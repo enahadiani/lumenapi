@@ -31,5 +31,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('users', 'UserController@allUsers');
     
     //Pengajuan
-    $router->get('aju', 'UserController@pengajuan');
+    $router->get('aju', 'ApvController@pengajuan');
 });
