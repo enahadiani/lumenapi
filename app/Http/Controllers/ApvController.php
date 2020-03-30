@@ -40,7 +40,7 @@ class ApvController extends Controller
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = [];
+                $success['data'] = $aju;
                 $success['message'] = "Success!";
                 
                 return response()->json(['success'=>$success], $this->successStatus);     
