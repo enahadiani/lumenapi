@@ -23,10 +23,7 @@ class ApvController extends Controller
 
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
-            $aju = DB::select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from yk_pb_m a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
+            $aju = DB::select("select * from yk_pb_m a 
             where a.progress='1' and a.kode_lokasi='34' and a.modul in ('PBBAU','PBPR','PBINV') 					 
             ");
             $aju = json_decode(json_encode($aju),true);
