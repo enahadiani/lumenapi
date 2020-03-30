@@ -29,4 +29,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     // Matches "/api/users
     $router->get('users', 'UserController@allUsers');
+    
+    //Pengajuan
+    $router->get('aju', 'UserController@pengajuan');
 });
