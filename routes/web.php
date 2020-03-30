@@ -31,9 +31,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('users', 'UserController@allUsers');
     
     //Pengajuan
-    $router->get('aju', 'APV\ApvController@pengajuan');
-    $router->get('ajudet/{no_aju}', 'APV\ApvController@detail');
-    $router->get('ajurek/{no_bukti}', 'APV\ApvController@rekening');
-    $router->get('ajujurnal/{no_aju}', 'APV\ApvController@jurnal');
+    $router->get('aju', 'apv\ApvController@pengajuan');
+    $router->get('ajudet/{no_aju}', 'apv\ApvController@detail');
+    $router->get('ajurek/{no_bukti}', 'apv\ApvController@rekening');
+    $router->get('ajujurnal/{no_aju}', 'apv\ApvController@jurnal');
 
 });
