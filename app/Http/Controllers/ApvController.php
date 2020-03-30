@@ -37,7 +37,6 @@ class ApvController extends Controller
             					 
             ");
             $aju = json_decode(json_encode($aju),true);
-            $siswa = DevSiswa::all();
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
