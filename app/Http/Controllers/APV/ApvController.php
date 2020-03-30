@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\apv;
+namespace App\Http\Controllers\APV;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
