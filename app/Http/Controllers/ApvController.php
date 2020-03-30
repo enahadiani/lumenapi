@@ -46,7 +46,6 @@ class ApvController extends Controller
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
-            DB::rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
