@@ -36,4 +36,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('ajurek/{no_bukti}', 'apv\ApvController@rekening');
     $router->get('ajujurnal/{no_aju}', 'apv\ApvController@jurnal');
 
+    //Approval SM
+    
+    $router->get('appsm', 'apv\ApvController@appSM');
+
+
 });
