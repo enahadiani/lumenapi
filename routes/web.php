@@ -38,7 +38,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     //Approval SM
     
-    $router->get('appsm', 'apv\ApvController@appSM');
+    $router->post('appsm', 'apv\ApvController@appSM');
 
 
 });
