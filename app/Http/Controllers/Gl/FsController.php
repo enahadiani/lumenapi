@@ -81,6 +81,13 @@ class FsController extends Controller
         DB::beginTransaction();
         
         try {
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
             
             $ins = DB::insert('insert into fs (kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_fs'),$kode_lokasi,$request->input('nama'),$request->input('tgl_awal'),$request->input('tgl_akhir'),$request->input('flag_status'),date('Y-m-d'),$nik]);
             
