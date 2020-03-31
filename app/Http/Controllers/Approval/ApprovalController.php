@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\apv;
+namespace App\Http\Controllers\Approval;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class ApvController extends Controller
+class ApprovalController extends Controller
 {
     /**
      * Instantiate a new UserController instance.
@@ -25,9 +25,14 @@ class ApvController extends Controller
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
-            $data =  Auth::user();
-            $nik= $data->nik;
-            $kode_lokasi= $data->kode_lokasi;
+            
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
 
             $aju = DB::select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
             from yk_pb_m a 
@@ -68,9 +73,13 @@ class ApvController extends Controller
 
         try {
             
-            $data =  Auth::user();
-            $nik= $data->nik;
-            $kode_lokasi= $data->kode_lokasi;
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
 
             switch(substr($no_aju,3,2)){
                 case 'PB':		
@@ -116,9 +125,13 @@ class ApvController extends Controller
 
         try {
             
-            $data =  Auth::user();
-            $nik= $data->nik;
-            $kode_lokasi= $data->kode_lokasi;
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
 
             $rek = DB::select("select a.bank,a.cabang,a.no_rek,a.nama_rek,a.bruto,a.pajak
             from spm_rek a
@@ -150,9 +163,13 @@ class ApvController extends Controller
 
         try {
 
-            $data =  Auth::user();
-            $nik= $data->nik;
-            $kode_lokasi= $data->kode_lokasi;
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
 
             switch(substr($no_aju,3,2)){
                 case 'PB':		
@@ -205,12 +222,16 @@ class ApvController extends Controller
         }
     }
 
-    public function appSM(Request $request)
+    public function approvalSM(Request $request)
     {
         
-        $data =  Auth::user();
-        $nik= $data->nik;
-        $kode_lokasi= $data->kode_lokasi;
+        if($data =  Auth::user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }else{
+            $nik= '';
+            $kode_lokasi= '34';
+        }
 
         $this->validate($request, [
             'modul' => 'required',
