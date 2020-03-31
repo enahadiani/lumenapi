@@ -15,10 +15,10 @@ class ApprovalController extends Controller
      * @return void
      */
     public $successStatus = 200;
-    public function __construct()
-    {
-        $this->middleware();
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware();
+    // }
 
     public function pengajuan(){
 
