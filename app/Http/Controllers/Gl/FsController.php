@@ -185,7 +185,7 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
             
-            $del = DB::delete('delete from fs where kode_lokasi ="'.$kode_lokasi.'" and kode_fs="'.$kode_fs.'"  ');
+            $del = DB::table('fs')->where('kode_lokasi', $kode_lokasi)->where('kode_fs', $kode_fs)->delete();
 
             $ins = DB::insert('insert into fs (kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?)', [$kode_fs,$kode_lokasi,$request->input('nama'),$request->input('tgl_awal'),$request->input('tgl_akhir'),$request->input('flag_status'),date('Y-m-d'),$nik]);
             
