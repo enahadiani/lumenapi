@@ -22,7 +22,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 });
 
-$router->group(['middleware' => 'auth'], function () use ($router) {
+$router->group(['middleware' => 'cors'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
