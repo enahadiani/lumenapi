@@ -17,7 +17,7 @@ class ApprovalController extends Controller
     public $successStatus = 200;
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware();
     }
 
     public function pengajuan(){
