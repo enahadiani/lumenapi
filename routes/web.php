@@ -31,14 +31,14 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('users', 'UserController@allUsers');
     
     //Pengajuan
-    $router->get('aju', 'apv\ApvController@pengajuan');
-    $router->get('ajudet/{no_aju}', 'apv\ApvController@detail');
-    $router->get('ajurek/{no_bukti}', 'apv\ApvController@rekening');
-    $router->get('ajujurnal/{no_aju}', 'apv\ApvController@jurnal');
+    $router->get('aju', 'Approval\ApprovalController@pengajuan');
+    $router->get('ajudet/{no_aju}', 'Approval\ApprovalController@detail');
+    $router->get('ajurek/{no_bukti}', 'Approval\ApprovalController@rekening');
+    $router->get('ajujurnal/{no_aju}', 'Approval\ApprovalController@jurnal');
 
     //Approval SM
     
-    $router->post('appsm', 'apv\ApvController@appSM');
+    $router->post('appsm', 'Approval\ApprovalController@approvalSM');
 
 
 });
