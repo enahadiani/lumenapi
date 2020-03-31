@@ -159,7 +159,6 @@ class FsController extends Controller
     public function update(Request $request, $kode_fs)
     {
         $this->validate($request, [
-            'kode_fs' => 'required',
             'nama' => 'required',
             'tgl_awal' => 'required',
             'tgl_akhir' => 'required',
