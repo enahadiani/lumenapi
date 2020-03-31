@@ -39,10 +39,22 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     $router->get('ajurek/{no_bukti}', 'Approval\ApprovalController@rekening');
     $router->get('ajujurnal/{no_aju}', 'Approval\ApprovalController@jurnal');
 
-    //Approval SM
+    //Approval 
     
     $router->post('appsm', 'Approval\ApprovalController@approvalSM');
     $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
     $router->post('appdir', 'Approval\ApprovalController@approvalDir');
+
+    //Menu
+    
+    $router->get('menu/{kode_klp}', 'Gl\MenuController@show');
+
+    //FS
+    
+    $router->get('fs','FsController@index');
+    $router->get('fs/{id}','FsController@show');
+    $router->post('fs','FsController@store');
+    $router->put('fs/{id}','FsController@update');
+    $router->delete('fs/{id}','FsController@destroy');
 
 });
