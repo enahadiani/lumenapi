@@ -80,10 +80,8 @@ $app->configure('app');
 $app->routeMiddleware([
     // 'auth' => App\Http\Middleware\Authenticate::class,
     'auth' => App\Http\Middleware\CorsMiddleware::class,
-    'cors' => Fruitcake\Cors\HandleCors::class,
 ]);
 
-$app->configure('cors');
 
 /*
 |--------------------------------------------------------------------------
@@ -101,7 +99,6 @@ $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
-$app->register(Fruitcake\Cors\CorsServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
