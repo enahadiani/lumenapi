@@ -221,7 +221,7 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
             
-            $del = DB::delete('delete from fs where kode_lokasi ="'.$kode_lokasi.'" and kode_fs="'.$kode_fs.'"  ');
+            $del = DB::table('fs')->where('kode_lokasi', $kode_lokasi)->where('kode_fs', $kode_fs)->delete();
 
             DB::commit();
             $success['status'] = true;
