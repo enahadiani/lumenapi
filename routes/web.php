@@ -20,6 +20,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
 
+});
+
+$router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
@@ -39,6 +42,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     //Approval SM
     
     $router->post('appsm', 'Approval\ApprovalController@approvalSM');
-
 
 });
