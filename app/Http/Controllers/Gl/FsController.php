@@ -168,6 +168,13 @@ class FsController extends Controller
         DB::beginTransaction();
         
         try {
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
             
             $del = DB::delete('delete from fs where kode_lokasi ="'.$kode_lokasi.'" and kode_fs="'.$kode_fs.'"  ');
 
@@ -197,6 +204,13 @@ class FsController extends Controller
         DB::beginTransaction();
         
         try {
+            if($data =  Auth::user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
             
             $del = DB::delete('delete from fs where kode_lokasi ="'.$kode_lokasi.'" and kode_fs="'.$kode_fs.'"  ');
 
