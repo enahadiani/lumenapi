@@ -15,14 +15,14 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['prefix' => 'api'], function () use ($router) {
+$router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($router) {
     // $router->post('register', 'AuthController@register');
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
 
 });
 
-$router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($router) {
+$router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
