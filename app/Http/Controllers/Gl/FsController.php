@@ -124,8 +124,10 @@ class FsController extends Controller
                 $nik= '';
                 $kode_lokasi= '34';
             }
-            $fs = Fs::where('kode_fs',$kode_fs)
-                    ->where('kode_lokasi',$kode_lokasi)->get();
+
+            $fs = DB::select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs where kode_lokasi='$kode_lokasi' and kode_fs='$kode_fs'				 
+            ");
+            $fs = json_decode(json_encode($fs),true);
             
             if(count($fs) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
