@@ -242,9 +242,9 @@ class ApprovalController extends Controller
 
         if ($request->input('status') == "RETURN") {
             $vStatus = "S";
-        } else {
+        } else if ($request->input('status') == "APPROVE") {
             $vStatus = "1";	
-        }	
+        }
         
         $str_format="0000";
         $periode=date('Y').date('m');
@@ -265,42 +265,48 @@ class ApprovalController extends Controller
         try {
             if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR" ||$request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" || $request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG" ) {
 
-                DB::table('spm_app_m')
-                    ->where('no_bukti', $request->input('no_aju'))
-                    ->where('no_flag', '-')
-                    ->where('form', 'APPSM')
-                    ->where('modul', $request->input('modul'))            
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_flag' => $no_bukti]);
-    
-                $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPSM',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
-    
-                //---------------- flag bukti									
-                if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
-                    DB::table('yk_pb_m')
-                    ->where('no_pb', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
+                if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
+
+                    DB::table('spm_app_m')
+                        ->where('no_bukti', $request->input('no_aju'))
+                        ->where('no_flag', '-')
+                        ->where('form', 'APPSM')
+                        ->where('modul', $request->input('modul'))            
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_flag' => $no_bukti]);
+        
+                    $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPSM',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
+        
+                    //---------------- flag bukti									
+                    if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
+                        DB::table('yk_pb_m')
+                        ->where('no_pb', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
+                    }
+                                                                                                                    
+                    if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
+                        DB::table('panjar2_m')
+                        ->where('no_panjar', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
+                    }
+                                                                                
+                    if ($request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG"){
+                        DB::table('panjarptg2_m')
+                        ->where('no_ptg', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
+                    } 
+                
+                    DB::commit();
+                    $success['status'] = true;
+                    $success['id'] = $no_bukti;
+                    $success['message'] = "Data approval berhasil disimpan";
+                }else{
+                    $success['status'] = false;
+                    $success['message'] = "Data status tidak valid";
                 }
-                                                                                                                
-                if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
-                    DB::table('panjar2_m')
-                    ->where('no_panjar', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
-                }
-                                                                               
-                if ($request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG"){
-                    DB::table('panjarptg2_m')
-                    ->where('no_ptg', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
-                } 
-              
-                DB::commit();
-                $success['status'] = true;
-                $success['id'] = $no_bukti;
-                $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['message'] = "Data modul tidak valid";
@@ -357,42 +363,48 @@ class ApprovalController extends Controller
         try {
             if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR" ||$request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" || $request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG" ) {
 
-                DB::table('spm_app_m')
-                    ->where('no_bukti', $request->input('no_aju'))
-                    ->where('no_flag', '-')
-                    ->where('form', 'APPFIN')
-                    ->where('modul', $request->input('modul'))            
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_flag' => $no_bukti]);
-    
-                $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPFIN',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
-    
-                //---------------- flag bukti									
-                if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
-                    DB::table('yk_pb_m')
-                    ->where('no_pb', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
+                if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
+
+                    DB::table('spm_app_m')
+                        ->where('no_bukti', $request->input('no_aju'))
+                        ->where('no_flag', '-')
+                        ->where('form', 'APPFIN')
+                        ->where('modul', $request->input('modul'))            
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_flag' => $no_bukti]);
+        
+                    $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPFIN',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
+        
+                    //---------------- flag bukti									
+                    if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
+                        DB::table('yk_pb_m')
+                        ->where('no_pb', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
+                    }
+                                                                                                                    
+                    if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
+                        DB::table('panjar2_m')
+                        ->where('no_panjar', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
+                    }
+                                                                                
+                    if ($request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG"){
+                        DB::table('panjarptg2_m')
+                        ->where('no_ptg', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
+                    } 
+                
+                    DB::commit();
+                    $success['status'] = true;
+                    $success['id'] = $no_bukti;
+                    $success['message'] = "Data approval berhasil disimpan";
+                }else{
+                    $success['status'] = false;
+                    $success['message'] = "Data status tidak valid";
                 }
-                                                                                                                
-                if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
-                    DB::table('panjar2_m')
-                    ->where('no_panjar', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
-                }
-                                                                               
-                if ($request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG"){
-                    DB::table('panjarptg2_m')
-                    ->where('no_ptg', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
-                } 
-              
-                DB::commit();
-                $success['status'] = true;
-                $success['id'] = $no_bukti;
-                $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['message'] = "Data modul tidak valid";
@@ -448,37 +460,42 @@ class ApprovalController extends Controller
         
         try {
             if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR" ||$request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" || $request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG" ) {
+                if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
 
-                DB::table('spm_app_m')
-                    ->where('no_bukti', $request->input('no_aju'))
-                    ->where('no_flag', '-')
-                    ->where('form', 'APPDIR')
-                    ->where('modul', $request->input('modul'))            
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_flag' => $no_bukti]);
-    
-                $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPDIR',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
-    
-                //---------------- flag bukti									
-                if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
-                    DB::table('yk_pb_m')
-                    ->where('no_pb', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app4' => $no_bukti,'progress'=>$vStatus]);
+                    DB::table('spm_app_m')
+                        ->where('no_bukti', $request->input('no_aju'))
+                        ->where('no_flag', '-')
+                        ->where('form', 'APPDIR')
+                        ->where('modul', $request->input('modul'))            
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_flag' => $no_bukti]);
+        
+                    $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPDIR',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
+        
+                    //---------------- flag bukti									
+                    if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
+                        DB::table('yk_pb_m')
+                        ->where('no_pb', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app4' => $no_bukti,'progress'=>$vStatus]);
+                    }
+                                                                                                                    
+                    if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
+                        DB::table('panjar2_m')
+                        ->where('no_panjar', $request->input('no_aju'))        
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->update(['no_app4' => $no_bukti,'progress'=>$vStatus]);
+                    }
+                                                            
+                
+                    DB::commit();
+                    $success['status'] = true;
+                    $success['id'] = $no_bukti;
+                    $success['message'] = "Data approval berhasil disimpan";
+                }else{
+                    $success['status'] = false;
+                    $success['message'] = "Data status tidak valid";
                 }
-                                                                                                                
-                if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
-                    DB::table('panjar2_m')
-                    ->where('no_panjar', $request->input('no_aju'))        
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['no_app4' => $no_bukti,'progress'=>$vStatus]);
-                }
-                                                        
-              
-                DB::commit();
-                $success['status'] = true;
-                $success['id'] = $no_bukti;
-                $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['message'] = "Data modul tidak valid";
