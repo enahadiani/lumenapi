@@ -15,7 +15,7 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($router) {
+$router->group(['prefix' => 'api'], function () use ($router) {
     // $router->post('register', 'AuthController@register');
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
