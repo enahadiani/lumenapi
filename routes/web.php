@@ -51,10 +51,10 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
 
     //FS
     
-    $router->get('fs','FsController@index');
-    $router->get('fs/{id}','FsController@show');
-    $router->post('fs','FsController@store');
-    $router->put('fs/{id}','FsController@update');
-    $router->delete('fs/{id}','FsController@destroy');
+    $router->get('fs','Gl\FsController@index');
+    $router->get('fs/{id}','Gl\FsController@show');
+    $router->post('fs','Gl\FsController@store');
+    $router->put('fs/{id}','Gl\FsController@update');
+    $router->delete('fs/{id}','Gl\FsController@destroy');
 
 });
