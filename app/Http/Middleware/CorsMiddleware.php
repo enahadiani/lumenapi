@@ -50,7 +50,7 @@
 
             if ($this->auth->guard($guard)->guest()) {
                     
-                return response()->json('{"message":"Unauthorized."}', 401);
+                return response()->json(['message'=>'Unauthorized'], 401);
             }
 
             $response = $next($request);
