@@ -43,5 +43,6 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     
     $router->post('appsm', 'Approval\ApprovalController@approvalSM');
     $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
+    $router->post('appdir', 'Approval\ApprovalController@approvalDir');
 
 });
