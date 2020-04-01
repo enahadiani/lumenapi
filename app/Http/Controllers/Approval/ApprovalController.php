@@ -102,6 +102,9 @@ class ApprovalController extends Controller
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($aju);$i++){
+                    $aju[$i]["nilai"] = number_format($aju[$i]["nilai"],0,",","."); 
+                }
                 $success['status'] = true;
                 $success['data'] = $aju;
                 $success['message'] = "Success!";
@@ -151,6 +154,9 @@ class ApprovalController extends Controller
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($aju);$i++){
+                    $aju[$i]["nilai"] = number_format($aju[$i]["nilai"],0,",","."); 
+                }
                 $success['status'] = true;
                 $success['data'] = $aju;
                 $success['message'] = "Success!";
@@ -226,6 +232,9 @@ class ApprovalController extends Controller
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($aju);$i++){
+                    $aju[$i]["nilai"] = number_format($aju[$i]["nilai"],0,",","."); 
+                }
                 $success['status'] = true;
                 $success['data'] = $aju;
                 $success['message'] = "Success!";
@@ -278,6 +287,9 @@ class ApprovalController extends Controller
             $det = json_decode(json_encode($det),true);
             
             if(count($det) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($det);$i++){
+                    $det[$i]["nilai"] = number_format($det[$i]["nilai"],0,",","."); 
+                }
                 $success['status'] = true;
                 $success['data'] = $det;
                 $success['message'] = "Success!";
@@ -316,6 +328,10 @@ class ApprovalController extends Controller
             $rek = json_decode(json_encode($rek),true);
             
             if(count($rek) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($rek);$i++){
+                    $rek[$i]["bruto"] = number_format($rek[$i]["bruto"],0,",","."); 
+                    $rek[$i]["pajak"] = number_format($rek[$i]["pajak"],0,",","."); 
+                }
                 $success['status'] = true;
                 $success['data'] = $rek;
                 $success['message'] = "Success!";
@@ -379,6 +395,10 @@ class ApprovalController extends Controller
             $jur = json_decode(json_encode($jur),true);
             
             if(count($jur) > 0){ //mengecek apakah data kosong atau tidak
+                
+                for($i=0;$i<count($jur);$i++){
+                    $jur[$i]["nilai"] = number_format($jur[$i]["nilai"],0,",","."); 
+                }
                 $success['status'] = true;
                 $success['data'] = $jur;
                 $success['message'] = "Success!";
