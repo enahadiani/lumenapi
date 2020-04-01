@@ -181,14 +181,14 @@ class ApprovalController extends Controller
 
             switch(substr($no_aju,3,2)){
                 case 'PB':		
-                    $sql = "select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+                    $sql = "select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,FORMAT(a.nilai, '#,#') as nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
                     from yk_pb_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
                     where a.progress='1' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.no_pb='$no_aju' ";
                 break;
                 case 'PP' : 
-                    $sql ="select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+                    $sql ="select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,FORMAT(a.nilai, '#,#') as nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
                     from panjar2_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -231,7 +231,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $rek = DB::select("select a.bank,a.cabang,a.no_rek,a.nama_rek,a.bruto,a.pajak
+            $rek = DB::select("select a.bank,a.cabang,a.no_rek,a.nama_rek,FORMAT(a.bruto, '#,#') as bruto,FORMAT(a.pajak, '#,#') as pajak
             from spm_rek a
             where a.no_bukti ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
             ");
@@ -271,7 +271,7 @@ class ApprovalController extends Controller
 
             switch(substr($no_aju,3,2)){
                 case 'PB':		
-                    $sql = "select b.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,d.kode_proyek,
+                    $sql = "select b.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,FORMAT(a.nilai, '#,#') as nilai,a.kode_pp,c.nama as nama_pp,d.kode_proyek,
                     isnull(e.nama,'-') as nama_proyek 
                     from yk_pb_j a 
                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
@@ -282,14 +282,14 @@ class ApprovalController extends Controller
                     ";
                 break;
                 case 'PP' : 
-                    $sql ="select b.kode_akun,b.nama as nama_akun,'D' as dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,'-' as kode_proyek,'-' as nama_proyek 
+                    $sql ="select b.kode_akun,b.nama as nama_akun,'D' as dc,a.keterangan,FORMAT(a.nilai, '#,#') as nilai,a.kode_pp,c.nama as nama_pp,'-' as kode_proyek,'-' as nama_proyek 
                     from panjar2_m a 
                     inner join masakun b on a.akun_panjar=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                     inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 								
                     where a.no_panjar = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
                 break;
                 default :
-                    $sql="select b.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,'-' as kode_proyek,'-' as nama_proyek 
+                    $sql="select b.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,FORMAT(a.nilai, '#,#') as nilai,a.kode_pp,c.nama as nama_pp,'-' as kode_proyek,'-' as nama_proyek 
                     from panjarptg2_j a 
                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                     inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 								
