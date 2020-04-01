@@ -37,6 +37,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
     $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
     $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
+    $router->get('ajuhistory', 'Approval\ApprovalController@pengajuanhistory');
 
     $router->get('ajudet/{no_aju}', 'Approval\ApprovalController@detail');
     $router->get('ajurek/{no_aju}', 'Approval\ApprovalController@rekening');
