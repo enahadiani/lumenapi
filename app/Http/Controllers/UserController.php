@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; 
 use  App\User;
 
 class UserController extends Controller
@@ -26,7 +27,38 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return response()->json(['user' => Auth::user()], 200);
+        if($data =  Auth::user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+
+            $user = DB::select("select a.kode_klp_menu, a.nik, a.nama, a.pass, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo
+            from hakakses a 
+            inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
+            left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
+            left join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi 
+            left join m_form e on a.path_view=e.kode_form 
+            where a.nik= '$nik' 
+            ");
+            $user = json_decode(json_encode($user),true);
+            
+            if(count($user) > 0){ //mengecek apakah data kosong atau tidak
+                $periode = DB::select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                ");
+                $periode = json_decode(json_encode($periode),true);
+
+                $fs = DB::select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                ");
+                $fs = json_decode(json_encode($fs),true);
+
+                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs], 200);
+            }
+            else{
+                return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+            }
+        }else{
+            return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+        }
     }
 
     /**
