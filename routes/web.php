@@ -36,6 +36,22 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     
     // Matches "/api/cekPayload
     $router->get('cekPayload', 'UserController@cekPayload');
+});
+
+$router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () use ($router) {
+    // Matches "/api/profile
+    $router->get('profile', 'UserController@profile');
+
+    // Matches "/api/users/1 
+    //get one user by id
+    $router->get('users/{id}', 'UserController@singleUser');
+
+    // Matches "/api/users
+    $router->get('users', 'UserController@allUsers');
+
+    
+    // Matches "/api/cekPayload
+    $router->get('cekPayload', 'UserController@cekPayload');
     
     //Pengajuan
     $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
@@ -53,6 +69,10 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
     $router->post('appdir', 'Approval\ApprovalController@approvalDir');
 
+
+});
+
+$router->group(['middleware' => 'auth','prefix' => 'api/gl'], function () use ($router) {
     //Menu
     
     $router->get('menu/{kode_klp}', 'Gl\MenuController@show');
@@ -64,5 +84,4 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     $router->post('fs','Gl\FsController@store');
     $router->put('fs/{id}','Gl\FsController@update');
     $router->delete('fs/{id}','Gl\FsController@destroy');
-
 });
