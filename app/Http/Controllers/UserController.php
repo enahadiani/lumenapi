@@ -31,7 +31,7 @@ class UserController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::select("select a.kode_klp_menu, a.nik, a.nama, a.pass, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
 			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
