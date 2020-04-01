@@ -89,4 +89,10 @@ class UserController extends Controller
         }
 
     }
+
+    public function cekPayload(){
+        $payload = Auth::payload();
+        // $payload->toArray();
+        return response()->json(['payload' => $payload], 200);
+    }
 }
