@@ -34,9 +34,12 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     $router->get('users', 'UserController@allUsers');
     
     //Pengajuan
-    $router->get('aju', 'Approval\ApprovalController@pengajuan');
+    $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
+    $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
+    $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
+
     $router->get('ajudet/{no_aju}', 'Approval\ApprovalController@detail');
-    $router->get('ajurek/{no_bukti}', 'Approval\ApprovalController@rekening');
+    $router->get('ajurek/{no_aju}', 'Approval\ApprovalController@rekening');
     $router->get('ajujurnal/{no_aju}', 'Approval\ApprovalController@jurnal');
 
     //Approval 
