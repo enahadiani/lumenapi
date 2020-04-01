@@ -94,13 +94,12 @@ class FsController extends Controller
             DB::commit();
             $success['status'] = true;
             $success['message'] = "Data Fs berhasil disimpan";
-            
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::rollback();
             $success['status'] = false;
             $success['message'] = "Data Fs gagal disimpan ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
         
@@ -133,12 +132,12 @@ class FsController extends Controller
                 $success['status'] = true;
                 $success['data'] = $fs;
                 $success['message'] = "Success!";
-                return response()->json($success, $this->successStatus);     
+                return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['status'] = false;
-                return response()->json($success, $this->successStatus);
+                return response()->json(['success'=>$success], $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -192,13 +191,12 @@ class FsController extends Controller
             DB::commit();
             $success['status'] = true;
             $success['message'] = "Data Fs berhasil diubah";
-            
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::rollback();
             $success['status'] = false;
             $success['message'] = "Data Fs gagal diubah ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
 
@@ -227,12 +225,13 @@ class FsController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Fs berhasil dihapus";
             
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::rollback();
             $success['status'] = false;
             $success['message'] = "Data Fs gagal dihapus ".$e;
-            return response()->json($success, $this->successStatus);
+            
+            return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
 
