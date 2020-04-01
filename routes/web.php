@@ -19,6 +19,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // $router->post('register', 'AuthController@register');
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
+    $router->post('call', 'ProxyController@callService');
 
 });
 
@@ -32,7 +33,6 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
 
     // Matches "/api/users
     $router->get('users', 'UserController@allUsers');
-
     
     // Matches "/api/cekPayload
     $router->get('cekPayload', 'UserController@cekPayload');
