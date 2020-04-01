@@ -32,6 +32,10 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
 
     // Matches "/api/users
     $router->get('users', 'UserController@allUsers');
+
+    
+    // Matches "/api/cekPayload
+    $router->get('cekPayload', 'UserController@cekPayload');
     
     //Pengajuan
     $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
