@@ -1,4 +1,5 @@
 <?php
+namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 /*
@@ -60,7 +61,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
-                    App::call('App\Http\Controllers\Approval\ApprovalController@pengajuan');
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuan();
                 break;
                 case 'APPFIN' :
                     $result = Approval::pengajuanfinal();
