@@ -53,10 +53,25 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
     // Matches "/api/cekPayload
     $router->get('cekPayload', 'UserController@cekPayload');
     
-    //Pengajuan
-    $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
-    $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
-    $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
+    $router->get('aju', function () {
+        if($data =  Auth::user()){
+            $nik= $data->nik;
+            //Pengajuan
+            $sql = DB::select("select menu_mobile from hakakses where nik='$nik' ");
+            $row = json_decode(json_encode($sql),true);
+            switch($row[0]["menu_mobile"]){
+                case 'APPSM' :
+                    $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
+                break;
+                case 'APPFIN' :
+                    $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
+                break;
+                case 'APPDIR' :
+                    $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
+                break;
+            }
+        }
+    });
 
     $router->get('ajuhistory', 'Approval\ApprovalController@pengajuanhistory');
 
