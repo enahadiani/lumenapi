@@ -1,4 +1,7 @@
 <?php
+// namespace App;
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\DB; 
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -18,7 +21,12 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     // $router->post('register', 'AuthController@register');
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
+});
 
+$router->group(['prefix' => 'api2'], function () use ($router) {
+    // $router->post('register', 'AuthController@register');
+     // Matches "/api/login
+    $router->post('login', 'AuthController@login');
 });
 
 $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($router) {
