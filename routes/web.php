@@ -93,9 +93,36 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
 
     //Approval 
     
-    $router->post('appsm', 'Approval\ApprovalController@approvalSM');
-    $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
-    $router->post('appdir', 'Approval\ApprovalController@approvalDir');
+    // $router->post('appsm', 'Approval\ApprovalController@approvalSM');
+    // $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
+    // $router->post('appdir', 'Approval\ApprovalController@approvalDir');
+
+    $router->post('app', function () {
+        if($data =  Auth::user()){
+            $nik= $data->nik;
+            //Pengajuan
+            $sql = DB::select("select menu_mobile from hakakses where nik='$nik' ");
+            $row = json_decode(json_encode($sql),true);
+            switch($row[0]["menu_mobile"]){
+                case 'APPSM' :
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalSM();
+                break;
+                case 'APPFIN' :
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalFinal();
+                break;
+                case 'APPDIR' :
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalDir();
+                break;
+                default :
+                    $success['status'] = false;
+                    $success['message'] = "Akses menu tidak tersedia !";
+                    
+                    $result = response()->json(['success'=>$success], 200);    
+                break;
+            }
+            return $result;
+        }
+    });
 
 
 });
