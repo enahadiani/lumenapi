@@ -61,13 +61,13 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
-                    return Approval\ApprovalController::pengajuan();
+                    return ApprovalController::pengajuan();
                 break;
                 case 'APPFIN' :
-                    return Approval\ApprovalController::pengajuanfinal();
+                    return ApprovalController::pengajuanfinal();
                 break;
                 case 'APPDIR' :
-                    return Approval\ApprovalController::pengajuandir();
+                    return ApprovalController::pengajuandir();
                 break;
             }
             // return $row[0]["menu_mobile"];
