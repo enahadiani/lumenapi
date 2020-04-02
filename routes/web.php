@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; 
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -57,6 +59,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
     $router->get('ajusm', 'Approval\ApprovalController@pengajuan');
     $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
     $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
+
     $router->get('ajuhistory', 'Approval\ApprovalController@pengajuanhistory');
 
     $router->get('ajudet/{no_aju}', 'Approval\ApprovalController@detail');
