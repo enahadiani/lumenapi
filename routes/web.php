@@ -64,13 +64,13 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
                     $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuan();
                 break;
                 case 'APPFIN' :
-                    $result = Approval::pengajuanfinal();
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuanfinal();
                 break;
                 case 'APPDIR' :
-                    $result = Approval::pengajuandir();
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuandir();
                 break;
             }
-            return response()->json(['success'=>$result], 200);
+            return $result;
         }
     });
 
