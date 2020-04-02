@@ -69,15 +69,21 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
                 case 'APPDIR' :
                     $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuandir();
                 break;
+                default :
+                    $success['status'] = false;
+                    $success['message'] = "Akses menu tidak tersedia !";
+                    
+                    $result = response()->json(['success'=>$success], 200);    
+                break;
             }
             return $result;
         }
     });
 
     
-    $router->get('ajusm', 'Approval\ApprovalController@pengajuan'); 
-    $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
-    $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
+    // $router->get('ajusm', 'Approval\ApprovalController@pengajuan'); 
+    // $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
+    // $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
 
     $router->get('ajuhistory', 'Approval\ApprovalController@pengajuanhistory');
 
