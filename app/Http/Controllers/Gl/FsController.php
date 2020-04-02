@@ -29,7 +29,7 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $fs = DB::select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs where kode_lokasi='$kode_lokasi'				 
+            $fs = DB::connection('sqlsrv')->select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs			 
             ");
             $fs = json_decode(json_encode($fs),true);
             
@@ -78,7 +78,7 @@ class FsController extends Controller
             'flag_status' => 'required'
         ]);
 
-        DB::beginTransaction();
+        DB::connection('sqlsrv')->beginTransaction();
         
         try {
             if($data =  Auth::user()){
@@ -89,14 +89,14 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
             
-            $ins = DB::insert('insert into fs (kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_fs'),$kode_lokasi,$request->input('nama'),$request->input('tgl_awal'),$request->input('tgl_akhir'),$request->input('flag_status'),date('Y-m-d'),$nik]);
+            $ins = DB::connection('sqlsrv')->insert('insert into fs (kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_fs'),$kode_lokasi,$request->input('nama'),$request->input('tgl_awal'),$request->input('tgl_akhir'),$request->input('flag_status'),date('Y-m-d'),$nik]);
             
-            DB::commit();
+            DB::connection('sqlsrv')->commit();
             $success['status'] = true;
             $success['message'] = "Data Fs berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::rollback();
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Fs gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -124,7 +124,7 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $fs = DB::select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs where kode_lokasi='$kode_lokasi' and kode_fs='$kode_fs'				 
+            $fs = DB::connection('sqlsrv')->select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs where kode_lokasi='$kode_lokasi' and kode_fs='$kode_fs'				 
             ");
             $fs = json_decode(json_encode($fs),true);
             
@@ -173,7 +173,7 @@ class FsController extends Controller
             'flag_status' => 'required'
         ]);
 
-        DB::beginTransaction();
+        DB::connection('sqlsrv')->beginTransaction();
         
         try {
             if($data =  Auth::user()){
@@ -184,16 +184,16 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
             
-            $del = DB::table('fs')->where('kode_lokasi', $kode_lokasi)->where('kode_fs', $kode_fs)->delete();
+            $del = DB::connection('sqlsrv')->table('fs')->where('kode_lokasi', $kode_lokasi)->where('kode_fs', $kode_fs)->delete();
 
-            $ins = DB::insert('insert into fs (kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?)', [$kode_fs,$kode_lokasi,$request->input('nama'),$request->input('tgl_awal'),$request->input('tgl_akhir'),$request->input('flag_status'),date('Y-m-d'),$nik]);
+            $ins = DB::connection('sqlsrv')->insert('insert into fs (kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?)', [$kode_fs,$kode_lokasi,$request->input('nama'),$request->input('tgl_awal'),$request->input('tgl_akhir'),$request->input('flag_status'),date('Y-m-d'),$nik]);
             
-            DB::commit();
+            DB::connection('sqlsrv')->commit();
             $success['status'] = true;
             $success['message'] = "Data Fs berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::rollback();
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Fs gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -208,7 +208,7 @@ class FsController extends Controller
      */
     public function destroy($kode_fs)
     {
-        DB::beginTransaction();
+        DB::connection('sqlsrv')->beginTransaction();
         
         try {
             if($data =  Auth::user()){
@@ -219,15 +219,15 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
             
-            $del = DB::table('fs')->where('kode_lokasi', $kode_lokasi)->where('kode_fs', $kode_fs)->delete();
+            $del = DB::connection('sqlsrv')->table('fs')->where('kode_lokasi', $kode_lokasi)->where('kode_fs', $kode_fs)->delete();
 
-            DB::commit();
+            DB::connection('sqlsrv')->commit();
             $success['status'] = true;
             $success['message'] = "Data Fs berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::rollback();
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Fs gagal dihapus ".$e;
             

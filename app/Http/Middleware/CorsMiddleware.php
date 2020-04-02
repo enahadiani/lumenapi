@@ -33,7 +33,7 @@
         * @return mixed
         */
 
-        public function handle($request, Closure $next,  $guard = null)
+        public function handle($request, Closure $next)
         {
             $headers = [
                 'Access-Control-Allow-Origin'      => '*',
@@ -48,10 +48,10 @@
                return response()->json('{"method":"OPTIONS"}', 200, $headers);
             }
 
-            if ($this->auth->guard($guard)->guest()) {
+            // if ($this->auth->guard($guard)->guest()) {
                     
-                return response()->json(['message'=>'Unauthorized'], 401);
-            }
+            //     return response()->json(['message'=>'Unauthorized'], 401);
+            // }
 
             $response = $next($request);
             foreach($headers as $key => $value)

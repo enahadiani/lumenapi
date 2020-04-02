@@ -17,13 +17,33 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['prefix' => 'api'], function () use ($router) {
+$router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($router) {
     // $router->post('register', 'AuthController@register');
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
+    $router->get('db1', function () {
+        
+        $sql = DB::connection('sqlsrv')->select("select * from hakakses ");
+        $row = json_decode(json_encode($sql),true);
+        
+        $result = response()->json(['success'=>$row], 200);    
+        
+        return $result;
+        
+    });
+    $router->get('db2', function () {
+        
+        $sql = DB::connection('sqlsrv2')->select("select * from hakakses ");
+        $row = json_decode(json_encode($sql),true);
+        
+        $result = response()->json(['success'=>$row], 200);    
+        
+        return $result;
+        
+    });
 });
 
-$router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($router) {
+$router->group(['middleware' => ['auth','cors'],'prefix' => 'api'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
@@ -38,7 +58,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api'], function () use ($rou
     $router->get('cekPayload', 'UserController@cekPayload');
 });
 
-$router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () use ($router) {
+$router->group(['middleware' => ['auth','cors'],'prefix' => 'api/approval'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
@@ -57,7 +77,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
         if($data =  Auth::user()){
             $nik= $data->nik;
             //Pengajuan
-            $sql = DB::select("select menu_mobile from hakakses where nik='$nik' ");
+            $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
@@ -101,7 +121,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
         if($data =  Auth::user()){
             $nik= $data->nik;
             //Pengajuan
-            $sql = DB::select("select menu_mobile from hakakses where nik='$nik' ");
+            $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
@@ -127,7 +147,7 @@ $router->group(['middleware' => 'auth','prefix' => 'api/approval'], function () 
 
 });
 
-$router->group(['middleware' => 'auth','prefix' => 'api/gl'], function () use ($router) {
+$router->group(['middleware' => ['auth','cors'],'prefix' => 'api/gl'], function () use ($router) {
     //Menu
     
     $router->get('menu/{kode_klp}', 'Gl\MenuController@show');

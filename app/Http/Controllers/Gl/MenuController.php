@@ -54,7 +54,7 @@ class MenuController extends Controller
     {
         try {
 
-            $menu = DB::select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' and (isnull(a.jenis_menu,'-') = '-' OR a.jenis_menu = '') order by kode_klp, rowindex ");
+            $menu = DB::connection('sqlsrv')->select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' and (isnull(a.jenis_menu,'-') = '-' OR a.jenis_menu = '') order by kode_klp, rowindex ");
             $menu = json_decode(json_encode($menu),true);
             
             if(count($menu) > 0){ //mengecek apakah data kosong atau tidak

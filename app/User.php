@@ -13,7 +13,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable;
-
+    protected $connection = 'sqlsrv';
     protected $table = 'hakakses';
 
     protected $primaryKey = 'nik';

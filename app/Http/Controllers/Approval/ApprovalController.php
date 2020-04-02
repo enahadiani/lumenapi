@@ -34,7 +34,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $aju = DB::select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            $aju = DB::connection('sqlsrv')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
             from yk_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -86,7 +86,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $aju = DB::select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            $aju = DB::connection('sqlsrv')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
             from yk_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -138,7 +138,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $aju = DB::select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            $aju = DB::connection('sqlsrv')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
             from yk_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -190,7 +190,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $aju = DB::select("select a.no_pb,a.kode_lokasi,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.posted,a.nilai,
+            $aju = DB::connection('sqlsrv')->select("select a.no_pb,a.kode_lokasi,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.posted,a.nilai,
             case a.progress 
             when '0' then 'Pengajuan'
             when '1' then 'App GM/SM'
@@ -283,7 +283,7 @@ class ApprovalController extends Controller
                 break;
             }
 
-            $det = DB::select($sql);
+            $det = DB::connection('sqlsrv')->select($sql);
             $det = json_decode(json_encode($det),true);
             
             if(count($det) > 0){ //mengecek apakah data kosong atau tidak
@@ -321,7 +321,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $rek = DB::select("select a.bank,a.cabang,a.no_rek,a.nama_rek,a.bruto,a.pajak
+            $rek = DB::connection('sqlsrv')->select("select a.bank,a.cabang,a.no_rek,a.nama_rek,a.bruto,a.pajak
             from spm_rek a
             where a.no_bukti ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
             ");
@@ -391,7 +391,7 @@ class ApprovalController extends Controller
                 break;
             }
 
-            $jur = DB::select($sql);
+            $jur = DB::connection('sqlsrv')->select($sql);
             $jur = json_decode(json_encode($jur),true);
             
             if(count($jur) > 0){ //mengecek apakah data kosong atau tidak
@@ -450,20 +450,20 @@ class ApprovalController extends Controller
         $per=date('y').date('m');
         $prefix=$kode_lokasi."-AGM".$per.".";		
         
-        $query = DB::select("select right(isnull(max(no_app),'".$prefix."0000'),".strlen($str_format).")+1 as id from spm_app_m where no_app like '$prefix%'");
+        $query = DB::connection('sqlsrv')->select("select right(isnull(max(no_app),'".$prefix."0000'),".strlen($str_format).")+1 as id from spm_app_m where no_app like '$prefix%'");
         
         $query = json_decode(json_encode($query),true);
 
         $no_bukti = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
 
-        DB::beginTransaction();
+        DB::connection('sqlsrv')->beginTransaction();
         
         try {
             if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR" ||$request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" || $request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG" ) {
 
                 if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
 
-                    DB::table('spm_app_m')
+                    DB::connection('sqlsrv')->table('spm_app_m')
                         ->where('no_bukti', $request->input('no_aju'))
                         ->where('no_flag', '-')
                         ->where('form', 'APPSM')
@@ -471,31 +471,31 @@ class ApprovalController extends Controller
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_flag' => $no_bukti]);
         
-                    $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPSM',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
+                    $ins = DB::connection('sqlsrv')->insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPSM',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
         
                     //---------------- flag bukti									
                     if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
-                        DB::table('yk_pb_m')
+                        DB::connection('sqlsrv')->table('yk_pb_m')
                         ->where('no_pb', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
                     }
                                                                                                                     
                     if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
-                        DB::table('panjar2_m')
+                        DB::connection('sqlsrv')->table('panjar2_m')
                         ->where('no_panjar', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
                     }
                                                                                 
                     if ($request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG"){
-                        DB::table('panjarptg2_m')
+                        DB::connection('sqlsrv')->table('panjarptg2_m')
                         ->where('no_ptg', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app2' => $no_bukti,'progress'=>$vStatus]);
                     } 
                 
-                    DB::commit();
+                    DB::connection('sqlsrv')->commit();
                     $success['status'] = true;
                     $success['id'] = $no_bukti;
                     $success['message'] = "Data approval berhasil disimpan";
@@ -509,7 +509,7 @@ class ApprovalController extends Controller
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            DB::rollback();
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Data approval gagal disimpan ".$e;
             return response()->json($success, $this->successStatus);
@@ -548,20 +548,20 @@ class ApprovalController extends Controller
         $per=date('y').date('m');
         $prefix=$kode_lokasi."-AFI".$per.".";		
         
-        $query = DB::select("select right(isnull(max(no_app),'".$prefix."0000'),".strlen($str_format).")+1 as id from spm_app_m where no_app like '$prefix%'");
+        $query = DB::connection('sqlsrv')->select("select right(isnull(max(no_app),'".$prefix."0000'),".strlen($str_format).")+1 as id from spm_app_m where no_app like '$prefix%'");
         
         $query = json_decode(json_encode($query),true);
 
         $no_bukti = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
 
-        DB::beginTransaction();
+        DB::connection('sqlsrv')->beginTransaction();
         
         try {
             if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR" ||$request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" || $request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG" ) {
 
                 if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
 
-                    DB::table('spm_app_m')
+                    DB::connection('sqlsrv')->table('spm_app_m')
                         ->where('no_bukti', $request->input('no_aju'))
                         ->where('no_flag', '-')
                         ->where('form', 'APPFIN')
@@ -569,31 +569,31 @@ class ApprovalController extends Controller
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_flag' => $no_bukti]);
         
-                    $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPFIN',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
+                    $ins = DB::connection('sqlsrv')->insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPFIN',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
         
                     //---------------- flag bukti									
                     if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
-                        DB::table('yk_pb_m')
+                        DB::connection('sqlsrv')->table('yk_pb_m')
                         ->where('no_pb', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
                     }
                                                                                                                     
                     if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
-                        DB::table('panjar2_m')
+                        DB::connection('sqlsrv')->table('panjar2_m')
                         ->where('no_panjar', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
                     }
                                                                                 
                     if ($request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG"){
-                        DB::table('panjarptg2_m')
+                        DB::connection('sqlsrv')->table('panjarptg2_m')
                         ->where('no_ptg', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app3' => $no_bukti,'progress'=>$vStatus]);
                     } 
                 
-                    DB::commit();
+                    DB::connection('sqlsrv')->commit();
                     $success['status'] = true;
                     $success['id'] = $no_bukti;
                     $success['message'] = "Data approval berhasil disimpan";
@@ -607,7 +607,7 @@ class ApprovalController extends Controller
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            DB::rollback();
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Data approval gagal disimpan ".$e;
             return response()->json($success, $this->successStatus);
@@ -646,19 +646,19 @@ class ApprovalController extends Controller
         $per=date('y').date('m');
         $prefix=$kode_lokasi."-ADI".$per.".";		
         
-        $query = DB::select("select right(isnull(max(no_app),'".$prefix."0000'),".strlen($str_format).")+1 as id from spm_app_m where no_app like '$prefix%'");
+        $query = DB::connection('sqlsrv')->select("select right(isnull(max(no_app),'".$prefix."0000'),".strlen($str_format).")+1 as id from spm_app_m where no_app like '$prefix%'");
         
         $query = json_decode(json_encode($query),true);
 
         $no_bukti = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
 
-        DB::beginTransaction();
+        DB::connection('sqlsrv')->beginTransaction();
         
         try {
             if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR" ||$request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" || $request->input('modul') == "PJPTG" || $request->input('modul') == "PRPTG" ) {
                 if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
 
-                    DB::table('spm_app_m')
+                    DB::connection('sqlsrv')->table('spm_app_m')
                         ->where('no_bukti', $request->input('no_aju'))
                         ->where('no_flag', '-')
                         ->where('form', 'APPDIR')
@@ -666,25 +666,25 @@ class ApprovalController extends Controller
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_flag' => $no_bukti]);
         
-                    $ins = DB::insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPDIR',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
+                    $ins = DB::connection('sqlsrv')->insert('insert into spm_app_m (no_app,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat)  values (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$request->input('modul'),'APPDIR',$request->input('no_aju'),$request->input('keterangan'),'-','X','X']);
         
                     //---------------- flag bukti									
                     if ($request->input('modul') == "PBBAU" || $request->input('modul') == "PBPR") {
-                        DB::table('yk_pb_m')
+                        DB::connection('sqlsrv')->table('yk_pb_m')
                         ->where('no_pb', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app4' => $no_bukti,'progress'=>$vStatus]);
                     }
                                                                                                                     
                     if ($request->input('modul') == "PJAJU" || $request->input('modul') == "PJPR" ) {
-                        DB::table('panjar2_m')
+                        DB::connection('sqlsrv')->table('panjar2_m')
                         ->where('no_panjar', $request->input('no_aju'))        
                         ->where('kode_lokasi', $kode_lokasi)
                         ->update(['no_app4' => $no_bukti,'progress'=>$vStatus]);
                     }
                                                             
                 
-                    DB::commit();
+                    DB::connection('sqlsrv')->commit();
                     $success['status'] = true;
                     $success['id'] = $no_bukti;
                     $success['message'] = "Data approval berhasil disimpan";
@@ -698,7 +698,7 @@ class ApprovalController extends Controller
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            DB::rollback();
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Data approval gagal disimpan ".$e;
             return response()->json($success, $this->successStatus);
