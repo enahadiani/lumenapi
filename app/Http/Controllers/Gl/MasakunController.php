@@ -338,4 +338,146 @@ class MasakunController extends Controller
         
     }
 
+    public function getFlagAkun()
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $modul = DB::connection('sqlsrv2')->select("select kode_flag, nama from flag_akun
+            ");
+            $modul = json_decode(json_encode($modul),true);
+            
+            if(count($modul) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $modul;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    
+    public function getNeraca($kode_fs)
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $res = DB::connection('sqlsrv2')->select("select kode_neraca, nama from neraca where kode_fs='".$kode_fs."' and tipe = 'posting' and kode_lokasi='".$kode_lokasi."'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+    
+    
+    public function getFSGar()
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $res = DB::connection('sqlsrv2')->select("select kode_fs, nama from fsgar where kode_lokasi='$kode_lokasi' ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    
+    public function getNeracaGar($kode_fs)
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $modul = DB::connection('sqlsrv2')->select("select kode_neraca, nama from neracagar where kode_fs='".$kode_fs."' and tipe = 'posting' and kode_lokasi='".$kode_lokasi."'
+            ");
+            $modul = json_decode(json_encode($modul),true);
+            
+            if(count($modul) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $modul;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 }

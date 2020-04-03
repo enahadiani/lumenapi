@@ -171,4 +171,8 @@ $router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api/gl'], fun
     
     $router->get('currency','Gl\MasakunController@getCurrency');
     $router->get('modul','Gl\MasakunController@getModul');
+    $router->get('flag_akun','Gl\MasakunController@getFlagAkun');
+    $router->get('neraca/{kode_fs}','Gl\MasakunController@getNeraca');
+    $router->get('fsgar','Gl\MasakunController@getFSGar');
+    $router->get('neracagar/{kode_fs}','Gl\MasakunController@getNeracaGar');
 });
