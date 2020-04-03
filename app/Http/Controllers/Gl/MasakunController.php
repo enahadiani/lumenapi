@@ -315,7 +315,7 @@ class MasakunController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $modul = DB::connection('sqlsrv2')->select("select kode_tipe,nama_tipe from tipe_neraca where kode_lokasi	 
+            $modul = DB::connection('sqlsrv2')->select("select kode_tipe,nama_tipe from tipe_neraca where kode_lokasi='$kode_lokasi'	 
             ");
             $modul = json_decode(json_encode($modul),true);
             
