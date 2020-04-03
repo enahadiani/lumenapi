@@ -46,7 +46,8 @@ $router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($rou
     });
 });
 
-$router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api'], function () use ($router) {
+
+$router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api/approval'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
@@ -59,25 +60,7 @@ $router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api'], functio
     
     // Matches "/api/cekPayload
     $router->get('cekPayload', 'UserController@cekPayload');
-});
 
-$router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api'], function () use ($router) {
-    // Matches "/api/profile
-    $router->get('profile', 'AdminController@profile');
-
-    // Matches "/api/users/1 
-    //get one user by id
-    $router->get('users/{id}', 'AdminController@singleUser');
-
-    // Matches "/api/users
-    $router->get('users', 'AdminController@allUsers');
-    
-    // Matches "/api/cekPayload
-    $router->get('cekPayload', 'AdminController@cekPayload');
-});
-
-$router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api/approval'], function () use ($router) {
-    
     $router->get('aju', function () {
         if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
@@ -153,6 +136,19 @@ $router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api/approval']
 });
 
 $router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api/gl'], function () use ($router) {
+     // Matches "/api/profile
+     $router->get('profile', 'AdminController@profile');
+
+     // Matches "/api/users/1 
+     //get one user by id
+     $router->get('users/{id}', 'AdminController@singleUser');
+ 
+     // Matches "/api/users
+     $router->get('users', 'AdminController@allUsers');
+     
+     // Matches "/api/cekPayload
+     $router->get('cekPayload', 'AdminController@cekPayload');
+    
     //Menu
     
     $router->get('menu/{kode_klp}', 'Gl\MenuController@show');
