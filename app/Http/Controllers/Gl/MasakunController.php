@@ -1,0 +1,244 @@
+<?php
+
+namespace App\Http\Controllers\Gl;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
+class MasakunController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public $successStatus = 200;
+
+    public function index()
+    {
+        try {
+            
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $akun = DB::connection('sqlsrv2')->select("select kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal from masakun where kode_lokasi='$kode_lokasi'		 
+            ");
+            $akun = json_decode(json_encode($akun),true);
+            
+            if(count($akun) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $akun;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'kode_akun' => 'required',
+            'nama' => 'required',
+            'modul' => 'required',
+            'jenis' => 'required',
+            'kode_curr' => 'required',
+            'block' => 'required',
+            'status_gar' => 'required',
+            'normal' => 'required'
+        ]);
+
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+            
+            $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_akun'),$kode_lokasi,$request->input('nama'),$request->input('jenis'),$request->input('kode_curr'),$request->input('block'),$request->input('status_gar'),$request->input('normal')]);
+            
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Master akun berhasil disimpan";
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Master akun gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function show($kode_akun)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $akun = DB::connection('sqlsrv2')->select("select kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal from masakun where kode_lokasi='$kode_lokasi' and kode_akun='$kode_akun'				 
+            ");
+            $akun = json_decode(json_encode($akun),true);
+            
+            if(count($akun) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $akun;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Fs $Fs)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $kode_fs)
+    {
+        $this->validate($request, [
+            'nama' => 'required',
+            'modul' => 'required',
+            'jenis' => 'required',
+            'kode_curr' => 'required',
+            'block' => 'required',
+            'status_gar' => 'required',
+            'normal' => 'required'
+        ]);
+
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+            
+            $del = DB::connection('sqlsrv2')->table('masakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+
+            $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_akun'),$kode_lokasi,$request->input('nama'),$request->input('jenis'),$request->input('kode_curr'),$request->input('block'),$request->input('status_gar'),$request->input('normal')]);
+            
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Master Akun berhasil diubah";
+            return response()->json(['success'=>$success], $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Master Akun gagal diubah ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($kode_akun)
+    {
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+            
+            $del = DB::connection('sqlsrv2')->table('masakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Masakun berhasil dihapus";
+            
+            return response()->json(['success'=>$success], $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Masakun gagal dihapus ".$e;
+            
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    }
+
+}

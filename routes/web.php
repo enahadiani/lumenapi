@@ -160,4 +160,12 @@ $router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api/gl'], fun
     $router->post('fs','Gl\FsController@store');
     $router->put('fs/{id}','Gl\FsController@update');
     $router->delete('fs/{id}','Gl\FsController@destroy');
+
+    //MASAKUN
+    
+    $router->get('masakun','Gl\MasakunController@index');
+    $router->get('masakun/{id}','Gl\MasakunController@show');
+    $router->post('masakun','Gl\MasakunController@store');
+    $router->put('masakun/{id}','Gl\MasakunController@update');
+    $router->delete('masakun/{id}','Gl\MasakunController@destroy');
 });
