@@ -29,7 +29,7 @@ class FsController extends Controller
                 $kode_lokasi= '34';
             }
 
-            $fs = DB::connection('sqlsrv2')->select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs			 
+            $fs = DB::connection('sqlsrv2')->select("select kode_fs,kode_lokasi,nama,tgl_awal,tgl_akhir,flag_status,tgl_input,nik_user from fs	where kode_lokasi='$kode_lokasi'		 
             ");
             $fs = json_decode(json_encode($fs),true);
             
