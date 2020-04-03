@@ -21,6 +21,9 @@ $router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($rou
     // $router->post('register', 'AuthController@register');
      // Matches "/api/login
     $router->post('login', 'AuthController@login');
+    $router->post('loginAdmin', 'AuthController@loginAdmin');
+    $router->get('hashPass', 'AuthController@hashPassword');
+    $router->get('hashPassAdmin', 'AuthController@hashPasswordAdmin');
     $router->get('db1', function () {
         
         $sql = DB::connection('sqlsrv')->select("select * from hakakses ");
@@ -43,7 +46,7 @@ $router->group(['middleware' => 'cors','prefix' => 'api'], function () use ($rou
     });
 });
 
-$router->group(['middleware' => ['auth','cors'],'prefix' => 'api'], function () use ($router) {
+$router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api'], function () use ($router) {
     // Matches "/api/profile
     $router->get('profile', 'UserController@profile');
 
@@ -58,23 +61,25 @@ $router->group(['middleware' => ['auth','cors'],'prefix' => 'api'], function () 
     $router->get('cekPayload', 'UserController@cekPayload');
 });
 
-$router->group(['middleware' => ['auth','cors'],'prefix' => 'api/approval'], function () use ($router) {
+$router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api'], function () use ($router) {
     // Matches "/api/profile
-    $router->get('profile', 'UserController@profile');
+    $router->get('profile', 'AdminController@profile');
 
     // Matches "/api/users/1 
     //get one user by id
-    $router->get('users/{id}', 'UserController@singleUser');
+    $router->get('users/{id}', 'AdminController@singleUser');
 
     // Matches "/api/users
-    $router->get('users', 'UserController@allUsers');
-
+    $router->get('users', 'AdminController@allUsers');
     
     // Matches "/api/cekPayload
-    $router->get('cekPayload', 'UserController@cekPayload');
+    $router->get('cekPayload', 'AdminController@cekPayload');
+});
+
+$router->group(['middleware' => ['auth:user','cors'],'prefix' => 'api/approval'], function () use ($router) {
     
     $router->get('aju', function () {
-        if($data =  Auth::user()){
+        if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
             //Pengajuan
             $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
@@ -118,7 +123,7 @@ $router->group(['middleware' => ['auth','cors'],'prefix' => 'api/approval'], fun
     // $router->post('appdir', 'Approval\ApprovalController@approvalDir');
 
     $router->post('app', function () {
-        if($data =  Auth::user()){
+        if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
             //Pengajuan
             $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
@@ -147,7 +152,7 @@ $router->group(['middleware' => ['auth','cors'],'prefix' => 'api/approval'], fun
 
 });
 
-$router->group(['middleware' => ['auth','cors'],'prefix' => 'api/gl'], function () use ($router) {
+$router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api/gl'], function () use ($router) {
     //Menu
     
     $router->get('menu/{kode_klp}', 'Gl\MenuController@show');

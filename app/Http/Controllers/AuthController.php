@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; 
 
 use  App\User;
+use  App\Admin;
 
 class AuthController extends Controller
 {
@@ -57,10 +59,76 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::attempt($credentials)) {
+        if (! $token = Auth::guard('user')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
         return $this->respondWithToken($token);
+    }
+
+    public function loginAdmin(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('admin')->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondAdminWithToken($token);
+    }
+
+    public function hashPassword(){
+        $users = User::all();
+        DB::connection('sqlsrv')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrv')->table('hakakses')->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrv')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrv')->commit();
+            $success['status'] = false;
+            $success['message'] = "Hash Password berhasil disimpan ".$e;
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPasswordAdmin(){
+        $users = Admin::all();
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrv2')->table('hakakses')->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrv2')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = false;
+            $success['message'] = "Hash Password berhasil disimpan ".$e;
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
     }
 }

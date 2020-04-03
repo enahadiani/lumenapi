@@ -13,7 +13,17 @@ class Controller extends BaseController
             'token' => $token,
             'token_type' => 'bearer',
             'message' => 'success',
-            'expires_in' => Auth::factory()->getTTL() * 60
+            'expires_in' => Auth::guard('user')->factory()->getTTL() * 60
+        ], 200);
+    }
+
+    protected function respondAdminWithToken($token)
+    {
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'message' => 'success',
+            'expires_in' => Auth::guard('admin')->factory()->getTTL() * 60
         ], 200);
     }
 }

@@ -26,7 +26,7 @@ class ApprovalController extends Controller
         try {
             
             
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -78,7 +78,7 @@ class ApprovalController extends Controller
         try {
             
             
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -130,7 +130,7 @@ class ApprovalController extends Controller
         try {
             
             
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -182,7 +182,7 @@ class ApprovalController extends Controller
         try {
             
             
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -258,7 +258,7 @@ class ApprovalController extends Controller
 
         try {
             
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -313,7 +313,7 @@ class ApprovalController extends Controller
 
         try {
             
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -355,7 +355,7 @@ class ApprovalController extends Controller
 
         try {
 
-            if($data =  Auth::user()){
+            if($data =  Auth::guard('user')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -421,7 +421,7 @@ class ApprovalController extends Controller
     public function approvalSM(Request $request)
     {
         
-        if($data =  Auth::user()){
+        if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }else{
@@ -519,7 +519,7 @@ class ApprovalController extends Controller
     public function approvalFinal(Request $request)
     {
         
-        if($data =  Auth::user()){
+        if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }else{
@@ -617,7 +617,7 @@ class ApprovalController extends Controller
     public function approvalDir(Request $request)
     {
         
-        if($data =  Auth::user()){
+        if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }else{

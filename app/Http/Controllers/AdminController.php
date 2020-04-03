@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
-use  App\User;
+use  App\Admin;
 
-class UserController extends Controller
+class AdminController extends Controller
 {
      /**
      * Instantiate a new UserController instance.
@@ -27,7 +27,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        if($data =  Auth::guard('user')->user()){
+        if($data =  Auth::guard('admin')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
@@ -68,7 +68,7 @@ class UserController extends Controller
      */
     public function allUsers()
     {
-         return response()->json(['users' =>  User::all()], 200);
+         return response()->json(['users' =>  Admin::all()], 200);
     }
 
     /**
@@ -79,7 +79,7 @@ class UserController extends Controller
     public function singleUser($id)
     {
         try {
-            $user = User::findOrFail($id);
+            $user = Admin::findOrFail($id);
 
             return response()->json(['user' => $user], 200);
 
@@ -91,7 +91,7 @@ class UserController extends Controller
     }
 
     public function cekPayload(){
-        $payload = Auth::guard('user')->payload();
+        $payload = Auth::guard('admin')->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }
