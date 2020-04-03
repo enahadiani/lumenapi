@@ -129,11 +129,38 @@ class MasakunController extends Controller
 
             $akun = DB::connection('sqlsrv2')->select("select kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal from masakun where kode_lokasi='$kode_lokasi' and kode_akun='$kode_akun'				 
             ");
+
             $akun = json_decode(json_encode($akun),true);
+
+            $akun2 = DB::connection('sqlsrv2')->select("select b.kode_flag,b.nama from flag_relasi a inner join flag_akun b on a.kode_flag=b.kode_flag where a.kode_akun = '".$kode_akun."' and a.kode_lokasi='".$kode_lokasi."'
+            ");
+
+            $akun2 = json_decode(json_encode($akun2),true);
+
+            $akun3 = DB::connection('sqlsrv2')->select("select b.kode_fs,b.nama as nama_fs,c.kode_neraca,c.nama as nama_lap 
+            from relakun a 
+            inner join fs b on a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi 
+            inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi 
+            where a.kode_akun = '".$kode_akun."' and a.kode_lokasi='".$kode_lokasi."'
+            ");
+
+            $akun3 = json_decode(json_encode($akun3),true);	
+            
+            $akun4 = DB::connection('sqlsrv2')->select("select b.kode_fs,b.nama as nama_fs,c.kode_neraca,c.nama as nama_lap 
+            from relakungar a 
+            inner join fsgar b on a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi 
+            inner join neracagar c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi 
+            where a.kode_akun = '".$kode_akun."' and a.kode_lokasi='".$kode_lokasi."'
+            ");
+
+            $akun4 = json_decode(json_encode($akun4),true);	
             
             if(count($akun) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $akun;
+                $success['detail_relasi'] = $akun2;
+                $success['detail_keuangan'] = $akun3;
+                $success['detail_anggaran'] = $akun4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
