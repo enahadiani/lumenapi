@@ -168,4 +168,7 @@ $router->group(['middleware' => ['auth:admin','cors'],'prefix' => 'api/gl'], fun
     $router->post('masakun','Gl\MasakunController@store');
     $router->put('masakun/{id}','Gl\MasakunController@update');
     $router->delete('masakun/{id}','Gl\MasakunController@destroy');
+    
+    $router->get('currency','Gl\MasakunController@getCurrency');
+    $router->get('modul','Gl\MasakunController@getModul');
 });

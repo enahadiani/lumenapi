@@ -268,4 +268,74 @@ class MasakunController extends Controller
         }	
     }
 
+    public function getCurrency()
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $curr = DB::connection('sqlsrv2')->select("select kode_curr from curr		 
+            ");
+            $curr = json_decode(json_encode($curr),true);
+            
+            if(count($curr) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $curr;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getModul()
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            $modul = DB::connection('sqlsrv2')->select("select kode_tipe,nama_tipe from tipe_neraca where kode_lokasi	 
+            ");
+            $modul = json_decode(json_encode($modul),true);
+            
+            if(count($modul) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $modul;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 }
