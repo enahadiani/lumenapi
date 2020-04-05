@@ -43,7 +43,7 @@
                 'Access-Control-Allow-Headers'     => 'Content-Type, Authorization, X-Requested-With'
             ];
 
-            if ($request->isMethod('OPTIONS'))
+            if ($request->isMethod('OPTIONS') || $request->getMethod() == "OPTIONS")
             {
                return response()->json('{"method":"OPTIONS"}', 200, $headers);
             }
