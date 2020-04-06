@@ -8,46 +8,74 @@ use Illuminate\Support\Facades\DB;
 
 use  App\User;
 use  App\Admin;
+use  App\Karyawan;
 
 class AuthController extends Controller
 {
-    // public function register(Request $request)
-    // {
-    //     //validate incoming request 
-    //     $this->validate($request, [
-    //         'nama' => 'required|string',
-    //         'nik' => 'required|unique:hakakses',
-    //         'password' => 'required|confirmed',
-    //         'kode_lokasi' => 'required'
-    //     ]);
-
-    //     try {
-
-    //         $user = new User;
-    //         $user->nama = $request->input('nama');
-    //         $user->nik = $request->input('nik');
-    //         $user->kode_lokasi = $request->input('kode_lokasi');
-    //         $user->kode_klp_menu = $request->input('kode_klp_menu');
-    //         $user->status_admin = $request->input('status_admin');
-    //         $user->klp_akses = $request->input('klp_akses');
-    //         $user->menu_mobile = $request->input('menu_mobile');            
-    //         $user->path_view = $request->input('path_view');
+    public function register(Request $request)
+    {
+        //TAMBAHKAN BAGIAN INI
+        $this->validate($request, [
+            'nama' => 'required|string',
+            'nik' => 'required',
+            'password' => 'required|confirmed',
+            'kode_lokasi' => 'required',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png',
+            'klp_akses'=>'required',
+            'kode_klp_menu'=>'required',
+            'status_admin'=>'required',
+            'menu_mobile'=>'required',
+            'path_view'=>'required',
+            'kode_menu_lab'=>'required'
+        ]);
+        
+        try {
+            //SEDIKIT TYPO DARI VARIABLE $filename, SEHINGGA PERBAHARUI SELURUH VARIABL TERKAIT
+            $filename = null;
+            if ($request->hasFile('foto')) {
+                $filename = $request->nik . '.jpg';
+                $file = $request->file('foto');
+                $file->move(base_path('public/images'), $filename); //
+            }
             
-    //         $user->kode_menu_lab = $request->input('kode_menu_lab');
-    //         $plainPassword = $request->input('password');
-    //         $user->password = app('hash')->make($plainPassword);
+            // $user = new User;
+            // $user->nama = $request->input('nama');
+            // $user->nik = $request->input('nik');
+            // $user->kode_lokasi = $request->input('kode_lokasi');
+            // $user->kode_klp_menu = $request->input('kode_klp_menu');
+            // $user->status_admin = $request->input('status_admin');
+            // $user->klp_akses = $request->input('klp_akses');
+            // $user->menu_mobile = $request->input('menu_mobile');            
+            // $user->path_view = $request->input('path_view');
+            
+            // $user->kode_menu_lab = $request->input('kode_menu_lab');
+            // $plainPassword = $request->input('password');
+            // $user->pass = $plainPassword;
+            // $user->password = app('hash')->make($plainPassword);
 
-    //         $user->save();
+            // $user->save();
 
-    //         //return successful response
-    //         return response()->json(['user' => $user, 'message' => 'CREATED'], 201);
+            // $karyawan = new karyawan;
+            // $karyawan->nama = $request->input('nama');
+            // $karyawan->nik = $request->input('nik');
+            // $karyawan->kode_lokasi = $request->input('kode_lokasi');
+            // $karyawan->alamat = '-';
+            // $karyawan->jabatan = '-';
+            // $karyawan->no_telp = '-';
+            // $karyawan->email = '-';          
+            // $karyawan->kode_pp = '-';
+            // $karyawan->flag_aktif = '1';
+            // $karyawan->foto = $filename;
+            // $karyawan->save();
+            //return successful response
+            return response()->json(['message' => 'CREATED'], 201);
 
-    //     } catch (\Exception $e) {
-    //         //return error message
-    //         return response()->json(['message' => 'User Registration Failed!'.$e], 409);
-    //     }
+        } catch (\Exception $e) {
+            //return error message
+            return response()->json(['message' => 'User Registration Failed!'.$e], 409);
+        }
 
-    // }
+    }
 
     public function login(Request $request)
     {

@@ -1,7 +1,7 @@
 <?php
 namespace App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -21,4 +21,11 @@ $router->get('/', function () use ($router) {
 $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
+
+
+$router->group(['middleware' => 'cors'], function () use ($router) {
+
+    $router->post('mail', 'MailController@send');
+
+});
 
