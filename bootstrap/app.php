@@ -118,4 +118,18 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/approval'
+], function ($router) {
+    require __DIR__.'/../routes/approval.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/gl'
+], function ($router) {
+    require __DIR__.'/../routes/gl.php';
+});
+
 return $app;
