@@ -40,6 +40,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
+    $router->get('upload', 'UploadController@upload');
+    $router->post('upload', 'UploadController@proses_upload');
+    $router->get('upload/{file}', 'UploadController@show');
+    
     $router->get('profile', 'AdminController@profile');
     $router->get('users/{id}', 'AdminController@singleUser');
     $router->get('users', 'AdminController@allUsers');

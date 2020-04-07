@@ -41,6 +41,11 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->group(['middleware' => 'auth:user'], function () use ($router) {
 
+    
+    $router->get('upload', 'UploadController@upload');
+    $router->post('upload', 'UploadController@proses_upload');
+    $router->get('upload/{file}', 'UploadController@show');
+    
     $router->get('profile', 'UserController@profile');
     $router->get('users/{id}', 'UserController@singleUser');
     $router->get('users', 'UserController@allUsers');

@@ -45,6 +45,10 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->get('users', 'AdminYptController@allUsers');
     $router->get('cekPayload', 'AdminYptController@cekPayload');
 
+    $router->get('upload', 'UploadController@upload');
+    $router->post('upload', 'UploadController@proses_upload');
+    $router->get('upload/{file}', 'UploadController@show');
+
     //PAGE 1
     $router->get('pencapaianYoY/{periode}', 'Dashboard\DashboardController@pencapaianYoY');
     $router->get('rkaVSReal/{periode}', 'Dashboard\DashboardController@rkaVSReal');
