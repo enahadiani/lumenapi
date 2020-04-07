@@ -139,4 +139,11 @@ $app->router->group([
     require __DIR__.'/../routes/gl.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt'
+], function ($router) {
+    require __DIR__.'/../routes/ypt.php';
+});
+
 return $app;

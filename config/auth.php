@@ -19,6 +19,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'admin',
         ],
+        'ypt' => [
+            'driver' => 'jwt',
+            'provider' => 'adminypt',
+        ]
     ],
 
     'providers' => [
@@ -29,6 +33,10 @@ return [
         'admin' => [
             'driver' => 'eloquent',
             'model' => \App\Admin::class
+        ],
+        'adminypt' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminYpt::class
         ]
     ]
 ];

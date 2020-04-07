@@ -26,4 +26,14 @@ class Controller extends BaseController
             'expires_in' => Auth::guard('admin')->factory()->getTTL() * 60
         ], 200);
     }
+
+    protected function respondYptWithToken($token)
+    {
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'message' => 'success',
+            'expires_in' => Auth::guard('ypt')->factory()->getTTL() * 60
+        ], 200);
+    }
 }

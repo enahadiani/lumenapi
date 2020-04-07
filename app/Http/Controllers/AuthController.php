@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 use  App\User;
 use  App\Admin;
-use  App\Karyawan;
+use  App\AdminYpt;
 
 class AuthController extends Controller
 {
@@ -111,6 +111,23 @@ class AuthController extends Controller
         return $this->respondAdminWithToken($token);
     }
 
+    public function loginYpt(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('ypt')->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondYptWithToken($token);
+    }
+
     public function hashPassword(){
         $users = User::all();
         DB::connection('sqlsrv')->beginTransaction();
@@ -125,7 +142,7 @@ class AuthController extends Controller
             });
             DB::connection('sqlsrv')->commit();
             $success['status'] = false;
-            $success['message'] = "Hash Password berhasil disimpan ".$e;
+            $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrv')->rollback();
@@ -150,7 +167,7 @@ class AuthController extends Controller
             });
             DB::connection('sqlsrv2')->commit();
             $success['status'] = false;
-            $success['message'] = "Hash Password berhasil disimpan ".$e;
+            $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
@@ -158,5 +175,33 @@ class AuthController extends Controller
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);
         }	
+    }
+
+    public function hashPasswordYpt(){
+        // $users = AdminYpt::all();
+        // $users = AdminYpt::where('password', NULL)->paginate(10);
+        // return count($users);
+        DB::connection('sqlsrvypt')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvypt')->table('hakakses')->where('password', NULL)->orderBy('nik')->chunk(10, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrvypt')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->where('password',NULL)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrvypt')->commit();
+            $success['status'] = false;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvypt')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
     }
 }
