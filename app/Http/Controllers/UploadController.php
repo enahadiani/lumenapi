@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\Storage; 
 
-use App\Upload;
-use File;
+// use App\Upload;
 
 class UploadController extends Controller
 {
@@ -38,9 +38,22 @@ class UploadController extends Controller
 
 
     public function upload(){
-        $gambar = Upload::all();
-        return response()->json(['daftar' => $gambar,'status'=>true], 200);
-	}
+        // $gambar = Upload::all();
+        $images = [];
+        $files = Storage::disk('local')->files('uploads');
+        foreach ($files as $file) {
+            $images[] = [
+                'name' => str_replace('uploads/', '', $file),
+                'src'  => Storage::disk('local')->url($file),
+            ];
+        }
+        return response()->json(['daftar' => $images,'status'=>true], 200);
+    }
+    
+    public function show($file){
+        $files = Storage::disk('local')->get('uploads/1586247142_Winter.jpg');
+        var_dump($files);
+    }
  
 	public function proses_upload(Request $request){
         
@@ -54,21 +67,16 @@ class UploadController extends Controller
             $file = $request->file('file');
     
             $nama_file = time()."_".$file->getClientOriginalName();
-
             // $picName = uniqid() . '_' . $picName;
-            $path = 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
-            $destinationPath = base_path($path); // upload path
-            // File::makeDirectory($destinationPath, 0777, true, true);
-            $file->move($destinationPath, $nama_file);
-    
-            //         // isi dengan nama folder tempat kemana file diupload
+            $filePath = 'uploads/' . $nama_file;
+            Storage::disk('local')->put($filePath,file_get_contents($file));
             // $tujuan_upload = base_path('public/images');
             // $file->move($tujuan_upload,$nama_file);
     
-            Upload::create([
-                'file_dok' => $nama_file,
-                'nama' => $request->keterangan,
-            ]);
+            // Upload::create([
+            //     'file_dok' => $nama_file,
+            //     'nama' => $request->keterangan,
+            // ]);
     
             return response()->json(['message' => 'Upload Berhasil','status'=>true], 200);
         } catch (\Exception $e) {

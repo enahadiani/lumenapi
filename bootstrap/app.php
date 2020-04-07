@@ -23,6 +23,8 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
+
+
 $app->withFacades();
 
 $app->withEloquent();
@@ -60,6 +62,12 @@ $app->singleton(
 */
 
 $app->configure('app');
+
+$app->configure('filesystems');
+
+$app->alias('Storage',Illuminate\Support\Facades\Storage::class);
+
+// class_alias('Illuminate\Support\Facades\Storage', 'Storage');
 
 $app->configure('mail');
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
@@ -106,6 +114,8 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
+
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 
 
 /*
