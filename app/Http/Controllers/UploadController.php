@@ -40,10 +40,10 @@ class UploadController extends Controller
     public function upload(){
         // $gambar = Upload::all();
         $images = [];
-        $files = Storage::disk('local')->files('uploads');
+        $files = Storage::disk('local')->files();
         foreach ($files as $file) {
             $images[] = [
-                'name' => str_replace('uploads/', '', $file),
+                'name' => $file,
                 'src'  => Storage::disk('local')->url($file),
             ];
         }
@@ -51,7 +51,7 @@ class UploadController extends Controller
     }
     
     public function show($file){
-        $files = Storage::disk('local')->get('uploads/1586247142_Winter.jpg');
+        $files = Storage::disk('local')->get($file);
         var_dump($files);
     }
  
@@ -68,7 +68,7 @@ class UploadController extends Controller
     
             $nama_file = time()."_".$file->getClientOriginalName();
             // $picName = uniqid() . '_' . $picName;
-            $filePath = 'uploads/' . $nama_file;
+            $filePath = $nama_file;
             Storage::disk('local')->put($filePath,file_get_contents($file));
             // $tujuan_upload = base_path('public/images');
             // $file->move($tujuan_upload,$nama_file);
