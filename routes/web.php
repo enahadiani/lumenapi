@@ -26,6 +26,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'cors'], function () use ($router) {
 
     $router->post('mail', 'MailController@send');
-
+    $router->get('upload', 'UploadController@upload');
+    $router->post('upload', 'UploadController@proses_upload');
 });
 
