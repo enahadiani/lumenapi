@@ -87,4 +87,10 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->get('bebanJurusan/{periode}/{kode_neraca}/{kode_bidang}', 'Dashboard\DashboardController@bebanJurusan');
     $router->get('detailBebanJurusan/{periode}/{kode_neraca}/{kode_bidang}/{tahun}', 'Dashboard\DashboardController@detailBebanJurusan');
 
+    $router->get('user_device','UserDeviceController@index');
+    $router->get('user_device/{nik}','UserDeviceController@show');
+    $router->post('user_device','UserDeviceController@store');
+    $router->put('user_device/{nik}','UserDeviceController@update');
+    $router->delete('user_device/{nik}','UserDeviceController@destroy');
+
 });

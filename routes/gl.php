@@ -72,4 +72,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('neraca/{kode_fs}','Gl\MasakunController@getNeraca');
     $router->get('fsgar','Gl\MasakunController@getFSGar');
     $router->get('neracagar/{kode_fs}','Gl\MasakunController@getNeracaGar');
+
+    $router->get('user_device','UserDeviceController@index');
+    $router->get('user_device/{nik}','UserDeviceController@show');
+    $router->post('user_device','UserDeviceController@store');
+    $router->put('user_device/{nik}','UserDeviceController@update');
+    $router->delete('user_device/{nik}','UserDeviceController@destroy');
 });

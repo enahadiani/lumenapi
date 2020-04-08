@@ -122,4 +122,10 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
         }
     });
 
+    $router->get('user_device','UserDeviceController@index');
+    $router->get('user_device/{nik}','UserDeviceController@show');
+    $router->post('user_device','UserDeviceController@store');
+    $router->put('user_device/{nik}','UserDeviceController@update');
+    $router->delete('user_device/{nik}','UserDeviceController@destroy');
+
 });
