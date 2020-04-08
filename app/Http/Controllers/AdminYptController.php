@@ -27,12 +27,12 @@ class AdminYptController extends Controller
      */
     public function profile()
     {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard('ypt')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection('sqlsrvypt')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo
+			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,,c.no_telp,c.jabatan
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -43,11 +43,11 @@ class AdminYptController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrv')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection('sqlsrvypt')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrv')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection('sqlsrvypt')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
