@@ -24,7 +24,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $capai = DB::connection('sqlsrvypt')->select("select a.kode_neraca,
+            $capai = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n2,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n3,
@@ -77,7 +77,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $capai = DB::connection('sqlsrvypt')->select("select a.kode_neraca,case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end as n1,
+            $capai = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n2,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n3,
             case when a.n2<>0 then (a.n4/a.n2)*100 else 0 end as capai
@@ -92,10 +92,13 @@ class DashboardController extends Controller
                 
                 $dt[0] = array();
                 $dt[1] = array();
+                $ctg= array();
                 for($i=0;$i<count($capai);$i++){
                     array_push($dt[0],floatval($capai[$i]['n1']));
-                    array_push($dt[1],floatval($capai[$i]['n2']));    
+                    array_push($dt[1],floatval($capai[$i]['n2']));  
+                    array_push($ctg,$capai[$i]['nama']);    
                 }
+                $success['ctg'] = $ctg;
                 $success["series"][0]= array(
                     "name"=> 'RKA', "type"=>'column',"color"=>'#ad1d3e',"data"=>$dt[0]
                 );
