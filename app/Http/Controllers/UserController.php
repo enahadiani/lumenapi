@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
+
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use  App\User;
 
 class UserController extends Controller
@@ -94,5 +97,10 @@ class UserController extends Controller
         $payload = Auth::guard('user')->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
+    }
+
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
     }
 }

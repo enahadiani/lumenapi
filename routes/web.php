@@ -28,3 +28,5 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('mail', 'MailController@send');
 });
 
+
+$router->get('users/export/', 'UserController@export');

@@ -74,6 +74,10 @@ $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 
+
+$app->configure('excel');
+$app->alias('Excel', Maatwebsite\Excel\Facades\Excel::class);
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -116,6 +120,7 @@ $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+$app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 
 
 /*
