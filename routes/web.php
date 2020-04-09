@@ -29,4 +29,5 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 });
 
 
-$router->get('users/export/', 'UserController@export');
+$router->get('users/export', 'UserController@export');
+$router->get('users/exportpdf', 'UserController@exportpdf');

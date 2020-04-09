@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "106d87b51c4c81537a63830800e10203",
+    "content-hash": "866d5f5a60bbadea9008b6b4e9ed6715",
     "packages": [
+        {
+            "name": "barryvdh/laravel-dompdf",
+            "version": "v0.8.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/barryvdh/laravel-dompdf.git",
+                "reference": "d7108f78cf5254a2d8c224542967f133e5a6d4e8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/barryvdh/laravel-dompdf/zipball/d7108f78cf5254a2d8c224542967f133e5a6d4e8",
+                "reference": "d7108f78cf5254a2d8c224542967f133e5a6d4e8",
+                "shasum": ""
+            },
+            "require": {
+                "dompdf/dompdf": "^0.8",
+                "illuminate/support": "^5.5|^6|^7",
+                "php": ">=7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.8-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Barryvdh\\DomPDF\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "PDF": "Barryvdh\\DomPDF\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Barryvdh\\DomPDF\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Barry vd. Heuvel",
+                    "email": "barryvdh@gmail.com"
+                }
+            ],
+            "description": "A DOMPDF Wrapper for Laravel",
+            "keywords": [
+                "dompdf",
+                "laravel",
+                "pdf"
+            ],
+            "time": "2020-02-25T20:44:34+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.8.14",
@@ -110,6 +166,60 @@
             "time": "2020-01-01T10:45:01+00:00"
         },
         {
+            "name": "darkaonline/swagger-lume",
+            "version": "7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DarkaOnLine/SwaggerLume.git",
+                "reference": "f51914718ab6a9b23c66febdef82d26da2f2fad8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DarkaOnLine/SwaggerLume/zipball/f51914718ab6a9b23c66febdef82d26da2f2fad8",
+                "reference": "f51914718ab6a9b23c66febdef82d26da2f2fad8",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/lumen-framework": "~6.0|~7.0",
+                "php": ">=7.2",
+                "swagger-api/swagger-ui": "^3.0",
+                "zircote/swagger-php": "~2.0|3.*"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "~1.8",
+                "mockery/mockery": "1.*",
+                "phpunit/phpunit": "8.*",
+                "satooshi/php-coveralls": "^2.0",
+                "vlucas/phpdotenv": "~3.3|~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "SwaggerLume\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Darius Matulionis",
+                    "email": "darius@matulionis.lt"
+                }
+            ],
+            "description": "Swagger integration to Lumen 5",
+            "keywords": [
+                "laravel",
+                "lumen",
+                "swagger"
+            ],
+            "time": "2020-03-26T09:34:03+00:00"
+        },
+        {
             "name": "dnoegel/php-xdg-base-dir",
             "version": "v0.1.1",
             "source": {
@@ -141,6 +251,75 @@
             ],
             "description": "implementation of xdg base directory specification for php",
             "time": "2019-12-04T15:06:13+00:00"
+        },
+        {
+            "name": "doctrine/annotations",
+            "version": "1.10.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/annotations.git",
+                "reference": "5eb79f3dbdffed6544e1fc287572c0f462bd29bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/5eb79f3dbdffed6544e1fc287572c0f462bd29bb",
+                "reference": "5eb79f3dbdffed6544e1fc287572c0f462bd29bb",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/lexer": "1.*",
+                "ext-tokenizer": "*",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "doctrine/cache": "1.*",
+                "phpunit/phpunit": "^7.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\Annotations\\": "lib/Doctrine/Common/Annotations"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Docblock Annotations Parser",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "annotations",
+                "docblock",
+                "parser"
+            ],
+            "time": "2020-04-02T12:33:25+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -272,6 +451,72 @@
             "time": "2019-10-30T14:39:59+00:00"
         },
         {
+            "name": "dompdf/dompdf",
+            "version": "v0.8.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dompdf/dompdf.git",
+                "reference": "6782abfc090b132134cd6cea0ec6d76f0fce2c56"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/6782abfc090b132134cd6cea0ec6d76f0fce2c56",
+                "reference": "6782abfc090b132134cd6cea0ec6d76f0fce2c56",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "phenx/php-font-lib": "^0.5.1",
+                "phenx/php-svg-lib": "^0.3.3",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "suggest": {
+                "ext-gd": "Needed to process images",
+                "ext-gmagick": "Improves image processing performance",
+                "ext-imagick": "Improves image processing performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "0.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dompdf\\": "src/"
+                },
+                "classmap": [
+                    "lib/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                },
+                {
+                    "name": "Brian Sweeney",
+                    "email": "eclecticgeek@gmail.com"
+                },
+                {
+                    "name": "Gabriel Bull",
+                    "email": "me@gabrielbull.com"
+                }
+            ],
+            "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
+            "homepage": "https://github.com/dompdf/dompdf",
+            "time": "2020-02-20T03:52:51+00:00"
+        },
+        {
             "name": "dragonmantank/cron-expression",
             "version": "v2.3.0",
             "source": {
@@ -385,22 +630,22 @@
         },
         {
             "name": "flipbox/lumen-generator",
-            "version": "6.0.7",
+            "version": "6.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/flipboxstudio/lumen-generator.git",
-                "reference": "8e24a4a813bd35730ed42b3036254f40355271b7"
+                "reference": "a6791a4b9f37ca9f6d920b2834f03b6feecca66d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/flipboxstudio/lumen-generator/zipball/8e24a4a813bd35730ed42b3036254f40355271b7",
-                "reference": "8e24a4a813bd35730ed42b3036254f40355271b7",
+                "url": "https://api.github.com/repos/flipboxstudio/lumen-generator/zipball/a6791a4b9f37ca9f6d920b2834f03b6feecca66d",
+                "reference": "a6791a4b9f37ca9f6d920b2834f03b6feecca66d",
                 "shasum": ""
             },
             "require": {
                 "classpreloader/classpreloader": "^3.0|^4.0",
                 "illuminate/support": "^5.4|^6.0|^7.0",
-                "psy/psysh": "0.8.*|0.9.*",
+                "psy/psysh": "0.8.*|0.9.*|0.10.*",
                 "symfony/var-dumper": "^3.1|^4.1|^4.2|^4.3|^5.0"
             },
             "type": "library",
@@ -420,20 +665,20 @@
                 }
             ],
             "description": "A Lumen Generator You Are Missing",
-            "time": "2020-03-15T01:12:57+00:00"
+            "time": "2020-04-06T09:08:14+00:00"
         },
         {
             "name": "illuminate/auth",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/auth.git",
-                "reference": "f1c078cfbcf76d92101296067d9b16ad7d11193c"
+                "reference": "21902cb614c3268f9613ffef371285ca4c0d3c09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/auth/zipball/f1c078cfbcf76d92101296067d9b16ad7d11193c",
-                "reference": "f1c078cfbcf76d92101296067d9b16ad7d11193c",
+                "url": "https://api.github.com/repos/illuminate/auth/zipball/21902cb614c3268f9613ffef371285ca4c0d3c09",
+                "reference": "21902cb614c3268f9613ffef371285ca4c0d3c09",
                 "shasum": ""
             },
             "require": {
@@ -471,11 +716,11 @@
             ],
             "description": "The Illuminate Auth package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-11T12:36:09+00:00"
+            "time": "2020-03-28T17:00:42+00:00"
         },
         {
             "name": "illuminate/broadcasting",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/broadcasting.git",
@@ -526,7 +771,7 @@
         },
         {
             "name": "illuminate/bus",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/bus.git",
@@ -574,7 +819,7 @@
         },
         {
             "name": "illuminate/cache",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/cache.git",
@@ -625,7 +870,7 @@
         },
         {
             "name": "illuminate/config",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/config.git",
@@ -669,7 +914,7 @@
         },
         {
             "name": "illuminate/console",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/console.git",
@@ -723,16 +968,16 @@
         },
         {
             "name": "illuminate/container",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/container.git",
-                "reference": "9108edffa95b34df94dc36721d92f380dd59bea3"
+                "reference": "10c5802e360595f5f2a8b6afa176b9542851e580"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/container/zipball/9108edffa95b34df94dc36721d92f380dd59bea3",
-                "reference": "9108edffa95b34df94dc36721d92f380dd59bea3",
+                "url": "https://api.github.com/repos/illuminate/container/zipball/10c5802e360595f5f2a8b6afa176b9542851e580",
+                "reference": "10c5802e360595f5f2a8b6afa176b9542851e580",
                 "shasum": ""
             },
             "require": {
@@ -763,20 +1008,20 @@
             ],
             "description": "The Illuminate Container package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-18T13:25:12+00:00"
+            "time": "2020-04-06T13:33:36+00:00"
         },
         {
             "name": "illuminate/contracts",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "075d70c8d621e474d10279bf62c19e121be30e95"
+                "reference": "2db7e8a936cc09e396d14902178ea177f4dc42ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/075d70c8d621e474d10279bf62c19e121be30e95",
-                "reference": "075d70c8d621e474d10279bf62c19e121be30e95",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/2db7e8a936cc09e396d14902178ea177f4dc42ac",
+                "reference": "2db7e8a936cc09e396d14902178ea177f4dc42ac",
                 "shasum": ""
             },
             "require": {
@@ -807,20 +1052,20 @@
             ],
             "description": "The Illuminate Contracts package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-16T13:40:39+00:00"
+            "time": "2020-04-04T15:13:36+00:00"
         },
         {
             "name": "illuminate/database",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/database.git",
-                "reference": "00aa70f49bba961e823c2bc35fddc1a43432a876"
+                "reference": "0a2dce944b5a5b6f2cc376706a086a4541c528fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/database/zipball/00aa70f49bba961e823c2bc35fddc1a43432a876",
-                "reference": "00aa70f49bba961e823c2bc35fddc1a43432a876",
+                "url": "https://api.github.com/repos/illuminate/database/zipball/0a2dce944b5a5b6f2cc376706a086a4541c528fc",
+                "reference": "0a2dce944b5a5b6f2cc376706a086a4541c528fc",
                 "shasum": ""
             },
             "require": {
@@ -869,11 +1114,11 @@
                 "orm",
                 "sql"
             ],
-            "time": "2020-03-23T14:29:01+00:00"
+            "time": "2020-04-06T21:45:53+00:00"
         },
         {
             "name": "illuminate/encryption",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/encryption.git",
@@ -920,7 +1165,7 @@
         },
         {
             "name": "illuminate/events",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/events.git",
@@ -965,16 +1210,16 @@
         },
         {
             "name": "illuminate/filesystem",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/filesystem.git",
-                "reference": "47f48e7045f8bbfc0789d30aabfd71ea392dfd5d"
+                "reference": "43d0aafb620151b9c88331e13e1660564fc56244"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/filesystem/zipball/47f48e7045f8bbfc0789d30aabfd71ea392dfd5d",
-                "reference": "47f48e7045f8bbfc0789d30aabfd71ea392dfd5d",
+                "url": "https://api.github.com/repos/illuminate/filesystem/zipball/43d0aafb620151b9c88331e13e1660564fc56244",
+                "reference": "43d0aafb620151b9c88331e13e1660564fc56244",
                 "shasum": ""
             },
             "require": {
@@ -1014,11 +1259,11 @@
             ],
             "description": "The Illuminate Filesystem package.",
             "homepage": "https://laravel.com",
-            "time": "2020-02-25T14:26:37+00:00"
+            "time": "2020-03-26T19:53:03+00:00"
         },
         {
             "name": "illuminate/hashing",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/hashing.git",
@@ -1062,16 +1307,16 @@
         },
         {
             "name": "illuminate/http",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/http.git",
-                "reference": "05475b44754d5cc3b9a0b6f360c62b5bceaf886e"
+                "reference": "8387bb84aa635b58a96b6da263094d68b3666ec0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/http/zipball/05475b44754d5cc3b9a0b6f360c62b5bceaf886e",
-                "reference": "05475b44754d5cc3b9a0b6f360c62b5bceaf886e",
+                "url": "https://api.github.com/repos/illuminate/http/zipball/8387bb84aa635b58a96b6da263094d68b3666ec0",
+                "reference": "8387bb84aa635b58a96b6da263094d68b3666ec0",
                 "shasum": ""
             },
             "require": {
@@ -1110,11 +1355,11 @@
             ],
             "description": "The Illuminate Http package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-22T12:54:20+00:00"
+            "time": "2020-04-07T17:10:31+00:00"
         },
         {
             "name": "illuminate/log",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/log.git",
@@ -1159,16 +1404,16 @@
         },
         {
             "name": "illuminate/mail",
-            "version": "v7.4.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/mail.git",
-                "reference": "b78233ddbaf4dbdd98a5db4fd14cbe80c6a59afa"
+                "reference": "c103e5f53575a7328dcba13a70403394d83bf82e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/mail/zipball/b78233ddbaf4dbdd98a5db4fd14cbe80c6a59afa",
-                "reference": "b78233ddbaf4dbdd98a5db4fd14cbe80c6a59afa",
+                "url": "https://api.github.com/repos/illuminate/mail/zipball/c103e5f53575a7328dcba13a70403394d83bf82e",
+                "reference": "c103e5f53575a7328dcba13a70403394d83bf82e",
                 "shasum": ""
             },
             "require": {
@@ -1210,20 +1455,20 @@
             ],
             "description": "The Illuminate Mail package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-30T08:46:42+00:00"
+            "time": "2020-04-07T18:38:09+00:00"
         },
         {
             "name": "illuminate/pagination",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/pagination.git",
-                "reference": "2646cb7e386d10998221c44608297fa70b2fdb20"
+                "reference": "e25872e11652eb8cd22f6949c4cbb968e7849c6e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/pagination/zipball/2646cb7e386d10998221c44608297fa70b2fdb20",
-                "reference": "2646cb7e386d10998221c44608297fa70b2fdb20",
+                "url": "https://api.github.com/repos/illuminate/pagination/zipball/e25872e11652eb8cd22f6949c4cbb968e7849c6e",
+                "reference": "e25872e11652eb8cd22f6949c4cbb968e7849c6e",
                 "shasum": ""
             },
             "require": {
@@ -1255,11 +1500,11 @@
             ],
             "description": "The Illuminate Pagination package.",
             "homepage": "https://laravel.com",
-            "time": "2020-02-29T19:38:32+00:00"
+            "time": "2020-04-06T13:31:42+00:00"
         },
         {
             "name": "illuminate/pipeline",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/pipeline.git",
@@ -1303,16 +1548,16 @@
         },
         {
             "name": "illuminate/queue",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/queue.git",
-                "reference": "16eaaa9c924eabbeb1e9269596479a43014bf7e3"
+                "reference": "579c976513246b1dcd698c6b3fee4ffa29c1c1b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/queue/zipball/16eaaa9c924eabbeb1e9269596479a43014bf7e3",
-                "reference": "16eaaa9c924eabbeb1e9269596479a43014bf7e3",
+                "url": "https://api.github.com/repos/illuminate/queue/zipball/579c976513246b1dcd698c6b3fee4ffa29c1c1b4",
+                "reference": "579c976513246b1dcd698c6b3fee4ffa29c1c1b4",
                 "shasum": ""
             },
             "require": {
@@ -1359,11 +1604,11 @@
             ],
             "description": "The Illuminate Queue package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-24T13:30:10+00:00"
+            "time": "2020-03-26T19:53:03+00:00"
         },
         {
             "name": "illuminate/session",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/session.git",
@@ -1414,16 +1659,16 @@
         },
         {
             "name": "illuminate/support",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "b81926f2dae8710b4048015cb2044274526d6285"
+                "reference": "b8d805437c075a44bf53737763c3b979932445c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/b81926f2dae8710b4048015cb2044274526d6285",
-                "reference": "b81926f2dae8710b4048015cb2044274526d6285",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/b8d805437c075a44bf53737763c3b979932445c7",
+                "reference": "b8d805437c075a44bf53737763c3b979932445c7",
                 "shasum": ""
             },
             "require": {
@@ -1472,20 +1717,20 @@
             ],
             "description": "The Illuminate Support package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-24T13:30:10+00:00"
+            "time": "2020-04-08T13:18:06+00:00"
         },
         {
             "name": "illuminate/testing",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/testing.git",
-                "reference": "b6473c86d1e3bae4b4c332a7e87d7b7f035c811f"
+                "reference": "b37f6c0a40b4967b7e10ff4f6c2fa955118420c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/testing/zipball/b6473c86d1e3bae4b4c332a7e87d7b7f035c811f",
-                "reference": "b6473c86d1e3bae4b4c332a7e87d7b7f035c811f",
+                "url": "https://api.github.com/repos/illuminate/testing/zipball/b37f6c0a40b4967b7e10ff4f6c2fa955118420c7",
+                "reference": "b37f6c0a40b4967b7e10ff4f6c2fa955118420c7",
                 "shasum": ""
             },
             "require": {
@@ -1523,20 +1768,20 @@
             ],
             "description": "The Illuminate Testing package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-14T14:49:42+00:00"
+            "time": "2020-04-06T20:15:44+00:00"
         },
         {
             "name": "illuminate/translation",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/translation.git",
-                "reference": "d0a56445ad419cd7337ad8663122acecd59cfe46"
+                "reference": "514f16362b9e623fa3148cc123ce31a0ee13caeb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/translation/zipball/d0a56445ad419cd7337ad8663122acecd59cfe46",
-                "reference": "d0a56445ad419cd7337ad8663122acecd59cfe46",
+                "url": "https://api.github.com/repos/illuminate/translation/zipball/514f16362b9e623fa3148cc123ce31a0ee13caeb",
+                "reference": "514f16362b9e623fa3148cc123ce31a0ee13caeb",
                 "shasum": ""
             },
             "require": {
@@ -1569,11 +1814,11 @@
             ],
             "description": "The Illuminate Translation package.",
             "homepage": "https://laravel.com",
-            "time": "2020-01-07T13:49:44+00:00"
+            "time": "2020-04-08T15:50:56+00:00"
         },
         {
             "name": "illuminate/validation",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/validation.git",
@@ -1626,16 +1871,16 @@
         },
         {
             "name": "illuminate/view",
-            "version": "v7.3.0",
+            "version": "v7.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/view.git",
-                "reference": "c4754754778c47a2177c66ca6a226b0cc174e00a"
+                "reference": "617d19b00ff8372401debe1df4eb5829b99fed9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/view/zipball/c4754754778c47a2177c66ca6a226b0cc174e00a",
-                "reference": "c4754754778c47a2177c66ca6a226b0cc174e00a",
+                "url": "https://api.github.com/repos/illuminate/view/zipball/617d19b00ff8372401debe1df4eb5829b99fed9a",
+                "reference": "617d19b00ff8372401debe1df4eb5829b99fed9a",
                 "shasum": ""
             },
             "require": {
@@ -1670,110 +1915,20 @@
             ],
             "description": "The Illuminate View package.",
             "homepage": "https://laravel.com",
-            "time": "2020-03-19T19:59:27+00:00"
-        },
-        {
-            "name": "jakub-onderka/php-console-color",
-            "version": "v0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JakubOnderka/PHP-Console-Color.git",
-                "reference": "d5deaecff52a0d61ccb613bb3804088da0307191"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JakubOnderka/PHP-Console-Color/zipball/d5deaecff52a0d61ccb613bb3804088da0307191",
-                "reference": "d5deaecff52a0d61ccb613bb3804088da0307191",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "jakub-onderka/php-code-style": "1.0",
-                "jakub-onderka/php-parallel-lint": "1.0",
-                "jakub-onderka/php-var-dump-check": "0.*",
-                "phpunit/phpunit": "~4.3",
-                "squizlabs/php_codesniffer": "1.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "JakubOnderka\\PhpConsoleColor\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-2-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Jakub Onderka",
-                    "email": "jakub.onderka@gmail.com"
-                }
-            ],
-            "abandoned": "php-parallel-lint/php-console-color",
-            "time": "2018-09-29T17:23:10+00:00"
-        },
-        {
-            "name": "jakub-onderka/php-console-highlighter",
-            "version": "v0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JakubOnderka/PHP-Console-Highlighter.git",
-                "reference": "9f7a229a69d52506914b4bc61bfdb199d90c5547"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JakubOnderka/PHP-Console-Highlighter/zipball/9f7a229a69d52506914b4bc61bfdb199d90c5547",
-                "reference": "9f7a229a69d52506914b4bc61bfdb199d90c5547",
-                "shasum": ""
-            },
-            "require": {
-                "ext-tokenizer": "*",
-                "jakub-onderka/php-console-color": "~0.2",
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "jakub-onderka/php-code-style": "~1.0",
-                "jakub-onderka/php-parallel-lint": "~1.0",
-                "jakub-onderka/php-var-dump-check": "~0.1",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "~1.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "JakubOnderka\\PhpConsoleHighlighter\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jakub Onderka",
-                    "email": "acci@acci.cz",
-                    "homepage": "http://www.acci.cz/"
-                }
-            ],
-            "description": "Highlight PHP code in terminal",
-            "abandoned": "php-parallel-lint/php-console-highlighter",
-            "time": "2018-09-29T18:48:56+00:00"
+            "time": "2020-04-06T01:34:32+00:00"
         },
         {
             "name": "laravel/lumen-framework",
-            "version": "v7.0.2",
+            "version": "v7.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/lumen-framework.git",
-                "reference": "353093cf86c872f7faf00c1da36820bba02026b6"
+                "reference": "dd22ce27cae0460261ef18a73a951c9c093a3b67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/lumen-framework/zipball/353093cf86c872f7faf00c1da36820bba02026b6",
-                "reference": "353093cf86c872f7faf00c1da36820bba02026b6",
+                "url": "https://api.github.com/repos/laravel/lumen-framework/zipball/dd22ce27cae0460261ef18a73a951c9c093a3b67",
+                "reference": "dd22ce27cae0460261ef18a73a951c9c093a3b67",
                 "shasum": ""
             },
             "require": {
@@ -1783,6 +1938,7 @@
                 "illuminate/bus": "^7.0",
                 "illuminate/cache": "^7.0",
                 "illuminate/config": "^7.0",
+                "illuminate/console": "^7.0",
                 "illuminate/container": "^7.0",
                 "illuminate/contracts": "^7.0",
                 "illuminate/database": "^7.0",
@@ -1850,7 +2006,7 @@
                 "laravel",
                 "lumen"
             ],
-            "time": "2020-03-19T16:00:28+00:00"
+            "time": "2020-03-31T15:39:43+00:00"
         },
         {
             "name": "lcobucci/jwt",
@@ -1983,28 +2139,28 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.46",
+            "version": "1.0.66",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "f3e0d925c18b92cf3ce84ea5cc58d62a1762a2b2"
+                "reference": "021569195e15f8209b1c4bebb78bd66aa4f08c21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/f3e0d925c18b92cf3ce84ea5cc58d62a1762a2b2",
-                "reference": "f3e0d925c18b92cf3ce84ea5cc58d62a1762a2b2",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/021569195e15f8209b1c4bebb78bd66aa4f08c21",
+                "reference": "021569195e15f8209b1c4bebb78bd66aa4f08c21",
                 "shasum": ""
             },
             "require": {
+                "ext-fileinfo": "*",
                 "php": ">=5.5.9"
             },
             "conflict": {
                 "league/flysystem-sftp": "<1.0.6"
             },
             "require-dev": {
-                "ext-fileinfo": "*",
                 "phpspec/phpspec": "^3.4",
-                "phpunit/phpunit": "^5.7.10"
+                "phpunit/phpunit": "^5.7.26"
             },
             "suggest": {
                 "ext-fileinfo": "Required for MimeType",
@@ -2063,7 +2219,13 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2018-08-22T07:45:22+00:00"
+            "funding": [
+                {
+                    "url": "https://offset.earth/frankdejonge",
+                    "type": "other"
+                }
+            ],
+            "time": "2020-03-17T18:58:12+00:00"
         },
         {
             "name": "maatwebsite/excel",
@@ -2452,16 +2614,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.32.1",
+            "version": "2.32.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "ecb525c766deb3bbbb6a0082ea0e41d3d9ae477c"
+                "reference": "f10e22cf546704fab1db4ad4b9dedbc5c797a0dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ecb525c766deb3bbbb6a0082ea0e41d3d9ae477c",
-                "reference": "ecb525c766deb3bbbb6a0082ea0e41d3d9ae477c",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/f10e22cf546704fab1db4ad4b9dedbc5c797a0dc",
+                "reference": "f10e22cf546704fab1db4ad4b9dedbc5c797a0dc",
                 "shasum": ""
             },
             "require": {
@@ -2519,7 +2681,17 @@
                 "datetime",
                 "time"
             ],
-            "time": "2020-03-26T13:04:10+00:00"
+            "funding": [
+                {
+                    "url": "https://opencollective.com/Carbon",
+                    "type": "open_collective"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/nesbot/carbon",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-03-31T13:43:19+00:00"
         },
         {
             "name": "nikic/fast-route",
@@ -2679,6 +2851,83 @@
                 "serialize"
             ],
             "time": "2019-11-29T22:36:02+00:00"
+        },
+        {
+            "name": "phenx/php-font-lib",
+            "version": "0.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PhenX/php-font-lib.git",
+                "reference": "760148820110a1ae0936e5cc35851e25a938bc97"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/760148820110a1ae0936e5cc35851e25a938bc97",
+                "reference": "760148820110a1ae0936e5cc35851e25a938bc97",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FontLib\\": "src/FontLib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                }
+            ],
+            "description": "A library to read, parse, export and make subsets of different types of font files.",
+            "homepage": "https://github.com/PhenX/php-font-lib",
+            "time": "2017-09-13T16:14:37+00:00"
+        },
+        {
+            "name": "phenx/php-svg-lib",
+            "version": "v0.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PhenX/php-svg-lib.git",
+                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+                "shasum": ""
+            },
+            "require": {
+                "sabberworm/php-css-parser": "^8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.5|^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Svg\\": "src/Svg"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                }
+            ],
+            "description": "A library to read, parse and export to PDF SVG files.",
+            "homepage": "https://github.com/PhenX/php-svg-lib",
+            "time": "2019-09-11T20:02:13+00:00"
         },
         {
             "name": "phpoffice/phpspreadsheet",
@@ -3020,32 +3269,30 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.9.12",
+            "version": "v0.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "90da7f37568aee36b116a030c5f99c915267edd4"
+                "reference": "2bde2fa03e05dff0aee834598b951d6fc7c6fe02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/90da7f37568aee36b116a030c5f99c915267edd4",
-                "reference": "90da7f37568aee36b116a030c5f99c915267edd4",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/2bde2fa03e05dff0aee834598b951d6fc7c6fe02",
+                "reference": "2bde2fa03e05dff0aee834598b951d6fc7c6fe02",
                 "shasum": ""
             },
             "require": {
                 "dnoegel/php-xdg-base-dir": "0.1.*",
                 "ext-json": "*",
                 "ext-tokenizer": "*",
-                "jakub-onderka/php-console-highlighter": "0.3.*|0.4.*",
-                "nikic/php-parser": "~1.3|~2.0|~3.0|~4.0",
-                "php": ">=5.4.0",
-                "symfony/console": "~2.3.10|^2.4.2|~3.0|~4.0|~5.0",
-                "symfony/var-dumper": "~2.7|~3.0|~4.0|~5.0"
+                "nikic/php-parser": "~4.0|~3.0|~2.0|~1.3",
+                "php": "^8.0 || ^7.0 || ^5.5.9",
+                "symfony/console": "~5.0|~4.0|~3.0|^2.4.2|~2.3.10",
+                "symfony/var-dumper": "~5.0|~4.0|~3.0|~2.7"
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.2",
-                "hoa/console": "~2.15|~3.16",
-                "phpunit/phpunit": "~4.8.35|~5.0|~6.0|~7.0"
+                "hoa/console": "3.17.*"
             },
             "suggest": {
                 "ext-pcntl": "Enabling the PCNTL extension makes PsySH a lot happier :)",
@@ -3060,7 +3307,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-develop": "0.9.x-dev"
+                    "dev-master": "0.10.x-dev"
                 }
             },
             "autoload": {
@@ -3090,7 +3337,7 @@
                 "interactive",
                 "shell"
             ],
-            "time": "2019-12-06T14:19:43+00:00"
+            "time": "2020-04-07T06:44:48+00:00"
         },
         {
             "name": "ramsey/collection",
@@ -3233,6 +3480,108 @@
                 "uuid"
             ],
             "time": "2020-03-29T20:13:32+00:00"
+        },
+        {
+            "name": "sabberworm/php-css-parser",
+            "version": "8.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
+                "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
+                "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.4",
+                "phpunit/phpunit": "~4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Sabberworm\\CSS": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Raphael Schweikert"
+                }
+            ],
+            "description": "Parser for CSS Files written in PHP",
+            "homepage": "http://www.sabberworm.com/blog/2010/6/10/php-css-parser",
+            "keywords": [
+                "css",
+                "parser",
+                "stylesheet"
+            ],
+            "time": "2019-02-22T07:42:52+00:00"
+        },
+        {
+            "name": "swagger-api/swagger-ui",
+            "version": "v3.25.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swagger-api/swagger-ui.git",
+                "reference": "e8a451a4cb1d774c62492ef44211f7589649e529"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/e8a451a4cb1d774c62492ef44211f7589649e529",
+                "reference": "e8a451a4cb1d774c62492ef44211f7589649e529",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Anna Bodnia",
+                    "email": "anna.bodnia@gmail.com"
+                },
+                {
+                    "name": "Buu Nguyen",
+                    "email": "buunguyen@gmail.com"
+                },
+                {
+                    "name": "Josh Ponelat",
+                    "email": "jponelat@gmail.com"
+                },
+                {
+                    "name": "Kyle Shockey",
+                    "email": "kyleshockey1@gmail.com"
+                },
+                {
+                    "name": "Robert Barnwell",
+                    "email": "robert@robertismy.name"
+                },
+                {
+                    "name": "Sahar Jafari",
+                    "email": "shr.jafari@gmail.com"
+                }
+            ],
+            "description": " Swagger UI is a collection of HTML, Javascript, and CSS assets that dynamically generate beautiful documentation from a Swagger-compliant API.",
+            "homepage": "http://swagger.io",
+            "keywords": [
+                "api",
+                "documentation",
+                "openapi",
+                "specification",
+                "swagger",
+                "ui"
+            ],
+            "time": "2020-01-17T21:39:28+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4646,6 +4995,79 @@
             "time": "2020-03-27T16:56:45+00:00"
         },
         {
+            "name": "symfony/yaml",
+            "version": "v5.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "ad5e9c83ade5bbb3a96a3f30588a0622708caefd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/ad5e9c83ade5bbb3a96a3f30588a0622708caefd",
+                "reference": "ad5e9c83ade5bbb3a96a3f30588a0622708caefd",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2.5",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "conflict": {
+                "symfony/console": "<4.4"
+            },
+            "require-dev": {
+                "symfony/console": "^4.4|^5.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-03-30T11:42:42+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.2",
             "source": {
@@ -4880,6 +5302,69 @@
                 "php"
             ],
             "time": "2020-03-13T01:23:26+00:00"
+        },
+        {
+            "name": "zircote/swagger-php",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zircote/swagger-php.git",
+                "reference": "c86386bd623ffad6f7e6f9269bf51d42d2797012"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/c86386bd623ffad6f7e6f9269bf51d42d2797012",
+                "reference": "c86386bd623ffad6f7e6f9269bf51d42d2797012",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/annotations": "*",
+                "php": ">=7.2",
+                "symfony/finder": ">=2.2",
+                "symfony/yaml": ">=3.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=8",
+                "squizlabs/php_codesniffer": ">=3.3",
+                "zendframework/zend-form": "<2.8"
+            },
+            "bin": [
+                "bin/openapi"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OpenApi\\": "src"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Robert Allen",
+                    "email": "zircote@gmail.com",
+                    "homepage": "http://www.zircote.com"
+                },
+                {
+                    "name": "Bob Fanger",
+                    "email": "bfanger@gmail.com",
+                    "homepage": "http://bfanger.nl"
+                }
+            ],
+            "description": "swagger-php - Generate interactive documentation for your RESTful API using phpdoc annotations",
+            "homepage": "https://github.com/zircote/swagger-php/",
+            "keywords": [
+                "api",
+                "json",
+                "rest",
+                "service discovery"
+            ],
+            "time": "2019-11-30T13:35:44+00:00"
         }
     ],
     "packages-dev": [
@@ -5720,16 +6205,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.2",
+            "version": "8.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "018b6ac3c8ab20916db85fa91bf6465acb64d1e0"
+                "reference": "67750516bc02f300e2742fed2f50177f8f37bedf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/018b6ac3c8ab20916db85fa91bf6465acb64d1e0",
-                "reference": "018b6ac3c8ab20916db85fa91bf6465acb64d1e0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/67750516bc02f300e2742fed2f50177f8f37bedf",
+                "reference": "67750516bc02f300e2742fed2f50177f8f37bedf",
                 "shasum": ""
             },
             "require": {
@@ -5799,7 +6284,17 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2020-01-08T08:49:49+00:00"
+            "funding": [
+                {
+                    "url": "https://phpunit.de/donate.html",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/sebastianbergmann",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-03-31T08:52:04+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

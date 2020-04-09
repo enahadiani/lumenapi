@@ -6,6 +6,8 @@
     "type": "project",
     "require": {
         "php": "^7.2.5",
+        "barryvdh/laravel-dompdf": "^0.8.6",
+        "darkaonline/swagger-lume": "^7.0",
         "flipbox/lumen-generator": "^6.0",
         "illuminate/mail": "^7.4",
         "laravel/lumen-framework": "^7.0",

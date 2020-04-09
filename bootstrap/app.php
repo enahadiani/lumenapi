@@ -78,6 +78,10 @@ $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 $app->configure('excel');
 $app->alias('Excel', Maatwebsite\Excel\Facades\Excel::class);
 
+$app->configure('swagger-lume');
+
+$app->configure('dompdf');
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -121,6 +125,8 @@ $app->register(Illuminate\Mail\MailServiceProvider::class);
 
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+$app->register(SwaggerLume\ServiceProvider::class);
+$app->register(Barryvdh\DomPDF\ServiceProvider::class);
 
 
 /*

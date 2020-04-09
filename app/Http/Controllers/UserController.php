@@ -10,9 +10,34 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
 use  App\User;
+use Barryvdh\DomPDF\PDF;
 
 class UserController extends Controller
 {
+
+    //SWAGGER ANNOTATION
+     /**
+     * @OA\Get(
+     *     path="/public/api/approval/profile",
+     *     operationId="/api/approval/profile",
+     *     tags={"Get Profile"},
+     *     @OA\Header(
+     *         header="Authorization",
+     *         description="Token with barrer type",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Returns json data profile",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Error: Bad request. When required parameters were not supplied.",
+     *     ),
+     * )
+     */
+    //END SWAGGER ANNOTATION
      /**
      * Instantiate a new UserController instance.
      *
@@ -102,5 +127,18 @@ class UserController extends Controller
     public function export() 
     {
         return Excel::download(new UsersExport, 'users.xlsx');
+    }
+
+    public function exportpdf(){
+        // return (new UsersExport)->download('users.pdf', \Maatwebsite\Excel\Excel::DomPdf);
+        //GET DATA BERDASARKAN ID
+        $user = User::all();
+        // //LOAD PDF YANG MERUJUK KE VIEW PRINT.BLADE.PHP DENGAN MENGIRIMKAN DATA DARI INVOICE
+        // //KEMUDIAN MENGGUNAKAN PENGATURAN LANDSCAPE A4
+        // // $pdf = PDF::loadView('user.print', ['user'=>$user])->setPaper('a4', 'landscape');
+        // // return $pdf->stream();
+        $pdf = app('dompdf.wrapper')->loadView('user.print', ['user'=>$user]);
+        $pdf->setPaper('a4', 'lanscape');
+        return $pdf->stream();
     }
 }
