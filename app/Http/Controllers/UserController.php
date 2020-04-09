@@ -15,29 +15,6 @@ use Barryvdh\DomPDF\PDF;
 class UserController extends Controller
 {
 
-    //SWAGGER ANNOTATION
-     /**
-     * @OA\Get(
-     *     path="/public/api/approval/profile",
-     *     operationId="/api/approval/profile",
-     *     tags={"Get Profile"},
-     *     @OA\Header(
-     *         header="Authorization",
-     *         description="Token with barrer type",
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Response(
-     *         response="200",
-     *         description="Returns json data profile",
-     *         @OA\JsonContent()
-     *     ),
-     *     @OA\Response(
-     *         response="400",
-     *         description="Error: Bad request. When required parameters were not supplied.",
-     *     ),
-     * )
-     */
-    //END SWAGGER ANNOTATION
      /**
      * Instantiate a new UserController instance.
      *
