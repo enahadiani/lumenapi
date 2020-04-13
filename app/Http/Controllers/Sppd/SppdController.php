@@ -171,7 +171,7 @@ class SppdController extends Controller
         }
     }
 
-    public function getDrk(){
+    public function getDrk(Request $request){
         try {
 
             if($data =  Auth::guard('ypt')->user()){
@@ -238,7 +238,7 @@ class SppdController extends Controller
         }
     }
 
-    public function cekBudget(){
+    public function cekBudget(Request $request){
         
         try {
             
@@ -247,10 +247,10 @@ class SppdController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $kode_pp=$data['kode_pp'];
-            $kode_akun=$data['kode_akun'];
-            $kode_drk=$data['kode_drk'];
-            $periode=$data['periode'];
+            $kode_pp=$request->input('kode_pp');
+            $kode_akun=$request->input('kode_akun');
+            $kode_drk=$request->input('kode_drk');
+            $periode=$request->input('periode');
 
             if($request->input('no_agenda') != ""){
                 $sql="select dbo.fn_cekagg3('$kode_pp','$kode_lokasi','$kode_akun','$kode_drk','$periode','$no_agenda') as gar ";
