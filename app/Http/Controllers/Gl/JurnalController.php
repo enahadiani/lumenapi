@@ -111,18 +111,18 @@ class JurnalController extends Controller
     {
         try {
             $this->validate($request, [
-                'jurnal.*.no_dokumen' => 'required',
-                'jurnal.*.tanggal' => 'required',
-                'jurnal.*.jenis' => 'required',
-                'jurnal.*.deskripsi' => 'required',
-                'jurnal.*.total_debet' => 'required',
-                'jurnal.*.total_kredit' => 'required',
-                'jurnal.*.nik_periksa' => 'required',
-                'jurnal.*.detail.*.kode_akun' => 'required',
-                'jurnal.*.detail.*.keterangan' => 'required',
-                'jurnal.*.detail.*.dc' => 'required',
-                'jurnal.*.detail.*.nilai' => 'required',
-                'jurnal.*.detail.*.kode_pp' => 'required'
+                'Jurnal.*.no_dokumen' => 'required',
+                'Jurnal.*.tanggal' => 'required',
+                'Jurnal.*.jenis' => 'required',
+                'Jurnal.*.deskripsi' => 'required',
+                'Jurnal.*.total_debet' => 'required',
+                'Jurnal.*.total_kredit' => 'required',
+                'Jurnal.*.nik_periksa' => 'required',
+                'Jurnal.*.Detail.*.kode_akun' => 'required',
+                'Jurnal.*.Detail.*.keterangan' => 'required',
+                'Jurnal.*.Detail.*.dc' => 'required',
+                'Jurnal.*.Detail.*.nilai' => 'required',
+                'Jurnal.*.Detail.*.kode_pp' => 'required'
             ]);
 
             if($rs =  Auth::guard('admin')->user()){
@@ -135,7 +135,7 @@ class JurnalController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $kode_pp = $res[0]['kode_pp'];
-            $data = $request->input('jurnal');
+            $data = $request->input('Jurnal');
             DB::connection('sqlsrv2')->beginTransaction();
 
             if(count($data) > 0){
@@ -151,7 +151,7 @@ class JurnalController extends Controller
                             
                             $sql = DB::connection('sqlsrv2')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".joinNum2($data[$i]['total_debet']).",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
 
-                            $data2 = $request->input('jurnal')[$i]['detail'];
+                            $data2 = $request->input('Jurnal')[$i]['Detail'];
                             
                             if (count($data2) > 0){
                                 for ($j=0;$j < count($data2);$j++){
@@ -209,19 +209,19 @@ class JurnalController extends Controller
     {
         try {
             $this->validate($request, [
-                'jurnal.*.no_bukti' => 'required',
-                'jurnal.*.no_dokumen' => 'required',
-                'jurnal.*.tanggal' => 'required',
-                'jurnal.*.jenis' => 'required',
-                'jurnal.*.deskripsi' => 'required',
-                'jurnal.*.total_debet' => 'required',
-                'jurnal.*.total_kredit' => 'required',
-                'jurnal.*.nik_periksa' => 'required',
-                'jurnal.*.detail.*.kode_akun' => 'required',
-                'jurnal.*.detail.*.keterangan' => 'required',
-                'jurnal.*.detail.*.dc' => 'required',
-                'jurnal.*.detail.*.nilai' => 'required',
-                'jurnal.*.detail.*.kode_pp' => 'required'
+                'Jurnal.*.no_bukti' => 'required',
+                'Jurnal.*.no_dokumen' => 'required',
+                'Jurnal.*.tanggal' => 'required',
+                'Jurnal.*.jenis' => 'required',
+                'Jurnal.*.deskripsi' => 'required',
+                'Jurnal.*.total_debet' => 'required',
+                'Jurnal.*.total_kredit' => 'required',
+                'Jurnal.*.nik_periksa' => 'required',
+                'Jurnal.*.Detail.*.kode_akun' => 'required',
+                'Jurnal.*.Detail.*.keterangan' => 'required',
+                'Jurnal.*.Detail.*.dc' => 'required',
+                'Jurnal.*.Detail.*.nilai' => 'required',
+                'Jurnal.*.Detail.*.kode_pp' => 'required'
             ]);
 
             if($rs =  Auth::guard('admin')->user()){
@@ -234,7 +234,7 @@ class JurnalController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $kode_pp = $res[0]['kode_pp'];
-            $data = $request->input('jurnal');
+            $data = $request->input('Jurnal');
             DB::connection('sqlsrv2')->beginTransaction();
 
             if(count($data) > 0){
@@ -255,7 +255,7 @@ class JurnalController extends Controller
                             
                             $sql = DB::connection('sqlsrv2')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".joinNum2($data[$i]['total_debet']).",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
 
-                            $data2 = $request->input('jurnal')[$i]['detail'];
+                            $data2 = $request->input('Jurnal')[$i]['Detail'];
                             
                             if (count($data2) > 0){
                                 for ($j=0;$j < count($data2);$j++){
