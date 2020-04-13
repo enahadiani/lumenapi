@@ -167,4 +167,12 @@ $app->router->group([
     require __DIR__.'/../routes/ypt.php';
 });
 
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sppd'
+], function ($router) {
+    require __DIR__.'/../routes/sppd.php';
+});
+
 return $app;
