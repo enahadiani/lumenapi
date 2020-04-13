@@ -263,8 +263,13 @@ class SppdController extends Controller
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $bug = explode(";",$res[0]['gar']);
-                $success['saldo_budget'] = $bug[0]-$bug[1];
+                if($res[0]['gar'] != ""){
+
+                    $bug = explode(";",$res[0]['gar']);
+                    $success['saldo_budget'] = $bug[0]-$bug[1];
+                }else{
+                    $success['saldo_budget'] = 0;
+                }
                 $success['message'] = "Success!";
                 $success['rows']=count($res);
                 
