@@ -78,4 +78,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('user_device','UserDeviceController@store');
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
+
+    $router->get('jurnal','Gl\JurnalController@index');
+    $router->get('jurnal/{id}','Gl\JurnalController@show');
+    $router->post('jurnal','Gl\JurnalController@store');
+    $router->put('jurnal/{id}','Gl\JurnalController@update');
+    $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
+
 });
