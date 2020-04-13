@@ -7,6 +7,67 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
+function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+    $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+    $query = json_decode(json_encode($query),true);
+    $kode = $query[0]['id'];
+    $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+    return $id;
+}
+
+function doCekPeriode2($modul,$status,$periode) {
+    try{
+        
+        $perValid = false;
+        if($data =  Auth::guard('admin')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+        
+        if ($status == "A") {
+
+            $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
+        }else{
+
+            $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
+        }
+
+        $auth = DB::connection('sqlsrv2')->select($strSQL);
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $perValid = true;
+        }
+        $msg = "ok";
+    } catch (\Throwable $e) {		
+        $msg= " error " .  $e;
+        $perValid = false;
+    } 	
+    $result['status'] = $perValid;
+    $result['message'] = $msg;
+    $result['sql'] = $strSQL;
+    return $result;		
+}
+
+function isUnik($isi,$no_bukti){
+    if($data =  Auth::guard('admin')->user()){
+        $nik= $data->nik;
+        $kode_lokasi= $data->kode_lokasi;
+    }
+
+    $strSQL = "select no_bukti from trans_m where no_dokumen = '".$isi."' and kode_lokasi='".$kode_lokasi."' and no_bukti <> '".$no_bukti."' ";
+
+    $auth = DB::connection('sqlsrv2')->select($strSQL);
+    $auth = json_decode(json_encode($auth),true);
+
+    if(count($auth) > 0){
+        $res['status'] = false;
+        $res['no_bukti'] = $auth[0]['no_bukti'];
+    }else{
+        $res['status'] = true;
+    }
+    return $res;
+}
+
 class JurnalController extends Controller
 {
     /**
@@ -16,57 +77,7 @@ class JurnalController extends Controller
      */
     public $successStatus = 200;
 
-    public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query =DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
-        $query = json_decode(json_encode($query),true);
-        $kode = $query[0]['id'];
-        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
-        return $id;
-    }
 
-    function doCekPeriode2($modul,$status,$periode) {
-        try{
-            
-            $perValid = false;
-            
-            if ($status == "A") {
-    
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$_SESSION['lokasi']."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
-            }else{
-    
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$_SESSION['lokasi']."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
-            }
-
-            $auth = DB::connection('sqlsrv2')->select($strSQL);
-            $auth = json_decode(json_encode($auth),true);
-            if(count($auth) > 0){
-                $perValid = true;
-            }
-            $msg = "ok";
-        } catch (\Throwable $e) {		
-            $msg= " error " .  $e;
-            $perValid = false;
-        } 	
-        $result['status'] = $perValid;
-        $result['message'] = $msg;
-        return $result;		
-    }
-
-    function isUnik($isi,$no_bukti){
-
-        $auth = "select no_bukti from trans_m where no_dokumen = '".$isi."' and kode_lokasi='".$_SESSION['lokasi']."' and no_bukti <> '".$no_bukti."' ";
-
-        $auth = DB::connection('sqlsrv2')->select($strSQL);
-        $auth = json_decode(json_encode($auth),true);
-
-        if(count($auth) > 0){
-            $res['status'] = false;
-            $res['no_bukti'] = $auth[0]['no_bukti'];
-        }else{
-            $res['status'] = true;
-        }
-        return $res;
-    }
     
     public function index()
     {
@@ -109,25 +120,27 @@ class JurnalController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'jurnal.*.no_dokumen' => 'required',
+            'jurnal.*.tanggal' => 'required',
+            'jurnal.*.jenis' => 'required',
+            'jurnal.*.deskripsi' => 'required',
+            'jurnal.*.total_debet' => 'required',
+            'jurnal.*.total_kredit' => 'required',
+            'jurnal.*.nik_periksa' => 'required',
+            'jurnal.*.detail.*.kode_akun' => 'required',
+            'jurnal.*.detail.*.keterangan' => 'required',
+            'jurnal.*.detail.*.dc' => 'required',
+            'jurnal.*.detail.*.nilai' => 'required',
+            'jurnal.*.detail.*.kode_pp' => 'required'
+        ]);
+
         try {
-            $this->validate($request, [
-                'Jurnal.*.no_dokumen' => 'required',
-                'Jurnal.*.tanggal' => 'required',
-                'Jurnal.*.jenis' => 'required',
-                'Jurnal.*.deskripsi' => 'required',
-                'Jurnal.*.total_debet' => 'required',
-                'Jurnal.*.total_kredit' => 'required',
-                'Jurnal.*.nik_periksa' => 'required',
-                'Jurnal.*.Detail.*.kode_akun' => 'required',
-                'Jurnal.*.Detail.*.keterangan' => 'required',
-                'Jurnal.*.Detail.*.dc' => 'required',
-                'Jurnal.*.Detail.*.nilai' => 'required',
-                'Jurnal.*.Detail.*.kode_pp' => 'required'
-            ]);
 
             if($rs =  Auth::guard('admin')->user()){
                 $nik= $rs->nik;
                 $kode_lokasi= $rs->kode_lokasi;
+                $status_admin=$rs->status_admin;
             }
 
             $res = DB::connection('sqlsrv2')->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'
@@ -135,23 +148,23 @@ class JurnalController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $kode_pp = $res[0]['kode_pp'];
-            $data = $request->input('Jurnal');
+            $data = $request->input('jurnal');
             DB::connection('sqlsrv2')->beginTransaction();
 
             if(count($data) > 0){
                 for($i=0;$i<count($data);$i++){
-                    $periode=substr($data[$i]['tanggal'],0,4).substr($data[$i]['tanggal'],5,2);
+                    $periode = substr($data[$i]['tanggal'],0,4).substr($data[$i]['tanggal'],5,2);
                     $no_bukti = generateKode("trans_m", "no_bukti", $kode_lokasi."-JU".substr($periode,2,4).".", "0001");
 
-                    $cek = doCekPeriode2($data['jenis'],$_SESSION['userStatus'],$periode);
+                    $cek = doCekPeriode2($data[$i]['jenis'],$status_admin,$periode);
                     
                     if($cek['status']){
-                        $res = isUnik($data['no_dokumen'],$no_bukti);
+                        $res = isUnik($data[$i]['no_dokumen'],$no_bukti);
                         if($res['status']){
                             
-                            $sql = DB::connection('sqlsrv2')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".joinNum2($data[$i]['total_debet']).",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
+                            $sql = DB::connection('sqlsrv2')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".floatval($data[$i]['total_debet']).",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
 
-                            $data2 = $request->input('Jurnal')[$i]['Detail'];
+                            $data2 = $request->input('jurnal')[$i]['detail'];
                             
                             if (count($data2) > 0){
                                 for ($j=0;$j < count($data2);$j++){
@@ -186,11 +199,11 @@ class JurnalController extends Controller
             }else{
                 DB::connection('sqlsrv2')->rollback();
                 $success['status'] = $sts;
-                $success['message'] = $msg;
+                $success['message'] = $tmp;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            // DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Jurnal gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -207,26 +220,28 @@ class JurnalController extends Controller
      */
     public function update(Request $request)
     {
+        $this->validate($request, [
+            'jurnal.*.no_bukti' => 'required',
+            'jurnal.*.no_dokumen' => 'required',
+            'jurnal.*.tanggal' => 'required',
+            'jurnal.*.jenis' => 'required',
+            'jurnal.*.deskripsi' => 'required',
+            'jurnal.*.total_debet' => 'required',
+            'jurnal.*.total_kredit' => 'required',
+            'jurnal.*.nik_periksa' => 'required',
+            'jurnal.*.detail.*.kode_akun' => 'required',
+            'jurnal.*.detail.*.keterangan' => 'required',
+            'jurnal.*.detail.*.dc' => 'required',
+            'jurnal.*.detail.*.nilai' => 'required',
+            'jurnal.*.detail.*.kode_pp' => 'required'
+        ]);
+
         try {
-            $this->validate($request, [
-                'Jurnal.*.no_bukti' => 'required',
-                'Jurnal.*.no_dokumen' => 'required',
-                'Jurnal.*.tanggal' => 'required',
-                'Jurnal.*.jenis' => 'required',
-                'Jurnal.*.deskripsi' => 'required',
-                'Jurnal.*.total_debet' => 'required',
-                'Jurnal.*.total_kredit' => 'required',
-                'Jurnal.*.nik_periksa' => 'required',
-                'Jurnal.*.Detail.*.kode_akun' => 'required',
-                'Jurnal.*.Detail.*.keterangan' => 'required',
-                'Jurnal.*.Detail.*.dc' => 'required',
-                'Jurnal.*.Detail.*.nilai' => 'required',
-                'Jurnal.*.Detail.*.kode_pp' => 'required'
-            ]);
 
             if($rs =  Auth::guard('admin')->user()){
                 $nik= $rs->nik;
                 $kode_lokasi= $rs->kode_lokasi;
+                $status_admin= $rs->status_admin;
             }
 
             $res = DB::connection('sqlsrv2')->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'
@@ -234,7 +249,7 @@ class JurnalController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $kode_pp = $res[0]['kode_pp'];
-            $data = $request->input('Jurnal');
+            $data = $request->input('jurnal');
             DB::connection('sqlsrv2')->beginTransaction();
 
             if(count($data) > 0){
@@ -247,15 +262,15 @@ class JurnalController extends Controller
 
                     $del2 = DB::connection('sqlsrv2')->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
-                    $cek = doCekPeriode2($data['jenis'],$_SESSION['userStatus'],$periode);
+                    $cek = doCekPeriode2($data[$i]['jenis'],$status_admin,$periode);
                     
                     if($cek['status']){
-                        $res = isUnik($data['no_dokumen'],$no_bukti);
+                        $res = isUnik($data[$i]['no_dokumen'],$no_bukti);
                         if($res['status']){
                             
-                            $sql = DB::connection('sqlsrv2')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".joinNum2($data[$i]['total_debet']).",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
+                            $sql = DB::connection('sqlsrv2')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".floatval($data[$i]['total_debet']).",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
 
-                            $data2 = $request->input('Jurnal')[$i]['Detail'];
+                            $data2 = $request->input('jurnal')[$i]['detail'];
                             
                             if (count($data2) > 0){
                                 for ($j=0;$j < count($data2);$j++){

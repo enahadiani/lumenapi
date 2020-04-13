@@ -82,7 +82,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('jurnal','Gl\JurnalController@index');
     $router->get('jurnal/{id}','Gl\JurnalController@show');
     $router->post('jurnal','Gl\JurnalController@store');
-    $router->put('jurnal/{id}','Gl\JurnalController@update');
+    $router->put('jurnal','Gl\JurnalController@update');
     $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
 
 });
