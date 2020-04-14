@@ -58,17 +58,6 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
-$app->singleton(
-    Illuminate\Routing\RouteCollectionInterface::class
-);
-
-$app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function ($app){
-    return new \Illuminate\Routing\ResponseFactory(
-        $app['Illuminate\Contracts\View\Factory'], 
-        $app['Illuminate\Routing\Redirector']
-    );
-});
-
 /*
 |--------------------------------------------------------------------------
 | Register Config Files
@@ -149,7 +138,6 @@ $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 // $app->register(SwaggerLume\ServiceProvider::class);
 $app->register(Barryvdh\DomPDF\ServiceProvider::class);
-// $app->register(Collective\Html\HtmlServiceProvider::class);
 $app->register(PrettyRoutes\ServiceProvider::class);
 
 
