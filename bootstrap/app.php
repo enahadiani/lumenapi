@@ -58,6 +58,16 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
+$app->singleton(
+    Illuminate\Routing\RouteCollectionInterface::class
+);
+
+$app->singleton('Illuminate\Contracts\Routing\ResponseFactory', function ($app){
+    return new \Illuminate\Routing\ResponseFactory(
+        $app['Illuminate\Contracts\View\Factory'], 
+        $app['Illuminate\Routing\Redirector']
+    );
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -128,7 +138,7 @@ $app->routeMiddleware([
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
