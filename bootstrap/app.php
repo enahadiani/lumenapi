@@ -58,6 +58,7 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
+
 /*
 |--------------------------------------------------------------------------
 | Register Config Files
@@ -127,7 +128,7 @@ $app->routeMiddleware([
 |
 */
 
-$app->register(App\Providers\AppServiceProvider::class);
+// $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
@@ -138,6 +139,7 @@ $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 // $app->register(SwaggerLume\ServiceProvider::class);
 $app->register(Barryvdh\DomPDF\ServiceProvider::class);
+// $app->register(Collective\Html\HtmlServiceProvider::class);
 $app->register(PrettyRoutes\ServiceProvider::class);
 
 
