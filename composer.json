@@ -8,6 +8,7 @@
         "php": "^7.2.5",
         "barryvdh/laravel-dompdf": "^0.8.6",
         "flipbox/lumen-generator": "^6.0",
+        "laravel/lumen-framework": "^7.0",
         "illuminate/auth": "^7.6",
         "illuminate/mail": "^7.5",
         "league/flysystem": "^1.0",
