@@ -92,7 +92,7 @@ $app->alias('Excel', Maatwebsite\Excel\Facades\Excel::class);
 
 $app->configure('dompdf');
 
-$app->configure('pretty-routes');
+//$app->configure('pretty-routes');
 
 /*
 |--------------------------------------------------------------------------
@@ -140,7 +140,7 @@ $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 // $app->register(SwaggerLume\ServiceProvider::class);
 $app->register(Barryvdh\DomPDF\ServiceProvider::class);
 // $app->register(Collective\Html\HtmlServiceProvider::class);
-$app->register(PrettyRoutes\ServiceProvider::class);
+//$app->register(PrettyRoutes\ServiceProvider::class);
 
 
 /*
