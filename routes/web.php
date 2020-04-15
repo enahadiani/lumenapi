@@ -31,3 +31,8 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->get('users/export', 'UserController@export');
 $router->get('users/exportpdf', 'UserController@exportpdf');
+
+$router->get('routes', ['middleware' => 'cors', function() use ($router) {
+    $data = $router->getRoutes();
+    return view('routes', ['routes' => $data]);
+}]);
