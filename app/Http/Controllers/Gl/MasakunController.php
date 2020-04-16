@@ -99,8 +99,8 @@ class MasakunController extends Controller
             if(count($data) > 0){
                 for($i=0;$i<count($data);$i++){
 
-                    $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['kode_akun'],$kode_lokasi,$data[$i]['nama'],$data[$i]['jenis'],$data[$i]['kode_curr'],$data[$i]['block'],$data[$i]['status_gar'],$data[$i]['normal']]);
-
+                    $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['kode_akun'],$kode_lokasi,$data[$i]['nama'],$data[$i]['modul'],$data[$i]['jenis'],$data[$i]['kode_curr'],$data[$i]['block'],$data[$i]['status_gar'],$data[$i]['normal']]);
+                  
                     $flag = $request->input('akun')[$i]['flag'];
                     if(count($flag) > 0){
                         for($f=0;$f<count($flag);$f++){
@@ -113,22 +113,19 @@ class MasakunController extends Controller
                     if(count($keu) > 0){
                         for($k=0;$k<count($keu);$k++){
                             $ins3 = DB::connection('sqlsrv2')->insert('insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?) ', [$keu[$k]['kode_neraca'],$keu[$k]['kode_fs'],$data[$i]['kode_akun'],$kode_lokasi]);
-
                         }
                     }
 
                     $agg = $request->input('akun')[$i]['anggaran'];
                     if(count($agg) > 0){
                         for($a=0;$a<count($agg);$a++){
-                            $ins3 = DB::connection('sqlsrv2')->insert('insert into relakungar (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?) ', [$agg[$a]['kode_neracagar'],$agg[$a]['kode_fsgar'],$data[$i]['kode_akun'],$kode_lokasi]);
+                            $ins4 = DB::connection('sqlsrv2')->insert('insert into relakungar (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?) ', [$agg[$a]['kode_neracagar'],$agg[$a]['kode_fsgar'],$data[$i]['kode_akun'],$kode_lokasi]);
 
                         }
                     }
                     
                 }
             }
-            
-            
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Master akun berhasil disimpan";
@@ -263,7 +260,7 @@ class MasakunController extends Controller
                     $del = DB::connection('sqlsrv2')->table('masakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
 
 
-                    $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['kode_akun'],$kode_lokasi,$data[$i]['nama'],$data[$i]['jenis'],$data[$i]['kode_curr'],$data[$i]['block'],$data[$i]['status_gar'],$data[$i]['normal']]);
+                    $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['kode_akun'],$kode_lokasi,$data[$i]['nama'],$data[$i]['modul'],$data[$i]['jenis'],$data[$i]['kode_curr'],$data[$i]['block'],$data[$i]['status_gar'],$data[$i]['normal']]);
 
                     $flag = $request->input('akun')[$i]['flag'];
                     if(count($flag) > 0){
