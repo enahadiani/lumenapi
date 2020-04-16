@@ -232,38 +232,79 @@ class MasakunController extends Controller
     public function update(Request $request, $kode_fs)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'modul' => 'required',
-            'jenis' => 'required',
-            'kode_curr' => 'required',
-            'block' => 'required',
-            'status_gar' => 'required',
-            'normal' => 'required'
+            'akun.*.kode_akun' => 'required',
+            'akun.*.nama' => 'required',
+            'akun.*.modul' => 'required',
+            'akun.*.jenis' => 'required',
+            'akun.*.kode_curr' => 'required',
+            'akun.*.block' => 'required',
+            'akun.*.status_gar' => 'required',
+            'akun.*.normal' => 'required',
+            'akun.*.flag.*.kode_flag'  => 'required',
+            'akun.*.keuangan.*.kode_fs'  => 'required',
+            'akun.*.keuangan.*.kode_neraca'  => 'required',
+            'akun.*.anggaran.*.kode_fsgar'  => 'required',
+            'akun.*.anggaran.*.kode_neracagar' => 'required'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
+            if($rs =  Auth::guard('admin')->user()){
+                $nik= $rs->nik;
+                $kode_lokasi= $rs->kode_lokasi;
+            }
+
+            $data = $request->input('akun');
+
+            if(count($data) > 0){
+                for($i=0;$i<count($data);$i++){
+
+                    $del = DB::connection('sqlsrv2')->table('masakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+
+
+                    $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['kode_akun'],$kode_lokasi,$data[$i]['nama'],$data[$i]['jenis'],$data[$i]['kode_curr'],$data[$i]['block'],$data[$i]['status_gar'],$data[$i]['normal']]);
+
+                    $flag = $request->input('akun')[$i]['flag'];
+                    if(count($flag) > 0){
+                        $del2 = DB::connection('sqlsrv2')->table('flag_relasi')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+
+                        for($f=0;$f<count($flag);$f++){
+                            $ins2 = DB::connection('sqlsrv2')->insert('insert into flag_relasi(kode_akun,kode_lokasi,kode_flag) values (?, ?, ?) ', [$data[$i]['kode_akun'],$kode_lokasi,$flag[$f]['kode_flag']]);
+                        }
+                    }
+                    
+                    $keu = $request->input('akun')[$i]['keuangan'];
+
+                    if(count($keu) > 0){
+                        $del3 = DB::connection('sqlsrv2')->table('relakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+                        for($k=0;$k<count($keu);$k++){
+                            $ins3 = DB::connection('sqlsrv2')->insert('insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?) ', [$keu[$k]['kode_neraca'],$keu[$k]['kode_fs'],$data[$i]['kode_akun'],$kode_lokasi]);
+
+                        }
+                    }
+
+                    $agg = $request->input('akun')[$i]['anggaran'];
+                    if(count($agg) > 0){
+                        $del4 = DB::connection('sqlsrv2')->table('relakungar')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+                        for($a=0;$a<count($agg);$a++){
+                            $ins4 = DB::connection('sqlsrv2')->insert('insert into relakungar (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?) ', [$agg[$a]['kode_neracagar'],$agg[$a]['kode_fsgar'],$data[$i]['kode_akun'],$kode_lokasi]);
+
+                        }
+                    }
+                    
+                }
             }
             
-            $del = DB::connection('sqlsrv2')->table('masakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
-
-            $ins = DB::connection('sqlsrv2')->insert('insert into masakun (kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal) values  (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_akun'),$kode_lokasi,$request->input('nama'),$request->input('jenis'),$request->input('kode_curr'),$request->input('block'),$request->input('status_gar'),$request->input('normal')]);
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Master Akun berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            $success['message'] = "Data Master akun berhasil disimpan";
+            return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Master Akun gagal diubah ".$e;
+            $success['message'] = "Data Master akun gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -282,12 +323,12 @@ class MasakunController extends Controller
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
             }
             
             $del = DB::connection('sqlsrv2')->table('masakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+            $del = DB::connection('sqlsrv2')->table('flag_relasi')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+            $del = DB::connection('sqlsrv2')->table('relakun')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
+            $del = DB::connection('sqlsrv2')->table('relakungar')->where('kode_lokasi', $kode_lokasi)->where('kode_akun', $kode_akun)->delete();
 
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
