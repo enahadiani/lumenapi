@@ -296,12 +296,12 @@ class MasakunController extends Controller
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Master akun berhasil disimpan";
+            $success['message'] = "Data Master akun berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Master akun gagal disimpan ".$e;
+            $success['message'] = "Data Master akun gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
