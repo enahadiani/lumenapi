@@ -189,4 +189,11 @@ $app->router->group([
     require __DIR__.'/../routes/sppd.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/lapsaku'
+], function ($router) {
+    require __DIR__.'/../routes/lapsaku.php';
+});
+
 return $app;

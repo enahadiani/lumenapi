@@ -86,12 +86,6 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
     $router->get('pp','Gl\JurnalController@getPP');
     $router->get('akun','Gl\JurnalController@getAkun');
-
-    $router->get('lapdago','Gl\LaporanController@getLap');
-    $router->get('periode','Gl\FilterController@getPeriode');
-    $router->get('paket','Gl\FilterController@getPaket');
-    $router->get('jadwal','Gl\FilterController@getJadwal');
-    $router->get('reg','Gl\FilterController@getNoReg');
-    $router->get('peserta','Gl\FilterController@getPeserta');
+    $router->get('nikperiksa','Gl\JurnalController@getNIKPeriksa');
 
 });
