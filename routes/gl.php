@@ -84,6 +84,8 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('jurnal','Gl\JurnalController@store');
     $router->put('jurnal','Gl\JurnalController@update');
     $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
+    $router->get('pp','Gl\JurnalController@getPP');
+    $router->get('akun','Gl\JurnalController@getAkun');
 
     $router->get('lapdago','Gl\LaporanController@getLap');
     $router->get('periode','Gl\LaporanController@getPeriode');
