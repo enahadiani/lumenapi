@@ -85,4 +85,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->put('jurnal','Gl\JurnalController@update');
     $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
 
+    $router->get('lapdago','Gl\LaporanController@getLap');
+    $router->get('periode','Gl\LaporanController@getPeriode');
+    $router->get('paket','Gl\LaporanController@getPaket');
+    $router->get('jadwal','Gl\LaporanController@getJadwal');
+    $router->get('reg','Gl\LaporanController@getNoReg');
+    $router->get('peserta','Gl\LaporanController@getPeserta');
+
 });
