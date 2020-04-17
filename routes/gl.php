@@ -88,10 +88,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('akun','Gl\JurnalController@getAkun');
 
     $router->get('lapdago','Gl\LaporanController@getLap');
-    $router->get('periode','Gl\LaporanController@getPeriode');
-    $router->get('paket','Gl\LaporanController@getPaket');
-    $router->get('jadwal','Gl\LaporanController@getJadwal');
-    $router->get('reg','Gl\LaporanController@getNoReg');
-    $router->get('peserta','Gl\LaporanController@getPeserta');
+    $router->get('periode','Gl\FilterController@getPeriode');
+    $router->get('paket','Gl\FilterController@getPaket');
+    $router->get('jadwal','Gl\FilterController@getJadwal');
+    $router->get('reg','Gl\FilterController@getNoReg');
+    $router->get('peserta','Gl\FilterController@getPeserta');
 
 });
