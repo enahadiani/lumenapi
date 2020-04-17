@@ -226,7 +226,7 @@ class MasakunController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $kode_fs)
+    public function update(Request $request, $kode_akun)
     {
         $this->validate($request, [
             'akun.*.kode_akun' => 'required',
