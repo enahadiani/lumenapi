@@ -30,4 +30,5 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
     //konten laporan
     $router->get('gl_rpt_jurnal','Gl\LaporanController@getGlRptJurnal');
+    $router->get('gl_rpt_jurnal_form','Gl\LaporanController@getGlRptJurnalForm');
 });

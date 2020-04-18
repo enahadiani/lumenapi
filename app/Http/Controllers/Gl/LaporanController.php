@@ -77,18 +77,28 @@ class LaporanController extends Controller
                 }
             }
 
+            $sql="select a.no_bukti,a.keterangan,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,
+                        a.nik1,a.nik2,b.nama as nama1,c.nama as nama2
+                from trans_m a 
+                left join karyawan b on a.nik1=b.nik and a.kode_lokasi=b.kode_lokasi
+                left join karyawan c on a.nik1=c.nik and a.kode_lokasi=c.kode_lokasi
+                $filter order by a.no_bukti ";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+
             $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
             case when a.dc='D' then a.nilai else 0 end as debet,
             case when a.dc='C' then a.nilai else 0 end as kredit 
             from trans_j a 
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             $filter order by a.no_bukti ";
-            $res = DB::connection('sqlsrv2')->select($sql);
-            $res = json_decode(json_encode($res),true);
+            $res2 = DB::connection('sqlsrv2')->select($sql);
+            $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['detail_jurnal'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
