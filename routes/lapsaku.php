@@ -23,11 +23,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
-    $router->get('lapdago','Gl\LaporanController@getLap');
-    $router->get('periode','Gl\FilterController@getPeriode');
-    $router->get('paket','Gl\FilterController@getPaket');
-    $router->get('jadwal','Gl\FilterController@getJadwal');
-    $router->get('reg','Gl\FilterController@getNoReg');
-    $router->get('peserta','Gl\FilterController@getPeserta');
+    //filter laporan
+    $router->get('gl_periode','Gl\FilterController@getGlPeriode');
+    $router->get('gl_modul','Gl\FilterController@getGlModul');
+    $router->get('gl_bukti','Gl\FilterController@getGlBukti');
 
+    //konten laporan
+    $router->get('gl_rpt_jurnal','Gl\LaporanController@getGlRptJurnal');
 });
