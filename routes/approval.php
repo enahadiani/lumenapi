@@ -2,6 +2,7 @@
 namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -101,15 +102,16 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
             //Pengajuan
             $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
             $row = json_decode(json_encode($sql),true);
+            $request = new Request;
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalSM();
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalSM($request);
                 break;
                 case 'APPFIN' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalFinal();
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalFinal($request);
                 break;
                 case 'APPDIR' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalDir();
+                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalDir($request);
                 break;
                 default :
                 $success['status'] = false;
