@@ -16,7 +16,37 @@ class FilterController extends Controller
      */
     public $successStatus = 200;
 
-    function getGlPeriode(){
+    function getGlFilterLokasi(Request $request){
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+          
+            $sql="select kode_lokasi,nama from lokasi where flag_aktif='1' order by kode_lokasi ";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getGlFilterPeriode(){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -46,7 +76,7 @@ class FilterController extends Controller
         
     }
 
-    function getGlModul(Request $request){
+    function getGlFilterModul(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -76,7 +106,7 @@ class FilterController extends Controller
         }
     }
 
-    function getGlBukti(Request $request){
+    function getGlFilterBukti(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -106,7 +136,7 @@ class FilterController extends Controller
         }
     }
 
-    function getGlAkun(Request $request){
+    function getGlFilterAkun(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -136,7 +166,7 @@ class FilterController extends Controller
         }
     }
 
-    function getGlFs(Request $request){
+    function getGlFilterFs(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){

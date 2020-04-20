@@ -16,7 +16,7 @@ class LaporanController extends Controller
      */
     public $successStatus = 200;
 
-    function getGlRptJurnal(Request $request){
+    function getGlReportJurnal(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -60,7 +60,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getGlRptJurnalForm(Request $request){
+    function getGlReportJurnalForm(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -114,7 +114,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getGlRptBukuBesar(Request $request){
+    function getGlReportBukuBesar(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -173,7 +173,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getGlRptNeracaLajur(Request $request){
+    function getGlReportNeracaLajur(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -226,7 +226,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getGlRptNeraca(Request $request){
+    function getGlReportNeraca(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -276,7 +276,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getGlRptLabaRugi(Request $request){
+    function getGlReportLabaRugi(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){

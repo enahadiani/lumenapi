@@ -24,17 +24,18 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //filter laporan
-    $router->get('gl_periode','Gl\FilterController@getGlPeriode');
-    $router->get('gl_modul','Gl\FilterController@getGlModul');
-    $router->get('gl_bukti','Gl\FilterController@getGlBukti');
-    $router->get('gl_akun','Gl\FilterController@getGlAkun');
-    $router->get('gl_fs','Gl\FilterController@getGlFs');
+    $router->get('gl_filter_lokasi','Gl\FilterController@getGlFilterLokasi');
+    $router->get('gl_filter_periode','Gl\FilterController@getGlFilterPeriode');
+    $router->get('gl_filter_modul','Gl\FilterController@getGlFilterModul');
+    $router->get('gl_filter_bukti','Gl\FilterController@getGlFilterBukti');
+    $router->get('gl_filter_akun','Gl\FilterController@getGlFilterAkun');
+    $router->get('gl_filter_fs','Gl\FilterController@getGlFilterFs');
 
     //konten laporan
-    $router->get('gl_rpt_jurnal','Gl\LaporanController@getGlRptJurnal');
-    $router->get('gl_rpt_jurnal_form','Gl\LaporanController@getGlRptJurnalForm');
-    $router->get('gl_rpt_buku_besar','Gl\LaporanController@getGlRptBukuBesar');
-    $router->get('gl_rpt_neraca_lajur','Gl\LaporanController@getGlRptNeracaLajur');
-    $router->get('gl_rpt_neraca','Gl\LaporanController@getGlRptNeraca');
-    $router->get('gl_rpt_laba_rugi','Gl\LaporanController@getGlRptLabaRugi');
+    $router->get('gl_report_jurnal','Gl\LaporanController@getGlReportJurnal');
+    $router->get('gl_report_jurnal_form','Gl\LaporanController@getGlReportJurnalForm');
+    $router->get('gl_report_buku_besar','Gl\LaporanController@getGlReportBukuBesar');
+    $router->get('gl_report_neraca_lajur','Gl\LaporanController@getGlReportNeracaLajur');
+    $router->get('gl_report_neraca','Gl\LaporanController@getGlReportNeraca');
+    $router->get('gl_report_laba_rugi','Gl\LaporanController@getGlReportLabaRugi');
 });
