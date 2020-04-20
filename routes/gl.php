@@ -88,4 +88,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('akun','Gl\JurnalController@getAkun');
     $router->get('nikperiksa','Gl\JurnalController@getNIKPeriksa');
 
+    $router->get('loadData','Gl\PostingController@loadData');
+    $router->get('modul2','Gl\PostingController@getModul');
+    $router->post('posting','Gl\PostingController@store');
 });
