@@ -361,7 +361,7 @@ class JurnalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select tanggal,no_bukti,periode,keterangan as deskripsi,nilai1,no_dokumen,modul as jenis from trans_m where no_bukti = '".$no_bukti."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection('sqlsrv2')->select("select tanggal,no_bukti,periode,keterangan as deskripsi,nilai1,no_dokumen,modul as jenis,nik2 as nik_periksa from trans_m where no_bukti = '".$no_bukti."' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
             $res2 = DB::connection('sqlsrv2')->select("select a.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
