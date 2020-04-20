@@ -96,13 +96,12 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
     // $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
     // $router->post('appdir', 'Approval\ApprovalController@approvalDir');
 
-    $router->post('app', function () {
+    $router->post('app', function (Request $request) {
         if($data =  Auth::guard('user')->user()){
             $nik= $data->nik;
             //Pengajuan
             $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
             $row = json_decode(json_encode($sql),true);
-            $request = new Request;
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
                     $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalSM($request);

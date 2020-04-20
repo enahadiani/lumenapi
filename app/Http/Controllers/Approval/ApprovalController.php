@@ -418,7 +418,7 @@ class ApprovalController extends Controller
         }
     }
 
-    public function approvalSM(Request $request)
+    public function approvalSM($request)
     {
         
         if($data =  Auth::guard('user')->user()){
@@ -516,7 +516,7 @@ class ApprovalController extends Controller
         }																
     }
 
-    public function approvalFinal(Request $request)
+    public function approvalFinal($request)
     {
         
         if($data =  Auth::guard('user')->user()){
@@ -614,7 +614,7 @@ class ApprovalController extends Controller
         }																
     }
 
-    public function approvalDir(Request $request)
+    public function approvalDir($request)
     {
         
         if($data =  Auth::guard('user')->user()){
