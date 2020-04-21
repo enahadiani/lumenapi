@@ -78,7 +78,7 @@ class PostingController extends Controller
                                 where a.no_bukti in (".$arr_nobukti2.") and a.kode_lokasi='".$kode_lokasi."' group by a.no_bukti,a.periode ) x where round(x.total,4) <> 0 ";						 
 				
                     $cek = DB::connection('sqlsrv2')->select($strSQL);
-                    $msg = $strSQL;
+                    $msg = "";
                     if (count($cek) > 0){			
                         for ($i=0; $i <count($cek);$i++){																		
                             $msg+= "Data Bukti Tidak Balance.(Bukti - Periode : ".$cek[$i]['bukper'].")\n";
@@ -125,7 +125,7 @@ class PostingController extends Controller
             if($sts){
                 DB::connection('sqlsrv2')->commit();
                 $success['status'] = $sts;
-                $success['message'] = "Data Posting berhasil disimpan ".$strSQL;
+                $success['message'] = "Data Posting berhasil disimpan ";
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
