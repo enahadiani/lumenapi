@@ -89,27 +89,25 @@ class PostingController extends Controller
                         $sts = false;
                     }else{
 
-                        // DB::connection('sqlsrv2')->beginTransaction();
+                        DB::connection('sqlsrv2')->beginTransaction();
             
-                        // $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-                        // $no_bukti = generateKode("posting_m", "no_post", $kode_lokasi."-PT".substr($periode,2,4).".", "0001");
+                        $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+                        $no_bukti = generateKode("posting_m", "no_post", $kode_lokasi."-PT".substr($periode,2,4).".", "0001");
             
-                        // $del = DB::connection('sqlsrv2')->table('gldt')->whereIn('no_bukti',$arr_nobukti)->where('kode_lokasi', $kode_lokasi)->delete();
+                        $del = DB::connection('sqlsrv2')->table('gldt')->whereIn('no_bukti',$arr_nobukti)->where('kode_lokasi', $kode_lokasi)->delete();
                         
-                        // $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',date('Y-m-d'),$nik,0));
+                        $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',date('Y-m-d'),$nik,0));
         
                         for ($i=0;$i < count($det);$i++){
-                        //     if (strtoupper($det[$i]['status']) == "POSTING"){
-                        //         $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$det[$i]['form'],$det[$i]['no_bukti'],$det[$i]['status'],'-','-',$kode_lokasi,$periode));
-        
-                                // $call[$i] = DB::connection('sqlsrv2')->select("exec sp_post_bukti (?, ?) ", array($kode_lokasi,$det[$i]['no_bukti']));
-                                $success['array_exec'][] = array($kode_lokasi,$det[$i]['no_bukti']);
+                            if (strtoupper($det[$i]['status']) == "POSTING"){
+                                $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$det[$i]['form'],$det[$i]['no_bukti'],$det[$i]['status'],'-','-',$kode_lokasi,$periode));
+
+                                DB::connection('sqlsrv2')->raw("call sp_post_bukti (?, ?) ", array($kode_lokasi,$det[$i]['no_bukti']));
                                 
-                                //     }
+                            }
                         }
-                        $success['exec'] = "exec sp_post_bukti";
                         
-                        // $call2 = DB::connection('sqlsrv2')->select("exec sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
+                        DB::connection('sqlsrv2')->raw("call sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
                         $sts = true;
                         $msg = "Posting data berhasil disimpan ";
                     }
