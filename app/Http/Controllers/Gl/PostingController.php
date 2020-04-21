@@ -92,7 +92,7 @@ class PostingController extends Controller
                         DB::connection('sqlsrv2')->beginTransaction();
             
                         $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-                        $no_bukti = generateKode("trans_m", "no_bukti", $kode_lokasi."-JU".substr($periode,2,4).".", "0001");
+                        $no_bukti = generateKode("posting_m", "no_post", $kode_lokasi."-PT".substr($periode,2,4).".", "0001");
             
                         $del = DB::connection('sqlsrv2')->table('gldt')->whereIn('no_bukti',$arr_nobukti)->where('kode_lokasi', $kode_lokasi)->delete();
                         
