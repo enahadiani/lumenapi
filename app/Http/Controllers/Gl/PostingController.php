@@ -202,14 +202,17 @@ class PostingController extends Controller
 
             $strSQL = "";
             $res = $request->input('data_modul');
-            for ($i=0;$i < count($res);$i++){	
-              
-                $strSQL .= "union all 
-                            select 'INPROG' as status,a.no_bukti as no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.form
-                            from trans_m a  
-                            where a.modul = '".$res[$i]['modul']."' and a.posted='F' and a.periode between '".$res[$i]['periode_awal']."' and '".$res[$i]['periode_akhir']."' and a.kode_lokasi='".$kode_lokasi."' ";								
-                
-            }		
+            if(count($res) > 0){
+
+                for ($i=0;$i < count($res);$i++){	
+                  
+                    $strSQL .= "union all 
+                                select 'INPROG' as status,a.no_bukti as no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.form
+                                from trans_m a  
+                                where a.modul = '".$res[$i]['modul']."' and a.posted='F' and a.periode between '".$res[$i]['periode_awal']."' and '".$res[$i]['periode_akhir']."' and a.kode_lokasi='".$kode_lokasi."' ";								
+                    
+                }		
+            }
             
             $strSQL = substr($strSQL,9);
             $result = DB::connection('sqlsrv2')->select($strSQL);						
