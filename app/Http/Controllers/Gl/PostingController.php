@@ -89,7 +89,6 @@ class PostingController extends Controller
                         $sts = false;
                     }else{
 
-                        $arr_nobukti = substr($arr_nobukti,1);
                         DB::connection('sqlsrv2')->beginTransaction();
             
                         $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
