@@ -188,24 +188,37 @@ class PostingController extends Controller
     public function loadData(Request $request)
     {
         try {
-            
+            $this->validate($request, [
+                'modul.*.modul' => 'required',
+                'modul.*.periode_awal' => 'required',
+                'modul.*.periode_akhir' => 'required'
+            ]);
+
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $status_admin = $data->status_admin;
             }
 
-            $strSQL = "select 'INPROG' as status,a.no_bukti as no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.form 
-                    from trans_m a  
-                    where a.modul = '".$request->modul."' and a.posted='F' and a.periode between '".$request->periode_awal."' and '".$request->periode_akhir."' and a.kode_lokasi='".$kode_lokasi."' ";			
-                    
-            $res = DB::connection('sqlsrv2')->select($strSQL);						
-            $res= json_decode(json_encode($res),true);
+            $strSQL = "";
+            $res = $request->input('modul');
+            for ($i=0;$i < count($res);$i++){	
+              
+                $strSQL .= "union all 
+                            select 'INPROG' as status,a.no_bukti as no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.form
+                            from trans_m a  
+                            where a.modul = '".$res[$i]['modul']."' and a.posted='F' and a.periode between '".$res[$i]['periode_awal']."' and '".$res[$i]['periode_akhir']."' and a.kode_lokasi='".$kode_lokasi."' ";								
+                
+            }		
+            
+            $strSQL = substr($strSQL,9);
+            $result = DB::connection('sqlsrv2')->select($strSQL);						
+            $result= json_decode(json_encode($result),true);
             
            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($result) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $result;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
