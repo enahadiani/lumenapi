@@ -185,7 +185,7 @@ class PostingController extends Controller
         
     }
 
-    public function loadData()
+    public function loadData(Request $request)
     {
         try {
             
