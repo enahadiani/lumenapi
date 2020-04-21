@@ -124,7 +124,7 @@ class PostingController extends Controller
             if($sts){
                 DB::connection('sqlsrv2')->commit();
                 $success['status'] = $sts;
-                $success['message'] = "Data Posting berhasil disimpan ";
+                $success['message'] = "Data Posting berhasil disimpan ".$strSQL;
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
