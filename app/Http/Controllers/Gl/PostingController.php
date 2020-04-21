@@ -49,90 +49,92 @@ class PostingController extends Controller
 
         try {
 
-            if($rs =  Auth::guard('admin')->user()){
-                $nik= $rs->nik;
-                $kode_lokasi= $rs->kode_lokasi;
-                $status_admin=$rs->status_admin;
-            }
+            // if($rs =  Auth::guard('admin')->user()){
+            //     $nik= $rs->nik;
+            //     $kode_lokasi= $rs->kode_lokasi;
+            //     $status_admin=$rs->status_admin;
+            // }
 
-            $det = $request->input('detail');
-            $arr_nobukti = array();
-            $arr_nobukti2 = "";
-            if(count($det) > 0){
-                $isAda = false;
-                for ($i=0;$i < count($det);$i++){
-                    $line = $det[$i];
-                    if (strtoupper($line['status']) == "POSTING"){
-                        $arr_nobukti[] = $line['no_bukti'];
-                        $arr_nobukti2 .= ",'".$line['no_bukti']."'"; 
-                        $isAda = true;
-                    }
-                }
+            // $det = $request->input('detail');
+            // $arr_nobukti = array();
+            // $arr_nobukti2 = "";
+            // if(count($det) > 0){
+            //     $isAda = false;
+            //     for ($i=0;$i < count($det);$i++){
+            //         $line = $det[$i];
+            //         if (strtoupper($line['status']) == "POSTING"){
+            //             $arr_nobukti[] = $line['no_bukti'];
+            //             $arr_nobukti2 .= ",'".$line['no_bukti']."'"; 
+            //             $isAda = true;
+            //         }
+            //     }
             
-                if($isAda){
+            //     if($isAda){
 
-                    $strSQL = "select no_bukti+' - '+periode as bukper from ( 
-                                select a.no_bukti,a.periode,sum(case a.dc when 'D' then a.nilai else -a.nilai end) as total 
-                                from trans_j a inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.posted='F' 
-                                where a.no_bukti in (".$arr_nobukti2.") and a.kode_lokasi='".$kode_lokasi."' group by a.no_bukti,a.periode ) x where round(x.total,4) <> 0 ";						 
+            //         $strSQL = "select no_bukti+' - '+periode as bukper from ( 
+            //                     select a.no_bukti,a.periode,sum(case a.dc when 'D' then a.nilai else -a.nilai end) as total 
+            //                     from trans_j a inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.posted='F' 
+            //                     where a.no_bukti in (".$arr_nobukti2.") and a.kode_lokasi='".$kode_lokasi."' group by a.no_bukti,a.periode ) x where round(x.total,4) <> 0 ";						 
 				
-                    $cek = DB::connection('sqlsrv2')->select($strSQL);
-                    $msg = "";
-                    if (count($cek) > 0){			
-                        for ($i=0; $i <count($cek);$i++){																		
-                            $msg+= "Data Bukti Tidak Balance.(Bukti - Periode : ".$cek[$i]['bukper'].")\n";
-                        }
-                    }	
-                    if ($msg != "") {
-                        $tmp = "Posting tidak valid. Terdapat Bukti Jurnal tidak Balanace Lihat Pesan Error. ".$msg;
-                        $sts = false;
-                    }else{
+            //         $cek = DB::connection('sqlsrv2')->select($strSQL);
+            //         $msg = "";
+            //         if (count($cek) > 0){			
+            //             for ($i=0; $i <count($cek);$i++){																		
+            //                 $msg+= "Data Bukti Tidak Balance.(Bukti - Periode : ".$cek[$i]['bukper'].")\n";
+            //             }
+            //         }	
+            //         if ($msg != "") {
+            //             $tmp = "Posting tidak valid. Terdapat Bukti Jurnal tidak Balanace Lihat Pesan Error. ".$msg;
+            //             $sts = false;
+            //         }else{
 
-                        $arr_nobukti = substr($arr_nobukti,1);
+            //             $arr_nobukti = substr($arr_nobukti,1);
                         DB::connection('sqlsrv2')->beginTransaction();
             
-                        $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-                        $no_bukti = generateKode("posting_m", "no_post", $kode_lokasi."-PT".substr($periode,2,4).".", "0001");
+            //             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            //             $no_bukti = generateKode("posting_m", "no_post", $kode_lokasi."-PT".substr($periode,2,4).".", "0001");
             
-                        $del = DB::connection('sqlsrv2')->table('gldt')->whereIn('no_bukti',$arr_nobukti)->where('kode_lokasi', $kode_lokasi)->delete();
+            //             $del = DB::connection('sqlsrv2')->table('gldt')->whereIn('no_bukti',$arr_nobukti)->where('kode_lokasi', $kode_lokasi)->delete();
                         
-                        $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',getdate(),$nik,0]);
+            //             $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',getdate(),$nik,0]);
         
-                        for ($i=0;$i < count($det);$i++){
-                            $line = $det[$i];
-                            if (strtoupper($line['status']) == "POSTING"){
-                                $arr_nobukti[] = $line['no_bukti'];
-                                $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values () ",[$no_bukti,strtoupper($line['form']),$line['no_bukti'],strtoupper($line['status']),'-','-',$kode_lokasi,$periode]);
+            //             for ($i=0;$i < count($det);$i++){
+            //                 $line = $det[$i];
+            //                 if (strtoupper($line['status']) == "POSTING"){
+            //                     $arr_nobukti[] = $line['no_bukti'];
+            //                     $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values () ",[$no_bukti,strtoupper($line['form']),$line['no_bukti'],strtoupper($line['status']),'-','-',$kode_lokasi,$periode]);
         
-                                $call[$i] = DB::connection('sqlsrv2')->select("call sp_post_bukti (?, ?) ", array($kode_lokasi,$line['no_bukti']));
+                                // $call[$i] = DB::connection('sqlsrv2')->select("call sp_post_bukti (?, ?) ", array($kode_lokasi,$line['no_bukti']));
+                                $call = DB::connection('sqlsrv2')->select("call sp_post_bukti (?, ?) ", array($kode_lokasi,"99-JU2004.0001"));
+                                
                              
-                            }
-                        }
+            //                 }
+            //             }
                         
-                        $call2 = DB::connection('sqlsrv2')->select("call sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
-                        $sts = true;
-                        $msg = "Posting data berhasil disimpan ";
-                    }
+            //             $call2 = DB::connection('sqlsrv2')->select("call sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
+            //             $sts = true;
+            //             $msg = "Posting data berhasil disimpan ";
+            //         }
 
-                }else{
-                    $sts = false;
-                    $msg = "Transaksi tidak valid. Tidak ada transaksi dengan status POSTING ";
-                }
-            }
+            //     }else{
+            //         $sts = false;
+            //         $msg = "Transaksi tidak valid. Tidak ada transaksi dengan status POSTING ";
+            //     }
+            // }
 
 
-            if($sts){
-                DB::connection('sqlsrv2')->commit();
-                $success['status'] = $sts;
-                $success['message'] = "Data Posting berhasil disimpan ";
-                return response()->json(['success'=>$success], $this->successStatus); 
+            // if($sts){
+            //     DB::connection('sqlsrv2')->commit();
+            //     $success['status'] = $sts;
+            //     $success['message'] = "Data Posting berhasil disimpan ";
+            //     return response()->json(['success'=>$success], $this->successStatus); 
 
-            }else{
+            // }else{
                 DB::connection('sqlsrv2')->rollback();
-                $success['status'] = $sts;
-                $success['message'] = $tmp;
-                return response()->json(['success'=>$success], $this->successStatus); 
-            }
+            //     $success['status'] = $sts;
+            //     $success['message'] = $tmp;
+            //     return response()->json(['success'=>$success], $this->successStatus); 
+            // }
         } catch (\Throwable $e) {
             // DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
