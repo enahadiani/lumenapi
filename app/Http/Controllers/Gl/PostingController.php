@@ -76,8 +76,8 @@ class PostingController extends Controller
                                 from trans_j a inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.posted='F' 
                                 where a.no_bukti in (".$arr_nobukti2.") and a.kode_lokasi='".$kode_lokasi."' group by a.no_bukti,a.periode ) x where round(x.total,4) <> 0 ";						 
 				
-                    $cek = DB::connection('sqlsrv2')->select($strSQL);
-                    $msg = "";
+                    // $cek = DB::connection('sqlsrv2')->select($strSQL);
+                    $msg = $strSQL;
                     if (count($cek) > 0){			
                         for ($i=0; $i <count($cek);$i++){																		
                             $msg+= "Data Bukti Tidak Balance.(Bukti - Periode : ".$cek[$i]['bukper'].")\n";
