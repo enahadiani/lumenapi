@@ -124,7 +124,7 @@ class PostingController extends Controller
             if($sts){
                 DB::connection('sqlsrv2')->commit();
                 $success['status'] = $sts;
-                $success['message'] = "Data Jurnal berhasil disimpan ";
+                $success['message'] = "Data Posting berhasil disimpan ";
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
@@ -136,7 +136,7 @@ class PostingController extends Controller
         } catch (\Throwable $e) {
             // DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jurnal gagal disimpan ".$e;
+            $success['message'] = "Data Posting gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     
