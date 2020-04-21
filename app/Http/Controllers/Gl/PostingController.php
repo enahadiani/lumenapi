@@ -189,9 +189,9 @@ class PostingController extends Controller
     {
         try {
             $this->validate($request, [
-                'modul.*.modul' => 'required',
-                'modul.*.periode_awal' => 'required',
-                'modul.*.periode_akhir' => 'required'
+                'data_modul.*.modul' => 'required',
+                'data_modul.*.periode_awal' => 'required',
+                'data_modul.*.periode_akhir' => 'required'
             ]);
 
             if($data =  Auth::guard('admin')->user()){
@@ -201,7 +201,7 @@ class PostingController extends Controller
             }
 
             $strSQL = "";
-            $res = $request->input('modul');
+            $res = $request->input('data_modul');
             for ($i=0;$i < count($res);$i++){	
               
                 $strSQL .= "union all 
