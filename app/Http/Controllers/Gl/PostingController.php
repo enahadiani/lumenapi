@@ -98,16 +98,16 @@ class PostingController extends Controller
                         
                         // $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',date('Y-m-d'),$nik,0));
         
-                        // for ($i=0;$i < count($det);$i++){
+                        for ($i=0;$i < count($det);$i++){
                         //     if (strtoupper($det[$i]['status']) == "POSTING"){
                         //         $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$det[$i]['form'],$det[$i]['no_bukti'],$det[$i]['status'],'-','-',$kode_lokasi,$periode));
         
                                 // $call[$i] = DB::connection('sqlsrv2')->select("exec sp_post_bukti (?, ?) ", array($kode_lokasi,$det[$i]['no_bukti']));
-                                $success['exec'] = "exec sp_post_bukti (?, ?) ";
-                                $success['array_exec'] = array($kode_lokasi,$det[$i]['no_bukti']);
-                             
-                        //     }
-                        // }
+                                $success['array_exec'][] = array($kode_lokasi,$det[$i]['no_bukti']);
+                                
+                                //     }
+                        }
+                        $success['exec'] = "exec sp_post_bukti";
                         
                         // $call2 = DB::connection('sqlsrv2')->select("exec sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
                         $sts = true;
