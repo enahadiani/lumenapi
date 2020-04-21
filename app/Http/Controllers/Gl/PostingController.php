@@ -134,7 +134,7 @@ class PostingController extends Controller
         } catch (\Throwable $e) {
             // DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Posting gagal disimpan ".$e;
+            $success['message'] = $ins2." Data Posting gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     
