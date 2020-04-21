@@ -96,13 +96,12 @@ class PostingController extends Controller
             
                         $del = DB::connection('sqlsrv2')->table('gldt')->whereIn('no_bukti',$arr_nobukti)->where('kode_lokasi', $kode_lokasi)->delete();
                         
-                        $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',getdate(),$nik,0]);
+                        $ins = DB::connection('sqlsrv2')->insert("insert into posting_m(no_post,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',getdate(),$nik,0));
         
                         for ($i=0;$i < count($det);$i++){
                             $line = $det[$i];
                             if (strtoupper($line['status']) == "POSTING"){
-                                $arr_nobukti[] = $line['no_bukti'];
-                                $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values () ",[$no_bukti,strtoupper($line['form']),$line['no_bukti'],strtoupper($line['status']),'-','-',$kode_lokasi,$periode]);
+                                $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values () ",array($no_bukti,strtoupper($line['form']),$line['no_bukti'],strtoupper($line['status']),'-','-',$kode_lokasi,$periode));
         
                                 $call[$i] = DB::connection('sqlsrv2')->select("exec sp_post_bukti (?, ?) ", array($kode_lokasi,$line['no_bukti']));
                              
