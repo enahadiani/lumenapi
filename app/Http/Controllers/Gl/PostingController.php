@@ -49,11 +49,11 @@ class PostingController extends Controller
 
         try {
 
-            // if($rs =  Auth::guard('admin')->user()){
-            //     $nik= $rs->nik;
-            //     $kode_lokasi= $rs->kode_lokasi;
-            //     $status_admin=$rs->status_admin;
-            // }
+            if($rs =  Auth::guard('admin')->user()){
+                $nik= $rs->nik;
+                $kode_lokasi= $rs->kode_lokasi;
+                $status_admin=$rs->status_admin;
+            }
 
             // $det = $request->input('detail');
             // $arr_nobukti = array();
