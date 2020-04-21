@@ -231,7 +231,7 @@ class PostingController extends Controller
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success'=>$success], $this->successStatus);
         }
         
     }
