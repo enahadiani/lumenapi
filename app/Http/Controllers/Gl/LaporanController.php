@@ -46,6 +46,8 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
@@ -100,6 +102,7 @@ class LaporanController extends Controller
                 $success['data'] = $res;
                 $success['detail_jurnal'] = $res2;
                 $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
@@ -157,7 +160,8 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
-                $success['message'] = "Success!";
+                $success['message'] = "Success!"; 
+                $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
@@ -211,6 +215,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
@@ -261,6 +266,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
@@ -312,6 +318,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
