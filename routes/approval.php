@@ -84,7 +84,7 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
     // $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
     // $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
 
-    $router->get('ajuhistory', 'Approval\ApprovalController@pengajuanhistory');
+    $router->get('aju_history/{no_aju}', 'Approval\ApprovalController@ajuHistory');
 
     $router->get('ajudet/{no_aju}', 'Approval\ApprovalController@detail');
     $router->get('ajurek/{no_aju}', 'Approval\ApprovalController@rekening');

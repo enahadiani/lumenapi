@@ -38,13 +38,13 @@ class ApprovalController extends Controller
             from yk_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='1' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') 					 
+            where a.progress='0' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.nik_app='$nik'					 
             union 			
             select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
             from panjar2_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='1' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') 
+            where a.progress='0' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') and a.nik_setuju='$nik'
             order by tgl  					 
             ");
             $aju = json_decode(json_encode($aju),true);
@@ -176,7 +176,7 @@ class ApprovalController extends Controller
         }
     }
 
-    public function pengajuanhistory(){
+    public function ajuHistory($no_aju){
 
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
@@ -189,52 +189,16 @@ class ApprovalController extends Controller
                 $nik= '';
                 $kode_lokasi= '34';
             }
-
-            $aju = DB::connection('sqlsrv')->select("select a.no_pb,a.kode_lokasi,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.posted,a.nilai,
-            case a.progress 
-            when '0' then 'Pengajuan'
-            when '1' then 'App GM/SM'
-            when 'S' then 'Return GM/SM'
-            when '2' then 'App Ver/SPB'
-            when 'V' then 'Return Ver/SPB'
-            when '3' then 'App GM Fin'
-            when 'K' then 'App GM Fin'
-            when '4' then 'App BOD'
-            when 'D' then 'Return BOD'
-            when '5' then 'App Fiat'
-            when 'F' then 'Return Fiat'
-            when '6' then 'Bayar'
-            end as progress
-            ,a.kode_pp,b.nama as nama_pp,
-                   a.no_app,convert(varchar,c.tanggal,103) as tgl_app,
-                   a.no_app4,convert(varchar,j.tanggal,103) as tgl_app4,
-                   a.no_app2,convert(varchar,h.tanggal,103) as tgl_app2,
-                   a.no_ver,convert(varchar,d.tanggal,103) as tgl_ver,
-                   a.no_app3,convert(varchar,e.tanggal,103) as tgl_app3,
-                   a.no_fiat,convert(varchar,f.tanggal,103) as tgl_fiat,
-                   a.no_kas,convert(varchar,g.tanggal,103) as tgl_kas,
-                   l.nama as vendor
-                   
-            from yk_pb_m a
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            left join spm_app_m c on a.no_app=c.no_app and a.kode_lokasi=c.kode_lokasi
-            left join spm_app_m j on a.no_app4=j.no_app and a.kode_lokasi=j.kode_lokasi
-            left join spm_app_m d on a.no_ver=d.no_app and a.kode_lokasi=d.kode_lokasi
-            left join spm_app_m e on a.no_app3=e.no_app and a.kode_lokasi=e.kode_lokasi
-            left join spm_app_m f on a.no_fiat=f.no_app and a.kode_lokasi=f.kode_lokasi
-            left join spm_app_m h on a.no_app2=h.no_app and a.kode_lokasi=f.kode_lokasi
-            left join trans_m g on a.no_kas=g.no_bukti and a.kode_lokasi=g.kode_lokasi
-            inner join (select distinct kode_vendor,kode_lokasi,no_pb from yk_pb_d) k on a.no_pb=k.no_pb and a.kode_lokasi=k.kode_lokasi
-            inner join vendor l on l.kode_vendor=k.kode_vendor and l.kode_lokasi=k.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'
-            order by a.no_pb 					 
-            ");
+            $sql="select a.no_app,convert(varchar,a.tanggal,103) as tgl,a.catatan,a.nik_user,b.nama
+            from spm_app_m a  
+            inner join karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+            where no_bukti='$no_aju'
+            order by a.tanggal ";
+            $aju = DB::connection('sqlsrv')->select($sql);
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
-                for($i=0;$i<count($aju);$i++){
-                    $aju[$i]["nilai"] = number_format($aju[$i]["nilai"],0,",","."); 
-                }
+                $success['sql'] = $sql;
                 $success['status'] = true;
                 $success['data'] = $aju;
                 $success['message'] = "Success!";
@@ -272,14 +236,14 @@ class ApprovalController extends Controller
                     from yk_pb_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-                    where a.progress='1' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.no_pb='$no_aju' ";
+                    where a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.no_pb='$no_aju' ";
                 break;
                 case 'PP' : 
                     $sql ="select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
                     from panjar2_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
-                    where a.progress='1' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') and a.no_panjar='$no_aju' ";
+                    where a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') and a.no_panjar='$no_aju' ";
                 break;
             }
 
