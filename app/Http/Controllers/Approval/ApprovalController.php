@@ -446,7 +446,6 @@ class ApprovalController extends Controller
         $periode=date('Y').date('m');
         $tanggal=date('Y-m-d');
 
-        $nik="tes";
         $per=date('y').date('m');
         $prefix=$kode_lokasi."-AGM".$per.".";		
         
@@ -544,7 +543,6 @@ class ApprovalController extends Controller
         $periode=date('Y').date('m');
         $tanggal=date('Y-m-d');
 
-        $nik="tes";
         $per=date('y').date('m');
         $prefix=$kode_lokasi."-AFI".$per.".";		
         
@@ -642,7 +640,6 @@ class ApprovalController extends Controller
         $periode=date('Y').date('m');
         $tanggal=date('Y-m-d');
 
-        $nik="tes";
         $per=date('y').date('m');
         $prefix=$kode_lokasi."-ADI".$per.".";		
         
