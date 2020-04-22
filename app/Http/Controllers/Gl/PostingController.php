@@ -102,12 +102,12 @@ class PostingController extends Controller
                             if (strtoupper($det[$i]['status']) == "POSTING"){
                                 $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$det[$i]['form'],$det[$i]['no_bukti'],$det[$i]['status'],'-','-',$kode_lokasi,$periode));
 
-                                DB::connection('sqlsrv2')->select("exec sp_post_bukti (?, ?) ", array($kode_lokasi,$det[$i]['no_bukti']));
+                                DB::connection('sqlsrv2')->getPdo()->exec("EXEC sp_post_bukti '$kode_lokasi','".$det[$i]['no_bukti']."' ");
                                 
                             }
                         }
-                        
-                        DB::connection('sqlsrv2')->select("exec sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
+
+                        DB::connection('sqlsrv2')->getPdo()->exec("EXEC sp_exs_proses '$kode_lokasi','$periode','FS1' ");
                         $sts = true;
                         $msg = "Posting data berhasil disimpan ";
                     }
@@ -235,6 +235,22 @@ class PostingController extends Controller
             return response()->json(['success'=>$success], $this->successStatus);
         }
         
+    }
+
+    public function tes($no_bukti){
+
+        DB::connection('sqlsrv2')->beginTransaction();
+        // $db = DB::connection('sqlsrv2')->select("EXEC sp_cariakses ? ",array($nik));
+        // DB::connection('sqlsrv2')->raw("SET NOCOUNT ON EXEC sp_post_bukti '99','$no_bukti' ");
+        
+
+        $db= DB::connection('sqlsrv2')->getPdo()->exec("EXEC sp_post_bukti '99','$no_bukti'");
+
+
+        $success['db'] = $db;
+        DB::connection('sqlsrv2')->commit();  
+        return response()->json(['success'=>$success], $this->successStatus);
+
     }
 
 }
