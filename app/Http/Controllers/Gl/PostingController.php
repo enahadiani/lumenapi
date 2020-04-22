@@ -102,12 +102,12 @@ class PostingController extends Controller
                             if (strtoupper($det[$i]['status']) == "POSTING"){
                                 $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into posting_d(no_post,modul,no_bukti,status,catatan,no_del,kode_lokasi,periode) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$det[$i]['form'],$det[$i]['no_bukti'],$det[$i]['status'],'-','-',$kode_lokasi,$periode));
 
-                                DB::connection('sqlsrv2')->select("exec sp_post_bukti ?, ? ", array($kode_lokasi,$det[$i]['no_bukti']));
+                                DB::connection('sqlsrv2')->select("exec sp_post_bukti (?, ?) ", array($kode_lokasi,$det[$i]['no_bukti']));
                                 
                             }
                         }
                         
-                        DB::connection('sqlsrv2')->select("exec sp_exs_proses ?, ?, ? ", array($kode_lokasi,$periode,'FS1'));
+                        DB::connection('sqlsrv2')->select("exec sp_exs_proses (?, ?, ?) ", array($kode_lokasi,$periode,'FS1'));
                         $sts = true;
                         $msg = "Posting data berhasil disimpan ";
                     }
