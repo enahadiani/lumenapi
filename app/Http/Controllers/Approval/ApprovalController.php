@@ -176,7 +176,7 @@ class ApprovalController extends Controller
         }
     }
 
-    public function ajuHistory($no_aju){
+    public function pengajuanHistory(){
 
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
@@ -189,16 +189,70 @@ class ApprovalController extends Controller
                 $nik= '';
                 $kode_lokasi= '34';
             }
-            $sql="select a.no_app,convert(varchar,a.tanggal,103) as tgl,a.catatan,a.nik_user,b.nama
-            from spm_app_m a  
-            inner join karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
-            where no_bukti='$no_aju'
-            order by a.tanggal ";
+
+            $aju = DB::connection('sqlsrv')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            from yk_pb_m a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
+            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') 					 
+            union 			
+            select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            from panjar2_m a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
+            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') 
+            order by tgl  					 
+            ");
+            $aju = json_decode(json_encode($aju),true);
+            
+            if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($aju);$i++){
+                    $aju[$i]["nilai"] = number_format($aju[$i]["nilai"],0,",","."); 
+                }
+                $success['status'] = true;
+                $success['data'] = $aju;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function ajuHistory(){
+
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard('user')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            from yk_pb_m a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
+            inner join spm_app_m d on a.no_pb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+            where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') 
+            order by a.tanggal";
             $aju = DB::connection('sqlsrv')->select($sql);
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
-                $success['sql'] = $sql;
+              
                 $success['status'] = true;
                 $success['data'] = $aju;
                 $success['message'] = "Success!";
