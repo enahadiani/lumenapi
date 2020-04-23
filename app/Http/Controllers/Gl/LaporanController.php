@@ -147,7 +147,7 @@ class LaporanController extends Controller
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
+            $sql="select a.kode_akun,a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
                 case when a.dc='D' then a.nilai else 0 end as debet,
                 case when a.dc='C' then a.nilai else 0 end as kredit 
                 from trans_j a 
