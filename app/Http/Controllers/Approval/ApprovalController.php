@@ -228,7 +228,7 @@ class ApprovalController extends Controller
         }
     }
 
-    public function ajuHistory(){
+    public function ajuHistory($jenis){
 
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
@@ -241,12 +241,21 @@ class ApprovalController extends Controller
                 $nik= '';
                 $kode_lokasi= '34';
             }
+            if ($jenis=="all") {
+                $tmp="";
+            }
+            if ($jenis=="reject") {
+                $tmp=" and d.status in ('S','K','D') ";
+            }
+            if ($jenis=="approve") {
+                $tmp=" and d.status not in ('S','K','D') ";
+            }
             $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
             from yk_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
             inner join spm_app_m d on a.no_pb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
-            where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') 
+            where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') $tmp 
             order by a.tanggal";
             $aju = DB::connection('sqlsrv')->select($sql);
             $aju = json_decode(json_encode($aju),true);
