@@ -79,33 +79,7 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
     }
     });
 
-    $router->get('aju', function () {
-        if($data =  Auth::guard('user')->user()){
-            $nik= $data->nik;
-            //Pengajuan
-            $sql = DB::connection('sqlsrv')->select("select menu_mobile from hakakses where nik='$nik' ");
-            $row = json_decode(json_encode($sql),true);
-            switch($row[0]["menu_mobile"]){
-                case 'APPSM' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuanHistory();
-                break;
-                case 'APPFIN' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuanfinalHistory();
-                break;
-                case 'APPDIR' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuandirHistory();
-                break;
-                default :
-                $success['status'] = false;
-                $success['message'] = "Akses menu tidak tersedia !";
-                
-                $result = response()->json(['success'=>$success], 200);    
-            break;
-        }
-        return $result;
-    }
-    });
-
+    
 
     // $router->get('ajusm', 'Approval\ApprovalController@pengajuan'); 
     // $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
