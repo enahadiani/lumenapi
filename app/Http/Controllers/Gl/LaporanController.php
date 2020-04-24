@@ -234,7 +234,7 @@ class LaporanController extends Controller
             case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
             case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
             from glma_tmp a 
-            $filter and a.nik_user='$nik_user' 
+            $filter and a.nik_user='$nik_user'  $mutasi
             order by a.kode_akun ";
             if(isset($request->trail)){
 
