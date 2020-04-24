@@ -83,8 +83,14 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if(isset($request->periode) && $request->periode != ""){
+                $filter = " and periode='".$request->periode."' ";
+            }else{
+                $filter = "";
+            }
           
-            $sql="select distinct modul from trans_m where kode_lokasi='$kode_lokasi'";
+            $sql="select distinct modul from trans_m where kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -113,8 +119,20 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if(isset($request->periode) && $request->periode != ""){
+                $filter = " and a.periode='".$request->periode."' ";
+            }else{
+                $filter = "";
+            }
+
+            if(isset($request->modul) && $request->modul != ""){
+                $filter .= " and a.modul='".$request->modul."' ";
+            }else{
+                $filter .= "";
+            }
             
-            $sql="select a.no_bukti,a.keterangan from trans_m a where kode_lokasi='$kode_lokasi' ";
+            $sql="select a.no_bukti,a.keterangan from trans_m a where kode_lokasi='$kode_lokasi' $filter ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
