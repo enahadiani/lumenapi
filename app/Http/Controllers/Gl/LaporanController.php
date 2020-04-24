@@ -220,7 +220,7 @@ class LaporanController extends Controller
             $res = DB::connection('sqlsrv2')->update($sql);
 
             $mutasi="";
-            if(isset($request->jenis)){
+            if($request->input('jenis') != ""){
 
                 if ($request->input('jenis')=="Tidak")
                 {
@@ -236,7 +236,7 @@ class LaporanController extends Controller
             from glma_tmp a 
             $filter and a.nik_user='$nik_user'  $mutasi
             order by a.kode_akun ";
-            if(isset($request->trail)){
+            if($request->input('trail') != ""){
 
                 if ($request->input('trail') =="1")
                 {
