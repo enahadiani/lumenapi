@@ -56,6 +56,8 @@ class LaporanController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = true;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
@@ -116,6 +118,8 @@ class LaporanController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail_jurnal'] = [];
                 $success['status'] = true;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
@@ -181,6 +185,8 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['status'] = true;
                 $success['sql'] = $sql;
+                $success['data'] = [];
+                $success['data_detail'] = [];
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -226,13 +232,14 @@ class LaporanController extends Controller
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data']=$res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']=[];
                 $success['status'] = true;
                 $success['sql'] = $sql;
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -284,6 +291,7 @@ class LaporanController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']=[];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -336,6 +344,7 @@ class LaporanController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = true;
                 $success['sql'] = $sql;
                 return response()->json(['success'=>$success], $this->successStatus);
