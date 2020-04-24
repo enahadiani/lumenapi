@@ -43,11 +43,11 @@ class AdminController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrv')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection('sqlsrv2')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrv')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection('sqlsrv2')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
