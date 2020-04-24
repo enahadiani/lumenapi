@@ -326,12 +326,13 @@ class LaporanController extends Controller
 
             $sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
             $res = DB::connection('sqlsrv2')->update($sql);
-
+            $success['sql'] = $sql;
             $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi,
                         case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4
                 from neraca_tmp 
                 where modul='L' and nik_user='$nik_user' 
                 order by rowindex ";
+            $success['sql2'] = $sql;
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -346,7 +347,7 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                $success['sql'] = $sql;
+                // $success['sql'] = $sql;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
