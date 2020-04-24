@@ -153,9 +153,15 @@ class LaporanController extends Controller
             $sql="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
             $res = DB::connection('sqlsrv2')->update($sql);
 
+            $tmp = "";
+            if (isset($request->jenis) && $request->jenis == "Tidak")
+            {
+                $tmp =" and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0) ";
+            }
+            
             $sql="select a.kode_lokasi,a.kode_akun,a.nama,a.so_awal,a.periode
                 from glma_tmp a
-                $filter and a.nik_user='$nik_user' 
+                $filter and a.nik_user='$nik_user' $tmp
                 order by a.kode_akun ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
