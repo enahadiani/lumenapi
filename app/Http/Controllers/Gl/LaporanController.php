@@ -33,6 +33,10 @@ class LaporanController extends Controller
                 }
             }
 
+            if($request->input('tgl_awal') !="" && $request->input('tgl_akhir') !=""){
+                $filter .=" and a.tanggal between '".$request->input('tgl_awal')."' and '".$request->input('tgl_akhir')."' ";
+            }
+
             $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
                 case when a.dc='D' then a.nilai else 0 end as debet,
                 case when a.dc='C' then a.nilai else 0 end as kredit 
@@ -78,6 +82,11 @@ class LaporanController extends Controller
                     $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
                 }
             }
+
+            if($request->input('tgl_awal') !="" && $request->input('tgl_akhir') !=""){
+                $filter .=" and a.tanggal between '".$request->input('tgl_awal')."' and '".$request->input('tgl_akhir')."' ";
+            }
+
 
             $sql="select a.no_bukti,a.keterangan,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,
                         a.nik1,a.nik2,b.nama as nama1,c.nama as nama2
@@ -146,6 +155,10 @@ class LaporanController extends Controller
                 order by a.kode_akun ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            if($request->input('tgl_awal') !="" && $request->input('tgl_akhir') !=""){
+                $filter .=" and a.tanggal between '".$request->input('tgl_awal')."' and '".$request->input('tgl_akhir')."' ";
+            }
 
             $sql="select a.kode_akun,a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
                 case when a.dc='D' then a.nilai else 0 end as debet,
