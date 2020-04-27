@@ -164,7 +164,6 @@ class KaryawanController extends Controller
     public function update(Request $request, $nik)
     {
         $this->validate($request, [
-            'nik' => 'required',
             'nama' => 'required',
             'kode_pp' => 'required',
             'kode_jab' => 'required',
