@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Mail;
 
 class JuskebController extends Controller
 {
@@ -16,6 +17,23 @@ class JuskebController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+
+    function sendMail($email,$to_name,$data){
+        try {
+
+            
+            $template_data = array("name"=>$to_name,"body"=>$data);
+            Mail::send('mail', $template_data,
+            function ($message) use ($email) {
+                $message->to($email)
+                ->subject('Pengajuan Justifikasi Kebutuhan (SAI LUMEN)');
+            });
+            
+            return array('status' => 200, 'msg' => 'Sent successfully');
+        } catch (Exception $ex) {
+            return array('status' => 200, 'msg' => 'Something went wrong, please try later.');
+        }  
+    }
 
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
@@ -177,8 +195,10 @@ class JuskebController extends Controller
             }
             
             DB::connection('sqlsrv2')->commit();
+            $mail = $this->sendMail("enahadiani2@gmail.com","Ena Hadiani","Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
+
             $success['status'] = true;
-            $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan";
+            $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti." Email: ".$mail['msg'];
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
