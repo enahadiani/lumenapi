@@ -176,6 +176,13 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/apv'
+], function ($router) {
+    require __DIR__.'/../routes/apv.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ypt'
 ], function ($router) {
     require __DIR__.'/../routes/ypt.php';
