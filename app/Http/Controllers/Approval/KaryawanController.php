@@ -214,7 +214,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
+            $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
