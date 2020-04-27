@@ -195,10 +195,16 @@ class JuskebController extends Controller
             }
             
             DB::connection('sqlsrv2')->commit();
-            $mail = $this->sendMail("enahadiani2@gmail.com","Ena Hadiani","Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
+            if(isset($request->email) && isset($request->nama_email)){
 
+                $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
+                $msg_email = " Email: ".$mail['msg'];
+            }else{
+                $msg_email = "";
+            }
+            
             $success['status'] = true;
-            $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti." Email: ".$mail['msg'];
+            $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
@@ -324,11 +330,23 @@ class JuskebController extends Controller
                     $arr_nama[] = $request->input('nama_file')[$i];
                     $i++;
                 }
+
+                $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
+                $res3 = DB::connection('sqlsrv2')->select($sql3);
+                $res3 = json_decode(json_encode($res3),true);
+
+                if(count($res3) > 0){
+                    for($i=0;$i<count($res3);$i++){
+
+                        Storage::disk('local')->delete($res3[$i]['file_dok']);
+                    }
+                }
+
+                $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             }
 
             $del = DB::connection('sqlsrv2')->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             
 
@@ -381,8 +399,16 @@ class JuskebController extends Controller
             }
             
             DB::connection('sqlsrv2')->commit();
+            if(isset($request->email) && isset($request->nama_email)){
+
+                $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
+                $msg_email = " Email: ".$mail['msg'];
+            }else{
+                $msg_email = "";
+            }
+            
             $success['status'] = true;
-            $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah";
+            $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
@@ -411,8 +437,21 @@ class JuskebController extends Controller
             
             $del = DB::connection('sqlsrv2')->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
+            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+
+            if(count($res3) > 0){
+                for($i=0;$i<count($res3);$i++){
+
+                    Storage::disk('local')->delete($res3[$i]['file_dok']);
+                }
+            }
+
             $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+
+
             
 
             DB::connection('sqlsrv2')->commit();

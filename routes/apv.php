@@ -33,7 +33,7 @@ $router->get('storage/{filename}', function ($filename)
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
-    $router->get('profile', 'AdminController@profile');
+    $router->get('profile', 'AdminController@profile2');
     $router->get('users/{id}', 'AdminController@singleUser');
     $router->get('users', 'AdminController@allUsers');
     $router->get('cek_payload', 'AdminController@cekPayload');
