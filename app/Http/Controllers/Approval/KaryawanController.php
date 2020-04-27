@@ -37,6 +37,7 @@ class KaryawanController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = true;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
@@ -117,8 +118,9 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select nik,nama,kode_pp,kode_jab,foto as file_gambar,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
-            ");
+            $sql = "select nik,nama,kode_pp,kode_jab,foto as file_gambar,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+            ";
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -129,6 +131,8 @@ class KaryawanController extends Controller
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
