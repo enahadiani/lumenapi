@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class KaryawanController extends Controller
 {
@@ -73,7 +74,8 @@ class KaryawanController extends Controller
             'kode_pp' => 'required',
             'kode_jab' => 'required',
             'email' => 'required',
-            'no_telp' => 'required'
+            'no_telp' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -84,7 +86,19 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto="-";
+            if(isset($request->foto)){
+                
+                $file = $request->file('foto');
+        
+                $nama_foto = time()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $foto = $nama_foto;
+                Storage::disk('local')->put($foto,file_get_contents($file));
+            }else{
+
+                $foto="-";
+            }
+
             
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp')]);
             
@@ -168,7 +182,8 @@ class KaryawanController extends Controller
             'kode_pp' => 'required',
             'kode_jab' => 'required',
             'email' => 'required',
-            'no_telp' => 'required'
+            'no_telp' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -179,7 +194,27 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = "-";
+            if(isset($request->foto)){
+
+                if($request->foto == ""){
+                    $sql = "select foto as file_gambar where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+                    ";
+                    $res = DB::connection('sqlsrv2')->select($sql);
+                    $res = json_decode(json_encode($res),true);
+                    $foto = $res[0]['file_gambar'];
+                }else{
+
+                    $file = $request->file('foto');
+            
+                    $nama_foto = time()."_".$file->getClientOriginalName();
+                    // $picName = uniqid() . '_' . $picName;
+                    $foto = $nama_foto;
+                    Storage::disk('local')->put($foto,file_get_contents($file));
+                }
+            }else{
+
+                $foto="-";
+            }
             
             $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
