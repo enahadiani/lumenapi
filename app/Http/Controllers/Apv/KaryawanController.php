@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Approval;
+namespace App\Http\Controllers\Apv;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -132,7 +132,9 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select nik,nama,kode_pp,kode_jab,foto as file_gambar,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+            $url = url('api/apv/storage');
+
+            $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
             ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);

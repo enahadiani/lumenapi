@@ -27,13 +27,6 @@ $router->get('storage/{filename}', function ($filename)
     if (!Storage::disk('local')->exists($filename)) {
         abort(404);
     }
-
-    // $file = Storage::get($filename);
-    // $type = Storage::mimeType();
-
-    // $response = Response::make($file, 200);
-    // $response->header("Content-Type", $type);
-
     return Storage::disk('local')->response($filename); 
 });
 

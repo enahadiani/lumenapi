@@ -44,7 +44,7 @@ class UploadController extends Controller
         foreach ($files as $file) {
             $images[] = [
                 'name' => $file,
-                'src'  => url(Storage::disk('local')->url($file)),
+                'src'  => Storage::disk('local')->url($file),
             ];
         }
         return response()->json(['daftar' => $images,'status'=>true], 200);
