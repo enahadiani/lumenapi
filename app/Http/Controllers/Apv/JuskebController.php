@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class JuskebController extends Controller
 {
@@ -107,14 +108,14 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $arr_nama = array();
             $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
             if($request->hasfile('file'))
             {
-
                 foreach($request->file('file') as $file)
                 {                
-                    $nama_foto = time()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $foto = $nama_foto;
                     if(Storage::disk('local')->exists($foto)){
                         Storage::disk('local')->delete($foto);
@@ -122,6 +123,7 @@ class JuskebController extends Controller
                     Storage::disk('local')->put($foto,file_get_contents($file));
                     $arr_foto[] = $foto;
                     $arr_nama[] = $request->input('nama_file')[$i];
+                    $i++;
                 }
             }
 
@@ -136,13 +138,13 @@ class JuskebController extends Controller
 
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
-                    $ins2 = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]]); 
+                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
                 }
             }
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3 = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
                 }
             }
 
@@ -150,7 +152,7 @@ class JuskebController extends Controller
             from apv_role a
             inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and ".joinNum($data['total'])." between a.bawah and a.atas and a.modul='JK'
+            where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK'
             order by b.no_urut";
 
             $role = DB::connection('sqlsrv2')->select($sql);
@@ -171,7 +173,7 @@ class JuskebController extends Controller
                 }else{
                     $prog = 0;
                 }
-                $ins4 = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0]);
+                $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0]);
             }
             
             DB::connection('sqlsrv2')->commit();
@@ -285,14 +287,14 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $arr_nama = array();
             $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
             if($request->hasfile('file'))
             {
-
                 foreach($request->file('file') as $file)
                 {                
-                    $nama_foto = time()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $foto = $nama_foto;
                     if(Storage::disk('local')->exists($foto)){
                         Storage::disk('local')->delete($foto);
@@ -300,6 +302,7 @@ class JuskebController extends Controller
                     Storage::disk('local')->put($foto,file_get_contents($file));
                     $arr_foto[] = $foto;
                     $arr_nama[] = $request->input('nama_file')[$i];
+                    $i++;
                 }
             }
 
@@ -307,6 +310,8 @@ class JuskebController extends Controller
             $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            
+
             
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A']);
 
@@ -317,13 +322,13 @@ class JuskebController extends Controller
 
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
-                    $ins2 = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]]); 
+                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
                 }
             }
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3 = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
                 }
             }
 
@@ -331,7 +336,7 @@ class JuskebController extends Controller
             from apv_role a
             inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and ".joinNum($data['total'])." between a.bawah and a.atas and a.modul='JK'
+            where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK'
             order by b.no_urut";
 
             $role = DB::connection('sqlsrv2')->select($sql);
@@ -352,20 +357,20 @@ class JuskebController extends Controller
                 }else{
                     $prog = 0;
                 }
-                $ins4 = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0]);
+                $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0]);
             }
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan";
+            $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah";
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Justifikasi Kebutuhan gagal disimpan ".$e;
+            $success['message'] = "Data Justifikasi Kebutuhan gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
-        }		
+        }	
     }
 
     /**
@@ -374,7 +379,7 @@ class JuskebController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function destroy($kode_pp)
+    public function destroy($no_bukti)
     {
         DB::connection('sqlsrv2')->beginTransaction();
         

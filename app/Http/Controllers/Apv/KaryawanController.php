@@ -89,7 +89,7 @@ class KaryawanController extends Controller
             if(isset($request->foto)){
                 $file = $request->file('foto');
                 
-                $nama_foto = time()."_".$file->getClientOriginalName();
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
                 if(Storage::disk('local')->exists($foto)){
@@ -210,7 +210,7 @@ class KaryawanController extends Controller
 
                     $file = $request->file('foto');
             
-                    $nama_foto = time()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     // $picName = uniqid() . '_' . $picName;
                     $foto = $nama_foto;
                     if(Storage::disk('local')->exists($foto)){

@@ -42,7 +42,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('karyawan','Apv\KaryawanController@index');
     $router->get('karyawan/{nik}','Apv\KaryawanController@show');
     $router->post('karyawan','Apv\KaryawanController@store');
-    $router->put('karyawan/{nik}','Apv\KaryawanController@update');
+    $router->post('karyawan/{nik}','Apv\KaryawanController@update');
     $router->delete('karyawan/{nik}','Apv\KaryawanController@destroy');
 
     //Master Jabatan
@@ -77,7 +77,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('juskeb_aju','Apv\JuskebController@index');
     $router->get('juskeb_aju/{no_juskeb}','Apv\JuskebController@show');
     $router->post('juskeb_aju','Apv\JuskebController@store');
-    $router->put('juskeb_aju/{no_juskeb}','Apv\JuskebController@update');
+    $router->post('juskeb_aju/{no_juskeb}','Apv\JuskebController@update');
     $router->delete('juskeb_aju/{no_juskeb}','Apv\JuskebController@destroy');
 
     // Verifikasi
