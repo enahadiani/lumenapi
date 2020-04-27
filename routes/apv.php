@@ -21,6 +21,21 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('hash_pass', 'AuthController@hashPasswordAdmin');
 });
 
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('local')->exists($filename)) {
+        abort(404);
+    }
+
+    $file = Storage::get($filename);
+    $type = $file->getMimeType();
+
+    $response = Response::make($file, 200);
+    $response->header("Content-Type", $type);
+
+    return $response;
+});
+
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
