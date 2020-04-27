@@ -6,9 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage; 
 
-class KaryawanController extends Controller
+class UnitController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,11 +21,11 @@ class KaryawanController extends Controller
         try {
             
             if($data =  Auth::guard('admin')->user()){
-                $nik= $data->nik;
+                $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select nik,nama,kode_pp,kode_jab,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."'
+            $res = DB::connection('sqlsrv2')->select("select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -69,49 +68,28 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nik' => 'required',
-            'nama' => 'required',
             'kode_pp' => 'required',
-            'kode_jab' => 'required',
-            'email' => 'required',
-            'no_telp' => 'required',
-            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'nama' => 'required'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
-                $nik= $data->nik;
+                $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            if(isset($request->foto)){
-                $file = $request->file('foto');
-                
-                $nama_foto = time()."_".$file->getClientOriginalName();
-                // $picName = uniqid() . '_' . $picName;
-                $foto = $nama_foto;
-                if(Storage::disk('local')->exists($foto)){
-                    Storage::disk('local')->delete($foto);
-                }
-                Storage::disk('local')->put($foto,file_get_contents($file));
-            }else{
-
-                $foto="-";
-            }
-
             
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp')]);
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi]);
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Karyawan berhasil disimpan";
+            $success['message'] = "Data Unit berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Karyawan gagal disimpan ".$e;
+            $success['message'] = "Data Unit gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -124,7 +102,7 @@ class KaryawanController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function show($nik)
+    public function show($kode_pp)
     {
         try {
             
@@ -134,9 +112,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $url = url('api/apv/storage');
-
-            $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+            $sql = "select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' and kode_pp='$kode_pp'
             ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -179,15 +155,10 @@ class KaryawanController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $nik)
+    public function update(Request $request, $kode_pp)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kode_pp' => 'required',
-            'kode_jab' => 'required',
-            'email' => 'required',
-            'no_telp' => 'required',
-            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'nama' => 'required'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -197,44 +168,19 @@ class KaryawanController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            if(isset($request->foto)){
-
-                if($request->foto == ""){
-                    $sql = "select foto as file_gambar where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
-                    ";
-                    $res = DB::connection('sqlsrv2')->select($sql);
-                    $res = json_decode(json_encode($res),true);
-                    $foto = $res[0]['file_gambar'];
-                }else{
-
-                    $file = $request->file('foto');
             
-                    $nama_foto = time()."_".$file->getClientOriginalName();
-                    // $picName = uniqid() . '_' . $picName;
-                    $foto = $nama_foto;
-                    if(Storage::disk('local')->exists($foto)){
-                        Storage::disk('local')->delete($foto);
-                    }
-                    Storage::disk('local')->put($foto,file_get_contents($file));
-                }
-            }else{
+            $del = DB::connection('sqlsrv2')->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
 
-                $foto="-";
-            }
-            
-            $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
-
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp) values (?, ?, ?, ?, ?, ?, ?, ?)', [$nik,$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp')]);
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$kode_pp,$request->input('nama'),$kode_lokasi]);
 
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Karyawan berhasil diubah";
+            $success['message'] = "Data Unit berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Karyawan gagal diubah ".$e;
+            $success['message'] = "Data Unit gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -245,7 +191,7 @@ class KaryawanController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function destroy($nik)
+    public function destroy($kode_pp)
     {
         DB::connection('sqlsrv2')->beginTransaction();
         
@@ -255,17 +201,17 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
+            $del = DB::connection('sqlsrv2')->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
 
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Karyawan berhasil dihapus";
+            $success['message'] = "Data Unit berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Karyawan gagal dihapus ".$e;
+            $success['message'] = "Data Unit gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
