@@ -200,11 +200,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('apv_juskeb_app/{no_app}','Approval\JuskebApprovalController@destroy');
 
     //Justifikasi Pengadaan
-    $router->get('apv_juspo_app','Approval\JuspoController@index');
-    $router->get('apv_juspo_app/{no_juspo}','Approval\JuspoController@show');
-    $router->post('apv_juspo_app','Approval\JuspoController@store');
-    $router->put('apv_juspo_app/{no_juspo}','Approval\JuspoController@update');
-    $router->delete('apv_juspo_app/{no_juspo}','Approval\JuspoController@destroy');
+    $router->get('apv_juspo_aju','Approval\JuspoController@index');
+    $router->get('apv_juspo_aju/{no_juspo}','Approval\JuspoController@show');
+    $router->post('apv_juspo_aju','Approval\JuspoController@store');
+    $router->put('apv_juspo_aju/{no_juspo}','Approval\JuspoController@update');
+    $router->delete('apv_juspo_aju/{no_juspo}','Approval\JuspoController@destroy');
 
     //Approval Justifikasi Pengadaan
     $router->get('apv_juspo_app','Approval\JuspoApprovalController@index');
