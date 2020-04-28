@@ -74,11 +74,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('hakakses/{nik}','Apv\HakaksesController@destroy');
 
     //Justifikasi Kebutuhan
-    $router->get('juskeb_aju','Apv\JuskebController@index');
-    $router->get('juskeb_aju/{no_bukti}','Apv\JuskebController@show');
-    $router->post('juskeb_aju','Apv\JuskebController@store');
-    $router->post('juskeb_aju/{no_bukti}','Apv\JuskebController@update');
-    $router->delete('juskeb_aju/{no_bukti}','Apv\JuskebController@destroy');
+    $router->get('juskeb','Apv\JuskebController@index');
+    $router->get('juskeb/{no_bukti}','Apv\JuskebController@show');
+    $router->post('juskeb','Apv\JuskebController@store');
+    $router->post('juskeb/{no_bukti}','Apv\JuskebController@update');
+    $router->delete('juskeb/{no_bukti}','Apv\JuskebController@destroy');
 
     // Verifikasi
     $router->get('verifikasi','Apv\VerifikasiController@index');
@@ -87,17 +87,16 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
     //Approval Justifikasi Kebutuhan
     $router->get('juskeb_app','Apv\JuskebApprovalController@index');
+    $router->get('juskeb_aju','Apv\JUskebApprovalController@getPengajuan');
     $router->get('juskeb_app/{no_app}','Apv\JuskebApprovalController@show');
     $router->post('juskeb_app','Apv\JuskebApprovalController@store');
-    $router->put('juskeb_app/{no_app}','Apv\JuskebApprovalController@update');
-    $router->delete('juskeb_app/{no_app}','Apv\JuskebApprovalController@destroy');
 
     //Justifikasi Pengadaan
-    $router->get('juspo_aju','Apv\JuspoController@index');
-    $router->get('juspo_aju/{no_juspo}','Apv\JuspoController@show');
-    $router->post('juspo_aju','Apv\JuspoController@store');
-    $router->put('juspo_aju/{no_juspo}','Apv\JuspoController@update');
-    $router->delete('juspo_aju/{no_juspo}','Apv\JuspoController@destroy');
+    $router->get('juspo','Apv\JuspoController@index');
+    $router->get('juspo/{no_juspo}','Apv\JuspoController@show');
+    $router->post('juspo','Apv\JuspoController@store');
+    $router->put('juspo/{no_juspo}','Apv\JuspoController@update');
+    $router->delete('juspo/{no_juspo}','Apv\JuspoController@destroy');
 
     //Approval Justifikasi Pengadaan
     $router->get('juspo_app','Apv\JuspoApprovalController@index');
