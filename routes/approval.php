@@ -91,6 +91,7 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
     $router->get('ajujurnal/{no_aju}', 'Approval\ApprovalController@jurnal');
     $router->get('ajudet_history/{no_aju}', 'Approval\ApprovalController@ajuDetailHistory');
     $router->get('ajudet_dok/{no_aju}', 'Approval\ApprovalController@ajuDetailDok');
+    $router->get('ajudet_approval/{no_aju}', 'Approval\ApprovalController@ajuDetailApproval');
 
     //Approval 
 
