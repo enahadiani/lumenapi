@@ -443,6 +443,63 @@ class ApprovalController extends Controller
         }
     }
 
+    public function ajuDetailApproval($no_aju){
+
+        try {
+            
+            if($data =  Auth::guard('user')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            switch(substr($no_aju,3,2)){
+                case 'PB':		
+                    $sql = "select a.no_app,convert(varchar,a.tanggal,103) as tgl,a.catatan,a.nik_user,b.nama,a.form,
+                            case when a.status in ('S','K','D') then 'reject' else 'approve' end as status
+                    from spm_app_m a
+                    inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+                    inner join spm_form c on a.kode_lokasi=c.kode_lokasi and a.form=c.form
+                    where a.no_bukti='$no_aju' 
+                    order by c.nu ";
+                break;
+                case 'PP' : 
+                    $sql = "select a.no_app,convert(varchar,a.tanggal,103) as tgl,a.catatan,a.nik_user,b.nama,a.form,
+                            case when a.status in ('S','K','D') then 'reject' else 'approve' end as status
+                    from spm_app_m a
+                    inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+                    inner join spm_form c on a.kode_lokasi=c.kode_lokasi and a.form=c.form
+                    where a.no_bukti='$no_aju' 
+                    order by c.nu ";
+                break;
+            }
+
+            $det = DB::connection('sqlsrv')->select($sql);
+            $det = json_decode(json_encode($det),true);
+            
+            if(count($det) > 0){ //mengecek apakah data kosong atau tidak
+               
+                $success['status'] = true;
+                $success['data'] = $det;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function rekening($no_aju){
 
         try {
