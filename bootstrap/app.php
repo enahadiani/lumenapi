@@ -203,4 +203,11 @@ $app->router->group([
     require __DIR__.'/../routes/lapsaku.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/proyek'
+], function ($router) {
+    require __DIR__.'/../routes/proyek.php';
+});
+
 return $app;
