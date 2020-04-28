@@ -17,10 +17,18 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+
+
 //Handle error cors to options method
 $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
+
+$router->group(['middleware' => 'cors'], function () use ($router) {
+    //approval dev
+    $router->post('login', 'AuthController@loginAdminYpt');
+    $router->get('hash_pass', 'AuthController@hashPasswordAdminYpt');
+});
 
 $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->get('tagihan','Proyek\TagihanController@getTagihan');

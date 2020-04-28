@@ -210,4 +210,11 @@ $app->router->group([
     require __DIR__.'/../routes/proyek.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/aset'
+], function ($router) {
+    require __DIR__.'/../routes/aset.php';
+});
+
 return $app;
