@@ -75,17 +75,15 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
     //Justifikasi Kebutuhan
     $router->get('juskeb_aju','Apv\JuskebController@index');
-    $router->get('juskeb_aju/{no_juskeb}','Apv\JuskebController@show');
+    $router->get('juskeb_aju/{no_bukti}','Apv\JuskebController@show');
     $router->post('juskeb_aju','Apv\JuskebController@store');
-    $router->post('juskeb_aju/{no_juskeb}','Apv\JuskebController@update');
-    $router->delete('juskeb_aju/{no_juskeb}','Apv\JuskebController@destroy');
+    $router->post('juskeb_aju/{no_bukti}','Apv\JuskebController@update');
+    $router->delete('juskeb_aju/{no_bukti}','Apv\JuskebController@destroy');
 
     // Verifikasi
     $router->get('verifikasi','Apv\VerifikasiController@index');
-    $router->get('verifikasi/{no_ver}','Apv\VerifikasiController@show');
+    $router->get('verifikasi/{no_aju}','Apv\VerifikasiController@show');
     $router->post('verifikasi','Apv\VerifikasiController@store');
-    $router->put('verifikasi/{no_ver}','Apv\VerifikasiController@update');
-    $router->delete('verifikasi/{no_ver}','Apv\VerifikasiController@destroy');
 
     //Approval Justifikasi Kebutuhan
     $router->get('juskeb_app','Apv\JuskebApprovalController@index');

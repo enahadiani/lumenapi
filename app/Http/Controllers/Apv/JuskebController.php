@@ -451,9 +451,6 @@ class JuskebController extends Controller
             $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
-
-            
-
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Kebutuhan berhasil dihapus";
