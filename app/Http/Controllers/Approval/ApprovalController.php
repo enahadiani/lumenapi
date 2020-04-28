@@ -336,6 +336,113 @@ class ApprovalController extends Controller
         }
     }
 
+    public function ajuDetailHistory($no_aju){
+
+        try {
+            
+            if($data =  Auth::guard('user')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            switch(substr($no_aju,3,2)){
+                case 'PB':		
+                    $sql = "select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,
+                        b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,
+                        convert(varchar,d.tanggal,103) as tgl_app,d.catatan
+                    from yk_pb_m a 
+                    inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                    inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+                    inner join spm_app_m d on a.no_pb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+                    where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.no_pb='$no_aju' ";
+                break;
+                case 'PP' : 
+                    $sql ="select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+                    from panjar2_m a 
+                    inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                    inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
+                    where a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') and a.no_panjar='$no_aju' ";
+                break;
+            }
+
+            $det = DB::connection('sqlsrv')->select($sql);
+            $det = json_decode(json_encode($det),true);
+            
+            if(count($det) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($det);$i++){
+                    $det[$i]["nilai"] = number_format($det[$i]["nilai"],0,",","."); 
+                }
+                $success['status'] = true;
+                $success['data'] = $det;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function ajuDetailDok($no_aju){
+
+        try {
+            
+            if($data =  Auth::guard('user')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '34';
+            }
+
+            switch(substr($no_aju,3,2)){
+                case 'PB':		
+                    $sql = "select a.no_gambar,a.kode_jenis,'http://bangtelindo.simkug.com/server/media' as host 
+                    from yk_pb_dok a 
+                    where a.no_pb='$no_aju' ";
+                break;
+                case 'PP' : 
+                    $sql = "select a.no_gambar,a.kode_jenis,'http://bangtelindo.simkug.com/server/media' as host 
+                    from yk_pb_dok a 
+                    where a.no_pb='$no_aju' ";
+                break;
+            }
+
+            $det = DB::connection('sqlsrv')->select($sql);
+            $det = json_decode(json_encode($det),true);
+            
+            if(count($det) > 0){ //mengecek apakah data kosong atau tidak
+               
+                $success['status'] = true;
+                $success['data'] = $det;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function rekening($no_aju){
 
         try {
