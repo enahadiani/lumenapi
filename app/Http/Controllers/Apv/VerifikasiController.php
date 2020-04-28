@@ -99,17 +99,10 @@ class VerifikasiController extends Controller
     {
         $this->validate($request, [
             'tanggal' => 'required',
-            'no_dokumen' => 'required',
-            'kode_pp' => 'required',
-            'waktu' => 'required',
-            'kegiatan' => 'required',
-            'dasar' => 'required',
+            'no_aju' => 'required',
+            'status' => 'required',
+            'keterangan' => 'required',
             'total_barang' => 'required',
-            'barang.*'=> 'required',
-            'harga.*'=> 'required',
-            'qty.*'=> 'required',
-            'subtotal.*'=> 'required',
-            'nama_file.*'=>'required',
             'file.*'=>'file|max:3072'
         ]);
 
@@ -222,14 +215,14 @@ class VerifikasiController extends Controller
             
             }else{
                 $success['status'] = true;
-                $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti;
+                $success['message'] = "Data Verifikasi Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
             }
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Justifikasi Kebutuhan gagal diubah ".$e;
+            $success['message'] = "Data Verifikasi Justifikasi Kebutuhan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }			
         
@@ -322,6 +315,39 @@ class VerifikasiController extends Controller
     public function destroy($no_bukti)
     {
         //	
+    }
+
+    public function getStatus()
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection('sqlsrv2')->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in ('V','F') 
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 
 }
