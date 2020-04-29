@@ -200,7 +200,7 @@ class KaryawanController extends Controller
 
             if($request->hasfile('foto')){
 
-                $sql = "select foto as file_gambar where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+                $sql = "select foto as file_gambar from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
                 ";
                 $res = DB::connection('sqlsrv2')->select($sql);
                 $res = json_decode(json_encode($res),true);
