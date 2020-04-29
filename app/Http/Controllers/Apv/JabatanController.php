@@ -177,7 +177,7 @@ class JabatanController extends Controller
 
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['cek'] = $request->input('nama');
+            $success['cek'] = $kode_jab;
             $success['message'] = "Data Jabatan berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
