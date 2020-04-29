@@ -72,6 +72,8 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('hakakses','Apv\HakaksesController@store');
     $router->put('hakakses/{nik}','Apv\HakaksesController@update');
     $router->delete('hakakses/{nik}','Apv\HakaksesController@destroy');
+    $router->get('form','Apv\HakaksesController@getForm');
+    $router->get('menu','Apv\HakaksesController@getMenu');
 
     //Justifikasi Kebutuhan
     $router->get('juskeb','Apv\JuskebController@index');
