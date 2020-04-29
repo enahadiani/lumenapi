@@ -304,7 +304,7 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select kode_form,nama from m_form 
+            $res = DB::connection('sqlsrv2')->select("select kode_form,nama_form from m_form 
             ");
             $res = json_decode(json_encode($res),true);
             
