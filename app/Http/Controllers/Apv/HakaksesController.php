@@ -89,7 +89,7 @@ class HakaksesController extends Controller
         $this->validate($request, [
             'nik' => 'required',
             'nama' => 'required',
-            'kode_klp' => 'required',
+            'kode_klp_menu' => 'required',
             'pass' => 'required',
             'status_admin' => 'required',
             'klp_akses' => 'required',
@@ -195,7 +195,7 @@ class HakaksesController extends Controller
     {
         $this->validate($request, [
             'nama' => 'required',
-            'kode_klp' => 'required',
+            'kode_klp_menu' => 'required',
             'pass' => 'required',
             'status_admin' => 'required',
             'klp_akses' => 'required',
