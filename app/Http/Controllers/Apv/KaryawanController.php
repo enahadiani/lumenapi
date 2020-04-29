@@ -86,7 +86,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->foto)){
+            if($request->hasfile('foto')){
                 $file = $request->file('foto');
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
