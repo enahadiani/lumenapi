@@ -198,26 +198,31 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->foto)){
+            if($request->hasfile('foto')){
 
-                if($request->foto == ""){
-                    $sql = "select foto as file_gambar where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
-                    ";
-                    $res = DB::connection('sqlsrv2')->select($sql);
-                    $res = json_decode(json_encode($res),true);
+                $sql = "select foto as file_gambar where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+                ";
+                $res = DB::connection('sqlsrv2')->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
-                }else{
-
-                    $file = $request->file('foto');
-            
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                    // $picName = uniqid() . '_' . $picName;
-                    $foto = $nama_foto;
-                    if(Storage::disk('local')->exists($foto)){
+                    if($foto != ""){
                         Storage::disk('local')->delete($foto);
                     }
-                    Storage::disk('local')->put($foto,file_get_contents($file));
+                }else{
+                    $foto = "-";
                 }
+                
+                $file = $request->file('foto');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('local')->exists($foto)){
+                    Storage::disk('local')->delete($foto);
+                }
+                Storage::disk('local')->put($foto,file_get_contents($file));
+                
             }else{
 
                 $foto="-";
