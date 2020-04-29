@@ -259,7 +259,7 @@ class RoleController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function destroy($kode_pp)
+    public function destroy($kode_role)
     {
         DB::connection('sqlsrv2')->beginTransaction();
         
