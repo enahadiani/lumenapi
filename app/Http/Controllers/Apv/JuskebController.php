@@ -140,7 +140,7 @@ class JuskebController extends Controller
                     }
                     Storage::disk('local')->put($foto,file_get_contents($file));
                     $arr_foto[] = $foto;
-                    $arr_nama[] = $request->input('nama_file')[$i];
+                    $arr_nama[] = trim($request->input('nama_file')[$i]," ");
                     $i++;
                 }
             }
@@ -328,7 +328,7 @@ class JuskebController extends Controller
                     }
                     Storage::disk('local')->put($foto,file_get_contents($file));
                     $arr_foto[] = $foto;
-                    $arr_nama[] = $request->input('nama_file')[$i];
+                    $arr_nama[] = trim($request->input('nama_file')[$i]," ");
                     $i++;
                 }
 
