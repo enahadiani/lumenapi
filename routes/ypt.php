@@ -48,6 +48,7 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->get('upload', 'UploadController@upload');
     $router->post('upload', 'UploadController@proses_upload');
     $router->get('upload/{file}', 'UploadController@show');
+    $router->get('menu/{kode_klp}', 'Dashboard\DashboardController@getMenu');
 
     //PAGE 1
     $router->get('pencapaianYoY/{periode}', 'Dashboard\DashboardController@pencapaianYoY');
