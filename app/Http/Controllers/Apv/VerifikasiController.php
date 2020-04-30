@@ -119,7 +119,7 @@ class VerifikasiController extends Controller
 
             $ins1 = DB::connection('sqlsrv2')->insert("insert into apv_ver_m (no_bukti,kode_lokasi,no_juskeb,status,keterangan,tanggal) values (?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$request->no_aju,$request->status,$request->keterangan,$request->tanggal]);
 
-            $upd =  DB::connection('sqlsrv')->table('apv_juskeb_m')
+            $upd =  DB::connection('sqlsrv2')->table('apv_juskeb_m')
             ->where('no_bukti', $request->input('no_aju'))    
             ->where('kode_lokasi', $kode_lokasi)
             ->update(['progress' => $request->input('status'),'nilai'=>$request->input('total_barang')]);
