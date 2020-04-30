@@ -465,4 +465,41 @@ class JuskebController extends Controller
         }	
     }
 
+    public function getHistory($no_bukti)
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_bukti,b.keterangan,b.tanggal,c.nama
+            from apv_flow a
+            inner join apv_pesan b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
+            left join apv_jab c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

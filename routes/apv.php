@@ -81,6 +81,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('juskeb','Apv\JuskebController@store');
     $router->post('juskeb/{no_bukti}','Apv\JuskebController@update');
     $router->delete('juskeb/{no_bukti}','Apv\JuskebController@destroy');
+    $router->get('juskeb_history/{no_bukti}','Apv\JuskebController@getHistory');
 
     // Verifikasi
     $router->get('verifikasi','Apv\VerifikasiController@index');
