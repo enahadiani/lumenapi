@@ -472,7 +472,7 @@ class JuskebApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in (2,3)
+            $res = DB::connection('sqlsrv2')->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in ('2','3')
             ");
             $res = json_decode(json_encode($res),true);
             
