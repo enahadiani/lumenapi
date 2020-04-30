@@ -133,7 +133,7 @@ class JuskebController extends Controller
             {
                 foreach($request->file('file') as $file)
                 {                
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                     $foto = $nama_foto;
                     if(Storage::disk('local')->exists($foto)){
                         Storage::disk('local')->delete($foto);
@@ -321,14 +321,14 @@ class JuskebController extends Controller
             {
                 foreach($request->file('file') as $file)
                 {                
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                     $foto = $nama_foto;
                     if(Storage::disk('local')->exists($foto)){
                         Storage::disk('local')->delete($foto);
                     }
                     Storage::disk('local')->put($foto,file_get_contents($file));
                     $arr_foto[] = $foto;
-                    $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                    $arr_nama[] = $request->input('nama_file')[$i];
                     $i++;
                 }
 
