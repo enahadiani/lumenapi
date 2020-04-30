@@ -205,6 +205,7 @@ class JuskebController extends Controller
             
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
+            $success['no_aju'] = $no_bukti;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
