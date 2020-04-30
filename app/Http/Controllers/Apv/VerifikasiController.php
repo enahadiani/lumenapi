@@ -211,7 +211,7 @@ class VerifikasiController extends Controller
                 DB::connection('sqlsrv2')->commit();
 
                 $success['status'] = true;
-                $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti;
+                $success['message'] = "Data Verifikasi Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
             
             }else{
                 $success['status'] = true;
