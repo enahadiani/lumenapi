@@ -127,6 +127,7 @@ class JuspoApprovalController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['kode_jab'] = $kode_jab;
                 $success['status'] = true;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
