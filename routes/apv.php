@@ -111,6 +111,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Approval Justifikasi Pengadaan
     $router->get('juspo_app','Apv\JuspoApprovalController@index');
     $router->get('juspo_app_aju','Apv\JuspoApprovalController@getPengajuan');
+    $router->get('juspo_app_status','Apv\JuspoApprovalController@getStatus');
     $router->get('juspo_app/{no_app}','Apv\JuspoApprovalController@show');
     $router->post('juspo_app','Apv\JuspoApprovalController@store');
     $router->put('juspo_app/{no_app}','Apv\JuspoApprovalController@update');
