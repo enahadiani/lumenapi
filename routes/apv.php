@@ -101,6 +101,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('juspo','Apv\JuspoController@index');
     $router->get('juspo_aju','Apv\JuspoController@getPengajuan');
     $router->get('juspo/{no_bukti}','Apv\JuspoController@show');
+    $router->get('juspo_aju/{no_bukti}','Apv\JuspoController@getDetailJuskeb');
     $router->post('juspo','Apv\JuspoController@store');
     $router->put('juspo/{no_bukti}','Apv\JuspoController@update');
     $router->delete('juspo/{no_bukti}','Apv\JuspoController@destroy');
