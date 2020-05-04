@@ -417,6 +417,7 @@ class DashboardController extends Controller
                 }
                 $success['status'] = true;
                 $success['data'] = $daftar;
+                $success['category'] = $category;
                 $success['message'] = "Success!";
                 
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -424,6 +425,7 @@ class DashboardController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['categori'] = [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -567,6 +569,7 @@ class DashboardController extends Controller
                 }
                 $success['status'] = true;
                 $success['data'] = $daftar;
+                $success['category'] = $category;
                 $success['message'] = "Success!";
                 
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -574,6 +577,7 @@ class DashboardController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['category'] = [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
