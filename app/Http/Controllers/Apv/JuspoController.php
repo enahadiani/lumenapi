@@ -151,9 +151,7 @@ class JuspoController extends Controller
             'barang.*'=> 'required',
             'harga.*'=> 'required',
             'qty.*'=> 'required',
-            'subtotal.*'=> 'required',
-            'nama_file.*'=>'required',
-            'file.*'=>'file|max:3072'
+            'subtotal.*'=> 'required'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -360,9 +358,7 @@ class JuspoController extends Controller
             'barang.*'=> 'required',
             'harga.*'=> 'required',
             'qty.*'=> 'required',
-            'subtotal.*'=> 'required',
-            'nama_file.*'=>'required',
-            'file.*'=>'file|max:3072'
+            'subtotal.*'=> 'required'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
