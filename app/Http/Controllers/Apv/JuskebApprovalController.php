@@ -358,7 +358,7 @@ class JuskebApprovalController extends Controller
                     }
                 }
             }
-            
+            DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Approval Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
           
