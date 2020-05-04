@@ -51,29 +51,65 @@
         <tbody>
             <?php $methodColours = ['GET' => 'success', 'HEAD' => 'default', 'OPTIONS' => 'default', 'POST' => 'primary', 'PUT' => 'warning', 'PATCH' => 'info', 'DELETE' => 'danger']; ?>
             @foreach ($routes as $route)
-                <tr>
-                    <td>
-                        <span class="tag tag-{{ $methodColours[$route['method']] }}">{{ $route['method'] }}</span>
-                    </td>
-                    <td>{!! preg_replace('#({[^}]+})#', '<span class="text-warning">$1</span>', $route['uri']) !!}</td>
-                    <td>
-                    @if(isset($route['action']['as']))
-                    {{ $route['action']['as'] }}                    
+                @php 
+                    $tmp = explode("/",$route['uri']);
+                    if(isset($tmp[2])){
+                        $uri_modul = $tmp[2];
+                    }else{
+                        $uri_modul = "";
+                    }
+                @endphp
+                @if($modul == "all")
+                    <tr>
+                        <td>
+                            <span class="tag tag-{{ $methodColours[$route['method']] }}">{{ $route['method'] }}</span>
+                        </td>
+                        <td>{!! preg_replace('#({[^}]+})#', '<span class="text-warning">$1</span>', $route['uri']) !!}</td>
+                        <td>
+                        @if(isset($route['action']['as']))
+                        {{ $route['action']['as'] }}                    
+                        @endif
+                        </td>
+                        <td>
+                        @if(isset($route['action']['uses']))
+                        {!! preg_replace('#(@.*)$#', '<span class="text-warning">$1</span>', $route['action']['uses']) !!}                   
+                        @endif
+                        </td>
+                        <td>
+                        @if(isset($route['action']['middleware']))
+                            @foreach($route['action']['middleware'] as $mid)
+                                {{ $mid }}
+                            @endforeach               
+                        @endif
+                        </td>
+                    </tr>
+                @else
+                    @if($modul == $uri_modul)
+                    <tr>
+                        <td>
+                            <span class="tag tag-{{ $methodColours[$route['method']] }}">{{ $route['method'] }}</span>
+                        </td>
+                        <td>{!! preg_replace('#({[^}]+})#', '<span class="text-warning">$1</span>', $route['uri']) !!}</td>
+                        <td>
+                        @if(isset($route['action']['as']))
+                        {{ $route['action']['as'] }}                    
+                        @endif
+                        </td>
+                        <td>
+                        @if(isset($route['action']['uses']))
+                        {!! preg_replace('#(@.*)$#', '<span class="text-warning">$1</span>', $route['action']['uses']) !!}                   
+                        @endif
+                        </td>
+                        <td>
+                        @if(isset($route['action']['middleware']))
+                            @foreach($route['action']['middleware'] as $mid)
+                                {{ $mid }}
+                            @endforeach               
+                        @endif
+                        </td>
+                    </tr>
                     @endif
-                    </td>
-                    <td>
-                    @if(isset($route['action']['uses']))
-                    {!! preg_replace('#(@.*)$#', '<span class="text-warning">$1</span>', $route['action']['uses']) !!}                   
-                    @endif
-                    </td>
-                    <td>
-                    @if(isset($route['action']['middleware']))
-                        @foreach($route['action']['middleware'] as $mid)
-                            {{ $mid }}
-                        @endforeach               
-                    @endif
-                    </td>
-                </tr>
+                @endif
             @endforeach
         </tbody>
     </table>

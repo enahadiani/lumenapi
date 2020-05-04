@@ -35,5 +35,10 @@ $router->get('users/exportpdf', 'UserController@exportpdf');
 
 $router->get('routes', ['middleware' => 'cors', function() use ($router) {
     $data = $router->getRoutes();
-    return view('routes', ['routes' => $data]);
+    return view('routes', ['routes' => $data, 'modul'=>'all']);
+}]);
+
+$router->get('routes/{modul}', ['middleware' => 'cors', function($modul) use ($router) {
+    $data = $router->getRoutes();
+    return view('routes', ['routes' => $data, 'modul'=>$modul]);
 }]);
