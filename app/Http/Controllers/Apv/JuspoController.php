@@ -216,12 +216,14 @@ class JuspoController extends Controller
             
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Pengadaan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
+            $success['no_aju'] = $no_bukti;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Justifikasi Pengadaan gagal disimpan ".$e;
+            $success['no_aju'] = '';
             return response()->json(['success'=>$success], $this->successStatus); 
         }		
         
