@@ -96,7 +96,7 @@ class JuspoController extends Controller
             $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.nilai,a.progress
             from apv_juskeb_m a 
             left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.progress='2'  and isnull(b.no_bukti,'-') = '-'
+            where a.kode_lokasi='$kode_lokasi' and a.progress='S'  and isnull(b.no_bukti,'-') = '-'
             ");
             $res = json_decode(json_encode($res),true);
             
