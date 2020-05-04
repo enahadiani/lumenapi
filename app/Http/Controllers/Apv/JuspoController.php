@@ -291,16 +291,16 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$id'  ";
+            $sql="select no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$id'  order by no_urut";					
+            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$id'  order by no_urut";
+            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
