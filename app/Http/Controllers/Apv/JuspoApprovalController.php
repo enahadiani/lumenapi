@@ -360,8 +360,10 @@ class JuspoApprovalController extends Controller
                 }
             }
             
+            DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Approval Justifikasi Pengadaan berhasil disimpan. No Bukti:".$no_bukti;
+            $success['no_app'] = $no_bukti;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
