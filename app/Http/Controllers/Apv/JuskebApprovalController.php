@@ -220,7 +220,7 @@ class JuskebApprovalController extends Controller
                             
                         }
                         $title = "Approval Pengajuan Justifikasi Kebutuhan";
-                        $content = "[Approval] Pengajuan Justifikasi Kebutuhan ".$no_bukti." telah di approve oleh $nik , Menunggu approval anda.";
+                        $content = "[Approval] Pengajuan Justifikasi Kebutuhan ".$no_bukti." telah di approve oleh $nik_user , Menunggu approval anda.";
                         // $notif1 = sendNotif($title,$content,$token_player);
                         // $wa1 = sendWA($no_telp,$content);
                         $psn = "Menunggu approval $nik_app1 ";
@@ -264,7 +264,7 @@ class JuskebApprovalController extends Controller
                         
                     }
                     $title = "Approval Pengajuan Justifikasi Kebutuhan";
-                    $content = "[Approval] Pengajuan Justifikasi Kebutuhan ".$no_bukti." anda telah di approve oleh $nik. ".$psn;
+                    $content = "[Approval] Pengajuan Justifikasi Kebutuhan ".$no_bukti." anda telah di approve oleh $nik_user. ".$psn;
                     // $notif2 = sendNotif($title,$content,$token_player);
                     // $wa2 = sendWA($no_telp2,$content);
                     $exec_notif2 = array();
@@ -306,7 +306,7 @@ class JuskebApprovalController extends Controller
                             
                         }
                         $title = "Approval Pengajuan Justifikasi Kebutuhan";
-                        $content = "[Return] Pengajuan Justifikasi Kebutuhan ".$no_bukti." telah di return oleh $nik";
+                        $content = "[Return] Pengajuan Justifikasi Kebutuhan ".$no_bukti." telah di return oleh $nik_user";
                         // $notif1 = sendNotif($title,$content,$token_player);
                         // $wa1 = sendWA($no_telp,$content);
                         // $psn = "Menunggu approval $nik_app1 ";
@@ -347,7 +347,7 @@ class JuskebApprovalController extends Controller
                         
                     }
                     $title = "Approval Pengajuan Justifikasi Kebutuhan";
-                    $content = "[Return] Pengajuan Justifikasi Kebutuhan ".$no_bukti." anda telah di direturn oleh $nik. ";
+                    $content = "[Return] Pengajuan Justifikasi Kebutuhan ".$no_bukti." anda telah di direturn oleh $nik_user. ";
                     // $notif2 = sendNotif($title,$content,$token_player);
                     // $wa2 = sendWA($no_telp2,$content);
                     $exec_notif2 = array();
