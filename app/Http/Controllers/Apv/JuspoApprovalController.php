@@ -176,7 +176,7 @@ class JuspoApprovalController extends Controller
 
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JP']);
 
-            $upd =  DB::connection('sqlsrv')->table('apv_flow')
+            $upd =  DB::connection('sqlsrv2')->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_urut', $request->input('no_urut'))
@@ -193,7 +193,7 @@ class JuspoApprovalController extends Controller
             if($request->status == 2){
                 $nu = $request->no_urut+1;
 
-                $upd2 =  DB::connection('sqlsrv')->table('apv_flow')
+                $upd2 =  DB::connection('sqlsrv2')->table('apv_flow')
                 ->where('no_bukti', $no_bukti)    
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
@@ -233,12 +233,12 @@ class JuspoApprovalController extends Controller
                         }
                     }
 
-                    $upd3 =  DB::connection('sqlsrv')->table('apv_juspo_m')
+                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => $request->status]);
                 }else{
-                    $upd3 =  DB::connection('sqlsrv')->table('apv_juspo_m')
+                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'S']);
@@ -280,7 +280,7 @@ class JuspoApprovalController extends Controller
             }else{
                 $nu=$request->no_urut-1;
 
-                $upd2 =  DB::connection('sqlsrv')->table('apv_flow')
+                $upd2 =  DB::connection('sqlsrv2')->table('apv_flow')
                 ->where('no_bukti', $no_bukti)    
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
@@ -317,12 +317,12 @@ class JuspoApprovalController extends Controller
                             
                         }
                     }
-                    $upd3 =  DB::connection('sqlsrv')->table('apv_juspo_m')
+                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'B']);
                 }else{
-                    $upd3 =  DB::connection('sqlsrv')->table('apv_juspo_m')
+                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'R']);
