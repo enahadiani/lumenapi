@@ -46,15 +46,15 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
 
 
-    $router->get('periodeAktif', 'Sppd\SppdController@getPeriodeAktif');
+    $router->get('periode_aktif', 'Sppd\SppdController@getPeriodeAktif');
     $router->get('akun', 'Sppd\SppdController@getAkun');
     $router->get('pp', 'Sppd\SppdController@getPP');
     $router->get('drk', 'Sppd\SppdController@getDrk');
     $router->get('budget', 'Sppd\SppdController@cekBudget');
     $router->post('budget', 'Sppd\SppdController@keepBudget');
     $router->delete('budget', 'Sppd\SppdController@releaseBudget');
-    $router->post('kirimAgenda', 'Sppd\SppdController@kirimNoAgenda');
-    $router->get('agendaDok/{no_aju}', 'Sppd\SppdController@getAgendaDok');
-    $router->get('agendaBayar/{no_aju}', 'Sppd\SppdController@getAgendaBayar');
+    $router->post('agenda_kirim', 'Sppd\SppdController@kirimNoAgenda');
+    $router->get('agenda_dok/{no_aju}', 'Sppd\SppdController@getAgendaDok');
+    $router->get('agenda_bayar/{no_aju}', 'Sppd\SppdController@getAgendaBayar');
 
 });
