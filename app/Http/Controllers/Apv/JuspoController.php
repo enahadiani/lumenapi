@@ -235,7 +235,7 @@ class JuspoController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function show($no_aju)
+    public function show($no_bukti)
     {
         try {
             
@@ -245,16 +245,16 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nilai,convert(varchar(10),tgl_input,121) as tgl_input, convert(varchar(10),tanggal,121) as tgl_juskeb from apv_juspo_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju' ";
+            $sql="select no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nilai,convert(varchar(10),tgl_input,121) as tgl_input, convert(varchar(10),tanggal,121) as tgl_juskeb from apv_juspo_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juspo_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";					
+            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juspo_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select a.no_bukti,a.nama,a.file_dok from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_aju'  order by a.no_urut";
+            $sql3="select a.no_bukti,a.nama,a.file_dok from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_bukti'  order by a.no_urut";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
@@ -425,6 +425,99 @@ class JuspoController extends Controller
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
+    }
+
+    public function getHistory($no_bukti)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_bukti,b.keterangan,b.tanggal,c.nama
+            from apv_flow a
+            inner join apv_pesan b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
+            left join apv_jab c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getPreview($no_bukti)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen, convert(varchar(10),a.tanggal,121) as tanggal,a.kegiatan,a.waktu,a.dasar,a.nilai,a.kode_pp,b.nama as nama_pp 
+            from apv_juspo_m a
+            left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2="select a.no_bukti,a.no_urut,a.barang,a.jumlah,a.harga,a.nilai 
+            from apv_juspo_d a            
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'";					
+            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            $sql3="select a.kode_role,a.kode_jab,a.no_urut,b.nama as nama_jab,c.nik,c.nama as nama_kar,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal
+            from apv_flow a
+            inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+            inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'";
+            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['data_app'] = $res3;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['data_app'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
 }

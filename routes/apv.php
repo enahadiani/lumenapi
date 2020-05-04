@@ -99,10 +99,13 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
     //Justifikasi Pengadaan
     $router->get('juspo','Apv\JuspoController@index');
-    $router->get('juspo/{no_juspo}','Apv\JuspoController@show');
+    $router->get('juspo_aju','Apv\JuspoController@getPengajuan');
+    $router->get('juspo/{no_bukti}','Apv\JuspoController@show');
     $router->post('juspo','Apv\JuspoController@store');
-    $router->put('juspo/{no_juspo}','Apv\JuspoController@update');
-    $router->delete('juspo/{no_juspo}','Apv\JuspoController@destroy');
+    $router->put('juspo/{no_bukti}','Apv\JuspoController@update');
+    $router->delete('juspo/{no_bukti}','Apv\JuspoController@destroy');
+    $router->get('juspo_history/{no_bukti}','Apv\JuspoController@getHistory');
+    $router->get('juspo_preview/{no_bukti}','Apv\JuspoController@getPreview');
 
     //Approval Justifikasi Pengadaan
     $router->get('juspo_app','Apv\JuspoApprovalController@index');
