@@ -106,7 +106,7 @@ class NotifikasiController extends Controller
         } catch (BadResponseException $ex) {
             $response = $ex->getResponse();
             $res = json_decode($response->getBody(),true);
-            return response()->json(['message' => $res["message"], 'status'=>false], 200);
+            return response()->json(['message' => $res["message"], 'status'=>false, 'fields'=> $fields], 200);
         }
 
     }
