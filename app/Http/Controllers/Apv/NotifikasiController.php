@@ -87,21 +87,21 @@ class NotifikasiController extends Controller
             
             $fields = json_encode($fields);
 
-            $client = new Client();
-            $response = $client->request('POST', 'https://onesignal.com/api/v1/notifications',[
-                'headers' => [
-                    'Content-Type: application/json; charset=utf-8',
-                    'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh'
-                ],
-                'body' => $fields
-            ]);
+            // $client = new Client();
+            // $response = $client->request('POST', 'https://onesignal.com/api/v1/notifications',[
+            //     'headers' => [
+            //         'Content-Type: application/json; charset=utf-8',
+            //         'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh'
+            //     ],
+            //     'body' => $fields
+            // ]);
 
-            if ($response->getStatusCode() == 200) { // 200 OK
-                $response_data = $response->getBody()->getContents();
+            // if ($response->getStatusCode() == 200) { // 200 OK
+            //     $response_data = $response->getBody()->getContents();
                 
-                $data = json_decode($response_data,true);
-            }
-            return response()->json(['result' => $data, 'status'=>true], 200); 
+            //     $data = json_decode($response_data,true);
+            // }
+            return response()->json(['result' => $fields, 'status'=>true], 200); 
 
         } catch (BadResponseException $ex) {
             $response = $ex->getResponse();
