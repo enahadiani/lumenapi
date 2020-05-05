@@ -25,8 +25,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
-    $router->post('login', 'AuthController@loginAdminYpt');
-    $router->get('hash_pass', 'AuthController@hashPasswordAdminYpt');
+    $router->post('login', 'AuthController@loginAdmin');
+    $router->get('hash_pass', 'AuthController@hashPasswordAdmin');
 });
 
 $router->get('storage/{filename}', function ($filename)
@@ -37,20 +37,20 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('local')->response($filename); 
 });
 
-$router->group(['middleware' => 'auth:ypt'], function () use ($router) {
-    $router->get('gedung','Proyek\TagihanController@getGedung');
-    $router->get('ruangan','Proyek\TagihanController@getRuangan');
-    $router->get('barang','Proyek\TagihanController@getBarang');
-    $router->get('aju_daftar','Proyek\TagihanController@getDaftarPengajuan');
-    $router->get('barang_detail','Proyek\TagihanController@getDetailBarang');
-    $router->get('barang_daftar','Proyek\TagihanController@getDaftarBarang');
-    $router->get('aset','Proyek\TagihanController@getDataAset');
-    $router->get('perbaikan','Proyek\TagihanController@getPerbaikan');
-    $router->get('perbaikan_detail','Proyek\TagihanController@getDetailPerbaikan');
-    $router->get('inventaris_berjalan','Proyek\TagihanController@getInventarisBerjalan');
-    $router->get('inventaris_lengkap','Proyek\TagihanController@getInventarisLengkap');
-    $router->get('lokasi','Proyek\TagihanController@getLokasi');
-    $router->get('aset_daftar','Proyek\TagihanController@getDaftarAset');
-    $router->post('inventaris','Proyek\TagihanController@simpanInventaris');
-    $router->post('ubah_gambar_aset','Proyek\TagihanController@ubahGambarAset');
+$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+    $router->get('gedung','Aset\AsetController@getGedung');
+    $router->get('ruangan','Aset\AsetController@getRuangan');
+    $router->get('barang','Aset\AsetController@getBarang');
+    $router->get('aju_daftar','Aset\AsetController@getDaftarPengajuan');
+    $router->get('barang_detail','Aset\AsetController@getDetailBarang');
+    $router->get('barang_daftar','Aset\AsetController@getDaftarBarang');
+    $router->get('aset','Aset\AsetController@getDataAset');
+    $router->get('perbaikan','Aset\AsetController@getPerbaikan');
+    $router->get('perbaikan_detail','Aset\AsetController@getDetailPerbaikan');
+    $router->get('inventaris_berjalan','Aset\AsetController@getInventarisBerjalan');
+    $router->get('inventaris_lengkap','Aset\AsetController@getInventarisLengkap');
+    $router->get('lokasi','Aset\AsetController@getLokasi');
+    $router->get('aset_daftar','Aset\AsetController@getDaftarAset');
+    $router->post('inventaris','Aset\AsetController@simpanInventaris');
+    $router->post('ubah_gambar_aset','Aset\AsetController@ubahGambarAset');
 });
