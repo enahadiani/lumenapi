@@ -46,7 +46,7 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
 
 
-    $router->get('periode_aktif', 'Sppd\SppdController@getPeriodeAktif');
+    $router->get('periode-aktif', 'Sppd\SppdController@getPeriodeAktif');
     $router->get('akun', 'Sppd\SppdController@getAkun');
     $router->get('pp', 'Sppd\SppdController@getPP');
     $router->get('drk', 'Sppd\SppdController@getDrk');
