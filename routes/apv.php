@@ -121,6 +121,13 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Dashboard
     $router->get('dash_databox','Apv\DashboardController@getDataBox');
     $router->get('dash_posisi','Apv\DashboardController@getPosisi');
+    
+    $router->get('dash_cek','Apv\DashboardController@cek');
+    $router->post('notif_register','Apv\NotifikasiController@register');
+    $router->post('notif_send','Apv\NotifikasiController@sendNotif');
+
 });
+
+
 
 ?>

@@ -156,4 +156,11 @@ class DashboardController extends Controller
         
     }
 
+    function cek(Request $request){
+        $result = $this->getPosisi($request);
+        $tmp = json_decode(json_encode($result),true);
+        $data = $tmp["original"]["success"];
+        dd($data);
+    }
+
 }
