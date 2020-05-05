@@ -90,8 +90,8 @@ class NotifikasiController extends Controller
             $client = new Client();
             $response = $client->request('POST', 'https://onesignal.com/api/v1/notifications',[
                 'headers' => [
-                    'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh',
-                    'Content-Type: application/json; charset=utf-8'
+                    'Content-Type: application/json; charset=utf-8',
+                    'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh'
                 ],
                 'body' => $fields
             ]);
