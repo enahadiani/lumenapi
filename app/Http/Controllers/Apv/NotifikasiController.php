@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use GuzzleHttp\Client;
 
 
 class NotifikasiController extends Controller
@@ -55,6 +56,56 @@ class NotifikasiController extends Controller
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
         
+    }
+
+    function sendNotif(Request $request){ 	
+
+        try {
+
+            $title = $request->title;
+            $content = $request->content;
+            $token_player = $request->token_player;
+            $title = $title;
+            $content      = array(
+                "en" => $content
+            );
+            
+            $fields = array(
+                'app_id' => "5f0781d5-8856-4f3e-a2c7-0f95695def7e", //appid laravelsai
+                'include_player_ids' => $token_player,
+                'data' => array(
+                    "foo" => "bar"
+                ),
+                'contents' => $content,
+                'headings' => array(
+                    'en' => $title
+                    )
+            );
+            
+            $fields = json_encode($fields);
+
+            $client = new Client();
+            $response = $client->request('POST', 'https://onesignal.com/api/v1/notifications',[
+                'headers' => [
+                    'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh',
+                    'Content-Type: application/json; charset=utf-8'
+                ],
+                'body' => $fields
+            ]);
+
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                
+                $data = json_decode($response_data,true);
+            }
+            return response()->json(['result' => $data, 'status'=>true], 200); 
+
+        } catch (BadResponseException $ex) {
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            return response()->json(['message' => $res["message"], 'status'=>false], 200);
+        }
+
     }
 
 }

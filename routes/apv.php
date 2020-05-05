@@ -124,6 +124,8 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
     $router->get('dash_cek','Apv\DashboardController@cek');
     $router->post('notif_register','Apv\NotifikasiController@register');
+    $router->post('notif_send','Apv\NotifikasiController@sendNotif');
+
 });
 
 
