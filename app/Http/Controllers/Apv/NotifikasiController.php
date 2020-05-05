@@ -37,7 +37,8 @@ class NotifikasiController extends Controller
             if(count($res)>0){
                 $success['message'] = 'Already registered';
             }else{
-                $token_sql = DB::connection('sqlsrv2')->insert('insert into api_token_auth (nik,api_key,token,kode_lokasi,os,ver,model,uuid,tgl_login) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,Str::random('alnum',20),$request->token,$kode_lokasi,'BROWSER','',
+                $api_key = Str::random('alnum',20);
+                $token_sql = DB::connection('sqlsrv2')->insert('insert into api_token_auth (nik,api_key,token,kode_lokasi,os,ver,model,uuid,tgl_login) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,$api_key,$request->token,$kode_lokasi,'BROWSER','',
                 '','',date('Y-m-d H:i:s')]);
                 if($token_sql){
                     $success['message'] = "ID registered";
@@ -48,6 +49,8 @@ class NotifikasiController extends Controller
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
+            $success['api'] = $api_key;
+            $success['token'] = $request->token;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
