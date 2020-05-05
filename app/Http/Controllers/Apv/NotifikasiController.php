@@ -37,7 +37,7 @@ class NotifikasiController extends Controller
                 $success['message'] = 'Already registered';
             }else{
                 $token_sql = DB::connection('sqlsrv2')->insert('insert into api_token_auth (nik,api_key,token,kode_lokasi,os,ver,model,uuid,tgl_login) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,Str::random('alnum',20),$request->token,$kode_lokasi,'BROWSER','',
-                '','',data('Y-m-d H:i:s')]);
+                '','',date('Y-m-d H:i:s')]);
                 if($token_sql){
                     $success['message'] = "ID registered";
                 }else{
