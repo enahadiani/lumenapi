@@ -117,6 +117,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('juspo_app','Apv\JuspoApprovalController@store');
     $router->put('juspo_app/{no_app}','Apv\JuspoApprovalController@update');
     $router->delete('juspo_app/{no_app}','Apv\JuspoApprovalController@destroy');
+
+    //Dashboard
+    $router->get('dash_databox','Apv\DashboardController@getDataBox');
+    $router->get('dash_posisi','Apv\DashboardController@getPosisi');
 });
 
 ?>
