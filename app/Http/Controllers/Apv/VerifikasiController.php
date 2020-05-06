@@ -247,10 +247,24 @@ class VerifikasiController extends Controller
                 DB::connection('sqlsrv2')->commit();
 
                 $success['status'] = true;
+                $success['verifikasi'] = "Approve";
+                $success['token_player'] = $token_player;
                 $success['message'] = "Data Verifikasi Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
             
             }else{
+
+                $token_player = array();
+                $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+                from apv_juskeb_m a
+                inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti='$request->no_aju' ");
+                $rst = json_decode(json_encode($rst),true);
+                for($t=0;$t<count($rst);$t++){
+                    array_push($token_player,$rst[$t]["token"]);
+                }
+                $success['token_player'] = $token_player;
                 $success['status'] = true;
+                $success['verifikasi'] = "Return";
                 $success['message'] = "Data Verifikasi Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
             }
           

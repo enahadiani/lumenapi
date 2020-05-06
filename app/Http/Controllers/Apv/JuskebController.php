@@ -181,13 +181,13 @@ class JuskebController extends Controller
                 
                 if($i == 0){
                     $prog = 1;
-                    $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
-                    $rst = json_decode(json_encode($rst),true);
-                    for($t=0;$t<count($rst);$t++){
-                        array_push($token_player,$rst[$t]["token"]);
-                    }
+                    // $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
+                    // $rst = json_decode(json_encode($rst),true);
+                    // for($t=0;$t<count($rst);$t++){
+                    //     array_push($token_player,$rst[$t]["token"]);
+                    // }
                     $no_telp = $role[$i]["no_telp"];
-                    $app_nik=$role[$i]["nik"];
+                    $app_nik = $role[$i]["nik"];
                 }else{
                     $prog = 0;
                 }
@@ -202,10 +202,21 @@ class JuskebController extends Controller
             }else{
                 $msg_email = "";
             }
+
+            $token_players = array();
+            $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+            from apv_juskeb_m a
+            inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+            where a.no_bukti='$request->no_aju' ");
+            $rst = json_decode(json_encode($rst),true);
+            for($t=0;$t<count($rst);$t++){
+                array_push($token_players,$rst[$t]["token"]);
+            }
             
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
             $success['no_aju'] = $no_bukti;
+            $success['token_players'] = $token_players;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {

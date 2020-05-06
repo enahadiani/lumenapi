@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 
 class NotifikasiController extends Controller
@@ -69,45 +70,44 @@ class NotifikasiController extends Controller
             $content = $request->content;
             $token_player = $request->token_player;
             $title = $title;
-            $content      = array(
-                "en" => $content
-            );
             
             $fields = array(
                 'app_id' => "5f0781d5-8856-4f3e-a2c7-0f95695def7e", //appid laravelsai
                 'include_player_ids' => $token_player,
+                'url' => "https://onesignal.com",
                 'data' => array(
                     "foo" => "bar"
                 ),
-                'contents' => $content,
+                'contents' => array(
+                    'en' => $content
+                ),
                 'headings' => array(
                     'en' => $title
-                    )
+                )
             );
             
-            $fields = json_encode($fields);
-
+            $url = "https://onesignal.com/api/v1/notifications";
             $client = new Client();
-            $response = $client->request('POST', 'https://onesignal.com/api/v1/notifications',[
+            $response = $client->request('POST', $url, [
+                'body' => json_encode($fields),
                 'headers' => [
-                    'Content-Type: application/json; charset=utf-8',
-                    'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh'
-                ],
-                'body' => $fields
+                    'Content-Type'     => 'application/json; charset=utf-8',
+                    'Authorization' => 'Basic ZmY5ODczYTMtNTgwZS00YmQ4LWFmNTMtMzQxZDY4ODc3MWFh',
+                ]
             ]);
 
-            
             if ($response->getStatusCode() == 200) { // 200 OK
                 $response_data = $response->getBody()->getContents();
                 
                 $data = json_decode($response_data,true);
             }
-            return response()->json(['result' => $data, 'status'=>true], 200); 
+            // $data = "";
+            return response()->json(['result' => $data, 'status'=>true, 'fields'=>$fields], 200); 
 
         } catch (BadResponseException $ex) {
             $response = $ex->getResponse();
             $res = json_decode($response->getBody(),true);
-            return response()->json(['message' => $res["message"], 'status'=>false, 'fields'=> $fields], 200);
+            return response()->json(['message' => $res, 'status'=>false, 'fields'=> $fields], 200);
         }
 
     }
