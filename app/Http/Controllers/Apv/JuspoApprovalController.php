@@ -276,7 +276,7 @@ class JuspoApprovalController extends Controller
                     }
                     
                 }
-
+                $success['approval'] = "Approve";
             }else{
                 $nu=$request->no_urut-1;
 
@@ -358,6 +358,7 @@ class JuspoApprovalController extends Controller
 
                     }
                 }
+                $success['approval'] = "Return";
             }
             
             DB::connection('sqlsrv2')->commit();
