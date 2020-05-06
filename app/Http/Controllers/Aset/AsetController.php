@@ -18,7 +18,7 @@ class AsetController extends Controller
     public $successStatus = 200;
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrvypt')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -37,7 +37,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrvyot')->select("select a.kode_pp
+                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
                 ");
@@ -60,9 +60,9 @@ class AsetController extends Controller
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and isnull(b.jumlah,0)>0 
             order by a.id_gedung";
 
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
-            
+            $success['sql'] = $sql;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['daftar'] = $res;
@@ -98,7 +98,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
                 ");
@@ -122,7 +122,7 @@ class AsetController extends Controller
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung'
             order by a.no_ruangan
             ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -160,7 +160,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
                 ");
@@ -184,7 +184,7 @@ class AsetController extends Controller
                     )b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0
             order by a.kode_klp ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -223,7 +223,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -254,7 +254,7 @@ class AsetController extends Controller
             ,sumber_dana
             ,nama_inv as nama
             ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.id_ruangan='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -295,7 +295,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -326,7 +326,7 @@ class AsetController extends Controller
             ,sumber_dana
             ,nama_inv as nama
             ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama'";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -365,7 +365,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -396,7 +396,7 @@ class AsetController extends Controller
             ,sumber_dana
             ,nama_inv as nama
             ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -434,7 +434,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -465,7 +465,7 @@ class AsetController extends Controller
             ,sumber_dana
             ,nama_inv as nama
             ,foto FROM amu_asset_bergerak a WHERE a.no_bukti='$request->qrcode'";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -499,7 +499,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -512,7 +512,7 @@ class AsetController extends Controller
             // }            
           
             $sql="select a.mon_id,a.kd_asset,a.id_gedung,a.no_ruangan, case a.status when 'Berfungsi' then 'Baik' else 'Rusak' end as kondisi,a.tgl_input from amu_mon_asset_bergerak a where a.status='Tidak Berfungsi' and a.kode_lokasi='$kode_lokasi'";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -549,7 +549,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -564,7 +564,7 @@ class AsetController extends Controller
             $sql="select b.mon_id,a.nama_inv as nama,a.kd_asset as kode, a.merk, a.warna, a.no_ruang, case status when 'Berfungsi' then 'Baik' when 'Tidak Berfungsi' then 'Rusak' end as kondisi,a.foto 
             from amu_asset_bergerak a
             left join amu_mon_asset_bergerak b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi where b.mon_id= '$request->mon_id' and a.kode_lokasi='$kode_lokasi' ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -598,7 +598,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -622,7 +622,7 @@ class AsetController extends Controller
                         group by a.no_ruangan,a.kode_lokasi
                     ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST((isnull(c.jum_mon,0) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 <> 100 ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -656,7 +656,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -669,7 +669,7 @@ class AsetController extends Controller
             // }            
           
             $sql="select a.no_ruangan, isnull(b.jum_asset,0) as jum_asset, isnull(d.jum_rusak,0) as jum_rusak,isnull(c.jum_baik,0) as jum_baik,CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 as persen, isnull(b.jum_asset,0) - (isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) as jum_belum,getdate() as tgl from amu_ruangan a left join ( select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jum_asset from amu_asset_bergerak a group by a.no_ruang,a.kode_lokasi ) b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_rusak  from amu_mon_asset_bergerak a inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti where a.status='Tidak Berfungsi' group by a.no_ruangan,a.kode_lokasi) d on a.no_ruangan=d.no_ruangan and a.kode_lokasi=d.kode_lokasi left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_baik from amu_mon_asset_bergerak a inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti where a.status='Berfungsi' group by a.no_ruangan,a.kode_lokasi ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 = 100 ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -703,7 +703,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
                 ");
@@ -716,7 +716,7 @@ class AsetController extends Controller
             }            
           
             $sql="SELECT a.no_ruangan, a.nama_ruangan, a.kode_pp FROM amu_ruangan a WHERE kode_pp='$kode_pp' ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -754,7 +754,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrvypt')->select("select a.kode_pp
+            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -778,7 +778,7 @@ class AsetController extends Controller
             from amu_asset_bergerak a
             left join amu_mon_asset_bergerak b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi
             where a.no_ruang='$no_ruangan' $filter ";
-            $res = DB::connection('sqlsrvypt')->select($sql);
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -809,7 +809,7 @@ class AsetController extends Controller
             'file_gambar' => 'file|max:3072'
         ]);
 
-        DB::connection('sqlsrvypt')->beginTransaction();
+        DB::connection('sqlsrv2')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
@@ -830,7 +830,7 @@ class AsetController extends Controller
 
             $sql = "select id_gedung from amu_ruangan where no_ruangan ='$no_ruangan' and kode_lokasi='$kode_lokasi' ";
 
-            $ged = DB::connection('sqlsrvypt')->select($sql);
+            $ged = DB::connection('sqlsrv2')->select($sql);
             $ged = json_decode(json_encode($ged),true);
             if(count($ged) > 0){
                 $id_gedung = $ged[0]['id_gedung'];
@@ -854,15 +854,15 @@ class AsetController extends Controller
                 $foto="-";
             }
 
-            $ins = DB::connection('sqlsrvypt')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),$foto]);
+            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),$foto]);
             
-            DB::connection('sqlsrvypt')->commit();
+            DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Aset berhasil disimpan ";
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvypt')->rollback();
+            DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Aset gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -878,7 +878,7 @@ class AsetController extends Controller
             'file_gambar' => 'file|max:3072'
         ]);
 
-        DB::connection('sqlsrvypt')->beginTransaction();
+        DB::connection('sqlsrv2')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
@@ -901,7 +901,7 @@ class AsetController extends Controller
                 Storage::disk('local')->put($foto,file_get_contents($file));
 
                 $sql3="select foto from amu_asset_bergerak where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'";
-                $res3 = DB::connection('sqlsrvypt')->select($sql3);
+                $res3 = DB::connection('sqlsrv2')->select($sql3);
                 $res3 = json_decode(json_encode($res3),true);
 
                 if(count($res3) > 0 ){
@@ -914,18 +914,18 @@ class AsetController extends Controller
                 $foto="-";
             }
 
-            $upd3 =  DB::connection('sqlsrvypt')->table('amu_asset_bergerak')
+            $upd3 =  DB::connection('sqlsrv2')->table('amu_asset_bergerak')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['foto' => $foto]);
             
-            DB::connection('sqlsrvypt')->commit();
+            DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Aset berhasil disimpan ";
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvypt')->rollback();
+            DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Aset gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
