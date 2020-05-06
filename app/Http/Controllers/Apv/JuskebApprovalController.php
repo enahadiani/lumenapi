@@ -255,26 +255,27 @@ class JuskebApprovalController extends Controller
                 $rs2 = DB::connection('sqlsrv2')->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
-                    $token_player = array();
+                    $token_player2 = array();
                     for($i=0;$i<count($rs2);$i++){
 
                         $no_telp2 = $rs2[0]["no_telp"];
                         $nik_buat = $rs2[0]['nik_buat'];
-                        array_push($token_player,$rs2[$i]['token']);
+                        array_push($token_player2,$rs2[$i]['token']);
                         
                     }
                     $title = "Approval Pengajuan Justifikasi Kebutuhan";
                     $content = "[Approval] Pengajuan Justifikasi Kebutuhan ".$no_bukti." anda telah di approve oleh $nik_user. ".$psn;
-                    // $notif2 = sendNotif($title,$content,$token_player);
+                    // $notif2 = sendNotif($title,$content,$token_player2);
                     // $wa2 = sendWA($no_telp2,$content);
                     $exec_notif2 = array();
-                    for($t=0;$t<count($token_player);$t++){
+                    for($t=0;$t<count($token_player2);$t++){
 
-                        $insert2[$t] = DB::connection('sqlsrv2')->insert(" insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player[$t],$title,$content,date('Y-m-d'),'-']);
+                        $insert2[$t] = DB::connection('sqlsrv2')->insert(" insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player2[$t],$title,$content,date('Y-m-d'),'-']);
 
                     }
                     
                 }
+                $success['approval'] = "Approve";
 
             }else{
                 $nu=$request->no_urut-1;
@@ -338,29 +339,38 @@ class JuskebApprovalController extends Controller
                 $rs2 = DB::connection('sqlsrv2')->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
-                    $token_player = array();
+                    $token_player2 = array();
                     for($i=0;$i<count($rs2);$i++){
 
                         $no_telp2 = $rs2[0]["no_telp"];
                         $nik_buat = $rs2[0]["nik_buat"];
-                        array_push($token_player,$rs2[$i]['token']);
+                        array_push($token_player2,$rs2[$i]['token']);
                         
                     }
                     $title = "Approval Pengajuan Justifikasi Kebutuhan";
                     $content = "[Return] Pengajuan Justifikasi Kebutuhan ".$no_bukti." anda telah di direturn oleh $nik_user. ";
-                    // $notif2 = sendNotif($title,$content,$token_player);
+                    // $notif2 = sendNotif($title,$content,$token_player2);
                     // $wa2 = sendWA($no_telp2,$content);
                     $exec_notif2 = array();
-                    for($t=0;$t<count($token_player);$t++){
+                    for($t=0;$t<count($token_player2);$t++){
 
-                        $insert[$t] = DB::connection('sqlsrv2')->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player[$t],$title,$content,date('Y-m-d'),'-']);
+                        $insert[$t] = DB::connection('sqlsrv2')->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player2[$t],$title,$content,date('Y-m-d'),'-']);
 
                     }
                 }
+                
+                $success['approval'] = "Return";
             }
             DB::connection('sqlsrv2')->commit();
+            
             $success['status'] = true;
             $success['message'] = "Data Approval Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
+            $success['no_aju'] = $no_bukti;
+            $success['nik_buat'] = $nik_buat;
+            $success['nik_app'] = $nik_user;
+            $success['nik_app_next'] = $nik_app1;
+            $success['token_players_app'] = $token_player;
+            $success['token_players_buat'] = $token_player2;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
