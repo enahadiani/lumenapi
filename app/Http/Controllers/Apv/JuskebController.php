@@ -207,7 +207,7 @@ class JuskebController extends Controller
             $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
             from apv_juskeb_m a
             inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
-            where a.no_bukti='$request->no_aju' ");
+            where a.no_bukti='$no_bukti' ");
             $rst = json_decode(json_encode($rst),true);
             for($t=0;$t<count($rst);$t++){
                 array_push($token_players,$rst[$t]["token"]);
