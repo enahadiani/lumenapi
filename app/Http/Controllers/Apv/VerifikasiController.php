@@ -248,7 +248,7 @@ class VerifikasiController extends Controller
 
                 $success['status'] = true;
                 $success['verifikasi'] = "Approve";
-                $success['token_player'] = $token_player;
+                $success['token_players'] = $token_player;
                 $success['no_aju'] = $no_aju;
                 $success['message'] = "Data Verifikasi Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
             
@@ -263,7 +263,7 @@ class VerifikasiController extends Controller
                 for($t=0;$t<count($rst);$t++){
                     array_push($token_player,$rst[$t]["token"]);
                 }
-                $success['token_player'] = $token_player;
+                $success['token_players'] = $token_player;
                 $success['status'] = true;
                 $success['verifikasi'] = "Return";
                 $success['no_aju'] = $request->no_aju;
