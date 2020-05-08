@@ -102,10 +102,22 @@ class VerifikasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            
+            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            from apv_karyawan a
+            where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
+            ");
+            $get = json_decode(json_encode($get),true);
+            if(count($get) > 0){
+                $kode_pp = $get[0]['kode_pp'];
+            }else{
+                $kode_pp = "";
+            }
+            
             $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_juskeb,case a.status when 'V' then 'Verifikasi' else 'Return' end as status, a.keterangan, convert(varchar,a.tanggal,103) as tanggal 
             from apv_ver_m a
             inner join apv_juskeb_m b on a.no_juskeb=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
-            where b.kode_lokasi='$kode_lokasi' 
+            where b.kode_lokasi='$kode_lokasi'  and b.kode_pp='$kode_pp'
             ");
             $res = json_decode(json_encode($res),true);
             
