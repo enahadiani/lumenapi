@@ -53,9 +53,20 @@ class VerifikasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            from apv_karyawan a
+            where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
+            ");
+            $get = json_decode(json_encode($get),true);
+            if(count($get) > 0){
+                $kode_pp = $get[0]['kode_pp'];
+            }else{
+                $kode_pp = "";
+            }
+
             $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai
             from apv_juskeb_m b 
-            where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') 
+            where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') and kode_pp='$kode_pp'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -242,7 +253,7 @@ class VerifikasiController extends Controller
                     }else{
                         $prog = 0;
                     }
-                    $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver) values (?, ?, ?, ?, ?, ?, ?) ",[$no_aju,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,1]);
+                    $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?) ",[$no_aju,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,1,$role[$i]['nik']]);
                 }
                 
                 DB::connection('sqlsrv2')->commit();
