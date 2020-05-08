@@ -80,6 +80,7 @@ class VerifikasiController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
+                $success['sql'] = $sql;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
