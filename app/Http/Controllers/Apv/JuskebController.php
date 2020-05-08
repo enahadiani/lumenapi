@@ -419,8 +419,20 @@ class JuskebController extends Controller
                 $msg_email = "";
             }
             
+            $token_players = array();
+            $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+            from apv_juskeb_m a
+            inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+            where a.no_bukti='$no_bukti' ");
+            $rst = json_decode(json_encode($rst),true);
+            for($t=0;$t<count($rst);$t++){
+                array_push($token_players,$rst[$t]["token"]);
+            }
+            
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
+            $success['no_aju'] = $no_bukti;
+            $success['token_players'] = $token_players;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
