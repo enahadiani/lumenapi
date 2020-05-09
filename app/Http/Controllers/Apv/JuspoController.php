@@ -182,7 +182,7 @@ class JuspoController extends Controller
             inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JP' 
-            order by b.no_urut";
+            order by b.no_urut,a.kode_role";
 
             $role = DB::connection('sqlsrv2')->select($sql);
             $role = json_decode(json_encode($role),true);
@@ -406,7 +406,7 @@ class JuspoController extends Controller
             inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JP' 
-            order by b.no_urut";
+            order by b.no_urut,a.kode_role";
 
             $role = DB::connection('sqlsrv2')->select($sql);
             $role = json_decode(json_encode($role),true);
