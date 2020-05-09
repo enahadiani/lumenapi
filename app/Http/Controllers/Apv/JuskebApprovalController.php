@@ -364,7 +364,6 @@ class JuskebApprovalController extends Controller
                 
                 $success['approval'] = "Return";
             }
-            DB::connection('sqlsrv2')->commit();
             
             $success['status'] = true;
             $success['message'] = "Data Approval Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
@@ -374,10 +373,10 @@ class JuskebApprovalController extends Controller
             $success['nik_app_next'] = $nik_app1;
             $success['token_players_app'] = $token_player;
             $success['token_players_buat'] = $token_player2;
-          
+            
+            DB::connection('sqlsrv2')->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Approval Justifikasi Kebutuhan gagal disimpan ".$e;
             $success['no_aju'] = "";
@@ -387,6 +386,7 @@ class JuskebApprovalController extends Controller
             $success['token_players_app'] = [];
             $success['token_players_buat'] = [];
             $success['approval'] = "Failed";
+            DB::connection('sqlsrv2')->rollback();
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
