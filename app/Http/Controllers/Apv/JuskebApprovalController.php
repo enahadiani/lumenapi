@@ -173,7 +173,9 @@ class JuskebApprovalController extends Controller
             }
             $no_bukti = $request->input('no_aju');
             $nik_buat = "";
-
+            $nik_app1 = "";
+            $token_player = array();
+            $token_player2 = array();
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JK']);
 
             $upd =  DB::connection('sqlsrv2')->table('apv_flow')
