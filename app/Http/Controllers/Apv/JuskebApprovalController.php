@@ -172,6 +172,7 @@ class JuskebApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $no_bukti = $request->input('no_aju');
+            $nik_buat = "";
 
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JK']);
 
@@ -250,7 +251,7 @@ class JuskebApprovalController extends Controller
                 from apv_flow a
                 inner join apv_juskeb_m b on a.no_bukti=b.no_bukti 
                 inner join apv_karyawan c on b.nik_buat=c.nik 
-                inner join api_token_auth d on c.nik=d.nik and c.kode_lokasi=d.kode_lokasi
+                left join api_token_auth d on c.nik=d.nik and c.kode_lokasi=d.kode_lokasi
                 where a.no_bukti='".$no_bukti."' and a.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection('sqlsrv2')->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -334,7 +335,7 @@ class JuskebApprovalController extends Controller
                 from apv_flow a
                 inner join apv_juskeb_m b on a.no_bukti=b.no_bukti 
                 inner join apv_karyawan c on b.nik_buat=c.nik 
-                inner join api_token_auth d on c.nik=d.nik and c.kode_lokasi=d.kode_lokasi
+                left join api_token_auth d on c.nik=d.nik and c.kode_lokasi=d.kode_lokasi
                 where a.no_bukti='".$no_bukti."' ";
                 $rs2 = DB::connection('sqlsrv2')->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -377,6 +378,13 @@ class JuskebApprovalController extends Controller
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Approval Justifikasi Kebutuhan gagal disimpan ".$e;
+            $success['no_aju'] = "";
+            $success['nik_buat'] = "";
+            $success['nik_app'] = "";
+            $success['nik_app_next'] = "";
+            $success['token_players_app'] = [];
+            $success['token_players_buat'] = [];
+            $success['approval'] = "Failed";
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
