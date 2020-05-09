@@ -173,6 +173,10 @@ class JuspoApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $no_bukti = $request->input('no_aju');
+            $nik_buat = "";
+            $nik_app1 = "";
+            $token_player = array();
+            $token_player2 = array();
 
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JP']);
 
@@ -376,6 +380,13 @@ class JuspoApprovalController extends Controller
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Approval Justifikasi Pengadaan gagal disimpan ".$e;
+            $success['no_aju'] = "";
+            $success['nik_buat'] = "";
+            $success['nik_app'] = "";
+            $success['nik_app_next'] = "";
+            $success['token_players_app'] = [];
+            $success['token_players_buat'] = [];
+            $success['approval'] = "Failed";
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
