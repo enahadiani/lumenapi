@@ -290,7 +290,7 @@ class JuskebApprovalController extends Controller
                 ->update(['status' => '1','tgl_app'=>NULL]);
 
 
-                if(intval($request->no_urut) != intval($min['nu'])){
+                if(intval($request->no_urut) != intval($min[0]['nu'])){
                     //send to approver sebelumnya
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,c.token,b.nik
