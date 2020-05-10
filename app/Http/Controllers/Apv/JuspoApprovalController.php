@@ -288,10 +288,10 @@ class JuspoApprovalController extends Controller
                 ->where('no_bukti', $no_bukti)    
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
-                ->update(['status' => '1','tgl_app'=>'-']);
+                ->update(['status' => '1','tgl_app'=>NULL]);
 
 
-                if(intval($request->no_urut) != intval($min['nu'])){
+                if(intval($request->no_urut) != intval($min[0]['nu'])){
                     //send to approver sebelumnya
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,c.token,b.nik
