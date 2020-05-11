@@ -1544,13 +1544,13 @@ class RtrwController extends Controller
             
             DB::connection('sqlsrvrtrw')->commit();
             $success['status'] = true;
-            $success['message'] = "Pembayaran Iuran berhasil disimpan";
+            $success['message'] = "Data setoran berhasil disimpan. No Bukti:".$id;
                 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvrtrw')->rollback();
             $success['status'] = false;
-            $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
+            $success['message'] = "Data setoran gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
                 
