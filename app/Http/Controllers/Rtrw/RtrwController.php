@@ -11,6 +11,63 @@ class RtrwController extends Controller
 {
     public $successStatus = 200;
 
+    public function toBulan($bln)
+	{
+	  $bulan=$bln;
+	  switch ($bulan) 
+	  {
+	    case "01":
+	      $tmp="Januari";
+	      break;
+		case "02":
+		  $tmp="Februari";
+	      break;
+		case "03":
+	      $tmp="Maret";
+	      break;
+		case "04":
+	      $tmp="April";
+	      break;
+		case "05":
+	      $tmp="Mei";
+	      break;
+		case "06":
+	      $tmp="Juni";
+	      break;
+		case "07":
+	      $tmp="Juli";
+	      break;
+		case "08":
+	      $tmp="Agustus";
+	      break;  
+		case "09":
+	      $tmp="September";
+	      break;  
+		case "10":
+	      $tmp="Oktober";
+	      break;  
+		case "11":
+	      $tmp="November";
+	      break;  
+		case "12":
+	      $tmp="Desember";
+	      break;  
+		case "13":
+	      $tmp="Desember 2";
+	      break;    
+	     case "14":
+	      $tmp="Desember 3";	      
+	      break;    
+	    case "15":
+	      $tmp="Desember 4";	      
+	      break;    
+	    case "16":
+	      $tmp="Desember 5";	      
+	      break;    
+	  }
+	  return $tmp;
+    }
+    
     public function getMenu(Request $request){
         $this->validate($request, [
             'kode_menu' => 'required'
@@ -1275,7 +1332,7 @@ class RtrwController extends Controller
 
             //SIMPAN SETORAN
 
-            $keterangan = "Setoran bulan ".toBulan(date('m'));
+            $keterangan = "Setoran bulan ".$this->toBulan(date('m'));
             $jml_iuran = 1;
             $sumbangan = 100000;
             $gaji=1200000;
