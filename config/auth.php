@@ -22,6 +22,10 @@ return [
         'ypt' => [
             'driver' => 'jwt',
             'provider' => 'adminypt',
+        ],
+        'rtrw' => [
+            'driver' => 'jwt',
+            'provider' => 'adminrtrw',
         ]
     ],
 
@@ -37,6 +41,10 @@ return [
         'adminypt' => [
             'driver' => 'eloquent',
             'model' => \App\AdminYpt::class
+        ],
+        'adminrtrw' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminRtrw::class
         ]
     ]
 ];

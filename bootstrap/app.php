@@ -217,4 +217,11 @@ $app->router->group([
     require __DIR__.'/../routes/aset.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/rtrw'
+], function ($router) {
+    require __DIR__.'/../routes/rtrw.php';
+});
+
 return $app;

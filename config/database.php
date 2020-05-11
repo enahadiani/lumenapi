@@ -70,6 +70,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'sqlsrvrtrw' => [
+            'driver' => env('DB_CONNECTION4','sqlsrv'),
+            'host' => env('DB_HOST4', 'localhost'),
+            'port' => env('DB_PORT4', '1433'),
+            'database' => env('DB_DATABASE4', 'forge'),
+            'username' => env('DB_USERNAME4', 'forge'),
+            'password' => env('DB_PASSWORD4', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',
