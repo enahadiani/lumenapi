@@ -917,6 +917,7 @@ class RtrwController extends Controller
     public function simpanKas(Request $request)
     {
         $this->validate($request, [
+            'kode_akun' => 'required',
             'kode_pp' => 'required',
             'kode_jenis' => 'required',
             'kode_ref' => 'required',
