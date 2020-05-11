@@ -53,7 +53,7 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,case a.progress when 'S' then 'FINISH' else isnull(b.nama_jab,'-') end as posisi,a.nilai,a.progress
+            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,case a.progress when 'S' then 'FINISH' when 'R' then 'Return' else isnull(b.nama_jab,'-') end as posisi,a.nilai,a.progress
             from apv_juspo_m a
             left join (select a.no_bukti,b.nama as nama_jab
                     from apv_flow a
@@ -439,13 +439,13 @@ class JuspoController extends Controller
             }
             
             $success['status'] = true;
-            $success['message'] = "Data Justifikasi Pengadaan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
+            $success['message'] = "Data Justifikasi Pengadaan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Justifikasi Pengadaan gagal disimpan ".$e;
+            $success['message'] = "Data Justifikasi Pengadaan gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }		
     }
