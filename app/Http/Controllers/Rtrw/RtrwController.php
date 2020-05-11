@@ -1523,7 +1523,7 @@ class RtrwController extends Controller
             
             $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
 
-            $keterangan = "Setoran bulan ".toBulan(date('m'));
+            $keterangan = "Setoran bulan ".$this->toBulan(date('m'));
             $jml_iuran = count($request->kode_rumah);
             $sumbangan = 100000;
             $gaji=1200000;
