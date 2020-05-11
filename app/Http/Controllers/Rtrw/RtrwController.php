@@ -1531,7 +1531,7 @@ class RtrwController extends Controller
             $kasRW = $request->bayar - $request->total_rt - $gaji;
             $setor= $kasRW +$sumbangan;
 
-            $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id_setor,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$rt,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
+            $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$request->kode_pp,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
 
             for($i=0;$i < count($request->kode_rumah);$i++){
                 $upd[$i] = DB::connection('sqlsrvrtrw')->table('rt_angs_d')
