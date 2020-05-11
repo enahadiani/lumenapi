@@ -974,7 +974,7 @@ class RtrwController extends Controller
             
             DB::connection('sqlsrvrtrw')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Kas berhasil disimpan";
+            $success['message'] = "Data Kas berhasil disimpan. No Bukti: ".$id;
                 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
