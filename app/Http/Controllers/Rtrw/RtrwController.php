@@ -929,7 +929,7 @@ class RtrwController extends Controller
         
         try {
             if($data =  Auth::guard('rtrw')->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($request->kode_jenis == 'Keluar'){
@@ -1074,7 +1074,7 @@ class RtrwController extends Controller
         
         try {
             if($data =  Auth::guard('rtrw')->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1220,7 +1220,7 @@ class RtrwController extends Controller
         
         try {
             if($data =  Auth::guard('rtrw')->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1452,7 +1452,7 @@ class RtrwController extends Controller
         
         try {
             if($data =  Auth::guard('rtrw')->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
