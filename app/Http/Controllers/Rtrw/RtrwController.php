@@ -509,7 +509,7 @@ class RtrwController extends Controller
             'kode_pp' => 'required',
             'kode_akun' => 'required',
             'tahun' => 'required',
-            'page' => 'required'
+            'page' => 'required',
             'nextpage' => 'required'
         ]);
         try {
@@ -920,7 +920,7 @@ class RtrwController extends Controller
             'nilai' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection('sqlsrvrtrw')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
@@ -937,7 +937,7 @@ class RtrwController extends Controller
             $periode=date('Y').date('m');
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-".$jenis.$per.".";
-            $query = DB::connection('sqlsrv2')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
+            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
             $query = json_decode(json_encode($query),true);
             
             $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -958,22 +958,22 @@ class RtrwController extends Controller
                 $akunDebet = $request->kode_akun;
             }
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBDUAL','T','-','-',$request->kode_pp,date('Y-m-d H:i:s'),'-',$request->keterangan,'IDR','1',$request->nilai,0,0,$nik,'-','-','-','-','-',$request->kode_ref,'TUNAI',$jenis]);
+            $ins = DB::connection('sqlsrvrtrw')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBDUAL','T','-','-',$request->kode_pp,date('Y-m-d H:i:s'),'-',$request->keterangan,'IDR','1',$request->nilai,0,0,$nik,'-','-','-','-','-',$request->kode_ref,'TUNAI',$jenis]);
 
-            $ins2 = DB::connection('sqlsrv2')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunDebet,'D',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
+            $ins2 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunDebet,'D',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
 
-            $ins2 = DB::connection('sqlsrv2')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKredit,'C',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
+            $ins3 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKredit,'C',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
 
-            $ins2 = DB::connection('sqlsrv2')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            $ins4 = DB::connection('sqlsrvrtrw')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
             where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection('sqlsrvrtrw')->commit();
             $success['status'] = true;
             $success['message'] = "Data Kas berhasil disimpan";
                 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection('sqlsrvrtrw')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kas gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -981,5 +981,617 @@ class RtrwController extends Controller
         
         
     }
+
+    public function getBayarIuran(Request $request){
+        
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            
+            if(isset($request->blok)){
+                $filter = " and b.blok='$request->blok' ";
+            }else{
+                $filter = "";
+            }
+            $periode = date('Ym');
+
+            $sql="select a.kode_rumah,a.saldo,isnull(b.nilai,0) as bayar 
+            from (
+                select a.kode_rumah,a.kode_lokasi,case when sum(a.nilai) < 0 then 0 else sum(a.nilai)end as saldo
+                from 
+                (
+                    select a.kode_rumah,a.kode_lokasi,sum(a.nilai_rt+a.nilai_rw) as nilai
+                    from rt_bill_d a
+                    inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi 
+                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode <='$periode' and a.kode_jenis='IWAJIB'
+                    group by a.kode_rumah,a.kode_lokasi
+                    union all
+                    select a.kode_rumah,a.kode_lokasi,-sum(a.nilai_rt+a.nilai_rw) as nilai
+                    from rt_angs_d a
+                    inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode_bill <='$periode' and a.kode_jenis='IWAJIB'
+                    group by a.kode_rumah,a.kode_lokasi
+                ) a
+                group by a.kode_rumah,a.kode_lokasi
+            ) a
+            left join (	select a.kode_rumah,a.kode_lokasi,sum(a.nilai_rt+a.nilai_rw) as nilai
+                        from rt_angs_d a
+                        inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi ='$kode_lokasi' $filter
+                        and a.kode_jenis='IWAJIB' and a.no_setor='-'
+                        group by a.kode_rumah,a.kode_lokasi
+            ) b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+            ";
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function simpanIuran(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_rumah' => 'required',
+            'kode_akun' => 'required',
+            'bayar' => 'required',
+            'status_bayar' => 'required',
+            'total_rw' => 'required',
+            'total_rt' => 'required',
+            'periode_bill.*' => 'required',
+            // 'toggle.*' => 'required',
+            'nilai_rw.*' => 'required',
+            'nilai_rt.*' => 'required',
+        ]);
+
+        DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $jenis="BM";
+
+            $str_format="0000";
+            $periode=date('Y').date('m');
+            $per=date('y').date('m');
+            $prefix=$kode_lokasi."-".$jenis.$per.".";
+            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
+            $query = json_decode(json_encode($query),true);
+            
+            $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+
+            $sql="select a.kode_pp,a.akun_kas,a.akun_kastitip, a.akun_titip,a.akun_pdpt 
+            from pp a inner join rt_rumah b on a.kode_pp=b.rt and a.kode_lokasi=b.kode_lokasi 
+            where b.kode_rumah='".$request->kode_rumah."' and a.kode_lokasi='".$kode_lokasi."'";
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $akunTitip=$res[0]['akun_titip'];
+
+            $akunKas = $request->kode_akun;
+            $keterangan ="Penerimaan Iuran Wajib atas rumah ".$request->kode_rumah." periode ".$periode;
+
+            $ins = DB::connection('sqlsrvrtrw')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'RTRW','KBIUR','T','0','0',$request->kode_pp,date('Y-m-d H:i:s'),'-',$keterangan,'IDR','1',$request->bayar,0,0,'-','-','-',$request->status_bayar,'-','-',$request->kode_rumah,'IWAJIB','-']);
+
+            $nilai_iur= intval($request->total_rw)+intval($request->total_rt);
+
+            $ins2 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKas,'D',$nilai_iur,$nilai_iur,$keterangan,'RTRW','KBRW','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-']);
+
+            $ins3 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunTitip,'C',$nilai_iur,$nilai_iur,$keterangan,'RTRW','TITIP','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-']);
+
+            for($a=0; $a<count($request->periode_bill);$a++){
+                // if ($_POST['toggle'][$a] == "on"){
+                $sqldet[$a] =  DB::connection('sqlsrvrtrw')->insert("insert into rt_angs_d (no_angs,kode_rumah,kode_jenis,periode_bill,periode_angs,nilai_rt,nilai_rw,kode_lokasi,kode_pp,dc,modul,jenis,no_setor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array(
+                                $id,$request->kode_rumah,'IWAJIB',$request->periode[$a],$periode,$request->nilai_rt[$a],$request->nilai_rw[$a],$kode_lokasi,$request->kode_pp,'D','KBIUR','KAS','-'));
+                    	
+                // }
+            }
+
+            $ins4 = DB::connection('sqlsrvrtrw')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
+            
+            DB::connection('sqlsrvrtrw')->commit();
+            $success['status'] = true;
+            $success['message'] = "Pembayaran Iuran berhasil disimpan";
+                
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvrtrw')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function getBayarIuranRw(Request $request){
+        
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            
+            if(isset($request->blok)){
+                $filter = " and b.blok='$request->blok' ";
+            }else{
+                $filter = "";
+            }
+            $periode = date('Ym');
+            
+            $sql="select a.kode_rumah,a.saldo,isnull(b.nilai,0) as bayar 
+            from (
+                select a.kode_rumah,a.kode_lokasi,case when sum(a.nilai) < 0 then 0 else sum(a.nilai)end as saldo
+                from 
+                (
+                    select a.kode_rumah,a.kode_lokasi,sum(a.nilai_rt+a.nilai_rw) as nilai
+                    from rt_bill_d a
+                    inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi 
+                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode <='$periode' and a.kode_jenis='IWAJIB'
+                    group by a.kode_rumah,a.kode_lokasi
+                    union all
+                    select a.kode_rumah,a.kode_lokasi,-sum(a.nilai_rt+a.nilai_rw) as nilai
+                    from rt_angs_d a
+                    inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode_bill <='$periode' and a.kode_jenis='IWAJIB'
+                    group by a.kode_rumah,a.kode_lokasi
+                ) a
+                group by a.kode_rumah,a.kode_lokasi
+            ) a
+            left join (	select a.kode_rumah,a.kode_lokasi,sum(a.nilai_rt+a.nilai_rw) as nilai
+                        from rt_angs_d a
+                        inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi ='$kode_lokasi' $filter
+                        and a.kode_jenis='IWAJIB' and a.no_setor='-'
+                        group by a.kode_rumah,a.kode_lokasi
+            ) b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+            ";
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function simpanIuranRw(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_rumah' => 'required',
+            'kode_akun' => 'required',
+            'bayar' => 'required',
+            'status_bayar' => 'required',
+            'total_rw' => 'required',
+            'total_rt' => 'required',
+            'periode_bill.*' => 'required',
+            // 'toggle.*' => 'required',
+            'nilai_rw.*' => 'required',
+            'nilai_rt.*' => 'required',
+        ]);
+
+        DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $jenis="BM";
+
+            $str_format="0000";
+            $periode=date('Y').date('m');
+            $per=date('y').date('m');
+            $prefix=$kode_lokasi."-".$jenis.$per.".";
+            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
+            $query = json_decode(json_encode($query),true);
+            
+            $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+
+            //id setor
+            $prefix2=$kode_lokasi."-STR".$per.".";
+            $query2 = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_setor),'0000'),".strlen($str_format).")+1 as id from rt_setor_m where no_setor like '$prefix2%' ");
+            $query2 = json_decode(json_encode($query2),true);
+
+            $id_setor = $prefix2.str_pad($query2[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+
+            $sql="select a.kode_pp,a.akun_kas,a.akun_kastitip, a.akun_titip,a.akun_pdpt,b.rt 
+            from pp a inner join rt_rumah b on a.kode_pp=b.rt and a.kode_lokasi=b.kode_lokasi 
+            where b.kode_rumah='".$request->kode_rumah."' and a.kode_lokasi='".$kode_lokasi."'";
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $akunTitip=$res[0]['akun_titip'];
+            $rt=$res[0]['rt'];
+            $kode_drk = "ST".substr($rt,1);
+
+            $akunKas = $request->kode_akun;
+            $keterangan ="Penerimaan Iuran Wajib atas rumah ".$request->kode_rumah." periode ".$periode;
+
+            $ins = DB::connection('sqlsrvrtrw')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'RTRW','KBIUR','T','0','0',$rt,date('Y-m-d H:i:s'),'-',$keterangan,'IDR','1',$request->bayar,0,0,'-','-','-',$request->status_bayar,'-','-',$request->kode_rumah,'IWAJIB','-']);
+
+            $nilai_iur= intval($request->total_rw)+intval($request->total_rt);
+
+            $ins2 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKas,'D',$nilai_iur,$nilai_iur,$keterangan,'RTRW','KBRW','IDR',1,$request->kode_pp,$kode_drk,'-','-','-','-','-','-','-']);
+
+            $ins3 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunTitip,'C',$nilai_iur,$nilai_iur,$keterangan,'RTRW','TITIP','IDR',1,$rt,$kode_drk,'-','-','-','-','-','-','-']);
+
+            for($a=0; $a<count($request->periode_bill);$a++){
+                // if ($_POST['toggle'][$a] == "on"){
+                $sqldet[$a] =  DB::connection('sqlsrvrtrw')->insert("insert into rt_angs_d (no_angs,kode_rumah,kode_jenis,periode_bill,periode_angs,nilai_rt,nilai_rw,kode_lokasi,kode_pp,dc,modul,jenis,no_setor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array(
+                                $id,$request->kode_rumah,'IWAJIB',$request->periode[$a],$periode,$request->nilai_rt[$a],$request->nilai_rw[$a],$kode_lokasi,$rt,'D','KBIUR','KAS',$id_setor));
+                    	
+                // }
+            }
+
+            $ins4 = DB::connection('sqlsrvrtrw')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
+
+            //SIMPAN SETORAN
+
+            $keterangan = "Setoran bulan ".toBulan(date('m'));
+            $jml_iuran = 1;
+            $sumbangan = 100000;
+            $gaji=1200000;
+            $kasRT= $request->total_rt - $sumbangan;
+            $kasRW= $request->bayar - $request->total_rt - $gaji;
+            $setor= $kasRW+$sumbangan;
+
+
+            $ins5 = DB::connection('sqlsrvrtrw')->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id_setor,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$rt,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
+            
+            DB::connection('sqlsrvrtrw')->commit();
+            $success['status'] = true;
+            $success['message'] = "Pembayaran Iuran berhasil disimpan";
+                
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvrtrw')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function getDetailBayar(Request $request){
+        $this->validate($request, [
+            'kode_rumah' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $kode_rumah = $request->kode_rumah;
+
+            $sql="
+            select a.periode,a.nilai_rt,a.nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,isnull(b.bayar,0) as bayar
+            from rt_bill_d a 
+            left join (
+            select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt+nilai_rw) as bayar
+            from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' group by periode_bill,kode_lokasi,kode_rumah
+            ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0
+            order by a.periode
+            ";
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDetailBayarRw(Request $request){
+        $this->validate($request, [
+            'kode_rumah' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $kode_rumah = $request->kode_rumah;
+
+            $sql="
+            select a.periode,a.nilai_rt,a.nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,isnull(b.bayar,0) as bayar
+            from rt_bill_d a 
+            left join (
+            select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt+nilai_rw) as bayar
+            from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' group by periode_bill,kode_lokasi,kode_rumah
+            ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0
+            order by a.periode
+            ";
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getSetoran(Request $request){
+        $this->validate($request, [
+            'kode_rumah' => 'required',
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $kode_rumah = $request->kode_rumah;
+            $kode_pp = $request->kode_pp;
+
+            $sql=" select kode_lokasi,kode_rumah,sum(nilai_rt) as nilai_rt,sum(nilai_rw) as nilai_rw,sum(nilai_rt+nilai_rw) as bayar
+            from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_pp='$kode_pp' and no_setor='-' and kode_jenis='IWAJIB' group by kode_lokasi,kode_rumah
+            "; 
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function simpanSetoran(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_akun' => 'required',
+            'bayar' => 'required',
+            'status_bayar' => 'required',
+            'total_rw' => 'required',
+            'total_rt' => 'required',
+            'kode_rumah.*' => 'required',
+            'nilai_rw.*' => 'required',
+            'nilai_rt.*' => 'required',
+        ]);
+
+        DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $str_format="0000";
+            $periode=date('Y').date('m');
+            $per=date('y').date('m');
+            $prefix=$kode_lokasi."-STR".$per.".";
+
+            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_setor),'0000'),".strlen($str_format).")+1 as id from rt_setor_m where no_setor like '$prefix%' ");
+            $query = json_decode(json_encode($query),true);
+            
+            $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+
+            $keterangan = "Setoran bulan ".toBulan(date('m'));
+            $jml_iuran = count($request->kode_rumah);
+            $sumbangan = 100000;
+            $gaji=1200000;
+            $kasRT= $request->total_rt - $sumbangan;
+            $kasRW = $request->bayar - $request->total_rt - $gaji;
+            $setor= $kasRW +$sumbangan;
+
+            $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id_setor,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$rt,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
+
+            for($i=0;$i < count($request->kode_rumah);$i++){
+                $upd[$i] = DB::connection('sqlsrvrtrw')->table('rt_angs_d')
+                    ->where('no_setor', '-')    
+                    ->where('kode_lokasi', $kode_lokasi)
+                    ->where('kode_rumah', $request->kode_rumah[$i])
+                    ->where('kode_jenis', 'IWAJIB')
+                    ->update(['no_setor' => $id]);
+            }
+            
+            DB::connection('sqlsrvrtrw')->commit();
+            $success['status'] = true;
+            $success['message'] = "Pembayaran Iuran berhasil disimpan";
+                
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvrtrw')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+                
+    }
+
+    public function getRekapSetoran(Request $request){
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            if(isset($request->periode)){
+
+                $periode = $request->periode;
+            }else{
+                $periode = "";
+            }
+            $kode_pp = $request->kode_pp;
+            if($periode == "" or $periode == "all"){
+                $filter = "";
+            }else{
+                $filter = " and periode='$periode' ";
+            }
+
+            $sql="select no_setor,convert(varchar,tanggal,103) as tanggal,isnull(sum(nilai),0)+isnull(sum(kas_rt),0)+isnull(sum(sumbangan),0) as total from rt_setor_m where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' and modul='IWAJIB' $filter  group by no_setor,tanggal order by no_setor desc ";
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDetailRekapSetoran(Request $request){
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            if(isset($request->no_setor)){
+                $no_setor = $request->no_setor;
+            }else{
+                $no_setor = "";
+            }
+            $kode_pp = $request->kode_pp;
+            if($no_setor == "" or $no_setor == "all"){
+                $filter = "";
+            }else{
+                $filter = " and no_setor='$no_setor' ";
+            }
+
+            $sql="
+            select kode_rumah,periode_bill,sum(nilai_rt)+sum(nilai_rw) as total
+            from rt_angs_d
+            where kode_lokasi ='$kode_lokasi' and kode_pp='$kode_pp' and kode_jenis='IWAJIB' $filter
+            group by kode_rumah,periode_bill order by kode_rumah,periode_bill ";
+            
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 }
