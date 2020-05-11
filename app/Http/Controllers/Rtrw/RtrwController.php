@@ -928,7 +928,7 @@ class RtrwController extends Controller
         DB::connection('sqlsrvrtrw')->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard('rtrw')->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -1073,7 +1073,7 @@ class RtrwController extends Controller
         DB::connection('sqlsrvrtrw')->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard('rtrw')->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -1219,7 +1219,7 @@ class RtrwController extends Controller
         DB::connection('sqlsrvrtrw')->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard('rtrw')->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -1451,7 +1451,7 @@ class RtrwController extends Controller
         DB::connection('sqlsrvrtrw')->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard('rtrw')->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
