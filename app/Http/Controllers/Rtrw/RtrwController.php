@@ -123,7 +123,10 @@ class RtrwController extends Controller
     }
 
     public function getTahunBill(Request $request){
-
+        $this->validate($request, [
+            'kode_menu' => 'required',
+            'kode_pp'=>'required'
+        ]);
         try {
             
             if($data =  Auth::guard('rtrw')->user()){
@@ -213,7 +216,10 @@ class RtrwController extends Controller
             $cek = json_decode(json_encode($cek),true);
             $kode_akun = $cek[0]['akun_kas'];
 
-            $sql="select 'all' as periode union all select '$periode' as periode union all select distinct periode from rt_setor_m where kode_lokasi='$kode_lokasi' order by periode desc ";
+            $sql="select a.kode_akun,a.nama 
+            from masakun a 
+            inner join relakun_pp c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi and c.kode_pp='$kode_pp'
+            inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag in ('001','009') where a.kode_lokasi='$kode_lokasi'   ";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
             
