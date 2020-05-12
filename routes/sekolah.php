@@ -83,7 +83,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('status_guru','Sekolah\StatusGuruController@update');
     $router->delete('status_guru','Sekolah\StatusGuruController@destroy');
 
-
+    //Mata Pelajaran
+    $router->get('mata_pelajaran_all','Sekolah\MataPelajaranController@index');
+    $router->get('mata_pelajaran','Sekolah\MataPelajaranController@show');
+    $router->post('mata_pelajaran','Sekolah\MataPelajaranController@store');
+    $router->put('mata_pelajaran','Sekolah\MataPelajaranController@update');
+    $router->delete('mata_pelajaran','Sekolah\MataPelajaranController@destroy');
 
 
 
