@@ -33,6 +33,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('tahun_ajaran','Sekolah\TahunAjaranController@update');
     $router->delete('tahun_ajaran','Sekolah\TahunAjaranController@destroy');
 
+    //Angkatan
+    $router->get('tingkat','Sekolah\AngkatanController@getTingkat');
+    $router->get('angkatan_all','Sekolah\AngkatanController@index');
+    $router->get('angkatan','Sekolah\AngkatanController@show');
+    $router->post('angkatan','Sekolah\AngkatanController@store');
+    $router->put('angkatan','Sekolah\AngkatanController@update');
+    $router->delete('angkatan','Sekolah\AngkatanController@destroy');
 
 
 
