@@ -16,6 +16,17 @@ class TahunAjaranController extends Controller
      */
     public $successStatus = 200;
 
+    public function isUnik($isi,$kode_lokasi,$kode_pp){
+        
+        $auth = DB::connection('sqlsrvtarbak')->select("select kode_ta from sis_ta where kode_ta ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -89,12 +100,16 @@ class TahunAjaranController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_ta (kode_ta,nama,kode_lokasi,kode_pp,tgl_mulai,tgl_akhir,flag_aktif) values (?, ?, ?, ?, ?, ?, ?)', [$request->kode_ta,$request->nama,$kode_lokasi,$request->kode_pp,$request->tgl_awal,$request->tgl_akhir,$request->flag_aktif]);
-            
-            DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Tahun Ajaran berhasil disimpan";
+            if($this->isUnik($request->kode_ta,$kode_lokasi,$request->kode_pp)){
+                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_ta (kode_ta,nama,kode_lokasi,kode_pp,tgl_mulai,tgl_akhir,flag_aktif) values (?, ?, ?, ?, ?, ?, ?)', [$request->kode_ta,$request->nama,$kode_lokasi,$request->kode_pp,$request->tgl_awal,$request->tgl_akhir,$request->flag_aktif]);
+                
+                DB::connection('sqlsrvtarbak')->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Tahun Ajaran berhasil disimpan";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Error : Duplicate entry. Kode TA sudah ada di database!";
+            }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();

@@ -16,6 +16,18 @@ class JurusanController extends Controller
      */
     public $successStatus = 200;
 
+    public function isUnik($isi,$kode_lokasi,$kode_pp){
+        
+        $auth = DB::connection('sqlsrvtarbak')->select("select kode_jur from sis_jur where kode_jur ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+
     public function index(Request $request)
     {
         try {
@@ -84,12 +96,18 @@ class JurusanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            if($this->isUnik($request->kode_jur,$kode_lokasi,$request->kode_pp)){
+
+                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_jur(kode_jur,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?)', [$request->kode_jur,$request->nama,$kode_lokasi,$request->kode_pp]);
+                
+                DB::connection('sqlsrvtarbak')->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Jurusan berhasil disimpan";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Error: Duplicate entry. Kode Jur sudah ada di database!";
+            }
             
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_jur(kode_jur,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?)', [$request->kode_jur,$request->nama,$kode_lokasi,$request->kode_pp]);
-            
-            DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Jurusan berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();

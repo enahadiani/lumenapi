@@ -16,6 +16,17 @@ class KelasController extends Controller
      */
     public $successStatus = 200;
 
+    public function isUnik($isi,$kode_lokasi,$kode_pp){
+        
+        $auth = DB::connection('sqlsrvtarbak')->select("select kode_kelas from sis_kelas where kode_kelas ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -87,12 +98,17 @@ class KelasController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_kelas(kode_kelas,nama,kode_tingkat,kode_jur,flag_aktif,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?, ?, ?)', [$request->kode_kelas,$request->nama,$request->kode_tingkat,$request->kode_jur,$request->flag_aktif,$kode_lokasi,$request->kode_pp]);
-            
-            DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Kelas berhasil disimpan";
+            if($this->isUnik($request->kode_kelas,$kode_lokasi,$request->kode_pp)){
+
+                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_kelas(kode_kelas,nama,kode_tingkat,kode_jur,flag_aktif,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?, ?, ?)', [$request->kode_kelas,$request->nama,$request->kode_tingkat,$request->kode_jur,$request->flag_aktif,$kode_lokasi,$request->kode_pp]);
+                
+                DB::connection('sqlsrvtarbak')->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Kelas berhasil disimpan";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Error : Duplicate entry. Kode Kelas sudah ada di database!";
+            }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
