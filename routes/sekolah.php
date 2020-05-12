@@ -55,6 +55,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('kelas','Sekolah\KelasController@update');
     $router->delete('kelas','Sekolah\KelasController@destroy');
 
+    //Status Siswa
+    $router->get('status_siswa_all','Sekolah\StatusSiswaController@index');
+    $router->get('status_siswa','Sekolah\StatusSiswaController@show');
+    $router->post('status_siswa','Sekolah\StatusSiswaController@store');
+    $router->put('status_siswa','Sekolah\StatusSiswaController@update');
+    $router->delete('status_siswa','Sekolah\StatusSiswaController@destroy');
+
 
 
 });
