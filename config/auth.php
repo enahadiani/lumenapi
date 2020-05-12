@@ -26,6 +26,10 @@ return [
         'rtrw' => [
             'driver' => 'jwt',
             'provider' => 'adminrtrw',
+        ],
+        'tarbak' => [
+            'driver' => 'jwt',
+            'provider' => 'admintarbak',
         ]
     ],
 
@@ -45,6 +49,10 @@ return [
         'adminrtrw' => [
             'driver' => 'eloquent',
             'model' => \App\AdminRtrw::class
+        ],
+        'admintarbak' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminTarbak::class
         ]
     ]
 ];

@@ -80,6 +80,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'sqlsrvtarbak' => [
+            'driver' => env('DB_CONNECTION5','sqlsrv'),
+            'host' => env('DB_HOST5', 'localhost'),
+            'port' => env('DB_PORT5', '1433'),
+            'database' => env('DB_DATABASE5', 'forge'),
+            'username' => env('DB_USERNAME5', 'forge'),
+            'password' => env('DB_PASSWORD5', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

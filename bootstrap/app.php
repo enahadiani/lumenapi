@@ -224,4 +224,11 @@ $app->router->group([
     require __DIR__.'/../routes/rtrw.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sekolah'
+], function ($router) {
+    require __DIR__.'/../routes/sekolah.php';
+});
+
 return $app;

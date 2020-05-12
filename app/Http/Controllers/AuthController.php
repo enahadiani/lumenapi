@@ -145,6 +145,23 @@ class AuthController extends Controller
         return $this->respondRtrwWithToken($token);
     }
 
+    public function loginTarbak(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('tarbak')->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondTarbakWithToken($token);
+    }
+
     public function hashPassword(){
         $users = User::all();
         DB::connection('sqlsrv')->beginTransaction();
@@ -240,6 +257,31 @@ class AuthController extends Controller
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrvrtrw')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPasswordTarbak(){
+        DB::connection('sqlsrvtarbak')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvtarbak')->table('hakakses')->where('password', NULL)->orderBy('nik')->chunk(10, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrvtarbak')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->where('password',NULL)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrvtarbak')->commit();
+            $success['status'] = false;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);
