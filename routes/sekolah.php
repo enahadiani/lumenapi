@@ -27,11 +27,11 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
 
     //Tahun Ajaran
     $router->get('pp','Sekolah\TahunAjaranController@getPP');
-    $router->get('tahun_ajaran','Sekolah\TahunAjaranController@index');
-    $router->get('tahun_ajaran/{kode_ta}','Sekolah\TahunAjaranController@show');
+    $router->get('tahun_ajaran_all','Sekolah\TahunAjaranController@index');
+    $router->get('tahun_ajaran','Sekolah\TahunAjaranController@show');
     $router->post('tahun_ajaran','Sekolah\TahunAjaranController@store');
-    $router->put('tahun_ajaran/{kode_ta}','Sekolah\TahunAjaranController@update');
-    $router->delete('tahun_ajaran/{kode_ta}','Sekolah\TahunAjaranController@destroy');
+    $router->put('tahun_ajaran','Sekolah\TahunAjaranController@update');
+    $router->delete('tahun_ajaran','Sekolah\TahunAjaranController@destroy');
 
 
 
