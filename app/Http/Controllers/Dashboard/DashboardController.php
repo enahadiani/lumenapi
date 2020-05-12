@@ -16,7 +16,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -24,7 +24,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $capai = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,
+            $capai = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n2,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n3,
@@ -69,7 +69,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -77,7 +77,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $capai = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end as n1,
+            $capai = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.nama,case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n2,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n3,
             case when a.n2<>0 then (a.n4/a.n2)*100 else 0 end as capai
@@ -129,7 +129,7 @@ class DashboardController extends Controller
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -139,7 +139,7 @@ class DashboardController extends Controller
 
             $bulan = substr($periode,4,2);
 
-            $rs = DB::connection('sqlsrvypt')->select("SELECT
+            $rs = DB::connection('sqlsrvyptkug')->select("SELECT
             tahun
             FROM
             (
@@ -167,7 +167,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $rs2 = DB::connection('sqlsrvypt')->select("select a.kode_neraca,b.nama $kolom
+            $rs2 = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,b.nama $kolom
             from db_grafik_d a
             inner join neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             left join (select a.kode_neraca,a.kode_lokasi,a.kode_fs $sumcase                        
@@ -232,7 +232,7 @@ class DashboardController extends Controller
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -242,7 +242,7 @@ class DashboardController extends Controller
 
             $bulan = substr($periode,4,2);
 
-            $rs = DB::connection('sqlsrvypt')->select("SELECT
+            $rs = DB::connection('sqlsrvyptkug')->select("SELECT
             tahun
             FROM
             (
@@ -270,7 +270,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $rs2 = DB::connection('sqlsrvypt')->select("select a.kode_neraca,b.nama $kolom
+            $rs2 = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,b.nama $kolom
             from db_grafik_d a
             inner join neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             left join (select a.kode_neraca,a.kode_lokasi,a.kode_fs $sumcase                        
@@ -336,7 +336,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -344,7 +344,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $komposisi = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,
+            $komposisi = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
@@ -387,7 +387,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -395,7 +395,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $row = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,
+            $row = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
@@ -442,7 +442,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -450,7 +450,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $row = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.n5,a.n1,a.n4,case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            $row = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.n5,a.n1,a.n4,case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D03'
@@ -488,7 +488,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -496,7 +496,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $komposisi = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,
+            $komposisi = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
@@ -539,7 +539,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -547,7 +547,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $row = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.nama,
+            $row = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
@@ -594,7 +594,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -602,7 +602,7 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $row = DB::connection('sqlsrvypt')->select("select a.kode_neraca,a.n5,a.n1,a.n4,case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            $row = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,a.n5,a.n1,a.n4,case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D05'
@@ -640,7 +640,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -651,7 +651,7 @@ class DashboardController extends Controller
             $bulan = substr($periode,4,2);
 
             // $sql = "select distinct substring(periode,1,4) as tahun from exs_neraca_pp where kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca='$kode_neraca' order by substring(periode,1,4) asc ";
-            $rs = DB::connection('sqlsrvypt')->select("SELECT
+            $rs = DB::connection('sqlsrvyptkug')->select("SELECT
             tahun
             FROM
             (
@@ -679,7 +679,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $row =  DB::connection('sqlsrvypt')->select("select a.kode_bidang,a.nama $kolom
+            $row =  DB::connection('sqlsrvyptkug')->select("select a.kode_bidang,a.nama $kolom
             from bidang a 
             left join (select c.kode_bidang,a.kode_lokasi $sumcase
                         from exs_neraca_pp a
@@ -734,7 +734,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -744,7 +744,7 @@ class DashboardController extends Controller
             
             $tahun= substr($periode,0,4);
             
-            $row = DB::connection('sqlsrvypt')->select(" select a.kode_bidang,a.nama,
+            $row = DB::connection('sqlsrvyptkug')->select(" select a.kode_bidang,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,4)/isnull(b.n2,0))*100 else 0 end as capai
             from bidang a 
@@ -789,7 +789,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -799,7 +799,7 @@ class DashboardController extends Controller
             
             $bulan = substr($periode,4,2);
 
-            $rs = DB::connection('sqlsrvypt')->select("SELECT
+            $rs = DB::connection('sqlsrvyptkug')->select("SELECT
             tahun
             FROM
             (
@@ -827,7 +827,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $row =  DB::connection('sqlsrvypt')->select("select a.kode_bidang,a.nama $kolom
+            $row =  DB::connection('sqlsrvyptkug')->select("select a.kode_bidang,a.nama $kolom
             from pp a 
             left join (select c.kode_pp,a.kode_lokasi $sumcase
                         from exs_neraca_pp a
@@ -882,7 +882,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -893,7 +893,7 @@ class DashboardController extends Controller
             $th = substr($periode,0,2);
             $tahun = $th.$tahun;
 
-            $row = DB::connection('sqlsrvypt')->select("select a.kode_pp,a.nama,
+            $row = DB::connection('sqlsrvyptkug')->select("select a.kode_pp,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,0)/isnull(b.n2,0))*100 else 0 end as capai
             from pp a 
@@ -940,7 +940,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -951,7 +951,7 @@ class DashboardController extends Controller
             $bulan = substr($periode,4,2);
 
             // $sql = "select distinct substring(periode,1,4) as tahun from exs_neraca_pp where kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca='$kode_neraca' order by substring(periode,1,4) asc ";
-            $rs = DB::connection('sqlsrvypt')->select("SELECT
+            $rs = DB::connection('sqlsrvyptkug')->select("SELECT
             tahun
             FROM
             (
@@ -979,7 +979,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $row =  DB::connection('sqlsrvypt')->select("select a.kode_bidang,a.nama $kolom
+            $row =  DB::connection('sqlsrvyptkug')->select("select a.kode_bidang,a.nama $kolom
             from bidang a 
             left join (select c.kode_bidang,a.kode_lokasi $sumcase
                         from exs_neraca_pp a
@@ -1034,7 +1034,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -1044,7 +1044,7 @@ class DashboardController extends Controller
             
             $tahun= substr($periode,0,4);
             
-            $row = DB::connection('sqlsrvypt')->select(" select a.kode_bidang,a.nama,
+            $row = DB::connection('sqlsrvyptkug')->select(" select a.kode_bidang,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,4)/isnull(b.n2,0))*100 else 0 end as capai
             from bidang a 
@@ -1089,7 +1089,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -1099,7 +1099,7 @@ class DashboardController extends Controller
             
             $bulan = substr($periode,4,2);
 
-            $rs = DB::connection('sqlsrvypt')->select("SELECT
+            $rs = DB::connection('sqlsrvyptkug')->select("SELECT
             tahun
             FROM
             (
@@ -1127,7 +1127,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $row =  DB::connection('sqlsrvypt')->select("select a.kode_bidang,a.nama $kolom
+            $row =  DB::connection('sqlsrvyptkug')->select("select a.kode_bidang,a.nama $kolom
             from pp a 
             left join (select c.kode_pp,a.kode_lokasi $sumcase
                         from exs_neraca_pp a
@@ -1182,7 +1182,7 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -1193,7 +1193,7 @@ class DashboardController extends Controller
             $th = substr($periode,0,2);
             $tahun = $th.$tahun;
 
-            $row = DB::connection('sqlsrvypt')->select("select a.kode_pp,a.nama,
+            $row = DB::connection('sqlsrvyptkug')->select("select a.kode_pp,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,0)/isnull(b.n2,0))*100 else 0 end as capai
             from pp a 
@@ -1237,12 +1237,12 @@ class DashboardController extends Controller
         try {
             
             
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $row = DB::connection('sqlsrvypt')->select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' and (isnull(a.jenis_menu,'-') = '-' OR a.jenis_menu = '') order by kode_klp, rowindex
+            $row = DB::connection('sqlsrvyptkug')->select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' and (isnull(a.jenis_menu,'-') = '-' OR a.jenis_menu = '') order by kode_klp, rowindex
             ");
             $row = json_decode(json_encode($row),true);
             

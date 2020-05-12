@@ -24,11 +24,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     
-    $router->post('login', 'AuthController@loginYpt');
-    $router->get('hashPass', 'AuthController@hashPasswordYpt');
+    $router->post('login', 'AuthController@loginYptKug');
+    $router->get('hash_pass', 'AuthController@hashPasswordYptKug');
     $router->get('db3', function () {
         
-        $sql = DB::connection('sqlsrvypt')->select("select * from hakakses ");
+        $sql = DB::connection('sqlsrvyptkug')->select("select * from hakakses ");
         $row = json_decode(json_encode($sql),true);
         
         $result = response()->json(['success'=>$row], 200);    
@@ -38,7 +38,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     });
 });
 
-$router->group(['middleware' => 'auth:ypt'], function () use ($router) {
+$router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     $router->get('profile', 'AdminYptController@profile');
     $router->get('users/{id}', 'AdminYptController@singleUser');

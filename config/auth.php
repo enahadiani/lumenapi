@@ -30,6 +30,10 @@ return [
         'tarbak' => [
             'driver' => 'jwt',
             'provider' => 'admintarbak',
+        ],
+        'yptkug' => [
+            'driver' => 'jwt',
+            'provider' => 'adminyptkug',
         ]
     ],
 
@@ -53,6 +57,10 @@ return [
         'admintarbak' => [
             'driver' => 'eloquent',
             'model' => \App\AdminTarbak::class
+        ],
+        'adminyptkug' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminYptKug::class
         ]
     ]
 ];

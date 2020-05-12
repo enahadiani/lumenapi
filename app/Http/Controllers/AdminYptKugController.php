@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use  App\AdminYpt;
 
-class AdminYptController extends Controller
+class AdminYptKugController extends Controller
 {
      /**
      * Instantiate a new UserController instance.
@@ -27,11 +27,11 @@ class AdminYptController extends Controller
      */
     public function profile()
     {
-        if($data =  Auth::guard('ypt')->user()){
+        if($data =  Auth::guard('yptkug')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrvypt')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
 			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
@@ -43,11 +43,11 @@ class AdminYptController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrvypt')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection('sqlsrvyptkug')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrvypt')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection('sqlsrvyptkug')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
@@ -68,7 +68,7 @@ class AdminYptController extends Controller
      */
     public function allUsers()
     {
-         return response()->json(['users' =>  AdminYpt::all()], 200);
+         return response()->json(['users' =>  AdminYptKug::all()], 200);
     }
 
     /**
@@ -79,7 +79,7 @@ class AdminYptController extends Controller
     public function singleUser($id)
     {
         try {
-            $user = AdminYpt::findOrFail($id);
+            $user = AdminYptKug::findOrFail($id);
 
             return response()->json(['user' => $user], 200);
 
@@ -91,7 +91,7 @@ class AdminYptController extends Controller
     }
 
     public function cekPayload(){
-        $payload = Auth::guard('ypt')->payload();
+        $payload = Auth::guard('yptkug')->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }

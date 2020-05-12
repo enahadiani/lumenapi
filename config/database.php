@@ -90,6 +90,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'sqlsrvyptkug' => [
+            'driver' => env('DB_CONNECTION6','sqlsrv'),
+            'host' => env('DB_HOST6', 'localhost'),
+            'port' => env('DB_PORT6', '1433'),
+            'database' => env('DB_DATABASE6', 'forge'),
+            'username' => env('DB_USERNAME6', 'forge'),
+            'password' => env('DB_PASSWORD6', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

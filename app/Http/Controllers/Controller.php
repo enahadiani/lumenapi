@@ -57,4 +57,14 @@ class Controller extends BaseController
             'expires_in' => Auth::guard('tarbak')->factory()->getTTL() * 60
         ], 200);
     }
+
+    protected function respondYptKugWithToken($token)
+    {
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'message' => 'success',
+            'expires_in' => Auth::guard('yptkug')->factory()->getTTL() * 60
+        ], 200);
+    }
 }
