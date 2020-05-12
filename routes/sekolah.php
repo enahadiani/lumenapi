@@ -62,6 +62,29 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('status_siswa','Sekolah\StatusSiswaController@update');
     $router->delete('status_siswa','Sekolah\StatusSiswaController@destroy');
 
+    //Slot Jam Belajar
+    $router->get('slot_all','Sekolah\SlotController@index');
+    $router->get('slot','Sekolah\SlotController@show');
+    $router->post('slot','Sekolah\SlotController@store');
+    $router->put('slot','Sekolah\SlotController@update');
+    $router->delete('slot','Sekolah\SlotController@destroy');
+
+    //Slot Jenis Penilaian
+    $router->get('jenis_nilai_all','Sekolah\JenisPenilaianController@index');
+    $router->get('jenis_nilai','Sekolah\JenisPenilaianController@show');
+    $router->post('jenis_nilai','Sekolah\JenisPenilaianController@store');
+    $router->put('jenis_nilai','Sekolah\JenisPenilaianController@update');
+    $router->delete('jenis_nilai','Sekolah\JenisPenilaianController@destroy');
+
+    //Status Guru
+    $router->get('status_guru_all','Sekolah\StatusGuruController@index');
+    $router->get('status_guru','Sekolah\StatusGuruController@show');
+    $router->post('status_guru','Sekolah\StatusGuruController@store');
+    $router->put('status_guru','Sekolah\StatusGuruController@update');
+    $router->delete('status_guru','Sekolah\StatusGuruController@destroy');
+
+
+
 
 
 });

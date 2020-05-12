@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class StatusSiswaController extends Controller
+class JenisPenilaianController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +18,7 @@ class StatusSiswaController extends Controller
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_ss from sis_siswa_status where kode_ss ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection('sqlsrvtarbak')->select("select kode_jenis from sis_jenisnilai where kode_jenis ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -39,10 +39,7 @@ class StatusSiswaController extends Controller
                 $filter = "and a.kode_pp='$request->kode_pp' ";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_ss, a.nama, a.flag_aktif,a.kode_pp+'-'+b.nama as pp 
-            from sis_siswa_status a
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi  
-            where a.kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_jenis, nama,kode_pp from sis_jenisnilai where kode_lokasi='".$kode_lokasi."'  $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -83,7 +80,7 @@ class StatusSiswaController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_ss' => 'required',
+            'kode_jenis' => 'required',
             'nama' => 'required',
             'kode_pp' => 'required',
             'flag_aktif' => 'required'
@@ -96,22 +93,22 @@ class StatusSiswaController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_ss,$kode_lokasi,$request->kode_pp)){
+            if($this->isUnik($request->kode_jenis,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_siswa_status(kode_ss,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_ss,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
+                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_jenis,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
                 
                 DB::connection('sqlsrvtarbak')->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Status Siswa berhasil disimpan";
+                $success['message'] = "Data Jenis Penilaian berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode Status Siswa sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode Jenis Penilaian sudah ada di database!";
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Status Siswa gagal disimpan ".$e;
+            $success['message'] = "Data Jenis Penilaian gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -128,7 +125,7 @@ class StatusSiswaController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ss' => 'required'
+            'kode_jenis' => 'required'
         ]);
         try {
             
@@ -138,9 +135,9 @@ class StatusSiswaController extends Controller
             }
 
             $kode_pp = $request->kode_pp;
-            $kode_ss= $request->kode_ss;
+            $kode_jenis= $request->kode_jenis;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nama, kode_ss,kode_pp,flag_aktif from sis_siswa_status where kode_ss ='".$kode_slot."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_jenis, nama,kode_pp,flag_aktif from sis_jenisnilai where kode_jenis ='".$kode_jenis."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -183,10 +180,10 @@ class StatusSiswaController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_ss' => 'required',
+            'kode_jenis' => 'required',
             'nama' => 'required',
             'kode_pp' => 'required',
-            'flag_aktif'=> 'required'
+            'flag_aktif' => 'required'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -197,23 +194,22 @@ class StatusSiswaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_siswa_status')
+            $del = DB::connection('sqlsrvtarbak')->table('sis_jenisnilai')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_ss', $request->kode_ss)
+            ->where('kode_jenis', $request->kode_jenis)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_siswa_status(kode_ss,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_ss,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
-                
+            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_jenis,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);          
                         
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Status Siswa berhasil diubah";
+            $success['message'] = "Data Jenis Penilaian berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Status Siswa gagal diubah ".$e;
+            $success['message'] = "Data Jenis Penilaian gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -228,7 +224,7 @@ class StatusSiswaController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ss' => 'required'
+            'kode_jenis' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -238,21 +234,21 @@ class StatusSiswaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_siswa_status')
+            $del = DB::connection('sqlsrvtarbak')->table('sis_jenisnilai')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_ss', $request->kode_ss)
+            ->where('kode_jenis', $request->kode_jenis)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Status Siswa berhasil dihapus";
+            $success['message'] = "Data Jenis Penilaian berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Status Siswa gagal dihapus ".$e;
+            $success['message'] = "Data Jenis Penilaian gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
