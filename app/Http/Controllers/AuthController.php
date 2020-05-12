@@ -192,7 +192,7 @@ class AuthController extends Controller
                 }
             });
             DB::connection('sqlsrv')->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
@@ -217,7 +217,7 @@ class AuthController extends Controller
                 }
             });
             DB::connection('sqlsrv2')->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
@@ -244,7 +244,7 @@ class AuthController extends Controller
                 }
             });
             DB::connection('sqlsrvypt')->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
@@ -269,7 +269,7 @@ class AuthController extends Controller
                 }
             });
             DB::connection('sqlsrvrtrw')->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
@@ -294,7 +294,7 @@ class AuthController extends Controller
                 }
             });
             DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
@@ -319,7 +319,7 @@ class AuthController extends Controller
                 }
             });
             DB::connection('sqlsrvyptkug')->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
@@ -344,7 +344,7 @@ class AuthController extends Controller
             ->update(['password' => app('hash')->make($password)]);
                 
             DB::connection($db)->commit();
-            $success['status'] = false;
+            $success['status'] = true;
             $success['message'] = "Hash Password berhasil disimpan ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
