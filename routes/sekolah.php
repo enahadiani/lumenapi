@@ -48,6 +48,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('jurusan','Sekolah\JurusanController@update');
     $router->delete('jurusan','Sekolah\JurusanController@destroy');
 
+    //Kelas
+    $router->get('kelas_all','Sekolah\KelasController@index');
+    $router->get('kelas','Sekolah\KelasController@show');
+    $router->post('kelas','Sekolah\KelasController@store');
+    $router->put('kelas','Sekolah\KelasController@update');
+    $router->delete('kelas','Sekolah\KelasController@destroy');
+
 
 
 });
