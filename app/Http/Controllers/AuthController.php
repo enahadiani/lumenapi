@@ -330,4 +330,29 @@ class AuthController extends Controller
         }	
 
     }
+
+    public function hashPasswordByNIK($db,$nik){
+        DB::connection($db)->beginTransaction();
+        
+        try {
+            
+            $res = DB::connection($db)->select ("select pass from hakakses where nik='$nik' ");
+            $res = json_decode(json_encode($res),true);
+            $password = $res[0]['pass'];
+            DB::connection($db)->table('hakakses')
+            ->where('nik', $nik)
+            ->update(['password' => app('hash')->make($password)]);
+                
+            DB::connection($db)->commit();
+            $success['status'] = false;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
 }
