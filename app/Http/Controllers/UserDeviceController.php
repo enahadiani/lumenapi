@@ -42,6 +42,11 @@ class UserDeviceController extends Controller
             $kode_lokasi= $data->kode_lokasi;
             $db = 'sqlsrvypt';
            
+        }else if($data =  Auth::guard('sju')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $db = 'sqlsrvsju';
+           
         }
         if($db != ""){
 
@@ -89,6 +94,11 @@ class UserDeviceController extends Controller
             $kode_lokasi= $data->kode_lokasi;
             $db = 'sqlsrvypt';
            
+        }else if($data =  Auth::guard('sju')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $db = 'sqlsrvsju';
+           
         }
 
         if($db != ""){
@@ -129,7 +139,13 @@ class UserDeviceController extends Controller
             $kode_lokasi= $data->kode_lokasi;
             $db = 'sqlsrvypt';
            
+        }else if($data =  Auth::guard('sju')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $db = 'sqlsrvsju';
+           
         }
+
         if($db != ""){
 
             $user = DB::connection($db)->select("select nik,device_os,device_status,device_token,device_model,device_version,device_uuid,kode_lokasi 
@@ -176,6 +192,11 @@ class UserDeviceController extends Controller
             $kode_lokasi= $data->kode_lokasi;
             $db = 'sqlsrvypt';
            
+        }else if($data =  Auth::guard('sju')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $db = 'sqlsrvsju';
+           
         }
 
         if($db != ""){
@@ -218,6 +239,11 @@ class UserDeviceController extends Controller
             
             $kode_lokasi= $data->kode_lokasi;
             $db = 'sqlsrvypt';
+           
+        }else if($data =  Auth::guard('sju')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $db = 'sqlsrvsju';
            
         }
 
