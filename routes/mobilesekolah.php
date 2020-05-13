@@ -37,11 +37,6 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
 
 $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
 
-    $router->get('profile_guru', 'AdminTarbakController@profileGuru');
-    $router->get('users_guru/{id}', 'AdminTarbakController@singleUser');
-    $router->get('users_guru', 'AdminTarbakController@allUsers');
-    $router->get('cek_payload_guru', 'AdminTarbakController@cekPayload');
-
     $router->get('profile_siswa', 'AdminSiswaController@profile');
     $router->get('users_siswa/{id}', 'AdminSiswaController@singleUser');
     $router->get('users_siswa', 'AdminSiswaController@allUsers');

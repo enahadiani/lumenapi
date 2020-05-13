@@ -27,7 +27,7 @@ class AdminSiswaController extends Controller
      */
     public function profile()
     {
-        if($data =  Auth::guard('tarbak')->user()){
+        if($data =  Auth::guard('siswa')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
@@ -89,7 +89,7 @@ class AdminSiswaController extends Controller
     }
 
     public function cekPayload(){
-        $payload = Auth::guard('tarbak')->payload();
+        $payload = Auth::guard('siswa')->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }

@@ -15,6 +15,9 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginTarbak');
     $router->get('hash_pass', 'AuthController@hashPasswordTarbak');
+    $router->get('hash_pass_costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
+    $router->get('hash_pass_nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
+    
 });
 
 $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {

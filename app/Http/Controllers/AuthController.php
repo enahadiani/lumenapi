@@ -415,17 +415,49 @@ class AuthController extends Controller
 
     }
 
-    public function hashPasswordByNIK($db,$nik){
+    public function hashPasswordByNIK($db,$table,$nik){
         DB::connection($db)->beginTransaction();
         
         try {
             
-            $res = DB::connection($db)->select ("select pass from hakakses where nik='$nik' ");
+            $res = DB::connection($db)->select ("select pass from $table where nik='$nik' ");
             $res = json_decode(json_encode($res),true);
             $password = $res[0]['pass'];
-            DB::connection($db)->table('hakakses')
+            DB::connection($db)->table($table)
             ->where('nik', $nik)
             ->update(['password' => app('hash')->make($password)]);
+                
+            DB::connection($db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPasswordCostum($db,$table,$top,$kode_pp=null){
+        DB::connection($db)->beginTransaction();
+        
+        try {
+        
+            if($kode_pp != "" OR $kode_pp != NULL){
+                $filter = " and kode_pp='$kode_pp' ";
+            }else{
+                $filter = "";
+            }
+            $users = DB::connection($db)->select("select top $top nik,pass from $table where isnull(password,'-')= '-' order by nik ");
+
+            foreach ($users as $user) {
+                DB::connection($db)->table($table)
+                        ->where('nik', $user->nik)
+                        ->where('password',NULL)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+            }
                 
             DB::connection($db)->commit();
             $success['status'] = true;
