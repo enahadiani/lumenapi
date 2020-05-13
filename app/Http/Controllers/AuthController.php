@@ -145,6 +145,23 @@ class AuthController extends Controller
         return $this->respondYptKugWithToken($token);
     }
 
+    public function loginSju(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('sju')->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondSjuWithToken($token);
+    }
+
     public function loginRtrw(Request $request)
     {
           //validate incoming request 
@@ -324,6 +341,31 @@ class AuthController extends Controller
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrvyptkug')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPasswordSju(){
+        DB::connection('sqlsrvsju')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvsju')->table('hakakses')->where('password', NULL)->orderBy('nik')->chunk(10, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrvsju')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->where('password',NULL)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrvsju')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvsju')->rollback();
             $success['status'] = false;
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);

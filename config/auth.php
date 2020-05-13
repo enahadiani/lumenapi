@@ -34,6 +34,10 @@ return [
         'yptkug' => [
             'driver' => 'jwt',
             'provider' => 'adminyptkug',
+        ],
+        'sju' => [
+            'driver' => 'jwt',
+            'provider' => 'adminsju',
         ]
     ],
 
@@ -61,6 +65,10 @@ return [
         'adminyptkug' => [
             'driver' => 'eloquent',
             'model' => \App\AdminYptKug::class
+        ],
+        'adminsju' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminSju::class
         ]
     ]
 ];

@@ -100,6 +100,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'sqlsrvsju' => [
+            'driver' => env('DB_CONNECTION7','sqlsrv'),
+            'host' => env('DB_HOST7', 'localhost'),
+            'port' => env('DB_PORT7', '1433'),
+            'database' => env('DB_DATABASE7', 'forge'),
+            'username' => env('DB_USERNAME7', 'forge'),
+            'password' => env('DB_PASSWORD7', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

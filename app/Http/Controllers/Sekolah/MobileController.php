@@ -1,0 +1,1050 @@
+<?php
+
+namespace App\Http\Controllers\Sekolah;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
+class MobileController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public $successStatus = 200;
+
+    public function getAbsen(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis, a.nama , isnull(b.hadir,0) as hadir,isnull(b.alpa,0) as alpha,isnull(b.izin,0) as izin,isnull(b.sakit,0) as sakit 
+            from sis_siswa a 
+            left join (select a.nis,a.kode_lokasi,count(case when a.status ='hadir' then status end) hadir,
+                       count(case when a.status ='alpa' then status end) alpa,
+                       count(case when a.status ='izin' then status end) izin,
+                       count(case when a.status ='sakit' then status end) sakit  
+                        from sis_presensi a
+                        inner join sis_ta b on a.kode_ta=b.kode_ta and a.kode_pp=b.kode_pp
+                        inner join sis_kelas c on a.kode_kelas=c.kode_kelas and a.kode_pp=c.kode_pp
+                        inner join sis_siswa d on a.nis=d.nis and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik' 
+            group by a.nis,a.kode_lokasi) b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
+           ");
+            $res = json_decode(json_encode($res),true);
+
+            $res2 = DB::connection('sqlsrvtarbak')->select( " select tanggal,convert(varchar(5),tgl_input,108) as jam, status from sis_presensi  where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' and nis='$nik'
+            ");
+            $res2 = json_decode(json_encode($res2),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getJadwalSekarang(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_hari' => 'required',
+            'kode_ta' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $kode_hari = $request->kode_hari;
+            $kode_ta = $request->kode_ta;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.kode_matpel,b.jam1,b.jam2,c.nama as matpel,'-' as status 
+            from sis_jadwal a 
+            inner join sis_slot b on a.kode_slot=b.kode_slot and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.kode_ta='$kode_ta' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.nik='$nik' and a.kode_hari='$kode_hari' 
+            ");
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getAbsenTotal(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_hari' => 'required',
+            'kode_ta' => 'required',
+            'jam' => 'required',
+            'tanggal' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $kode_hari = $request->kode_hari;
+            $kode_ta = $request->kode_ta;
+            $jam = $request->jam;
+            $tanggal = $request->tanggal;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,isnull(b.jum,0) as jum_sis,isnull(c.jum_hadir,0) as jum_hadir,isnull(c.jum_sakit,0) as jum_sakit,isnull(c.jum_izin,0) as jum_izin,isnull(c.jum_alpa,0) as jum_alpa
+            from sis_jadwal a 
+            inner join sis_slot x on a.kode_slot=x.kode_slot and a.kode_lokasi=x.kode_lokasi
+            left join (select kode_kelas,kode_pp,kode_lokasi,count(nis) as jum
+                        from sis_siswa 
+                        where flag_aktif='1'
+                        group by kode_kelas,kode_pp,kode_lokasi) b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            left join (select kode_kelas,kode_pp,kode_lokasi,kode_matpel,count(case when status='Hadir' then nis end) jum_hadir,
+                        count(case when status='Sakit' then nis end) jum_sakit,
+                        count(case when status='Alpa' then nis end) jum_alpa,
+                        count(case when status='Izin' then nis end) jum_izin
+                        from sis_presensi
+                        where tanggal = '$tanggal'
+                        group by kode_kelas,kode_pp,kode_lokasi,kode_matpel) c on a.kode_kelas=c.kode_kelas and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi and a.kode_matpel=c.kode_matpel
+            where a.kode_ta='$kode_ta' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.nik='$nik' and a.kode_hari='$kode_hari' and '$jam' between x.jam1 and x.jam2
+            ");
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getDaftarSiswa(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_kelas' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $kode_kelas = $request->kode_kelas;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis,a.nama,'HADIR' as sts
+            from sis_siswa a
+            where a.flag_aktif='1' and a.kode_kelas = '$kode_kelas' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'             
+            ");
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getEditAbsen(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_kelas' => 'required',
+            'kode_matpel' => 'required',
+            'tanggal' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $kode_kelas = $request->kode_kelas;
+            $kode_matpel = $request->kode_matpel;
+            $tanggal = $request->tanggal;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis,a.nama,isnull(b.status,'-') as sts
+            from sis_siswa a
+            left join (select a.nis,kode_pp,kode_lokasi,a.status,a.kode_kelas
+                        from sis_presensi a
+                        where a.tanggal = '$tanggal' and a.kode_matpel='$kode_matpel'
+                        ) b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_kelas=b.kode_kelas
+            where a.flag_aktif='1' and a.kode_kelas = '$kode_kelas' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'           
+           ");
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function insertAbsen(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_kelas' => 'required',
+            'kode_ta' => 'required',
+            'kode_matpel' => 'required',
+            'tanggal' => 'required',
+            'status_simpan' => 'required',
+            'detail.*.status' => 'required',
+            'detail.*.nis' => 'required'
+        ]);
+
+        DB::connection('sqlsrvtarbak')->beginTransaction();
+        
+        try {
+            if($res =  Auth::guard('tarbak')->user()){
+                $nik= $res->nik;
+                $kode_lokasi= $res->kode_lokasi;
+            }
+
+            $kode_pp = $request->kode_pp;
+            $kode_kelas = $request->kode_kelas;
+            $kode_ta = $request->kode_ta;
+            $kode_matpel = $request->kode_matpel;
+            $tanggal = $request->tanggal;
+            $status_simpan = $request->status_simpan;
+
+            if ($status_simpan == 0) {
+                $del = DB::connection('sqlsrvtarbak')->table('sis_presensi')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('kode_kelas', $request->kode_kelas)
+                ->where('kode_pp', $request->kode_pp)
+                ->where('tanggal', $request->tanggal)
+                ->where('kode_ta', $request->kode_ta)
+                ->where('kode_matpel', $request->kode_matpel)
+                ->where('jenis_absen', 'HARIAN')
+                ->delete();
+            }
+
+            $data = $request->detail;	
+            if(count($data) > 0){
+
+                for ($i=0;$i < count($data);$i++){
+                     
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen,kode_matpel,nik) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['nis'],$kode_kelas,$kode_ta,date('Y-m-d H:i:s'),$data[$i]['status'],$kode_lokasi,$kode_pp,$tanggal,'HARIAN',$kode_matpel,$nik]);
+                }	
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Data Presensi berhasil disimpan";
+            DB::connection('sqlsrvtarbak')->commit();
+            
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvtarbak')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Presensi gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function getJadwalGuru(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_ta' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $kode_ta = $request->kode_ta;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot,a.kode_kelas, a.kode_hari, a.kode_matpel,d.nama as nama_matpel, a.nik,e.nama as nama_guru,c.jam1,c.jam2 
+            from sis_jadwal a
+                        inner join sis_slot c on a.kode_slot=c.kode_slot and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                        inner join karyawan e on a.nik=e.nik and a.kode_pp=e.kode_pp and a.kode_lokasi=e.kode_lokasi
+                        where a.nik='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.kode_ta='$kode_ta'
+                        order by a.kode_slot,a.kode_hari  ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getJadwalSiswa(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($cek =  Auth::guard('tarbak')->user()){
+                $nik= $cek->nik;
+                $kode_lokasi= $cek->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $kode_ta = $request->kode_ta;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select kode_hari,nama from sis_hari where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' ");
+            $res = json_decode(json_encode($res),true);
+
+            $res2 = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot, c.nama as nama_slot,a.kode_kelas, a.kode_hari, a.kode_matpel,d.nama as nama_matpel, b.nis,a.nik,e.nama as nama_guru from sis_jadwal a
+            inner join sis_siswa b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_slot c on a.kode_slot=c.kode_slot and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+            inner join karyawan e on a.nik=e.nik and a.kode_pp=e.kode_pp and a.kode_lokasi=e.kode_lokasi
+            where b.nis='$nik' and b.kode_lokasi='$kode_lokasi' and b.kode_pp='$kode_pp'  order by kode_slot,kode_hari ");
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res2) > 0){
+                $data=array();
+                for($i=0;$i< count($res2);$i++){
+                    $sub_array = array();
+                    $tmp = explode(" ",$res2[$i]["nama_slot"]);
+                    $jam1 = str_replace("[","",$tmp[2]);
+                    $jam2 = str_replace("]","",$tmp[4]);
+                    $sub_array =array(
+                        'kode_slot'=>$res2[$i]['kode_slot'],
+                        'nama_slot'=>$res2[$i]['nama_slot'],
+                        'kode_kelas'=>$res2[$i]['kode_kelas'],
+                        'kode_hari'=>$res2[$i]['kode_hari'],
+                        'kode_matpel'=>$res2[$i]['kode_matpel'],
+                        'nama_matpel'=>$res2[$i]['nama_matpel'],
+                        'nis'=>$res2[$i]['nis'],
+                        'nik'=>$res2[$i]['nik'],
+                        'nama_guru'=>$res2[$i]['nama_guru'],
+                        'jam1'=>$jam1,
+                        'jam2'=>$jam2,
+                        'absen'=>"-"
+                    );
+                    $data[] = $sub_array;
+                }
+
+            }
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $data;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = $data;
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getKalender(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select * from sis_kalender_akad a where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getEskul(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select convert(varchar,a.tgl_mulai,103) as tgl_mulai,convert(varchar,a.tgl_selesai,103) as tgl_selesai,a.keterangan,a.predikat from sis_ekskul a
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik' ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPiutang(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,c.nama as nama_jur,a.kode_akt,a.id_bank,x.nama as nama_pp
+			from sis_siswa a
+			inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			inner join sis_jur c on b.kode_jur=c.kode_jur and 
+			b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
+			inner join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
+			left join (select a.nis,a.kode_pp,a.kode_lokasi
+						from sis_cd_d a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+						group by a.nis,a.kode_pp,a.kode_lokasi
+						)g on a.nis=g.nis and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+			where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
+            order by a.kode_kelas,a.nis");
+            $res = json_decode(json_encode($res),true);
+            
+            $get = DB::connection('sqlsrvtarbak')->select( "select case when sum(debet-kredit) < 0 then 0 else sum(debet-kredit) end as so_akhir
+			from (select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			a.nilai as debet,0 as kredit,a.dc
+			from sis_cd_d a
+			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='D'
+			union all
+			select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+			from sis_cd_d a
+			inner join sis_rekon_m b on a.no_bukti=b.no_rekon and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' 
+			union all
+			select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			0 as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+			from sis_cd_d a
+			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='C'
+			)a");
+            $get = json_decode(json_encode($get),true);
+            $success['saldo'] = $get[0]['so_akhir'];
+
+            $res2 = DB::connection('sqlsrvtarbak')->select( "select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,0 as bayar from sis_bill_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp where y.flag_aktif=1 and x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi union all select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.keterangan,'PDD' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param from (select x.kode_lokasi,x.no_rekon,x.kode_param,0 as tagihan,sum(nilai) as bayar from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp where y.flag_aktif=1 and x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 group by x.kode_lokasi,x.no_rekon,x.nis,x.kode_param )a inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi union all select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.keterangan,'KB' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param from (select x.kode_lokasi,x.no_rekon,x.kode_param,0 as tagihan,sum(nilai) as bayar from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp where y.flag_aktif=1 and x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 group by x.kode_lokasi,x.no_rekon,x.nis,x.kode_param )a inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi order by tanggal,modul");
+            $res2 = json_decode(json_encode($res2),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPDD(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,c.nama as nama_jur,a.kode_akt,a.id_bank,x.nama as nama_pp
+			from sis_siswa a
+			inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			inner join sis_jur c on b.kode_jur=c.kode_jur and 
+			b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
+			inner join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
+			inner join (select a.nis,a.kode_pp,a.kode_lokasi
+			from sis_cd_d a
+			where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+			group by a.nis,a.kode_pp,a.kode_lokasi
+			)g on a.nis=g.nis and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+			where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
+			order by a.kode_kelas,a.nis");
+            $res = json_decode(json_encode($res),true);
+            
+            $get = DB::connection('sqlsrvtarbak')->select( "select case when sum(debet-kredit) < 0 then 0 else sum(debet-kredit) end as so_akhir
+			from (select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			a.nilai as debet,0 as kredit,a.dc
+			from sis_cd_d a
+			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='D'
+			union all
+			select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+			from sis_cd_d a
+			inner join sis_rekon_m b on a.no_bukti=b.no_rekon and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' 
+			union all
+			select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			0 as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+			from sis_cd_d a
+			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='C'
+			
+			)a");
+            $get = json_decode(json_encode($get),true);
+            $success['saldo'] = $get[0]['so_akhir'];
+
+            $res2 = DB::connection('sqlsrvtarbak')->select( "select a.no_bukti,a.tgl,a.keterangan,a.modul,a.debet,a.kredit,a.dc
+			from (select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+					   a.nilai as debet,0 as kredit,a.dc
+				from sis_cd_d a
+				inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+				where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='D'
+				union all
+				select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+					   case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+				from sis_cd_d a
+				inner join sis_rekon_m b on a.no_bukti=b.no_rekon and a.kode_lokasi=b.kode_lokasi
+				where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' 
+				union all
+				select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+					   0 as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+				from sis_cd_d a
+				inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+				where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='C'
+							
+				)a
+			order by a.tanggal,a.no_bukti");
+            $res2 = json_decode(json_encode($res2),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getSaldoPiutang(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'periode' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $periode = $request->periode;
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total,a.kode_kelas,isnull(e.total,0) as bayar
+            from sis_siswa a 
+            inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+            left join (select y.nis,y.kode_lokasi,  
+                        sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi
+            left join (select y.nis,y.kode_lokasi,  
+                        sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )c on a.nis=c.nis and a.kode_lokasi=c.kode_lokasi
+            left join (select y.nis,y.kode_lokasi,  
+                        sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                        from sis_rekon_d x 	
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periode')	and x.kode_pp='$kode_pp'		
+                        group by y.nis,y.kode_lokasi 			
+                        )d on a.nis=d.nis and a.kode_lokasi=d.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                        sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
+                        from sis_rekon_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )e on a.nis=e.nis and a.kode_lokasi=e.kode_lokasi
+            where(a.kode_lokasi = '$kode_lokasi') and a.kode_pp='$kode_pp'	and a.nis='$nik'
+            order by a.kode_kelas,a.nis");
+            $res = json_decode(json_encode($res),true);
+            
+            $success['status'] = true;
+            $success['saldo'] = $res[0]['sak_total'];
+            $success['message'] = "Success!";     
+           
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getSaldoPDD(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'periode' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $periode = $request->periode;
+
+            $res = DB::connection('sqlsrvtarbak')->select("select case when sum(debet-kredit) < 0 then 0 else sum(debet-kredit) end as so_akhir
+			from (select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			a.nilai as debet,0 as kredit,a.dc
+			from sis_cd_d a
+			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='D'
+			union all
+			select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+			from sis_cd_d a
+			inner join sis_rekon_m b on a.no_bukti=b.no_rekon and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' 
+			union all
+			select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
+			0 as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+			from sis_cd_d a
+			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
+			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='C'
+			
+			)a");
+            $res = json_decode(json_encode($res),true);
+            
+            $success['status'] = true;
+            $success['saldo'] = $res[0]['so_akhir'];
+            $success['message'] = "Success!";     
+           
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getRiwayat(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select  top 10 a.* from (
+                select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
+                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,
+                        0 as bayar from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                        group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
+                union all 
+                select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+                convert(varchar(10),b.tanggal,103) as tgl,b.periode,b.keterangan,'PDD' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+                    case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+                    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0
+                    )a 
+                inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi 
+                union all 
+                select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+                convert(varchar(10),b.tanggal,103) as tgl,b.periode,b.keterangan,'KB' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param 
+                from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+                    case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+                    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                )a
+                inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
+            ) a
+            order by a.tanggal desc");
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+    
+    public function getDetailPiu(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'tahun' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+            $tahun = $request->tahun;
+
+            $res = DB::connection('sqlsrvtarbak')->select( "select distinct a.periode from sis_bill_d a where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and a.periode  LIKE '$tahun%' ");
+            $res = json_decode(json_encode($res),true);
+
+            $res2 = DB::connection('sqlsrvtarbak')->select("select a.no_bill,a.periode,a.tanggal,isnull(b.jum,0) as jum_param
+            from sis_bill_m a 
+             left join (select a.no_bill,a.kode_lokasi,a.kode_pp,a.periode,a.nis,count(a.kode_param) as jum
+                       from sis_bill_d a
+                        where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.periode  LIKE '$tahun%' 
+                        group by a.no_bill,a.kode_lokasi,a.kode_pp,a.periode,a.nis
+             ) b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+             where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.periode  LIKE '$tahun%'  and b.nis ='$nik'");
+            $res2 = json_decode(json_encode($res2),true);
+
+            $res3 = DB::connection('sqlsrvtarbak')->select("select a.nis, a.nama, b.kode_param,isnull(b.total,0) as bill, isnull(c.total,0) as bayar , isnull(b.total,0)-isnull(c.total,0) as saldo,b.periode,b.tanggal,b.no_bill   
+            from sis_siswa a             
+            left join (select x.no_bill,x.periode,z.tanggal,x.kode_param,x.nis,x.kode_lokasi,sum(case when x.dc='D' then x.nilai else -x.nilai end) as total                         
+                       from sis_bill_d x    
+					   inner join sis_bill_m z on x.no_bill=z.no_bill and x.kode_lokasi=z.kode_lokasi and x.kode_pp=z.kode_pp                   
+                       inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp               
+                       where(x.kode_lokasi = '$kode_lokasi')and x.kode_pp='$kode_pp'              
+                       group by x.no_bill,x.periode,z.tanggal,x.kode_param,x.kode_lokasi,x.nis ) b on a.kode_lokasi=b.kode_lokasi and a.nis=b.nis            
+            left join (select x.no_rekon,x.periode_bill,x.kode_param,x.nis,x.kode_lokasi, 
+                        sum(case when x.dc='D' then x.nilai else -x.nilai end) as total                       
+                        from sis_rekon_d x                       
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp                       
+                        where(x.kode_lokasi = '$kode_lokasi')and x.kode_pp='$kode_pp'                        
+                        group by x.no_rekon,x.periode_bill,x.kode_param,x.nis,x.kode_lokasi ) c on a.kode_lokasi=c.kode_lokasi and a.nis=c.nis 
+                        and b.periode=c.periode_bill and b.kode_param=c.kode_param            
+            where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and b.periode  LIKE '$tahun%'            
+            order by periode desc");
+            $res3 = json_decode(json_encode($res3),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['data_detail2'] = $res3;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['data_detail2'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getNilai(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
+            from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='UAS'
+           ");
+            $res = json_decode(json_encode($res),true);
+
+            $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
+            from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='UTS'
+            ");
+            $res2 = json_decode(json_encode($res2),true);
+            
+            $success['status'] = true;
+            $success['UAS'] = $res;
+            $success['UTS'] = $res2;
+            $success['message'] = "Success!";     
+            
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPrestasi(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select(" select a.no_bukti, convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.tempat,a.jenis from sis_prestasi a
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
+            ");
+            $res = json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }    
+            
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getRaport(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select("select b.kode_matpel,c.nama, isnull(b.nilai,0) as nilai,isnull(c.kkm,0) as kkm from sis_raport_m a
+            inner join sis_raport_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel c on b.kode_matpel=c.kode_matpel and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
+            ");
+            $res = json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }    
+            
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+}
