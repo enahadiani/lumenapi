@@ -105,6 +105,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('guru_matpel','Sekolah\GuruMatpelController@update');
     $router->delete('guru_matpel','Sekolah\GuruMatpelController@destroy');
 
+    //Kalender Akademik
+    $router->get('kalender_akad_all','Sekolah\KalenderAkadController@index');
+    $router->get('kalender_akad','Sekolah\KalenderAkadController@show');
+    $router->post('kalender_akad','Sekolah\KalenderAkadController@store');
+    $router->put('kalender_akad','Sekolah\KalenderAkadController@update');
+    $router->delete('kalender_akad','Sekolah\KalenderAkadController@destroy');
+
 
 
 });
