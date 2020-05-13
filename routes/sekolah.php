@@ -24,6 +24,8 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('users', 'AdminTarbakController@allUsers');
     $router->get('cek_payload', 'AdminTarbakController@cekPayload');
 
+    $router->get('menu/{kode_klp}', 'Sekolah\MenuController@show');
+
     //Tahun Ajaran
     $router->get('pp','Sekolah\TahunAjaranController@getPP');
     $router->get('tahun_ajaran_all','Sekolah\TahunAjaranController@index');
