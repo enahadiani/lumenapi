@@ -90,6 +90,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('mata_pelajaran','Sekolah\MataPelajaranController@update');
     $router->delete('mata_pelajaran','Sekolah\MataPelajaranController@destroy');
 
+    $router->get('kkm_all','Sekolah\KkmController@index');
+    $router->get('kkm','Sekolah\KkmController@show');
+    $router->post('kkm','Sekolah\KkmController@store');
+    $router->put('kkm','Sekolah\KkmController@update');
+    $router->delete('kkm','Sekolah\KkmController@destroy');
+
 
 
 });
