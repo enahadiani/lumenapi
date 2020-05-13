@@ -38,6 +38,10 @@ return [
         'sju' => [
             'driver' => 'jwt',
             'provider' => 'adminsju',
+        ],
+        'siswa' => [
+            'driver' => 'jwt',
+            'provider' => 'adminsiswa',
         ]
     ],
 
@@ -69,6 +73,10 @@ return [
         'adminsju' => [
             'driver' => 'eloquent',
             'model' => \App\AdminSju::class
+        ],
+        'adminsiswa' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminSiswa::class
         ]
     ]
 ];

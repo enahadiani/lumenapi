@@ -39,6 +39,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     });
 });
 
+
 $router->group(['middleware' => 'auth:sju'], function () use ($router) {
 
     $router->get('profile', 'UserController@profile');
