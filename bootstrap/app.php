@@ -242,6 +242,6 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/mobile_sekolah'
 ], function ($router) {
-    require __DIR__.'/../routes/mobile_sekolah.php';
+    require __DIR__.'/../routes/mobilesekolah.php';
 });
 return $app;
