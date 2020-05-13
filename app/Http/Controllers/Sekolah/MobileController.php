@@ -23,7 +23,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -374,7 +374,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($cek =  Auth::guard('tarbak')->user()){
+            if($cek =  Auth::guard('siswa')->user()){
                 $nik= $cek->nik;
                 $kode_lokasi= $cek->kode_lokasi;
             }
@@ -446,7 +446,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -482,7 +482,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -518,7 +518,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -592,7 +592,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -688,7 +688,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -751,7 +751,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -800,7 +800,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -864,7 +864,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -933,7 +933,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -976,7 +976,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -1014,7 +1014,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
