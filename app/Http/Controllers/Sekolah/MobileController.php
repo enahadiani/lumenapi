@@ -878,21 +878,22 @@ class MobileController extends Controller
                 $kode_pp = $data->kode_pp;
             }
             $tahun = $request->tahun;
-
-            $res = DB::connection('sqlsrvtarbak')->select( "select distinct a.periode from sis_bill_d a where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and a.periode  LIKE '$tahun%' ");
+            $sql = "select distinct a.periode from sis_bill_d a where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and a.periode  LIKE '$tahun%' ";
+            $res = DB::connection('sqlsrvtarbak')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.no_bill,a.periode,a.tanggal,isnull(b.jum,0) as jum_param
+            $sql2 = "select a.no_bill,a.periode,a.tanggal,isnull(b.jum,0) as jum_param
             from sis_bill_m a 
              left join (select a.no_bill,a.kode_lokasi,a.kode_pp,a.periode,a.nis,count(a.kode_param) as jum
                        from sis_bill_d a
                         where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.periode  LIKE '$tahun%' 
                         group by a.no_bill,a.kode_lokasi,a.kode_pp,a.periode,a.nis
              ) b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-             where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.periode  LIKE '$tahun%'  and b.nis ='$nik'");
+             where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.periode  LIKE '$tahun%'  and b.nis ='$nik'";
+            $res2 = DB::connection('sqlsrvtarbak')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $res3 = DB::connection('sqlsrvtarbak')->select("select a.nis, a.nama, b.kode_param,isnull(b.total,0) as bill, isnull(c.total,0) as bayar , isnull(b.total,0)-isnull(c.total,0) as saldo,b.periode,b.tanggal,b.no_bill   
+            $sql3 = "select a.nis, a.nama, b.kode_param,isnull(b.total,0) as bill, isnull(c.total,0) as bayar , isnull(b.total,0)-isnull(c.total,0) as saldo,b.periode,b.tanggal,b.no_bill   
             from sis_siswa a             
             left join (select x.no_bill,x.periode,z.tanggal,x.kode_param,x.nis,x.kode_lokasi,sum(case when x.dc='D' then x.nilai else -x.nilai end) as total                         
                        from sis_bill_d x    
@@ -908,7 +909,8 @@ class MobileController extends Controller
                         group by x.no_rekon,x.periode_bill,x.kode_param,x.nis,x.kode_lokasi ) c on a.kode_lokasi=c.kode_lokasi and a.nis=c.nis 
                         and b.periode=c.periode_bill and b.kode_param=c.kode_param            
             where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and b.periode  LIKE '$tahun%'            
-            order by periode desc");
+            order by periode desc";
+            $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1016,7 +1018,7 @@ class MobileController extends Controller
             if($data =  Auth::guard('siswa')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-                $kode_pp = $data->kode_pp;
+                $kode_pp = $request->kode_pp;
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select b.kode_matpel,c.nama, isnull(b.nilai,0) as nilai,isnull(c.kkm,0) as kkm from sis_raport_m a
