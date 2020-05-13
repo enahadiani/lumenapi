@@ -18,6 +18,28 @@ class JuskebController extends Controller
      */
     public $successStatus = 200;
 
+    public function isUnik($isi,$kode_lokasi,$kode_pp){
+        
+        $auth = DB::connection('sqlsrv2')->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public function isUnik2($isi,$kode_lokasi,$kode_pp,$no_bukti){
+        
+        $auth = DB::connection('sqlsrv2')->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' and no_bukti <> '$no_bukti' ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     function sendMail($email,$to_name,$data){
         try {
 
@@ -126,98 +148,107 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $arr_foto = array();
-            $arr_nama = array();
-            $i=0;
-            if($request->hasfile('file'))
-            {
-                foreach($request->file('file') as $file)
-                {                
-                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                    $foto = $nama_foto;
-                    if(Storage::disk('local')->exists($foto)){
-                        Storage::disk('local')->delete($foto);
+            if($this->isUnik($request->no_dokumen,$kode_lokasi,$request->kode_pp)){
+
+                $arr_foto = array();
+                $arr_nama = array();
+                $i=0;
+                if($request->hasfile('file'))
+                {
+                    foreach($request->file('file') as $file)
+                    {                
+                        $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                        $foto = $nama_foto;
+                        if(Storage::disk('local')->exists($foto)){
+                            Storage::disk('local')->delete($foto);
+                        }
+                        Storage::disk('local')->put($foto,file_get_contents($file));
+                        $arr_foto[] = $foto;
+                        $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                        $i++;
                     }
-                    Storage::disk('local')->put($foto,file_get_contents($file));
-                    $arr_foto[] = $foto;
-                    $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
-                    $i++;
                 }
-            }
-
-            $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
-            
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A']);
-
-            $barang = $request->input('barang');
-            $harga = $request->input('harga');
-            $qty = $request->input('qty');
-            $subtotal = $request->input('subtotal');
-
-            if(count($barang) > 0){
-                for($i=0; $i<count($barang);$i++){
-                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
-                }
-            }
-
-            if(count($arr_nama) > 0){
-                for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
-                }
-            }
-
-            $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
-            from apv_role a
-            inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
-            inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
-            order by b.no_urut";
-
-            $role = DB::connection('sqlsrv2')->select($sql);
-            $role = json_decode(json_encode($role),true);
-            $token_player = array();
-            
-            for($i=0;$i<count($role);$i++){
+    
+                $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
                 
-                if($i == 0){
-                    $prog = 1;
-                    // $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
-                    // $rst = json_decode(json_encode($rst),true);
-                    // for($t=0;$t<count($rst);$t++){
-                    //     array_push($token_player,$rst[$t]["token"]);
-                    // }
-                    $no_telp = $role[$i]["no_telp"];
-                    $app_nik = $role[$i]["nik"];
-                }else{
-                    $prog = 0;
+                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A']);
+    
+                $barang = $request->input('barang');
+                $harga = $request->input('harga');
+                $qty = $request->input('qty');
+                $subtotal = $request->input('subtotal');
+    
+                if(count($barang) > 0){
+                    for($i=0; $i<count($barang);$i++){
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
+                    }
                 }
-                $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
-            }
-            
-            DB::connection('sqlsrv2')->commit();
-            if(isset($request->email) && isset($request->nama_email)){
-
-                $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
-                $msg_email = " Email: ".$mail['msg'];
+    
+                if(count($arr_nama) > 0){
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    }
+                }
+    
+                $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
+                from apv_role a
+                inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+                inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
+                order by b.no_urut";
+    
+                $role = DB::connection('sqlsrv2')->select($sql);
+                $role = json_decode(json_encode($role),true);
+                $token_player = array();
+                
+                for($i=0;$i<count($role);$i++){
+                    
+                    if($i == 0){
+                        $prog = 1;
+                        // $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
+                        // $rst = json_decode(json_encode($rst),true);
+                        // for($t=0;$t<count($rst);$t++){
+                        //     array_push($token_player,$rst[$t]["token"]);
+                        // }
+                        $no_telp = $role[$i]["no_telp"];
+                        $app_nik = $role[$i]["nik"];
+                    }else{
+                        $prog = 0;
+                    }
+                    $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
+                }
+                
+                DB::connection('sqlsrv2')->commit();
+                if(isset($request->email) && isset($request->nama_email)){
+    
+                    $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
+                    $msg_email = " Email: ".$mail['msg'];
+                }else{
+                    $msg_email = "";
+                }
+    
+                $token_players = array();
+                $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+                from apv_juskeb_m a
+                inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti='$no_bukti' ");
+                $rst = json_decode(json_encode($rst),true);
+                for($t=0;$t<count($rst);$t++){
+                    array_push($token_players,$rst[$t]["token"]);
+                }
+                
+                $success['status'] = true;
+                $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
+                $success['no_aju'] = $no_bukti;
+                $success['token_players'] = $token_players;
+              
             }else{
-                $msg_email = "";
+                $success['status'] = false;
+                $success['message'] = "Error : Duplicate entry. No Dokumen sudah ada di database !";
+                $success['no_aju'] = '-';
+                $success['token_players'] = [];
             }
 
-            $token_players = array();
-            $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
-            from apv_juskeb_m a
-            inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
-            where a.no_bukti='$no_bukti' ");
-            $rst = json_decode(json_encode($rst),true);
-            for($t=0;$t<count($rst);$t++){
-                array_push($token_players,$rst[$t]["token"]);
-            }
-            
-            $success['status'] = true;
-            $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
-            $success['no_aju'] = $no_bukti;
-            $success['token_players'] = $token_players;
-          
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
@@ -325,114 +356,123 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $arr_foto = array();
-            $arr_nama = array();
-            $i=0;
-            if($request->hasfile('file'))
-            {
-                foreach($request->file('file') as $file)
-                {                
-                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                    $foto = $nama_foto;
-                    if(Storage::disk('local')->exists($foto)){
-                        Storage::disk('local')->delete($foto);
+            if($this->isUnik($request->no_dokumen,$kode_lokasi,$request->kode_pp,$no_bukti)){
+
+                $arr_foto = array();
+                $arr_nama = array();
+                $i=0;
+                if($request->hasfile('file'))
+                {
+                    foreach($request->file('file') as $file)
+                    {                
+                        $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                        $foto = $nama_foto;
+                        if(Storage::disk('local')->exists($foto)){
+                            Storage::disk('local')->delete($foto);
+                        }
+                        Storage::disk('local')->put($foto,file_get_contents($file));
+                        $arr_foto[] = $foto;
+                        $arr_nama[] = $request->input('nama_file')[$i];
+                        $i++;
                     }
-                    Storage::disk('local')->put($foto,file_get_contents($file));
-                    $arr_foto[] = $foto;
-                    $arr_nama[] = $request->input('nama_file')[$i];
-                    $i++;
-                }
 
-                $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
-                $res3 = DB::connection('sqlsrv2')->select($sql3);
-                $res3 = json_decode(json_encode($res3),true);
+                    $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
+                    $res3 = DB::connection('sqlsrv2')->select($sql3);
+                    $res3 = json_decode(json_encode($res3),true);
 
-                if(count($res3) > 0){
-                    for($i=0;$i<count($res3);$i++){
+                    if(count($res3) > 0){
+                        for($i=0;$i<count($res3);$i++){
 
-                        Storage::disk('local')->delete($res3[$i]['file_dok']);
+                            Storage::disk('local')->delete($res3[$i]['file_dok']);
+                        }
                     }
+
+                    $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 }
 
-                $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            }
-
-            $del = DB::connection('sqlsrv2')->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            
-
-            
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A']);
-
-            $barang = $request->input('barang');
-            $harga = $request->input('harga');
-            $qty = $request->input('qty');
-            $subtotal = $request->input('subtotal');
-
-            if(count($barang) > 0){
-                for($i=0; $i<count($barang);$i++){
-                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
-                }
-            }
-
-            if(count($arr_nama) > 0){
-                for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
-                }
-            }
-
-            $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
-            from apv_role a
-            inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
-            inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
-            order by b.no_urut";
-
-            $role = DB::connection('sqlsrv2')->select($sql);
-            $role = json_decode(json_encode($role),true);
-            $token_player = array();
-            
-            for($i=0;$i<count($role);$i++){
+                $del = DB::connection('sqlsrv2')->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 
-                if($i == 0){
-                    $prog = 1;
-                    $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
-                    $rst = json_decode(json_encode($rst),true);
-                    for($t=0;$t<count($rst);$t++){
-                        array_push($token_player,$rst[$t]["token"]);
-                    }
-                    $no_telp = $role[$i]["no_telp"];
-                    $app_nik=$role[$i]["nik"];
-                }else{
-                    $prog = 0;
-                }
-                $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
-            }
-            
-            DB::connection('sqlsrv2')->commit();
-            if(isset($request->email) && isset($request->nama_email)){
 
-                $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
-                $msg_email = " Email: ".$mail['msg'];
+                
+                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A']);
+
+                $barang = $request->input('barang');
+                $harga = $request->input('harga');
+                $qty = $request->input('qty');
+                $subtotal = $request->input('subtotal');
+
+                if(count($barang) > 0){
+                    for($i=0; $i<count($barang);$i++){
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
+                    }
+                }
+
+                if(count($arr_nama) > 0){
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    }
+                }
+
+                $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
+                from apv_role a
+                inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+                inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
+                order by b.no_urut";
+
+                $role = DB::connection('sqlsrv2')->select($sql);
+                $role = json_decode(json_encode($role),true);
+                $token_player = array();
+                
+                for($i=0;$i<count($role);$i++){
+                    
+                    if($i == 0){
+                        $prog = 1;
+                        $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
+                        $rst = json_decode(json_encode($rst),true);
+                        for($t=0;$t<count($rst);$t++){
+                            array_push($token_player,$rst[$t]["token"]);
+                        }
+                        $no_telp = $role[$i]["no_telp"];
+                        $app_nik=$role[$i]["nik"];
+                    }else{
+                        $prog = 0;
+                    }
+                    $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
+                }
+                
+                DB::connection('sqlsrv2')->commit();
+                if(isset($request->email) && isset($request->nama_email)){
+
+                    $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
+                    $msg_email = " Email: ".$mail['msg'];
+                }else{
+                    $msg_email = "";
+                }
+                
+                $token_players = array();
+                $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+                from apv_juskeb_m a
+                inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti='$no_bukti' ");
+                $rst = json_decode(json_encode($rst),true);
+                for($t=0;$t<count($rst);$t++){
+                    array_push($token_players,$rst[$t]["token"]);
+                }
+                
+                $success['status'] = true;
+                $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
+                $success['no_aju'] = $no_bukti;
+                $success['token_players'] = $token_players;
+
             }else{
-                $msg_email = "";
+                $success['status'] = false;
+                $success['message'] = "Error : Duplicate entry. No Dokumen sudah ada di database !";
+                $success['no_aju'] = '-';
+                $success['token_players'] = [];
             }
-            
-            $token_players = array();
-            $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
-            from apv_juskeb_m a
-            inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
-            where a.no_bukti='$no_bukti' ");
-            $rst = json_decode(json_encode($rst),true);
-            for($t=0;$t<count($rst);$t++){
-                array_push($token_players,$rst[$t]["token"]);
-            }
-            
-            $success['status'] = true;
-            $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
-            $success['no_aju'] = $no_bukti;
-            $success['token_players'] = $token_players;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
