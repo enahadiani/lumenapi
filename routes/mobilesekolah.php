@@ -27,12 +27,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('users_guru', 'AdminTarbakController@allUsers');
     $router->get('cek_payload_guru', 'AdminTarbakController@cekPayload');
 
-    $router->get('jadwal_sekarang', 'MobileController@getJadwalSekarang');
-    $router->get('absen_total', 'MobileController@getAbsenTotal');
-    $router->get('absen_edit', 'MobileController@getEditAbsen');
-    $router->get('siswa_list', 'MobileController@getDaftarSiswa');
-    $router->post('absen', 'MobileController@insertAbsen');
-    $router->get('jadwal_guru', 'MobileController@getJadwalGuru');
+    $router->get('jadwal_sekarang', 'Sekolah\MobileController@getJadwalSekarang');
+    $router->get('absen_total', 'Sekolah\MobileController@getAbsenTotal');
+    $router->get('absen_edit', 'Sekolah\MobileController@getEditAbsen');
+    $router->get('siswa_list', 'Sekolah\MobileController@getDaftarSiswa');
+    $router->post('absen', 'Sekolah\MobileController@insertAbsen');
+    $router->get('jadwal_guru', 'Sekolah\MobileController@getJadwalGuru');
 });
 
 $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
@@ -42,19 +42,19 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('users_siswa', 'AdminSiswaController@allUsers');
     $router->get('cek_payload_siswa', 'AdminSiswaController@cekPayload');
 
-    $router->get('absen', 'MobileController@getAbsen');
-    $router->get('jadwal_siswa', 'MobileController@getJadwalSiswa');
-    $router->get('kalender', 'MobileController@getKalender');
-    $router->get('eskul', 'MobileController@getEskul');
-    $router->get('kartu_piutang', 'MobileController@getPiutang');
-    $router->get('kartu_pdd', 'MobileController@getPDD');
-    $router->get('saldo_piutang', 'MobileController@getSaldoPiutang');
-    $router->get('saldo_pdd', 'MobileController@getSaldoPDD');
-    $router->get('riwayat', 'MobileController@getRiwayat');
-    $router->get('piutang_detail', 'MobileController@getDetailPiu');
-    $router->get('nilai', 'MobileController@getNilai');
-    $router->get('prestasi', 'MobileController@getPrestasi');
-    $router->get('raport', 'MobileController@getRaport');
+    $router->get('absen', 'Sekolah\MobileController@getAbsen');
+    $router->get('jadwal_siswa', 'Sekolah\MobileController@getJadwalSiswa');
+    $router->get('kalender', 'Sekolah\MobileController@getKalender');
+    $router->get('eskul', 'Sekolah\MobileController@getEskul');
+    $router->get('kartu_piutang', 'Sekolah\MobileController@getPiutang');
+    $router->get('kartu_pdd', 'Sekolah\MobileController@getPDD');
+    $router->get('saldo_piutang', 'Sekolah\MobileController@getSaldoPiutang');
+    $router->get('saldo_pdd', 'Sekolah\MobileController@getSaldoPDD');
+    $router->get('riwayat', 'Sekolah\MobileController@getRiwayat');
+    $router->get('piutang_detail', 'Sekolah\MobileController@getDetailPiu');
+    $router->get('nilai', 'Sekolah\MobileController@getNilai');
+    $router->get('prestasi', 'Sekolah\MobileController@getPrestasi');
+    $router->get('raport', 'Sekolah\MobileController@getRaport');
 
 
 });
