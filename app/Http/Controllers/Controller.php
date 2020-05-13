@@ -58,6 +58,16 @@ class Controller extends BaseController
         ], 200);
     }
 
+    protected function respondSiswaWithToken($token)
+    {
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'message' => 'success',
+            'expires_in' => Auth::guard('siswa')->factory()->getTTL() * 60
+        ], 200);
+    }
+
     protected function respondYptKugWithToken($token)
     {
         return response()->json([

@@ -13,7 +13,6 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
-    
     $router->post('login', 'AuthController@loginTarbak');
     $router->get('hash_pass', 'AuthController@hashPasswordTarbak');
 });
@@ -111,7 +110,5 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('kalender_akad','Sekolah\KalenderAkadController@store');
     $router->put('kalender_akad','Sekolah\KalenderAkadController@update');
     $router->delete('kalender_akad','Sekolah\KalenderAkadController@destroy');
-
-
 
 });
