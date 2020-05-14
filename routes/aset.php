@@ -35,7 +35,7 @@ $router->get('storage/{filename}', function ($filename)
     if (!Storage::disk('s3')->exists($filename)) {
         abort(404);
     }
-    return Storage::disk('s3')->response($filename); 
+    return Storage::disk('s3')->response('aset/'.$filename); 
     // $url = 'https://'. env('AWS_BUCKET') .'.s3-'. env('AWS_DEFAULT_REGION') .'.amazonaws.com/images/';
     // return $url . $this->avatar;
 });

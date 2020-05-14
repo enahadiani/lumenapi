@@ -845,10 +845,10 @@ class AsetController extends Controller
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists($foto)){
-                    Storage::disk('s3')->delete($foto);
+                if(Storage::disk('s3')->exists('aset/'.$foto)){
+                    Storage::disk('s3')->delete('aset/'.$foto);
                 }
-                Storage::disk('s3')->put($foto,file_get_contents($file));
+                Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
             }else{
 
                 $foto="-";
@@ -895,10 +895,10 @@ class AsetController extends Controller
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists($foto)){
-                    Storage::disk('s3')->delete($foto);
+                if(Storage::disk('s3')->exists('aset/'.$foto)){
+                    Storage::disk('s3')->delete('aset/'.$foto);
                 }
-                Storage::disk('s3')->put($foto,file_get_contents($file));
+                Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
 
                 $sql3="select foto from amu_asset_bergerak where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'";
                 $res3 = DB::connection('sqlsrv2')->select($sql3);
@@ -906,7 +906,7 @@ class AsetController extends Controller
 
                 if(count($res3) > 0 ){
                     if($res3[0]['foto'] != "" && $res3[0]['foto'] != "-"){
-                        Storage::disk('s3')->delete($res3[0]['foto']);
+                        Storage::disk('s3')->delete('aset/'.$res3[0]['foto']);
                     }
                 }
             }else{
