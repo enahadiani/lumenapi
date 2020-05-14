@@ -990,6 +990,9 @@ class AsetController extends Controller
             $success['status'] = true;
             $success['message'] = "Upload Dokumen berhasil disimpan";
 
+            $success['arr_nama'] = $arr_nama;
+            $success['count file'] = count($arr_foto);
+
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
