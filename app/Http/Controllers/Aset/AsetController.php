@@ -845,10 +845,10 @@ class AsetController extends Controller
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
-                if(Storage::disk('local')->exists($foto)){
-                    Storage::disk('local')->delete($foto);
+                if(Storage::disk('s3')->exists($foto)){
+                    Storage::disk('s3')->delete($foto);
                 }
-                Storage::disk('local')->put($foto,file_get_contents($file));
+                Storage::disk('s3')->put($foto,file_get_contents($file));
             }else{
 
                 $foto="-";
@@ -895,10 +895,10 @@ class AsetController extends Controller
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
-                if(Storage::disk('local')->exists($foto)){
-                    Storage::disk('local')->delete($foto);
+                if(Storage::disk('s3')->exists($foto)){
+                    Storage::disk('s3')->delete($foto);
                 }
-                Storage::disk('local')->put($foto,file_get_contents($file));
+                Storage::disk('s3')->put($foto,file_get_contents($file));
 
                 $sql3="select foto from amu_asset_bergerak where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'";
                 $res3 = DB::connection('sqlsrv2')->select($sql3);
@@ -906,7 +906,7 @@ class AsetController extends Controller
 
                 if(count($res3) > 0 ){
                     if($res3[0]['foto'] != "" && $res3[0]['foto'] != "-"){
-                        Storage::disk('local')->delete($res3[0]['foto']);
+                        Storage::disk('s3')->delete($res3[0]['foto']);
                     }
                 }
             }else{
@@ -922,77 +922,6 @@ class AsetController extends Controller
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
             $success['message'] = "Data Aset berhasil disimpan ";
-          
-            return response()->json(['success'=>$success], $this->successStatus);     
-        } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
-            $success['status'] = false;
-            $success['message'] = "Data Aset gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
-        }				
-        
-        
-    }
-
-    public function simpanInventarisS3(Request $request)
-    {
-        $this->validate($request, [
-            'no_ruangan' => 'required',
-            'kode_aset' => 'required',
-            'kondisi' => 'required',
-            'file_gambar' => 'file|max:3072'
-        ]);
-
-        DB::connection('sqlsrv2')->beginTransaction();
-        
-        try {
-            if($data =  Auth::guard('admin')->user()){
-                $nik_user= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-            $no_ruangan=$request->no_ruangan;
-            $kode_aset=$request->kode_aset;
-            $kondisi = $request->kondisi;
-            $periode = date('Y').date('m');
-            if($kondisi == "Baik"){
-                $status = "Berfungsi";
-            }else if($kondisi == "Rusak"){
-                $status = "Tidak Berfungsi";
-            }
-            
-            $id = $this->generateKode("amu_mon_asset_bergerak", "mon_id", $kode_lokasi."-NMA".$periode.".", "001");
-
-            $sql = "select id_gedung from amu_ruangan where no_ruangan ='$no_ruangan' and kode_lokasi='$kode_lokasi' ";
-
-            $ged = DB::connection('sqlsrv2')->select($sql);
-            $ged = json_decode(json_encode($ged),true);
-            if(count($ged) > 0){
-                $id_gedung = $ged[0]['id_gedung'];
-            }else{
-                $id_gedung = "";
-            }
-
-            if($request->hasfile('file_gambar'))
-            {
-                $file = $request->file('file_gambar');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                // $picName = uniqid() . '_' . $picName;
-                $foto = $nama_foto;
-                // if(Storage::disk('s3')->exists($foto)){
-                //     Storage::disk('s3')->delete($foto);
-                // }
-                Storage::disk('s3')->put($foto,file_get_contents($file));
-            }else{
-
-                $foto="-";
-            }
-
-            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),$foto]);
-            
-            DB::connection('sqlsrv2')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Aset berhasil disimpan. Id =".$id;
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {

@@ -32,10 +32,12 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('local')->exists($filename)) {
+    if (!Storage::disk('s3')->exists($filename)) {
         abort(404);
     }
-    return Storage::disk('local')->response($filename); 
+    return Storage::disk('s3')->response($filename); 
+    // $url = 'https://'. env('AWS_BUCKET') .'.s3-'. env('AWS_DEFAULT_REGION') .'.amazonaws.com/images/';
+    // return $url . $this->avatar;
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
@@ -54,6 +56,4 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('aset-daftar','Aset\AsetController@getDaftarAset');
     $router->post('inventaris','Aset\AsetController@simpanInventaris');
     $router->post('ubah-gambar-aset','Aset\AsetController@ubahGambarAset');
-    
-    $router->post('inventaris_aws','Aset\AsetController@simpanInventarisS3');
 });
