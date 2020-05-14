@@ -965,9 +965,9 @@ class AsetController extends Controller
             $arr_foto = array();
             $arr_nama = array();
             $i=0;
-            if($request->hasfile('file'))
+            if($request->hasfile('file_gambar'))
             {
-                foreach($request->file('file') as $file)
+                foreach($request->file('file_gambar') as $file)
                 {                
                     $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                     $foto = $nama_foto;
