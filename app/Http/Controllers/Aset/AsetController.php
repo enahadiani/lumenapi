@@ -875,6 +875,7 @@ class AsetController extends Controller
     {
         $this->validate($request, [
             'no_bukti' => 'required',
+            'no_urut' => 'required',
             'file_gambar' => 'file|max:3072'
         ]);
 
@@ -900,7 +901,7 @@ class AsetController extends Controller
                 }
                 Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
 
-                $sql3="select foto from amu_asset_bergerak where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'";
+                $sql3="select file_dok as foto from amu_asset_bergerak_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and no_urut ='$request->no_urut' ";
                 $res3 = DB::connection('sqlsrv2')->select($sql3);
                 $res3 = json_decode(json_encode($res3),true);
 
@@ -914,10 +915,11 @@ class AsetController extends Controller
                 $foto="-";
             }
 
-            $upd3 =  DB::connection('sqlsrv2')->table('amu_asset_bergerak')
+            $upd3 =  DB::connection('sqlsrv2')->table('amu_asset_bergerak_dok')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['foto' => $foto]);
+                    ->where('no_urut', $request->no_urut)
+                    ->update(['file_dok' => $foto]);
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
@@ -928,6 +930,71 @@ class AsetController extends Controller
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Aset gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function uploadDok(Request $request){
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'nama_file.*'=>'required',
+            'file_gambar.*'=>'file|max:3072'
+        ]);
+
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+                    from karyawan a
+                    where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            $get = json_decode(json_encode($get),true);
+            if(count($get) > 0){
+                $kode_pp = $get[0]['kode_pp'];
+            }else{
+                $kode_pp = "";
+            }
+            $no_bukti = $request->no_bukti;
+
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
+            if($request->hasfile('file'))
+            {
+                foreach($request->file('file') as $file)
+                {                
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('aset/'.$foto)){
+                        Storage::disk('s3')->delete('aset/'.$foto);
+                    }
+                    Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                    $i++;
+                }
+            }
+    
+            if(count($arr_nama) > 0){
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i],$kode_pp]); 
+                }
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Upload Dokumen berhasil disimpan";
+
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Upload Dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         

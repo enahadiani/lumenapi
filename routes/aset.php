@@ -56,4 +56,5 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('aset-daftar','Aset\AsetController@getDaftarAset');
     $router->post('inventaris','Aset\AsetController@simpanInventaris');
     $router->post('ubah-gambar-aset','Aset\AsetController@ubahGambarAset');
+    $router->post('upload-dok','Aset\AsetController@uploadDok');
 });
