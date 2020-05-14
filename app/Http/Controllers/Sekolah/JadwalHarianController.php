@@ -106,7 +106,7 @@ class JadwalHarianController extends Controller
                 for ($i=0;$i < count($req['kode_slot']);$i++){
                     for ($j = 0; $j < count($hari);$j++){
                         if($req[$hari[$j]][$i] == "ISI"){
-                            $ins[$i] = DB::connection('sqlsrv2')->insert("insert into sis_jadwal(kode_slot,kode_lokasi,kode_pp,kode_kelas,kode_hari,kode_ta,nik,kode_matpel) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$req['kode_slot'][$i],$kode_lokasi,$req['kode_pp'],$req['kode_kelas'],$kodeHari[$j],$req['kode_ta'],$req['nik_guru'],$req['kode_matpel']]);
+                            $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_jadwal(kode_slot,kode_lokasi,kode_pp,kode_kelas,kode_hari,kode_ta,nik,kode_matpel) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$req['kode_slot'][$i],$kode_lokasi,$req['kode_pp'],$req['kode_kelas'],$kodeHari[$j],$req['kode_ta'],$req['nik_guru'],$req['kode_matpel']]);
                             
                         }
                     }

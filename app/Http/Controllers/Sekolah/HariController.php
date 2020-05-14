@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class JadwalUjianController extends Controller
+class HariController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,6 +15,17 @@ class JadwalUjianController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+
+    public function isUnik($isi,$kode_lokasi,$kode_pp){
+        
+        $auth = DB::connection('sqlsrvtarbak')->select("select kode_hari from sis_hari where kode_hari ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
 
     public function index(Request $request)
     {
@@ -25,12 +36,11 @@ class JadwalUjianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if(isset($request->kode_pp)){
-                $filter = "and a.kode_pp='$request->kode_pp' ";
+                $filter = "and kode_pp='$request->kode_pp' ";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.tanggal,a.jam,a.kode_matpel,b.nama,a.kode_tingkat,a.kode_jenis,a.kode_ta,a.kode_sem from sis_jadwal_ujian a 
-            inner join sis_matpel b on a.kode_matpel=b.kode_matpel  
-            where a.kode_lokasi='$kode_lokasi' $filter");
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_hari, nama,kode_pp from sis_hari
+            where kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -72,14 +82,8 @@ class JadwalUjianController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ta' => 'required',
-            'kode_sem' => 'required',
-            'kode_tingkat' => 'required',
-            'kode_jenis' => 'required',
-            'kode_slot.*' => 'required',
-            'kode_matpel.*' => 'required',
-            'tanggal.*' => 'required',
-            'jam.*' => 'required'
+            'kode_hari' => 'required',
+            'nama' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -90,24 +94,22 @@ class JadwalUjianController extends Controller
             }
             
             $req = $request->all();
+            if($this->isUnik($req['kode_hari'],$kode_lokasi,$req['kode_pp'])){
 
-            if (count($req['tanggal']) > 0){
-                for ($i=0;$i < count($req['tanggal']);$i++){
-
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_jadwal_ujian(kode_pp,kode_lokasi,kode_ta,kode_sem,kode_tingkat,kode_jenis,tanggal,jam,kode_matpel) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ",[$req['kode_pp'],$req['kode_lokasi'],$req['kode_ta'],$req['kode_sem'],$req['kode_tingkat'],$req['kode_jenis'],$req['tanggal'][$i],$req['jam'][$i],$req['kode_matpel'][$i]]);
-
-                }						
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_hari(kode_hari,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?) ",[$req['kode_hari'],$req['nama'],$kode_lokasi,$req['kode_pp']]);
+                
+                DB::connection('sqlsrvtarbak')->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Hari berhasil disimpan";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Error: Duplicate entry. Kode Hari sudah ada di database!";
             }
-            
-            DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Jadwal Ujian berhasil disimpan";
-            
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jadwal Ujian gagal disimpan ".$e;
+            $success['message'] = "Data Hari gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }
     }
@@ -116,14 +118,8 @@ class JadwalUjianController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ta' => 'required',
-            'kode_sem' => 'required',
-            'kode_tingkat' => 'required',
-            'kode_jenis' => 'required',
-            'kode_slot.*' => 'required',
-            'kode_matpel.*' => 'required',
-            'tanggal.*' => 'required',
-            'jam.*' => 'required'
+            'kode_hari' => 'required',
+            'nama' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -133,34 +129,25 @@ class JadwalUjianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del = DB::connection('sqlsrvtarbak')->table('sis_jadwal_ujian')
+            $del = DB::connection('sqlsrvtarbak')->table('sis_hari')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_ta', $request->kode_ta)
-            ->where('kode_sem', $request->kode_sem)
-            ->where('kode_tingkat', $request->kode_tingkat)
-            ->where('kode_jenis', $request->kode_jenis)
+            ->where('kode_hari', $request->kode_hari)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
             
-            $req = $request->all();
-
-            if (count($req['tanggal']) > 0){
-                for ($i=0;$i < count($req['tanggal']);$i++){
-
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_jadwal_ujian(kode_pp,kode_lokasi,kode_ta,kode_sem,kode_tingkat,kode_jenis,tanggal,jam,kode_matpel) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ",[$req['kode_pp'],$req['kode_lokasi'],$req['kode_ta'],$req['kode_sem'],$req['kode_tingkat'],$req['kode_jenis'],$req['tanggal'][$i],$req['jam'][$i],$req['kode_matpel'][$i]]);
-
-                }						
-            }
             
+            $req = $request->all();
+            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_hari(kode_hari,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?) ",[$req['kode_hari'],$req['nama'],$kode_lokasi,$req['kode_pp']]);
+
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Jadwal Ujian berhasil disimpan";
+            $success['message'] = "Data Hari berhasil disimpan";
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jadwal Ujian gagal disimpan ".$e;
+            $success['message'] = "Data Hari gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }
     }
@@ -174,10 +161,7 @@ class JadwalUjianController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ta' => 'required',
-            'kode_matpel' => 'required',
-            'nik_guru' => 'required',
-            'kode_kelas' => 'required'
+            'kode_hari' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -187,24 +171,21 @@ class JadwalUjianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_jadwal_ujian')
+            $del = DB::connection('sqlsrvtarbak')->table('sis_hari')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('kode_ta', $request->kode_ta)
-                ->where('kode_sem', $request->kode_sem)
-                ->where('kode_tingkat', $request->kode_tingkat)
-                ->where('kode_jenis', $request->kode_jenis)
+                ->where('kode_hari', $request->kode_hari)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Jadwal Ujian berhasil dihapus";
+            $success['message'] = "Data Hari berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jadwal Ujian gagal dihapus ".$e;
+            $success['message'] = "Data Hari gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
@@ -214,7 +195,7 @@ class JadwalUjianController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ta' => 'required'
+            'kode_hari' => 'required'
         ]);
         try {
             
@@ -223,9 +204,9 @@ class JadwalUjianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $kode_pp= $request->kode_pp;
-            $kode_ta= $request->kode_ta;
+            $kode_hari= $request->kode_hari;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nama, flag_aktif,tgl_mulai,tgl_akhir from sis_ta where kode_ta ='".$kode_ta."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' 
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_hari, nama,kode_pp from sis_hari where kode_hari ='".$kode_hari."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'
             ");
             $res = json_decode(json_encode($res),true);
             
