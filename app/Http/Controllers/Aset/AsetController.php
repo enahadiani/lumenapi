@@ -985,10 +985,13 @@ class AsetController extends Controller
                 for($i=0; $i<count($arr_nama);$i++){
                     $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i],$kode_pp]); 
                 }
+                $success['status'] = true;
+                $success['message'] = "Upload Dokumen berhasil disimpan";
+            }else{
+                
+                $success['status'] = false;
+                $success['message'] = "Upload Dokumen gagal disimpan";
             }
-
-            $success['status'] = true;
-            $success['message'] = "Upload Dokumen berhasil disimpan";
 
             $success['arr_nama'] = $arr_nama;
             $success['count file'] = count($arr_foto);
