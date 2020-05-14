@@ -92,10 +92,10 @@ class KaryawanController extends Controller
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
-                if(Storage::disk('local')->exists($foto)){
-                    Storage::disk('local')->delete($foto);
+                if(Storage::disk('s3')->exists('apv/'.$foto)){
+                    Storage::disk('s3')->delete('apv/'.$foto);
                 }
-                Storage::disk('local')->put($foto,file_get_contents($file));
+                Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
             }else{
 
                 $foto="-";
@@ -208,7 +208,7 @@ class KaryawanController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('local')->delete($foto);
+                        Storage::disk('s3')->delete('apv/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -218,10 +218,10 @@ class KaryawanController extends Controller
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 $foto = $nama_foto;
-                if(Storage::disk('local')->exists($foto)){
-                    Storage::disk('local')->delete($foto);
+                if(Storage::disk('s3')->exists('apv/'.$foto)){
+                    Storage::disk('s3')->delete('apv/'.$foto);
                 }
-                Storage::disk('local')->put($foto,file_get_contents($file));
+                Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                 
             }else{
 

@@ -24,10 +24,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('local')->exists($filename)) {
+    if (!Storage::disk('s3')->exists('apv/'.$filename)) {
         abort(404);
     }
-    return Storage::disk('local')->response($filename); 
+    return Storage::disk('s3')->response('apv/'.$filename); 
 });
 
 

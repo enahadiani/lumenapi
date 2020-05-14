@@ -159,10 +159,10 @@ class JuskebController extends Controller
                     {                
                         $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                         $foto = $nama_foto;
-                        if(Storage::disk('local')->exists($foto)){
-                            Storage::disk('local')->delete($foto);
+                        if(Storage::disk('s3')->exists('apv/'.$foto)){
+                            Storage::disk('s3')->delete('apv/'.$foto);
                         }
-                        Storage::disk('local')->put($foto,file_get_contents($file));
+                        Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                         $arr_foto[] = $foto;
                         $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
                         $i++;
@@ -367,10 +367,10 @@ class JuskebController extends Controller
                     {                
                         $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                         $foto = $nama_foto;
-                        if(Storage::disk('local')->exists($foto)){
-                            Storage::disk('local')->delete($foto);
+                        if(Storage::disk('s3')->exists('apv/'.$foto)){
+                            Storage::disk('s3')->delete('apv/'.$foto);
                         }
-                        Storage::disk('local')->put($foto,file_get_contents($file));
+                        Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                         $arr_foto[] = $foto;
                         $arr_nama[] = $request->input('nama_file')[$i];
                         $i++;
@@ -383,7 +383,7 @@ class JuskebController extends Controller
                     if(count($res3) > 0){
                         for($i=0;$i<count($res3);$i++){
 
-                            Storage::disk('local')->delete($res3[$i]['file_dok']);
+                            Storage::disk('s3')->delete('apv/'.$res3[$i]['file_dok']);
                         }
                     }
 
@@ -508,7 +508,7 @@ class JuskebController extends Controller
             if(count($res3) > 0){
                 for($i=0;$i<count($res3);$i++){
 
-                    Storage::disk('local')->delete($res3[$i]['file_dok']);
+                    Storage::disk('s3')->delete('apv/'.$res3[$i]['file_dok']);
                 }
             }
 
