@@ -37,6 +37,8 @@ class SlotController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot, a.nama,a.kode_pp+'-'+b.nama as pp 

@@ -34,6 +34,8 @@ class KkmController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kkm, a.kode_ta,a.kode_tingkat,a.kode_jur,a.kode_pp+'-'+b.nama as pp from sis_kkm a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter group by a.kode_kkm,kode_ta,a.kode_tingkat,a.kode_jur,a.kode_pp+'-'+b.nama  ");

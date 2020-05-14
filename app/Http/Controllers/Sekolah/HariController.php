@@ -91,6 +91,8 @@ class HariController extends Controller
             if($data =  Auth::guard('tarbak')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $filter = "";
             }
             
             $req = $request->all();

@@ -26,6 +26,8 @@ class GuruMatpelController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp from sis_guru_matpel b inner join karyawan a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp  

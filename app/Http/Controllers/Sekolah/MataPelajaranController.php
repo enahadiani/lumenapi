@@ -37,8 +37,9 @@ class MataPelajaranController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
-
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp
             from sis_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi

@@ -37,6 +37,8 @@ class AngkatanController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_akt,a.kode_pp+'-'+b.nama as pp, a.nama, a.kode_tingkat,a.flag_aktif from sis_angkat a

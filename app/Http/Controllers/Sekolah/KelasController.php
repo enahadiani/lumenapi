@@ -37,6 +37,8 @@ class KelasController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_kelas+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp 

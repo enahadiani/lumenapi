@@ -37,6 +37,8 @@ class JenisPenilaianController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select kode_jenis, nama,kode_pp from sis_jenisnilai where kode_lokasi='".$kode_lokasi."'  $filter ");

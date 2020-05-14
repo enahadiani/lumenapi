@@ -26,6 +26,8 @@ class JadwalUjianController extends Controller
             }
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.tanggal,a.jam,a.kode_matpel,b.nama,a.kode_tingkat,a.kode_jenis,a.kode_ta,a.kode_sem from sis_jadwal_ujian a 
