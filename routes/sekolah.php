@@ -122,4 +122,11 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
      $router->post('jadwal_harian','Sekolah\JadwalHarianController@store');
      $router->delete('jadwal_harian','Sekolah\JadwalHarianController@destroy');
 
+     //Jadwal Ujian
+    $router->get('jadwal_ujian_all','Sekolah\JadwalUjianController@index');
+    $router->get('jadwal_ujian','Sekolah\JadwalUjianController@show');
+    $router->post('jadwal_ujian','Sekolah\JadwalUjianController@store');
+    $router->put('jadwal_ujian','Sekolah\JadwalUjianController@update');
+    $router->delete('jadwal_ujian','Sekolah\JadwalUjianController@destroy');
+
 });

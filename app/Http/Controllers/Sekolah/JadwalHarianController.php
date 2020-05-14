@@ -238,7 +238,7 @@ class JadwalHarianController extends Controller
                     $jadwal[] = array("no"=>$no,"kode_slot"=>$row['kode_slot'],"nama"=>$row['nama'],"senin"=>$senin,"selasa"=>$selasa,"rabu"=>$rabu,"kamis"=>$kamis,"jumat"=>$jumat,"sabtu"=>$sabtu,"minggu"=>$minggu); 
                     $no++;
                 }
-                $success['message'] = "Data Kosong!";
+                $success['message'] = "Success!";
                 $success['data'] = $jadwal;
                 $success['status'] = true;
             } 
