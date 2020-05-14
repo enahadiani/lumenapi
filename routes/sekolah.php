@@ -116,4 +116,10 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('kalender_akad','Sekolah\KalenderAkadController@update');
     $router->delete('kalender_akad','Sekolah\KalenderAkadController@destroy');
 
+     //Jadwal Harian
+     $router->get('jadwal_harian_all','Sekolah\JadwalHarianController@index');
+     $router->get('jadwal_harian','Sekolah\JadwalHarianController@loadData');
+     $router->post('jadwal_harian','Sekolah\JadwalHarianController@store');
+     $router->delete('jadwal_harian','Sekolah\JadwalHarianController@destroy');
+
 });
