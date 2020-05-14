@@ -32,7 +32,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('s3')->exists($filename)) {
+    if (!Storage::disk('s3')->exists('aset/'.$filename)) {
         abort(404);
     }
     return Storage::disk('s3')->response('aset/'.$filename); 
