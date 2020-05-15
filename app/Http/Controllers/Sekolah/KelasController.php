@@ -41,10 +41,10 @@ class KelasController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_kelas+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp 
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_jur+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp 
             from sis_kelas a 
-			inner join sis_jur b on a.kode_jur=b.kode_jur and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            inner join pp c on a.kode_pp=b.kode_pp and b.kode_pp=c.kode_pp  and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ");
+			left join sis_jur b on a.kode_jur=b.kode_jur and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_pp=c.kode_pp  and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
