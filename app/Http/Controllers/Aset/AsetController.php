@@ -1019,4 +1019,64 @@ class AsetController extends Controller
         
     }
 
+    public function hapusDok(Request $request){
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'no_urut' => 'required'
+        ]);
+
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+                    from karyawan a
+                    where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            $get = json_decode(json_encode($get),true);
+            if(count($get) > 0){
+                $kode_pp = $get[0]['kode_pp'];
+            }else{
+                $kode_pp = "";
+            }
+            $no_bukti = $request->no_bukti;
+            $no_urut = $request->no_urut;
+
+            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+                    from amu_asset_bergerak_dok a
+                    where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $file = $cek[0]['file_dok'];
+            }else{
+                $file = "";
+            }
+
+            $del = DB::connection('sqlsrv2')->table('amu_asset_bergerak_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_pp', $kode_pp)
+            ->where('no_bukti', $no_bukti) 
+            ->where('no_urut', $no_urut)
+            ->delete();
+
+            if($file != ""){
+                Storage::disk('s3')->delete('aset/'.$file);
+            }
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Delete dokumen berhasil disimpan";
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Delete dokumen gagal disimpan. ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
 }
