@@ -346,4 +346,39 @@ class SiswaController extends Controller
         
     }
 
+    public function getJurusanTingkat(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_kelas' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_tingkat,kode_jur from sis_kelas where kode_kelas='".$kode_kelas."' and kode_lokasi='".$kode_lokasi."'");
+            $res = json_decode(json_encode($res),true);
+
+            if (count($res) > 0){
+                $success['message'] = "Success!";
+                $success['data'] = $res;
+                $success['status'] = true;
+            } 
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 }
