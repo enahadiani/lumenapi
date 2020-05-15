@@ -1019,12 +1019,7 @@ class AsetController extends Controller
         
     }
 
-    public function hapusDok(Request $request){
-        $this->validate($request, [
-            'no_bukti' => 'required',
-            'no_urut' => 'required'
-        ]);
-
+    public function hapusDok($no_bukti,$no_urut){
         DB::connection('sqlsrv2')->beginTransaction();
         
         try {
@@ -1042,8 +1037,6 @@ class AsetController extends Controller
             }else{
                 $kode_pp = "";
             }
-            $no_bukti = $request->no_bukti;
-            $no_urut = $request->no_urut;
 
             $cek = DB::connection('sqlsrv2')->select("select a.file_dok
                     from amu_asset_bergerak_dok a
