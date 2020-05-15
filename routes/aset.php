@@ -58,4 +58,5 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('ubah-gambar-aset','Aset\AsetController@ubahGambarAset');
     $router->post('upload-dok','Aset\AsetController@uploadDok');
     $router->delete('delete-dok','Aset\AsetController@hapusDok');
+    $router->post('upload-dok-single','Aset\AsetController@uploadDokSingle');
 });
