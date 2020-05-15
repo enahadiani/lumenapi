@@ -806,7 +806,7 @@ class AsetController extends Controller
             'no_ruangan' => 'required',
             'kode_aset' => 'required',
             'kondisi' => 'required',
-            'file_gambar' => 'file|max:3072'
+            'file_gambar' => 'file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -876,7 +876,7 @@ class AsetController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'no_urut' => 'required',
-            'file_gambar' => 'file|max:3072'
+            'file_gambar' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -940,7 +940,7 @@ class AsetController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'nama_file.*'=>'required',
-            'file_gambar.*'=>'file|max:3072'
+            'file_gambar' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -982,8 +982,20 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
+                $cek = DB::connection('sqlsrv2')->select("
+                select no_bukti,count(file_dok) as nomor
+                from amu_asset_bergerak_dok 
+                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
+                group by no_bukti");
+                $cek = json_decode(json_encode($cek),true);
+                if(count($cek) > 0){
+                    $no = $cek[0]['nomor'];
+                }else{
+                    $no = 0;
+                }
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i],$kode_pp]); 
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp]); 
+                    $no++;
                 }
                 $success['status'] = true;
                 $success['message'] = "Upload Dokumen berhasil disimpan";
