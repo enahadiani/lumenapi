@@ -750,21 +750,8 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }  
+            $no_ruangan = $request->no_ruangan;
+            $kondisi = $request->kondisi;
             
             if($request->kondisi == "All"){
                 $filter = "";
@@ -774,9 +761,10 @@ class AsetController extends Controller
                 $filter = " and isnull(b.status,'-') = '-' ";
             }
           
-            $sql="select a.foto,a.no_bukti,a.no_ruang,a.nama_inv as nama,a.kd_asset,case b.status when 'Tidak Berfungsi' then 'Rusak' when 'Berfungsi' then 'Baik' else 'Belum diketahui' end as kondisi
+            $sql="select a.foto,a.no_bukti,a.no_ruang,a.nama_inv as nama,a.kd_asset,case b.status when 'Tidak Berfungsi' then 'Rusak' when 'Berfungsi' then 'Baik' else 'Belum diketahui' end as kondisi,'".url('api/aset/storage')."/'+c.file_dok as foto
             from amu_asset_bergerak a
             left join amu_mon_asset_bergerak b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi
+            left join amu_asset_bergerak_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and c.no_urut = 0
             where a.no_ruang='$no_ruangan' $filter ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -806,7 +794,7 @@ class AsetController extends Controller
             'no_ruangan' => 'required',
             'kode_aset' => 'required',
             'kondisi' => 'required',
-            'file_gambar' => 'file|max:3072|image|mimes:jpeg,png,jpg'
+            'file_gambar.*' => 'file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -838,37 +826,79 @@ class AsetController extends Controller
                 $id_gedung = "";
             }
 
+            // if($request->hasfile('file_gambar'))
+            // {
+            //     $file = $request->file('file_gambar');
+                
+            //     $nama_foto = uniqid()."_".$file->getClientOriginalName();
+            //     // $picName = uniqid() . '_' . $picName;
+            //     $foto = $nama_foto;
+            //     if(Storage::disk('s3')->exists('aset/'.$foto)){
+            //         Storage::disk('s3')->delete('aset/'.$foto);
+            //     }
+            //     Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
+            // }else{
+
+            //     $foto="-";
+            // }
+
+            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),'-']);
+
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
             if($request->hasfile('file_gambar'))
             {
-                $file = $request->file('file_gambar');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                // $picName = uniqid() . '_' . $picName;
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('aset/'.$foto)){
-                    Storage::disk('s3')->delete('aset/'.$foto);
+                foreach($request->file('file_gambar') as $file)
+                {                
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('aset/'.$foto)){
+                        Storage::disk('s3')->delete('aset/'.$foto);
+                    }
+                    Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = str_replace(' ', '_', $file->getClientOriginalName());
+                    $i++;
                 }
-                Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
-            }else{
-
-                $foto="-";
             }
-
-            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),$foto]);
+    
+            if(count($arr_nama) > 0){
+                $cek = DB::connection('sqlsrv2')->select("
+                select no_bukti,count(file_dok) as nomor
+                from amu_asset_bergerak_dok 
+                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
+                group by no_bukti");
+                $cek = json_decode(json_encode($cek),true);
+                if(count($cek) > 0){
+                    $no = $cek[0]['nomor'];
+                }else{
+                    $no = 0;
+                }
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp]); 
+                    $no++;
+                }
+                $sts = true;
+                $message = "Upload Dokumen berhasil disimpan";
+            }else{
+                $sts = false;
+                $message = "Tidak ada dokumen yang disimpan";
+            }
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Aset berhasil disimpan. Id =".$id;
-          
+            $success['message'] = "Data Inventaris berhasil disimpan. Id =".$id;
+            $success['status_upload'] = $sts;
+            $success['message_upload'] = $message;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Aset gagal disimpan ".$e;
+            $success['message'] = "Data Inventaris gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
-        
-        
+     
     }
 
     public function ubahGambarAset(Request $request)
@@ -1137,6 +1167,44 @@ class AsetController extends Controller
         }				
         
         
+    }
+
+    function getDetailUpload(Request $request){
+        $this->validate($request, [
+            'no_bukti' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $no_bukti = $request->no_bukti;
+          
+            $sql="select no_bukti,kode_lokasi,no_urut,nama,kode_pp,'".url('api/aset/storage')."/'+file_dok as foto
+            from amu_asset_bergerak_dok 
+            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
 }
