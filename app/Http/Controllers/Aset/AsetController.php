@@ -1184,7 +1184,8 @@ class AsetController extends Controller
           
             $sql="select no_bukti,kode_lokasi,no_urut,nama,kode_pp,'".url('api/aset/storage')."/'+file_dok as foto
             from amu_asset_bergerak_dok 
-            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ";
+            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi'
+            order by no_bukti,no_urut ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
