@@ -244,4 +244,11 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/mobilesekolah.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dago'
+], function ($router) {
+    require __DIR__.'/../routes/dago.php';
+});
 return $app;

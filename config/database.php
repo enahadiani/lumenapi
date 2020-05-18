@@ -110,6 +110,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'sqlsrvdago' => [
+            'driver' => env('DB_CONNECTION8','sqlsrv'),
+            'host' => env('DB_HOST8', 'localhost'),
+            'port' => env('DB_PORT8', '1433'),
+            'database' => env('DB_DATABASE8', 'forge'),
+            'username' => env('DB_USERNAME8', 'forge'),
+            'password' => env('DB_PASSWORD8', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

@@ -42,6 +42,10 @@ return [
         'siswa' => [
             'driver' => 'jwt',
             'provider' => 'adminsiswa',
+        ],
+        'dago' => [
+            'driver' => 'jwt',
+            'provider' => 'admindago',
         ]
     ],
 
@@ -77,6 +81,10 @@ return [
         'adminsiswa' => [
             'driver' => 'eloquent',
             'model' => \App\AdminSiswa::class
+        ],
+        'admindago' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminDago::class
         ]
     ]
 ];
