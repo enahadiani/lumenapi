@@ -47,7 +47,7 @@ class PaketController extends Controller
             }
 
             $res = DB::connection('sqlsrvdago')->select( "select 
-            no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen where kode_lokasi='".$kode_lokasi."' $filter ");
+            no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen from dgw_paket where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
