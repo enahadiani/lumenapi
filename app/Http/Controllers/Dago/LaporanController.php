@@ -60,7 +60,6 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['sql'] = $sql;
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
@@ -145,6 +144,134 @@ class LaporanController extends Controller
         }
     }
 
-    
+    function getPaket(Request $request){
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('no_paket');
+            $db_col_name = array('a.no_paket');
+
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            $sql="select a.no_paket,a.nama,a.kode_curr,a.jenis,a.kode_produk, a.tarif_agen from dgw_paket a $filter";
+           
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getDokumen(Request $request){
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('no_dokumen');
+            $db_col_name = array('a.no_dokumen');
+
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            $sql="select a.no_dokumen,a.deskripsi,a.jenis from dgw_dok a $filter";
+           
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getJamaah(Request $request){
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('no_peserta');
+            $db_col_name = array('a.no_peserta');
+
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            $sql="select a.no_peserta, a.kode_lokasi, a.id_peserta, a.nama, a.jk, a.status, a.alamat, a.kode_pos, a.telp, a.hp, a.email, a.pekerjaan, a.bank, a.cabang, a.norek, a.namarek, a.nopass, a.kantor_mig, a.sp, a.ec_telp, a.ec_hp, a.issued, a.ex_pass, a.tempat, a.tgl_lahir, a.th_haji, 
+            a.th_umroh, a.ibu, a.foto, a.ayah, a.pendidikan from dgw_peserta a $filter";
+           
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 
 }

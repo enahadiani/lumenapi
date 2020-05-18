@@ -107,18 +107,13 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('filter-peserta','Dago\LaporanController@getFilterPeserta');
 
     //Pihak ketiga
-    //Paket
-    $router->get('lap-paket','Dago\PaketController@index');
-
-    //Dokumen
-    $router->get('lap-masterdokumen','Dago\DokumenController@index');
-
-    //Jamaah
-    $router->get('lap-jamaah','Dago\JamaahController@index');
-
+   
     //Laporan
     $router->get('lap-mku-operasional','Dago\LaporanController@getMkuOperasional');
     $router->get('lap-mku-keuangan','Dago\LaporanController@getMkuKeuangan');
+    $router->get('lap-paket','Dago\LaporanController@getPaket');
+    $router->get('lap-dokumen','Dago\LaporanController@getDokumen');
+    $router->get('lap-jamaah','Dago\LaporanController@getJamaah');
 
 
 });
