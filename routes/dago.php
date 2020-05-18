@@ -93,6 +93,8 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('jadwal','Dago\PaketController@index');
     $router->post('ubah-jadwal','Dago\PaketController@store');
 
+    //Jamaah
+    $router->get('jamaah','Dago\JamaahController@index');
 
 });
 
