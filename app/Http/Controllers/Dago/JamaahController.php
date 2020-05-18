@@ -60,7 +60,6 @@ class JamaahController extends Controller
                     inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and c.no_peserta = '".$res[$i]['no_peserta']."'
                     order by b.tanggal");
-                    $res2 = json_decode(json_encode($res2),true);
                     $res[$i]['payments'] = array();
                     foreach ($res2 as $row) {
                         $res[$i]['payments'][] = $row->nilai_bayar;
