@@ -61,13 +61,13 @@ class JamaahController extends Controller
                     where a.kode_lokasi='$kode_lokasi' and c.no_peserta = '".$res[$i]['no_peserta']."'
                     order by b.tanggal");
                     $res[$i]['payments'] = array();
-                    $no=0;
+                    $no=1;
                     foreach ($res2 as $row) {
-                        $res[$i]['payments'][] = array("$no" => $row->nilai_bayar);
+                        $res[$i]['payments'][] = array($no => $row->nilai_bayar);
                         $no++;
                     }   
 
-                    $res3 = DB::connection('sqlsrvdago')->select("select a.no_dokumen as id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
+                    $res3 = DB::connection('sqlsrvdago')->select("select ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
                     from dgw_dok a 
                     left join dgw_reg_dok b on a.no_dokumen=b.no_dok
                     left join dgw_reg d on b.no_reg = d.no_reg  
