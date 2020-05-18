@@ -54,18 +54,17 @@ class JamaahController extends Controller
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 for($i=0;$i < count($res);$i++){
-                    $res2 = DB::connection('sqlsrvdago')->select("select a.no_reg,a.no_kwitansi,a.kode_lokasi,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,case when a.kode_curr = 'IDR' then a.nilai_p+a.nilai_t+a.nilai_m else (a.nilai_p*a.kurs)+a.nilai_t+a.nilai_m end as nilai_bayar
+                    $res2 = DB::connection('sqlsrvdago')->select("select case when a.kode_curr = 'IDR' then a.nilai_p+a.nilai_t+a.nilai_m else (a.nilai_p*a.kurs)+a.nilai_t+a.nilai_m end as nilai_bayar
                     from dgw_pembayaran a
                     inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
                     inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and c.no_peserta = '".$res[$i]['no_peserta']."'
                     order by b.tanggal");
                     $res2 = json_decode(json_encode($res2),true);
-                    if(count($res2) > 0){
-                        $res[$i]['payments'] = $res2;
-                    }else{
-                        $res[$i]['payments'] = array();
-                    }
+                    $res[$i]['payments'] = array();
+                    foreach ($res2 as $row) {
+                        $res[$i]['payments'][] = $row->nilai_bayar;
+                    }   
 
                     $res3 = DB::connection('sqlsrvdago')->select("select a.no_dokumen as id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
                     from dgw_dok a 
@@ -98,16 +97,6 @@ class JamaahController extends Controller
         }
         
     }
-
-    // /**
-    //  * Show the form for creating a new resource.
-    //  *
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function create()
-    // {
-    //     //
-    // }
 
     // /**
     //  * Store a newly created resource in storage.
