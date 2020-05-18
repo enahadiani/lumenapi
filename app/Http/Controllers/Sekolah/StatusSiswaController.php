@@ -142,7 +142,7 @@ class StatusSiswaController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_ss= $request->kode_ss;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nama, kode_ss,kode_pp,flag_aktif from sis_siswa_status where kode_ss ='".$kode_slot."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
+            $res = DB::connection('sqlsrvtarbak')->select("select nama, kode_ss,kode_pp,flag_aktif from sis_siswa_status where kode_ss ='".$kode_ss."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
