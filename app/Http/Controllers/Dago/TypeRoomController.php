@@ -50,18 +50,18 @@ class TypeRoomController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -105,19 +105,19 @@ class TypeRoomController extends Controller
                 $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_cur) values values (?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
                 
                 DB::connection('sqlsrvdago')->commit();
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['message'] = "Data Type Room berhasil disimpan";
             }else{
-                $success['status'] = false;
+                $success['status'] = "FAILED";
                 $success['message'] = "Error : Duplicate entry. Id Type Room sudah ada di database!";
             }
             
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Type Room gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -167,14 +167,14 @@ class TypeRoomController extends Controller
             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_cur) values values (?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
             
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Type Room berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Type Room gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -203,16 +203,16 @@ class TypeRoomController extends Controller
             ->delete();
 
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Type Room berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Type Room gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 }

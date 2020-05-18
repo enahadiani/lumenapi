@@ -50,18 +50,18 @@ class JenisHargaController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -103,19 +103,19 @@ class JenisHargaController extends Controller
                 $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['message'] = "Data Jenis Harga berhasil disimpan";
             }else{
-                $success['status'] = false;
+                $success['status'] = "FAILED";
                 $success['message'] = "Error : Duplicate entry. Id Jenis Harga sudah ada di database!";
             }
             
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Jenis Harga gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -163,14 +163,14 @@ class JenisHargaController extends Controller
             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Jenis Harga berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Jenis Harga gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -199,16 +199,16 @@ class JenisHargaController extends Controller
             ->delete();
 
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Jenis Harga berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Jenis Harga gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 }

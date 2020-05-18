@@ -50,18 +50,18 @@ class JenisProdukController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -105,19 +105,19 @@ class JenisProdukController extends Controller
                 $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_produk(kode_produk,nama,kode_akun,akun_pdpt,akun_piutang,kode_lokasi) values values (?, ?, ?, ?, ?, ?)', array($request->kode_produk,$request->nama,$request->kode_akun,$request->akun_pdpt,$request->akun_piutang,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['message'] = "Data Produk berhasil disimpan";
             }else{
-                $success['status'] = false;
+                $success['status'] = "FAILED";
                 $success['message'] = "Error : Duplicate entry. Kode Produk sudah ada di database!";
             }
             
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Produk gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -168,14 +168,14 @@ class JenisProdukController extends Controller
             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_produk(kode_produk,nama,kode_akun,akun_pdpt,akun_piutang,kode_lokasi) values values (?, ?, ?, ?, ?, ?)', array($request->kode_produk,$request->nama,$request->kode_akun,$request->akun_pdpt,$request->akun_piutang,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Produk berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Produk gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -204,16 +204,16 @@ class JenisProdukController extends Controller
             ->delete();
 
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Produk berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Produk gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -232,18 +232,18 @@ class JenisProdukController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -264,18 +264,18 @@ class JenisProdukController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -296,18 +296,18 @@ class JenisProdukController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

@@ -82,6 +82,13 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('akun-piutang','Dago\ProdukController@getAkunPiutang');
     $router->get('akun-pdd','Dago\ProdukController@getAkunPDD');
 
+    //Paket
+    $router->get('paket','Dago\PaketController@index');
+    $router->post('paket','Dago\PaketController@store');
+    $router->get('paket-detail','Dago\PaketController@edit');
+    $router->put('paket','Dago\PaketController@update');
+    $router->delete('paket','Dago\PaketController@destroy');
+
 
 });
 

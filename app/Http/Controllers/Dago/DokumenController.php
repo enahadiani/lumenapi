@@ -50,18 +50,18 @@ class DokumenController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -104,19 +104,19 @@ class DokumenController extends Controller
                 $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_dok(no_dokumen,deskripsi,kode_lokasi,jenis) values values (?, ?, ?)', array($request->no_dokumen,$request->deskripsi,$kode_lokasi,$request->jenis));
                 
                 DB::connection('sqlsrvdago')->commit();
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['message'] = "Data Dokumen berhasil disimpan";
             }else{
-                $success['status'] = false;
+                $success['status'] = "FAILED";
                 $success['message'] = "Error : Duplicate entry. Id Dokumen sudah ada di database!";
             }
             
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Dokumen gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -165,14 +165,14 @@ class DokumenController extends Controller
             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_dok(no_dokumen,deskripsi,kode_lokasi,jenis) values values (?, ?, ?)', array($request->no_dokumen,$request->deskripsi,$kode_lokasi,$request->jenis));
             
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Dokumen berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Dokumen gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -201,16 +201,16 @@ class DokumenController extends Controller
             ->delete();
 
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Dokumen berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Dokumen gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 }

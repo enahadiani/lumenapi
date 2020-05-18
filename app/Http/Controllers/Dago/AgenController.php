@@ -51,18 +51,18 @@ class AgenController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = "FAILED";
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -116,19 +116,19 @@ class AgenController extends Controller
                 no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,no_rek,namarek,kode_marketing,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->no_rek,$request->namarek,$request->kode_marketing,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['message'] = "Data Agen berhasil disimpan";
             }else{
-                $success['status'] = false;
+                $success['status'] = "FAILED";
                 $success['message'] = "Error : Duplicate entry. No Agent sudah ada di database!";
             }
             
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Agen gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -188,14 +188,14 @@ class AgenController extends Controller
                 no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,no_rek,namarek,kode_marketing,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->no_rek,$request->namarek,$request->kode_marketing,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Agen berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Agen gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -224,16 +224,16 @@ class AgenController extends Controller
             ->delete();
 
             DB::connection('sqlsrvdago')->commit();
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Agen berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Data Agen gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 }
