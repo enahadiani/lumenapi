@@ -38,18 +38,22 @@ class JamaahController extends Controller
 
     public function index(Request $request)
     {
+        $this->validate($request, [
+            'no_jamaah' => 'required'
+        ]);
+
         try {
             
             if($data =  Auth::guard('dago')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->no_peserta)){
-                if($request->no_peserta == "all"){
+            if(isset($request->no_jamaah)){
+                if($request->no_jamaah == "all"){
                     $filter = "";
                 }else{
 
-                    $filter = " and no_peserta='$request->no_peserta' ";
+                    $filter = " and no_peserta='$request->no_jamaah' ";
                 }
             }else{
                 $filter = "";
@@ -202,7 +206,7 @@ class JamaahController extends Controller
     public function edit(Request $request)
     {
         $this->validate($request, [
-            'no_peserta' => 'required'
+            'no_jamaah' => 'required'
         ]);
         try {
             
@@ -211,7 +215,7 @@ class JamaahController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' ");
+            $res = DB::connection('sqlsrvdago')->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' ");
             $res = json_decode(json_encode($res),true);
 
            
@@ -244,7 +248,7 @@ class JamaahController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_peserta' => 'required',
+            'no_jamaah' => 'required',
             'id_peserta' => 'required',
             'nama' => 'required',
             'tempat' => 'required',
@@ -283,13 +287,14 @@ class JamaahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $no_peserta = $request->no_jamaah;
 
             $del = DB::connection('sqlsrvdago')->table('dgw_peserta')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_peserta', $request->no_peserta)
+            ->where('no_peserta', $no_peserta)
             ->delete();		
             
-            $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' 
+            $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$no_peserta' 
             ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -343,7 +348,7 @@ class JamaahController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'no_peserta' => 'required'
+            'no_jamaah' => 'required'
         ]);
         DB::connection('sqlsrvdago')->beginTransaction();
         
@@ -353,7 +358,7 @@ class JamaahController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select count(*) as jml from dgw_reg where no_peserta='".$request->no_peserta."' and kode_lokasi='".$kode_lokasi."'";					
+            $strSQL = "select count(*) as jml from dgw_reg where no_peserta='".$request->no_jamaah."' and kode_lokasi='".$kode_lokasi."'";					
             $res = DB::connection('sqlsrvdago')->select($strSQL); 
             $res = json_decode(json_encode($res),true);
             if (count($res) > 0){
@@ -363,7 +368,7 @@ class JamaahController extends Controller
                     $sts = "FAILED";		
                 }
             }else{
-                $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' 
+                $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' 
                 ";
                 $res = DB::connection('sqlsrv2')->select($sql);
                 $res = json_decode(json_encode($res),true);
@@ -378,7 +383,7 @@ class JamaahController extends Controller
                 }
                 $del = DB::connection('sqlsrvdago')->table('dgw_jamaah')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_peserta', $request->no_peserta)
+                ->where('no_peserta', $request->no_jamaah)
                 ->delete();
                 
                 DB::connection('sqlsrvdago')->commit();

@@ -31,17 +31,35 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     
-    //Pekerjaan
-    $router->get('pekerjaan','Dago\PekerjaanController@index');
-    $router->post('pekerjaan','Dago\PekerjaanController@store');
-    $router->put('pekerjaan','Dago\PekerjaanController@update');
-    $router->delete('pekerjaan','Dago\PekerjaanController@destroy');
+    //Paket
+    $router->get('paket','Dago\PaketController@index');
+    $router->post('paket','Dago\PaketController@store');
+    $router->get('paket-detail','Dago\PaketController@edit');
+    $router->put('paket','Dago\PaketController@update');
+    $router->delete('paket','Dago\PaketController@destroy');
 
     //Dokumen
     $router->get('masterdokumen','Dago\DokumenController@index');
     $router->post('masterdokumen','Dago\DokumenController@store');
     $router->put('masterdokumen','Dago\DokumenController@update');
     $router->delete('masterdokumen','Dago\DokumenController@destroy');
+
+    //Jamaah
+    $router->get('jamaah','Dago\JamaahController@index');
+    $router->post('jamaah','Dago\JamaahController@store');
+    $router->get('jamaah-detail','Dago\JamaahController@edit');
+    $router->post('jamaah-ubah','Dago\JamaahController@update');
+    $router->delete('jamaah','Dago\JamaahController@destroy');
+
+    //Laporan
+    $router->get('mku-operasional','Dago\LaporanController@getMkuOperasional');
+    $router->get('mku-keuangan','Dago\LaporanController@getMkuKeuangan');
+
+    //Pekerjaan
+    $router->get('pekerjaan','Dago\PekerjaanController@index');
+    $router->post('pekerjaan','Dago\PekerjaanController@store');
+    $router->put('pekerjaan','Dago\PekerjaanController@update');
+    $router->delete('pekerjaan','Dago\PekerjaanController@destroy');
 
     //Jenis Harga
     $router->get('jenis-harga','Dago\JenisHargaController@index');
@@ -82,23 +100,9 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('akun-piutang','Dago\ProdukController@getAkunPiutang');
     $router->get('akun-pdd','Dago\ProdukController@getAkunPDD');
 
-    //Paket
-    $router->get('paket','Dago\PaketController@index');
-    $router->post('paket','Dago\PaketController@store');
-    $router->get('paket-detail','Dago\PaketController@edit');
-    $router->put('paket','Dago\PaketController@update');
-    $router->delete('paket','Dago\PaketController@destroy');
-
     //Jadwal
     $router->get('jadwal','Dago\PaketController@index');
     $router->post('ubah-jadwal','Dago\PaketController@store');
-
-    //Jamaah
-    $router->get('jamaah','Dago\JamaahController@index');
-    $router->post('jamaah','Dago\JamaahController@store');
-    $router->get('jamaah-detail','Dago\JamaahController@edit');
-    $router->post('jamaah-ubah','Dago\JamaahController@update');
-    $router->delete('jamaah','Dago\JamaahController@destroy');
 
     //Filter Laporan
     $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
@@ -106,11 +110,6 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('filter-jadwal','Dago\LaporanController@getFilterJadwal');
     $router->get('filter-noreg','Dago\LaporanController@getFilterNoReg');
     $router->get('filter-peserta','Dago\LaporanController@getFilterPeserta');
-
-    //Laporan
-    $router->get('lap-mku-operasional','Dago\LaporanController@getMkuOperasional');
-    $router->get('lap-mku-keuangan','Dago\LaporanController@getMkuKeuangan');
-
 
 });
 
