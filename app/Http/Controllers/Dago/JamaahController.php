@@ -63,7 +63,7 @@ class JamaahController extends Controller
                     $res[$i]['payments'] = array();
                     $no=0;
                     foreach ($res2 as $row) {
-                        $res[$i]['payments'][] = array($no => $row->nilai_bayar);
+                        $res[$i]['payments'][] = array("$no" => $row->nilai_bayar);
                         $no++;
                     }   
 
