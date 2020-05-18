@@ -31,19 +31,12 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from yk_pb_m a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='0' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.nik_app='$nik'					 
-            union 			
-            select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from panjar2_m a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='0' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') and a.nik_setuju='$nik'
-            order by tgl  					 
-            ");
+            $sql="select case when no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_atasan,nilai_curr,due_date, progress 
+            from sju_pb_m 
+            where periode <='202006' and kode_lokasi='$kode_lokasi' and progress='0' and no_atasan='-' 
+            and modul='PBPROSES' and no_kas='-' and nik_atasan='$nik' ";
+
+            $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
@@ -80,19 +73,12 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from yk_pb_m a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') 					 
-            union 			
-            select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from panjar2_m a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') 
-            order by tgl  					 
-            ");
+            $sql="select case when no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_atasan,nilai_curr,due_date, progress 
+            from sju_pb_m 
+            where periode <='202006' and kode_lokasi='$kode_lokasi' and progress='0' and no_atasan='-' 
+            and modul='PBPROSES' and no_kas='-' and nik_atasan='$nik' ";
+
+            $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
             
             if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
@@ -275,22 +261,11 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            switch(substr($no_aju,3,2)){
-                case 'PB':		
-                    $sql = "select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-                    from yk_pb_m a 
-                    inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                    inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-                    where a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.no_pb='$no_aju' ";
-                break;
-                case 'PP' : 
-                    $sql ="select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-                    from panjar2_m a 
-                    inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                    inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
-                    where a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') and a.no_panjar='$no_aju' ";
-                break;
-            }
+            $sql="select a.kode_akun, b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
+            from sju_pb_j a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 					  
+            where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'";
 
             $det = DB::connection('sqlsrvsju')->select($sql);
             $det = json_decode(json_encode($det),true);
@@ -382,19 +357,12 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            switch(substr($no_aju,3,2)){
-                case 'PB':		
-                    $sql = "select a.no_gambar,a.kode_jenis,'http://bangtelindo.simkug.com/server/media' as host 
-                    from yk_pb_dok a 
-                    where a.no_pb='$no_aju' ";
-                break;
-                case 'PP' : 
-                    $sql = "select a.no_gambar,a.kode_jenis,'http://bangtelindo.simkug.com/server/media' as host 
-                    from yk_pb_dok a 
-                    where a.no_pb='$no_aju' ";
-                break;
-            }
-
+            $sql="select b.kode_jenis,b.nama,a.no_gambar 
+            from pbh_dok a 
+            inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
+            where a.no_bukti = '$no_aju' and a.kode_lokasi='$kode_lokasi' 
+            order by a.nu ";
+          
             $det = DB::connection('sqlsrvsju')->select($sql);
             $det = json_decode(json_encode($det),true);
             
@@ -428,27 +396,13 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            switch(substr($no_aju,3,2)){
-                case 'PB':		
-                    $sql = "select a.no_app,convert(varchar,a.tanggal,103) as tgl,a.catatan,a.nik_user,b.nama,a.form,
-                            case when a.status in ('S','K','D') then 'reject' else 'approve' end as status
-                    from spm_app_m a
-                    inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
-                    inner join spm_form c on a.kode_lokasi=c.kode_lokasi and a.form=c.form
-                    where a.no_bukti='$no_aju' 
-                    order by c.nu ";
-                break;
-                case 'PP' : 
-                    $sql = "select a.no_app,convert(varchar,a.tanggal,103) as tgl,a.catatan,a.nik_user,b.nama,a.form,
-                            case when a.status in ('S','K','D') then 'reject' else 'approve' end as status
-                    from spm_app_m a
-                    inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
-                    inner join spm_form c on a.kode_lokasi=c.kode_lokasi and a.form=c.form
-                    where a.no_bukti='$no_aju' 
-                    order by c.nu ";
-                break;
-            }
+            $sql="select a.kode_akun, b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
+            from sju_pb_j a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 					  
+            where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'";
 
+           
             $det = DB::connection('sqlsrvsju')->select($sql);
             $det = json_decode(json_encode($det),true);
             
@@ -482,6 +436,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $sql="";
             $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.cabang,a.no_rek,a.nama_rek,a.bruto,a.pajak
             from spm_rek a
             where a.no_bukti ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
@@ -521,33 +476,12 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            switch(substr($no_aju,3,2)){
-                case 'PB':		
-                    $sql = "select b.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,d.kode_proyek,
-                    isnull(e.nama,'-') as nama_proyek 
-                    from yk_pb_j a 
-                    inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                    inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 							
-                    inner join yk_pb_m d on a.no_pb=d.no_pb and a.kode_lokasi=d.kode_lokasi 	
-                    left join spm_proyek e on d.kode_proyek=e.kode_proyek and d.kode_lokasi=e.kode_lokasi 
-                    where a.no_pb = '$no_aju' and a.kode_lokasi='$kode_lokasi'
-                    ";
-                break;
-                case 'PP' : 
-                    $sql ="select b.kode_akun,b.nama as nama_akun,'D' as dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,'-' as kode_proyek,'-' as nama_proyek 
-                    from panjar2_m a 
-                    inner join masakun b on a.akun_panjar=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                    inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 								
-                    where a.no_panjar = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
-                break;
-                default :
-                    $sql="select b.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,'-' as kode_proyek,'-' as nama_proyek 
-                    from panjarptg2_j a 
-                    inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                    inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 								
-                    where a.no_ptg = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
-                break;
-            }
+            $sql="select a.kode_akun, b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
+            from sju_pb_j a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 					  
+            where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'";
+           
 
             $jur = DB::connection('sqlsrvsju')->select($sql);
             $jur = json_decode(json_encode($jur),true);
