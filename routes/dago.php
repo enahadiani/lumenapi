@@ -89,6 +89,10 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->put('paket','Dago\PaketController@update');
     $router->delete('paket','Dago\PaketController@destroy');
 
+    //Jadwal
+    $router->get('jadwal','Dago\PaketController@index');
+    $router->post('ubah-jadwal','Dago\PaketController@store');
+
 
 });
 
