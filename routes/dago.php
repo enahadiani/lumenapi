@@ -55,6 +55,33 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->put('type-room','Dago\TypeRoomController@update');
     $router->delete('type-room','Dago\TypeRoomController@destroy');
 
+    //Biaya Wajib
+    $router->get('biaya','Dago\BiayaController@index');
+    $router->post('biaya','Dago\BiayaController@store');
+    $router->put('biaya','Dago\BiayaController@update');
+    $router->delete('biaya','Dago\BiayaController@destroy');
+    $router->get('akun-pendapatan','Dago\BiayaController@getAkunPDPT');
+
+    //Marketing
+    $router->get('marketing','Dago\MarketingController@index');
+    $router->post('marketing','Dago\MarketingController@store');
+    $router->put('marketing','Dago\MarketingController@update');
+    $router->delete('marketing','Dago\MarketingController@destroy');
+
+    //Agen
+    $router->get('agen','Dago\AgenController@index');
+    $router->post('agen','Dago\AgenController@store');
+    $router->put('agen','Dago\AgenController@update');
+    $router->delete('agen','Dago\AgenController@destroy');
+
+    //Jenis Produk
+    $router->get('produk','Dago\ProdukController@index');
+    $router->post('produk','Dago\ProdukController@store');
+    $router->put('produk','Dago\ProdukController@update');
+    $router->delete('produk','Dago\ProdukController@destroy');
+    $router->get('akun-piutang','Dago\ProdukController@getAkunPiutang');
+    $router->get('akun-pdd','Dago\ProdukController@getAkunPDD');
+
 
 });
 
