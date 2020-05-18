@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class JamaahController extends Controller
 {
@@ -25,6 +26,14 @@ class JamaahController extends Controller
         }else{
             return true;
         }
+    }
+
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
     }
 
     public function index(Request $request)
@@ -99,315 +108,294 @@ class JamaahController extends Controller
         
     }
 
-    // /**
-    //  * Store a newly created resource in storage.
-    //  *
-    //  * @param  \Illuminate\Http\Request  $request
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function store(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'no_paket' => 'required',
-    //         'nama' => 'required',
-    //         'kode_curr' => 'required',
-    //         'jenis' => 'required',
-    //         'kode_produk' => 'required',
-    //         'tarif_agen' => 'required',
-    //         'data_harga.*.kode_harga' => 'required',
-    //         'data_harga.*.harga' => 'required',
-    //         'data_harga.*.harga_se' => 'required',
-    //         'data_harga.*.harga_e' => 'required',
-    //         'data_harga.*.fee' => 'required',
-    //         'data_harga.*.curr_fee' => 'required',
-    //         'data_jadwal.*.tgl_berangkat' => 'required',
-    //         'data_jadwal.*.lama_hari' => 'required',
-    //         'data_jadwal.*.quota' => 'required',
-    //         'data_jadwal.*.quota_se' => 'required',
-    //         'data_jadwal.*.quota_e' => 'required',
-    //         'data_jadwal.*.tgl_datang' => 'required'
-    //     ]);
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'id_peserta' => 'required',
+            'nama' => 'required',
+            'tempat' => 'required',
+            'tgl_lahir' => 'required',
+            'jk' => 'required',
+            'status' => 'required',
+            'ibu' => 'required',
+            'ayah' => 'required',
+            'alamat' => 'required',
+            'kode_pos' => 'required',
+            'telp' => 'required',
+            'hp' => 'required',
+            'email' => 'required',
+            'pekerjaan' => 'required',
+            'bank' => 'required',
+            'norek' => 'required',
+            'cabang' => 'required',
+            'namarek' => 'required',
+            'nopass' => 'required',
+            'issued' => 'required',
+            'ex_pass' => 'required',
+            'kantor_mig' => 'required',
+            'ec_telp' => 'required',
+            'ec_hp' => 'required',
+            'sp' => 'required',
+            'th_haji' => 'required',
+            'th_umroh' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048',
+            'pendidikan' => 'required'
+        ]);
 
-    //     DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection('sqlsrvdago')->beginTransaction();
         
-    //     try {
-    //         if($data =  Auth::guard('dago')->user()){
-    //             $nik= $data->nik;
-    //             $kode_lokasi= $data->kode_lokasi;
-    //         }
-    //         if($this->isUnik($request->no_paket,$kode_lokasi)){
+        try {
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $tahun = date('y');
+            $no_peserta = generateKode("dgw_peserta", "no_peserta", $tahun, "00001");
 
-    //             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_paket(
-    //             no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?)', array($request->no_paket,$request->nama,$request->kode_curr,$request->jenis, $request->kode_produk, $request->tarif_agen,$kode_lokasi));
+            if($request->hasfile('foto')){
 
-    //             $detHarga = $request->data_harga;
-
-    //             if (count($detHarga) > 0){
-    //                 for ($i=0;$i < count($detHarga);$i++){
-    //                     $ins2[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_harga(no_paket,kode_harga,harga,harga_se,harga_e,fee,kode_lokasi,curr_fee) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$detHarga[$i]['kode_harga'],$detHarga[$i]['harga'],$detHarga[$i]['harga_se'],$detHarga[$i]['harga_e'],$detHarga[$i]['fee'],$kode_lokasi,$detHarga[$i]['curr_fee']));
-    //                 }						
-    //             }
-
-    //             $strSQL = "select isnull(max(no_jadwal),0) + 1 as id_jadwal from dgw_jadwal where no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";	
+                $file = $request->file('foto');
                 
-    //             $res = DB::connection('sqlsrvdago')->select($strSQL); 
-    //             $res = json_decode(json_encode($res),true);
-    //             if (count($res) > 0){
-    //                 $line = $res[0];							
-    //                 $idJadwal = intval($line['id_jadwal']);
-    //             } 
-
-    //             $detJadwal = $request->data_jadwal;
-    //             if (count($detJadwal) > 0){
-    //                 for ($i=0;$i < count($detJadwal);$i++){
-                       
-    //                     $ins3[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_jadwal(no_paket,no_jadwal,tgl_berangkat,lama_hari,quota,quota_se,quota_e,kode_lokasi, no_closing,kurs_closing,id_pbb,tgl_datang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$idJadwal,$detJadwal[$i]['tgl_berangkat'],$detJadwal[$i]['lama_hari'],$detJadwal[$i]['quota'],$detJadwal[$i]['quota_se'],$detJadwal[$i]['quota_e'],$kode_lokasi,'-',0,'-',$detJadwal[$i]['tgl_datang']));   
-    //                     $idJadwal = $idJadwal + 1;	
-    //                 }						
-    //             }
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('dago/'.$foto)){
+                    Storage::disk('s3')->delete('dago/'.$foto);
+                }
+                Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
                 
-    //             DB::connection('sqlsrvdago')->commit();
-    //             $success['status'] = "SUCCESS";
-    //             $success['message'] = "Data Paket berhasil disimpan";
-    //         }else{
-    //             $success['status'] = "FAILED";
-    //             $success['message'] = "Error : Duplicate entry. No Paket sudah ada di database!";
-    //         }
+            }else{
+
+                $foto="-";
+            }
+
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
             
-    //         return response()->json($success, $this->successStatus);     
-    //     } catch (\Throwable $e) {
-    //         DB::connection('sqlsrvdago')->rollback();
-    //         $success['status'] = "FAILED";
-    //         $success['message'] = "Data Paket gagal disimpan ".$e;
-    //         return response()->json($success, $this->successStatus); 
-    //     }				
+            DB::connection('sqlsrvdago')->commit();
+            $success['status'] = "SUCCESS";
+            $success['message'] = "Data Jamaah berhasil disimpan";
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvdago')->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Jamaah gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
         
         
-    // }
+    }
 
 
-    // /**
-    //  * Show the form for editing the specified resource.
-    //  *
-    //  * @param  \App\Fs  $Fs
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function edit(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'no_paket' => 'required'
-    //     ]);
-    //     try {
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Request $request)
+    {
+        $this->validate($request, [
+            'no_peserta' => 'required'
+        ]);
+        try {
             
-    //         if($data =  Auth::guard('dago')->user()){
-    //             $nik= $data->nik;
-    //             $kode_lokasi= $data->kode_lokasi;
-    //         }
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
 
-    //         $res = DB::connection('sqlsrvdago')->select( "select 
-    //         no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
-    //         $res = json_decode(json_encode($res),true);
+            $res = DB::connection('sqlsrvdago')->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' ");
+            $res = json_decode(json_encode($res),true);
 
-    //         $res2 = DB::connection('sqlsrvdago')->select("select kode_harga,no_paket,harga,harga_se,fee,curr_fee from dgw_harga where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
-    //         $res2 = json_decode(json_encode($res2),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
 
-    //         $res3 = DB::connection('sqlsrvdago')->select("select no_jadwal,tgl_berangkat,no_paket,lama_hari,quota,quota_se,quota_e,no_closing,kurs_closing,id_pbb,tgl_datang,tgl_cetak from dgw_jadwal where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
-    //         $res3 = json_decode(json_encode($res3),true);
-            
-    //         if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-    //             $success['status'] = "SUCCESS";
-    //             $success['data'] = $res;
-    //             $success['data_harga'] = $res2;
-    //             $success['data_jadwal'] = $res3;
-    //             $success['message'] = "Success!";     
-    //         }
-    //         else{
-    //             $success['message'] = "Data Kosong!";
-    //             $success['data'] = [];
-    //             $success['data_harga'] = [];
-    //             $success['data_jadwal'] = [];
-    //             $success['status'] = "FAILED";
-    //         }
-    //         return response()->json($success, $this->successStatus);
-    //     } catch (\Throwable $e) {
-    //         $success['status'] = "FAILED";
-    //         $success['message'] = "Error ".$e;
-    //         return response()->json($success, $this->successStatus);
-    //     }
+    }
 
-    // }
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'no_peserta' => 'required',
+            'id_peserta' => 'required',
+            'nama' => 'required',
+            'tempat' => 'required',
+            'tgl_lahir' => 'required',
+            'jk' => 'required',
+            'status' => 'required',
+            'ibu' => 'required',
+            'ayah' => 'required',
+            'alamat' => 'required',
+            'kode_pos' => 'required',
+            'telp' => 'required',
+            'hp' => 'required',
+            'email' => 'required',
+            'pekerjaan' => 'required',
+            'bank' => 'required',
+            'norek' => 'required',
+            'cabang' => 'required',
+            'namarek' => 'required',
+            'nopass' => 'required',
+            'issued' => 'required',
+            'ex_pass' => 'required',
+            'kantor_mig' => 'required',
+            'ec_telp' => 'required',
+            'ec_hp' => 'required',
+            'sp' => 'required',
+            'th_haji' => 'required',
+            'th_umroh' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048',
+            'pendidikan' => 'required'
+        ]);
 
-    // /**
-    //  * Update the specified resource in storage.
-    //  *
-    //  * @param  \Illuminate\Http\Request  $request
-    //  * @param  \App\Fs  $Fs
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function update(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'no_paket' => 'required',
-    //         'nama' => 'required',
-    //         'kode_curr' => 'required',
-    //         'jenis' => 'required',
-    //         'kode_produk' => 'required',
-    //         'tarif_agen' => 'required',
-    //         'data_harga.*.kode_harga' => 'required',
-    //         'data_harga.*.harga' => 'required',
-    //         'data_harga.*.harga_se' => 'required',
-    //         'data_harga.*.harga_e' => 'required',
-    //         'data_harga.*.fee' => 'required',
-    //         'data_harga.*.curr_fee' => 'required',
-    //         'data_jadwal.*.tgl_berangkat' => 'required',
-    //         'data_jadwal.*.lama_hari' => 'required',
-    //         'data_jadwal.*.quota' => 'required',
-    //         'data_jadwal.*.quota_se' => 'required',
-    //         'data_jadwal.*.quota_e' => 'required',
-    //         'data_jadwal.*.tgl_datang' => 'required'
-    //     ]);
-
-    //     DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection('sqlsrvdago')->beginTransaction();
         
-    //     try {
-    //         if($data =  Auth::guard('dago')->user()){
-    //             $nik= $data->nik;
-    //             $kode_lokasi= $data->kode_lokasi;
-    //         }
-    //         //update idJadwal
-    //         $detJadwal = $request->data_jadwal;
-    //         if (count($detJadwal) > 0){
-    //             for ($i=0;$i < count($detJadwal);$i++){
-                   
-    //                 $strSQL = "select no_jadwal from dgw_jadwal where tgl_berangkat='".$detJadwal[$i]['tgl_berangkat']."' and no_paket='".$detJadwal[$i]['no_paket']."' and kode_lokasi='".$kode_lokasi."'";					
-    //                 $res = DB::connection('sqlsrvdago')->select($strSQL); 
-    //                 $res = json_decode(json_encode($res),true);
-    //                 if (count($res) > 0){
-    //                     $line = $res[0];
-    //                     $detJadwal[$i]['no_jadwal'] = $line[$i]['no_jadwal'];
-    //                 }								
-    //                 else $detJadwal[$i]['no_jadwal'] = "ID";
-    //             }
-    //         }
+        try {
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $del = DB::connection('sqlsrvdago')->table('dgw_peserta')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_peserta', $request->no_peserta)
+            ->delete();		
+            
+            $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' 
+            ";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){
+                $foto = $res[0]['file_gambar'];
+                if($foto != "" || $foto != "-"){
+                    Storage::disk('s3')->delete('dago/'.$foto);
+                }
+            }else{
+                $foto = "-";
+            }
+
+            if($request->hasfile('foto')){
 
 
-    //         $del = DB::connection('sqlsrvdago')->table('dgw_paket')
-    //         ->where('kode_lokasi', $kode_lokasi)
-    //         ->where('no_paket', $request->no_paket)
-    //         ->delete();		
+                $file = $request->file('foto');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('dago/'.$foto)){
+                    Storage::disk('s3')->delete('dago/'.$foto);
+                }
+                Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
+                
+            }else{
 
-    //         $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_paket(
-    //         no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?)', array($request->no_paket,$request->nama,$request->kode_curr,$request->jenis, $request->kode_produk, $request->tarif_agen,$kode_lokasi));
-            
-    //         $del2 = DB::connection('sqlsrvdago')->table('dgw_harga')
-    //         ->where('kode_lokasi', $kode_lokasi)
-    //         ->where('no_paket', $request->no_paket)
-    //         ->delete();		
-    //         $detHarga = $request->data_harga;
-    //         if (count($detHarga) > 0){
-    //             for ($i=0;$i < count($detHarga);$i++){
-    //                 $ins2[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_harga(no_paket,kode_harga,harga,harga_se,harga_e,fee,kode_lokasi,curr_fee) values (?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$detHarga[$i]['kode_harga'],$detHarga[$i]['harga'],$detHarga[$i]['harga_se'],$detHarga[$i]['harga_e'],$detHarga[$i]['fee'],$kode_lokasi,$detHarga[$i]['curr_fee']));
-    //             }						
-    //         }
-            
-    //         $strSQL = "select isnull(max(no_jadwal),0) + 1 as id_jadwal from dgw_jadwal where no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";	
-            
-    //         $res = DB::connection('sqlsrvdago')->select($strSQL); 
-    //         $res = json_decode(json_encode($res),true);
-    //         if (count($res) > 0){
-    //             $line = $res[0];							
-    //             $idJadwal = intval($line['id_jadwal']);
-    //         } 
-            
-    //         $del3 = DB::connection('sqlsrvdago')->table('dgw_jadwal')
-    //         ->where('kode_lokasi', $kode_lokasi)
-    //         ->where('no_paket', $request->no_paket)
-    //         ->delete();		
-    //         $detJadwal = $request->data_jadwal;
-    //         if (count($detJadwal) > 0){
-    //             for ($i=0;$i < count($detJadwal);$i++){
-                    
-    //                 $ins3[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_jadwal(no_paket,no_jadwal,tgl_berangkat,lama_hari,quota,quota_se,quota_e,kode_lokasi, no_closing,kurs_closing,id_pbb,tgl_datang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$idJadwal,$detJadwal[$i]['tgl_berangkat'],$detJadwal[$i]['lama_hari'],$detJadwal[$i]['quota'],$detJadwal[$i]['quota_se'],$detJadwal[$i]['quota_e'],$kode_lokasi,'-',0,'-',$detJadwal[$i]['tgl_datang']));   
-    //                 $idJadwal = $idJadwal + 1;	
-    //             }						
-    //         }
-            
-    //         DB::connection('sqlsrvdago')->commit();
-    //         $success['status'] = "SUCCESS";
-    //         $success['message'] = "Data Paket berhasil diubah";
-    //         return response()->json($success, $this->successStatus); 
-    //     } catch (\Throwable $e) {
-    //         DB::connection('sqlsrvdago')->rollback();
-    //         $success['status'] = "FAILED";
-    //         $success['message'] = "Data Paket gagal diubah ".$e;
-    //         return response()->json($success, $this->successStatus); 
-    //     }	
-    // }
+                $foto="-";
+            }
 
-    // /**
-    //  * Remove the specified resource from storage.
-    //  *
-    //  * @param  \App\Fs  $Fs
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function destroy(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'no_paket' => 'required'
-    //     ]);
-    //     DB::connection('sqlsrvdago')->beginTransaction();
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
+            
+            DB::connection('sqlsrvdago')->commit();
+            $success['status'] = "SUCCESS";
+            $success['message'] = "Data Paket berhasil diubah";
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvdago')->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Paket gagal diubah ".$e;
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_peserta' => 'required'
+        ]);
+        DB::connection('sqlsrvdago')->beginTransaction();
         
-    //     try {
-    //         if($data =  Auth::guard('dago')->user()){
-    //             $nik= $data->nik;
-    //             $kode_lokasi= $data->kode_lokasi;
-    //         }
+        try {
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $strSQL = "select count(*) as jml from dgw_reg where no_peserta='".$request->no_peserta."' and kode_lokasi='".$kode_lokasi."'";					
+            $res = DB::connection('sqlsrvdago')->select($strSQL); 
+            $res = json_decode(json_encode($res),true);
+            if (count($res) > 0){
+                $line = $res[0];							
+                if ($line['jml'] != 0) {
+                    $msg = "Jamaah tidak dapat dihapus. Jamaah telah melakukan registrasi umroh/haji";
+                    $sts = "FAILED";		
+                }
+            }else{
+                $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' 
+                ";
+                $res = DB::connection('sqlsrv2')->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_gambar'];
+                    if($foto != "" || $foto != "-"){
+                        Storage::disk('s3')->delete('dago/'.$foto);
+                    }
+                }else{
+                    $foto = "-";
+                }
+                $del = DB::connection('sqlsrvdago')->table('dgw_jamaah')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_peserta', $request->no_peserta)
+                ->delete();
+                
+                DB::connection('sqlsrvdago')->commit();
+                $msg = "Data Jamaah berhasil dihapus";
+                $sts = "SUCCESS";
+            } 
+
+            $success['status'] = $sts;
+            $success['message'] = $msg;
             
-    //         $del = DB::connection('sqlsrvdago')->table('dgw_paket')
-    //         ->where('kode_lokasi', $kode_lokasi)
-    //         ->where('no_paket', $request->no_paket)
-    //         ->delete();
-
-    //         $strSQL = "select count(*) as jml from dgw_jadwal where no_closing <> '-' and  no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";					
-    //         $res = DB::connection('sqlsrvdago')->select($strSQL); 
-    //         $res = json_decode(json_encode($res),true);
-    //         if (count($res) > 0){
-    //             $line = $res[0];							
-    //             if ($line['jml'] != 0) {
-    //                 $msg = "Paket tidak dapat dihapus. Terdapat jadwal yang sudah di closing.";
-    //                 $sts = "FAILED";		
-    //             }
-    //         }else{
-    //             $msg = "Data Paket berhasil dihapus";
-    //             $sts = "SUCCESS";
-    //             $del = DB::connection('sqlsrvdago')->table('dgw_paket')
-    //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_paket', $request->no_paket)
-    //             ->delete();
-
-    //             $del2 = DB::connection('sqlsrvdago')->table('dgw_harga')
-    //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_paket', $request->no_paket)
-    //             ->delete();
-
-    //             $del3 = DB::connection('sqlsrvdago')->table('dgw_jadwal')
-    //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_paket', $request->no_paket)
-    //             ->delete();
-
-    //             DB::connection('sqlsrvdago')->commit();
-    //         } 
-
-    //         $success['status'] = $sts;
-    //         $success['message'] = $msg;
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvdago')->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Paket gagal dihapus ".$e;
             
-    //         return response()->json($success, $this->successStatus); 
-    //     } catch (\Throwable $e) {
-    //         DB::connection('sqlsrvdago')->rollback();
-    //         $success['status'] = "FAILED";
-    //         $success['message'] = "Data Paket gagal dihapus ".$e;
-            
-    //         return response()->json($success, $this->successStatus); 
-    //     }	
-    // }
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
 }

@@ -95,6 +95,10 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
 
     //Jamaah
     $router->get('jamaah','Dago\JamaahController@index');
+    $router->post('jamaah','Dago\JamaahController@store');
+    $router->get('jamaah-detail','Dago\JamaahController@edit');
+    $router->post('jamaah-ubah','Dago\JamaahController@update');
+    $router->delete('jamaah','Dago\JamaahController@destroy');
 
 });
 

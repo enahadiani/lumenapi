@@ -118,7 +118,7 @@ class PaketController extends Controller
             if($this->isUnik($request->no_paket,$kode_lokasi)){
 
                 $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_paket(
-                no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?)', array($request->no_paket,$request->nama,$request->kode_curr,$request->jenis, $request->kode_produk, $request->tarif_agen,$kode_lokasi));
+                no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?)', array($request->no_paket,$request->nama,$request->kode_curr,$request->jenis, $request->kode_produk, $request->tarif_agen,$kode_lokasi));
 
                 $detHarga = $request->data_harga;
 
@@ -277,7 +277,7 @@ class PaketController extends Controller
             ->delete();		
 
             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_paket(
-            no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?)', array($request->no_paket,$request->nama,$request->kode_curr,$request->jenis, $request->kode_produk, $request->tarif_agen,$kode_lokasi));
+            no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?)', array($request->no_paket,$request->nama,$request->kode_curr,$request->jenis, $request->kode_produk, $request->tarif_agen,$kode_lokasi));
             
             $del2 = DB::connection('sqlsrvdago')->table('dgw_harga')
             ->where('kode_lokasi', $kode_lokasi)
@@ -342,11 +342,6 @@ class PaketController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $del = DB::connection('sqlsrvdago')->table('dgw_paket')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_paket', $request->no_paket)
-            ->delete();
 
             $strSQL = "select count(*) as jml from dgw_jadwal where no_closing <> '-' and  no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";					
             $res = DB::connection('sqlsrvdago')->select($strSQL); 
