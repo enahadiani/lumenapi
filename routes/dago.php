@@ -38,10 +38,10 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->delete('pekerjaan','Dago\PekerjaanController@destroy');
 
     //Dokumen
-    $router->get('dokumen','Dago\DokumenController@index');
-    $router->post('dokumen','Dago\DokumenController@store');
-    $router->put('dokumen','Dago\DokumenController@update');
-    $router->delete('dokumen','Dago\DokumenController@destroy');
+    $router->get('masterdokumen','Dago\DokumenController@index');
+    $router->post('masterdokumen','Dago\DokumenController@store');
+    $router->put('masterdokumen','Dago\DokumenController@update');
+    $router->delete('masterdokumen','Dago\DokumenController@destroy');
 
     //Jenis Harga
     $router->get('jenis-harga','Dago\JenisHargaController@index');
@@ -99,6 +99,18 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('jamaah-detail','Dago\JamaahController@edit');
     $router->post('jamaah-ubah','Dago\JamaahController@update');
     $router->delete('jamaah','Dago\JamaahController@destroy');
+
+    //Filter Laporan
+    $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
+    $router->get('filter-paket','Dago\LaporanController@getFilterPaket');
+    $router->get('filter-jadwal','Dago\LaporanController@getFilterJadwal');
+    $router->get('filter-noreg','Dago\LaporanController@getFilterNoReg');
+    $router->get('filter-peserta','Dago\LaporanController@getFilterPeserta');
+
+    //Laporan
+    $router->get('lap-mku-operasional','Dago\LaporanController@getMkuOperasional');
+    $router->get('lap-mku-keuangan','Dago\LaporanController@getMkuKeuangan');
+
 
 });
 
