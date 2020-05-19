@@ -91,7 +91,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondWithToken($token);
+        return $this->respondWithToken($token,'user');
     }
 
     public function loginAdmin(Request $request)
@@ -108,7 +108,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondAdminWithToken($token);
+        return $this->respondWithToken($token,'admin');
     }
 
     public function loginYpt(Request $request)
@@ -125,7 +125,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondYptWithToken($token);
+        return $this->respondWithToken($token,'ypt');
     }
 
     public function loginYptKug(Request $request)
@@ -142,7 +142,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondYptKugWithToken($token);
+        return $this->respondWithToken($token,'yptkug');
     }
 
     public function loginSju(Request $request)
@@ -159,7 +159,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondSjuWithToken($token);
+        return $this->respondWithToken($token,'sju');
     }
 
     public function loginRtrw(Request $request)
@@ -176,7 +176,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondRtrwWithToken($token);
+        return $this->respondWithToken($token,'rtrw');
     }
 
     public function loginTarbak(Request $request)
@@ -193,7 +193,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondTarbakWithToken($token);
+        return $this->respondWithToken($token,'tarbak');
     }
 
     public function loginSiswa(Request $request)
@@ -210,7 +210,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondSiswaWithToken($token);
+        return $this->respondWithToken($token,'siswa');
     }
 
     public function loginDago(Request $request)
@@ -227,7 +227,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondDagoWithToken($token);
+        return $this->respondWithToken($token,'dago');
     }
 
     public function hashPassword(){
