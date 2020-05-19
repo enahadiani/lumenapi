@@ -145,6 +145,12 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('lap-dokumen','Dago\LaporanController@getDokumen');
     $router->get('lap-jamaah','Dago\LaporanController@getJamaah');
 
+    $router->get('lap-form-registrasi','Dago\LaporanController@getFormRegistrasi');
+    $router->get('lap-registrasi','Dago\LaporanController@getRegistrasi');
+    $router->get('lap-pembayaran','Dago\LaporanController@getPembayaran');
+    $router->get('lap-rekap-saldo','Dago\LaporanController@getRekapSaldo');
+    $router->get('lap-kartu-pembayaran','Dago\LaporanController@getKartuPembayaran');
+
 
 });
 

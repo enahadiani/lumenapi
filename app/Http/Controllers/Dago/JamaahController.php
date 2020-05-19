@@ -38,9 +38,9 @@ class JamaahController extends Controller
 
     public function index(Request $request)
     {
-        $this->validate($request, [
-            'no_jamaah' => 'required'
-        ]);
+        // $this->validate($request, [
+        //     'no_jamaah' => 'required'
+        // ]);
 
         try {
             
@@ -48,52 +48,52 @@ class JamaahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->no_jamaah)){
-                if($request->no_jamaah == "all"){
-                    $filter = "";
-                }else{
+            // if(isset($request->no_jamaah)){
+            //     if($request->no_jamaah == "all"){
+            //         $filter = "";
+            //     }else{
 
-                    $filter = " and no_peserta='$request->no_jamaah' ";
-                }
-            }else{
-                $filter = "";
-            }
+            //         $filter = " and no_peserta='$request->no_jamaah' ";
+            //     }
+            // }else{
+            //     $filter = "";
+            // }
 
             $res = DB::connection('sqlsrvdago')->select("select no_peserta, kode_lokasi, id_peserta, nama, jk, status, alamat, kode_pos, telp, hp, email, pekerjaan, bank, cabang, norek, namarek, nopass, kantor_mig, sp, ec_telp, ec_hp, issued, ex_pass, tempat, tgl_lahir, th_haji, 
             th_umroh, ibu, foto, ayah, pendidikan
             from dgw_peserta
-            where kode_lokasi='".$kode_lokasi."' $filter ");
+            where kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                for($i=0;$i < count($res);$i++){
-                    $res2 = DB::connection('sqlsrvdago')->select("select case when a.kode_curr = 'IDR' then a.nilai_p+a.nilai_t+a.nilai_m else (a.nilai_p*a.kurs)+a.nilai_t+a.nilai_m end as nilai_bayar
-                    from dgw_pembayaran a
-                    inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
-                    inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and c.no_peserta = '".$res[$i]['no_peserta']."'
-                    order by b.tanggal");
-                    $res[$i]['payments'] = array();
-                    $no=1;
-                    foreach ($res2 as $row) {
-                        $res[$i]['payments'][] = array($no => $row->nilai_bayar);
-                        $no++;
-                    }   
+                // for($i=0;$i < count($res);$i++){
+                //     $res2 = DB::connection('sqlsrvdago')->select("select case when a.kode_curr = 'IDR' then a.nilai_p+a.nilai_t+a.nilai_m else (a.nilai_p*a.kurs)+a.nilai_t+a.nilai_m end as nilai_bayar
+                //     from dgw_pembayaran a
+                //     inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
+                //     inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+                //     where a.kode_lokasi='$kode_lokasi' and c.no_peserta = '".$res[$i]['no_peserta']."'
+                //     order by b.tanggal");
+                //     $res[$i]['payments'] = array();
+                //     $no=1;
+                //     foreach ($res2 as $row) {
+                //         $res[$i]['payments'][] = array($no => $row->nilai_bayar);
+                //         $no++;
+                //     }   
 
-                    $res3 = DB::connection('sqlsrvdago')->select("select ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
-                    from dgw_dok a 
-                    left join dgw_reg_dok b on a.no_dokumen=b.no_dok
-                    left join dgw_reg d on b.no_reg = d.no_reg  
-                    left join dgw_scan c on a.no_dokumen=c.modul and c.no_bukti = b.no_reg and c.no_bukti=d.no_reg
-                    where d.no_peserta = '".$res[$i]['no_peserta']."'
-                    order by a.no_dokumen ");
-                    $res3 = json_decode(json_encode($res3),true);
-                    if(count($res3) > 0){
-                        $res[$i]['documents'] = $res3;
-                    }else{
-                        $res[$i]['documents'] = array();
-                    }
-                }
+                //     $res3 = DB::connection('sqlsrvdago')->select("select ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
+                //     from dgw_dok a 
+                //     left join dgw_reg_dok b on a.no_dokumen=b.no_dok
+                //     left join dgw_reg d on b.no_reg = d.no_reg  
+                //     left join dgw_scan c on a.no_dokumen=c.modul and c.no_bukti = b.no_reg and c.no_bukti=d.no_reg
+                //     where d.no_peserta = '".$res[$i]['no_peserta']."'
+                //     order by a.no_dokumen ");
+                //     $res3 = json_decode(json_encode($res3),true);
+                //     if(count($res3) > 0){
+                //         $res[$i]['documents'] = $res3;
+                //     }else{
+                //         $res[$i]['documents'] = array();
+                //     }
+                // }
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
