@@ -161,7 +161,7 @@ class JamaahController extends Controller
             }
             
             $tahun = date('y');
-            $no_peserta = generateKode("dgw_peserta", "no_peserta", $tahun, "00001");
+            $no_peserta = $this->generateKode("dgw_peserta", "no_peserta", $tahun, "00001");
 
             if($request->hasfile('foto')){
 

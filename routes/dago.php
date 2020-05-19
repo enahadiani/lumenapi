@@ -105,6 +105,25 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('registrasi-detail','Dago\RegistrasiController@edit');
     $router->put('registrasi','Dago\RegistrasiController@update');
     $router->delete('registrasi','Dago\RegistrasiController@destroy');
+    $router->get('biaya-tambahan','Dago\RegistrasiController@getBiayaTambahan');
+    $router->get('biaya-dokumen','Dago\RegistrasiController@getBiayaDokumen');
+    $router->get('pp','Dago\RegistrasiController@getPP');
+    $router->get('harga','Dago\RegistrasiController@getHarga');
+    $router->get('quota','Dago\RegistrasiController@getQuota');
+    $router->get('harga-room','Dago\RegistrasiController@getHargaRoom');
+    $router->get('no-marketing','Dago\RegistrasiController@getNoMarketing');
+    $router->get('registrasi-preview','Dago\RegistrasiController@getPreview');
+    
+    //Pembayaran
+    $router->get('pembayaran','Dago\RegistrasiController@index');
+    $router->get('pembayaran-reg','Dago\RegistrasiController@getRegistrasi');
+    $router->post('pembayaran','Dago\RegistrasiController@store');
+    $router->get('pembayaran-detail','Dago\RegistrasiController@show');
+    $router->get('pembayaran-edit','Dago\RegistrasiController@edit');
+    $router->put('pembayaran','Dago\RegistrasiController@update');
+    $router->delete('pembayaran','Dago\RegistrasiController@destroy');
+    $router->get('pembayaran-rekbank','Dago\RegistrasiController@getRekBank');
+    $router->get('pembayaran-preview','Dago\RegistrasiController@getPreview');
 
     //Registrasi Group
     $router->get('registrasi-group','Dago\RegistrasiGroupController@getGroup');

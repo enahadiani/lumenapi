@@ -124,7 +124,7 @@ class RegistrasiController extends Controller
             }
             
             $tahun = date('y');
-            $no_reg = generateKode("dgw_reg", "no_reg", "REG/".substr($request->periode,2,4)."/", "0001");
+            $no_reg = $this->generateKode("dgw_reg", "no_reg", "REG/".substr($request->periode,2,4)."/", "0001");
             
             $ins = DB::connection('sqlsrvdago')->insert("insert into dgw_history_jadwal(no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$request->paket,$request->jadwal,'-','-',$kode_lokasi));
 
@@ -225,7 +225,7 @@ class RegistrasiController extends Controller
                 $success['data'] = $res;
                 $success['biaya_tambahan'] = $res2;
                 $success['biaya_dokumen'] = $res3;
-                $success['dokymen'] = $res4;
+                $success['dokumen'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
@@ -233,7 +233,7 @@ class RegistrasiController extends Controller
                 $success['data'] = [];
                 $success['biaya_tambahan'] = [];
                 $success['biaya_dokumen'] = [];
-                $success['dokymen'] = [];
+                $success['dokumen'] = [];
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
@@ -301,7 +301,7 @@ class RegistrasiController extends Controller
             }
             
             $tahun = date('y');
-            $no_reg = generateKode("dgw_reg", "no_reg", "REG/".substr($request->periode,2,4)."/", "0001");
+            $no_reg = $request->no_reg;
 
             $del = DB::connection('sqlsrvdago')->table('dgw_reg')
                 ->where('kode_lokasi', $kode_lokasi)
@@ -415,13 +415,13 @@ class RegistrasiController extends Controller
                 ->delete();	
 
             $success['status'] = true;
-            $success['message'] = "Data Paket berhasil dihapus ";
+            $success['message'] = "Data Registrasi berhasil dihapus ";
             DB::connection('sqlsrvdago')->commit();
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
             $success['status'] = "FAILED";
-            $success['message'] = "Data Paket gagal dihapus ".$e;
+            $success['message'] = "Data Registrasi gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
