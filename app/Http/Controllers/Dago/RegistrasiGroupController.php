@@ -420,4 +420,338 @@ class RegisterController extends Controller
             return response()->json($success, $this->successStatus); 
         }	
     }
+
+    public function getBiayaTambahan()
+    {
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection('sqlsrvdago')->select("select kode_biaya, nama, nilai from dgw_biaya where jenis = 'TAMBAHAN' and kode_lokasi='$kode_lokasi'");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getBiayaDokumen()
+    {
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection('sqlsrvdago')->select("select kode_biaya, nama, nilai from dgw_biaya where jenis = 'DOKUMEN' and kode_lokasi='$kode_lokasi'");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPP()
+    {
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select kode_pp, nama from pp where flag_aktif='1' and kode_lokasi = '$kode_lokasi'";
+            
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql="select kode_pp from karyawan_pp where nik='".$_SESSION['userLog']."' and kode_lokasi = '$kode_lokasi'";
+            $res2 = DB::connection('sqlsrvdago')->select($sql);
+            $res2 = json_decode(json_encode($res2),true);
+            $success["kodePP"]= $res2[0]['kode_pp'];
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getHarga()
+    {
+        $this->validate($request, [
+            'no_paket' => 'required',
+            'jenis_paket' => 'required',
+            'jenis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select harga,harga_se,harga_e from dgw_harga where no_paket ='".$request->no_paket."' and kode_harga ='".$request->jenis_paket."' and kode_lokasi='$kode_lokasi'";
+            
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                if ($request->jenis == "STANDAR") $harga = $res[0]['harga'];
+                if ($request->jenis == "SEMI") $harga = $res[0]['harga_se'];
+                if ($request->jenis == "EKSEKUTIF") $harga = $res[0]['harga_e'];	
+
+                $success['harga']= $harga;
+                $success['status'] = "SUCCESS";
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['harga'] = 0;
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }   
+    }
+
+    public function getQuota()
+    {
+        $this->validate($request, [
+            'no_paket' => 'required',
+            'jadwal' => 'required',
+            'jenis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.tgl_berangkat,a.lama_hari,b.kode_curr 
+            from dgw_jadwal a 
+            inner join dgw_paket b on a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi 
+            where a.no_paket='".$request->no_paket."' and a.no_jadwal='".$request->jadwal."' and a.kode_lokasi='$kode_lokasi'";
+            
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+               
+                $tgl_berangkat = $res[0]['tgl_berangkat'];
+                $kode_curr = $res[0]['kode_curr'];
+                $lama_hari = $res[0]['lama_hari'];
+                
+                if ($request->jenis == "STANDAR") $strSQL="select quota as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";				
+                if ($request->jenis == "SEMI") $strSQL="select quota_se as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";				
+                if ($request->jenis == "EKSEKUTIF") $strSQL="select quota_e as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";	
+                if($request->jenis == "") {
+                    $strSQL = "select quota+quota_se+quota_e as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";
+                    $filter_jenis = "";
+                }else{
+                    $filter_jenis = " and jenis='".$request->jenis."' ";
+                }
+                
+                $res2 = DB::connection('sqlsrvdago')->select($strSQL);
+                $res2 = json_decode(json_encode($res2),true);
+                if(count($res2) > 0){
+                    $quota1 = $res2[0]['quota1'];
+                }
+    
+                $strSQL="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
+                $res3 = DB::connection('sqlsrvdago')->select($strSQL);
+                $res3 = json_decode(json_encode($res3),true);
+                if(count($res3) > 0){
+                    $jumlah = $res3[0]['jumlah'];
+                }
+
+                $quota = $quota1-$jumlah;
+                
+                $success['tgl_berangkat']= $tgl_berangkat;
+                $success['kode_curr']= $kode_curr;
+                $success['lama_hari']= $lama_hari;
+                $success['quota']= $quota;
+                $success['status'] = "SUCCESS";
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['tgl_berangkat']= NULL;
+                $success['kode_curr']= '';
+                $success['lama_hari']= 0;
+                $success['quota']= 0;
+                $success['message'] = "Data Kosong!";
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getHargaRoom()
+    {
+        $this->validate($request, [
+            'kode_curr' => 'required',
+            'type_room' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $strSQL="select harga  
+            from dgw_typeroom 
+            where kode_curr ='".$request->kode_curr."' and no_type='".$request->type_room."' and kode_lokasi='".$kode_lokasi."'";	
+            
+            $res = DB::connection('sqlsrvdago')->select($strSQL);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['harga_room']= $res[0]['harga'];
+                $success['status'] = "SUCCESS";
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['harga_room'] = 0;
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }   
+    }
+
+    public function getNoMarketing()
+    {
+        $this->validate($request, [
+            'no_agen' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select kode_marketing from dgw_agent where no_agen= '".$request->no_agen."' and kode_lokasi = '$kode_lokasi'";	
+            
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['marketing']= $res[0]['kode_marketing'];
+                $success['status'] = "SUCCESS";
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['marketing'] = '';
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }   
+    }
+
+    public function getPreview()
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('dago')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_reg,b.alamat, a.no_quota, a.uk_pakaian, b.hp, a.no_peserta, b.nopass, b.norek, b.nama as peserta, b.status, a.no_paket, c.nama as namapaket, a.no_jadwal, d.tgl_berangkat, a.no_agen, e.nama_agen, a.no_type, f.nama as type, a.harga, h.nama_marketing, a.kode_lokasi,b.id_peserta,b.jk,b.tgl_lahir,b.tempat,b.th_umroh,b.th_haji,b.pekerjaan,b.kantor_mig,b.hp,b.telp,b.email,b.ec_telp,a.info,a.uk_pakaian,a.diskon,a.no_peserta_ref,isnull(a.brkt_dgn,'-') as brkt_dgn,isnull(a.hubungan,'-') as hubungan,isnull(a.referal,'-') as referal,g.nama as nama_pekerjaan,c.jenis as jenis_paket,a.harga_room
+            from dgw_reg a
+            inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi
+            left join dgw_agent e on a.no_agen=e.no_agen and a.kode_lokasi=e.kode_lokasi 
+            inner join dgw_typeroom f on a.no_type=f.no_type and a.kode_lokasi=f.kode_lokasi 
+            left join dgw_marketing h on a.no_marketing=h.no_marketing and a.kode_lokasi=h.kode_lokasi
+            inner join dgw_paket c on a.no_paket=c.no_paket and a.kode_lokasi=c.kode_lokasi 
+            inner join dgw_jadwal d on  a.no_paket=d.no_paket and a.no_jadwal=d.no_jadwal and a.kode_lokasi=d.kode_lokasi
+            inner join dgw_pekerjaan g on b.pekerjaan=g.id_pekerjaan and b.kode_lokasi=g.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_reg='$request->no_bukti' ";	
+            
+            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data']= $res;
+                $success['status'] = "SUCCESS";
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }   
+    }
 }
