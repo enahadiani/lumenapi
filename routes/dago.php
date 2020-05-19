@@ -106,6 +106,10 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->put('registrasi','Dago\RegistrasiController@update');
     $router->delete('registrasi','Dago\RegistrasiController@destroy');
 
+    //Registrasi Group
+    $router->get('registrasi-group','Dago\RegistrasiGroupController@getGroup');
+    $router->post('registrasi-group','Dago\RegistrasiGroupController@store');
+
     //Filter Laporan
     $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
     $router->get('filter-paket','Dago\LaporanController@getFilterPaket');

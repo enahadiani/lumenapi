@@ -223,11 +223,17 @@ class RegistrasiController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
+                $success['biaya_tambahan'] = $res2;
+                $success['biaya_dokumen'] = $res3;
+                $success['dokymen'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['biaya_tambahan'] = [];
+                $success['biaya_dokumen'] = [];
+                $success['dokymen'] = [];
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
