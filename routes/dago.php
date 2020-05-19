@@ -99,6 +99,13 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('jadwal','Dago\PaketController@index');
     $router->post('ubah-jadwal','Dago\PaketController@store');
 
+    //Registrasi
+    $router->get('registrasi','Dago\RegistrasiController@index');
+    $router->post('registrasi','Dago\RegistrasiController@store');
+    $router->get('registrasi-detail','Dago\RegistrasiController@edit');
+    $router->put('registrasi','Dago\RegistrasiController@update');
+    $router->delete('registrasi','Dago\RegistrasiController@destroy');
+
     //Filter Laporan
     $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
     $router->get('filter-paket','Dago\LaporanController@getFilterPaket');
