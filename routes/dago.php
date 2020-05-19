@@ -115,8 +115,8 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('registrasi-preview','Dago\RegistrasiController@getPreview');
     
     //Pembayaran
-    $router->get('pembayaran','Dago\RegistrasiController@index');
-    $router->get('pembayaran-reg','Dago\RegistrasiController@getRegistrasi');
+    $router->get('pembayaran','Dago\RegistrasiController@getRegistrasi');
+    $router->get('pembayaran-history','Dago\RegistrasiController@index');
     $router->post('pembayaran','Dago\RegistrasiController@store');
     $router->get('pembayaran-detail','Dago\RegistrasiController@show');
     $router->get('pembayaran-edit','Dago\RegistrasiController@edit');
