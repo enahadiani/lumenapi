@@ -120,21 +120,21 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('harga-room','Dago\RegistrasiController@getHargaRoom');
     $router->get('no-marketing','Dago\RegistrasiController@getNoMarketing');
     $router->get('registrasi-preview','Dago\RegistrasiController@getPreview');
-    
-    //Pembayaran
-    $router->get('pembayaran','Dago\RegistrasiController@getRegistrasi');
-    $router->get('pembayaran-history','Dago\RegistrasiController@index');
-    $router->post('pembayaran','Dago\RegistrasiController@store');
-    $router->get('pembayaran-detail','Dago\RegistrasiController@show');
-    $router->get('pembayaran-edit','Dago\RegistrasiController@edit');
-    $router->put('pembayaran','Dago\RegistrasiController@update');
-    $router->delete('pembayaran','Dago\RegistrasiController@destroy');
-    $router->get('pembayaran-rekbank','Dago\RegistrasiController@getRekBank');
-    $router->get('pembayaran-preview','Dago\RegistrasiController@getPreview');
 
     //Registrasi Group
     $router->get('registrasi-group','Dago\RegistrasiGroupController@getGroup');
     $router->post('registrasi-group','Dago\RegistrasiGroupController@store');
+    
+    //Pembayaran
+    $router->get('pembayaran','Dago\PembayaranController@getRegistrasi');
+    $router->get('pembayaran-history','Dago\PembayaranController@index');
+    $router->post('pembayaran','Dago\PembayaranController@store');
+    $router->get('pembayaran-detail','Dago\PembayaranController@show');
+    $router->get('pembayaran-edit','Dago\PembayaranController@edit');
+    $router->put('pembayaran','Dago\PembayaranController@update');
+    $router->delete('pembayaran','Dago\PembayaranController@destroy');
+    $router->get('pembayaran-rekbank','Dago\PembayaranController@getRekBank');
+    $router->get('pembayaran-preview','Dago\PembayaranController@getPreview');
 
     //Filter Laporan
     $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');

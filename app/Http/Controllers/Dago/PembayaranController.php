@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class RegistrasiController extends Controller
+class PembayaranController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -122,19 +122,20 @@ class RegistrasiController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'tanggal' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
             'no_reg' => 'required',
             'deskripsi' => 'required',
             'kode_pp' => 'required',
             'kode_akun' => 'required',
             'akun_titip' => 'required',
             'paket' => 'required',
-            'tgl_berangkat' => 'required',
-            'status_bayar' => 'required',
-            'total_bayar' => 'required',
-            'bayar_paket' => 'required',
-            'bayar_tambahan' => 'required',
-            'bayar_dok' => 'required',
+            'tgl_berangkat' => 'required|date_format:Y-m-d',
+            'status_bayar' => 'required|in:TUNAI,TRANSFER',
+            'total_bayar' => 'required|integer',
+            'bayar_paket' => 'required|integer',
+            'bayar_tambahan' => 'required|integer',
+            'bayar_dok' => 'required|integer',
+            'biaya' => 'required|array',
             'biaya.*.kode_biaya' => 'required',
             'biaya.*.jenis_biaya' => 'required',
             'biaya.*.kode_akun' => 'required',
@@ -153,7 +154,7 @@ class RegistrasiController extends Controller
             $d = DB::connection('sqlsrvdago')->select("select kode_spro,flag from spro where kode_spro in ('LKURS','RKURS','AKUNT','AKUND','AKUNOI','AKUNOE') and kode_lokasi = '".$kode_lokasi."'");
             $d = json_decode(json_encode($d),true);	
             if (count($d) > 0){
-				for ($i;$i<count($d);$i++){
+				for ($i=0;$i<count($d);$i++){
 					$line = $d[$i];	
 					if ($line['kode_spro'] == "AKUNOI") $akunOI = $line['flag'];
 					if ($line['kode_spro'] == "AKUNOE") $akunOE = $line['flag'];
@@ -166,14 +167,13 @@ class RegistrasiController extends Controller
             $ins = DB::connection('sqlsrvdago')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,'IDR','1',$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
 
             $ins2 = DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,0,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-            array_push($exec,$ins2);
                     
             $ins3 = DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,1,$request->akun_titip,'C',$bayarPaketIDR,$request->bayar_paket,$request->deskripsi,'KB','TTPPAKET','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));										
 
             if (intval($request->bayar_tambahan) != 0 || intval($request->bayar_dok) != 0 || intval($request->bayar_paket) != 0) {
                
                 $nilai_t=0;$nilai_d=0;$total_t=0;$total_d=0;$ser_t=array();$ser2_t=array();$ser_d=array();$ser2_d=array();$tes=array();
-                $biaya = $request->detail_biaya;
+                $biaya = $request->biaya;
                 for($i=0; $i<count($biaya);$i++){
                 
                     if(intval($biaya[$i]['bayar']) != 0){
@@ -186,10 +186,13 @@ class RegistrasiController extends Controller
                             
                             $akun_t = $biaya[$i]['kode_akun'];						
                             for ($c=0;$c <= $i;$c++){
-                                if ($akun_t == $biaya[$c-1]['kode_akun']) {
-                                    $isAda_t = true;
-                                    $idx_t = $c;
-                                    break;
+                                if(isset($biaya[$c-1]['kode_akun'])){
+
+                                    if ($akun_t == $biaya[$c-1]['kode_akun']) {
+                                        $isAda_t = true;
+                                        $idx_t = $c;
+                                        break;
+                                    }
                                 }
                             }
                             if (!$isAda_t) {							
@@ -209,10 +212,12 @@ class RegistrasiController extends Controller
                             
                             $akun_d = $biaya[$i]['kode_akun'];						
                             for ($c=0;$c <= $i;$c++){
-                                if ($akun_d == $biaya[$c-1]['kode_akun']) {
-                                    $isAda_d = true;
-                                    $idx_d = $c;
-                                    break;
+                                if(isset($biaya[$c-1]['kode_akun'])){
+                                    if ($akun_d == $biaya[$c-1]['kode_akun']) {
+                                        $isAda_d = true;
+                                        $idx_d = $c;
+                                        break;
+                                    }
                                 }
                             }
                             if (!$isAda_d) {							
@@ -241,17 +246,17 @@ class RegistrasiController extends Controller
                 $nu =3;
                 for($x=0; $x<count($ser_d);$x++){
                         
-                    $ins5[$i] =  DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$nu,$ser_d[$x],'C',$ser2_t[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                    $ins5[$i] =  DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$ser_d[$x],'C',$ser2_d[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
                     $nu++;
                         
                 }
             }		
             
-            $insp = DB::connection('sqlsrvdago')->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->biaya_tambahan,$request->biaya_paket,'IDR',1,$request->biaya_dokumen));
+            $insp = DB::connection('sqlsrvdago')->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,'IDR',1,$request->bayar_dok));
 
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";
-            $success['message'] = "Data Pembayaran berhasil disimpan";
+            $success['message'] = "Data Pembayaran berhasil disimpan. No Bukti:".$no_bukti;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -282,9 +287,9 @@ class RegistrasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $id = $request->no_reg;
             if(isset($request->no_bukti)){
                 $no_bukti = $request->no_bukti;
-                $id = $request->no_reg;
                 $sql = "select no_bukti,keterangan,param1 as kode_akun 
                 from trans_m 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_ref1='".$id."'";
@@ -415,9 +420,9 @@ class RegistrasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $id = $request->no_reg;
             if(isset($request->no_bukti)){
                 $no_bukti = $request->no_bukti;
-                $id = $request->no_reg;
                 $sql = "select no_bukti,keterangan,param1 as kode_akun 
                 from trans_m 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_ref1='".$id."'";
@@ -532,19 +537,20 @@ class RegistrasiController extends Controller
     {
         $this->validate($request, [
             'no_bukti' => 'required',
-            'tanggal' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
             'no_reg' => 'required',
             'deskripsi' => 'required',
             'kode_pp' => 'required',
             'kode_akun' => 'required',
             'akun_titip' => 'required',
             'paket' => 'required',
-            'tgl_berangkat' => 'required',
-            'status_bayar' => 'required',
-            'total_bayar' => 'required',
-            'bayar_paket' => 'required',
-            'bayar_tambahan' => 'required',
-            'bayar_dok' => 'required',
+            'tgl_berangkat' => 'required|date_format:Y-m-d',
+            'status_bayar' => 'required|in:TUNAI,TRANSFER',
+            'total_bayar' => 'required|integer',
+            'bayar_paket' => 'required|integer',
+            'bayar_tambahan' => 'required|integer',
+            'bayar_dok' => 'required|integer',
+            'biaya' => 'required|array',
             'biaya.*.kode_biaya' => 'required',
             'biaya.*.jenis_biaya' => 'required',
             'biaya.*.kode_akun' => 'required',
@@ -563,7 +569,7 @@ class RegistrasiController extends Controller
             $d = DB::connection('sqlsrvdago')->select("select kode_spro,flag from spro where kode_spro in ('LKURS','RKURS','AKUNT','AKUND','AKUNOI','AKUNOE') and kode_lokasi = '".$kode_lokasi."'");
             $d = json_decode(json_encode($d),true);	
             if (count($d) > 0){
-				for ($i;$i<count($d);$i++){
+				for ($i=0;$i<count($d);$i++){
 					$line = $d[$i];	
 					if ($line['kode_spro'] == "AKUNOI") $akunOI = $line['flag'];
 					if ($line['kode_spro'] == "AKUNOE") $akunOE = $line['flag'];
@@ -586,25 +592,24 @@ class RegistrasiController extends Controller
             
             $del3 = DB::connection('sqlsrvdago')->table('dgw_pembayaran')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
+                ->where('no_kwitansi', $request->no_bukti)
                 ->delete();	
             
             $del4 = DB::connection('sqlsrvdago')->table('dgw_pembayaran_d')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
+                ->where('no_kwitansi', $request->no_bukti)
                 ->delete();	
             
             $ins = DB::connection('sqlsrvdago')->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,'IDR','1',$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
 
             $ins2 = DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,0,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-            array_push($exec,$ins2);
                     
             $ins3 = DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,1,$request->akun_titip,'C',$bayarPaketIDR,$request->bayar_paket,$request->deskripsi,'KB','TTPPAKET','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));										
 
             if (intval($request->bayar_tambahan) != 0 || intval($request->bayar_dok) != 0 || intval($request->bayar_paket) != 0) {
                
                 $nilai_t=0;$nilai_d=0;$total_t=0;$total_d=0;$ser_t=array();$ser2_t=array();$ser_d=array();$ser2_d=array();$tes=array();
-                $biaya = $request->detail_biaya;
+                $biaya = $request->biaya;
                 for($i=0; $i<count($biaya);$i++){
                 
                     if(intval($biaya[$i]['bayar']) != 0){
@@ -617,10 +622,12 @@ class RegistrasiController extends Controller
                             
                             $akun_t = $biaya[$i]['kode_akun'];						
                             for ($c=0;$c <= $i;$c++){
-                                if ($akun_t == $biaya[$c-1]['kode_akun']) {
-                                    $isAda_t = true;
-                                    $idx_t = $c;
-                                    break;
+                                if(isset($biaya[$c-1]['kode_akun'])){
+                                    if ($akun_t == $biaya[$c-1]['kode_akun']) {
+                                        $isAda_t = true;
+                                        $idx_t = $c;
+                                        break;
+                                    }
                                 }
                             }
                             if (!$isAda_t) {							
@@ -640,10 +647,12 @@ class RegistrasiController extends Controller
                             
                             $akun_d = $biaya[$i]['kode_akun'];						
                             for ($c=0;$c <= $i;$c++){
-                                if ($akun_d == $biaya[$c-1]['kode_akun']) {
-                                    $isAda_d = true;
-                                    $idx_d = $c;
-                                    break;
+                                if(isset($biaya[$c-1]['kode_akun'])){
+                                    if ($akun_d == $biaya[$c-1]['kode_akun']) {
+                                        $isAda_d = true;
+                                        $idx_d = $c;
+                                        break;
+                                    }
                                 }
                             }
                             if (!$isAda_d) {							
@@ -672,13 +681,13 @@ class RegistrasiController extends Controller
                 $nu =3;
                 for($x=0; $x<count($ser_d);$x++){
                         
-                    $ins5[$i] =  DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$nu,$ser_d[$x],'C',$ser2_t[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                    $ins5[$i] =  DB::connection('sqlsrvdago')->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$ser_d[$x],'C',$ser2_d[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
                     $nu++;
                         
                 }
             }		
             
-            $insp = DB::connection('sqlsrvdago')->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->biaya_tambahan,$request->biaya_paket,'IDR',1,$request->biaya_dokumen));
+            $insp = DB::connection('sqlsrvdago')->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,'IDR',1,$request->bayar_dok));
 
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";
@@ -702,7 +711,7 @@ class RegistrasiController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'no_jamaah' => 'required'
+            'no_bukti' => 'required'
         ]);
         DB::connection('sqlsrvdago')->beginTransaction();
         
@@ -724,12 +733,12 @@ class RegistrasiController extends Controller
             
             $del3 = DB::connection('sqlsrvdago')->table('dgw_pembayaran')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
+                ->where('no_kwitansi', $request->no_bukti)
                 ->delete();	
             
             $del4 = DB::connection('sqlsrvdago')->table('dgw_pembayaran_d')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
+                ->where('no_kwitansi', $request->no_bukti)
                 ->delete();	
 
             $success['status'] = true;
