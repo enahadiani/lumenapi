@@ -102,8 +102,8 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->delete('jamaah','Dago\JamaahController@destroy');
 
     //Jadwal
-    $router->get('jadwal','Dago\PaketController@index');
-    $router->post('ubah-jadwal','Dago\PaketController@store');
+    $router->get('jadwal','Dago\JadwalController@index');
+    $router->put('jadwal','Dago\JadwalController@update');
 
     //Registrasi
     $router->get('registrasi','Dago\RegistrasiController@index');

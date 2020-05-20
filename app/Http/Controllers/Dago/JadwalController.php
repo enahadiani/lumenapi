@@ -25,7 +25,7 @@ class JadwalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
+            $res = DB::connection('sqlsrvdago')->select( "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -63,10 +63,11 @@ class JadwalController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
         $this->validate($request, [
             'no_paket' => 'required',
+            'data_jadwal' => 'required|array',
             'data_jadwal.*.no_jadwal' => 'required',
             'data_jadwal.*.tgl_berangkat' => 'required',
             'data_jadwal.*.tgl_baru' => 'required'
