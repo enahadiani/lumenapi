@@ -252,24 +252,24 @@ class JamaahController extends Controller
             'id_peserta' => 'required',
             'nama' => 'required',
             'tempat' => 'required',
-            'tgl_lahir' => 'required',
-            'jk' => 'required',
-            'status' => 'required',
+            'tgl_lahir' => 'required|date_format:Y-m-d',
+            'jk' => 'required|in:P,L',
+            'status' => 'required|in:-,Menikah,Belum Menikah',
             'ibu' => 'required',
             'ayah' => 'required',
             'alamat' => 'required',
             'kode_pos' => 'required',
             'telp' => 'required',
             'hp' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'pekerjaan' => 'required',
             'bank' => 'required',
             'norek' => 'required',
             'cabang' => 'required',
             'namarek' => 'required',
             'nopass' => 'required',
-            'issued' => 'required',
-            'ex_pass' => 'required',
+            'issued' => 'required|date_format:Y-m-d',
+            'ex_pass' => 'required|date_format:Y-m-d',
             'kantor_mig' => 'required',
             'ec_telp' => 'required',
             'ec_hp' => 'required',
@@ -296,7 +296,7 @@ class JamaahController extends Controller
             
             $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$no_peserta' 
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection('sqlsrvdago')->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){
@@ -365,31 +365,31 @@ class JamaahController extends Controller
                 $line = $res[0];							
                 if ($line['jml'] != 0) {
                     $msg = "Jamaah tidak dapat dihapus. Jamaah telah melakukan registrasi umroh/haji";
-                    $sts = "FAILED";		
-                }
-            }else{
-                $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' 
-                ";
-                $res = DB::connection('sqlsrv2')->select($sql);
-                $res = json_decode(json_encode($res),true);
-
-                if(count($res) > 0){
-                    $foto = $res[0]['file_gambar'];
-                    if($foto != "" || $foto != "-"){
-                        Storage::disk('s3')->delete('dago/'.$foto);
-                    }
+                    $sts = "FAILED";	
                 }else{
-                    $foto = "-";
-                }
-                $del = DB::connection('sqlsrvdago')->table('dgw_jamaah')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_peserta', $request->no_jamaah)
-                ->delete();
-                
-                DB::connection('sqlsrvdago')->commit();
-                $msg = "Data Jamaah berhasil dihapus";
-                $sts = "SUCCESS";
-            } 
+                    $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' 
+                    ";
+                    $res = DB::connection('sqlsrvdago')->select($sql);
+                    $res = json_decode(json_encode($res),true);
+                    if(count($res) > 0){
+                        $foto = $res[0]['file_gambar'];
+                        if($foto != "" || $foto != "-"){
+                            Storage::disk('s3')->delete('dago/'.$foto);
+                        }
+                    }else{
+                        $foto = "-";
+                    }
+                    $del = DB::connection('sqlsrvdago')->table('dgw_peserta')
+                    ->where('kode_lokasi', $kode_lokasi)
+                    ->where('no_peserta', $request->no_jamaah)
+                    ->delete();
+                    
+                    DB::connection('sqlsrvdago')->commit();
+                    $msg = "Data Jamaah berhasil dihapus";
+                    $sts = "SUCCESS";
+                } 	
+            }
+            
 
             $success['status'] = $sts;
             $success['message'] = $msg;
