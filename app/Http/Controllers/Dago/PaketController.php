@@ -90,22 +90,22 @@ class PaketController extends Controller
         $this->validate($request, [
             'no_paket' => 'required',
             'nama' => 'required',
-            'kode_curr' => 'required',
-            'jenis' => 'required',
+            'kode_curr' => 'required|in:IDR,USD',
+            'jenis' => 'required|in:REGULER,PLUS',
             'kode_produk' => 'required',
-            'tarif_agen' => 'required',
+            'tarif_agen' => 'required|integer',
             'data_harga.*.kode_harga' => 'required',
-            'data_harga.*.harga' => 'required',
-            'data_harga.*.harga_se' => 'required',
-            'data_harga.*.harga_e' => 'required',
-            'data_harga.*.fee' => 'required',
-            'data_harga.*.curr_fee' => 'required',
-            'data_jadwal.*.tgl_berangkat' => 'required',
-            'data_jadwal.*.lama_hari' => 'required',
-            'data_jadwal.*.quota' => 'required',
-            'data_jadwal.*.quota_se' => 'required',
-            'data_jadwal.*.quota_e' => 'required',
-            'data_jadwal.*.tgl_datang' => 'required'
+            'data_harga.*.harga' => 'required|integer',
+            'data_harga.*.harga_se' => 'required|integer',
+            'data_harga.*.harga_e' => 'required|integer',
+            'data_harga.*.fee' => 'required|integer',
+            'data_harga.*.curr_fee' => 'required|in:IDR,USD',
+            'data_jadwal.*.tgl_berangkat' => 'required|date_format:Y-m-d',
+            'data_jadwal.*.lama_hari' => 'required|integer',
+            'data_jadwal.*.quota' => 'required|integer',
+            'data_jadwal.*.quota_se' => 'required|integer',
+            'data_jadwal.*.quota_e' => 'required|integer',
+            'data_jadwal.*.tgl_datang' => 'required|date_format:Y-m-d'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();

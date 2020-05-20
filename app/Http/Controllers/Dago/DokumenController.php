@@ -89,7 +89,7 @@ class DokumenController extends Controller
         $this->validate($request, [
             'no_dokumen' => 'required',
             'deskripsi' => 'required',
-            'jenis' => 'required'
+            'jenis' => 'required|in:COPY,ASLI'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -101,7 +101,7 @@ class DokumenController extends Controller
             }
             if($this->isUnik($request->no_dokumen,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_dok(no_dokumen,deskripsi,kode_lokasi,jenis) values values (?, ?, ?)', array($request->no_dokumen,$request->deskripsi,$kode_lokasi,$request->jenis));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_dok(no_dokumen,deskripsi,kode_lokasi,jenis) values (?, ?, ?, ?)', array($request->no_dokumen,$request->deskripsi,$kode_lokasi,$request->jenis));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -146,7 +146,7 @@ class DokumenController extends Controller
         $this->validate($request, [
             'no_dokumen' => 'required',
             'deskripsi' => 'required',
-            'jenis' => 'required'
+            'jenis' => 'required|in:COPY,ASLI'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -162,7 +162,7 @@ class DokumenController extends Controller
             ->where('no_dokumen', $request->no_dokumen)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_dok(no_dokumen,deskripsi,kode_lokasi,jenis) values values (?, ?, ?)', array($request->no_dokumen,$request->deskripsi,$kode_lokasi,$request->jenis));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_dok(no_dokumen,deskripsi,kode_lokasi,jenis) values (?, ?, ?, ?)', array($request->no_dokumen,$request->deskripsi,$kode_lokasi,$request->jenis));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";

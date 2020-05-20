@@ -102,7 +102,7 @@ class JenisProdukController extends Controller
             }
             if($this->isUnik($request->kode_produk,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_produk(kode_produk,nama,kode_akun,akun_pdpt,akun_piutang,kode_lokasi) values values (?, ?, ?, ?, ?, ?)', array($request->kode_produk,$request->nama,$request->kode_akun,$request->akun_pdpt,$request->akun_piutang,$kode_lokasi));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_produk(kode_produk,nama,kode_akun,akun_pdpt,akun_piutang,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_produk,$request->nama,$request->kode_akun,$request->akun_pdpt,$request->akun_piutang,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -165,7 +165,7 @@ class JenisProdukController extends Controller
             ->where('kode_produk', $request->kode_produk)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_produk(kode_produk,nama,kode_akun,akun_pdpt,akun_piutang,kode_lokasi) values values (?, ?, ?, ?, ?, ?)', array($request->kode_produk,$request->nama,$request->kode_akun,$request->akun_pdpt,$request->akun_piutang,$kode_lokasi));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_produk(kode_produk,nama,kode_akun,akun_pdpt,akun_piutang,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_produk,$request->nama,$request->kode_akun,$request->akun_pdpt,$request->akun_piutang,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";

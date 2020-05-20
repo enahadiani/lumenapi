@@ -47,7 +47,7 @@ class AgenController extends Controller
             }
 
             $res = DB::connection('sqlsrvdago')->select( "select 
-            no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,no_rek,namarek,kode_marketing where kode_lokasi='".$kode_lokasi."' $filter ");
+            no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing from dgw_agent where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -91,14 +91,14 @@ class AgenController extends Controller
             'no_agen' => 'required',
             'nama_agen' => 'required',
             'alamat' => 'required',
-            'flag_aktif' => 'required',
+            'flag_aktif' => 'required|in:1,0',
             'tempat_lahir' => 'required',
-            'tgl_lahir' => 'required',
+            'tgl_lahir' => 'required|date_format:Y-m-d',
             'no_hp' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'bank' => 'required',
             'cabang' => 'required',
-            'no_rek' => 'required',
+            'norek' => 'required',
             'namarek' => 'required',
             'kode_marketing' => 'required'
         ]);
@@ -113,7 +113,7 @@ class AgenController extends Controller
             if($this->isUnik($request->no_agen,$kode_lokasi)){
 
                 $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_agent(
-                no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,no_rek,namarek,kode_marketing,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->no_rek,$request->namarek,$request->kode_marketing,$kode_lokasi));
+                no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->norek,$request->namarek,$request->kode_marketing,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -159,14 +159,14 @@ class AgenController extends Controller
             'no_agen' => 'required',
             'nama_agen' => 'required',
             'alamat' => 'required',
-            'flag_aktif' => 'required',
+            'flag_aktif' => 'required|in:1,0',
             'tempat_lahir' => 'required',
-            'tgl_lahir' => 'required',
+            'tgl_lahir' => 'required|date_format:Y-m-d',
             'no_hp' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'bank' => 'required',
             'cabang' => 'required',
-            'no_rek' => 'required',
+            'norek' => 'required',
             'namarek' => 'required',
             'kode_marketing' => 'required'
         ]);
@@ -185,7 +185,7 @@ class AgenController extends Controller
             ->delete();
 
             $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_agent(
-                no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,no_rek,namarek,kode_marketing,kode_lokasi) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->no_rek,$request->namarek,$request->kode_marketing,$kode_lokasi));
+                no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->norek,$request->namarek,$request->kode_marketing,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";

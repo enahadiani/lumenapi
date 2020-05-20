@@ -90,7 +90,7 @@ class TypeRoomController extends Controller
             'no_type' => 'required',
             'nama' => 'required',
             'harga' => 'required',
-            'kode_curr' => 'required'
+            'kode_curr' => 'required|in:USD,IDR'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -102,7 +102,7 @@ class TypeRoomController extends Controller
             }
             if($this->isUnik($request->no_type,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_cur) values values (?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_curr) values (?, ?, ?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -148,7 +148,7 @@ class TypeRoomController extends Controller
             'no_type' => 'required',
             'nama' => 'required',
             'harga' => 'required',
-            'kode_curr' => 'required'
+            'kode_curr' => 'required|in:USD,IDR'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -164,7 +164,7 @@ class TypeRoomController extends Controller
             ->where('no_type', $request->no_type)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_cur) values values (?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_curr) values (?, ?, ?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";

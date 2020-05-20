@@ -68,12 +68,18 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->delete('agen','Dago\AgenController@destroy');
 
     //Jenis Produk
-    $router->get('produk','Dago\ProdukController@index');
-    $router->post('produk','Dago\ProdukController@store');
-    $router->put('produk','Dago\ProdukController@update');
-    $router->delete('produk','Dago\ProdukController@destroy');
-    $router->get('akun-piutang','Dago\ProdukController@getAkunPiutang');
-    $router->get('akun-pdd','Dago\ProdukController@getAkunPDD');
+    $router->get('produk','Dago\JenisProdukController@index');
+    $router->post('produk','Dago\JenisProdukController@store');
+    $router->put('produk','Dago\JenisProdukController@update');
+    $router->delete('produk','Dago\JenisProdukController@destroy');
+    $router->get('akun-piutang','Dago\JenisProdukController@getAkunPiutang');
+    $router->get('akun-pdd','Dago\JenisProdukController@getAkunPDD');
+
+    //Jenis Produk
+    $router->get('produk','Dago\JenisProdukController@index');
+    $router->post('produk','Dago\JenisProdukController@store');
+    $router->put('produk','Dago\JenisProdukController@update');
+    $router->delete('produk','Dago\JenisProdukController@destroy');
 
     //Dokumen
     $router->get('masterdokumen','Dago\DokumenController@index');
@@ -82,7 +88,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->delete('masterdokumen','Dago\DokumenController@destroy');
 
     //Paket
-    $router->get('paket','Dago\PaketController@show');
+    $router->get('paket','Dago\PaketController@index');
     $router->post('paket','Dago\PaketController@store');
     $router->get('paket-detail','Dago\PaketController@edit');
     $router->put('paket','Dago\PaketController@update');

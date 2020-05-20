@@ -100,7 +100,7 @@ class JenisHargaController extends Controller
             }
             if($this->isUnik($request->kode_harga,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -160,7 +160,7 @@ class JenisHargaController extends Controller
             ->where('kode_harga', $request->kode_harga)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";

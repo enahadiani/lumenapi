@@ -89,7 +89,7 @@ class MarketingController extends Controller
         $this->validate($request, [
             'no_marketing' => 'required',
             'nama_marketing' => 'required',
-            'flag_aktif' => 'required'
+            'flag_aktif' => 'required|in:1,0'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -101,7 +101,7 @@ class MarketingController extends Controller
             }
             if($this->isUnik($request->no_marketing,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_marketing(no_marketing,nama,flag_aktif,kode_lokasi) values values (?, ?, ?, ?)', array($request->no_marketing,$request->nama,$request->flag_aktif,$kode_lokasi));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_marketing(no_marketing,nama_marketing,flag_aktif,kode_lokasi) values (?, ?, ?, ?)', array($request->no_marketing,$request->nama_marketing,$request->flag_aktif,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -145,8 +145,8 @@ class MarketingController extends Controller
     {
         $this->validate($request, [
             'no_marketing' => 'required',
-            'nama' => 'required',
-            'flag_aktif' => 'required'
+            'nama_marketing' => 'required',
+            'flag_aktif' => 'required|in:1,0'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -162,7 +162,7 @@ class MarketingController extends Controller
             ->where('no_marketing', $request->no_marketing)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_marketing(no_marketing,nama,flag_aktif,kode_lokasi) values values (?, ?, ?, ?)', array($request->no_marketing,$request->nama,$request->flag_aktif,$kode_lokasi));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_marketing(no_marketing,nama_marketing,flag_aktif,kode_lokasi) values (?, ?, ?, ?)', array($request->no_marketing,$request->nama_marketing,$request->flag_aktif,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";

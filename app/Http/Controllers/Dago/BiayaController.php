@@ -91,7 +91,7 @@ class BiayaController extends Controller
             'nama' => 'required',
             'nilai' => 'required',
             'akun_pdpt' => 'required',
-            'jenis' => 'required'
+            'jenis' => 'required|in:TAMBAHAN,DOKUMEN'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -103,7 +103,7 @@ class BiayaController extends Controller
             }
             if($this->isUnik($request->kode_biaya,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -150,7 +150,7 @@ class BiayaController extends Controller
             'nama' => 'required',
             'nilai' => 'required',
             'akun_pdpt' => 'required',
-            'jenis' => 'required'
+            'jenis' => 'required|in:TAMBAHAN,DOKUMEN'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -166,7 +166,7 @@ class BiayaController extends Controller
             ->where('kode_biaya', $request->kode_biaya)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";
