@@ -94,12 +94,14 @@ class PaketController extends Controller
             'jenis' => 'required|in:REGULER,PLUS',
             'kode_produk' => 'required',
             'tarif_agen' => 'required|integer',
+            'data_harga' => 'required|array',
             'data_harga.*.kode_harga' => 'required',
             'data_harga.*.harga' => 'required|integer',
             'data_harga.*.harga_se' => 'required|integer',
             'data_harga.*.harga_e' => 'required|integer',
             'data_harga.*.fee' => 'required|integer',
             'data_harga.*.curr_fee' => 'required|in:IDR,USD',
+            'data_jadwal' => 'required|array',
             'data_jadwal.*.tgl_berangkat' => 'required|date_format:Y-m-d',
             'data_jadwal.*.lama_hari' => 'required|integer',
             'data_jadwal.*.quota' => 'required|integer',
@@ -185,7 +187,7 @@ class PaketController extends Controller
             }
 
             $res = DB::connection('sqlsrvdago')->select( "select 
-            no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
+            no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen from dgw_paket where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection('sqlsrvdago')->select("select kode_harga,no_paket,harga,harga_se,fee,curr_fee from dgw_harga where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
@@ -229,22 +231,24 @@ class PaketController extends Controller
         $this->validate($request, [
             'no_paket' => 'required',
             'nama' => 'required',
-            'kode_curr' => 'required',
-            'jenis' => 'required',
+            'kode_curr' => 'required|in:IDR,USD',
+            'jenis' => 'required|in:REGULER,PLUS',
             'kode_produk' => 'required',
-            'tarif_agen' => 'required',
+            'tarif_agen' => 'required|integer',
+            'data_harga' => 'required|array',
             'data_harga.*.kode_harga' => 'required',
-            'data_harga.*.harga' => 'required',
-            'data_harga.*.harga_se' => 'required',
-            'data_harga.*.harga_e' => 'required',
-            'data_harga.*.fee' => 'required',
-            'data_harga.*.curr_fee' => 'required',
-            'data_jadwal.*.tgl_berangkat' => 'required',
-            'data_jadwal.*.lama_hari' => 'required',
-            'data_jadwal.*.quota' => 'required',
-            'data_jadwal.*.quota_se' => 'required',
-            'data_jadwal.*.quota_e' => 'required',
-            'data_jadwal.*.tgl_datang' => 'required'
+            'data_harga.*.harga' => 'required|integer',
+            'data_harga.*.harga_se' => 'required|integer',
+            'data_harga.*.harga_e' => 'required|integer',
+            'data_harga.*.fee' => 'required|integer',
+            'data_harga.*.curr_fee' => 'required|in:IDR,USD',
+            'data_jadwal' => 'required|array',
+            'data_jadwal.*.tgl_berangkat' => 'required|date_format:Y-m-d',
+            'data_jadwal.*.lama_hari' => 'required|integer',
+            'data_jadwal.*.quota' => 'required|integer',
+            'data_jadwal.*.quota_se' => 'required|integer',
+            'data_jadwal.*.quota_e' => 'required|integer',
+            'data_jadwal.*.tgl_datang' => 'required|date_format:Y-m-d'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();
@@ -259,12 +263,12 @@ class PaketController extends Controller
             if (count($detJadwal) > 0){
                 for ($i=0;$i < count($detJadwal);$i++){
                    
-                    $strSQL = "select no_jadwal from dgw_jadwal where tgl_berangkat='".$detJadwal[$i]['tgl_berangkat']."' and no_paket='".$detJadwal[$i]['no_paket']."' and kode_lokasi='".$kode_lokasi."'";					
+                    $strSQL = "select no_jadwal from dgw_jadwal where tgl_berangkat='".$detJadwal[$i]['tgl_berangkat']."' and no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";					
                     $res = DB::connection('sqlsrvdago')->select($strSQL); 
                     $res = json_decode(json_encode($res),true);
                     if (count($res) > 0){
                         $line = $res[0];
-                        $detJadwal[$i]['no_jadwal'] = $line[$i]['no_jadwal'];
+                        $detJadwal[$i]['no_jadwal'] = $line['no_jadwal'];
                     }								
                     else $detJadwal[$i]['no_jadwal'] = "ID";
                 }
@@ -342,7 +346,8 @@ class PaketController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            $sts = false;
+            $msg = "something wrong";
             $strSQL = "select count(*) as jml from dgw_jadwal where no_closing <> '-' and  no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";					
             $res = DB::connection('sqlsrvdago')->select($strSQL); 
             $res = json_decode(json_encode($res),true);
@@ -351,31 +356,32 @@ class PaketController extends Controller
                 if ($line['jml'] != 0) {
                     $msg = "Paket tidak dapat dihapus. Terdapat jadwal yang sudah di closing.";
                     $sts = "FAILED";		
-                }
-            }else{
-                $msg = "Data Paket berhasil dihapus";
-                $sts = "SUCCESS";
-                $del = DB::connection('sqlsrvdago')->table('dgw_paket')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_paket', $request->no_paket)
-                ->delete();
-
-                $del2 = DB::connection('sqlsrvdago')->table('dgw_harga')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_paket', $request->no_paket)
-                ->delete();
-
-                $del3 = DB::connection('sqlsrvdago')->table('dgw_jadwal')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_paket', $request->no_paket)
-                ->delete();
-
-                DB::connection('sqlsrvdago')->commit();
-            } 
+                }else{
+                    $del = DB::connection('sqlsrvdago')->table('dgw_paket')
+                    ->where('kode_lokasi', $kode_lokasi)
+                    ->where('no_paket', $request->no_paket)
+                    ->delete();
+                    
+                    $del2 = DB::connection('sqlsrvdago')->table('dgw_harga')
+                    ->where('kode_lokasi', $kode_lokasi)
+                    ->where('no_paket', $request->no_paket)
+                    ->delete();
+                    
+                    $del3 = DB::connection('sqlsrvdago')->table('dgw_jadwal')
+                    ->where('kode_lokasi', $kode_lokasi)
+                    ->where('no_paket', $request->no_paket)
+                    ->delete();
+                    
+                    DB::connection('sqlsrvdago')->commit();
+                    $msg = "Data Paket berhasil dihapus";
+                    $sts = "SUCCESS";
+                } 
+            }
+            
 
             $success['status'] = $sts;
             $success['message'] = $msg;
-            
+            // $success['sql'] = $strSQL;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvdago')->rollback();
