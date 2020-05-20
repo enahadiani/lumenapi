@@ -55,13 +55,16 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuan();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuan();
                 break;
                 case 'APPFIN' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuanfinal();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuanfinal();
                 break;
                 case 'APPDIR' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->pengajuandir();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuandir();
+                break;
+                case 'APPKUG' :
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuankug();
                 break;
                 default :
                 $success['status'] = false;
@@ -74,26 +77,14 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
     }
     });
 
-    
 
-    // $router->get('ajusm', 'Approval\ApprovalController@pengajuan'); 
-    // $router->get('ajufin', 'Approval\ApprovalController@pengajuanfinal');
-    // $router->get('ajudir', 'Approval\ApprovalController@pengajuandir');
-
-
-    $router->get('ajudet/{no_aju}', 'Approval\ApprovalController@detail');
-    $router->get('ajurek/{no_aju}', 'Approval\ApprovalController@rekening');
-    $router->get('ajujurnal/{no_aju}', 'Approval\ApprovalController@jurnal');
-    $router->get('aju_history/{jenis}', 'Approval\ApprovalController@ajuHistory');
-    $router->get('ajudet_history/{no_aju}', 'Approval\ApprovalController@ajuDetailHistory');
-    $router->get('ajudet_dok/{no_aju}', 'Approval\ApprovalController@ajuDetailDok');
-    $router->get('ajudet_approval/{no_aju}', 'Approval\ApprovalController@ajuDetailApproval');
-
-    //Approval 
-
-    // $router->post('appsm', 'Approval\ApprovalController@approvalSM');
-    // $router->post('appfin', 'Approval\ApprovalController@approvalFinal');
-    // $router->post('appdir', 'Approval\ApprovalController@approvalDir');
+    $router->get('ajudet/{no_aju}', 'Sju\ApprovalController@detail');
+    $router->get('ajurek/{no_aju}', 'Sju\ApprovalController@rekening');
+    $router->get('ajujurnal/{no_aju}', 'Sju\ApprovalController@jurnal');
+    $router->get('aju_history/{jenis}', 'Sju\ApprovalController@ajuHistory');
+    $router->get('ajudet_history/{no_aju}', 'Sju\ApprovalController@ajuDetailHistory');
+    $router->get('ajudet_dok/{no_aju}', 'Sju\ApprovalController@ajuDetailDok');
+    $router->get('ajudet_approval/{no_aju}', 'Sju\ApprovalController@ajuDetailApproval');
 
     $router->post('app', function (Request $request) {
         if($data =  Auth::guard('user')->user()){
@@ -103,13 +94,16 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalSM($request);
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->approvalSM($request);
                 break;
                 case 'APPFIN' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalFinal($request);
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->approvalFinal($request);
+                break;
+                case 'APPKUG' :
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->approvalKug($request);
                 break;
                 case 'APPDIR' :
-                    $result = app('App\Http\Controllers\Approval\ApprovalController')->approvalDir($request);
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->approvalDir($request);
                 break;
                 default :
                 $success['status'] = false;
