@@ -29,7 +29,7 @@ class JamaahController extends Controller
     }
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection('sqlsrvdago')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -124,24 +124,24 @@ class JamaahController extends Controller
             'id_peserta' => 'required',
             'nama' => 'required',
             'tempat' => 'required',
-            'tgl_lahir' => 'required',
-            'jk' => 'required',
-            'status' => 'required',
+            'tgl_lahir' => 'required|date_format:Y-m-d',
+            'jk' => 'required|in:P,L',
+            'status' => 'required|in:-,Menikah,Belum Menikah',
             'ibu' => 'required',
             'ayah' => 'required',
             'alamat' => 'required',
             'kode_pos' => 'required',
             'telp' => 'required',
             'hp' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'pekerjaan' => 'required',
             'bank' => 'required',
             'norek' => 'required',
             'cabang' => 'required',
             'namarek' => 'required',
             'nopass' => 'required',
-            'issued' => 'required',
-            'ex_pass' => 'required',
+            'issued' => 'required|date_format:Y-m-d',
+            'ex_pass' => 'required|date_format:Y-m-d',
             'kantor_mig' => 'required',
             'ec_telp' => 'required',
             'ec_hp' => 'required',
@@ -183,7 +183,7 @@ class JamaahController extends Controller
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";
-            $success['message'] = "Data Jamaah berhasil disimpan";
+            $success['message'] = "Data Jamaah berhasil disimpan. No jamaah:".$no_peserta;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {

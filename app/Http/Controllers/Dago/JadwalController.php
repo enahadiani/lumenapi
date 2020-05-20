@@ -69,8 +69,8 @@ class JadwalController extends Controller
             'no_paket' => 'required',
             'data_jadwal' => 'required|array',
             'data_jadwal.*.no_jadwal' => 'required',
-            'data_jadwal.*.tgl_berangkat' => 'required',
-            'data_jadwal.*.tgl_baru' => 'required'
+            'data_jadwal.*.tgl_berangkat' => 'required|date_format:Y-m-d',
+            'data_jadwal.*.tgl_baru' => 'required|date_format:Y-m-d'
         ]);
 
         DB::connection('sqlsrvdago')->beginTransaction();

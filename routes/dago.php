@@ -20,13 +20,14 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
     $router->post('login', 'AuthController@loginDago');
     $router->get('hash_pass', 'AuthController@hashPasswordDago');
-    $router->get('storage/{filename}', function ($filename)
-    {
-        if (!Storage::disk('s3')->exists('dago/'.$filename)) {
-            abort(404);
-        }
-        return Storage::disk('s3')->response('dago/'.$filename); 
-    });
+});
+
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('dago/'.$filename)) {
+        abort(404);
+    }
+    return Storage::disk('s3')->response('dago/'.$filename); 
 });
 
 $router->group(['middleware' => 'auth:dago'], function () use ($router) {
