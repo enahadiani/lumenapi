@@ -136,6 +136,11 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('pembayaran-rekbank','Dago\PembayaranController@getRekBank');
     $router->get('pembayaran-preview','Dago\PembayaranController@getPreview');
 
+    //UploadDok
+    $router->get('upload-dok','Dago\UploadDokController@index');
+    $router->get('upload-dok-detail','Dago\UploadDokController@show');
+    $router->post('upload-dok','Dago\UploadDokController@store');
+
     //Filter Laporan
     $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
     $router->get('filter-paket','Dago\LaporanController@getFilterPaket');

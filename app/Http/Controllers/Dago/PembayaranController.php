@@ -787,7 +787,7 @@ class PembayaranController extends Controller
         
     }
 
-    public function getPreview()
+    public function getPreview(Request $request)
     {
         $this->validate($request, [
             'no_bukti' => 'required'
