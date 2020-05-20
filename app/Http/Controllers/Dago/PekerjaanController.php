@@ -100,7 +100,7 @@ class PekerjaanController extends Controller
             }
             if($this->isUnik($request->id_pekerjaan,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
+                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
                 
                 DB::connection('sqlsrvdago')->commit();
                 $success['status'] = "SUCCESS";
@@ -160,7 +160,7 @@ class PekerjaanController extends Controller
             ->where('id_pekerjaan', $request->id_pekerjaan)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
+            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
             
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";
