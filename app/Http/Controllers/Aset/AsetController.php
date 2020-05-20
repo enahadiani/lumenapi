@@ -586,7 +586,7 @@ class AsetController extends Controller
         }
     }
 
-    function getInvetarisBerjalan(Request $request){
+    function getInventarisBerjalan(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
@@ -644,7 +644,7 @@ class AsetController extends Controller
         }
     }
 
-    function getInvetarisLengkap(Request $request){
+    function getInventarisLengkap(Request $request){
         try {
             
             if($data =  Auth::guard('admin')->user()){
