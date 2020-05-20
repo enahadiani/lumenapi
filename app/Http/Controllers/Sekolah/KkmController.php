@@ -17,7 +17,7 @@ class KkmController extends Controller
     public $successStatus = 200;
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrvyptkug')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection('sqlsrvtarbak')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -109,7 +109,7 @@ class KkmController extends Controller
             
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Kkm berhasil disimpan";
+            $success['message'] = "Data Kkm berhasil disimpan. Kode KKM:".$kode;
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
