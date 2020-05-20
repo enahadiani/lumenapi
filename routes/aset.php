@@ -41,6 +41,11 @@ $router->get('storage/{filename}', function ($filename)
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
+    $router->get('profile', 'AdminController@profile');
+    $router->get('users/{id}', 'AdminController@singleUser');
+    $router->get('users', 'AdminController@allUsers');
+    $router->get('cek-payload', 'AdminController@cekPayload');
+
     $router->get('gedung','Aset\AsetController@getGedung');
     $router->get('ruangan','Aset\AsetController@getRuangan');
     $router->get('barang','Aset\AsetController@getBarang');
@@ -60,4 +65,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('delete-dok/{no_bukti}/{no_urut}','Aset\AsetController@hapusDok');
     $router->post('upload-dok-single','Aset\AsetController@uploadDokSingle');
     $router->get('aset-detail-upload','Aset\AsetController@getDetailUpload');
+
+    $router->get('user_device','UserDeviceController@index');
+    $router->get('user_device/{nik}','UserDeviceController@show');
+    $router->post('user_device','UserDeviceController@store');
+    $router->put('user_device/{nik}','UserDeviceController@update');
+    $router->delete('user_device/{nik}','UserDeviceController@destroy');
 });
