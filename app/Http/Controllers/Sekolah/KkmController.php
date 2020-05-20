@@ -81,7 +81,6 @@ class KkmController extends Controller
         $this->validate($request, [
             'kode_ta' => 'required',
             'kode_tingkat' => 'required',
-            'kode_lokasi' => 'required',
             'kode_pp' => 'required',
             'kode_jur' => 'required',
             'flag_aktif' => 'required',
@@ -97,10 +96,10 @@ class KkmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $kode = $this->generateKode("sis_kkm", "kode_kkm", $data['kode_lokasi']."-KKM.", "0001");
-            if(count($data['kode_matpel']) > 0){
+            $kode = $this->generateKode("sis_kkm", "kode_kkm", $kode_lokasi."-KKM.", "0001");
+            if(count($request->kode_matpel) > 0){
 
-                for($i=0;$i<count($data['kode_matpel']);$i++){
+                for($i=0;$i<count($request->kode_matpel);$i++){
     
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$kode,$request->kode_ta,$request->kode_tingkat,$request->kode_matpel[$i],$kode_lokasi,$request->kode_pp,$request->kkm[$i],$request->flag_aktif,$request->kode_jur]);
                     
@@ -196,7 +195,6 @@ class KkmController extends Controller
             'kode_kkm' => 'required',
             'kode_ta' => 'required',
             'kode_tingkat' => 'required',
-            'kode_lokasi' => 'required',
             'kode_pp' => 'required',
             'kode_jur' => 'required',
             'flag_aktif' => 'required',
@@ -213,14 +211,14 @@ class KkmController extends Controller
             }
             
             
-            if(count($data['kode_matpel']) > 0){
+            if(count($request->kode_matpel) > 0){
                 $del = DB::connection('sqlsrvtarbak')->table('sis_kkm')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_kkm', $request->kode_kkm)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
-                for($i=0;$i<count($data['kode_matpel']);$i++){
+                for($i=0;$i<count($request->kode_matpel);$i++){
     
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->kode_kkm,$request->kode_ta,$request->kode_tingkat,$request->kode_matpel[$i],$kode_lokasi,$request->kode_pp,$request->kkm[$i],$request->flag_aktif,$request->kode_jur]);
                     
