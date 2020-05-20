@@ -86,9 +86,9 @@ class GuruMatpelController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(count($data['kode_matpel']) > 0){
+            if(count($request->kode_matpel) > 0){
 
-                for($i=0;$i<count($data['kode_matpel']);$i++){
+                for($i=0;$i<count($request->kode_matpel);$i++){
     
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_matpel[$i],$request->nik_guru,$request->flag_aktif,$request->kode_status[$i]]);
                     
@@ -199,14 +199,14 @@ class GuruMatpelController extends Controller
             }
             
             
-            if(count($data['kode_matpel']) > 0){
+            if(count($request->kode_matpel) > 0){
                 $del = DB::connection('sqlsrvtarbak')->table('sis_guru_matpel')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('nik', $request->nik_guru)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
-                for($i=0;$i<count($data['kode_matpel']);$i++){
+                for($i=0;$i<count($request->kode_matpel);$i++){
     
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_matpel[$i],$request->nik_guru,$request->flag_aktif,$request->kode_status[$i]]);
                     
