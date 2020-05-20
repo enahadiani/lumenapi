@@ -196,17 +196,12 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from yk_pb_m a 
+            $aju = DB::connection('sqlsrvsju')->select("
+            select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_atasan,a.no_app1,a.no_app2,a.no_app3,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            from sju_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') 					 
-            union 			
-            select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from panjar2_m a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi 
-            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PJAJU','PJPR') 
+            where a.progress='2' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') 	
             order by tgl  					 
             ");
             $aju = json_decode(json_encode($aju),true);
@@ -248,18 +243,18 @@ class ApprovalController extends Controller
                 $tmp="";
             }
             if ($jenis=="reject") {
-                $tmp=" and d.status in ('S','K','D') ";
+                $tmp=" and d.status in ('A','P','K','U') ";
             }
             if ($jenis=="approve") {
-                $tmp=" and d.status not in ('S','K','D') ";
+                $tmp=" and d.status not in ('1','3','4','5') ";
             }
-            $sql="select a.due_date,a.no_pb as no_bukti,case when d.status in ('S','K','D') then 'REJECT' when d.status not in ('S','K','D') then 'APPROVE' else 'INPROG' end as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
-            from yk_pb_m a 
+            $sql="select a.due_date,a.no_pb as no_bukti,case when d.status in ('A','P','K','U') then 'REJECT' when d.status not in ('1','3','4','5') then 'APPROVE' else 'INPROG' end as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_atasan,a.no_app1,a.no_app2,a.no_app3,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            from sju_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-            inner join spm_app_m d on a.no_pb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
-            where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') $tmp 
-            order by a.tanggal";
+            inner join sju_ver_m d on a.no_pb=d.no_dokumen and a.kode_lokasi=d.kode_lokasi
+            where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') $tmp
+            order by a.tanggal	";
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
             
@@ -335,15 +330,13 @@ class ApprovalController extends Controller
             }
 
             switch(substr($no_aju,3,2)){
-                case 'PB':		
-                    $sql = "select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,
-                        b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,
-                        convert(varchar,d.tanggal,103) as tgl_app,d.catatan
-                    from yk_pb_m a 
+                case 'PB':	
+                    $sql = "select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_atasan,a.no_app1,a.no_app2,a.no_app3,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+                    from sju_pb_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                    inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
-                    inner join spm_app_m d on a.no_pb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
-                    where d.nik_user='$nik' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBBAU','PBPR','PBINV') and a.no_pb='$no_aju' ";
+                    inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
+                    where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') and d.nik_user='$nik'	
+                    order by tgl";
                 break;
                 case 'PP' : 
                     $sql ="select a.due_date,a.no_panjar as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
