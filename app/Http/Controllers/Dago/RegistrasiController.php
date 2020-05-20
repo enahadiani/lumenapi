@@ -83,16 +83,16 @@ class RegistrasiController extends Controller
         $this->validate($request, [
             'periode' => 'required',
             'paket' => 'required',
-            'jadwal' => 'required',
-            'tgl_input' => 'required',
+            'jadwal' => 'required|integer',
+            'tgl_input' => 'required|date_format:Y-m-d H:i:s',
             'no_peserta' => 'required',
             'agen' => 'required',
             'type_room' => 'required',
             'harga_room' => 'required',
             'sumber' => 'required',
             'quota' => 'required',
-            'harga_paket' => 'required',
-            'ukuran_pakaian' => 'required',
+            'harga_paket' => 'required|integer',
+            'ukuran_pakaian' => 'required|in:S,XS,L,2L,3L,4L,5L,6L,7L,8L,9L,10L',
             'marketing' => 'required',
             'jenis_promo' => 'required',
             'jenis_paket' => 'required',
@@ -103,12 +103,15 @@ class RegistrasiController extends Controller
             'hubungan' => 'required',
             'referal' => 'required',
             'ket_diskon' => 'required',
+            'dokumen'=>'required|array',
             'dokumen.*.no_dokumen' => 'required',
             'dokumen.*.deskripsi' => 'required',
+            'biaya_tambahan'=>'required|array',
             'biaya_tambahan.*.kode_biaya' => 'required',
             'biaya_tambahan.*.nilai' => 'required',
             'biaya_tambahan.*.jumlah' => 'required',
             'biaya_tambahan.*.total' => 'required',
+            'biaya_dokumen'=>'required|array',
             'biaya_dokumen.*.kode_biaya' => 'required',
             'biaya_dokumen.*.nilai' => 'required',
             'biaya_dokumen.*.jumlah' => 'required',
@@ -165,7 +168,7 @@ class RegistrasiController extends Controller
 
             DB::connection('sqlsrvdago')->commit();
             $success['status'] = "SUCCESS";
-            $success['message'] = "Data Registrasi berhasil disimpan";
+            $success['message'] = "Data Registrasi berhasil disimpan. No Reg:".$no_reg;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -255,21 +258,18 @@ class RegistrasiController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_reg'=>'required',
             'periode' => 'required',
             'paket' => 'required',
-            'jadwal' => 'required',
-            'paket_lama' => 'required',
-            'jadwal_lama' => 'required',
-            'tgl_input' => 'required',
+            'jadwal' => 'required|integer',
+            'tgl_input' => 'required|date_format:Y-m-d H:i:s',
             'no_peserta' => 'required',
             'agen' => 'required',
             'type_room' => 'required',
             'harga_room' => 'required',
             'sumber' => 'required',
             'quota' => 'required',
-            'harga_paket' => 'required',
-            'ukuran_pakaian' => 'required',
+            'harga_paket' => 'required|integer',
+            'ukuran_pakaian' => 'required|in:S,XS,L,2L,3L,4L,5L,6L,7L,8L,9L,10L',
             'marketing' => 'required',
             'jenis_promo' => 'required',
             'jenis_paket' => 'required',
@@ -280,12 +280,15 @@ class RegistrasiController extends Controller
             'hubungan' => 'required',
             'referal' => 'required',
             'ket_diskon' => 'required',
+            'dokumen'=>'required|array',
             'dokumen.*.no_dokumen' => 'required',
             'dokumen.*.deskripsi' => 'required',
+            'biaya_tambahan'=>'required|array',
             'biaya_tambahan.*.kode_biaya' => 'required',
             'biaya_tambahan.*.nilai' => 'required',
             'biaya_tambahan.*.jumlah' => 'required',
             'biaya_tambahan.*.total' => 'required',
+            'biaya_dokumen'=>'required|array',
             'biaya_dokumen.*.kode_biaya' => 'required',
             'biaya_dokumen.*.nilai' => 'required',
             'biaya_dokumen.*.jumlah' => 'required',
@@ -503,7 +506,7 @@ class RegistrasiController extends Controller
             $res = DB::connection('sqlsrvdago')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql="select kode_pp from karyawan_pp where nik='".$_SESSION['userLog']."' and kode_lokasi = '$kode_lokasi'";
+            $sql="select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi = '$kode_lokasi'";
             $res2 = DB::connection('sqlsrvdago')->select($sql);
             $res2 = json_decode(json_encode($res2),true);
             $success["kodePP"]= $res2[0]['kode_pp'];
@@ -527,7 +530,7 @@ class RegistrasiController extends Controller
         
     }
 
-    public function getHarga()
+    public function getHarga(Request $request)
     {
         $this->validate($request, [
             'no_paket' => 'required',
@@ -568,7 +571,7 @@ class RegistrasiController extends Controller
         }   
     }
 
-    public function getQuota()
+    public function getQuota(Request $request)
     {
         $this->validate($request, [
             'no_paket' => 'required',
@@ -644,7 +647,7 @@ class RegistrasiController extends Controller
         }
     }
 
-    public function getHargaRoom()
+    public function getHargaRoom(Request $request)
     {
         $this->validate($request, [
             'kode_curr' => 'required',
@@ -682,7 +685,7 @@ class RegistrasiController extends Controller
         }   
     }
 
-    public function getNoMarketing()
+    public function getNoMarketing(Request $request)
     {
         $this->validate($request, [
             'no_agen' => 'required'
@@ -717,7 +720,7 @@ class RegistrasiController extends Controller
         }   
     }
 
-    public function getPreview()
+    public function getPreview(Request $request)
     {
         $this->validate($request, [
             'no_bukti' => 'required'
