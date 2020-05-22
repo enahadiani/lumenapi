@@ -18,6 +18,6 @@ class Pp extends Model
      * @var array
      */
     protected $fillable = [
-        'kode_lokasi','kode_pp','nama'
+        'kode_lokasi','kode_pp','nama','flag_aktif'
     ];
 }

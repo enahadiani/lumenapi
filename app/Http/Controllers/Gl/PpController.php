@@ -198,7 +198,6 @@ class PpController extends Controller
      */
     public function destroy($id)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
@@ -206,7 +205,7 @@ class PpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $res = Pp::where('kode_pp',$id)->where('kode_lokasi',$kode_lokasi)->get();
+            $res = Pp::find($id);
             if($res->delete()){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['message'] = "Data PP berhasil dihapus";    
@@ -218,7 +217,6 @@ class PpController extends Controller
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data PP gagal dihapus ".$e;
             
