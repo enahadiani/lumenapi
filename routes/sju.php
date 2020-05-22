@@ -88,7 +88,7 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
     $router->get('ajudet_approval/{no_aju}', 'Sju\ApprovalController@ajuDetailApproval');
 
     $router->post('app', function (Request $request) {
-        if($data =  Auth::guard('user')->user()){
+        if($data =  Auth::guard('sju')->user()){
             $nik= $data->nik;
             //Pengajuan
             $sql = DB::connection('sqlsrvsju')->select("select menu_mobile from hakakses where nik='$nik' ");
