@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Gl\Pp;
 
 class PpController extends Controller
 {
@@ -71,26 +72,23 @@ class PpController extends Controller
             'nama' => 'required',
             'flag_aktif' => 'required'
         ]);
-
-        DB::connection('sqlsrv2')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
             }
-            
-            $ins = DB::connection('sqlsrv2')->insert('insert into pp (kode_pp,kode_lokasi,nama,flag_aktif) values (?, ?, ?, ?)', [$request->input('kode_pp'),$kode_lokasi,$request->input('nama'),$request->input('flag_aktif')]);
-            
-            DB::connection('sqlsrv2')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data PP berhasil disimpan";
+            $res = $request->all();
+            $res['kode_lokasi'] = $kode_lokasi;
+            if(Pp::create($res)){
+                $success['status'] = true;
+                $success['message'] = "Data PP berhasil disimpan";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data PP gagal disimpan";
+            }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data PP gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -105,7 +103,7 @@ class PpController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function show($kode_pp)
+    public function show($id)
     {
         try {
             
@@ -115,7 +113,7 @@ class PpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'";
+            $sql="select kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' and kode_pp='$id'";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -156,14 +154,12 @@ class PpController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $kode_pp)
+    public function update(Request $request, $id)
     {
         $this->validate($request, [
             'nama' => 'required',
             'flag_aktif' => 'required'
         ]);
-
-        DB::connection('sqlsrv2')->beginTransaction();
         
         try {
             if($data =  Auth::guard('admin')->user()){
@@ -171,16 +167,23 @@ class PpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
+            $res = Pp::where('kode_lokasi',$kode_lokasi)
+            ->where('kode_pp',$id)
+            ->update([
+                'nama' => $request->nama,
+                'flag_aktif' => $request->flag_aktif,
+            ]);
+            if($res){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['message'] = "Data Pp berhasil diubah";   
+            }
+            else{
+                $success['status'] = false;
+                $success['message'] = "Data Pp gagal diubah";   
+            }
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into pp (kode_pp,kode_lokasi,nama,flag_aktif) values (?, ?, ?, ?)', [$kode_pp,$kode_lokasi,$request->input('nama'),$request->input('flag_aktif')]);
-            
-            DB::connection('sqlsrv2')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data PP berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Data PP gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -193,7 +196,7 @@ class PpController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function destroy($kode_pp)
+    public function destroy($id)
     {
         DB::connection('sqlsrv2')->beginTransaction();
         
@@ -201,16 +204,17 @@ class PpController extends Controller
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
             }
             
-            $del = DB::connection('sqlsrv2')->table('pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
-
-            DB::connection('sqlsrv2')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data PP berhasil dihapus";
+            $res = Pp::where('kode_pp',$id)->where('kode_lokasi',$kode_lokasi)->get();
+            if($res->delete()){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['message'] = "Data PP berhasil dihapus";    
+            }
+            else{
+                $success['status'] = false;
+                $success['message'] = "Data PP gagal dihapus";    
+            }
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
