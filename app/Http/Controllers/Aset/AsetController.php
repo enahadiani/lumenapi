@@ -614,10 +614,12 @@ class AsetController extends Controller
             from amu_ruangan a
             left join ( select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jum_asset 
                         from amu_asset_bergerak a
+                        where a.kode_lokasi='$kode_lokasi'
                         group by a.no_ruang,a.kode_lokasi
                         ) b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi
             left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_mon 
                         from amu_mon_asset_bergerak a
+                        where a.kode_lokasi='$kode_lokasi'
                         inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti
                         group by a.no_ruangan,a.kode_lokasi
                     ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi
@@ -667,8 +669,28 @@ class AsetController extends Controller
             //         $kode_pp = "";
             //     }
             // }            
-          
-            $sql="select a.no_ruangan, isnull(b.jum_asset,0) as jum_asset, isnull(d.jum_rusak,0) as jum_rusak,isnull(c.jum_baik,0) as jum_baik,CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 as persen, isnull(b.jum_asset,0) - (isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) as jum_belum,getdate() as tgl from amu_ruangan a left join ( select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jum_asset from amu_asset_bergerak a group by a.no_ruang,a.kode_lokasi ) b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_rusak  from amu_mon_asset_bergerak a inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti where a.status='Tidak Berfungsi' group by a.no_ruangan,a.kode_lokasi) d on a.no_ruangan=d.no_ruangan and a.kode_lokasi=d.kode_lokasi left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_baik from amu_mon_asset_bergerak a inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti where a.status='Berfungsi' group by a.no_ruangan,a.kode_lokasi ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 = 100 ";
+            $sql="select a.no_ruangan, isnull(b.jum_asset,0) as jum_asset, isnull(d.jum_rusak,0) as jum_rusak,isnull(c.jum_baik,0) as jum_baik,
+            case when isnull(b.jum_asset,0)<>0 then CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 else 0 end  as persen,
+            isnull(b.jum_asset,0) - (isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) as jum_belum,getdate() as tgl 
+            from amu_ruangan a 
+            left join ( select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jum_asset 
+                        from amu_asset_bergerak a 
+                        where a.kode_lokasi='$kode_lokasi'
+                        group by a.no_ruang,a.kode_lokasi 
+                      ) b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi 
+            left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_rusak  
+                        from amu_mon_asset_bergerak a 
+                        inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti 
+                        where a.status='Tidak Berfungsi' and a.kode_lokasi='$kode_lokasi'
+                        group by a.no_ruangan,a.kode_lokasi
+                      ) d on a.no_ruangan=d.no_ruangan and a.kode_lokasi=d.kode_lokasi 
+            left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_baik 
+                        from amu_mon_asset_bergerak a 
+                        inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti 
+                        where a.status='Berfungsi' and a.kode_lokasi='$kode_lokasi'
+                        group by a.no_ruangan,a.kode_lokasi 
+                      ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi 
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 = 100 ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
