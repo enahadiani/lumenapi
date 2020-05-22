@@ -170,8 +170,7 @@ class RegistrasiGroupController extends Controller
             inner join dgw_paket b on a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi
             inner join dgw_peserta c on a.no_peserta=c.no_peserta and a.kode_lokasi=c.kode_lokasi
             inner join dgw_jadwal d on a.no_paket=d.no_paket and a.no_jadwal=d.no_jadwal and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_reg='$no_reg'
-            ";);
+            where a.kode_lokasi='$kode_lokasi' and a.no_reg='$no_reg'");
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection('sqlsrvdago')->select(  "select a.no_reg,a.no_peserta,no_reg_ref from dgw_group_d a

@@ -24,9 +24,6 @@ class PpController extends Controller
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
             }
 
             $rs = DB::connection('sqlsrv2')->select("select kode_pp,nama,flag_aktif from pp	where kode_lokasi='$kode_lokasi'");
@@ -116,18 +113,16 @@ class PpController extends Controller
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
             }
 
-            $rs = DB::connection('sqlsrv2')->select("select kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'				 
-            ");
-            $rs = json_decode(json_encode($rs),true);
+            $sql="select kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
             
-            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $rs;
+                $success['data'] = $res;
+                $success['sql'] = $sql;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
@@ -174,9 +169,6 @@ class PpController extends Controller
             if($data =  Auth::guard('admin')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }else{
-                $nik= '';
-                $kode_lokasi= '34';
             }
             
             $del = DB::connection('sqlsrv2')->table('pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
