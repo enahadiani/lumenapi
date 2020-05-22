@@ -58,6 +58,13 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('fs','Gl\FsController@store');
     $router->put('fs/{id}','Gl\FsController@update');
     $router->delete('fs/{id}','Gl\FsController@destroy');
+
+    //PP
+    $router->get('pp','Gl\PpController@index');
+    $router->get('pp/{id}','Gl\PpController@show');
+    $router->post('pp','Gl\PpController@store');
+    $router->put('pp/{id}','Gl\PpController@update');
+    $router->delete('pp/{id}','Gl\PpController@destroy');
     
     //MASAKUN
     $router->get('masakun','Gl\MasakunController@index');
@@ -84,7 +91,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('jurnal','Gl\JurnalController@store');
     $router->put('jurnal','Gl\JurnalController@update');
     $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
-    $router->get('pp','Gl\JurnalController@getPP');
+    $router->get('pp-list','Gl\JurnalController@getPP');
     $router->get('akun','Gl\JurnalController@getAkun');
     $router->get('nikperiksa','Gl\JurnalController@getNIKPeriksa');
 
