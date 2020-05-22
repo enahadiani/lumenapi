@@ -335,7 +335,7 @@ class ApprovalController extends Controller
                     from sju_pb_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-                    where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') and d.nik_user='$nik'	
+                    where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') and c.nik_user='$nik'	
                     order by tgl";
                 break;
                 case 'PP' : 
