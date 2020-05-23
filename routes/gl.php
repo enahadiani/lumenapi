@@ -59,12 +59,20 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->put('fs/{id}','Gl\FsController@update');
     $router->delete('fs/{id}','Gl\FsController@destroy');
 
+    //lokasi
+    $router->get('lokasi','Gl\LokasiController@index');
+    $router->get('lokasi/{kode_lokasi}','Gl\LokasiController@show');
+    $router->post('lokasi','Gl\LokasiController@store');
+    $router->put('lokasi/{kode_lokasi}','Gl\LokasiController@update');
+    $router->delete('lokasi/{kode_lokasi}','Gl\LokasiController@destroy');
+
+
     //PP
     $router->get('pp','Gl\PpController@index');
-    $router->get('pp/{id}','Gl\PpController@show');
+    $router->get('pp/{kode_pp}','Gl\PpController@show');
     $router->post('pp','Gl\PpController@store');
-    $router->put('pp/{id}','Gl\PpController@update');
-    $router->delete('pp/{id}','Gl\PpController@destroy');
+    $router->put('pp/{kode_pp}','Gl\PpController@update');
+    $router->delete('pp/{kode_pp}','Gl\PpController@destroy');
     
     //MASAKUN
     $router->get('masakun','Gl\MasakunController@index');

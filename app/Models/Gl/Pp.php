@@ -11,7 +11,8 @@ class Pp extends Model
 
     protected $primaryKey = 'kode_pp';
     public $incrementing = false;
-
+    public $timestamps = false;
+    
     /**
      * The attributes that are mass assignable.
      *
