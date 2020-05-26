@@ -24,16 +24,17 @@ class SiswaController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
             if(isset($request->kode_pp)){
-                $filter = " and a.kode_pp='$request->kode_pp' ";
+                $filter .= " and a.kode_pp='$request->kode_pp' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
             if(isset($request->flag_aktif)){
-                $filter = " and a.flag_aktif='$request->flag_aktif' ";
+                $filter .= " and a.flag_aktif='$request->flag_aktif' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp 

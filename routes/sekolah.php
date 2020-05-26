@@ -116,11 +116,11 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('kalender_akad','Sekolah\KalenderAkadController@update');
     $router->delete('kalender_akad','Sekolah\KalenderAkadController@destroy');
 
-     //Jadwal Harian
-     $router->get('jadwal_harian_all','Sekolah\JadwalHarianController@index');
-     $router->get('jadwal_harian','Sekolah\JadwalHarianController@loadData');
-     $router->post('jadwal_harian','Sekolah\JadwalHarianController@store');
-     $router->delete('jadwal_harian','Sekolah\JadwalHarianController@destroy');
+    //Jadwal Harian
+    $router->get('jadwal_harian_all','Sekolah\JadwalHarianController@index');
+    $router->get('jadwal_harian','Sekolah\JadwalHarianController@loadData');
+    $router->post('jadwal_harian','Sekolah\JadwalHarianController@store');
+    $router->delete('jadwal_harian','Sekolah\JadwalHarianController@destroy');
 
      //Jadwal Ujian
     $router->get('jadwal_ujian_all','Sekolah\JadwalUjianController@index');
@@ -144,5 +144,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('siswa','Sekolah\SiswaController@store');
     $router->put('siswa','Sekolah\SiswaController@update');
     $router->delete('siswa','Sekolah\SiswaController@destroy');
+
+    //Presensi
+    $router->get('presensi_all','Sekolah\PresensiController@index');
+    $router->get('presensi','Sekolah\PresensiController@show');
+    $router->get('presensi_load','Sekolah\PresensiController@loadPresensi');
+    $router->post('presensi','Sekolah\PresensiController@store');
+    $router->put('presensi','Sekolah\PresensiController@update');
+    $router->delete('presensi','Sekolah\PresensiController@destroy');
 
 });
