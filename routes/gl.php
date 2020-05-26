@@ -102,6 +102,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('pp-list','Gl\JurnalController@getPP');
     $router->get('akun','Gl\JurnalController@getAkun');
     $router->get('nikperiksa','Gl\JurnalController@getNIKPeriksa');
+    $router->get('nikperiksa/{nik}','Gl\JurnalController@getNIKPeriksaByNIK');
 
     $router->post('loadData','Gl\PostingController@loadData');
     $router->get('modul2','Gl\PostingController@getModul');
