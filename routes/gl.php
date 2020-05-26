@@ -76,10 +76,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
     //MASAKUN
     $router->get('masakun','Gl\MasakunController@index');
-    $router->get('masakun/{id}','Gl\MasakunController@show');
+    $router->get('masakun/{kode_akun}','Gl\MasakunController@show');
     $router->post('masakun','Gl\MasakunController@store');
-    $router->put('masakun/{id}','Gl\MasakunController@update');
-    $router->delete('masakun/{id}','Gl\MasakunController@destroy');
+    $router->put('masakun/{kode_akun}','Gl\MasakunController@update');
+    $router->delete('masakun/{kode_akun}','Gl\MasakunController@destroy');
     
     $router->get('currency','Gl\MasakunController@getCurrency');
     $router->get('modul','Gl\MasakunController@getModul');
