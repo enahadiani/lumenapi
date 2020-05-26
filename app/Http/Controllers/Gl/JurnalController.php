@@ -464,7 +464,7 @@ class JurnalController extends Controller
         try {
             
             if($data =  Auth::guard('admin')->user()){
-                $nik= $data->nik;
+                $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
