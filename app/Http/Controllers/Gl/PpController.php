@@ -38,7 +38,7 @@ class PpController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {

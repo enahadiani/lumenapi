@@ -101,7 +101,7 @@ class JurnalController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['jurnal']= [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -382,7 +382,7 @@ class JurnalController extends Controller
                 $success['message'] = "Data Kosong!"; 
                 $success['jurnal'] = [];
                 $success['detail'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -415,7 +415,7 @@ class JurnalController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -448,7 +448,7 @@ class JurnalController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -480,7 +480,7 @@ class JurnalController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -529,7 +529,7 @@ class JurnalController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
