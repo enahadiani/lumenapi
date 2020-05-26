@@ -95,10 +95,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
 
     $router->get('jurnal','Gl\JurnalController@index');
-    $router->get('jurnal/{id}','Gl\JurnalController@show');
+    $router->get('jurnal/{no_bukti}','Gl\JurnalController@show');
     $router->post('jurnal','Gl\JurnalController@store');
     $router->put('jurnal','Gl\JurnalController@update');
-    $router->delete('jurnal/{id}','Gl\JurnalController@destroy');
+    $router->delete('jurnal/{no_bukti}','Gl\JurnalController@destroy');
     $router->get('pp-list','Gl\JurnalController@getPP');
     $router->get('akun','Gl\JurnalController@getAkun');
     $router->get('nikperiksa','Gl\JurnalController@getNIKPeriksa');
