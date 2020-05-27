@@ -78,7 +78,7 @@ class KalenderAkadController extends Controller
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_sem' => 'required',
-            'tanggal' => 'required|date_format:Y-m-d|array',
+            'tanggal' => 'required|array',
             'agenda'=>'required|array'
         ]);
 
@@ -194,7 +194,7 @@ class KalenderAkadController extends Controller
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_sem' => 'required',
-            'tanggal' => 'required|date_format:Y-m-d|array',
+            'tanggal' => 'required|array',
             'agenda'=>'required|array'
         ]);
 
