@@ -78,8 +78,8 @@ class KalenderAkadController extends Controller
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_sem' => 'required',
-            'tanggal.*' => 'required',
-            'agenda.*'=>'required'
+            'tanggal' => 'required|array',
+            'agenda'=>'required|array'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -89,9 +89,9 @@ class KalenderAkadController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(count($data['tanggal']) > 0){
+            if(count($request->tanggal) > 0){
 
-                for($i=0;$i<count($data['tanggal']);$i++){
+                for($i=0;$i<count($request->tanggal);$i++){
     
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
                     
@@ -190,8 +190,8 @@ class KalenderAkadController extends Controller
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_sem' => 'required',
-            'tanggal.*' => 'required',
-            'agenda.*'=>'required'
+            'tanggal' => 'required|array',
+            'agenda'=>'required|array'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -203,7 +203,7 @@ class KalenderAkadController extends Controller
             }
             
             
-            if(count($data['tanggal']) > 0){
+            if(count($request->tanggal) > 0){
                 $del = DB::connection('sqlsrvtarbak')->table('sis_kalender_akad')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_ta', $request->kode_ta)
@@ -211,7 +211,7 @@ class KalenderAkadController extends Controller
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
-                for($i=0;$i<count($data['tanggal']);$i++){
+                for($i=0;$i<count($request->tanggal);$i++){
     
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
                     
