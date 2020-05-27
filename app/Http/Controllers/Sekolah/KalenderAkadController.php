@@ -78,7 +78,7 @@ class KalenderAkadController extends Controller
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_sem' => 'required',
-            'tanggal' => 'required|array',
+            'tanggal' => 'required|date_format=Y-m-d|array',
             'agenda'=>'required|array'
         ]);
 
@@ -96,12 +96,16 @@ class KalenderAkadController extends Controller
                     $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
                     
                 }
-                
-            }
-            
-            DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Kalender Akademik berhasil disimpan";
+                DB::connection('sqlsrvtarbak')->commit();
+                $sts = true;
+                $msg = "Data Kalender Akademik berhasil disimpan";
+            }else{
+                $sts = false;
+                $msg = "Data detail tidak valid!";
+            }          
+                        
+            $success['status'] = $sts;
+            $success['message'] = $msg;
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
@@ -190,7 +194,7 @@ class KalenderAkadController extends Controller
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_sem' => 'required',
-            'tanggal' => 'required|array',
+            'tanggal' => 'required|date_format=Y-m-d|array',
             'agenda'=>'required|array'
         ]);
 
@@ -217,11 +221,16 @@ class KalenderAkadController extends Controller
                     
                 }
                 
+                DB::connection('sqlsrvtarbak')->commit();
+                $sts = true;
+                $msg = "Data Kalender Akademik berhasil diubah";
+            }else{
+                $sts = false;
+                $msg = "Data detail tidak valid!";
             }          
                         
-            DB::connection('sqlsrvtarbak')->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Kalender Akademik berhasil diubah";
+            $success['status'] = $sts;
+            $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
