@@ -189,6 +189,10 @@ class JadwalHarianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $kode_pp= $request->kode_pp;
+            $kode_ta= $request->kode_ta;
+            $kode_kelas= $request->kode_kelas;
+            $kode_matpel= $request->kode_matpel;
+            $nik_guru= $request->nik_guru;
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_slot,a.nama
             from  sis_slot a 
