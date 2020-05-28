@@ -205,10 +205,9 @@ class JadwalHarianController extends Controller
                 foreach ($res as $row){
                     $senin=$selasa=$rabu=$kamis=$jumat=$sabtu=$minggu="KOSONG";
                     $strSQL2 = "select kode_hari,kode_matpel,nik from sis_jadwal where kode_slot='".$row['kode_slot']."' and kode_ta='".$kode_ta."' and kode_kelas='".$kode_kelas."' and kode_pp='".$kode_pp."' ";
-                    // array_push($exec,$strSQL2);
                     $res2 = DB::connection('sqlsrvtarbak')->select($strSQL2); 
                     $res2 = json_decode(json_encode($res2),true);			
-                    if (count($res2 > 0)){		
+                    if (count($res2) > 0){		
                         foreach ($res2 as $row2){
                             if ($row2['kode_hari'] == "HR_01") {
                                 if ($row2['kode_matpel'] == $kode_matpel && $row2['nik'] == $nik_guru) $senin  = "ISI";
@@ -240,7 +239,7 @@ class JadwalHarianController extends Controller
                             }
                         }
                     }				
-                     
+                    $success['result2'] = count($res2);
                     $jadwal[] = array("no"=>$no,"kode_slot"=>$row['kode_slot'],"nama"=>$row['nama'],"senin"=>$senin,"selasa"=>$selasa,"rabu"=>$rabu,"kamis"=>$kamis,"jumat"=>$jumat,"sabtu"=>$sabtu,"minggu"=>$minggu); 
                     $no++;
                 }
