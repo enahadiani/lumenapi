@@ -121,6 +121,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('jadwal_harian','Sekolah\JadwalHarianController@loadData');
     $router->post('jadwal_harian','Sekolah\JadwalHarianController@store');
     $router->delete('jadwal_harian','Sekolah\JadwalHarianController@destroy');
+    $router->get('jadwal_load','Sekolah\JadwalHarianController@loadJadwal');
 
      //Jadwal Ujian
     $router->get('jadwal_ujian_all','Sekolah\JadwalUjianController@index');
