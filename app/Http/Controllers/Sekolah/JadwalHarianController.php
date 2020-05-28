@@ -81,7 +81,7 @@ class JadwalHarianController extends Controller
             'kode_matpel' => 'required',
             'nik_guru' => 'required',
             'kode_kelas' => 'required',
-            'kode_slot.*' => 'required'
+            'kode_slot' => 'required|array'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -96,7 +96,7 @@ class JadwalHarianController extends Controller
             ->where('kode_ta', $request->kode_ta)
             ->where('kode_kelas', $request->kode_kelas)
             ->where('kode_matpel', $request->kode_matpel)
-            ->where('nik_guru', $request->nik_guru)
+            ->where('nik', $request->nik_guru)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
             
@@ -155,7 +155,7 @@ class JadwalHarianController extends Controller
                 ->where('kode_ta', $request->kode_ta)
                 ->where('kode_kelas', $request->kode_kelas)
                 ->where('kode_matpel', $request->kode_matpel)
-                ->where('nik_guru', $request->nik_guru)
+                ->where('nik', $request->nik_guru)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
