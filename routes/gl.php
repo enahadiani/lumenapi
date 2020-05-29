@@ -88,11 +88,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('fsgar','Gl\MasakunController@getFSGar');
     $router->get('neracagar/{kode_fs}','Gl\MasakunController@getNeracaGar');
 
-    $router->get('user_device','UserDeviceController@index');
-    $router->get('user_device/{nik}','UserDeviceController@show');
-    $router->post('user_device','UserDeviceController@store');
-    $router->put('user_device/{nik}','UserDeviceController@update');
-    $router->delete('user_device/{nik}','UserDeviceController@destroy');
+    $router->get('user-device','UserDeviceController@index');
+    $router->get('user-device/{nik}','UserDeviceController@show');
+    $router->post('user-device','UserDeviceController@store');
+    $router->put('user-device/{nik}','UserDeviceController@update');
+    $router->delete('user-device/{nik}','UserDeviceController@destroy');
 
     $router->get('jurnal','Gl\JurnalController@index');
     $router->get('jurnal/{no_bukti}','Gl\JurnalController@show');
@@ -103,6 +103,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('akun','Gl\JurnalController@getAkun');
     $router->get('nikperiksa','Gl\JurnalController@getNIKPeriksa');
     $router->get('nikperiksa/{nik}','Gl\JurnalController@getNIKPeriksaByNIK');
+    $router->get('jurnal-periode','Gl\JurnalController@getPeriodeJurnal');
 
     $router->post('loadData','Gl\PostingController@loadData');
     $router->get('modul2','Gl\PostingController@getModul');

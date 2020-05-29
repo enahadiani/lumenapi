@@ -539,4 +539,39 @@ class JurnalController extends Controller
         }
         
     }
+
+    public function getPeriodeJurnal()
+    {
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
+            }
+
+            $sql = "select distinct a.periode from trans_m a  where a.kode_lokasi = '".$kode_lokasi."' and a.modul='MI'";
+
+            $res = DB::connection('sqlsrv2')->select($sql);						
+            $res= json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
 }
