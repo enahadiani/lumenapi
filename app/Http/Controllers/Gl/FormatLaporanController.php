@@ -434,7 +434,7 @@ class FormatLaporanController extends Controller
             else{
                 $success['status'] = false;
                 $success['data'] = [];
-                $success['detail'] = [];
+                $success['detail'] = $res2;
                 $success['message'] = "Data Tidak ditemukan!";
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
