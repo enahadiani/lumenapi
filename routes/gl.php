@@ -108,4 +108,15 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('loadData','Gl\PostingController@loadData');
     $router->get('modul2','Gl\PostingController@getModul');
     $router->post('posting','Gl\PostingController@store');
+
+    //Format Laporan
+    $router->get('format-laporan','Gl\JurnalController@show');
+    $router->post('format-laporan','Gl\JurnalController@store');
+    $router->put('format-laporan','Gl\JurnalController@update');
+    $router->delete('format-laporan','Gl\JurnalController@destroy');
+    $router->get('format-laporan-versi','Gl\JurnalController@getVersi');
+    $router->get('format-laporan-tipe','Gl\JurnalController@getTipe');
+    $router->get('format-laporan-relakun','Gl\JurnalController@getRelakun');
+    $router->post('format-laporan-relasi','Gl\JurnalController@simpanRelasi');
+    $router->post('format-laporan-move','Gl\JurnalController@simpanMove');
 });
