@@ -93,7 +93,7 @@ class FormatLaporanController extends Controller
             //insert nrc
             $i=1;
             for($x=0;$x < count($getnrc);$x++){
-                $ins[$x] =  DB::connection('sqlsrv2')->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($getnrc[$x]['kode_neraca'],$getnrc[$x]['kode_fs'],$getnrc[$x]['nama'],$getnrc[$x]['level_spasi'],$getnrc[$x]['level_lap'],$getnrc[$x]['tipe'],$getnrc[$x]['sum_header'],$getnrc[$x]['jenis_akun'],$getnrc[$x]['kode_induk'],$i,$getnrc[$x]['modul'],$kode_lokasi));
+                $ins[$x] =  DB::connection('sqlsrv2')->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($getnrc[$x]['kode_neraca'],$getnrc[$x]['kode_fs'],$getnrc[$x]['nama'],$getnrc[$x]['level_spasi'],$getnrc[$x]['level_lap'],$getnrc[$x]['tipe'],$getnrc[$x]['sum_header'],$getnrc[$x]['jenis_akun'],$getnrc[$x]['kode_induk'],$i,$getnrc[$x]['modul'],$kode_lokasi));
                 $i++;
             }
         
