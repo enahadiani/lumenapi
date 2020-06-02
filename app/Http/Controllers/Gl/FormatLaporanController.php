@@ -68,7 +68,7 @@ class FormatLaporanController extends Controller
 
             //insert neraca tmp
             $nrc_tmp = DB::connection('sqlsrv2')->update("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi)
-            select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik_user' as nik_user,getdate(),kode_lokasi
+            select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate(),kode_lokasi
             from neraca 
             where modul = '$modul' and kode_fs='".$kode_fs."' and kode_lokasi='$kode_lokasi'
             order by rowindex");
