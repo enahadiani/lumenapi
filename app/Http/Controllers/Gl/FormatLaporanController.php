@@ -378,7 +378,7 @@ class FormatLaporanController extends Controller
             $nu=1;
             for($i=0;$i<count($request->kode_neraca);$i++){
 
-                $ins = DB::connection('sqlsrv2')->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($request->kode_neraca[$i],$kode_fs,$request->nama[$i],$request->level_spasi[$i],$request->level_lap[$i],$request->tipe[$i],$request->sum_header[$i],$request->jenis_akun[$i],$request->kode_induk[$i],$nu,$request->modul[$i],$kode_lokasi));
+                $ins = DB::connection('sqlsrv2')->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($request->kode_neraca[$i],$kode_fs,$request->nama[$i],$request->level_spasi[$i],$request->level_lap[$i],$request->tipe[$i],$request->sum_header[$i],$request->jenis_akun[$i],$request->kode_induk[$i],$nu,$request->modul[$i],$kode_lokasi));
                 $nu++;
             }
         
