@@ -110,13 +110,13 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('posting','Gl\PostingController@store');
 
     //Format Laporan
-    $router->get('format-laporan','Gl\JurnalController@show');
-    $router->post('format-laporan','Gl\JurnalController@store');
-    $router->put('format-laporan','Gl\JurnalController@update');
-    $router->delete('format-laporan','Gl\JurnalController@destroy');
-    $router->get('format-laporan-versi','Gl\JurnalController@getVersi');
-    $router->get('format-laporan-tipe','Gl\JurnalController@getTipe');
-    $router->get('format-laporan-relakun','Gl\JurnalController@getRelakun');
-    $router->post('format-laporan-relasi','Gl\JurnalController@simpanRelasi');
-    $router->post('format-laporan-move','Gl\JurnalController@simpanMove');
+    $router->get('format-laporan','Gl\FormatLaporanController@show');
+    $router->post('format-laporan','Gl\FormatLaporanController@store');
+    $router->put('format-laporan','Gl\FormatLaporanController@update');
+    $router->delete('format-laporan','Gl\FormatLaporanController@destroy');
+    $router->get('format-laporan-versi','Gl\FormatLaporanController@getVersi');
+    $router->get('format-laporan-tipe','Gl\FormatLaporanController@getTipe');
+    $router->get('format-laporan-relakun','Gl\FormatLaporanController@getRelakun');
+    $router->post('format-laporan-relasi','Gl\FormatLaporanController@simpanRelasi');
+    $router->post('format-laporan-move','Gl\FormatLaporanController@simpanMove');
 });
