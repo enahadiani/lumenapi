@@ -271,13 +271,8 @@ class FormatLaporanController extends Controller
         }	
     }
 
-    public function getVersi(Request $request)
+    public function getVersi()
     {
-        $this->validate($request, [
-            'kode_fs' => 'required',
-            'modul' => 'required'
-        ]);
-
         try {
             
             
@@ -286,8 +281,6 @@ class FormatLaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $kode_fs = $request->kode_fs;
-            $modul = $request->modul;
             $res = DB::connection('sqlsrv2')->select("select kode_fs,nama from fs where kode_lokasi='$kode_lokasi' 
             ");
             $res = json_decode(json_encode($res),true);
