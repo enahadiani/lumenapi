@@ -149,6 +149,7 @@ class FormatLaporanController extends Controller
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
