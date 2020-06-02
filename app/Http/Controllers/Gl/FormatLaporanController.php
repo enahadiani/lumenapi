@@ -450,7 +450,7 @@ class FormatLaporanController extends Controller
         $this->validate($request, [
             'kode_fs' => 'required',
             'kode_neraca' => 'required',
-            'kode_akun' => 'required|array'
+            'kode_akun' => 'array'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -470,9 +470,12 @@ class FormatLaporanController extends Controller
             ->where('kode_neraca', $kode_neraca)
             ->delete();
 
-            for($i=0;$i<count($request->kode_akun);$i++){
+            if(isset($request->kode_akun)){
 
-                $ins = DB::connection('sqlsrv2')->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?)",array($kode_neraca,$kode_fs,$request->kode_akun[$i],$kode_lokasi));
+                for($i=0;$i<count($request->kode_akun);$i++){
+    
+                    $ins = DB::connection('sqlsrv2')->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?)",array($kode_neraca,$kode_fs,$request->kode_akun[$i],$kode_lokasi));
+                }
             }
         
             DB::connection('sqlsrv2')->commit();
