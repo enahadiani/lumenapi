@@ -412,7 +412,7 @@ class FormatLaporanController extends Controller
 
             $kode_neraca = $request->kode_neraca;
             $modul = $request->modul;
-            $res = DB::connection('sqlsrv2')->select("select kode_akun,nama from masakun where kode_lokasi='$kode_lokasi' and kode_akun not in (select distinct kode_akun from relakun where kode_lokasi='$kode_lokasi') and modul='$modul'
+            $res = DB::connection('sqlsrv2')->select("select kode_akun,nama from masakun where kode_lokasi='$kode_lokasi' and kode_akun not in (select distinct kode_akun from relakun where kode_lokasi='$kode_lokasi' and kode_neraca='$kode_neraca' ) and modul='$modul'
             ") ;
             
             $res = json_decode(json_encode($res),true);
