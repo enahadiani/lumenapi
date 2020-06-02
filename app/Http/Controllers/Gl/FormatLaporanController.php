@@ -249,9 +249,9 @@ class FormatLaporanController extends Controller
             if(count($cek) > 0){
                 
                 $del = DB::connection('sqlsrv2')->table('neraca')->where('kode_lokasi', $kode_lokasi)
-                ->where('kode_fs', $kode_fs)
-                ->where('kode_neraca', $kode_neraca)
-                ->where('modul', $modul)
+                ->where('kode_fs', $request->kode_fs)
+                ->where('kode_neraca', $request->kode_neraca)
+                ->where('modul', $request->modul)
                 ->delete();
                 $success['status']= true;
                 $success['message']= 'Data berhasil dihapus';
