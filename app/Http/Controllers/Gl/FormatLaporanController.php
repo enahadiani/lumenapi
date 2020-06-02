@@ -460,7 +460,6 @@ class FormatLaporanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $modul = $request->modul;
             $kode_fs = $request->kode_fs;
             $kode_neraca = $request->kode_neraca;
                
