@@ -202,9 +202,9 @@ class FormatLaporanController extends Controller
             }
 
             $del = DB::connection('sqlsrv2')->table('neraca')->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_fs', $kode_fs)
-            ->where('kode_neraca', $kode_neraca)
-            ->where('modul', $modul)
+            ->where('kode_fs', $request->kode_fs)
+            ->where('kode_neraca', $request->kode_neraca)
+            ->where('modul', $request->modul)
             ->delete();
 
             $ins = DB::connection('sqlsrv2')->insert('insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->kode_neraca,$request->kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->rowindex,$request->modul,$kode_lokasi]);
