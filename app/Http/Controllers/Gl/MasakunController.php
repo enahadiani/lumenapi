@@ -524,8 +524,9 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select kode_neraca, nama from neraca where kode_fs='".$kode_fs."' and kode_neraca ='".$kode_neraca."' and tipe = 'posting' and kode_lokasi='".$kode_lokasi."'
-            ");
+            $sql = "select kode_neraca, nama from neraca where kode_fs='".$kode_fs."' and kode_neraca ='".$kode_neraca."' and tipe = 'posting' and kode_lokasi='".$kode_lokasi."'
+            ";
+            $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -537,6 +538,7 @@ class MasakunController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['sql'] =$sql;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
