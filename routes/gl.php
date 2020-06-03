@@ -123,5 +123,5 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('format-laporan-move','Gl\FormatLaporanController@simpanMove');
 
     // Midtrans Test
-    $router->get('sai-midtrans','Gl\MidtransController@getSnapToken');
+    $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
 });
