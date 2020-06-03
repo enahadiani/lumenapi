@@ -455,7 +455,7 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select kode_flag, nama from flag_akun where kode_flag='$flag'
+            $res = DB::connection('sqlsrv2')->select("select kode_flag, nama from flag_akun where kode_flag='$kode_flag'
             ");
             $res = json_decode(json_encode($res),true);
             
