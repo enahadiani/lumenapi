@@ -26,6 +26,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     
     $router->post('login', 'AuthController@loginRtrw');
     $router->get('hash_pass', 'AuthController@hashPasswordRtrw');
+    $router->get('hash_pass_user/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     $router->get('db', function () {
         
         $sql = DB::connection('sqlsrvrtrw')->select("select * from hakakses ");
