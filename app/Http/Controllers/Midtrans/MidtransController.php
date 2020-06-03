@@ -92,11 +92,10 @@ class MidtransController extends Controller
         // return $transaction;
         try {
             $snapToken = Snap::getSnapToken($transaction);
-            return response()->json($snapToken);
-            // return ['code' => 1 , 'message' => 'success' , 'result' => $snapToken];
+            return response()->json(['status' => 1 , 'message' => 'success' , 'token' => $snapToken, 'redirect_url' => 'https://app.sandbox.midtrans.com/snap/v2/vtweb/'.$snapToken]);
         } catch (\Exception $e) {
             dd($e);
-            return ['code' => 0 , 'message' => 'failed'];
+            return response()->json(['status' => 0 , 'message' => 'failed']);
         }
 
     }

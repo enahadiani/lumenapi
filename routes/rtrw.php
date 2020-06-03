@@ -78,4 +78,8 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
 
     $router->get('rekap_setoran', 'Rtrw\RtrwController@getRekapSetoran');
     $router->get('rekap_setoran_detail', 'Rtrw\RtrwController@getDetailRekapSetoran');
+
+    // Midtrans Test
 });
+
+$router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
