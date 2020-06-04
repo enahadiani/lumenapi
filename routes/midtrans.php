@@ -43,6 +43,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('donasi-kode','Midtrans\DonasiController@getKode');
     $router->get('donasi/{no_bukti}','Midtrans\DonasiController@show');
     $router->post('donasi','Midtrans\DonasiController@store');
-    $router->put('donasi/{no_bukti}/{sts_bayar}','Midtrans\DonasiController@ubahStatus');
-
+    
 });
+
+$router->put('donasi/{no_bukti}/{sts_bayar}','Midtrans\DonasiController@ubahStatus');
