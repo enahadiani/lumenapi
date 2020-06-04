@@ -164,16 +164,10 @@ class DonasiController extends Controller
         DB::connection('sqlsrv2')->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
             
             $upd = DB::connection('sqlsrv2')->table('mid_donasi')
-            ->where('no_bukti', $no_bukti)          
-            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti)      
             ->update(['status' => $sts_bayar]);
-    
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
