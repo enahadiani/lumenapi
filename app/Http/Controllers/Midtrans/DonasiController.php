@@ -110,7 +110,7 @@ class DonasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $ins = DB::connection('sqlsrv2')->insert('insert into mid_donasi (no_bukti,nama,email,type_donasi,nilai,keterangan,status,snap_token,kode_lokasi,nik) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->nama,$request->email,$request->type_donasi,$request->nilai,$request->keterangan,$request->status,$request->snap_token,$kode_lokasi,$nik]);
+            $ins = DB::connection('sqlsrv2')->insert('insert into mid_donasi (no_bukti,nama,email,type_donasi,nilai,keterangan,status,snap_token,kode_lokasi,nik) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->no_bukti,$request->nama,$request->email,$request->type_donasi,$request->nilai,$request->keterangan,$request->status,$request->snap_token,$kode_lokasi,$nik]);
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
