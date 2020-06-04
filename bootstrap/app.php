@@ -251,4 +251,11 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/dago.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/midtrans'
+], function ($router) {
+    require __DIR__.'/../routes/midtrans.php';
+});
 return $app;
