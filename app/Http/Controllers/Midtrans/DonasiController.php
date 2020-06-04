@@ -99,12 +99,12 @@ class DonasiController extends Controller
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
-            $success['message'] = "Data Fs berhasil disimpan";
+            $success['message'] = "Data Donasi berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Fs gagal disimpan ".$e;
+            $success['message'] = "Data Donasi gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -143,5 +143,36 @@ class DonasiController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function ubahStatus($no_bukti,$sts_bayar)
+    {
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $upd = DB::connection('sqlsrv2')->table('mid_donasi')
+            ->where('no_bukti', $no_bukti)          
+            ->where('kode_lokasi', $kode_lokasi)
+            ->update(['status' => $sts_bayar]);
+    
+            
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Donasi berhasil disimpan";
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Donasi gagal disimpan ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
 
 }
