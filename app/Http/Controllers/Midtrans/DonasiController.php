@@ -63,9 +63,24 @@ class DonasiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function getKode()
     {
-        //
+        try{
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bukti = $this->generateKode("mid_donasi", "no_bukti", $kode_lokasi."-MID.", "0001");
+            $success['no_bukti'] = $no_bukti;
+            $success['status'] = true;
+            $success['message'] = "Success";
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
     /**
@@ -77,6 +92,7 @@ class DonasiController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
+            'no_bukti' => 'required',
             'nama' => 'required',
             'email' => 'required',
             'type_donasi' => 'required',
@@ -93,7 +109,6 @@ class DonasiController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $no_bukti = $this->generateKode("mid_donasi", "no_bukti", $kode_lokasi."-MID.", "0001");
             
             $ins = DB::connection('sqlsrv2')->insert('insert into mid_donasi (no_bukti,nama,email,type_donasi,nilai,keterangan,status,snap_token,kode_lokasi,nik) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->nama,$request->email,$request->type_donasi,$request->nilai,$request->keterangan,$request->status,$request->snap_token,$kode_lokasi,$nik]);
             
