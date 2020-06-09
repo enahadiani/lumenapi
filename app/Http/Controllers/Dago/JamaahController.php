@@ -41,7 +41,7 @@ class JamaahController extends Controller
     public function index(Request $request)
     {
         // $this->validate($request, [
-        //     'no_jamaah' => 'required'
+        //     'no_peserta' => 'required'
         // ]);
 
         try {
@@ -50,12 +50,12 @@ class JamaahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            // if(isset($request->no_jamaah)){
-            //     if($request->no_jamaah == "all"){
+            // if(isset($request->no_peserta)){
+            //     if($request->no_peserta == "all"){
             //         $filter = "";
             //     }else{
 
-            //         $filter = " and no_peserta='$request->no_jamaah' ";
+            //         $filter = " and no_peserta='$request->no_peserta' ";
             //     }
             // }else{
             //     $filter = "";
@@ -210,7 +210,7 @@ class JamaahController extends Controller
     public function edit(Request $request)
     {
         $this->validate($request, [
-            'no_jamaah' => 'required'
+            'no_peserta' => 'required'
         ]);
         try {
             
@@ -219,7 +219,7 @@ class JamaahController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('dago/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' ");
+            $res = DB::connection($this->sql)->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('dago/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' ");
             $res = json_decode(json_encode($res),true);
 
            
@@ -252,7 +252,7 @@ class JamaahController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_jamaah' => 'required',
+            'no_peserta' => 'required',
             'id_peserta' => 'required',
             'nama' => 'required',
             'tempat' => 'required',
@@ -291,7 +291,7 @@ class JamaahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $no_peserta = $request->no_jamaah;
+            $no_peserta = $request->no_peserta;
 
             $del = DB::connection($this->sql)->table('dgw_peserta')
             ->where('kode_lokasi', $kode_lokasi)
@@ -352,7 +352,7 @@ class JamaahController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'no_jamaah' => 'required'
+            'no_peserta' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -362,7 +362,7 @@ class JamaahController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select count(*) as jml from dgw_reg where no_peserta='".$request->no_jamaah."' and kode_lokasi='".$kode_lokasi."'";					
+            $strSQL = "select count(*) as jml from dgw_reg where no_peserta='".$request->no_peserta."' and kode_lokasi='".$kode_lokasi."'";					
             $res = DB::connection($this->sql)->select($strSQL); 
             $res = json_decode(json_encode($res),true);
             if (count($res) > 0){
@@ -371,7 +371,7 @@ class JamaahController extends Controller
                     $msg = "Jamaah tidak dapat dihapus. Jamaah telah melakukan registrasi umroh/haji";
                     $sts = "FAILED";	
                 }else{
-                    $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' 
+                    $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' 
                     ";
                     $res = DB::connection($this->sql)->select($sql);
                     $res = json_decode(json_encode($res),true);
@@ -385,7 +385,7 @@ class JamaahController extends Controller
                     }
                     $del = DB::connection($this->sql)->table('dgw_peserta')
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->where('no_peserta', $request->no_jamaah)
+                    ->where('no_peserta', $request->no_peserta)
                     ->delete();
                     
                     DB::connection($this->sql)->commit();
