@@ -15,10 +15,12 @@ class BiayaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select kode_biaya from dgw_biaya where kode_biaya ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_biaya from dgw_biaya where kode_biaya ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class BiayaController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class BiayaController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select kode_biaya,nama,nilai,akun_pdpt,jenis from dgw_biaya where kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection($this->sql)->select( "select kode_biaya,nama,nilai,akun_pdpt,jenis from dgw_biaya where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -94,18 +96,18 @@ class BiayaController extends Controller
             'jenis' => 'required|in:TAMBAHAN,DOKUMEN'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_biaya,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
+                $ins = DB::connection($this->sql)->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
                 
-                DB::connection('sqlsrvdago')->commit();
+                DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
                 $success['message'] = "Data Biaya berhasil disimpan";
             }else{
@@ -115,7 +117,7 @@ class BiayaController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Biaya gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -153,27 +155,27 @@ class BiayaController extends Controller
             'jenis' => 'required|in:TAMBAHAN,DOKUMEN'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_biaya')
+            $del = DB::connection($this->sql)->table('dgw_biaya')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_biaya', $request->kode_biaya)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_biaya(kode_biaya,nama,nilai,akun_pdpt,jenis,kode_lokasi) values (?, ?, ?, ?, ?, ?)', array($request->kode_biaya,$request->nama,$request->nilai,$request->akun_pdpt,$request->jenis,$kode_lokasi));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Biaya berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Biaya gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -191,26 +193,26 @@ class BiayaController extends Controller
         $this->validate($request, [
             'kode_biaya' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_biaya')
+            $del = DB::connection($this->sql)->table('dgw_biaya')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_biaya', $request->kode_biaya)
             ->delete();
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Biaya berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Biaya gagal dihapus ".$e;
             
@@ -222,12 +224,12 @@ class BiayaController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select a.kode_akun, a.nama from masakun a 
+            $res = DB::connection($this->sql)->select( "select a.kode_akun, a.nama from masakun a 
             inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag in ('022') 
             where a.block='0' and a.kode_lokasi = '$kode_lokasi' ");
             $res = json_decode(json_encode($res),true);

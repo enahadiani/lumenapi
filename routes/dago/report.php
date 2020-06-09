@@ -15,23 +15,16 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
+$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+    //Filter Laporan
+    $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
+    $router->get('filter-paket','Dago\LaporanController@getFilterPaket');
+    $router->get('filter-jadwal','Dago\LaporanController@getFilterJadwal');
+    $router->get('filter-noreg','Dago\LaporanController@getFilterNoReg');
+    $router->get('filter-peserta','Dago\LaporanController@getFilterPeserta');
 
-$router->group(['middleware' => 'cors'], function () use ($router) {
-    //approval dev
-    $router->post('login', 'AuthController@loginDago');
-    $router->get('hash_pass', 'AuthController@hashPasswordDago');
-});
-
-$router->get('storage/{filename}', function ($filename)
-{
-    if (!Storage::disk('s3')->exists('dago/'.$filename)) {
-        abort(404);
-    }
-    return Storage::disk('s3')->response('dago/'.$filename); 
-});
-
-$router->group(['middleware' => 'auth:dago'], function () use ($router) {
     //Pihak ketiga
+   
     //Laporan
     $router->get('lap-mku-operasional','Dago\LaporanController@getMkuOperasional');
     $router->get('lap-mku-keuangan','Dago\LaporanController@getMkuKeuangan');
@@ -44,6 +37,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('lap-pembayaran','Dago\LaporanController@getPembayaran');
     $router->get('lap-rekap-saldo','Dago\LaporanController@getRekapSaldo');
     $router->get('lap-kartu-pembayaran','Dago\LaporanController@getKartuPembayaran');
+
 });
 
 

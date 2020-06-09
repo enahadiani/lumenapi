@@ -15,10 +15,12 @@ class JenisHargaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select kode_harga from dgw_jenis_harga where kode_harga ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_harga from dgw_jenis_harga where kode_harga ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class JenisHargaController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class JenisHargaController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select kode_harga,nama from dgw_jenis_harga where kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection($this->sql)->select( "select kode_harga,nama from dgw_jenis_harga where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -91,18 +93,18 @@ class JenisHargaController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_harga,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
+                $ins = DB::connection($this->sql)->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
                 
-                DB::connection('sqlsrvdago')->commit();
+                DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
                 $success['message'] = "Data Jenis Harga berhasil disimpan";
             }else{
@@ -112,7 +114,7 @@ class JenisHargaController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Jenis Harga gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -147,27 +149,27 @@ class JenisHargaController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_jenis_harga')
+            $del = DB::connection($this->sql)->table('dgw_jenis_harga')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_harga', $request->kode_harga)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_jenis_harga(kode_harga,nama,kode_lokasi) values (?, ?, ?)', array($request->kode_harga,$request->nama,$kode_lokasi));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Jenis Harga berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Jenis Harga gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -185,26 +187,26 @@ class JenisHargaController extends Controller
         $this->validate($request, [
             'kode_harga' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_jenis_harga')
+            $del = DB::connection($this->sql)->table('dgw_jenis_harga')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_harga', $request->kode_harga)
             ->delete();
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Jenis Harga berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Jenis Harga gagal dihapus ".$e;
             

@@ -16,10 +16,12 @@ class JamaahController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select no_peserta from dgw_paket where id_peserta ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select no_peserta from dgw_paket where id_peserta ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -29,7 +31,7 @@ class JamaahController extends Controller
     }
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrvdago')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -44,7 +46,7 @@ class JamaahController extends Controller
 
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -59,7 +61,7 @@ class JamaahController extends Controller
             //     $filter = "";
             // }
 
-            $res = DB::connection('sqlsrvdago')->select("select no_peserta, kode_lokasi, id_peserta, nama, jk, status, alamat, kode_pos, telp, hp, email, pekerjaan, bank, cabang, norek, namarek, nopass, kantor_mig, sp, ec_telp, ec_hp, issued, ex_pass, tempat, tgl_lahir, th_haji, 
+            $res = DB::connection($this->sql)->select("select no_peserta, kode_lokasi, id_peserta, nama, jk, status, alamat, kode_pos, telp, hp, email, pekerjaan, bank, cabang, norek, namarek, nopass, kantor_mig, sp, ec_telp, ec_hp, issued, ex_pass, tempat, tgl_lahir, th_haji, 
             th_umroh, ibu, '".url('dago/storage')."/'+foto as foto, ayah, pendidikan
             from dgw_peserta
             where kode_lokasi='".$kode_lokasi."'");
@@ -67,7 +69,7 @@ class JamaahController extends Controller
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 // for($i=0;$i < count($res);$i++){
-                //     $res2 = DB::connection('sqlsrvdago')->select("select case when a.kode_curr = 'IDR' then a.nilai_p+a.nilai_t+a.nilai_m else (a.nilai_p*a.kurs)+a.nilai_t+a.nilai_m end as nilai_bayar
+                //     $res2 = DB::connection($this->sql)->select("select case when a.kode_curr = 'IDR' then a.nilai_p+a.nilai_t+a.nilai_m else (a.nilai_p*a.kurs)+a.nilai_t+a.nilai_m end as nilai_bayar
                 //     from dgw_pembayaran a
                 //     inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
                 //     inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
@@ -80,7 +82,7 @@ class JamaahController extends Controller
                 //         $no++;
                 //     }   
 
-                //     $res3 = DB::connection('sqlsrvdago')->select("select ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
+                //     $res3 = DB::connection($this->sql)->select("select ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS id,a.deskripsi as name,case when isnull(c.no_gambar,'-') ='-' then 'not uploaded' else 'uploaded' end as status, case when isnull(c.no_gambar,'-') ='-' then '-' else isnull(c.no_gambar,'-') end as url
                 //     from dgw_dok a 
                 //     left join dgw_reg_dok b on a.no_dokumen=b.no_dok
                 //     left join dgw_reg d on b.no_reg = d.no_reg  
@@ -152,10 +154,10 @@ class JamaahController extends Controller
             'pendidikan' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -179,15 +181,15 @@ class JamaahController extends Controller
                 $foto="-";
             }
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Jamaah berhasil disimpan. No jamaah:".$no_peserta;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Jamaah gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -210,12 +212,12 @@ class JamaahController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('dago/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' ");
+            $res = DB::connection($this->sql)->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('dago/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' ");
             $res = json_decode(json_encode($res),true);
 
            
@@ -280,23 +282,23 @@ class JamaahController extends Controller
             'pendidikan' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             $no_peserta = $request->no_jamaah;
 
-            $del = DB::connection('sqlsrvdago')->table('dgw_peserta')
+            $del = DB::connection($this->sql)->table('dgw_peserta')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_peserta', $no_peserta)
             ->delete();		
             
             $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$no_peserta' 
             ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){
@@ -325,14 +327,14 @@ class JamaahController extends Controller
                 $foto="-";
             }
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Paket berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Paket gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -350,16 +352,16 @@ class JamaahController extends Controller
         $this->validate($request, [
             'no_jamaah' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $strSQL = "select count(*) as jml from dgw_reg where no_peserta='".$request->no_jamaah."' and kode_lokasi='".$kode_lokasi."'";					
-            $res = DB::connection('sqlsrvdago')->select($strSQL); 
+            $res = DB::connection($this->sql)->select($strSQL); 
             $res = json_decode(json_encode($res),true);
             if (count($res) > 0){
                 $line = $res[0];							
@@ -369,7 +371,7 @@ class JamaahController extends Controller
                 }else{
                     $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_jamaah' 
                     ";
-                    $res = DB::connection('sqlsrvdago')->select($sql);
+                    $res = DB::connection($this->sql)->select($sql);
                     $res = json_decode(json_encode($res),true);
                     if(count($res) > 0){
                         $foto = $res[0]['file_gambar'];
@@ -379,12 +381,12 @@ class JamaahController extends Controller
                     }else{
                         $foto = "-";
                     }
-                    $del = DB::connection('sqlsrvdago')->table('dgw_peserta')
+                    $del = DB::connection($this->sql)->table('dgw_peserta')
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('no_peserta', $request->no_jamaah)
                     ->delete();
                     
-                    DB::connection('sqlsrvdago')->commit();
+                    DB::connection($this->sql)->commit();
                     $msg = "Data Jamaah berhasil dihapus";
                     $sts = "SUCCESS";
                 } 	
@@ -396,7 +398,7 @@ class JamaahController extends Controller
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Paket gagal dihapus ".$e;
             

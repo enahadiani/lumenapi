@@ -132,7 +132,7 @@ class PresensiController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'tanggal' => 'required|date_format=Y-m-d',
+            'tanggal' => 'required|date_format:Y-m-d',
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_kelas' => 'required'
@@ -300,7 +300,7 @@ class PresensiController extends Controller
     public function loadPresensi(Request $request)
     {
         $this->validate($request, [
-            'tanggal' => 'required|date_format=Y-m-d',
+            'tanggal' => 'required|date_format:Y-m-d',
             'kode_pp' => 'required',
             'kode_ta' => 'required',
             'kode_kelas' => 'required'

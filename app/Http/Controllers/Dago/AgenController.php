@@ -15,10 +15,12 @@ class AgenController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select no_agen from dgw_agent where no_agen ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select no_agen from dgw_agent where no_agen ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class AgenController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class AgenController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select 
+            $res = DB::connection($this->sql)->select( "select 
             no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing from dgw_agent where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
@@ -103,19 +105,19 @@ class AgenController extends Controller
             'kode_marketing' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->no_agen,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_agent(
+                $ins = DB::connection($this->sql)->insert('insert into dgw_agent(
                 no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->norek,$request->namarek,$request->kode_marketing,$kode_lokasi));
                 
-                DB::connection('sqlsrvdago')->commit();
+                DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
                 $success['message'] = "Data Agen berhasil disimpan";
             }else{
@@ -125,7 +127,7 @@ class AgenController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Agen gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -171,28 +173,28 @@ class AgenController extends Controller
             'kode_marketing' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_agent')
+            $del = DB::connection($this->sql)->table('dgw_agent')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_agen', $request->no_agen)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_agent(
+            $ins = DB::connection($this->sql)->insert('insert into dgw_agent(
                 no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->no_agen,$request->nama_agen,$request->alamat,$request->flag_aktif, $request->tempat_lahir, $request->tgl_lahir,$request->no_hp,$request->email,$request->bank,$request->cabang,$request->norek,$request->namarek,$request->kode_marketing,$kode_lokasi));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Agen berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Agen gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -210,26 +212,26 @@ class AgenController extends Controller
         $this->validate($request, [
             'no_agen' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_agent')
+            $del = DB::connection($this->sql)->table('dgw_agent')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_agen', $request->no_agen)
             ->delete();
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Agen berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Agen gagal dihapus ".$e;
             

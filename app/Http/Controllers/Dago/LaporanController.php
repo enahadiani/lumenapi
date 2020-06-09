@@ -15,11 +15,13 @@ class LaporanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
+    
     function getMkuOperasional(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class LaporanController extends Controller
             inner join dgw_marketing g on a.no_marketing=g.no_marketing and a.kode_lokasi=g.kode_lokasi
             inner join dgw_pekerjaan h on d.pekerjaan=h.id_pekerjaan and d.kode_lokasi=h.kode_lokasi
             $filter ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -73,7 +75,7 @@ class LaporanController extends Controller
     function getMkuKeuangan(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -121,7 +123,7 @@ class LaporanController extends Controller
                         )i on a.no_reg=i.no_reg and a.kode_lokasi=i.kode_lokasi
             $filter 
             order by a.no_reg ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -147,7 +149,7 @@ class LaporanController extends Controller
     function getPaket(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -163,7 +165,7 @@ class LaporanController extends Controller
             }
             $sql="select a.no_paket,a.nama,a.kode_curr,a.jenis,a.kode_produk, a.tarif_agen from dgw_paket a $filter";
            
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -190,7 +192,7 @@ class LaporanController extends Controller
     function getDokumen(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -206,7 +208,7 @@ class LaporanController extends Controller
             }
             $sql="select a.no_dokumen,a.deskripsi,a.jenis from dgw_dok a $filter";
            
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -233,7 +235,7 @@ class LaporanController extends Controller
     function getJamaah(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -250,7 +252,7 @@ class LaporanController extends Controller
             $sql="select a.no_peserta, a.kode_lokasi, a.id_peserta, a.nama, a.jk, a.status, a.alamat, a.kode_pos, a.telp, a.hp, a.email, a.pekerjaan, a.bank, a.cabang, a.norek, a.namarek, a.nopass, a.kantor_mig, a.sp, a.ec_telp, a.ec_hp, a.issued, a.ex_pass, a.tempat, a.tgl_lahir, a.th_haji, 
             a.th_umroh, a.ibu, a.foto, a.ayah, a.pendidikan from dgw_peserta a $filter";
            
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -277,7 +279,7 @@ class LaporanController extends Controller
     function getFormRegistrasi(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -302,7 +304,7 @@ class LaporanController extends Controller
             inner join dgw_jadwal d on  a.no_paket=d.no_paket and a.no_jadwal=d.no_jadwal and a.kode_lokasi=d.kode_lokasi
             inner join dgw_pekerjaan g on b.pekerjaan=g.id_pekerjaan and b.kode_lokasi=g.kode_lokasi
             $filter  ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -328,7 +330,7 @@ class LaporanController extends Controller
     function getRegistrasi(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -349,7 +351,7 @@ class LaporanController extends Controller
             inner join dgw_jadwal c on a.no_paket=c.no_paket and a.no_jadwal=c.no_jadwal and a.kode_lokasi=c.kode_lokasi
             inner join dgw_paket d on a.no_paket=d.no_paket and a.kode_lokasi=d.kode_lokasi
             $filter  ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -375,7 +377,7 @@ class LaporanController extends Controller
     function getPembayaran(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -410,7 +412,7 @@ class LaporanController extends Controller
                         from dgw_pembayaran 
                         group by no_reg,kode_lokasi ) n on b.no_reg=n.no_reg and b.kode_lokasi=n.kode_lokasi
             $filter  ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -436,7 +438,7 @@ class LaporanController extends Controller
     function getRekapSaldo(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -475,7 +477,7 @@ class LaporanController extends Controller
                         ) h on a.no_reg=h.no_reg and a.kode_lokasi=h.kode_lokasi
             $filter 
             order by a.no_reg";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -501,7 +503,7 @@ class LaporanController extends Controller
     function getKartuPembayaran(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -536,7 +538,7 @@ class LaporanController extends Controller
             )g on a.no_reg=g.no_reg and a.kode_lokasi=g.kode_lokasi
             $filter
             order by a.no_reg desc ";
-            $rs = DB::connection('sqlsrvdago')->select($sql);
+            $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -561,7 +563,7 @@ class LaporanController extends Controller
                 inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' and a.no_reg in ($no_reg)
                 order by b.tanggal ";
-                $rs2 = DB::connection('sqlsrvdago')->select($sql);
+                $rs2 = DB::connection($this->sql)->select($sql);
                 $rs2 = json_decode(json_encode($rs2),true);
                 
                 $success['status'] = "SUCCESS";

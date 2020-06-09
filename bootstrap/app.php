@@ -254,6 +254,48 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dago-auth'
+], function ($router) {
+    require __DIR__.'/../routes/dago/auth.php';
+});
+
+// $app->router->group([
+//     'namespace' => 'App\Http\Controllers',
+//     'prefix' => 'api/dago-out'
+// ], function ($router) {
+//     require __DIR__.'/../routes/dago/out.php';
+// });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dago-dash'
+], function ($router) {
+    require __DIR__.'/../routes/dago/dash.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dago-master'
+], function ($router) {
+    require __DIR__.'/../routes/dago/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dago-trans'
+], function ($router) {
+    require __DIR__.'/../routes/dago/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dago-report'
+], function ($router) {
+    require __DIR__.'/../routes/dago/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/midtrans'
 ], function ($router) {
     require __DIR__.'/../routes/midtrans.php';

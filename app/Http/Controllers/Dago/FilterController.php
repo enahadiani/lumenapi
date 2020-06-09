@@ -15,17 +15,19 @@ class FilterController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     function getFilterPeriode(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
           
             $sql="select distinct periode from dgw_reg where kode_lokasi='$kode_lokasi' ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -49,7 +51,7 @@ class FilterController extends Controller
     function getFilterPaket(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -64,7 +66,7 @@ class FilterController extends Controller
                 from dgw_reg a 
                 inner join dgw_paket b on a.no_paket=b.no_paket and a.kode_lokasi = b.kode_lokasi 
                 where kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -88,7 +90,7 @@ class FilterController extends Controller
     function getFilterJadwal(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -109,7 +111,7 @@ class FilterController extends Controller
             from dgw_reg a 
             inner join dgw_jadwal b on a.no_jadwal=b.no_jadwal and a.kode_lokasi=b.kode_lokasi and a.no_paket=b.no_paket 
             where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -133,7 +135,7 @@ class FilterController extends Controller
     function getFilterNoReg(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -157,7 +159,7 @@ class FilterController extends Controller
             }
 
             $sql="select a.no_reg from dgw_reg a where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -181,7 +183,7 @@ class FilterController extends Controller
     function getFilterPeserta(Request $request){
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -215,7 +217,7 @@ class FilterController extends Controller
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

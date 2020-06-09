@@ -154,4 +154,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('presensi','Sekolah\PresensiController@update');
     $router->delete('presensi','Sekolah\PresensiController@destroy');
 
+    //Penilaian
+    $router->get('penilaian_all','Sekolah\PenilaianController@index');
+    $router->get('penilaian','Sekolah\PenilaianController@show');
+    $router->get('penilaian_load','Sekolah\PenilaianController@loadSiswa');
+    $router->post('penilaian','Sekolah\PenilaianController@store');
+    $router->put('penilaian','Sekolah\PenilaianController@update');
+    $router->delete('penilaian','Sekolah\PenilaianController@destroy');
+
 });

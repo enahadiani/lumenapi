@@ -16,10 +16,12 @@ class RegistrasiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select no_peserta from dgw_paket where id_peserta ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select no_peserta from dgw_paket where id_peserta ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -40,12 +42,12 @@ class RegistrasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group
+            $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group
             from dgw_reg a
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             inner join dgw_jadwal c on a.no_paket=c.no_paket and a.no_jadwal=c.no_jadwal and a.kode_lokasi=c.kode_lokasi
@@ -118,10 +120,10 @@ class RegistrasiController extends Controller
             'biaya_dokumen.*.total' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -129,7 +131,7 @@ class RegistrasiController extends Controller
             $tahun = date('y');
             $no_reg = $this->generateKode("dgw_reg", "no_reg", "REG/".substr($request->periode,2,4)."/", "0001");
             
-            $ins = DB::connection('sqlsrvdago')->insert("insert into dgw_history_jadwal(no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$request->paket,$request->jadwal,'-','-',$kode_lokasi));
+            $ins = DB::connection($this->sql)->insert("insert into dgw_history_jadwal(no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$request->paket,$request->jadwal,'-','-',$kode_lokasi));
 
             //NON-agen tidak ada fee
             if ($request->no_agen == "NON") {
@@ -138,13 +140,13 @@ class RegistrasiController extends Controller
                 $noFee = "-";
             }
 
-            $ins2 = DB::connection('sqlsrvdago')->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,$request->tgl_input,$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
+            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,$request->tgl_input,$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
 
             $dok = $request->dokumen;
             if (count($dok) > 0){
                 for ($i=0;$i <count($dok);$i++){
                    
-                    $ins3[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_reg_dok(no_reg,no_dok,ket,kode_lokasi,tgl_terima) values (?, ?, ?, ?, ?) ",array($no_reg,$dok[$i]['no_dokumen'],$dok[$i]['deskripsi'],$kode_lokasi,NULL));
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into dgw_reg_dok(no_reg,no_dok,ket,kode_lokasi,tgl_terima) values (?, ?, ?, ?, ?) ",array($no_reg,$dok[$i]['no_dokumen'],$dok[$i]['deskripsi'],$kode_lokasi,NULL));
                     
                 }						
             }
@@ -152,7 +154,7 @@ class RegistrasiController extends Controller
             if (count($btambah) > 0){
                 for ($i=0;$i <count($btambah);$i++){
                   
-                    $ins4[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ? ) ",array($no_reg,$btambah[$i]['kode_biaya'],$btambah[$i]['nilai'],$btambah[$i]['jumlah'],$btambah[$i]['total'],$kode_lokasi));
+                    $ins4[$i] = DB::connection($this->sql)->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ? ) ",array($no_reg,$btambah[$i]['kode_biaya'],$btambah[$i]['nilai'],$btambah[$i]['jumlah'],$btambah[$i]['total'],$kode_lokasi));
                 
                 }						
             }	
@@ -161,18 +163,18 @@ class RegistrasiController extends Controller
             if (count($bdok) > 0){
                 for ($i=0;$i <count($bdok);$i++){
                     
-                    $ins5[$i] =  DB::connection('sqlsrvdago')->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$bdok[$i]['kode_biaya'],$bdok[$i]['nilai'],$bdok[$i]['jumlah'],$bdok[$i]['total'],$kode_lokasi));
+                    $ins5[$i] =  DB::connection($this->sql)->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$bdok[$i]['kode_biaya'],$bdok[$i]['nilai'],$bdok[$i]['jumlah'],$bdok[$i]['total'],$kode_lokasi));
                     
                 }						
             }
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Registrasi berhasil disimpan. No Reg:".$no_reg;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Registrasi gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -194,30 +196,30 @@ class RegistrasiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select a.no_reg,a.kode_harga,a.harga, a.harga_room,a.no_paket, a.no_jadwal, a.tgl_input, a.no_type, b.tgl_berangkat, b.lama_hari, a.uk_pakaian, a.no_peserta, a.no_agen,a.no_jadwal,a.no_paket, a.no_marketing, a.info, a.jenis, a.no_peserta_ref, a.kode_pp, a.diskon,c.kode_curr,a.no_quota,a.flag_group,a.brkt_dgn,a.hubungan,a.referal,a.ket_diskon
+            $res = DB::connection($this->sql)->select( "select a.no_reg,a.kode_harga,a.harga, a.harga_room,a.no_paket, a.no_jadwal, a.tgl_input, a.no_type, b.tgl_berangkat, b.lama_hari, a.uk_pakaian, a.no_peserta, a.no_agen,a.no_jadwal,a.no_paket, a.no_marketing, a.info, a.jenis, a.no_peserta_ref, a.kode_pp, a.diskon,c.kode_curr,a.no_quota,a.flag_group,a.brkt_dgn,a.hubungan,a.referal,a.ket_diskon
             from dgw_reg a 
             left join dgw_jadwal b on a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi and a.no_jadwal=b.no_jadwal 
             left join dgw_typeroom c on a.no_type=c.no_type and a.kode_lokasi=c.kode_lokasi 
             where a.no_reg='$request->no_reg'  and a.kode_lokasi='$kode_lokasi' ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvdago')->select( "select b.kode_biaya,isnull(a.tarif,0) as tarif,isnull(a.jml,0) as jml,isnull(a.nilai,0) as nilai,b.nama 
+            $res2 = DB::connection($this->sql)->select( "select b.kode_biaya,isnull(a.tarif,0) as tarif,isnull(a.jml,0) as jml,isnull(a.nilai,0) as nilai,b.nama 
             from  dgw_biaya b left join dgw_reg_biaya a on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi and a.no_reg = '$request->no_reg' 
             where b.jenis='TAMBAHAN' and b.kode_lokasi='$kode_lokasi' order by b.kode_biaya ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $res3 = DB::connection('sqlsrvdago')->select( "select a.kode_biaya,a.tarif,a.jml,a.nilai,b.nama 
+            $res3 = DB::connection($this->sql)->select( "select a.kode_biaya,a.tarif,a.jml,a.nilai,b.nama 
             from dgw_reg_biaya a 
             inner join dgw_biaya b on a.kode_biaya=b.kode_biaya 
             where b.jenis='DOKUMEN' and a.no_reg = '$request->no_reg' and a.kode_lokasi='$kode_lokasi' order by a.kode_biaya ");
             $res3 = json_decode(json_encode($res3),true);
 
-            $res4 = DB::connection('sqlsrvdago')->select( "select a.no_dok,b.deskripsi as ket,b.jenis 
+            $res4 = DB::connection($this->sql)->select( "select a.no_dok,b.deskripsi as ket,b.jenis 
             from dgw_reg_dok a 
             inner join dgw_dok b on a.no_dok=b.no_dokumen 
             where a.no_reg = '$request->no_reg' and a.kode_lokasi='$kode_lokasi' order by a.no_dok");
@@ -295,10 +297,10 @@ class RegistrasiController extends Controller
             'biaya_dokumen.*.total' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -306,28 +308,28 @@ class RegistrasiController extends Controller
             $tahun = date('y');
             $no_reg = $request->no_reg;
 
-            $del = DB::connection('sqlsrvdago')->table('dgw_reg')
+            $del = DB::connection($this->sql)->table('dgw_reg')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();
 
-            $del2 = DB::connection('sqlsrvdago')->table('dgw_reg_dok')
+            $del2 = DB::connection($this->sql)->table('dgw_reg_dok')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();
             
-            $del3 = DB::connection('sqlsrvdago')->table('dgw_reg_biaya')
+            $del3 = DB::connection($this->sql)->table('dgw_reg_biaya')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();	
             
-            $del4 = DB::connection('sqlsrvdago')->table('dgw_history_jadwal')
+            $del4 = DB::connection($this->sql)->table('dgw_history_jadwal')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();		
             
             if($request->paket_lama != $request->paket && $request->jadwal_lama != $request->jadwal){						
-                $ins = DB::connection('sqlsrvdago')->insert("insert into dgw_history_jadwal(no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$request->paket,$request->jadwal,$request->paket_lama,$request->jadwal_lama,$kode_lokasi));
+                $ins = DB::connection($this->sql)->insert("insert into dgw_history_jadwal(no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$request->paket,$request->jadwal,$request->paket_lama,$request->jadwal_lama,$kode_lokasi));
             }	
 
             //NON-agen tidak ada fee
@@ -337,13 +339,13 @@ class RegistrasiController extends Controller
                 $noFee = "-";
             }
 
-            $ins2 = DB::connection('sqlsrvdago')->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,$request->tgl_input,$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
+            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,$request->tgl_input,$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
 
             $dok = $request->dokumen;
             if (count($dok) > 0){
                 for ($i=0;$i <count($dok);$i++){
                    
-                    $ins3[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_reg_dok(no_reg,no_dok,ket,kode_lokasi,tgl_terima) values (?, ?, ?, ?, ?) ",array($no_reg,$dok[$i]['no_dokumen'],$dok[$i]['deskripsi'],$kode_lokasi,NULL));
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into dgw_reg_dok(no_reg,no_dok,ket,kode_lokasi,tgl_terima) values (?, ?, ?, ?, ?) ",array($no_reg,$dok[$i]['no_dokumen'],$dok[$i]['deskripsi'],$kode_lokasi,NULL));
                     
                 }						
             }
@@ -351,7 +353,7 @@ class RegistrasiController extends Controller
             if (count($btambah) > 0){
                 for ($i=0;$i <count($btambah);$i++){
                   
-                    $ins4[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ? ) ",array($no_reg,$btambah[$i]['kode_biaya'],$btambah[$i]['nilai'],$btambah[$i]['jumlah'],$btambah[$i]['total'],$kode_lokasi));
+                    $ins4[$i] = DB::connection($this->sql)->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ? ) ",array($no_reg,$btambah[$i]['kode_biaya'],$btambah[$i]['nilai'],$btambah[$i]['jumlah'],$btambah[$i]['total'],$kode_lokasi));
                 
                 }						
             }	
@@ -360,18 +362,18 @@ class RegistrasiController extends Controller
             if (count($bdok) > 0){
                 for ($i=0;$i <count($bdok);$i++){
                     
-                    $ins5[$i] =  DB::connection('sqlsrvdago')->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$bdok[$i]['kode_biaya'],$bdok[$i]['nilai'],$bdok[$i]['jumlah'],$bdok[$i]['total'],$kode_lokasi));
+                    $ins5[$i] =  DB::connection($this->sql)->insert("insert into dgw_reg_biaya(no_reg,kode_biaya,tarif,jml,nilai,kode_lokasi) values (?, ?, ?, ?, ?, ?) ", array($no_reg,$bdok[$i]['kode_biaya'],$bdok[$i]['nilai'],$bdok[$i]['jumlah'],$bdok[$i]['total'],$kode_lokasi));
                     
                 }						
             }
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Registrasi berhasil diubah";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Registrasi gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -389,40 +391,40 @@ class RegistrasiController extends Controller
         $this->validate($request, [
             'no_jamaah' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del = DB::connection('sqlsrvdago')->table('dgw_reg')
+            $del = DB::connection($this->sql)->table('dgw_reg')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();
 
-            $del2 = DB::connection('sqlsrvdago')->table('dgw_reg_dok')
+            $del2 = DB::connection($this->sql)->table('dgw_reg_dok')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();
             
-            $del3 = DB::connection('sqlsrvdago')->table('dgw_reg_biaya')
+            $del3 = DB::connection($this->sql)->table('dgw_reg_biaya')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();	
             
-            $del4 = DB::connection('sqlsrvdago')->table('dgw_history_jadwal')
+            $del4 = DB::connection($this->sql)->table('dgw_history_jadwal')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_reg', $request->no_reg)
                 ->delete();	
 
             $success['status'] = true;
             $success['message'] = "Data Registrasi berhasil dihapus ";
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Registrasi gagal dihapus ".$e;
             
@@ -434,12 +436,12 @@ class RegistrasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select("select kode_biaya, nama, nilai from dgw_biaya where jenis = 'TAMBAHAN' and kode_lokasi='$kode_lokasi'");
+            $res = DB::connection($this->sql)->select("select kode_biaya, nama, nilai from dgw_biaya where jenis = 'TAMBAHAN' and kode_lokasi='$kode_lokasi'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -465,12 +467,12 @@ class RegistrasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select("select kode_biaya, nama, nilai from dgw_biaya where jenis = 'DOKUMEN' and kode_lokasi='$kode_lokasi'");
+            $res = DB::connection($this->sql)->select("select kode_biaya, nama, nilai from dgw_biaya where jenis = 'DOKUMEN' and kode_lokasi='$kode_lokasi'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -496,18 +498,18 @@ class RegistrasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $sql="select kode_pp, nama from pp where flag_aktif='1' and kode_lokasi = '$kode_lokasi'";
             
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql="select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi = '$kode_lokasi'";
-            $res2 = DB::connection('sqlsrvdago')->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
             $success["kodePP"]= $res2[0]['kode_pp'];
 
@@ -539,14 +541,14 @@ class RegistrasiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $sql="select harga,harga_se,harga_e from dgw_harga where no_paket ='".$request->no_paket."' and kode_harga ='".$request->jenis_paket."' and kode_lokasi='$kode_lokasi'";
             
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -580,7 +582,7 @@ class RegistrasiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -590,7 +592,7 @@ class RegistrasiController extends Controller
             inner join dgw_paket b on a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi 
             where a.no_paket='".$request->no_paket."' and a.no_jadwal='".$request->jadwal."' and a.kode_lokasi='$kode_lokasi'";
             
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -609,14 +611,14 @@ class RegistrasiController extends Controller
                     $filter_jenis = " and jenis='".$request->jenis."' ";
                 }
                 
-                $res2 = DB::connection('sqlsrvdago')->select($strSQL);
+                $res2 = DB::connection($this->sql)->select($strSQL);
                 $res2 = json_decode(json_encode($res2),true);
                 if(count($res2) > 0){
                     $quota1 = $res2[0]['quota1'];
                 }
     
                 $strSQL="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
-                $res3 = DB::connection('sqlsrvdago')->select($strSQL);
+                $res3 = DB::connection($this->sql)->select($strSQL);
                 $res3 = json_decode(json_encode($res3),true);
                 if(count($res3) > 0){
                     $jumlah = $res3[0]['jumlah'];
@@ -655,7 +657,7 @@ class RegistrasiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -664,7 +666,7 @@ class RegistrasiController extends Controller
             from dgw_typeroom 
             where kode_curr ='".$request->kode_curr."' and no_type='".$request->type_room."' and kode_lokasi='".$kode_lokasi."'";	
             
-            $res = DB::connection('sqlsrvdago')->select($strSQL);
+            $res = DB::connection($this->sql)->select($strSQL);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -692,14 +694,14 @@ class RegistrasiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $sql="select kode_marketing from dgw_agent where no_agen= '".$request->no_agen."' and kode_lokasi = '$kode_lokasi'";	
             
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -727,7 +729,7 @@ class RegistrasiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -743,7 +745,7 @@ class RegistrasiController extends Controller
             inner join dgw_pekerjaan g on b.pekerjaan=g.id_pekerjaan and b.kode_lokasi=g.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_reg='$request->no_bukti' ";	
             
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

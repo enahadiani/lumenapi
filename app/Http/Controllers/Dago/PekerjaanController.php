@@ -15,10 +15,12 @@ class PekerjaanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select id_pekerjaan from dgw_pekerjaan where id_pekerjaan ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select id_pekerjaan from dgw_pekerjaan where id_pekerjaan ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class PekerjaanController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class PekerjaanController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select id_pekerjaan,nama from dgw_pekerjaan where kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection($this->sql)->select( "select id_pekerjaan,nama from dgw_pekerjaan where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -91,18 +93,18 @@ class PekerjaanController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->id_pekerjaan,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
+                $ins = DB::connection($this->sql)->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
                 
-                DB::connection('sqlsrvdago')->commit();
+                DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
                 $success['message'] = "Data Pekerjaan berhasil disimpan";
             }else{
@@ -112,7 +114,7 @@ class PekerjaanController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Pekerjaan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -147,27 +149,27 @@ class PekerjaanController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_pekerjaan')
+            $del = DB::connection($this->sql)->table('dgw_pekerjaan')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('id_pekerjaan', $request->id_pekerjaan)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_pekerjaan(id_pekerjaan,nama,kode_lokasi) values (?, ?, ?)', array($request->id_pekerjaan,$request->nama,$kode_lokasi));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Pekerjaan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Pekerjaan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -185,26 +187,26 @@ class PekerjaanController extends Controller
         $this->validate($request, [
             'id_pekerjaan' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_pekerjaan')
+            $del = DB::connection($this->sql)->table('dgw_pekerjaan')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('id_pekerjaan', $request->id_pekerjaan)
             ->delete();
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Pekerjaan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Pekerjaan gagal dihapus ".$e;
             

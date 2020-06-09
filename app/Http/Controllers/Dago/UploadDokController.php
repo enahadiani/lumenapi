@@ -17,17 +17,19 @@ class UploadDokController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function index()
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group,
+            $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group,
             isnull(d.jum_upload,0) as jum_upload,isnull(f.jum_dok,0) as jum_dok,
             case when d.jum_upload = f.jum_dok then 'selesai' else '-' end as sts_dok 
             from dgw_reg a
@@ -90,10 +92,10 @@ class UploadDokController extends Controller
             'file_dok.*'=>'required|file|max:3072'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -120,15 +122,15 @@ class UploadDokController extends Controller
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
                     
-                    $del[$i] = DB::connection('sqlsrvdago')->table('dgw_scan')
+                    $del[$i] = DB::connection($this->sql)->table('dgw_scan')
                     ->where('no_bukti', $request->no_reg)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('modul', $request->no_dokumen[$i])
                     ->delete();
                     
-                    $ins[$i] = DB::connection('sqlsrvdago')->insert("insert into dgw_scan(no_bukti,modul,no_gambar,kode_lokasi,nik) values (?, ?, ?, ?, ?) ", [$request->no_reg,$request->no_dokumen[$i],$arr_foto[$i],$kode_lokasi,$nik_user]);
+                    $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_scan(no_bukti,modul,no_gambar,kode_lokasi,nik) values (?, ?, ?, ?, ?) ", [$request->no_reg,$request->no_dokumen[$i],$arr_foto[$i],$kode_lokasi,$nik_user]);
 
-                    $upd[$i] = DB::connection('sqlsrvdago')->table('dgw_reg_dok')
+                    $upd[$i] = DB::connection($this->sql)->table('dgw_reg_dok')
                     ->where('no_reg', $request->no_reg)    
                     ->where('no_dok', $request->no_dokumen[$i]) 
                     ->update(['tgl_terima' => $request->tgl_terima]);
@@ -138,10 +140,10 @@ class UploadDokController extends Controller
             $success['status'] = true;
             $success['message'] = "Upload Dokumen berhasil disimpan.";
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Dokumen gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -164,7 +166,7 @@ class UploadDokController extends Controller
         try {
             
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -177,7 +179,7 @@ class UploadDokController extends Controller
             inner join dgw_jadwal d on a.no_paket=d.no_paket and a.no_jadwal=d.no_jadwal and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_reg='$no_reg'
             ";
-            $res = DB::connection('sqlsrvdago')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2="select a.no_dokumen,a.deskripsi,a.jenis,isnull(convert(varchar,b.tgl_terima,111),'-') as tgl_terima,'".url('dago/storage')."/'+isnull(c.no_gambar,'-') as fileaddres,isnull(c.nik,'-') as nik 
@@ -185,7 +187,7 @@ class UploadDokController extends Controller
             inner join dgw_reg_dok b on a.no_dokumen=b.no_dok and b.no_reg='$no_reg'
             left join dgw_scan c on a.no_dokumen=c.modul and c.no_bukti ='$no_reg' 
             where a.kode_lokasi='$kode_lokasi' order by a.no_dokumen";
-            $res2 = DB::connection('sqlsrvdago')->select($sql2);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

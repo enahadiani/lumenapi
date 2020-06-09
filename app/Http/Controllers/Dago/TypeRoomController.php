@@ -15,10 +15,12 @@ class TypeRoomController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select no_type from dgw_typeroom where no_type ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select no_type from dgw_typeroom where no_type ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class TypeRoomController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class TypeRoomController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select no_type,nama,harga,kode_curr from dgw_typeroom where kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection($this->sql)->select( "select no_type,nama,harga,kode_curr from dgw_typeroom where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -93,18 +95,18 @@ class TypeRoomController extends Controller
             'kode_curr' => 'required|in:USD,IDR'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->no_type,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_curr) values (?, ?, ?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
+                $ins = DB::connection($this->sql)->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_curr) values (?, ?, ?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
                 
-                DB::connection('sqlsrvdago')->commit();
+                DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
                 $success['message'] = "Data Type Room berhasil disimpan";
             }else{
@@ -114,7 +116,7 @@ class TypeRoomController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Type Room gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -151,27 +153,27 @@ class TypeRoomController extends Controller
             'kode_curr' => 'required|in:USD,IDR'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_typeroom')
+            $del = DB::connection($this->sql)->table('dgw_typeroom')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_type', $request->no_type)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_curr) values (?, ?, ?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_typeroom(no_type,nama,kode_lokasi,harga,kode_curr) values (?, ?, ?, ?, ?)', array($request->no_type,$request->nama,$kode_lokasi,$request->harga,$request->kode_curr));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Type Room berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Type Room gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -189,26 +191,26 @@ class TypeRoomController extends Controller
         $this->validate($request, [
             'no_type' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_typeroom')
+            $del = DB::connection($this->sql)->table('dgw_typeroom')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_type', $request->no_type)
             ->delete();
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Type Room berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Type Room gagal dihapus ".$e;
             

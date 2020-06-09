@@ -15,17 +15,19 @@ class JadwalController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function index(Request $request)
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' ");
+            $res = DB::connection($this->sql)->select( "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -73,10 +75,10 @@ class JadwalController extends Controller
             'data_jadwal.*.tgl_baru' => 'required|date_format:Y-m-d'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -85,7 +87,7 @@ class JadwalController extends Controller
             if (count($detJadwal) > 0){
                 for ($i=0;$i < count($detJadwal);$i++){
                     
-                    $upd[$i] = DB::connection('sqlsrvdago')->table('dgw_jadwal')
+                    $upd[$i] = DB::connection($this->sql)->table('dgw_jadwal')
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('no_paket', $request->no_paket)
                     ->where('no_jadwal', $detJadwal[$i]['no_jadwal'])
@@ -93,13 +95,13 @@ class JadwalController extends Controller
                 }						
             }
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Jadwal berhasil diubah";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Jadwal gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 

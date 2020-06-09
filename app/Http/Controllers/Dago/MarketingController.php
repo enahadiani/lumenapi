@@ -15,10 +15,12 @@ class MarketingController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection('sqlsrvdago')->select("select no_marketing from dgw_marketing where no_marketing ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select no_marketing from dgw_marketing where no_marketing ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class MarketingController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -46,7 +48,7 @@ class MarketingController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvdago')->select( "select no_marketing,nama_marketing,flag_aktif from dgw_marketing where kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection($this->sql)->select( "select no_marketing,nama_marketing,flag_aktif from dgw_marketing where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -92,18 +94,18 @@ class MarketingController extends Controller
             'flag_aktif' => 'required|in:1,0'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->no_marketing,$kode_lokasi)){
 
-                $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_marketing(no_marketing,nama_marketing,flag_aktif,kode_lokasi) values (?, ?, ?, ?)', array($request->no_marketing,$request->nama_marketing,$request->flag_aktif,$kode_lokasi));
+                $ins = DB::connection($this->sql)->insert('insert into dgw_marketing(no_marketing,nama_marketing,flag_aktif,kode_lokasi) values (?, ?, ?, ?)', array($request->no_marketing,$request->nama_marketing,$request->flag_aktif,$kode_lokasi));
                 
-                DB::connection('sqlsrvdago')->commit();
+                DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
                 $success['message'] = "Data Maketing berhasil disimpan";
             }else{
@@ -113,7 +115,7 @@ class MarketingController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Maketing gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -149,27 +151,27 @@ class MarketingController extends Controller
             'flag_aktif' => 'required|in:1,0'
         ]);
 
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_marketing')
+            $del = DB::connection($this->sql)->table('dgw_marketing')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_marketing', $request->no_marketing)
             ->delete();
 
-            $ins = DB::connection('sqlsrvdago')->insert('insert into dgw_marketing(no_marketing,nama_marketing,flag_aktif,kode_lokasi) values (?, ?, ?, ?)', array($request->no_marketing,$request->nama_marketing,$request->flag_aktif,$kode_lokasi));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_marketing(no_marketing,nama_marketing,flag_aktif,kode_lokasi) values (?, ?, ?, ?)', array($request->no_marketing,$request->nama_marketing,$request->flag_aktif,$kode_lokasi));
             
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Maketing berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Maketing gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -187,26 +189,26 @@ class MarketingController extends Controller
         $this->validate($request, [
             'no_marketing' => 'required'
         ]);
-        DB::connection('sqlsrvdago')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('dago')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvdago')->table('dgw_marketing')
+            $del = DB::connection($this->sql)->table('dgw_marketing')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_marketing', $request->no_marketing)
             ->delete();
 
-            DB::connection('sqlsrvdago')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Maketing berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvdago')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Maketing gagal dihapus ".$e;
             
