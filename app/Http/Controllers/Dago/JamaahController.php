@@ -293,16 +293,11 @@ class JamaahController extends Controller
             }
             $no_peserta = $request->no_peserta;
 
-            $del = DB::connection($this->sql)->table('dgw_peserta')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_peserta', $no_peserta)
-            ->delete();		
-            
             $sql = "select foto as file_gambar from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$no_peserta' 
             ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
-
+            
             if(count($res) > 0){
                 $foto = $res[0]['file_gambar'];
             }else{
@@ -313,7 +308,7 @@ class JamaahController extends Controller
                 if($foto != "" || $foto != "-"){
                     Storage::disk('s3')->delete('dago/'.$foto);
                 }
-
+                
                 $file = $request->file('foto');
                 
                 
@@ -325,7 +320,12 @@ class JamaahController extends Controller
                 Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
                 
             }
-
+            
+            $del = DB::connection($this->sql)->table('dgw_peserta')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_peserta', $no_peserta)
+            ->delete();		
+            
             $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
             
             DB::connection($this->sql)->commit();
