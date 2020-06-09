@@ -183,7 +183,7 @@ class JamaahController extends Controller
                 $foto="-";
             }
 
-            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
             
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
@@ -219,7 +219,7 @@ class JamaahController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select( "select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('api/dago-auth/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' ");
+            $res = DB::connection($this->sql)->select("select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('api/dago-auth/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and no_peserta='$request->no_peserta' ");
             $res = json_decode(json_encode($res),true);
 
            
@@ -305,15 +305,14 @@ class JamaahController extends Controller
 
             if(count($res) > 0){
                 $foto = $res[0]['file_gambar'];
-                if($foto != "" || $foto != "-"){
-                    Storage::disk('s3')->delete('dago/'.$foto);
-                }
             }else{
                 $foto = "-";
             }
-
+            
             if($request->hasfile('foto')){
-
+                if($foto != "" || $foto != "-"){
+                    Storage::disk('s3')->delete('dago/'.$foto);
+                }
 
                 $file = $request->file('foto');
                 
@@ -324,12 +323,9 @@ class JamaahController extends Controller
                 }
                 Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
                 
-            }else{
-
-                $foto="-";
             }
 
-            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->no_pass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
+            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
             
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
