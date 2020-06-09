@@ -316,6 +316,7 @@ class JamaahController extends Controller
 
                 $file = $request->file('foto');
                 
+                
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 $foto = $nama_foto;
                 if(Storage::disk('s3')->exists('dago/'.$foto)){
