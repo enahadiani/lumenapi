@@ -21,6 +21,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('jamaah','Dago\JamaahController@index');
     $router->post('jamaah','Dago\JamaahController@store');
     $router->get('jamaah-detail','Dago\JamaahController@edit');
+    $router->get('jamaah-detail-id','Dago\JamaahController@editById');
     $router->post('jamaah-ubah','Dago\JamaahController@update');
     $router->delete('jamaah','Dago\JamaahController@destroy');
 

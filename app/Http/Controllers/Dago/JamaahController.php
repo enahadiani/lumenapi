@@ -242,6 +242,41 @@ class JamaahController extends Controller
 
     }
 
+    public function editById(Request $request)
+    {
+        $this->validate($request, [
+            'id_peserta' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select no_peserta,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,ayah,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,'".url('api/dago-auth/storage')."/'+foto as foto,pendidikan from dgw_peserta where kode_lokasi='".$kode_lokasi."' and id_peserta='$request->id_peserta' ");
+            $res = json_decode(json_encode($res),true);
+
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+
+    }
+
     /**
      * Update the specified resource in storage.
      *
