@@ -61,10 +61,11 @@ class JamaahController extends Controller
             //     $filter = "";
             // }
 
-            $res = DB::connection($this->sql)->select("select no_peserta, kode_lokasi, id_peserta, nama, jk, status, alamat, kode_pos, telp, hp, email, pekerjaan, bank, cabang, norek, namarek, nopass, kantor_mig, sp, ec_telp, ec_hp, issued, ex_pass, tempat, tgl_lahir, th_haji, 
+            $sql = "select no_peserta, kode_lokasi, id_peserta, nama, jk, status, alamat, kode_pos, telp, hp, email, pekerjaan, bank, cabang, norek, namarek, nopass, kantor_mig, sp, ec_telp, ec_hp, issued, ex_pass, tempat, tgl_lahir, th_haji, 
             th_umroh, ibu, '".url('dago/storage')."/'+foto as foto, ayah, pendidikan
             from dgw_peserta
-            where kode_lokasi='".$kode_lokasi."'");
+            where kode_lokasi='".$kode_lokasi."'";
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -103,6 +104,7 @@ class JamaahController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['sql']= $sql;
                 $success['status'] = "SUCCESS";
             }
             return response()->json($success, $this->successStatus);
