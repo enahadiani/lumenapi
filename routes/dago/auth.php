@@ -30,4 +30,13 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('s3')->response('dago/'.$filename); 
 });
 
+$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+    $router->get('profile', 'AdminController@profile');
+    $router->get('users/{id}', 'AdminController@singleUser');
+    $router->get('users', 'AdminController@allUsers');
+    $router->get('cek_payload', 'AdminController@cekPayload');
+    //Menu
+    $router->get('menu/{kode_klp}', 'Gl\MenuController@show');
+});
+
 ?>
