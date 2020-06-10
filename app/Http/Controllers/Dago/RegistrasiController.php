@@ -732,6 +732,7 @@ class RegistrasiController extends Controller
         $this->validate($request, [
             'no_reg' => 'required'
         ]);
+        
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
