@@ -100,12 +100,12 @@ class RegistrasiGroupController extends Controller
                 
                 $tmp = $this->generateKode("dgw_reg", "no_reg", "REG/".substr(date('Ym'),2,4)."/", "0001");
                 $temp = explode("/",$tmp);
-                $id = intval($temp[1]);
+                $id = intval($temp[2]);
 
                 for($i=0; $i<count($group);$i++){
                     if($group[$i]['status_reg'] == "0"){
 
-                        $no_reg = $temp[0]."/".sprintf("%04s",$id);
+                        $no_reg = $temp[0]."/".$temp[1]."/".sprintf("%04s",$id);
         
                         $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_group_d(no_reg,no_peserta,no_reg_ref,kode_lokasi) values (?, ?, ?, ?)", array($request->no_reg,$group[$i]['no_peserta'],$no_reg,$kode_lokasi));	
 
