@@ -730,7 +730,7 @@ class RegistrasiController extends Controller
     public function getPreview(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required'
+            'no_reg' => 'required'
         ]);
         try {
             
@@ -748,7 +748,7 @@ class RegistrasiController extends Controller
             inner join dgw_paket c on a.no_paket=c.no_paket and a.kode_lokasi=c.kode_lokasi 
             inner join dgw_jadwal d on  a.no_paket=d.no_paket and a.no_jadwal=d.no_jadwal and a.kode_lokasi=d.kode_lokasi
             inner join dgw_pekerjaan g on b.pekerjaan=g.id_pekerjaan and b.kode_lokasi=g.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_reg='$request->no_bukti' ";	
+            where a.kode_lokasi='$kode_lokasi' and a.no_reg='$request->no_reg' ";	
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
