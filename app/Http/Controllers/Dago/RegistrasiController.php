@@ -388,7 +388,7 @@ class RegistrasiController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'no_jamaah' => 'required'
+            'no_reg' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -732,7 +732,7 @@ class RegistrasiController extends Controller
         $this->validate($request, [
             'no_reg' => 'required'
         ]);
-        
+
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
