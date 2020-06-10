@@ -614,16 +614,16 @@ class RegistrasiController extends Controller
                 $res2 = DB::connection($this->sql)->select($strSQL);
                 $res2 = json_decode(json_encode($res2),true);
                 if(count($res2) > 0){
-                    $quota1 = $res2[0]['quota1'];
+                    $quota1 = intval($res2[0]['quota1']);
                 }else{
                     $quota1 = 0;
                 }
     
-                $strSQL="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
-                $res3 = DB::connection($this->sql)->select($strSQL);
+                $strSQL2="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
+                $res3 = DB::connection($this->sql)->select($strSQL2);
                 $res3 = json_decode(json_encode($res3),true);
                 if(count($res3) > 0){
-                    $jumlah = $res3[0]['jumlah'];
+                    $jumlah = intval($res3[0]['jumlah']);
                 }else{
                     $jumlah = 0;
                 }
@@ -635,7 +635,9 @@ class RegistrasiController extends Controller
                 $success['lama_hari']= $lama_hari;
                 $success['quota']= $quota;
                 $success['status'] = "SUCCESS";
-                $success['message'] = "Success!";     
+                $success['message'] = "Success!";  
+                $success['strSQL'] = $strSQL;  
+                $success['strSQL2'] = $strSQL2;   
             }
             else{
                 $success['tgl_berangkat']= NULL;
