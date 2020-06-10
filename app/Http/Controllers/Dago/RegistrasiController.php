@@ -86,7 +86,6 @@ class RegistrasiController extends Controller
             'periode' => 'required',
             'paket' => 'required',
             'jadwal' => 'required|integer',
-            'tgl_input' => 'required|date_format:Y-m-d H:i:s',
             'no_peserta' => 'required',
             'agen' => 'required',
             'type_room' => 'required',
@@ -140,7 +139,7 @@ class RegistrasiController extends Controller
                 $noFee = "-";
             }
 
-            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,$request->tgl_input,$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
+            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,date('Y-m-d H:i:s'),$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
 
             $dok = $request->dokumen;
             if (count($dok) > 0){
@@ -263,7 +262,6 @@ class RegistrasiController extends Controller
             'periode' => 'required',
             'paket' => 'required',
             'jadwal' => 'required|integer',
-            'tgl_input' => 'required|date_format:Y-m-d H:i:s',
             'no_peserta' => 'required',
             'agen' => 'required',
             'type_room' => 'required',
@@ -339,7 +337,7 @@ class RegistrasiController extends Controller
                 $noFee = "-";
             }
 
-            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,$request->tgl_input,$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
+            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,date('Y-m-d H:i:s'),$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->uk_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
 
             $dok = $request->dokumen;
             if (count($dok) > 0){
