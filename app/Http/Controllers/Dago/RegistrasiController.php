@@ -601,11 +601,11 @@ class RegistrasiController extends Controller
                 $kode_curr = $res[0]['kode_curr'];
                 $lama_hari = $res[0]['lama_hari'];
                 
-                if ($request->jenis == "STANDAR") $strSQL="select quota as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";				
-                if ($request->jenis == "SEMI") $strSQL="select quota_se as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";				
-                if ($request->jenis == "EKSEKUTIF") $strSQL="select quota_e as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";	
+                if ($request->jenis == "STANDAR") $strSQL="select quota as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->jadwal."' and kode_lokasi='".$kode_lokasi."'";				
+                if ($request->jenis == "SEMI") $strSQL="select quota_se as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->jadwal."' and kode_lokasi='".$kode_lokasi."'";				
+                if ($request->jenis == "EKSEKUTIF") $strSQL="select quota_e as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->jadwal."' and kode_lokasi='".$kode_lokasi."'";	
                 if($request->jenis == "") {
-                    $strSQL = "select quota+quota_se+quota_e as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."'";
+                    $strSQL = "select quota+quota_se+quota_e as quota1 from dgw_jadwal where no_paket= '".$request->no_paket."' and no_jadwal = '".$request->jadwal."' and kode_lokasi='".$kode_lokasi."'";
                     $filter_jenis = "";
                 }else{
                     $filter_jenis = " and jenis='".$request->jenis."' ";
@@ -619,7 +619,7 @@ class RegistrasiController extends Controller
                     $quota1 = 0;
                 }
     
-                $strSQL2="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
+                $strSQL2="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
                 $res3 = DB::connection($this->sql)->select($strSQL2);
                 $res3 = json_decode(json_encode($res3),true);
                 if(count($res3) > 0){
