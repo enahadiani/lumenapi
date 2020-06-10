@@ -31,6 +31,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('registrasi-detail','Dago\RegistrasiController@edit');
     $router->put('registrasi','Dago\RegistrasiController@update');
     $router->delete('registrasi','Dago\RegistrasiController@destroy');
+    $router->get('jadwal-detail','Dago\JadwalController@show');
     $router->get('biaya-tambahan','Dago\RegistrasiController@getBiayaTambahan');
     $router->get('biaya-dokumen','Dago\RegistrasiController@getBiayaDokumen');
     $router->get('pp','Dago\RegistrasiController@getPP');
