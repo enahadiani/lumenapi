@@ -49,15 +49,7 @@ class RegistrasiGroupController extends Controller
         $this->validate($request, [
             'no_reg' => 'required',
             'group.*.status_reg' => 'required',
-            'group.*.no_peserta' => 'required',
-            'biaya_tambahan.*.kode_biaya' => 'required',
-            'biaya_tambahan.*.nilai' => 'required',
-            'biaya_tambahan.*.jumlah' => 'required',
-            'biaya_tambahan.*.total' => 'required',
-            'biaya_dokumen.*.kode_biaya' => 'required',
-            'biaya_dokumen.*.nilai' => 'required',
-            'biaya_dokumen.*.jumlah' => 'required',
-            'biaya_dokumen.*.total' => 'required'
+            'group.*.no_peserta' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -111,22 +103,22 @@ class RegistrasiGroupController extends Controller
                 $id = intval($temp[1]);
 
                 for($i=0; $i<count($group);$i++){
-                    if($data['group_sts_reg'][$i] == "0"){
+                    if($group[$i]['status_reg'] == "0"){
 
                         $no_reg = $temp[0]."/".sprintf("%04s",$id);
         
-                        $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_group_d(no_reg,no_peserta,no_reg_ref,kode_lokasi) values (?, ?, ?, ?)", array($request->no_reg,$group[$i]['no_anggota'],$no_reg,$kode_lokasi));	
+                        $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_group_d(no_reg,no_peserta,no_reg_ref,kode_lokasi) values (?, ?, ?, ?)", array($request->no_reg,$group[$i]['no_peserta'],$no_reg,$kode_lokasi));	
 
-                        $ins2[$i] = DB::connection($this->sql)->update("insert into dgw_reg (no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) select '$no_reg' as no_reg,getdate(),'".$group[$i]['no_anggota']."' as no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,'0' as flag_group,brkt_dgn,hubungan,referal,ket_diskon from dgw_reg where no_reg = '".$request->no_reg."' and kode_lokasi='".$kode_lokasi."' ");	
+                        $ins2[$i] = DB::connection($this->sql)->update("insert into dgw_reg (no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) select '$no_reg' as no_reg,getdate(),'".$group[$i]['no_peserta']."' as no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,'0' as flag_group,brkt_dgn,hubungan,referal,ket_diskon from dgw_reg where no_reg = '".$request->no_reg."' and kode_lokasi='".$kode_lokasi."' ");	
 
                         $ins3[$i] = DB::connection($this->sql)->update("insert into dgw_reg_dok (no_dok,no_reg,ket,kode_lokasi,tgl_terima) 
                         select a.no_dok,'$no_reg' as no_reg,a.ket,a.kode_lokasi,'2099-12-31' from dgw_reg_dok a where a.no_reg='".$request->no_reg."' and a.kode_lokasi='$kode_lokasi'" );
         
                         $ins4[$i] = DB::connection($this->sql)->update("insert into dgw_reg_biaya (kode_biaya,no_reg,tarif,jml,nilai,kode_lokasi) 
-                        select kode_biaya,'$no_reg' as no_reg,tarif,jml,nilai,kode_lokasi from dgw_reg_biaya where no_reg = '".$data['group_no_reg']."' and kode_lokasi='".$kode_lokasi."' ");
+                        select kode_biaya,'$no_reg' as no_reg,tarif,jml,nilai,kode_lokasi from dgw_reg_biaya where no_reg = '".$request->no_reg."' and kode_lokasi='".$kode_lokasi."' ");
         
                         $ins5[$i] = DB::connection($this->sql)->update("insert into dgw_history_jadwal(no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi)
-                        select '$no_reg' as no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi from dgw_history_jadwal where no_reg = '".$data['group_no_reg']."' and kode_lokasi='".$kode_lokasi."' ");
+                        select '$no_reg' as no_reg,no_paket,no_jadwal,no_paket_lama,no_jadwal_lama,kode_lokasi from dgw_history_jadwal where no_reg = '".$request->no_reg."' and kode_lokasi='".$kode_lokasi."' ");
                         $id++;
                     }                   
     
