@@ -418,7 +418,7 @@ class RegistrasiController extends Controller
                 ->where('no_reg', $request->no_reg)
                 ->delete();	
 
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Data Registrasi berhasil dihapus ";
             DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus); 
