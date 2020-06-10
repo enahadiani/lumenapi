@@ -98,7 +98,7 @@ class RegistrasiGroupController extends Controller
                     }
                 }
                 
-                $tmp = generateKode("dgw_reg", "no_reg", "REG/".substr(date('Ym'),2,4)."/", "0001");
+                $tmp = $this->generateKode("dgw_reg", "no_reg", "REG/".substr(date('Ym'),2,4)."/", "0001");
                 $temp = explode("/",$tmp);
                 $id = intval($temp[1]);
 
