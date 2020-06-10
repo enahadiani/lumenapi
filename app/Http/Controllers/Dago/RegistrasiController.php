@@ -169,6 +169,7 @@ class RegistrasiController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
+            $success['no_reg'] = $no_reg;
             $success['message'] = "Data Registrasi berhasil disimpan. No Reg:".$no_reg;
             
             return response()->json($success, $this->successStatus);     
@@ -368,6 +369,7 @@ class RegistrasiController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
+            $success['no_reg'] = $no_reg;
             $success['message'] = "Data Registrasi berhasil diubah";
             
             return response()->json($success, $this->successStatus);     
