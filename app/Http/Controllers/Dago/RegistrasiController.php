@@ -615,6 +615,8 @@ class RegistrasiController extends Controller
                 $res2 = json_decode(json_encode($res2),true);
                 if(count($res2) > 0){
                     $quota1 = $res2[0]['quota1'];
+                }else{
+                    $quota1 = 0;
                 }
     
                 $strSQL="select COUNT(*) as jumlah from dgw_reg where no_paket= '".$request->no_paket."' and no_jadwal= '".$request->no_jadwal."' and kode_lokasi='".$kode_lokasi."' $filter_jenis  ";				
@@ -622,6 +624,8 @@ class RegistrasiController extends Controller
                 $res3 = json_decode(json_encode($res3),true);
                 if(count($res3) > 0){
                     $jumlah = $res3[0]['jumlah'];
+                }else{
+                    $jumlah = 0;
                 }
 
                 $quota = $quota1-$jumlah;
