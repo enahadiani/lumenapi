@@ -129,6 +129,8 @@ class RegistrasiGroupController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['message'] = "Data Registrasi berhasil disimpan";
+            $success['id'] = $id;
+            $success['temp'] = $temp;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
