@@ -133,10 +133,10 @@ class PembayaranController extends Controller
             'paket' => 'required',
             'tgl_berangkat' => 'required|date_format:Y-m-d',
             'status_bayar' => 'required|in:TUNAI,TRANSFER',
-            'total_bayar' => 'required|integer',
-            'bayar_paket' => 'required|integer',
-            'bayar_tambahan' => 'required|integer',
-            'bayar_dok' => 'required|integer',
+            'total_bayar' => 'required',
+            'bayar_paket' => 'required',
+            'bayar_tambahan' => 'required',
+            'bayar_dok' => 'required',
             'biaya' => 'required|array',
             'biaya.*.kode_biaya' => 'required',
             'biaya.*.jenis_biaya' => 'required',
@@ -258,6 +258,7 @@ class PembayaranController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
+            $success['no_kwitansi'] = $no_bukti;
             $success['message'] = "Data Pembayaran berhasil disimpan. No Bukti:".$no_bukti;
             
             return response()->json($success, $this->successStatus);     
@@ -548,10 +549,10 @@ class PembayaranController extends Controller
             'paket' => 'required',
             'tgl_berangkat' => 'required|date_format:Y-m-d',
             'status_bayar' => 'required|in:TUNAI,TRANSFER',
-            'total_bayar' => 'required|integer',
-            'bayar_paket' => 'required|integer',
-            'bayar_tambahan' => 'required|integer',
-            'bayar_dok' => 'required|integer',
+            'total_bayar' => 'required',
+            'bayar_paket' => 'required',
+            'bayar_tambahan' => 'required',
+            'bayar_dok' => 'required',
             'biaya' => 'required|array',
             'biaya.*.kode_biaya' => 'required',
             'biaya.*.jenis_biaya' => 'required',
@@ -693,6 +694,7 @@ class PembayaranController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
+            $success['no_kwitansi'] = $no_bukti;
             $success['message'] = "Data Pembayaran berhasil diubah";
             
             return response()->json($success, $this->successStatus);     
