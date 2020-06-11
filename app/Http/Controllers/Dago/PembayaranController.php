@@ -373,7 +373,7 @@ class PembayaranController extends Controller
             inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.posted='F' and b.form='KBREG' and a.no_kwitansi <> '$no_bukti' ";
             $res5 = DB::connection($this->sql)->select( $sql5);
-            $res5 = json_decode(json_encode($res4),true);
+            $res5 = json_decode(json_encode($res5),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $totTambah = $totDok = 0;
