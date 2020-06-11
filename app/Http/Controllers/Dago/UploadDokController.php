@@ -88,7 +88,7 @@ class UploadDokController extends Controller
             'tgl_terima' => 'required',
             'no_reg' => 'required',
             'no_dokumen'=>'required|array',
-            'file_dok'=>'required|file|max:3072|array'
+            'file_dok.*'=>'required|file|max:3072'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
