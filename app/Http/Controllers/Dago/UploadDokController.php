@@ -88,8 +88,7 @@ class UploadDokController extends Controller
             'tgl_terima' => 'required',
             'no_reg' => 'required',
             'no_dokumen'=>'required|array',
-            'nama_file.*'=>'required',
-            'file_dok.*'=>'required|file|max:3072'
+            'file_dok'=>'required|file|max:3072|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -101,7 +100,6 @@ class UploadDokController extends Controller
             }
 
             $arr_foto = array();
-            $arr_nama = array();
             $i=0;
             if($request->hasfile('file_dok'))
             {
@@ -114,13 +112,12 @@ class UploadDokController extends Controller
                     }
                     Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
                     $arr_foto[] = $foto;
-                    $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
                     $i++;
                 }
             }        
     
-            if(count($arr_nama) > 0){
-                for($i=0; $i<count($arr_nama);$i++){
+            if(count($arr_foto) > 0){
+                for($i=0; $i<count($arr_foto);$i++){
                     
                     $del[$i] = DB::connection($this->sql)->table('dgw_scan')
                     ->where('no_bukti', $request->no_reg)    
