@@ -47,19 +47,19 @@ class UploadDokController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -137,16 +137,16 @@ class UploadDokController extends Controller
                 }
             }
     
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['message'] = "Upload Dokumen berhasil disimpan.";
             
             DB::connection($this->sql)->commit();
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Upload Dokumen gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -191,21 +191,21 @@ class UploadDokController extends Controller
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                $success['status'] = "SUCCESS";
                 $success['data_reg'] = $res;
                 $success['data_dokumen'] = $res2;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data_reg'] = [];
                 $success['data_dokumen'] = [];
-                $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
