@@ -182,7 +182,7 @@ class UploadDokController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_dokumen,a.deskripsi,a.jenis,isnull(convert(varchar,b.tgl_terima,111),'-') as tgl_terima,case isnull(c.no_gambar,'-') = '-' then isnull(c.no_gambar,'-') else  '".url('dago/storage')."/'+isnull(c.no_gambar,'-') as fileaddres,isnull(c.nik,'-') as nik 
+            $sql2="select a.no_dokumen,a.deskripsi,a.jenis,isnull(convert(varchar,b.tgl_terima,111),'-') as tgl_terima,case isnull(c.no_gambar,'-') when '-' then isnull(c.no_gambar,'-') else  '".url('dago/storage')."/'+isnull(c.no_gambar,'-') as fileaddres,isnull(c.nik,'-') as nik 
             from dgw_dok a 
             inner join dgw_reg_dok b on a.no_dokumen=b.no_dok and b.no_reg='$no_reg'
             left join dgw_scan c on a.no_dokumen=c.modul and c.no_bukti ='$no_reg' 
