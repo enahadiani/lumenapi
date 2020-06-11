@@ -519,26 +519,27 @@ class RegistrasiController extends Controller
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
-
-            $sql="select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi = '$kode_lokasi' $filter";
-            $res2 = DB::connection($this->sql)->select($sql);
-            $res2 = json_decode(json_encode($res2),true);
-            $success["kodePP"]= $res2[0]['kode_pp'];
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $sql="select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi = '$kode_lokasi' $filter";
+                $res2 = DB::connection($this->sql)->select($sql);
+                $res2 = json_decode(json_encode($res2),true);
+                $success['message'] = "Success!";     
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
-                $success['message'] = "Success!";     
+                $success["kodePP"]= $res2[0]['kode_pp'];
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
                 $success['status'] = "FAILED";
+                $success['data'] = [];
+                $success["kodePP"]= [];
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
+            $success['data'] = [];
+            $success["kodePP"]= [];
             return response()->json($success, $this->successStatus);
         }
         
