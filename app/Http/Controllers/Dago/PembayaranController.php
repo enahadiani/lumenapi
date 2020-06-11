@@ -296,7 +296,7 @@ class PembayaranController extends Controller
                 $sql = "select no_bukti,keterangan,param1 as kode_akun 
                 from trans_m 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_ref1='".$id."'";
-                $res4 = DB::connection($this->sql)->select( $sql);
+                $res4 = DB::connection($this->sql)->select($sql);
                 $res4 = json_decode(json_encode($res4),true);
                 
             }else{
@@ -368,6 +368,13 @@ class PembayaranController extends Controller
             order by curr desc");
             $res3 = json_decode(json_encode($res3),true);
 
+            $sql5 = " select a.no_kwitansi, a.tgl_bayar, a.no_reg, a.paket, a.jadwal, round(a.nilai_p,4) as nilai_p, a.nilai_t,nilai_m, (a.nilai_p * a.kurs) + a.nilai_t+a.nilai_m as total_idr 
+            from dgw_pembayaran a 
+            inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.posted='F' and b.form='KBREG' and a.no_kwitansi <> '$no_bukti' ";
+            $res5 = DB::connection($this->sql)->select( $sql5);
+            $res5 = json_decode(json_encode($res4),true);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $totTambah = $totDok = 0;
                 if (count($res3) > 0){
@@ -381,7 +388,8 @@ class PembayaranController extends Controller
                 $success['data_jamaah'] = $res;
                 $success['detail_bayar'] = $res2;
                 $success['detail_biaya'] = $res3;
-                $success['histori_bayar'] = $res4;
+                $success['data_bayar'] = $res4;
+                $success['histori_bayar'] = $res5;
                 $success['totTambah']=$totTambah;
                 $success['totDok']=$totDok;
                 $success['message'] = "Success!";     
@@ -391,6 +399,7 @@ class PembayaranController extends Controller
                 $success['data'] = [];
                 $success['biaya_tambahan'] = [];
                 $success['biaya_dokumen'] = [];
+                $success['data_bayar'] = [];
                 $success['histori_bayar'] = [];
                 $success['totTambah']=0;
                 $success['totDok']=0;
