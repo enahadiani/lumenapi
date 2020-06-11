@@ -48,7 +48,7 @@ class MarketingController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection($this->sql)->select( "select no_marketing,nama_marketing,flag_aktif from dgw_marketing where kode_lokasi='".$kode_lokasi."' $filter ");
+            $res = DB::connection($this->sql)->select( "select no_marketing,nama_marketing as nama,flag_aktif from dgw_marketing where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

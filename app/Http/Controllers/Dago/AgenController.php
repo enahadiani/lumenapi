@@ -49,7 +49,7 @@ class AgenController extends Controller
             }
 
             $res = DB::connection($this->sql)->select( "select 
-            no_agen,nama_agen,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing from dgw_agent where kode_lokasi='".$kode_lokasi."' $filter ");
+            no_agen,nama_agen as nama,alamat,flag_aktif,tempat_lahir,tgl_lahir,no_hp,email,bank,cabang,norek,namarek,kode_marketing from dgw_agent where kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
