@@ -526,20 +526,24 @@ class RegistrasiController extends Controller
                 $success['message'] = "Success!";     
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
-                $success["kodePP"]= $res2[0]['kode_pp'];
+                if(count($res2) > 0){
+                    $success["kodePP"]= $res2[0]['kode_pp'];
+                }else{
+                    $success["kodePP"]= "";
+                }
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['status'] = "FAILED";
                 $success['data'] = [];
-                $success["kodePP"]= [];
+                $success["kodePP"]= "";
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             $success['data'] = [];
-            $success["kodePP"]= [];
+            $success["kodePP"]= "";
             return response()->json($success, $this->successStatus);
         }
         
