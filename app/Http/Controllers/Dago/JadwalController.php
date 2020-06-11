@@ -62,7 +62,19 @@ class JadwalController extends Controller
             }
 
             $no_paket = $request->no_paket;
-            $sql = "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' and no_paket='".$no_paket."' ";
+
+            if(isset($request->no_jadwal)){
+                if($request->no_jadwal == "all"){
+                    $filter = "";
+                }else{
+
+                    $filter = " and no_jadwal='$request->no_jadwal' ";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $sql = "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' and no_paket='".$no_paket."' $filter";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             

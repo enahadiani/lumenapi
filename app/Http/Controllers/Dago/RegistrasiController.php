@@ -495,7 +495,7 @@ class RegistrasiController extends Controller
         
     }
 
-    public function getPP()
+    public function getPP(Request $request)
     {
         try {
             
@@ -504,12 +504,23 @@ class RegistrasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select kode_pp, nama from pp where flag_aktif='1' and kode_lokasi = '$kode_lokasi'";
+            if(isset($request->kode_pp)){
+                if($request->kode_pp == "all"){
+                    $filter = "";
+                }else{
+
+                    $filter = " and kode_pp='$request->kode_pp' ";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $sql="select kode_pp, nama from pp where flag_aktif='1' and kode_lokasi = '$kode_lokasi' $filter";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql="select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi = '$kode_lokasi'";
+            $sql="select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi = '$kode_lokasi' $filter";
             $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
             $success["kodePP"]= $res2[0]['kode_pp'];
