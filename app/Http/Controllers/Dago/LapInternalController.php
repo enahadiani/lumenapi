@@ -587,4 +587,221 @@ class LapInternalController extends Controller
         }
     }
 
+    
+    function getDetailSaldo(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
+            $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
+                       
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            $sql="select 'ROOM' as kode_biaya, c.harga_room as tarif, c.harga_room as nilai,isnull(d.byr,0) as byr,c.harga_room-isnull(d.byr,0) as saldo, 
+            1 as jml, 'ROOM' as nama, '-' as jenis
+            from dgw_reg c 
+            left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.kode_biaya ='ROOM' and a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_lokasi ) d on c.kode_lokasi=d.kode_lokasi 
+                        and c.no_reg=d.no_reg 
+            where c.kode_lokasi='$kode_lokasi' $where 
+            union all
+            select 'PAKET' as kode_biaya, c.harga-isnull(c.diskon,0) as tarif, c.harga-isnull(c.diskon,0) as nilai,isnull(d.byr,0) as byr,c.harga-isnull(c.diskon,0)-isnull(d.byr,0) as saldo, 1 as jml, 'PAKET' as nama, '-' as jenis
+            from dgw_reg c
+            left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.kode_biaya = 'PAKET' and a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_lokasi ) d on c.kode_lokasi=d.kode_lokasi 
+                        and c.no_reg=d.no_reg 
+            where c.kode_lokasi='$kode_lokasi' $where 
+            union all
+            select a.kode_biaya, a.tarif, a.nilai, isnull(d.byr,0) as byr,a.nilai-isnull(d.byr,0) as saldo,a.jml, b.nama, b.jenis 
+            from dgw_reg_biaya a 
+            inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+            inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+            left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        group by a.no_reg,a.kode_biaya,a.kode_lokasi ) d on a.kode_biaya=d.kode_biaya and a.kode_lokasi=d.kode_lokasi 
+                        and a.no_reg=d.no_reg 
+            where a.nilai <> 0 and a.kode_lokasi='$kode_lokasi' and b.jenis='TAMBAHAN' $where 
+            union all
+            select a.kode_biaya, a.tarif, a.nilai, isnull(d.byr,0) as byr,a.nilai-isnull(d.byr,0) as saldo,a.jml, b.nama, b.jenis 
+            from dgw_reg_biaya a 
+            inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+            inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+            left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        group by a.no_reg,a.kode_biaya,a.kode_lokasi ) d on a.kode_biaya=d.kode_biaya and a.kode_lokasi=d.kode_lokasi 
+                        and a.no_reg=d.no_reg 
+            where a.nilai <> 0 and a.kode_lokasi='$kode_lokasi' and b.jenis='DOKUMEN' $where ";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $resdata;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getDetailBayar(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
+            $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
+                       
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            $sql="select 'ROOM' as kode_biaya, c.harga_room as tarif, c.harga_room as nilai,isnull(d.byr,0) as byr,
+            1 as jml, 'ROOM' as nama, '-' as jenis
+            from dgw_reg c
+            left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.kode_biaya ='ROOM' and a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_lokasi ) d on c.kode_lokasi=d.kode_lokasi 
+                        and c.no_reg=d.no_reg 
+            where c.kode_lokasi='$kode_lokasi' $where 
+            union all
+            select 'PAKET' as kode_biaya, c.harga-isnull(c.diskon,0) as tarif, c.harga-isnull(c.diskon,0) as nilai,isnull(d.byr,0) as byr,1 as jml, 'PAKET' as nama, '-' as jenis
+            from dgw_reg c
+            left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.kode_biaya = 'PAKET' and a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_lokasi ) d on c.kode_lokasi=d.kode_lokasi 
+                        and c.no_reg=d.no_reg 
+            where c.kode_lokasi='$kode_lokasi' $where
+            union all
+            select a.kode_biaya, a.tarif, a.nilai, isnull(d.byr,0) as byr,a.jml, b.nama, b.jenis
+            from dgw_reg_biaya a 
+            inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+            inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+            left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        group by a.no_reg,a.kode_biaya,a.kode_lokasi ) d on a.kode_biaya=d.kode_biaya and a.kode_lokasi=d.kode_lokasi 
+                        and a.no_reg=d.no_reg 
+            where a.nilai <> 0 and a.kode_lokasi='$kode_lokasi' and b.jenis='TAMBAHAN' $where 
+            union all
+            select a.kode_biaya, a.tarif, a.nilai, isnull(d.byr,0) as byr,a.jml, b.nama, b.jenis
+            from dgw_reg_biaya a 
+            inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+            inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+            left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        group by a.no_reg,a.kode_biaya,a.kode_lokasi ) d on a.kode_biaya=d.kode_biaya and a.kode_lokasi=d.kode_lokasi 
+                        and a.no_reg=d.no_reg 
+            where a.nilai <> 0 and a.kode_lokasi='$kode_lokasi' and b.jenis='DOKUMEN' $where ";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $resdata;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getDetailTagihan(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
+            $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
+                       
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            $sql="select 'ROOM' as kode_biaya, c.harga_room as tarif, c.harga_room as nilai,1 as jml, 'ROOM' as nama,'-' as jenis
+                from dgw_reg c 
+                where c.kode_lokasi='$kode_lokasi' $where 
+                union all
+                select 'PAKET' as kode_biaya, c.harga-isnull(c.diskon,0) as tarif, c.harga-isnull(c.diskon,0) as nilai, 1 as jml, 'PAKET' as nama, '-' as jenis
+                from dgw_reg c
+                where c.kode_lokasi='$kode_lokasi' $where 
+                union all
+                select a.kode_biaya, a.tarif, a.nilai, a.jml, b.nama,b.jenis 
+                from dgw_reg_biaya a 
+                inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi
+                inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_lokasi='$kode_lokasi' and b.jenis='TAMBAHAN' $where 
+                union all
+                select a.kode_biaya, a.tarif, a.nilai, a.jml, b.nama,b.jenis 
+                from dgw_reg_biaya a 
+                inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+                inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_lokasi='$kode_lokasi' and b.jenis='DOKUMEN' $where ";
+                
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $resdata;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

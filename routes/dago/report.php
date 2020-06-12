@@ -38,6 +38,9 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('lap-registrasi','Dago\LapInternalController@getRegistrasi');
     $router->get('lap-pembayaran','Dago\LapInternalController@getPembayaran');
     $router->get('lap-rekap-saldo','Dago\LapInternalController@getRekapSaldo');
+    $router->get('lap-detail-saldo','Dago\LapInternalController@getDetailSaldo');
+    $router->get('lap-detail-tagihan','Dago\LapInternalController@getDetailTagihan');
+    $router->get('lap-detail-bayar','Dago\LapInternalController@getDetailBayar');
     $router->get('lap-kartu-pembayaran','Dago\LapInternalController@getKartuPembayaran');
 
 });
