@@ -776,9 +776,20 @@ class PembayaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if(isset($request->kode_akun)){
+                if($request->kode_akun == "all"){
+                    $filter = "";
+                }else{
+
+                    $filter = " and a.kode_akun='$request->kode_akun' ";
+                }
+            }else{
+                $filter = "";
+            }
+
             $res = DB::connection($this->sql)->select("select a.kode_akun, a.nama
             from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.kode_flag in ('057') ");
+            where a.kode_lokasi='$kode_lokasi' and b.kode_flag in ('057') $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
