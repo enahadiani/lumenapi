@@ -767,7 +767,7 @@ class PembayaranController extends Controller
         }	
     }
 
-    public function getRekBank()
+    public function getRekBank(Request $request)
     {
         try {
             
@@ -780,7 +780,6 @@ class PembayaranController extends Controller
                 if($request->kode_akun == "all"){
                     $filter = "";
                 }else{
-
                     $filter = " and a.kode_akun='$request->kode_akun' ";
                 }
             }else{
