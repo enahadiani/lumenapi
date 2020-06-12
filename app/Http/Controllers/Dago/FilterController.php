@@ -291,6 +291,7 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter ="";
             if(isset($request->periode) && $request->periode != ""){
                 $filter .= " and a.periode='".$request->periode."' ";
             }else{
