@@ -17,11 +17,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Filter Laporan
-    $router->get('filter-periode','Dago\LaporanController@getFilterPeriode');
-    $router->get('filter-paket','Dago\LaporanController@getFilterPaket');
-    $router->get('filter-jadwal','Dago\LaporanController@getFilterJadwal');
-    $router->get('filter-noreg','Dago\LaporanController@getFilterNoReg');
-    $router->get('filter-peserta','Dago\LaporanController@getFilterPeserta');
+    $router->get('filter-periode','Dago\FilterController@getFilterPeriode');
+    $router->get('filter-paket','Dago\FilterController@getFilterPaket');
+    $router->get('filter-jadwal','Dago\FilterController@getFilterJadwal');
+    $router->get('filter-noreg','Dago\FilterController@getFilterNoReg');
+    $router->get('filter-peserta','Dago\FilterController@getFilterPeserta');
 
     //Pihak ketiga
    
