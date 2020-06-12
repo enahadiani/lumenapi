@@ -22,6 +22,8 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('filter-jadwal','Dago\FilterController@getFilterJadwal');
     $router->get('filter-noreg','Dago\FilterController@getFilterNoReg');
     $router->get('filter-peserta','Dago\FilterController@getFilterPeserta');
+    $router->get('filter-kwitansi','Dago\FilterController@getFilterKwitansi');
+    $router->get('filter-jk','Dago\FilterController@getFilterJK');
 
     //Pihak ketiga
    

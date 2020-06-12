@@ -243,5 +243,82 @@ class FilterController extends Controller
         }
     }
     
+    function getFilterJK(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->no_peserta) && $request->no_peserta != ""){
+                $filter .= " and a.no_peserta='".$request->no_peserta."' ";
+            }else{
+                $filter .= "";
+            }
+          
+            $sql="select a.jk 
+            from dgw_peserta a  
+            where a.kode_lokasi='$kode_lokasi' $filter";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterKwitansi(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->periode) && $request->periode != ""){
+                $filter .= " and a.periode='".$request->periode."' ";
+            }else{
+                $filter .= "";
+            }
+          
+            $sql="select a.no_kwitansi,a.no_reg 
+            from dgw_pembayaran a 
+            where kode_lokasi='$kode_lokasi' $filter";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 
 }
