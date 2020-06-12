@@ -599,7 +599,7 @@ class LapInternalController extends Controller
             $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
             $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
                        
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
                     $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
@@ -677,7 +677,7 @@ class LapInternalController extends Controller
             $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
             $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
                        
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
                     $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
@@ -755,7 +755,7 @@ class LapInternalController extends Controller
             $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
             $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
                        
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
                     $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
