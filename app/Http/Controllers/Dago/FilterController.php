@@ -65,7 +65,7 @@ class FilterController extends Controller
             $sql="select a.no_paket,b.nama 
                 from dgw_reg a 
                 inner join dgw_paket b on a.no_paket=b.no_paket and a.kode_lokasi = b.kode_lokasi 
-                where kode_lokasi='$kode_lokasi' $filter";
+                where a.kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
