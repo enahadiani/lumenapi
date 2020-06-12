@@ -27,7 +27,9 @@ class JadwalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select( "select no_jadwal,convert (varchar, tgl_berangkat,103) as tgl_berangkat from dgw_jadwal where no_closing = '-' and kode_lokasi='".$kode_lokasi."' ");
+            $res = DB::connection($this->sql)->select( "select a.no_paket,a.nama,a.kode_curr,b.nama as nama_produk 
+            from dgw_paket a
+            inner join dgw_jenis_produk b on a.kode_produk=b.kode_produk and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
