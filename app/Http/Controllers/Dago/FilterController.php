@@ -251,6 +251,7 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
             if(isset($request->no_peserta) && $request->no_peserta != ""){
                 $filter .= " and a.no_peserta='".$request->no_peserta."' ";
             }else{
