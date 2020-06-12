@@ -26,17 +26,17 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Pihak ketiga
    
     //Laporan
-    $router->get('lap-mku-operasional','Dago\LaporanController@getMkuOperasional');
-    $router->get('lap-mku-keuangan','Dago\LaporanController@getMkuKeuangan');
-    $router->get('lap-paket','Dago\LaporanController@getPaket');
-    $router->get('lap-dokumen','Dago\LaporanController@getDokumen');
-    $router->get('lap-jamaah','Dago\LaporanController@getJamaah');
+    $router->get('lap-mku-operasional','Dago\LapInternalController@getMkuOperasional');
+    $router->get('lap-mku-keuangan','Dago\LapInternalController@getMkuKeuangan');
+    $router->get('lap-paket','Dago\LapInternalController@getPaket');
+    $router->get('lap-dokumen','Dago\LapInternalController@getDokumen');
+    $router->get('lap-jamaah','Dago\LapInternalController@getJamaah');
 
-    $router->get('lap-form-registrasi','Dago\LaporanController@getFormRegistrasi');
-    $router->get('lap-registrasi','Dago\LaporanController@getRegistrasi');
-    $router->get('lap-pembayaran','Dago\LaporanController@getPembayaran');
-    $router->get('lap-rekap-saldo','Dago\LaporanController@getRekapSaldo');
-    $router->get('lap-kartu-pembayaran','Dago\LaporanController@getKartuPembayaran');
+    $router->get('lap-form-registrasi','Dago\LapInternalController@getFormRegistrasi');
+    $router->get('lap-registrasi','Dago\LapInternalController@getRegistrasi');
+    $router->get('lap-pembayaran','Dago\LapInternalController@getPembayaran');
+    $router->get('lap-rekap-saldo','Dago\LapInternalController@getRekapSaldo');
+    $router->get('lap-kartu-pembayaran','Dago\LapInternalController@getKartuPembayaran');
 
 });
 
