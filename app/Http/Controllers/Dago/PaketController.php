@@ -192,7 +192,12 @@ class PaketController extends Controller
             no_paket,nama,kode_curr,jenis,kode_produk, tarif_agen from dgw_paket where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select("select kode_harga,no_paket,harga,harga_se,harga_e,fee,curr_fee from dgw_harga where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
+            $res2 = DB::connection($this->sql)->select("
+            select a.kode_harga,b.nama,a.no_paket,a.harga,a.harga_se,a.harga_e,a.fee,a.curr_fee 
+            from dgw_harga a 
+            inner join dgw_jenis_harga b on a.kode_harga=b.kode_harga and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_paket='$request->no_paket' 
+            ");
             $res2 = json_decode(json_encode($res2),true);
 
             $res3 = DB::connection($this->sql)->select("select no_jadwal,tgl_berangkat,no_paket,lama_hari,quota,quota_se,quota_e,no_closing,kurs_closing,id_pbb,tgl_datang,tgl_cetak from dgw_jadwal where kode_lokasi='".$kode_lokasi."' and no_paket='$request->no_paket' ");
