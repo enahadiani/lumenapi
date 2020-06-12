@@ -605,6 +605,7 @@ class LapInternalController extends Controller
                     $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
                 }
             }
+            $no_bukti = "";
             $sql="select 'ROOM' as kode_biaya, c.harga_room as tarif, c.harga_room as nilai,isnull(d.byr,0) as byr,c.harga_room-isnull(d.byr,0) as saldo, 
             1 as jml, 'ROOM' as nama, '-' as jenis
             from dgw_reg c 
@@ -676,7 +677,7 @@ class LapInternalController extends Controller
             
             $col_array = array('periode','no_paket','no_jadwal','no_reg','no_peserta');
             $db_col_name = array('c.periode','c.no_paket','c.no_jadwal','c.no_reg','c.no_peserta');
-                       
+            $no_bukti = "";
             $where = "";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
