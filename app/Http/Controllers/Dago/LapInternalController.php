@@ -543,7 +543,7 @@ class LapInternalController extends Controller
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $resdata = array();
-                $tgl = "";
+                $no_reg = "";
                 $i=0;
                 foreach($rs as $row){
 
