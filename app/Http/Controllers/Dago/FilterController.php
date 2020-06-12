@@ -38,6 +38,7 @@ class FilterController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
@@ -77,6 +78,7 @@ class FilterController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
@@ -122,6 +124,7 @@ class FilterController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
@@ -170,6 +173,7 @@ class FilterController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
@@ -228,6 +232,7 @@ class FilterController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }

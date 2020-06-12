@@ -82,6 +82,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
     //Jadwal
     $router->get('jadwal','Dago\JadwalController@index');
+    $router->get('jadwal-detail','Dago\JadwalController@show');
     $router->put('jadwal','Dago\JadwalController@update');
 });
 
