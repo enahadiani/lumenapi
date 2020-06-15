@@ -57,10 +57,11 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter = " and a.periode='".$request->periode."' ";
+                $filter .= " and a.periode='".$request->periode."' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
           
             $sql="select a.no_paket,b.nama 
@@ -96,17 +97,18 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
 
             if(isset($request->periode) && $request->periode != ""){
-                $filter = " and a.periode='".$request->periode."' ";
+                $filter .= " and a.periode='".$request->periode."' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
           
             if(isset($request->paket) && $request->paket != ""){
-                $filter = " and a.no_paket='".$request->paket."' ";
+                $filter .= " and a.no_paket='".$request->paket."' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
             $sql="select a.no_jadwal,b.tgl_berangkat 
@@ -143,22 +145,23 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter = " and a.periode='".$request->periode."' ";
+                $filter .= " and a.periode='".$request->periode."' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
           
             if(isset($request->paket) && $request->paket != ""){
-                $filter = " and a.no_paket='".$request->paket."' ";
+                $filter .= " and a.no_paket='".$request->paket."' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
             if(isset($request->jadwal) && $request->jadwal != ""){
-                $filter = " and a.no_jadwal='".$request->jadwal."' ";
+                $filter .= " and a.no_jadwal='".$request->jadwal."' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
             if(isset($request->no_peserta) && $request->no_peserta != ""){
