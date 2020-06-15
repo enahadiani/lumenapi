@@ -234,7 +234,7 @@ class FilterController extends Controller
             }else{
                 $filter .= "";
             }
-            
+
             $sql="select a.no_peserta,b.nama 
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
@@ -312,6 +312,12 @@ class FilterController extends Controller
             $filter ="";
             if(isset($request->periode) && $request->periode != ""){
                 $filter .= " and a.periode='".$request->periode."' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->no_reg) && $request->no_reg != ""){
+                $filter .= " and a.no_reg='".$request->no_reg."' ";
             }else{
                 $filter .= "";
             }
