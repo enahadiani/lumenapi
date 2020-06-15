@@ -43,7 +43,7 @@ $router->get('storage/{filename}', function ($filename)
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     
-    $router->get('profile', 'AdminTokoController@profile2');
+    $router->get('profile', 'AdminTokoController@profile');
     $router->get('users/{id}', 'AdminTokoController@singleUser');
     $router->get('users', 'AdminTokoController@allUsers');
     $router->get('cek-payload', 'AdminTokoController@cekPayload');
