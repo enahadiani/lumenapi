@@ -328,4 +328,11 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/toko/report.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/toko-dash'
+], function ($router) {
+    require __DIR__.'/../routes/toko/dash.php';
+});
 return $app;

@@ -10,7 +10,7 @@ use Laravel\Lumen\Auth\Authorizable;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Admin extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
+class AdminToko extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable;
     protected $connection = 'tokoaws';
