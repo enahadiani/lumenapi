@@ -201,10 +201,15 @@ class RegistrasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select( "select a.no_reg,a.kode_harga,a.harga, a.harga_room,a.no_paket, a.no_jadwal, a.tgl_input, a.no_type, b.tgl_berangkat, b.lama_hari, a.uk_pakaian, a.no_peserta, a.no_agen,a.no_jadwal,a.no_paket, a.no_marketing, a.info, a.jenis, a.no_peserta_ref, a.kode_pp, a.diskon,c.kode_curr,a.no_quota,a.flag_group,a.brkt_dgn,a.hubungan,a.referal,a.ket_diskon
+            $res = DB::connection($this->sql)->select( "select a.no_reg,a.kode_harga,a.harga, a.harga_room,a.no_paket,a.no_jadwal,b.tgl_berangkat,a.tgl_input, a.no_type,b.lama_hari, a.uk_pakaian, a.no_peserta, a.no_agen,a.no_jadwal,a.no_paket, a.no_marketing, a.info, a.jenis, a.no_peserta_ref, a.kode_pp, a.diskon,c.kode_curr,a.no_quota,a.flag_group,a.brkt_dgn,a.hubungan,a.referal,a.ket_diskon,h.nama as nama_peserta,c.nama as nama_room, d.nama as nama_paket,e.nama_marketing,f.nama_agen,g.nama as nama_pp
             from dgw_reg a 
+			inner join dgw_paket d on a.no_paket=d.no_paket and a.kode_lokasi=d.kode_lokasi
+			inner join pp g on a.kode_pp=g.kode_pp and a.kode_lokasi=g.kode_lokasi
+			inner join dgw_peserta h on a.no_peserta=h.no_peserta and a.kode_lokasi=h.kode_lokasi
             left join dgw_jadwal b on a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi and a.no_jadwal=b.no_jadwal 
             left join dgw_typeroom c on a.no_type=c.no_type and a.kode_lokasi=c.kode_lokasi 
+			left join dgw_marketing e on a.no_marketing=e.no_marketing and a.kode_lokasi=e.kode_lokasi
+			left join dgw_agent f on a.no_agen=f.no_agen and a.kode_lokasi=f.kode_lokasi
             where a.no_reg='$request->no_reg'  and a.kode_lokasi='$kode_lokasi' ");
             $res = json_decode(json_encode($res),true);
 
