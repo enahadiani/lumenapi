@@ -92,7 +92,7 @@ class PembayaranController extends Controller
                         from dgw_pembayaran 
                         where kode_lokasi='$kode_lokasi' group by no_reg 
                         ) c on a.no_reg=c.no_reg 
-            inner join dgw_jadwal e on a.no_paket=e.no_paket and a.no_jadwal=e.no_jadwal and a.kode_lokasi=e.kode_lokasi
+            left join dgw_jadwal e on a.no_paket=e.no_paket and a.no_jadwal=e.no_jadwal and a.kode_lokasi=e.kode_lokasi
             where a.kode_lokasi='$kode_lokasi'");
             $res = json_decode(json_encode($res),true);
             
