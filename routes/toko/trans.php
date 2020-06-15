@@ -23,6 +23,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('penjualan-nota','Toko\PenjualanController@getNota');
     $router->get('penjualan-bonus','Toko\PenjualanController@cekBonus');
 
+    //Open Kasir
+    $router->get('open-kasir','Toko\OpenKasirController@index');
+    $router->post('open-kasir','Toko\OpenKasirController@store');
+    $router->put('open-kasir','Toko\OpenKasirController@update');
+
 });
 
 
