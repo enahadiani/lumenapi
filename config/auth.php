@@ -46,6 +46,10 @@ return [
         'dago' => [
             'driver' => 'jwt',
             'provider' => 'admindago',
+        ],
+        'toko' => [
+            'driver' => 'jwt',
+            'provider' => 'admintoko',
         ]
     ],
 
@@ -85,6 +89,10 @@ return [
         'admindago' => [
             'driver' => 'eloquent',
             'model' => \App\AdminDago::class
+        ],
+        'admintoko' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminToko::class
         ]
     ]
 ];

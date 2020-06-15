@@ -307,4 +307,25 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/toko/auth.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/toko-master'
+], function ($router) {
+    require __DIR__.'/../routes/toko/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/toko-trans'
+], function ($router) {
+    require __DIR__.'/../routes/toko/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/toko-report'
+], function ($router) {
+    require __DIR__.'/../routes/toko/report.php';
+});
 return $app;

@@ -230,6 +230,23 @@ class AuthController extends Controller
         return $this->respondWithToken($token,'dago');
     }
 
+    public function loginToko(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('toko')->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token,'toko',720);
+    }
+
     public function hashPassword(){
         $users = User::all();
         DB::connection('sqlsrv')->beginTransaction();
@@ -455,6 +472,30 @@ class AuthController extends Controller
             return response()->json($success, 200);
         }	
 
+    }
+
+    public function hashPasswordToko(){
+        $users = Admin::all();
+        DB::connection('tokoaws')->beginTransaction();
+        
+        try {
+            DB::connection('tokoaws')->table('hakakses')->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('tokoaws')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('tokoaws')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('tokoaws')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
     }
 
     public function hashPasswordByNIK($db,$table,$nik){
