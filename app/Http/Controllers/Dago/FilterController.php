@@ -161,6 +161,18 @@ class FilterController extends Controller
                 $filter = "";
             }
 
+            if(isset($request->no_peserta) && $request->no_peserta != ""){
+                $filter .= " and a.no_peserta='".$request->no_peserta."' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->no_reg) && $request->no_reg != ""){
+                $filter .= " and a.no_reg='".$request->no_reg."' ";
+            }else{
+                $filter .= "";
+            }
+
             $sql="select a.no_reg from dgw_reg a where a.kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -211,12 +223,18 @@ class FilterController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->no_peserta) && $request->no_peserta != ""){
+                $filter .= " and a.no_peserta='".$request->no_peserta."' ";
+            }else{
+                $filter .= "";
+            }
+
             if(isset($request->no_reg) && $request->no_reg != ""){
                 $filter .= " and a.no_reg='".$request->no_reg."' ";
             }else{
                 $filter .= "";
             }
-
+            
             $sql="select a.no_peserta,b.nama 
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
