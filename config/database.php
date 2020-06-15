@@ -120,6 +120,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'tokoaws' => [
+            'driver' => env('DB_CONNECTION9','sqlsrv'),
+            'host' => env('DB_HOST9', 'localhost'),
+            'port' => env('DB_PORT9', '1433'),
+            'database' => env('DB_DATABASE9', 'forge'),
+            'username' => env('DB_USERNAME9', 'forge'),
+            'password' => env('DB_PASSWORD9', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

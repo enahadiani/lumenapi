@@ -300,4 +300,11 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/midtrans.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/toko-auth'
+], function ($router) {
+    require __DIR__.'/../routes/toko/auth.php';
+});
 return $app;

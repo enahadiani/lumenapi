@@ -50,7 +50,7 @@ class RegistrasiController extends Controller
             $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group
             from dgw_reg a
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
-            inner join dgw_jadwal c on a.no_paket=c.no_paket and a.no_jadwal=c.no_jadwal and a.kode_lokasi=c.kode_lokasi
+            left join dgw_jadwal c on a.no_paket=c.no_paket and a.no_jadwal=c.no_jadwal and a.kode_lokasi=c.kode_lokasi
             inner join dgw_paket e on a.no_paket=e.no_paket and a.kode_lokasi=e.kode_lokasi 
             where a.kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
