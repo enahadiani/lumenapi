@@ -17,7 +17,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
-    //
+    //Penjualan (POS)
+    $router->get('penjualan-open','Toko\PenjualanController@getNoOpen');
+    $router->post('penjualan','Toko\PenjualanController@store');
+    $router->get('penjualan-nota','Toko\PenjualanController@getNota');
+    $router->get('penjualan-bonus','Toko\PenjualanController@cekBonus');
 
 });
 
