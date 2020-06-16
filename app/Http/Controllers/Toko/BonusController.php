@@ -109,7 +109,7 @@ class BonusController extends Controller
             }
             // if($this->isUnik($request->kode_bonus,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->keterangan,$kode_lokasi,$request->ref_qty, $request->bonus_qty, $request->tgl_mulai,$request->tgl_selesai));
+                $ins = DB::connection($this->sql)->insert('insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->keterangan,$kode_lokasi,$request->ref_qty,$request->bonus_qty,$request->tgl_mulai,$request->tgl_selesai));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -173,7 +173,7 @@ class BonusController extends Controller
             ->where('kode_barang', $request->kode_barang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->keterangan,$kode_lokasi,$request->ref_qty, $request->bonus_qty, $request->tgl_mulai,$request->tgl_selesai));
+            $ins = DB::connection($this->sql)->insert('insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->keterangan,$kode_lokasi,$request->ref_qty, $request->bonus_qty,$request->tgl_mulai,$request->tgl_selesai));
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;

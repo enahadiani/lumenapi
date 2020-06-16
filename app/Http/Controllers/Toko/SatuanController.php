@@ -42,7 +42,7 @@ class SatuanController extends Controller
                 if($request->kode_satuan == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.kode_satuan='$request->kode_satuan' ";
+                    $filter = " and kode_satuan='$request->kode_satuan' ";
                 }
                 $sql= "select kode_satuan,nama from brg_satuan where kode_lokasi='$kode_lokasi'
                 $filter ";
