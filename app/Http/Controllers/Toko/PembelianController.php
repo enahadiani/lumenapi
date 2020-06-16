@@ -192,6 +192,7 @@ class PembelianController extends Controller
             if(isset($request->nik) && $request->nik != ""){
                 $nik= $request->nik;
             }
+            $no_bukti = $request->no_bukti;
 
             $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
             ";
