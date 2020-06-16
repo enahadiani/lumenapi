@@ -20,7 +20,7 @@ class BonusController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select kode_bonus form brg_bonus where kode_bonus ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_bonus from brg_bonus where kode_bonus ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -74,7 +74,7 @@ class BonusController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the from for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
@@ -132,7 +132,7 @@ class BonusController extends Controller
 
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the from for editing the specified resource.
      *
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response

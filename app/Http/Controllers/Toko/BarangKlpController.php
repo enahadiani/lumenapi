@@ -20,7 +20,7 @@ class BarangKlpController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select kode_klp form brg_barangklp where kode_klp ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_klp from brg_barangklp where kode_klp ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -77,7 +77,7 @@ class BarangKlpController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the from for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
@@ -134,7 +134,7 @@ class BarangKlpController extends Controller
 
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the from for editing the specified resource.
      *
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
