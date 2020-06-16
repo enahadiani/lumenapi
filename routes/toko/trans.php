@@ -43,6 +43,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('pembelian-nota','Toko\PembelianController@getNota');
     $router->get('pembelian-barang','Toko\PembelianController@getBarang');
 
+    //Retur Pembelian
+    $router->get('retur-beli-new','Toko\ReturPembelianController@getNew');
+    $router->get('retur-beli-finish','Toko\ReturPembelianController@index');
+    $router->get('retur-beli-detail','Toko\ReturPembelianController@show');
+    $router->post('retur-beli','Toko\ReturPembelianController@store');
+    $router->get('retur-beli-barang','Toko\ReturPembelianController@getBarang');
+
 });
 
 
