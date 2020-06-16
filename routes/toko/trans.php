@@ -34,6 +34,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('close-kasir-detail','Toko\CloseKasirController@show');
     $router->post('close-kasir','Toko\CloseKasirController@store');
 
+    //Pembelian
+    $router->get('pembelian','Toko\PembelianController@index');
+    $router->get('pembelian-detail','Toko\PembelianController@show');
+    $router->post('pembelian','Toko\PembelianController@store');
+    $router->put('pembelian','Toko\PembelianController@update');
+    $router->delete('pembelian','Toko\PembelianController@destroy');
+    $router->get('pembelian-nota','Toko\PembelianController@getNota');
+    $router->get('pembelian-barang','Toko\PembelianController@getBarang');
+
 });
 
 
