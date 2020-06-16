@@ -189,6 +189,10 @@ class OpenKasirController extends Controller
             }
 
             $id = $request->no_open;
+            $del = DB::connection($this->sql)->table('kasir_open')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_open', $id)
+            ->delete();
 
             $sql="select*from kasir_open where nik='$nik' and no_close ='-' and kode_lokasi='$kode_lokasi' ";
             $get2 = DB::connection($this->sql)->select($sql);
