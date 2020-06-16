@@ -44,7 +44,7 @@ class CustomerController extends Controller
                 }else{
                     $filter = " and a.kode_cust='$request->kode_cust' ";
                 }
-                $sql= "select a.kode_cust, a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_piutang,b.nama as nama_akun from cust a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.kode_cust, a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_piutang,b.nama as nama_akun from cust a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select kode_cust, nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_piutang  from cust where kode_lokasi= '".$kode_lokasi."'";
             }
