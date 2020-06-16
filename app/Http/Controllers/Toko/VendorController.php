@@ -45,7 +45,7 @@ class VendorController extends Controller
                     $filter = " and a.kode_vendor='$request->kode_vendor' ";
                 }
                 $sql= "select a.kode_vendor,a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_hutang,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pictel,b.nama as nama_akun 
-                from vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where kode_lokasi='".$kode_lokasi."' $filter ";
+                from vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select kode_vendor,nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_hutang,bank,cabang,no_rek,nama_rek,no_pictel from vendor where kode_lokasi= '".$kode_lokasi."'";
             }
@@ -91,25 +91,25 @@ class VendorController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required',
-            'nama' => 'required',
-            'alamat' => 'required',
-            'no_tel' => 'required',
-            'email' => 'required|email',
-            'npwp' => 'required',
-            'pic' => 'required',
-            'alamat2' => 'required',
-            'bank' => 'required',
-            'cabang' => 'required',
-            'no_rek' => 'required',
-            'nama_rek' => 'required',
-            'no_fax' => 'required',
-            'no_pictel' => 'required',
-            'spek' => 'required',
-            'kode_klpvendor' => 'required',
-            'penilaian' => 'required',
-            'bank_trans' => 'required',
-            'akun_hutang' => 'required'
+            'kode_vendor' => 'required|max:10',
+            'nama' => 'required|max:50',
+            'alamat' => 'required|max:200',
+            'no_tel' => 'required|max:50',
+            'email' => 'required|email|max:50',
+            'npwp' => 'required|max:50',
+            'pic' => 'required|max:50',
+            'alamat2' => 'required|max:200',
+            'bank' => 'required|max:50',
+            'cabang' => 'required|max:50',
+            'no_rek' => 'required|max:50',
+            'nama_rek' => 'required|max:50',
+            'no_fax' => 'required|max:50',
+            'no_pictel' => 'required|max:50',
+            'spek' => 'required|max:200',
+            'kode_klpvendor' => 'required|max:10',
+            'penilaian' => 'required|max:50',
+            'bank_trans' => 'required|max:50',
+            'akun_hutang' => 'required|max:20'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -164,25 +164,25 @@ class VendorController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required',
-            'nama' => 'required',
-            'alamat' => 'required',
-            'no_tel' => 'required',
-            'email' => 'required|email',
-            'npwp' => 'required',
-            'pic' => 'required',
-            'alamat2' => 'required',
-            'bank' => 'required',
-            'cabang' => 'required',
-            'no_rek' => 'required',
-            'nama_rek' => 'required',
-            'no_fax' => 'required',
-            'no_pictel' => 'required',
-            'spek' => 'required',
-            'kode_klpvendor' => 'required',
-            'penilaian' => 'required',
-            'bank_trans' => 'required',
-            'akun_hutang' => 'required'
+            'kode_vendor' => 'required|max:10',
+            'nama' => 'required|max:50',
+            'alamat' => 'required|max:200',
+            'no_tel' => 'required|max:50',
+            'email' => 'required|email|max:50',
+            'npwp' => 'required|max:50',
+            'pic' => 'required|max:50',
+            'alamat2' => 'required|max:200',
+            'bank' => 'required|max:50',
+            'cabang' => 'required|max:50',
+            'no_rek' => 'required|max:50',
+            'nama_rek' => 'required|max:50',
+            'no_fax' => 'required|max:50',
+            'no_pictel' => 'required|max:50',
+            'spek' => 'required|max:200',
+            'kode_klpvendor' => 'required|max:10',
+            'penilaian' => 'required|max:50',
+            'bank_trans' => 'required|max:50',
+            'akun_hutang' => 'required|max:20'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
