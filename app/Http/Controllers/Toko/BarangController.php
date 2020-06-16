@@ -107,7 +107,7 @@ class BarangController extends Controller
             'fm1' => 'required',
             'fm2' => 'required',
             'kode_klp' => 'required',
-            'file_gambar' => 'required',
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048',
             'barcode' => 'required',
             'hrg_satuan' => 'required',
             'ppn' => 'required',
@@ -123,7 +123,22 @@ class BarangController extends Controller
             }
             if($this->isUnik($request->kode_barang,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->nama,$kode_lokasi,$request->sat_kecil, $request->sat_besar, $request->jml_sat,$request->hna,$request->pabrik,$request->flag_gen, $request->flag_aktif,$request->ss, $request->sm1, $request->sm2, $request->mm1, $request->mm2, $request->fm1, $request->fm2, $request->kode_klp, $request->file_gambar, $request->barcode,$request->hrg_satuan, $request->ppn, $request->profit));
+                if($request->hasfile('file_gambar')){
+                    $file = $request->file('file_gambar');
+                    
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    // $picName = uniqid() . '_' . $picName;
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('toko/'.$foto)){
+                        Storage::disk('s3')->delete('toko/'.$foto);
+                    }
+                    Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                }else{
+    
+                    $foto="-";
+                }
+
+                $ins = DB::connection($this->sql)->insert('insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->nama,$kode_lokasi,$request->sat_kecil, $request->sat_besar, $request->jml_sat,$request->hna,$request->pabrik,$request->flag_gen, $request->flag_aktif,$request->ss, $request->sm1, $request->sm2, $request->mm1, $request->mm2, $request->fm1, $request->fm2, $request->kode_klp, $foto, $request->barcode,$request->hrg_satuan, $request->ppn, $request->profit));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -184,7 +199,7 @@ class BarangController extends Controller
             'fm1' => 'required',
             'fm2' => 'required',
             'kode_klp' => 'required',
-            'file_gambar' => 'required',
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048',
             'barcode' => 'required',
             'hrg_satuan' => 'required',
             'ppn' => 'required',
@@ -198,13 +213,43 @@ class BarangController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if($request->hasfile('file_gambar')){
+
+                $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and kode_barang='$request->kode_barang' 
+                ";
+                $res = DB::connection('sqlsrv2')->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_gambar'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('toko/'.$foto);
+                    }
+                }else{
+                    $foto = "-";
+                }
+                
+                $file = $request->file('file_gambar');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
+                }
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                
+            }else{
+
+                $foto="-";
+            }
             
             $del = DB::connection($this->sql)->table('brg_barang')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_barang', $request->kode_barang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->nama,$kode_lokasi,$request->sat_kecil, $request->sat_besar, $request->jml_sat,$request->hna,$request->pabrik,$request->flag_gen, $request->flag_aktif,$request->ss, $request->sm1, $request->sm2, $request->mm1, $request->mm2, $request->fm1, $request->fm2, $request->kode_klp, $request->file_gambar, $request->barcode,$request->hrg_satuan, $request->ppn, $request->profit));
+            $ins = DB::connection($this->sql)->insert('insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->nama,$kode_lokasi,$request->sat_kecil, $request->sat_besar, $request->jml_sat,$request->hna,$request->pabrik,$request->flag_gen, $request->flag_aktif,$request->ss, $request->sm1, $request->sm2, $request->mm1, $request->mm2, $request->fm1, $request->fm2, $request->kode_klp, $foto, $request->barcode,$request->hrg_satuan, $request->ppn, $request->profit));
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -236,6 +281,18 @@ class BarangController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and kode_barang='$request->kode_barang' 
+            ";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){
+                $foto = $res[0]['file_gambar'];
+                if($foto != ""){
+                    Storage::disk('s3')->delete('toko/'.$foto);
+                }
+            }
+
             $del = DB::connection($this->sql)->table('brg_barang')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_barang', $request->kode_barang)

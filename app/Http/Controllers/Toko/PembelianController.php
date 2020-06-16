@@ -383,7 +383,6 @@ class PembelianController extends Controller
             return response()->json($success, $this->successStatus); 
         }				
         
-        
     }
 
     public function update(Request $request)
