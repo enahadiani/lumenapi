@@ -279,6 +279,8 @@ class PenjualanController extends Controller
         $this->validate($request, [
             'tanggal' => 'required|date_format:Y-m-d',
             'kode_barang' => 'required',
+            'jumlah' => 'required',
+            'harga' => 'required'
         ]);
         try {
             
