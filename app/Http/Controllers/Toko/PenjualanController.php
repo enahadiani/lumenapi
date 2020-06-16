@@ -299,6 +299,7 @@ class PenjualanController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $bonus=0;
                 $diskon=0;
+                $jml_bonus=0;
                 if(count($res)>0){
                     for($i=0;$i<count($res);$i++){
                         $bonus += (int) floor(abs($jumlah_brg/$res[$i]["beli"]));
@@ -306,10 +307,11 @@ class PenjualanController extends Controller
                         $diskon+= $bonus*$harga;
                     }
                 }
+                $jml_bonus = $jumlah_brg - $request->jumlah;
         
-                $success["bonus"] = $bonus;
+                $success["bonus"] = $jml_bonus;
                 $success["jumlah"] = $jumlah_brg;
-                $success["diskon"] = $diskon;
+                $success["diskon"] = $jml_bonus*$harga;
                 $success['status'] = true;
                 $success['message'] = "Success!";     
             }
