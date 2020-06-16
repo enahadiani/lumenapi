@@ -114,7 +114,7 @@ class OpenKasirController extends Controller
             $periode=date('Y').date('m');
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-OPN".$per.".";
-            $sql2="select right(isnull(max(no_open),'0000'),".strlen($str_format).")+1 as id from kasir_open where no_open like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
+            $sql="select right(isnull(max(no_open),'0000'),".strlen($str_format).")+1 as id from kasir_open where no_open like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
             $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
