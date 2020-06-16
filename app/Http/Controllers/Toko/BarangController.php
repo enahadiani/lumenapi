@@ -39,13 +39,13 @@ class BarangController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $url = url('api/toko-auth/storage');
             if(isset($request->kode_barang)){
                 if($request->kode_barang == "all"){
                     $filter = "";
                 }else{
                     $filter = " and kode_barang='$request->kode_barang' ";
                 }
-                $url = url('api/toko-auth/storage');
                 $sql= "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang
                 where kode_lokasi='".$kode_lokasi."' $filter";
             }else{
