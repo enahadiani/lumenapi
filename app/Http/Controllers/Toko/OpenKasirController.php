@@ -48,6 +48,10 @@ class OpenKasirController extends Controller
                 $filter = "";
             }
 
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
+            }
+
             $sql = "select no_open,nik,tgl_input,saldo_awal,no_close from kasir_open where kode_lokasi='".$kode_lokasi."' and nik='".$nik."' and no_close = '-' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
@@ -100,6 +104,10 @@ class OpenKasirController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
             $str_format="0000";
@@ -174,6 +182,10 @@ class OpenKasirController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
             $id = $request->no_open;

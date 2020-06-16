@@ -38,6 +38,10 @@ class PenjualanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
+            }
+
             $sql = "select no_open from kasir_open where nik='$nik' and kode_lokasi='$kode_lokasi' and no_close='-' ";
 
             $res = DB::connection($this->sql)->select($sql);
@@ -99,6 +103,11 @@ class PenjualanController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
             $str_format="00000";
@@ -208,6 +217,10 @@ class PenjualanController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
   
             $success["nik"]=$nik;
