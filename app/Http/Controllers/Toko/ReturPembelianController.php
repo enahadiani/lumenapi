@@ -208,7 +208,7 @@ class ReturPembelianController extends Controller
             'qty_beli' => 'required|array',
             'qty_return' => 'required|array',
             'harga' => 'required|array',
-            'satuan' => 'required|array'
+            'satuan' => 'required|array',
             'subtotal' => 'required|array',
 
         ]);
@@ -249,36 +249,34 @@ class ReturPembelianController extends Controller
                 }else{
                     $id = "-";
                 }
-                
-                $query = execute($sql2);
-                $exec = array();
-                
-                $temp = explode("-",$request->kode_vendor);
-                $vendor = $temp[0];
+
+                // $temp = explode("-",$request->kode_vendor);
+                // $vendor = $temp[0];
                 $sql = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values 
-                        ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$request->periode."','IV','BRGRETBELI','F','-','-','".$kode_pp."','".$request->tanggal."','-','Retur Pembelian No: ".$id."','IDR',1,".$request->total_return.",0,0,'-','-','-','".$request->no_bukti."','-','-','-','".$vendor."','-')");
+                        ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$request->periode."','IV','BRGRETBELI','F','-','-','".$kode_pp."','".$request->tanggal."','-','Retur Pembelian No: ".$id."','IDR',1,".$request->total_return.",0,0,'-','-','-','".$request->no_bukti."','-','-','-','".$request->kode_vendor."','-')");
 
                 $sql2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values
-                        ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$request->periode."','-','".$request->tanggal."',0,'".$request->akun_hutang."','D',$request->total_return,$request->total_return,'Retur Pembelian No:".$request->no_bukti."','BRGBELI','BRGRETBELI','IDR',1,'$kode_pp','-','-','".$vendor."','-','-','-','-','-')");    
+                        ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$request->periode."','-','".$request->tanggal."',0,'".$request->akun_hutang."','D',$request->total_return,$request->total_return,'Retur Pembelian No:".$request->no_bukti."','BRGBELI','BRGRETBELI','IDR',1,'$kode_pp','-','-','".$request->kode_vendor."','-','-','-','-','-')");    
                 $nu=1;
-                for ($i=0;$i < count($_POST['kode_barang']);$i++){						
+                for ($i=0;$i < count($request->kode_barang);$i++){						
                     
                     $sql1 = DB::connection($this->sql)->insert("insert into brg_belibayar_d(no_bukti,kode_lokasi,no_beli,kode_vendor,periode,dc,modul,nilai,nik_user,tgl_input) 
                     values ('".$id."','".$kode_lokasi."','".$request->no_bukti."','-', '".$periode."','D','KBBELICCL',$request->total_return,'".$nik."',getdate())");
                 
-                    $sql2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values
-                            ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$nu.",'".$request->kode_akun[$i]."','C',$request->subtotal[$i],$request->subtotal[$i],'Retur Pembelian No:".$request->no_bukti."','BRGBELI','BRGRETBELI','IDR',1,'$kode_pp','-','-','".$vendor."','-','-','-','-','-')");
+                    $sql2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$nu.",'".$request->kode_akun[$i]."','C',".$request->subtotal[$i].",".$request->subtotal[$i].",'Retur Pembelian No:".$request->no_bukti."','BRGBELI','BRGRETBELI','IDR',1,'$kode_pp','-','-','".$request->kode_vendor."','-','-','-','-','-')");
                    
-                    $sql3 = DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values 
-                            ('".$id."','".$kode_lokasi."','".$periode."','BRGRETBELI','BRGRETBELI',".$nu.",'$kodeGudang','".$request->kode_barang[$i]."','-',getdate(),'".$request->satuan[$i]."','C',".$request->qty_beli[$i].",".$request->qty_retur[$i].",0,".$request->harga[$i].",0,0,0,0,".$request->subtotal[$i].")");
+                    $sql3 = DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values ('".$id."','".$kode_lokasi."','".$periode."','BRGRETBELI','BRGRETBELI',".$nu.",'$kodeGudang','".$request->kode_barang[$i]."','-',getdate(),'".$request->satuan[$i]."','C',".$request->qty_beli[$i].",".$request->qty_return[$i].",0,".$request->harga[$i].",0,0,0,0,".$request->subtotal[$i].")");
                     $nu++;	
                     
                 }
                 	
                 $tmp="Data Retur Pembelian berhasil disimpan";
                 $sts=true;
+                $success["no_bukti"] =$id;
                 $success["message"] =$tmp;
                 $success["status"] = $sts;
+                
+                DB::connection($this->sql)->commit();
             }else{
                 $success["message"] = "error. Total Retur tidak boleh melebihi saldo pembelian";
                 $success["status"] = false;
