@@ -45,10 +45,10 @@ class BarangController extends Controller
                 }else{
                     $filter = " and kode_barang='$request->kode_barang' ";
                 }
-                $sql= "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang
+                $sql= "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang
                 where kode_lokasi='".$kode_lokasi."' $filter";
             }else{
-                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
