@@ -121,7 +121,7 @@ class VendorController extends Controller
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,$request->bank,$request->cabang,$request->no_rek,$request->nama_rek,$request->no_fax,$no->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
+                $ins = DB::connection($this->sql)->insert('insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,$request->bank,$request->cabang,$request->no_rek,$request->nama_rek,$request->no_fax,$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
