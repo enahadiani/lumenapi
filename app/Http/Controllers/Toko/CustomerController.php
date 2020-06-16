@@ -90,16 +90,16 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_cust' => 'required',
-            'nama' => 'required',
-            'alamat' => 'required',
-            'no_tel' => 'required',
-            'email' => 'required|email',
-            'npwp' => 'required',
-            'pic' => 'required',
-            'alamat2' => 'required',
-            'no_fax' => 'required',
-            'akun_piutang' => 'required'
+            'kode_cust' => 'required|max:10',
+            'nama' => 'required|max:50',
+            'alamat' => 'required|max:200',
+            'no_tel' => 'required|max:50',
+            'email' => 'required|email|max:50',
+            'npwp' => 'required|max:50',
+            'pic' => 'required|max:50',
+            'alamat2' => 'required|max:200',
+            'no_fax' => 'required|max:50',
+            'akun_piutang' => 'required|max:20'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -154,16 +154,16 @@ class CustomerController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_cust' => 'required',
-            'nama' => 'required',
-            'alamat' => 'required',
-            'no_tel' => 'required',
-            'email' => 'required|email',
-            'npwp' => 'required',
-            'pic' => 'required',
-            'alamat2' => 'required',
-            'no_fax' => 'required',
-            'akun_piutang' => 'required'
+            'kode_cust' => 'required|max:10',
+            'nama' => 'required|max:50',
+            'alamat' => 'required|max:200',
+            'no_tel' => 'required|max:50',
+            'email' => 'required|email|max:50',
+            'npwp' => 'required|max:50',
+            'pic' => 'required|max:50',
+            'alamat2' => 'required|max:200',
+            'no_fax' => 'required|max:50',
+            'akun_piutang' => 'required|max:20'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
