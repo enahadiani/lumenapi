@@ -216,23 +216,24 @@ class BarangController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('file_gambar')){
-
-                $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and kode_barang='$request->kode_barang' 
-                ";
-                $res = DB::connection('sqlsrv2')->select($sql);
-                $res = json_decode(json_encode($res),true);
-
-                if(count($res) > 0){
-                    $foto = $res[0]['file_gambar'];
-                    if($foto != ""){
-                        Storage::disk('s3')->delete('toko/'.$foto);
-                    }
-                }else{
-                    $foto = "-";
+            $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and kode_barang='$request->kode_barang' 
+            ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){
+                $foto = $res[0]['file_gambar'];
+            }else{
+                $foto = "-";
+            }
+            
+            if($request->hasfile('foto')){
+                if($foto != "" || $foto != "-"){
+                    Storage::disk('s3')->delete('toko/'.$foto);
                 }
                 
-                $file = $request->file('file_gambar');
+                $file = $request->file('foto');
+                
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 $foto = $nama_foto;
@@ -241,9 +242,6 @@ class BarangController extends Controller
                 }
                 Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
                 
-            }else{
-
-                $foto="-";
             }
             
             $del = DB::connection($this->sql)->table('brg_barang')
@@ -285,7 +283,7 @@ class BarangController extends Controller
             }
             $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and kode_barang='$request->kode_barang' 
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){
