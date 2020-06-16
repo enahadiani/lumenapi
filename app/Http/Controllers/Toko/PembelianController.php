@@ -284,7 +284,7 @@ class PembelianController extends Controller
 
             $sql3 = "select akun_hutang from vendor where kode_vendor ='".$request->kode_vendor."' and kode_lokasi = '".$kode_lokasi."'";
             $res = DB::connection($this->sql)->select($sql3);
-            $tmp = $res;
+            $tmp = $res->akun_hutang;
             // if (count($res) > 0)
             // {
             //     $akunHutang = $res->akun_hutang;									
