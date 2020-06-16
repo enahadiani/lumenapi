@@ -20,7 +20,7 @@ class BarangController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select kode_barang form brg_barang where kode_barang ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_barang from brg_barang where kode_barang ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -73,7 +73,7 @@ class BarangController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the from for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
@@ -93,13 +93,11 @@ class BarangController extends Controller
         $this->validate($request, [
             'kode_barang' => 'required',
             'nama' => 'required',
-            'kode_lokasi' => 'required',
             'sat_kecil' => 'required',
             'sat_besar' => 'required',
             'jml_sat' => 'required',
             'hna' => 'required',
             'pabrik' => 'required',
-            'flag_gen' => 'required',
             'flag_aktif' => 'required',
             'ss' => 'required',
             'sm1' => 'required',
@@ -148,7 +146,7 @@ class BarangController extends Controller
 
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the from for editing the specified resource.
      *
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
