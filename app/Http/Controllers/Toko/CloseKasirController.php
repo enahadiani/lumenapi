@@ -126,15 +126,23 @@ class CloseKasirController extends Controller
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon from brg_jualpiu_dloc
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' " ;
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+          
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['data_detail'] = [];
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
