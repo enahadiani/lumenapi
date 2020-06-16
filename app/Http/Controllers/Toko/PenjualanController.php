@@ -230,12 +230,12 @@ class PenjualanController extends Controller
             $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
-                $total_trans=$get['nilai']+$get['diskon'];
-                $total_disk=$get['diskon'];
-                $total_stlh=$get['nilai'];
-                $total_byr=$get['tobyr'];
-                $kembalian=$get['tobyr']-$get['nilai'];
-                $success["tgl"] = $get['tanggal'];
+                $total_trans=$get[0]['nilai']+$get[0]['diskon'];
+                $total_disk=$get[0]['diskon'];
+                $total_stlh=$get[0]['nilai'];
+                $total_byr=$get[0]['tobyr'];
+                $kembalian=$get[0]['tobyr']-$get[0]['nilai'];
+                $success["tgl"] = $get[0]['tanggal'];
             }else{
                 $total_trans=0;
                 $total_disk=0;
