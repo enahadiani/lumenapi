@@ -62,6 +62,7 @@ class BonusController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
