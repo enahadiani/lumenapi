@@ -46,7 +46,7 @@ class GudangController extends Controller
                 }
                 $sql= "select a.kode_gudang,a.nama,a.pic,a.telp,a.alamat,a.kode_pp,b.nama as nama_pp from brg_gudang a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp form brg_gudang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp from brg_gudang where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
