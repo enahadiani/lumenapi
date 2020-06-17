@@ -73,6 +73,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('menu','Toko\MenuController@update');
     $router->delete('menu','Toko\MenuController@destroy');
     $router->get('menu-klp','Toko\MenuController@getKlp');
+
+    //Akses User
+    $router->get('akses-user','Toko\HakaksesController@index');
+    $router->post('akses-user','Toko\HakaksesController@store');
+    $router->put('akses-user','Toko\HakaksesController@update');
+    $router->delete('akses-user','Toko\HakaksesController@destroy');
+    $router->get('akses-user-menu','Toko\HakaksesController@getMenu');
     
     //Form
     $router->get('form','Toko\FormController@index');
