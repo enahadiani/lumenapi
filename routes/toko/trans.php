@@ -50,6 +50,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('retur-beli','Toko\ReturPembelianController@store');
     $router->get('retur-beli-barang','Toko\ReturPembelianController@getBarang');
 
+    //Stok Opname
+    $router->post('stok-opname-import-excel', 'Toko\StockOpnameController@importExcel');
+
 });
 
 
