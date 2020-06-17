@@ -56,13 +56,13 @@ class KaryawanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -133,12 +133,12 @@ class KaryawanController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Karyawan berhasil disimpan";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Karyawan gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -174,14 +174,14 @@ class KaryawanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -272,12 +272,12 @@ class KaryawanController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Karyawan berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Karyawan gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -306,13 +306,13 @@ class KaryawanController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Karyawan berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Karyawan gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 

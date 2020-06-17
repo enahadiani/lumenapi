@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apv;
+namespace App\Http\Controllers\Toko;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -15,8 +15,8 @@ class HakaksesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'sqlsrv2';
-    public $guard = 'admin';
+    public $sql = 'tokoaws';
+    public $guard = 'toko';
 
     function isUnik($isi){
         if($data =  Auth::guard($this->guard)->user()){
@@ -54,13 +54,13 @@ class HakaksesController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -124,12 +124,12 @@ class HakaksesController extends Controller
                 $success['status'] = $sts;
                 $success['message'] = $tmp;
             }
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Hakakses gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -160,13 +160,13 @@ class HakaksesController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -219,12 +219,12 @@ class HakaksesController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Hakakses berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Hakakses gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -250,13 +250,13 @@ class HakaksesController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Hakakses berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Hakakses gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -277,13 +277,13 @@ class HakaksesController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -310,13 +310,13 @@ class HakaksesController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;

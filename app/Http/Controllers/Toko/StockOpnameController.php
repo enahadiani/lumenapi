@@ -139,18 +139,18 @@ class StockOpnameController extends Controller
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = "SUCCESS";
+                $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = "FAILED";
+                $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            $success['status'] = "FAILED";
+            $success['status'] = true;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

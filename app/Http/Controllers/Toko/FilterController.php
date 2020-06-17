@@ -33,13 +33,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -74,13 +74,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -119,13 +119,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -165,13 +165,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -198,13 +198,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -230,13 +230,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -272,13 +272,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -318,13 +318,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -348,13 +348,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -390,13 +390,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -436,13 +436,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -466,13 +466,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -508,13 +508,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -554,13 +554,13 @@ class FilterController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;

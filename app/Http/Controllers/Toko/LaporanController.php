@@ -16,12 +16,12 @@ class LaporanController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'toko';
-    public $db = 'tokoaws';
+    public $sql = 'tokoaws';
 
     function getReportBarang(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -37,7 +37,7 @@ class LaporanController extends Controller
 
             $sql="select a.kode_barang,a.nama,a.sat_kecil as satuan,a.hna as harga,a.hrg_satuan,a.ppn,a.profit,a.barcode,a.kode_klp
             from brg_barang a $filter ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -46,14 +46,14 @@ class LaporanController extends Controller
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -65,7 +65,7 @@ class LaporanController extends Controller
     function getReportClosing(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -80,7 +80,7 @@ class LaporanController extends Controller
             }
 
             $sql="select a.no_close as no_bukti,a.tgl_input as tanggal,a.saldo_awal,a.total_pnj,a.nik_user from kasir_close a $filter ";
-            $rs = DB::connection('sqlsrv2')->select($sql);
+            $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
             $nb = "";
@@ -100,7 +100,7 @@ class LaporanController extends Controller
 
             $sql2="select no_jual,tanggal,keterangan,periode,nilai,diskon,no_close as no_bukti from brg_jualpiu_dloc
             where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb) " ;
-            $res2 = DB::connection('sqlsrv2')->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -110,7 +110,7 @@ class LaporanController extends Controller
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
@@ -118,7 +118,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -130,7 +130,7 @@ class LaporanController extends Controller
     function getReportPenjualan(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -156,7 +156,7 @@ class LaporanController extends Controller
             left join brg_gudang e on b.kode_gudang=e.kode_gudang and b.kode_lokasi=e.kode_lokasi
             $filter
             order by a.no_jual";
-            $rs = DB::connection('sqlsrv2')->select($sql);
+            $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
             $nb = "";
@@ -180,7 +180,7 @@ class LaporanController extends Controller
             where a.kode_lokasi = '".$kode_lokasi."'  and a.no_bukti in ($nb) 
             order by a.no_bukti
             " ;
-            $res2 = DB::connection('sqlsrv2')->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -190,7 +190,7 @@ class LaporanController extends Controller
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
@@ -198,7 +198,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -210,7 +210,7 @@ class LaporanController extends Controller
     function getReportPembelian(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -234,7 +234,7 @@ class LaporanController extends Controller
             inner join karyawan f on a.nik_user=f.nik and a.kode_lokasi=f.kode_lokasi
             $filter and e.form='BRGBELI' 
             order by a.no_bukti";
-            $rs = DB::connection('sqlsrv2')->select($sql);
+            $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
             $nb = "";
@@ -258,7 +258,7 @@ class LaporanController extends Controller
             where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti in ($nb) 
             order by a.kode_barang
             " ;
-            $res2 = DB::connection('sqlsrv2')->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -268,7 +268,7 @@ class LaporanController extends Controller
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
@@ -276,7 +276,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -288,7 +288,7 @@ class LaporanController extends Controller
     function getReportPenjualanHarian(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -315,7 +315,7 @@ class LaporanController extends Controller
             left join brg_gudang e on b.kode_gudang=e.kode_gudang and b.kode_lokasi=e.kode_lokasi
             $filter
             group by a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama,d.nama,e.nama,a.nik_user";
-            $rs = DB::connection('sqlsrv2')->select($sql);
+            $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
             $tgl = "";
@@ -341,7 +341,7 @@ class LaporanController extends Controller
 			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga
             order by c.tanggal
             " ;
-            $res2 = DB::connection('sqlsrv2')->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -351,7 +351,7 @@ class LaporanController extends Controller
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
@@ -359,7 +359,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -371,7 +371,7 @@ class LaporanController extends Controller
     function getReportReturBeli(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -398,7 +398,7 @@ class LaporanController extends Controller
             left join brg_gudang e on b.kode_gudang=e.kode_gudang and b.kode_lokasi=e.kode_lokasi
             $filter and a.form='BRGRETBELI'
             order by a.no_bukti";
-            $rs = DB::connection('sqlsrv2')->select($sql);
+            $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
             $nb = "";
@@ -422,7 +422,7 @@ class LaporanController extends Controller
             where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETBELI' and a.no_bukti in ($nb)
             order by a.no_bukti
             " ;
-            $res2 = DB::connection('sqlsrv2')->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -432,7 +432,7 @@ class LaporanController extends Controller
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
@@ -440,7 +440,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
