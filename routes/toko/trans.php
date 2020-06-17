@@ -51,7 +51,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('retur-beli-barang','Toko\ReturPembelianController@getBarang');
 
     //Stok Opname
-    $router->post('stok-opname-import-excel', 'Toko\StockOpnameController@importExcel');
+    
+    $router->get('stok-opname', 'Toko\StockOpnameController@index');
+    $router->post('stok-opname-load', 'Toko\StockOpnameController@load');
+    $router->post('upload-barang-fisik', 'Toko\StockOpnameController@importExcel');
+    $router->post('stok-opname-rekon', 'Toko\StockOpnameController@simpanRekon');
+    $router->post('stok-opname', 'Toko\StockOpnameController@store');
+    $router->get('stok-opname-edit', 'Toko\StockOpnameController@show');
+    $router->put('stok-opname', 'Toko\StockOpnameController@update');
+    $router->delete('stok-opname', 'Toko\StockOpnameController@destroy');
 
 });
 
