@@ -185,13 +185,11 @@ class BarangController extends Controller
         $this->validate($request, [
             'kode_barang' => 'required',
             'nama' => 'required',
-            'kode_lokasi' => 'required',
             'sat_kecil' => 'required',
             'sat_besar' => 'required',
             'jml_sat' => 'required',
             'hna' => 'required',
             'pabrik' => 'required',
-            'flag_gen' => 'required',
             'flag_aktif' => 'required',
             'ss' => 'required',
             'sm1' => 'required',
