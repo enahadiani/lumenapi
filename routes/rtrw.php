@@ -47,6 +47,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('cek_payload', 'AdminRtrwController@cekPayload');
 
     $router->get('menu', 'Rtrw\RtrwController@getMenu');
+    $router->get('menu2', 'Rtrw\RtrwController@getMenu2');
     $router->get('filter_tahun', 'Rtrw\RtrwController@getTahun');
     $router->get('filter_bulan', 'Rtrw\RtrwController@getBulan');
     $router->get('filter_tahun_bill', 'Rtrw\RtrwController@getTahunBill');
