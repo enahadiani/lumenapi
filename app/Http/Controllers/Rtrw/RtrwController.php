@@ -104,6 +104,42 @@ class RtrwController extends Controller
         }
     }
 
+    public function getMenu2(Request $request){
+        $this->validate($request, [
+            'kode_menu' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard('rtrw')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $kode_menu = $request->kode_menu;
+            $sql="select a.*,b.form  from menu a left join m_form b on a.kode_form=b.kode_form where kode_klp = '$kode_menu' and a.jenis_menu='tengah' order by kode_klp, rowindex ";
+            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getTahun(){
         
         try {
