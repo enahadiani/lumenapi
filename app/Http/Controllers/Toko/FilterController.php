@@ -255,9 +255,9 @@ class FilterController extends Controller
             }
             $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter .= "";
-            }else{
                 $filter .= " and substring(convert(varchar(10),a.tgl_input,121),1,4)+''+substring(convert(varchar(10),a.tgl_input,121),6,2) ='".$request->periode."' ";
+            }else{
+                $filter .= "";
             }
             
             $sql="select distinct a.nik_user,b.nama 
@@ -297,9 +297,9 @@ class FilterController extends Controller
             }
             $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter .= "";
-            }else{
                 $filter .= " and substring(convert(varchar(10),a.tgl_input,121),1,4)+''+substring(convert(varchar(10),a.tgl_input,121),6,2) ='".$request->periode."' ";
+            }else{
+                $filter .= "";
             }
 
             if(isset($request->nik_kasir) && $request->nik_kasir != ""){
@@ -374,9 +374,9 @@ class FilterController extends Controller
             }
             $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter .= "";
-            }else{
                 $filter .= " and a.periode ='".$request->periode."' ";
+            }else{
+                $filter .= "";
             }
             
             $sql="select distinct a.nik_user,b.nama 
@@ -415,9 +415,9 @@ class FilterController extends Controller
             }
             $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter .= "";
-            }else{
                 $filter .= "and a.periode ='".$request->periode."' ";
+            }else{
+                $filter .= "";
             }
 
             if(isset($request->nik_kasir) && $request->nik_kasir != ""){
@@ -492,9 +492,9 @@ class FilterController extends Controller
             }
             $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter .= "";
-            }else{
                 $filter .= " and a.periode ='".$request->periode."' ";
+            }else{
+                $filter .= "";
             }
             
             $sql="select distinct a.nik_user,b.nama 
@@ -533,9 +533,9 @@ class FilterController extends Controller
             }
             $filter = "";
             if(isset($request->periode) && $request->periode != ""){
-                $filter .= "";
-            }else{
                 $filter .= "and a.periode ='".$request->periode."' ";
+            }else{
+                $filter .= "";
             }
 
             if(isset($request->nik_kasir) && $request->nik_kasir != ""){
