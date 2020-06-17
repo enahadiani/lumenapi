@@ -270,6 +270,8 @@ class SppdController extends Controller
                 }else{
                     $success['saldo_budget'] = 0;
                 }
+                $success['sql'] = $sql;
+                $success['gar'] = $res;
                 $success['message'] = "Success!";
                 $success['rows']=count($res);
                 
