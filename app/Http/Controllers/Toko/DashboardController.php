@@ -180,6 +180,7 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $periode = $request->periode;
             $res = DB::connection($this->sql)->select(" select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
             from db_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi,sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as nilai
