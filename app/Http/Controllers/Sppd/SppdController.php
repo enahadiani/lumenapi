@@ -247,12 +247,12 @@ class SppdController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $kode_pp=$request->input('kode_pp');
-            $kode_akun=$request->input('kode_akun');
-            $kode_drk=$request->input('kode_drk');
-            $periode=$request->input('periode');
+            $kode_pp=$request->kode_pp;
+            $kode_akun=$request->kode_akun;
+            $kode_drk=$request->kode_drk;
+            $periode=$request->periode;
 
-            if($request->input('no_agenda') != ""){
+            if(isset($request->no_agenda) && $request->no_agenda != ""){
                 $sql="select dbo.fn_cekagg3('$kode_pp','$kode_lokasi','$kode_akun','$kode_drk','$periode','$no_agenda') as gar ";
             }else{
                 $sql="select dbo.fn_cekagg2('$kode_pp','$kode_lokasi','$kode_akun','$kode_drk','$periode') as gar ";
@@ -270,8 +270,8 @@ class SppdController extends Controller
                 }else{
                     $success['saldo_budget'] = 0;
                 }
-                $success['sql'] = $sql;
-                $success['gar'] = $res;
+                // $success['sql'] = $sql;
+                // $success['gar'] = $res;
                 $success['message'] = "Success!";
                 $success['rows']=count($res);
                 
