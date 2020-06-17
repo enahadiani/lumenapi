@@ -57,7 +57,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Barang
     $router->get('barang','Toko\BarangController@index');
     $router->post('barang','Toko\BarangController@store');
-    $router->put('barang','Toko\BarangController@update');
+    $router->post('barang-ubah','Toko\BarangController@update');
     $router->delete('barang','Toko\BarangController@destroy');
 
     //Bonus
