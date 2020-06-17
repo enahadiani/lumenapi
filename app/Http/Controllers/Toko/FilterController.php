@@ -222,7 +222,7 @@ class FilterController extends Controller
             }
             $sql="select distinct substring(convert(varchar(10),tgl_input,121),1,4)+''+substring(convert(varchar(10),tgl_input,121),6,2)  as periode 
             from kasir_close a 
-            where a.kode_lokasi='$kode_lokasi ";
+            where a.kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
