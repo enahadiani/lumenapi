@@ -15,7 +15,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
-$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+$router->group(['middleware' => 'auth:toko'], function () use ($router) {
     
     $router->get('top-selling','Toko\DashboardController@getTopSelling');
     $router->get('ctg-selling','Toko\DashboardController@getSellingCtg');
