@@ -6,15 +6,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
-class HakaksesController extends Controller
+class KaryawanController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public $successStatus = 200;
+    public $successStatus = 200; 
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
@@ -24,7 +25,7 @@ class HakaksesController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
     
-        $strSQL = "select nik from hakakses where nik = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
+        $strSQL = "select nik from karyawan where nik = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
     
         $auth = DB::connection($this->sql)->select($strSQL);
         $auth = json_decode(json_encode($auth),true);
@@ -37,16 +38,17 @@ class HakaksesController extends Controller
         return $res;
     }
 
+
     public function index()
     {
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select nik,nama,kode_klp_menu,kode_lokasi,status_admin from hakakses where kode_lokasi='".$kode_lokasi."'
+            $res = DB::connection($this->sql)->select("select nik,nama,alamat,jabatan,no_telp,email,kode_pp from karyawan where kode_lokasi='".$kode_lokasi."' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -91,44 +93,51 @@ class HakaksesController extends Controller
         $this->validate($request, [
             'nik' => 'required',
             'nama' => 'required',
-            'kode_klp_menu' => 'required',
-            'pass' => 'required',
-            'status_admin' => 'required',
-            'klp_akses' => 'required',
-            'kode_menu_lab'=> 'required'
+            'kode_pp' => 'required',
+            'alamat' => 'required',
+            'jabatan' => 'required',
+            'no_telp' => 'required',
+            'no_hp' => 'required',
+            'status' => 'required',
+            'flag_aktif' => 'required',
+            'email' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(!$this->isUnik($request->nik)){
-                $tmp=" error:Duplicate Entry. NIK sudah terdaftar di database !";
-                $sts=false;
-            }else{
-                $sts= true;
-            }
-            
-            if($sts){
-
-                $ins = DB::connection($this->sql)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$request->input('kode_menu_lab'),app('hash')->make($request->pass)]);
+            if($request->hasfile('foto')){
+                $file = $request->file('foto');
                 
-                DB::connection($this->sql)->commit();
-                $success['status'] = true;
-                $success['message'] = "Data Hakakses berhasil disimpan";
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
+                }
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
             }else{
-                $success['status'] = $sts;
-                $success['message'] = $tmp;
+
+                $foto="-";
             }
+
+            
+            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$request->kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Karyawan berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Hakakses gagal disimpan ".$e;
+            $success['message'] = "Data Karyawan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -141,8 +150,11 @@ class HakaksesController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function show($nik)
+    public function show(Request $request)
     {
+        $this->validate($request,[
+            'nik' => 'required'
+        ]);
         try {
             
             
@@ -151,7 +163,9 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select nik,nama,kode_klp_menu,pass,status_admin,klp_akses,menu_mobile,path_view,kode_menu_lab from hakakses where kode_lokasi='".$kode_lokasi."' and nik='$nik'
+            $url = url('api/toko-auth/storage');
+
+            $sql = "nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' 
             ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -165,6 +179,7 @@ class HakaksesController extends Controller
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
@@ -193,16 +208,22 @@ class HakaksesController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $nik)
+    public function update(Request $request)
     {
         $this->validate($request, [
+            'nik' => 'required',
             'nama' => 'required',
-            'kode_klp_menu' => 'required',
-            'pass' => 'required',
-            'status_admin' => 'required',
-            'klp_akses' => 'required',
-            'kode_menu_lab'=> 'required'
+            'kode_pp' => 'required',
+            'alamat' => 'required',
+            'jabatan' => 'required',
+            'no_telp' => 'required',
+            'no_hp' => 'required',
+            'status' => 'required',
+            'flag_aktif' => 'required',
+            'email' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
+
 
         DB::connection($this->sql)->beginTransaction();
         
@@ -211,19 +232,51 @@ class HakaksesController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $del = DB::connection($this->sql)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$request->input('kode_menu_lab'),app('hash')->make($request->pass)]);
+            if($request->hasfile('foto')){
+
+                $sql = "select foto as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' 
+                ";
+                $res = DB::connection($this->sql)->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_gambar'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('toko/'.$foto);
+                    }
+                }else{
+                    $foto = "-";
+                }
+                
+                $file = $request->file('foto');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
+                }
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                
+            }else{
+
+                $foto="-";
+            }
+            
+            $del = DB::connection($this->sql)->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
+
+            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$request->kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            
+            
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Hakakses berhasil diubah";
+            $success['message'] = "Data Karyawan berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Hakakses gagal diubah ".$e;
+            $success['message'] = "Data Karyawan gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -234,8 +287,11 @@ class HakaksesController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function destroy($nik)
+    public function destroy(Request $request)
     {
+        $this->validate($request,[
+            'nik' => 'required'
+        ]);
         DB::connection($this->sql)->beginTransaction();
         
         try {
@@ -244,87 +300,20 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
+            $del = DB::connection($this->sql)->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Hakakses berhasil dihapus";
+            $success['message'] = "Data Karyawan berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Hakakses gagal dihapus ".$e;
+            $success['message'] = "Data Karyawan gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
-
-    public function getMenu()
-    {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $res = DB::connection($this->sql)->select("select distinct kode_klp_menu as kode_klp from hakakses where kode_lokasi='$kode_lokasi'
-            ");
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getForm()
-    {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $res = DB::connection($this->sql)->select("select kode_form,nama_form from m_form 
-            ");
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
 
 }

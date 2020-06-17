@@ -66,6 +66,38 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('bonus','Toko\BonusController@update');
     $router->delete('bonus','Toko\BonusController@destroy');
 
+    //ADMIN
+    //Menu
+    $router->get('menu','Toko\MenuController@index');
+    $router->post('menu','Toko\MenuController@store');
+    $router->put('menu','Toko\MenuController@update');
+    $router->delete('menu','Toko\MenuController@destroy');
+    $router->get('menu-klp','Toko\MenuController@getKlp');
+    
+    //Form
+    $router->get('form','Toko\FormController@index');
+    $router->post('form','Toko\FormController@store');
+    $router->put('form','Toko\FormController@update');
+    $router->delete('form','Toko\FormController@destroy');
+
+    //Karyawan
+    $router->get('karyawan','Toko\KaryawanController@index');
+    $router->post('karyawan','Toko\KaryawanController@store');
+    $router->get('karyawan-detail','Toko\KaryawanController@show');
+    $router->post('karyawan-ubah','Toko\KaryawanController@update');
+    $router->delete('karyawan','Toko\KaryawanController@destroy');
+
+    //Kelompok Menu
+    $router->get('menu-klp','Toko\KelompokMenuController@index');
+    $router->post('menu-klp','Toko\KelompokMenuController@store');
+    $router->put('menu-klp','Toko\KelompokMenuController@update');
+    $router->delete('menu-klp','Toko\KelompokMenuController@destroy');
+
+    //Unit
+    $router->get('unit','Toko\UnitController@index');
+    $router->post('unit','Toko\UnitController@store');
+    $router->put('unit','Toko\UnitController@update');
+    $router->delete('unit','Toko\UnitController@destroy');
 
 });
 
