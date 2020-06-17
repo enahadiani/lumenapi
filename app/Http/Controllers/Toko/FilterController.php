@@ -277,7 +277,8 @@ class FilterController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['status'] = true;
+                $success['status'] = false;
+                $success['sql'] = $sql;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
