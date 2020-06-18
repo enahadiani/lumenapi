@@ -222,6 +222,9 @@ class DashboardController extends Controller
 
     public function getBukuBesar(Request $request)
     {
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -230,6 +233,7 @@ class DashboardController extends Controller
             }else{
                 $kode_lokasi= '04';
             }
+            $periode = $request->periode;
 
             if(isset($request->param) && $request->param != ""){
 
