@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 use  App\User;
 use  App\Admin;
 use  App\AdminYpt;
+use  App\AdminSatpam;
 
 class AuthController extends Controller
 {
@@ -245,6 +248,39 @@ class AuthController extends Controller
         }
 
         return $this->respondWithToken($token,'toko');
+    }
+
+    public function loginSatpam(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'qrcode' => 'required|string',
+        ]);
+
+        // $credentials = $request->only(['id_satpam']);
+
+        // if (! $token = Auth::guard('satpam')->attempt($credentials)) {
+        //     return response()->json(['message' => 'Unauthorized'], 401);
+        // }
+
+        $id_satpam = $request->input('qrcode');
+        $user = AdminSatpam::where('id_satpam', '=', $id_satpam)->first();
+        try { 
+            // verify the credentials and create a token for the user
+            if (!$token = JWTAuth::fromUser($user)) { 
+                return response()->json(['message' => 'Unauthorized'], 401);
+            } 
+        } catch (JWTException $e) { 
+            // something went wrong 
+            return response()->json(['message' => 'could_not_create_token'], 500); 
+        } 
+
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'message' => 'success',
+            'expires_in' => Auth::factory()->getTTL() * 60
+        ], 200);
     }
 
     public function hashPassword(){

@@ -50,6 +50,10 @@ return [
         'toko' => [
             'driver' => 'jwt',
             'provider' => 'admintoko',
+        ],
+        'satpam' => [
+            'driver' => 'jwt',
+            'provider' => 'satpam',
         ]
     ],
 
@@ -93,6 +97,10 @@ return [
         'admintoko' => [
             'driver' => 'eloquent',
             'model' => \App\AdminToko::class
+        ],
+        'satpam' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminSatpam::class
         ]
     ]
 ];

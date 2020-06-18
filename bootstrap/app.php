@@ -113,7 +113,7 @@ $app->configure('dompdf');
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'cors' => App\Http\Middleware\CorsMiddleware::class,
-    // 'auth2' => App\Http\Middleware\Authenticate::class,
+    'jwt.portal' => App\Http\Middleware\JwtMiddleware::class,
 ]);
 
 
@@ -334,5 +334,12 @@ $app->router->group([
     'prefix' => 'api/toko-dash'
 ], function ($router) {
     require __DIR__.'/../routes/toko/dash.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/portal'
+], function ($router) {
+    require __DIR__.'/../routes/portal.php';
 });
 return $app;
