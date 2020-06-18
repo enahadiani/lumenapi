@@ -405,14 +405,15 @@ class DashboardController extends Controller
                 $success["persen"] = round($rowAcvp[0]->persen*100,2);
                 $success['status'] = true;
                 $success['daftar'] = $res;
-                $success['daftar2'] = $hasil;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success["budpend"] = 0;
+                $success["actpend"] = 0;
+                $success["persen"] = 0;
                 $success['daftar'] = [];
-                $success['daftar2'] = [];
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }    
@@ -487,6 +488,9 @@ class DashboardController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success["budpend"] = 0;
+                $success["actpend"] = 0;
+                $success["persen"] = 0;
                 $success['daftar'] = [];
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
@@ -552,9 +556,9 @@ class DashboardController extends Controller
                 where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB15')
                 ";
                 $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
-                $response["budcogs"] = $rowAcvp[0]->n2;
-                $response["actcogs"] = $rowAcvp[0]->n4;
-                $response["persen"] = round($rowAcvp[0]->persen*100,2);
+                $success["budcogs"] = $rowAcvp[0]->n2;
+                $success["actcogs"] = $rowAcvp[0]->n4;
+                $success["persen"] = round($rowAcvp[0]->persen*100,2);
                 $success['status'] = true;
                 $success['daftar'] = $res;
                 $success['message'] = "Success!";
@@ -562,6 +566,9 @@ class DashboardController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success["budcogs"] = 0;
+                $success["actcogs"] = 0;
+                $success["persen"] = 0;
                 $success['daftar'] = [];
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
