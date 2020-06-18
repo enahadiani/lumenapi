@@ -235,6 +235,7 @@ class DashboardController extends Controller
             }
             $periode = $request->periode;
 
+            $filterakun = "";
             if(isset($request->param) && $request->param != ""){
 
                 $tmp = explode("|",$request->param);
@@ -268,15 +269,19 @@ class DashboardController extends Controller
             $rs2=DB::connection($this->sql2)->select($sql2);
             $temp = explode(" ",$rs2[0]->tgl);
             $tgl_akhir=$temp[0];
+
+            $filtertgl = "";
+            if((isset($request->tgl1) && $request->tgl1 != "") && (isset($request->tgl1) && $request->tgl1 != "")){
             
-            if($request->tgl1 == "" AND $request->tgl2 == ""){
-                $filtertgl="";
-            }else if ($request->tgl1 != ""  AND $request->tgl2 == ""){
-                $filtertgl=" and a.tanggal between '".$request->tgl1."' AND '".$tgl_akhir."' ";
-            }else if ($request->tgl1 == "" AND $request->tgl2 != ""){
-                $filtertgl=" and a.tanggal between '$tahun-$bulan-01' AND '".$request->tgl2."' ";
-            }else{
-                $filtertgl=" and a.tanggal between '".$request->tgl1."' AND '".$request->tgl2."' ";
+                if($request->tgl1 == "" AND $request->tgl2 == ""){
+                    $filtertgl="";
+                }else if ($request->tgl1 != ""  AND $request->tgl2 == ""){
+                    $filtertgl=" and a.tanggal between '".$request->tgl1."' AND '".$tgl_akhir."' ";
+                }else if ($request->tgl1 == "" AND $request->tgl2 != ""){
+                    $filtertgl=" and a.tanggal between '$tahun-$bulan-01' AND '".$request->tgl2."' ";
+                }else{
+                    $filtertgl=" and a.tanggal between '".$request->tgl1."' AND '".$request->tgl2."' ";
+                }
             }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
