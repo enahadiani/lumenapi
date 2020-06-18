@@ -555,7 +555,7 @@ class DashboardController extends Controller
                 inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB15')
                 ";
-                $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
+                $rowAcvp = DB::connection($this->sql2)->select($sqlbox1);
                 $success["budcogs"] = $rowAcvp[0]->n2;
                 $success["actcogs"] = $rowAcvp[0]->n4;
                 $success["persen"] = round($rowAcvp[0]->persen*100,2);
@@ -629,7 +629,7 @@ class DashboardController extends Controller
             }
 
 
-            $rs = DB::connection($this->sql2)->select("select top 20 a.kode_barang,a.nama,isnull(b.jumlah,0) as jumlah,0 as stok,0 as persen
+            $rs = DB::connection($this->sql)->select("select top 20 a.kode_barang,a.nama,isnull(b.jumlah,0) as jumlah,0 as stok,0 as persen
             from brg_barang a
             left join (select a.kode_barang,a.kode_lokasi,sum(a.jumlah) as jumlah
             from brg_trans_dloc a
