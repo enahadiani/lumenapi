@@ -595,6 +595,8 @@ class DashboardController extends Controller
             }
 
             $periode = $request->periode;
+            $filterper = "";
+            $filter2 = "";
             if(isset($request->param) && $request->param != ""){
 
                 $tmp = explode("|",$request->param);
@@ -602,7 +604,6 @@ class DashboardController extends Controller
                 $per2=$tmp[1];
                 $kode_klp=$tmp[2];
                 $order=$tmp[3];
-                $filterper = "";
                 if($per1 == ""){
                     $filterper.="";
                 }else{
@@ -674,12 +675,12 @@ class DashboardController extends Controller
             }
 
             $periode = $request->periode;
+            $filterper = "";
             if(isset($request->param) && $request->param != ""){
 
                 $tmp = explode("|",$request->param);
                 $vendor = $tmp[1];
                 $order = $tmp[0];
-                $filterper = "";
                 if($vendor == ""){
                     $filterper.="";
                 }else{
