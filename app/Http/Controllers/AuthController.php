@@ -240,7 +240,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('toko')->attempt($credentials)) {
+        if (! $token = Auth::guard('toko')->setTTL(720)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
