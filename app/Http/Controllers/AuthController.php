@@ -244,7 +244,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondWithToken($token,'toko',720);
+        return $this->respondWithToken($token,'toko');
     }
 
     public function hashPassword(){
