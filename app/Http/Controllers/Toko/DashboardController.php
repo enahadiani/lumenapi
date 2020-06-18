@@ -317,12 +317,17 @@ class DashboardController extends Controller
 
     public function getIncomeChart(Request $request)
     {
+        $this->validate($request,[
+            'periode' => 'required'
+        ])
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            
+            $periode = $request->periode;
 
             $tmp = explode("|",$request->param);
             $kode_akun = $tmp[0];
@@ -398,6 +403,347 @@ class DashboardController extends Controller
         }
         
     }
+
+    public function getNetProfitChart(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ])
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode;
+
+            $rs = DB::connection($this->sql)->select("select a.kode_lokasi,
+            sum(case when substring(a.periode,5,2)='01' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n1,
+            sum(case when substring(a.periode,5,2)='02' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n2,   
+            sum(case when substring(a.periode,5,2)='03' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n3,
+            sum(case when substring(a.periode,5,2)='04' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n4,
+            sum(case when substring(a.periode,5,2)='05' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n5,
+            sum(case when substring(a.periode,5,2)='06' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n6,
+            sum(case when substring(a.periode,5,2)='07' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n7,
+            sum(case when substring(a.periode,5,2)='08' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n8,
+            sum(case when substring(a.periode,5,2)='09' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n9,
+            sum(case when substring(a.periode,5,2)='10' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n10,
+            sum(case when substring(a.periode,5,2)='11' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n11,  
+            sum(case when substring(a.periode,5,2) in ('12','13','14','15') then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n12
+            from exs_neraca a
+            inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='".substr($periode,0,4)."' and b.kode_grafik='DB13'
+            group by a.kode_lokasi");
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $series = array();
+                foreach ($rs as $row){
+                    $series[] = array("name" =>"Income", "data" => array(
+                        round(floatval($row->n1)), round(floatval($row->n2)), round(floatval($row->n3)), 
+                        round(floatval($row->n4)), round(floatval($row->n5)), round(floatval($row->n6)),
+                        round(floatval($row->n7)), round(floatval($row->n8)), round(floatval($row->n9)), 
+                        round(floatval($row->n10)), round(floatval($row->n11)), round(floatval($row->n12))
+                    ));
+                }	
+    
+                $sqlbox1 = "select 
+                sum(case a.jenis_akun when 'Pendapatan' then -a.n2 else a.n2 end) as n2, 
+                sum(case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end) as n4, (sum(case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end) - sum(case a.jenis_akun when 'Pendapatan' then -a.n2 else a.n2 end))/sum(case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end) as persen
+                from exs_neraca a
+                inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB12')
+                ";
+                $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
+                $success["budpend"] = $rowAcvp[0]->n2;
+                $success["actpend"] = $rowAcvp[0]->n4;
+                $success["persen"] = round($rowAcvp[0]->persen*100,2);
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }    
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getCOGSChart(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ])
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode;
+
+            $rs = DB::connection($this->sql)->select("select a.kode_lokasi,
+            sum(case when substring(a.periode,5,2)='01' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n1,
+            sum(case when substring(a.periode,5,2)='02' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n2,   
+            sum(case when substring(a.periode,5,2)='03' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n3,
+            sum(case when substring(a.periode,5,2)='04' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n4,
+            sum(case when substring(a.periode,5,2)='05' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n5,
+            sum(case when substring(a.periode,5,2)='06' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n6,
+            sum(case when substring(a.periode,5,2)='07' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n7,
+            sum(case when substring(a.periode,5,2)='08' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n8,
+            sum(case when substring(a.periode,5,2)='09' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n9,
+            sum(case when substring(a.periode,5,2)='10' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n10,
+            sum(case when substring(a.periode,5,2)='11' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n11,  
+            sum(case when substring(a.periode,5,2) in ('12','13','14','15') then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n12
+            from exs_neraca a
+            inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='".substr($periode,0,4)."' and b.kode_grafik='DB15'
+            group by a.kode_lokasi");
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $series = array();
+                foreach ($rs as $row){
+                    $series[] = array("name" =>"COGS", "data" => array(
+                        round(floatval($row->n1)), round(floatval($row->n2)), round(floatval($row->n3)), 
+                        round(floatval($row->n4)), round(floatval($row->n5)), round(floatval($row->n6)),
+                        round(floatval($row->n7)), round(floatval($row->n8)), round(floatval($row->n9)), 
+                        round(floatval($row->n10)), round(floatval($row->n11)), round(floatval($row->n12))
+                    ));
+                }	
+    
+                $sqlbox1 = "select 
+                sum(case a.jenis_akun when 'Pendapatan' then -a.n2 else a.n2 end) as n2, 
+                sum(case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end) as n4, (sum(case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end) - sum(case a.jenis_akun when 'Pendapatan' then -a.n2 else a.n2 end))/sum(case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end) as persen
+                from exs_neraca a
+                inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB15')
+                ";
+                $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
+                $response["budcogs"] = $rowAcvp[0]->n2;
+                $response["actcogs"] = $rowAcvp[0]->n4;
+                $response["persen"] = round($rowAcvp[0]->persen*100,2);
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }    
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getLapPnj(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ])
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode;
+            $tmp = explode("|",$request->param);
+            $per1 = $tmp[0];
+            $per2=$tmp[1];
+            $kode_klp=$tmp[2];
+            $order=$tmp[3];
+            $filterper = "";
+            if($per1 == ""){
+                $filterper.="";
+            }else{
+                $filterper.=" and a.periode >= '$per1' ";
+            }
+
+            if($per2 == ""){
+                $filterper.="";
+            }else{
+                $filterper.=" and a.periode <= '$per2' ";
+            }
+
+            if($kode_klp == ""){
+                $filter2.="";
+            }else{
+                $filter2.=" and a.kode_klp = '$kode_klp' ";
+            }
+
+            if($order == ""){
+                $filter2.="";
+            }else{
+                $filter2.=" order by $order ";
+            }
+
+
+            $rs = DB::connection($this->sql)->select("select top 20 a.kode_barang,a.nama,isnull(b.jumlah,0) as jumlah,0 as stok,0 as persen
+            from brg_barang a
+            left join (select a.kode_barang,a.kode_lokasi,sum(a.jumlah) as jumlah
+            from brg_trans_dloc a
+            where a.kode_lokasi='$kode_lokasi' and a.modul='BRGJUAL' $filterper
+            group by a.kode_barang,a.kode_lokasi
+                    )b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' 
+            $filter2");
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }    
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getLapVendor(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ])
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode;
+            $tmp = explode("|",$request->param);
+            $vendor = $tmp[1];
+            $order = $tmp[0];
+            $filterper = "";
+            if($vendor == ""){
+                $filterper.="";
+            }else{
+                $filterper.=" and a.kode_vendor like '%$vendor%' or a.nama like '%$vendor%' ";
+            }
+
+            if($order == ""){
+                $filterper.="";
+            }else{
+                $filterper.=" order by $order ";
+            }
+
+            $rs = DB::connection($this->sql)->select("select a.kode_vendor,a.nama,isnull(b.total,0) as total
+            from vendor a
+            left join (select b.param2,a.kode_lokasi,sum(a.total) as total
+            from brg_trans_d a
+            inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.modul='BRGBELI'
+            group by b.param2,a.kode_lokasi
+                    )b on a.kode_vendor=b.param2 and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.total,0)>0
+            $filterper ");
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }    
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getJurnal(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ])
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode;
+            $param = explode("|",$request->param);
+            $no_bukti = $param[0];
+            $tgl = $param[1];
+
+            $rs = DB::connection($this->sql)->select("select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.kode_akun,a.keterangan,a.kode_pp,b.nama as nama_akun,a.kode_drk,
+            case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+            from gldt a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' 
+            union all
+            select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.kode_akun,a.keterangan,a.kode_pp,b.nama as nama_akun,a.kode_drk,
+            case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
+            from gldt_h a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+            order by a.dc desc");
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }    
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 
     // function cek(Request $request){
     //     $result = $this->getPosisi($request);
