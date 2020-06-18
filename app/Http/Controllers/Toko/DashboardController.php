@@ -730,7 +730,8 @@ class DashboardController extends Controller
     public function getJurnal(Request $request)
     {
         $this->validate($request,[
-            'periode' => 'required'
+            'periode' => 'required',
+            'param' => 'required'
         ]);
         try {
             
