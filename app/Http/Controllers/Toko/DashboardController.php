@@ -184,7 +184,7 @@ class DashboardController extends Controller
             }
 
             $periode = $request->periode;
-            $res = DB::connection($this->sql2)->select(" select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
+            $res = DB::connection($this->sql)->select(" select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
             from db_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi,sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as nilai
                        from db_grafik_d a
@@ -195,7 +195,7 @@ class DashboardController extends Controller
             where a.kode_grafik in ('DB11') and a.kode_lokasi='$kode_lokasi' ");
             $res = json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->sql2)->select("   select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
+            $res2 = DB::connection($this->sql)->select("   select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
             from db_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi,sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as nilai
                        from db_grafik_d a
@@ -251,7 +251,7 @@ class DashboardController extends Controller
                 }
             }
 
-            $rs = DB::connection($this->sql2)->select("select c.kode_lokasi,c.kode_akun,d.nama,c.so_awal,c.periode,case when c.so_awal>=0 then c.so_awal else 0 end as so_debet,case when c.so_awal<0 then c.so_awal else 0 end as so_kredit
+            $rs = DB::connection($this->sql)->select("select c.kode_lokasi,c.kode_akun,d.nama,c.so_awal,c.periode,case when c.so_awal>=0 then c.so_awal else 0 end as so_debet,case when c.so_awal<0 then c.so_awal else 0 end as so_kredit
             from db_grafik_d a
             inner join relakun b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs 
             inner join exs_glma c on b.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
@@ -266,7 +266,7 @@ class DashboardController extends Controller
             
             $sql2 = "SELECT DATEADD(s,-1,DATEADD(mm, DATEDIFF(m,0,'$tahun-$bulan-01')+1,0)) as tgl";
             
-            $rs2=DB::connection($this->sql2)->select($sql2);
+            $rs2=DB::connection($this->sql)->select($sql2);
             $temp = explode(" ",$rs2[0]->tgl);
             $tgl_akhir=$temp[0];
 
@@ -307,7 +307,7 @@ class DashboardController extends Controller
                 from gldt a
                 where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filtertgl and a.kode_akun in ($kode)
                 order by a.tanggal,a.no_bukti,a.dc ";
-                $hasil= DB::connection($this->sql2)->select($sqlx); 
+                $hasil= DB::connection($this->sql)->select($sqlx); 
                 $hasil = json_decode(json_encode($hasil),true);
 
                 $success['status'] = true;
@@ -362,7 +362,7 @@ class DashboardController extends Controller
                 }
             }
 
-            $rs = DB::connection($this->sql2)->select("select a.kode_lokasi,
+            $rs = DB::connection($this->sql)->select("select a.kode_lokasi,
             sum(case when substring(a.periode,5,2)='01' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n1,
             sum(case when substring(a.periode,5,2)='02' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n2,   
             sum(case when substring(a.periode,5,2)='03' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n3,
@@ -399,7 +399,7 @@ class DashboardController extends Controller
                     inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB13')
                 ";
-                $rowAcvp = DB::connection($this->sql2)->select($sqlbox1);
+                $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
                 $success["budpend"] = $rowAcvp[0]->n2;
                 $success["actpend"] = $rowAcvp[0]->n4;
                 $success["persen"] = round($rowAcvp[0]->persen*100,2);
@@ -440,7 +440,7 @@ class DashboardController extends Controller
 
             $periode = $request->periode;
 
-            $rs = DB::connection($this->sql2)->select("select a.kode_lokasi,
+            $rs = DB::connection($this->sql)->select("select a.kode_lokasi,
             sum(case when substring(a.periode,5,2)='01' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n1,
             sum(case when substring(a.periode,5,2)='02' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n2,   
             sum(case when substring(a.periode,5,2)='03' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n3,
@@ -477,7 +477,7 @@ class DashboardController extends Controller
                 inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB12')
                 ";
-                $rowAcvp = DB::connection($this->sql2)->select($sqlbox1);
+                $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
                 $success["budpend"] = $rowAcvp[0]->n2;
                 $success["actpend"] = $rowAcvp[0]->n4;
                 $success["persen"] = round($rowAcvp[0]->persen*100,2);
@@ -518,7 +518,7 @@ class DashboardController extends Controller
 
             $periode = $request->periode;
 
-            $rs = DB::connection($this->sql2)->select("select a.kode_lokasi,
+            $rs = DB::connection($this->sql)->select("select a.kode_lokasi,
             sum(case when substring(a.periode,5,2)='01' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n1,
             sum(case when substring(a.periode,5,2)='02' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n2,   
             sum(case when substring(a.periode,5,2)='03' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) n3,
@@ -555,7 +555,7 @@ class DashboardController extends Controller
                 inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' and a.periode='".$periode."' and b.kode_grafik in ('DB15')
                 ";
-                $rowAcvp = DB::connection($this->sql2)->select($sqlbox1);
+                $rowAcvp = DB::connection($this->sql)->select($sqlbox1);
                 $success["budcogs"] = $rowAcvp[0]->n2;
                 $success["actcogs"] = $rowAcvp[0]->n4;
                 $success["persen"] = round($rowAcvp[0]->persen*100,2);
@@ -749,7 +749,7 @@ class DashboardController extends Controller
                 $tgl = $param[1];
             }
 
-            $rs = DB::connection($this->sql2)->select("select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.kode_akun,a.keterangan,a.kode_pp,b.nama as nama_akun,a.kode_drk,
+            $rs = DB::connection($this->sql)->select("select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.kode_akun,a.keterangan,a.kode_pp,b.nama as nama_akun,a.kode_drk,
             case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
             from gldt a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
