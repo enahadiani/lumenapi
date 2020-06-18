@@ -231,16 +231,19 @@ class DashboardController extends Controller
                 $kode_lokasi= '04';
             }
 
-            $tmp = explode("|",$request->param);
-            $kode_akun = $tmp[0];
-            $tgl1=$tmp[1];
-            $tgl2=$tmp[2];
-            if($kode_akun == "All" OR $kode_akun == ""){
-                $kode_akun="";
-                $filterakun="";
-            }else{
-                $kode_akun=$kode_akun;
-                $filterakun=" and c.kode_akun='$kode_akun' ";
+            if(isset($request->param) && $request->param != ""){
+
+                $tmp = explode("|",$request->param);
+                $kode_akun = $tmp[0];
+                $tgl1=$tmp[1];
+                $tgl2=$tmp[2];
+                if($kode_akun == "All" OR $kode_akun == ""){
+                    $kode_akun="";
+                    $filterakun="";
+                }else{
+                    $kode_akun=$kode_akun;
+                    $filterakun=" and c.kode_akun='$kode_akun' ";
+                }
             }
 
             $rs = DB::connection($this->sql2)->select("select c.kode_lokasi,c.kode_akun,d.nama,c.so_awal,c.periode,case when c.so_awal>=0 then c.so_awal else 0 end as so_debet,case when c.so_awal<0 then c.so_awal else 0 end as so_kredit
@@ -335,17 +338,19 @@ class DashboardController extends Controller
             }
             
             $periode = $request->periode;
+            if(isset($request->param) && $request->param != ""){
 
-            $tmp = explode("|",$request->param);
-            $kode_akun = $tmp[0];
-            $tgl1=$tmp[1];
-            $tgl2=$tmp[2];
-            if($kode_akun == "All" OR $kode_akun == ""){
-                $kode_akun="";
-                $filterakun="";
-            }else{
-                $kode_akun=$kode_akun;
-                $filterakun=" and c.kode_akun='$kode_akun' ";
+                $tmp = explode("|",$request->param);
+                $kode_akun = $tmp[0];
+                $tgl1=$tmp[1];
+                $tgl2=$tmp[2];
+                if($kode_akun == "All" OR $kode_akun == ""){
+                    $kode_akun="";
+                    $filterakun="";
+                }else{
+                    $kode_akun=$kode_akun;
+                    $filterakun=" and c.kode_akun='$kode_akun' ";
+                }
             }
 
             $rs = DB::connection($this->sql2)->select("select a.kode_lokasi,
@@ -574,34 +579,37 @@ class DashboardController extends Controller
             }
 
             $periode = $request->periode;
-            $tmp = explode("|",$request->param);
-            $per1 = $tmp[0];
-            $per2=$tmp[1];
-            $kode_klp=$tmp[2];
-            $order=$tmp[3];
-            $filterper = "";
-            if($per1 == ""){
-                $filterper.="";
-            }else{
-                $filterper.=" and a.periode >= '$per1' ";
-            }
+            if(isset($request->param) && $request->param != ""){
 
-            if($per2 == ""){
-                $filterper.="";
-            }else{
-                $filterper.=" and a.periode <= '$per2' ";
-            }
+                $tmp = explode("|",$request->param);
+                $per1 = $tmp[0];
+                $per2=$tmp[1];
+                $kode_klp=$tmp[2];
+                $order=$tmp[3];
+                $filterper = "";
+                if($per1 == ""){
+                    $filterper.="";
+                }else{
+                    $filterper.=" and a.periode >= '$per1' ";
+                }
 
-            if($kode_klp == ""){
-                $filter2.="";
-            }else{
-                $filter2.=" and a.kode_klp = '$kode_klp' ";
-            }
+                if($per2 == ""){
+                    $filterper.="";
+                }else{
+                    $filterper.=" and a.periode <= '$per2' ";
+                }
 
-            if($order == ""){
-                $filter2.="";
-            }else{
-                $filter2.=" order by $order ";
+                if($kode_klp == ""){
+                    $filter2.="";
+                }else{
+                    $filter2.=" and a.kode_klp = '$kode_klp' ";
+                }
+
+                if($order == ""){
+                    $filter2.="";
+                }else{
+                    $filter2.=" order by $order ";
+                }
             }
 
 
@@ -650,20 +658,23 @@ class DashboardController extends Controller
             }
 
             $periode = $request->periode;
-            $tmp = explode("|",$request->param);
-            $vendor = $tmp[1];
-            $order = $tmp[0];
-            $filterper = "";
-            if($vendor == ""){
-                $filterper.="";
-            }else{
-                $filterper.=" and a.kode_vendor like '%$vendor%' or a.nama like '%$vendor%' ";
-            }
+            if(isset($request->param) && $request->param != ""){
 
-            if($order == ""){
-                $filterper.="";
-            }else{
-                $filterper.=" order by $order ";
+                $tmp = explode("|",$request->param);
+                $vendor = $tmp[1];
+                $order = $tmp[0];
+                $filterper = "";
+                if($vendor == ""){
+                    $filterper.="";
+                }else{
+                    $filterper.=" and a.kode_vendor like '%$vendor%' or a.nama like '%$vendor%' ";
+                }
+
+                if($order == ""){
+                    $filterper.="";
+                }else{
+                    $filterper.=" order by $order ";
+                }
             }
 
             $rs = DB::connection($this->sql)->select("select a.kode_vendor,a.nama,isnull(b.total,0) as total
@@ -709,12 +720,16 @@ class DashboardController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $kode_lokasi = '04';
             }
 
             $periode = $request->periode;
-            $param = explode("|",$request->param);
-            $no_bukti = $param[0];
-            $tgl = $param[1];
+            if(isset($request->param) && $request->param != ""){
+                $param = explode("|",$request->param);
+                $no_bukti = $param[0];
+                $tgl = $param[1];
+            }
 
             $rs = DB::connection($this->sql2)->select("select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.kode_akun,a.keterangan,a.kode_pp,b.nama as nama_akun,a.kode_drk,
             case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit,a.dc
