@@ -28,6 +28,7 @@ class AdminSatpamController extends Controller
     public function profile()
     {
         // if($data =  Auth::user()){
+            $data = Auth::user();
             $id_satpam= $data->id_satpam;
             $kode_lokasi= $data->kode_lokasi;
 
