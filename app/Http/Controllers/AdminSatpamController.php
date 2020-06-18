@@ -29,20 +29,21 @@ class AdminSatpamController extends Controller
     {
         // if($data =  Auth::user()){
             $data = Auth::user();
-            $id_satpam= $data->id_satpam;
-            $kode_lokasi= $data->kode_lokasi;
+            return $data;
+            // $id_satpam= $data->id_satpam;
+            // $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrvrtrw')->select("select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif from rt_satpam
-            where id_satpam= '$id_satpam' 
-            ");
-            $user = json_decode(json_encode($user),true);
+            // $user = DB::connection('sqlsrvrtrw')->select("select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif from rt_satpam
+            // where id_satpam= '$id_satpam' 
+            // ");
+            // $user = json_decode(json_encode($user),true);
             
-            if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                return response()->json(['user' => $user], 200);
-            }
-            else{
-                return response()->json(['user' => []], 200);
-            }
+            // if(count($user) > 0){ //mengecek apakah data kosong atau tidak
+            //     return response()->json(['user' => $user], 200);
+            // }
+            // else{
+            //     return response()->json(['user' => []], 200);
+            // }
         // }else{
         //     return response()->json(['user' => []], 200);
         // }
