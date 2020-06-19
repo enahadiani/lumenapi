@@ -39,7 +39,7 @@ class RumahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -108,7 +108,7 @@ class RumahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_rumah,$kode_lokasi)){
@@ -180,7 +180,7 @@ class RumahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -221,7 +221,7 @@ class RumahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
             $del = DB::connection($this->sql)->table('rt_rumah')

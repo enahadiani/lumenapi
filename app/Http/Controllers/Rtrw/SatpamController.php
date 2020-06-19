@@ -41,7 +41,7 @@ class SatpamController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -91,7 +91,7 @@ class SatpamController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -145,7 +145,7 @@ class SatpamController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->id_satpam,$kode_lokasi)){
@@ -256,7 +256,7 @@ class SatpamController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
            
@@ -326,7 +326,7 @@ class SatpamController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }else if($data =  Auth::guard($this->guard2)->user()){
-            $nik= $data->nik;
+            $nik= $data->id_satpam;
             $kode_lokasi= $data->kode_lokasi;
         }
         $get = AdminSatpam::where('id_satpam',$request->id_satpam)

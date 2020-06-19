@@ -39,7 +39,7 @@ class PpController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -105,7 +105,7 @@ class PpController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -175,7 +175,7 @@ class PpController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
-                $nik= $data->nik;
+                $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
             

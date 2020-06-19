@@ -76,6 +76,11 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     $router->post('warga-ubah','Rtrw\WargaController@update');
     $router->delete('warga','Rtrw\WargaController@destroy');
 
+    //Tamu
+    $router->get('tamu-masuk','Rtrw\TamuController@index');
+    $router->post('tamu-masuk','Rtrw\TamuController@store');
+    $router->post('tamu-keluar','Rtrw\TamuController@update');
+
 });
 
 // $router->get('qrcode', function () {
