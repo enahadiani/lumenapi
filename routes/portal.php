@@ -81,6 +81,15 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     $router->post('tamu-masuk','Rtrw\TamuController@store');
     $router->post('tamu-keluar','Rtrw\TamuController@update');
 
+    //Akses Form
+    $router->get('akses-form','Rtrw\AksesFormController@index');
+    $router->post('akses-form','Rtrw\AksesFormController@store');
+
+    //Paket Titip
+    $router->get('paket','Rtrw\PaketController@index');
+    $router->post('paket','Rtrw\PaketController@store');
+    $router->put('paket','Rtrw\PaketController@update');
+
 });
 
 // $router->get('qrcode', function () {

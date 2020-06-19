@@ -29,6 +29,30 @@ class TamuController extends Controller
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
         return $id;
     }
+
+    public function cekValid($isi,$kode_lokasi){
+        
+        $auth = DB::connection($this->sql)->select("select no_tamu as kode from rt_tamu_m where no_tamu ='$isi' and kode_lokasi='$kode_lokasi' 
+        union all
+        select id_satpam as kode from rt_satpam where id_satpam ='$isi' and kode_lokasi='$kode_lokasi' ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function cekValidSatpam($isi,$kode_lokasi){
+        
+        $auth = DB::connection($this->sql)->select("select id_satpam as kode from rt_satpam where id_satpam ='$isi' and kode_lokasi='$kode_lokasi' ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
     
     public function index(Request $request)
     {
@@ -56,9 +80,9 @@ class TamuController extends Controller
                         $res[$i]['selisih'] = $res[$i]['selisih'].' detik';
                     }else if(intval($res[$i]['selisih']) > 60){
                         if((intval($res[$i]['selisih'])/60) <= 3600){
-                            $res[$i]['selisih'] = (intval($res[$i]['selisih'])/60).' menit';
+                            $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/60).' menit';
                         }else{
-                            $res[$i]['selisih'] = (intval($res[$i]['selisih'])/3600).' jam';
+                            $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/3600).' jam';
                         }
                     }
                 }
@@ -110,7 +134,7 @@ class TamuController extends Controller
         DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
@@ -121,12 +145,8 @@ class TamuController extends Controller
             $periode = date('Ym');
 
             $no_bukti = $this->generateKode("rt_tamu_m", "no_tamu", $kode_lokasi."-IN".substr($periode,2,4).".", "000001");
-            $res = DB::connection($this->sql)->select("select max(id_tamu) + 1 as id from rt_tamu_m where kode_lokasi ='$kode_lokasi' ");
-            if($res > 0){
-                $id_tamu = $res[0]->id;
-            }else{
-                $id_tamu = 1;
-            }
+
+            $id_tamu = $this->generateKode("rt_tamu_m", "id_tamu", date('Ymd').".", "00001");
 
             if($request->hasfile('ktp')){
 
@@ -162,7 +182,7 @@ class TamuController extends Controller
             $success['message'] = "Data Tamu Masuk berhasil disimpan";
             $success['qrcode'] = url("portal/storage/").$output_file;
             $success['no_tamu'] = $no_bukti;
-            $success['id_tamu'] = $id_tamu; 
+            $success['no_urut'] = $id_tamu; 
 
             DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus);     
@@ -177,7 +197,7 @@ class TamuController extends Controller
             $success['status'] = false;
             $success['message'] = "Data Tamu Masuk gagal disimpan ".$e;
             $success['no_tamu'] = "";
-            $success['id_tamu'] = ""; 
+            $success['no_urut'] = ""; 
 
             return response()->json($success, $this->successStatus); 
         }			
@@ -221,7 +241,7 @@ class TamuController extends Controller
         DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else if($data =  Auth::guard($this->guard2)->user()){
@@ -230,15 +250,31 @@ class TamuController extends Controller
             }
             $periode = date('Ym');
 
-            $no_bukti = $this->generateKode("rt_tamu_m", "no_tamu", $kode_lokasi."-OUT".substr($periode,2,4).".", "000001");
+            if($this->cekValid($request->qrcode,$kode_lokasi)){
+                
+                $no_bukti = $this->generateKode("rt_tamu_m", "no_tamu", $kode_lokasi."-OUT".substr($periode,2,4).".", "000001");
+                
+                $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate(),status_keluar='normal' where no_tamu='$request->qrcode' and kode_lokasi='$kode_lokasi' ");
+                
+                $success['status'] = true;
+                $success['message'] = "Data Tamu Keluar berhasil disimpan";
+                
+                DB::connection($this->sql)->commit();
+            }
+            else if($this->cekValid2($request->qrcode,$kode_lokasi)){
+                
+                $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$request->qrcode', tgljam_out=getdate(), status_keluar='satpam' where no_tamu='$request->no_tamu' and kode_lokasi='$kode_lokasi' ");
+                
+                $success['status'] = true;
+                $success['message'] = "Data Tamu Keluar berhasil disimpan";
+                
+                DB::connection($this->sql)->commit();
+            }
+            else{
+                $success['status'] = false;
+                $success['message'] = "Qrcode tidak valid";
+            }
 
-            
-            $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate() where no_tamu='$request->qrcode' and kode_lokasi='$kode_lokasi' ");
-            
-            $success['status'] = true;
-            $success['message'] = "Data Tamu Keluar berhasil disimpan";
-            
-            DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
