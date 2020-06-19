@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class BlokController extends Controller
+class KeperluanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class BlokController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select blok from rt_blok where blok ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_perlu from rt_perlu where kode_perlu ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -43,15 +43,15 @@ class BlokController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->blok)){
-                if($request->blok == "all"){
+            if(isset($request->kode_perlu)){
+                if($request->kode_perlu == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.blok='$request->blok' ";
+                    $filter = " where a.kode_perlu='$request->kode_perlu' ";
                 }
-                $sql= "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.kode_perlu,a.nama from rt_perlu a $filter ";
             }else{
-                $sql = "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select a.kode_perlu,a.nama from rt_perlu a ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -94,8 +94,8 @@ class BlokController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'blok' => 'required',
-            'kode_pp' => 'required'
+            'kode_perlu' => 'required',
+            'nama' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -108,23 +108,23 @@ class BlokController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->blok,$kode_lokasi)){
+            if($this->isUnik($request->kode_perlu,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into rt_blok(blok,kode_lokasi,kode_pp) values (?, ?, ?)', array($request->blok,$kode_lokasi,$request->kode_pp));
+                $ins = DB::connection($this->sql)->insert('insert into rt_perlu(kode_perlu,nama) values (?, ?, ?)', array($request->kode_perlu,$request->kode_pp));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Blok berhasil disimpan";
+                $success['message'] = "Data Keperluan berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Blok sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode Perlu sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Blok gagal disimpan ".$e;
+            $success['message'] = "Data Keperluan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -163,8 +163,8 @@ class BlokController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'blok' => 'required',
-            'kode_pp' => 'required'
+            'kode_perlu' => 'required',
+            'nama' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -178,21 +178,20 @@ class BlokController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('rt_blok')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('blok', $request->blok)
+            $del = DB::connection($this->sql)->table('rt_perlu')
+            ->where('kode_perlu', $request->kode_perlu)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into rt_blok(blok,kode_lokasi,kode_pp) values (?, ?, ?)', array($request->blok,$kode_lokasi,$request->kode_pp));
+            $ins = DB::connection($this->sql)->insert('insert into rt_perlu(kode_perlu,nama) values (?, ?, ?)', array($request->kode_perlu,$request->nama));
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Blok berhasil diubah";
+            $success['message'] = "Data Keperluan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Blok gagal diubah ".$e;
+            $success['message'] = "Data Keperluan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -206,7 +205,7 @@ class BlokController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'blok' => 'required'
+            'kode_perlu' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -218,20 +217,19 @@ class BlokController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $del = DB::connection($this->sql)->table('rt_blok')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('blok', $request->blok)
+            $del = DB::connection($this->sql)->table('rt_perlu')
+            ->where('kode_perlu', $request->kode_perlu)
             ->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Blok berhasil dihapus";
+            $success['message'] = "Data Keperluan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Blok gagal dihapus ".$e;
+            $success['message'] = "Data Keperluan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class BlokController extends Controller
+class RumahController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class BlokController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select blok from rt_blok where blok ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_rumah from rt_rumah where kode_rumah ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -43,15 +43,15 @@ class BlokController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->blok)){
-                if($request->blok == "all"){
+            if(isset($request->kode_rumah)){
+                if($request->kode_rumah == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.blok='$request->blok' ";
+                    $filter = " and a.kode_rumah='$request->kode_rumah' ";
                 }
-                $sql= "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.kode_rumah,a.kode_lokasi,a.rt,a.rw,a.blok,a.status_huni from rt_rumah a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select a.kode_rumah,a.kode_lokasi,a.rt,a.rw,a.blok,a.status_huni from rt_rumah a where a.kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -94,8 +94,11 @@ class BlokController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
+            'kode_rumah' => 'required',
+            'rt' => 'required',
+            'rw' => 'required',
             'blok' => 'required',
-            'kode_pp' => 'required'
+            'status_huni' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -108,23 +111,23 @@ class BlokController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->blok,$kode_lokasi)){
+            if($this->isUnik($request->kode_rumah,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into rt_blok(blok,kode_lokasi,kode_pp) values (?, ?, ?)', array($request->blok,$kode_lokasi,$request->kode_pp));
+                $ins = DB::connection($this->sql)->insert('insert into rt_rumah(kode_rumah,kode_lokasi,rt,rw,blok,status_huni) values (?, ?, ?, ?, ?, ?)', array($request->kode_rumah,$kode_lokasi,$request->rt,$request->rw,$request->blok,$request->status_huni));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Blok berhasil disimpan";
+                $success['message'] = "Data Rumah berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Blok sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. No Rumah sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Blok gagal disimpan ".$e;
+            $success['message'] = "Data Rumah gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -163,8 +166,11 @@ class BlokController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
+            'kode_rumah' => 'required',
+            'rt' => 'required',
+            'rw' => 'required',
             'blok' => 'required',
-            'kode_pp' => 'required'
+            'status_huni' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -178,21 +184,21 @@ class BlokController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('rt_blok')
+            $del = DB::connection($this->sql)->table('rt_rumah')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('blok', $request->blok)
+            ->where('kode_rumah', $request->kode_rumah)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into rt_blok(blok,kode_lokasi,kode_pp) values (?, ?, ?)', array($request->blok,$kode_lokasi,$request->kode_pp));
-            
+            $ins = DB::connection($this->sql)->insert('insert into rt_rumah(kode_rumah,kode_lokasi,rt,rw,blok,status_huni) values (?, ?, ?, ?, ?, ?)', array($request->kode_rumah,$kode_lokasi,$request->rt,$request->rw,$request->blok,$request->status_huni));
+                
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Blok berhasil diubah";
+            $success['message'] = "Data Rumah berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Blok gagal diubah ".$e;
+            $success['message'] = "Data Rumah gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -206,7 +212,7 @@ class BlokController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'blok' => 'required'
+            'kode_rumah' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -218,20 +224,20 @@ class BlokController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $del = DB::connection($this->sql)->table('rt_blok')
+            $del = DB::connection($this->sql)->table('rt_rumah')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('blok', $request->blok)
+            ->where('kode_rumah', $request->kode_rumah)
             ->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Blok berhasil dihapus";
+            $success['message'] = "Data Rumah berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Blok gagal dihapus ".$e;
+            $success['message'] = "Data Rumah gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
