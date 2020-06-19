@@ -46,6 +46,12 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     $router->delete('satpam','Rtrw\SatpamController@destroy');
     $router->post('satpam-generate-qrcode','Rtrw\SatpamController@generateQrCode');
 
+    //Master Blok
+    $router->get('blok','Rtrw\BlokController@index');
+    $router->post('blok','Rtrw\BlokController@store');
+    $router->post('blok-ubah','Rtrw\BlokController@update');
+    $router->delete('blok','Rtrw\BlokController@destroy');
+
 });
 
 // $router->get('qrcode', function () {
