@@ -51,14 +51,14 @@ class TamuController extends Controller
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                foreach($rs as $row){
-                    if(intval($row->selisih) <=60){
-                        $row->selisih = $row->selisih.' detik';
-                    }else if(intval($row->selisih) > 60){
-                        if((intval($row->selisih)/60) <= 3600){
-                            $row->selisih = (intval($row->selisih)/60).' menit';
+                for($i=0;$i<count($res);$i++){
+                    if(intval($res[$i]['selisih']) <=60){
+                        $res[$i]['selisih'] = $res[$i]['selisih'].' detik';
+                    }else if(intval($res[$i]['selisih']) > 60){
+                        if((intval($res[$i]['selisih'])/60) <= 3600){
+                            $res[$i]['selisih'] = (intval($res[$i]['selisih'])/60).' menit';
                         }else{
-                            $row->selisih = (intval($row->selisih)/3600).' jam';
+                            $res[$i]['selisih'] = (intval($res[$i]['selisih'])/3600).' jam';
                         }
                     }
                 }
@@ -160,7 +160,7 @@ class TamuController extends Controller
 
             $success['status'] = true;
             $success['message'] = "Data Tamu Masuk berhasil disimpan";
-            $success['qrcode'] = $output_file;
+            $success['qrcode'] = url("portal/storage/").$output_file;
             $success['no_tamu'] = $no_bukti;
             $success['id_tamu'] = $id_tamu; 
 
@@ -212,10 +212,10 @@ class TamuController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $this->validate($request, [
-            'no_tamu' => 'required'
+            'qrcode' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -233,17 +233,17 @@ class TamuController extends Controller
             $no_bukti = $this->generateKode("rt_tamu_m", "no_tamu", $kode_lokasi."-OUT".substr($periode,2,4).".", "000001");
 
             
-            $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate() where no_tamu='$request->no_tamu' and kode_lokasi='$kode_lokasi' ");
+            $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate() where no_tamu='$request->qrcode' and kode_lokasi='$kode_lokasi' ");
             
             $success['status'] = true;
-            $success['message'] = "Data Tamu Masuk berhasil disimpan";
+            $success['message'] = "Data Tamu Keluar berhasil disimpan";
             
             DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Tamu Masuk gagal disimpan ".$e;
+            $success['message'] = "Data Tamu Keluar gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }   
     }
