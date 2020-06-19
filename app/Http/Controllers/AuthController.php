@@ -12,6 +12,7 @@ use  App\User;
 use  App\Admin;
 use  App\AdminYpt;
 use  App\AdminSatpam;
+use  App\AdminRtrw;
 
 class AuthController extends Controller
 {
@@ -250,37 +251,78 @@ class AuthController extends Controller
         return $this->respondWithToken($token,'toko');
     }
 
+    // $id_satpam = $request->input('qrcode');
+        // $user = AdminSatpam::where('id_satpam', '=', $id_satpam)->first();
+        // try { 
+        //     // verify the credentials and create a token for the user
+        //     if (!$token = JWTAuth::fromUser($user)) { 
+        //         return response()->json(['message' => 'Unauthorized'], 401);
+        //     } 
+        // } catch (JWTException $e) { 
+        //     // something went wrong 
+        //     return response()->json(['message' => 'could_not_create_token'], 500); 
+        // } 
     public function loginSatpam(Request $request)
     {
           //validate incoming request 
         $this->validate($request, [
-            'qrcode' => 'required|string',
+            'qrcode' => 'required',
         ]);
 
-        // $credentials = $request->only(['id_satpam']);
+        $user = AdminSatpam::where('id_satpam', '=', $request->qrcode)->first();
+        $credentials = array('id_satpam' => $request->qrcode, 'password' => $user->pass);
 
-        // if (! $token = Auth::guard('satpam')->attempt($credentials)) {
-        //     return response()->json(['message' => 'Unauthorized'], 401);
-        // }
+        if (! $token = Auth::guard('satpam')->setTTL(1440)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }else{
+            if($data = Auth::guard('satpam')->user()){
+                DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+                try {
+                    $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_satpam_log (id_satpam,kode_lokasi,tgl_log_in,flag_aktif) values ('$data->id_satpam','$data->kode_lokasi',getdate(),1) ");
+                    DB::connection('sqlsrvrtrw')->commit();
+                } catch (\Throwable $e) {
+                    DB::connection('sqlsrvrtrw')->rollback();
+                    $success['status'] = false;
+                    $success['message'] = "Insert to satpam log error".$e;
+                    return response()->json($success, 200); 
+                }	
 
-        $id_satpam = $request->input('qrcode');
-        $user = AdminSatpam::where('id_satpam', '=', $id_satpam)->first();
-        try { 
-            // verify the credentials and create a token for the user
-            if (!$token = JWTAuth::fromUser($user)) { 
-                return response()->json(['message' => 'Unauthorized'], 401);
-            } 
-        } catch (JWTException $e) { 
-            // something went wrong 
-            return response()->json(['message' => 'could_not_create_token'], 500); 
-        } 
+            }
+        }
+        return $this->respondWithToken($token,'satpam');
+    }
 
-        return response()->json([
-            'token' => $token,
-            'token_type' => 'bearer',
-            'message' => 'success',
-            'expires_in' => Auth::factory()->getTTL() * 60
-        ], 200);
+    public function logoutSatpam(Request $request)
+    {
+          //validate incoming request 
+        $token = Auth::guard('satpam')->getToken();
+        try {
+            if($data = Auth::guard('satpam')->user()){
+                DB::connection('sqlsrvrtrw')->beginTransaction();
+                try {
+                    $ins = DB::connection('sqlsrvrtrw')->update("update rt_satpam_log set tgl_log_out=getdate(), flag_aktif=0 where id_satpam='$data->id_satpam' and kode_lokasi='$data->kode_lokasi' and flag_aktif='1' ");
+                    DB::connection('sqlsrvrtrw')->commit();
+                    Auth::guard('satpam')->invalidate($token);
+                } catch (\Throwable $e) {
+                    DB::connection('sqlsrvrtrw')->rollback();
+                    $success['status'] = false;
+                    $success['message'] = "Update to satpam log error".$e;
+                    return response()->json($success, 200); 
+                }	
+                return response()->json([
+                    'status' => true, 
+                    'message'=> "User successfully logged out."
+                ], 200);
+            }
+        } catch (JWTException $e) {
+            // something went wrong whilst attempting to encode the token
+            return response()->json([
+              'status' => false, 
+              'message' => 'Failed to logout, please try again.'
+            ], 200);
+        }
+        
     }
 
     public function hashPassword(){
@@ -584,6 +626,31 @@ class AuthController extends Controller
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPassTable($db,$table){
+        $users = AdminSatpam::all();
+        DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvrtrw')->table('rt_satpam')->orderBy('id_satpam')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrvrtrw')->table('rt_satpam')
+                        ->where('id_satpam', $user->id_satpam)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrvrtrw')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv')->rollback();
             $success['status'] = false;
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);

@@ -94,6 +94,9 @@ $app->configure('dompdf');
 
 //$app->configure('pretty-routes');
 
+
+$app->alias('QrCode', SimpleSoftwareIO\QrCode\Facade::class);
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -141,6 +144,8 @@ $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(Barryvdh\DomPDF\ServiceProvider::class);
 // $app->register(Collective\Html\HtmlServiceProvider::class);
 //$app->register(PrettyRoutes\ServiceProvider::class);
+$app->register(SimpleSoftwareIO\QrCode\ServiceProvider::class);
+
 
 
 /*

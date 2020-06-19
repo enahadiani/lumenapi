@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use App\AdminSatpam;
 
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class AdminSatpamController extends Controller
 {
      /**
@@ -27,26 +29,24 @@ class AdminSatpamController extends Controller
      */
     public function profile()
     {
-        // if($data =  Auth::user()){
-            $data = Auth::user();
-            return $data;
-            // $id_satpam= $data->id_satpam;
-            // $kode_lokasi= $data->kode_lokasi;
+        if($data =  Auth::guard('satpam')->user()){
+            $id_satpam= $data->id_satpam;
+            $kode_lokasi= $data->kode_lokasi;
 
-            // $user = DB::connection('sqlsrvrtrw')->select("select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif from rt_satpam
-            // where id_satpam= '$id_satpam' 
-            // ");
-            // $user = json_decode(json_encode($user),true);
+            $user = DB::connection('sqlsrvrtrw')->select("select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif from rt_satpam
+            where id_satpam= '$id_satpam' 
+            ");
+            $user = json_decode(json_encode($user),true);
             
-            // if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-            //     return response()->json(['user' => $user], 200);
-            // }
-            // else{
-            //     return response()->json(['user' => []], 200);
-            // }
-        // }else{
-        //     return response()->json(['user' => []], 200);
-        // }
+            if(count($user) > 0){ //mengecek apakah data kosong atau tidak
+                return response()->json(['user' => $user], 200);
+            }
+            else{
+                return response()->json(['user' => []], 200);
+            }
+        }else{
+            return response()->json(['user' => []], 200);
+        }
     }
 
     /**
@@ -79,7 +79,7 @@ class AdminSatpamController extends Controller
     }
 
     public function cekPayload(){
-        $payload = Auth::payload();
+        $payload = Auth::guard('satpam')->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }

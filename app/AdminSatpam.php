@@ -18,6 +18,7 @@ class AdminSatpam extends Model implements AuthenticatableContract, Authorizable
 
     protected $primaryKey = 'id_satpam';
     public $incrementing = false;
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +26,7 @@ class AdminSatpam extends Model implements AuthenticatableContract, Authorizable
      * @var array
      */
     protected $fillable = [
-        'id_satpam','kode_lokasi','nama','alamat','status','no_hp','flag_aktif'
+        'id_satpam','kode_lokasi','nama','alamat','status','no_hp','flag_aktif','foto','qrcode','password','pass'
     ];
 
     /**
@@ -34,7 +35,7 @@ class AdminSatpam extends Model implements AuthenticatableContract, Authorizable
      * @var array
      */
     protected $hidden = [
-        'password'
+        'password','pass'
     ];
 
     /**

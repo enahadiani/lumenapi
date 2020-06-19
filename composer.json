@@ -17,6 +17,7 @@
         "maatwebsite/excel": "^3.1",
         "midtrans/midtrans-php": "^2.2",
         "phpoffice/phpspreadsheet": "^1.11",
+        "simplesoftwareio/simple-qrcode": "^3.0",
         "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {
