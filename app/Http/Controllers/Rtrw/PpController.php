@@ -47,7 +47,7 @@ class PpController extends Controller
                 if($request->kode_pp == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.kode_pp='$request->pp' ";
+                    $filter = " and a.kode_pp='$request->kode_pp' ";
                 }
                 $sql= "select a.kode_pp,a.kode_lokasi,a.nama from pp a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
@@ -65,6 +65,7 @@ class PpController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                // $success['sql'] = $sql;
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
