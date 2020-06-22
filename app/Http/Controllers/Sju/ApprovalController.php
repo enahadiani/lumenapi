@@ -54,7 +54,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['sql']= $sql;
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -99,7 +99,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['sql']= $sql;
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -143,6 +143,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -186,6 +187,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -230,6 +232,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -280,6 +283,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -321,6 +325,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -374,6 +379,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -413,6 +419,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -453,6 +460,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -493,6 +501,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -536,6 +545,7 @@ class ApprovalController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data']= [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -572,7 +582,7 @@ class ApprovalController extends Controller
         
         $tanggal=$request->tanggal;
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
-        $per=substr($periode,2,2);
+        $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-AAT".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");        
@@ -602,6 +612,7 @@ class ApprovalController extends Controller
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['id']= "-";
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
@@ -640,7 +651,7 @@ class ApprovalController extends Controller
         
         $tanggal=$request->tanggal;
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
-        $per=substr($periode,2,2);
+        $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-VDD".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");
@@ -671,6 +682,7 @@ class ApprovalController extends Controller
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['id']= "-";
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
@@ -709,7 +721,7 @@ class ApprovalController extends Controller
         
         $tanggal=$request->tanggal;
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
-        $per=substr($periode,2,2);
+        $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-VDD".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");
@@ -740,6 +752,7 @@ class ApprovalController extends Controller
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['id']= "-";
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
@@ -778,7 +791,7 @@ class ApprovalController extends Controller
        
         $tanggal=$request->tanggal;
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
-        $per=substr($periode,2,2);
+        $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-VDD".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");
@@ -809,6 +822,7 @@ class ApprovalController extends Controller
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['id']= "-";
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
