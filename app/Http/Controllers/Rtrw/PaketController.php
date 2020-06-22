@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class PaketController extends Controller
 {
@@ -19,6 +20,14 @@ class PaketController extends Controller
     public $sql = 'sqlsrvrtrw';
     public $guard = 'rtrw';
     public $guard2 = 'satpam';
+
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
     
     public function index(Request $request)
     {
@@ -58,7 +67,7 @@ class PaketController extends Controller
                 }
             }
             $sql= "
-            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket from rt_paket_m a where kode_lokasi='".$kode_lokasi."' $filter ";
+            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket,a.status_ambil from rt_paket_m a where kode_lokasi='".$kode_lokasi."' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -140,19 +149,22 @@ class PaketController extends Controller
                 $foto="-";
             }
 
-            $ins = DB::connection($this->sql)->insert("insert into rt_paket_m (no_paket,no_rumah,blok,nik,nama,kode_lokasi,tgl_input,nik_user,id_paket,foto,status_ambil) values ('$no_bukti','$request->no_rumah','$request->blok','$kode_lokasi',getdate(),'$nik_user','-','$id_paket','$foto','belum')");
+            $ins = DB::connection($this->sql)->insert("insert into rt_paket_m (no_paket,no_rumah,blok,nik,nama,kode_lokasi,tgl_input,nik_user,id_paket,foto,status_ambil) values ('$no_bukti','$request->no_rumah','$request->blok','$request->nik','$request->nama','$kode_lokasi',getdate(),'$nik_user','$id_paket','$foto','belum')");
 
             $success['status'] = true;
             $success['message'] = "Data Paket berhasil disimpan";
             $success['no_paket'] = $no_bukti;
-            $success['no_urut'] = $id_tamu; 
+            $success['no_urut'] = $id_paket; 
 
             DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
-            if(Storage::disk('s3')->exists('rtrw/'.$foto)){
-                Storage::disk('s3')->delete('rtrw/'.$foto);
+            if(isset($foto)){
+
+                if(Storage::disk('s3')->exists('rtrw/'.$foto)){
+                    Storage::disk('s3')->delete('rtrw/'.$foto);
+                }
             }
             $success['status'] = false;
             $success['message'] = "Data Paket gagal disimpan ".$e;

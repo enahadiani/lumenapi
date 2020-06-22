@@ -81,7 +81,44 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('rekap_setoran', 'Rtrw\RtrwController@getRekapSetoran');
     $router->get('rekap_setoran_detail', 'Rtrw\RtrwController@getDetailRekapSetoran');
 
+    //Master Satpam
+    $router->get('satpam','Rtrw\SatpamController@index');
+    $router->post('satpam','Rtrw\SatpamController@store');
+    $router->post('satpam-ubah','Rtrw\SatpamController@update');
+    $router->delete('satpam','Rtrw\SatpamController@destroy');
+    $router->post('satpam-generate-qrcode','Rtrw\SatpamController@generateQrCode');
+
+    //Master Blok
+    $router->get('blok','Rtrw\BlokController@index');
+    $router->post('blok','Rtrw\BlokController@store');
+    $router->post('blok-ubah','Rtrw\BlokController@update');
+    $router->delete('blok','Rtrw\BlokController@destroy');
+
+    //Master PP
+    $router->get('pp','Rtrw\PpController@index');
+    $router->post('pp','Rtrw\PpController@store');
+    $router->put('pp','Rtrw\PpController@update');
+    $router->delete('pp','Rtrw\PpController@destroy');
+
+    //Master Perlu
+    $router->get('perlu','Rtrw\KeperluanController@index');
+    $router->post('perlu','Rtrw\KeperluanController@store');
+    $router->put('perlu','Rtrw\KeperluanController@update');
+    $router->delete('perlu','Rtrw\KeperluanController@destroy');
+
+    //Master Rumah
+    $router->get('rumah','Rtrw\RumahController@index');
+    $router->post('rumah','Rtrw\RumahController@store');
+    $router->put('rumah','Rtrw\RumahController@update');
+    $router->delete('rumah','Rtrw\RumahController@destroy');
+
+    //Master Warga
+    $router->get('warga','Rtrw\WargaController@index');
+    $router->post('warga','Rtrw\WargaController@store');
+    $router->post('warga-ubah','Rtrw\WargaController@update');
+    $router->delete('warga','Rtrw\WargaController@destroy'); 
+
     // Midtrans Test
 });
 
-$router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
+// $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
