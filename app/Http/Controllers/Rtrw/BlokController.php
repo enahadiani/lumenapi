@@ -43,16 +43,27 @@ class BlokController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
             if(isset($request->blok)){
-                if($request->blok == "all"){
-                    $filter = "";
+                if($request->blok == "all" || $request->blok == ""){
+                    $filter .= "";
                 }else{
-                    $filter = " and a.blok='$request->blok' ";
+                    $filter .= " and a.blok='$request->blok' ";
                 }
-                $sql= "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi= '".$kode_lokasi."'";
+                $filter .= "";
             }
+
+            if(isset($request->kode_pp)){
+                if($request->kode_pp == "all" || $request->kode_pp == ""){
+                    $filter .= "";
+                }else{
+                    $filter .= " and a.kode_pp='$request->kode_pp' ";
+                }
+            }else{
+                $filter .= "";
+            }
+            $sql= "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
