@@ -110,7 +110,7 @@ class KeperluanController extends Controller
             }
             if($this->isUnik($request->kode_perlu,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into rt_perlu(kode_perlu,nama) values (?, ?)', array($request->kode_perlu,$request->kode_pp));
+                $ins = DB::connection($this->sql)->insert('insert into rt_perlu(kode_perlu,nama) values (?, ?)', array($request->kode_perlu,$request->nama));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
