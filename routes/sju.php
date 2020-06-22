@@ -48,7 +48,7 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
     $router->get('users', 'UserController@allUsers');
     $router->get('cekPayload', 'UserController@cekPayload');
 
-    $router->get('aju', function () {
+    $router->get('aju', function (Request $request) {
         if($data =  Auth::guard('sju')->user()){
             $nik= $data->nik;
             //Pengajuan
@@ -56,16 +56,16 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
             $row = json_decode(json_encode($sql),true);
             switch($row[0]["menu_mobile"]){
                 case 'APPSM' :
-                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuan();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuan($request);
                 break;
                 case 'APPFIN' :
-                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuanfinal();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuanfinal($request);
                 break;
                 case 'APPDIR' :
-                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuandir();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuandir($request);
                 break;
                 case 'APPKUG' :
-                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuankug();
+                    $result = app('App\Http\Controllers\Sju\ApprovalController')->pengajuankug($request);
                 break;
                 default :
                 $success['status'] = false;

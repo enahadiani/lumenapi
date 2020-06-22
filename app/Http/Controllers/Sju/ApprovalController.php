@@ -20,9 +20,12 @@ class ApprovalController extends Controller
     //     $this->middleware();
     // }
 
-    public function pengajuan(){
+    public function pengajuan(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
         try {
             
             
@@ -33,7 +36,7 @@ class ApprovalController extends Controller
 
             $sql="select case when no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_atasan,nilai_curr,due_date, progress 
             from sju_pb_m 
-            where periode <='202006' and kode_lokasi='$kode_lokasi' and progress='0' and no_atasan='-' 
+            where periode <='$request->periode' and kode_lokasi='$kode_lokasi' and progress='0' and no_atasan='-' 
             and modul='PBPROSES' and no_kas='-' and nik_atasan='$nik' ";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
@@ -63,9 +66,12 @@ class ApprovalController extends Controller
         }
     }
 
-    public function pengajuanfinal(){
+    public function pengajuanfinal(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
         try {
             
             
@@ -76,7 +82,7 @@ class ApprovalController extends Controller
 
             $sql="select case when no_app1 ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_app1 as no_app,nilai_curr,due_date, 'APP-VP' as progress 
             from sju_pb_m 
-            where periode <='202006' and kode_lokasi='".$kode_lokasi."' and progress='2' and no_app1='-' and modul='PBPROSES' and no_kas='-' and nik_app1='".$nik."' ";
+            where periode <='$request->periode' and kode_lokasi='".$kode_lokasi."' and progress='2' and no_app1='-' and modul='PBPROSES' and no_kas='-' and nik_app1='".$nik."' ";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
@@ -105,9 +111,12 @@ class ApprovalController extends Controller
         }
     }
 
-    public function pengajuankug(){
+    public function pengajuankug(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
         try {
             
             
@@ -118,7 +127,7 @@ class ApprovalController extends Controller
 
             $aju = DB::connection('sqlsrvsju')->select("select case when no_app2 ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_app2 as no_app,nilai_curr,due_date, 'APP-DIRKUG' as progress 
             from sju_pb_m 
-            where periode <='202006' and kode_lokasi='".$kode_lokasi."' and progress='3' and no_app2='-' and modul='PBPROSES' and no_kas='-' and nik_app2='".$nik."'			 
+            where periode <='$request->periode' and kode_lokasi='".$kode_lokasi."' and progress='3' and no_app2='-' and modul='PBPROSES' and no_kas='-' and nik_app2='".$nik."'			 
             ");
             $aju = json_decode(json_encode($aju),true);
             
@@ -145,9 +154,12 @@ class ApprovalController extends Controller
         }
     }
 
-    public function pengajuandir(){
+    public function pengajuandir(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
         try {
             
             
@@ -158,7 +170,7 @@ class ApprovalController extends Controller
 
             $aju = DB::connection('sqlsrvsju')->select("select case when no_app3 ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_app3 as no_app,nilai_curr,due_date, 'APP-DIRUT' as progress 
             from sju_pb_m 
-            where periode <='202006' and kode_lokasi='".$kode_lokasi."' and progress='4' and no_app3='-' and modul='PBPROSES' and no_kas='-' and nik_app3='".$nik."'			 
+            where periode <='$request->periode' and kode_lokasi='".$kode_lokasi."' and progress='4' and no_app3='-' and modul='PBPROSES' and no_kas='-' and nik_app3='".$nik."'			 
             ");
             $aju = json_decode(json_encode($aju),true);
             
@@ -556,13 +568,10 @@ class ApprovalController extends Controller
         }                    
         
         $str_format="0000";
-        // $periode="date('Y').date('m')";
-        // $tanggal=date('Y-m-d');
-
-        // $per=date('y').date('m');
-        $periode = "202006";
-        $per="2006";
-        $tanggal=date('Y-06-d');
+        
+        $tanggal=$request->tanggal;
+        $periode =substr($tanggal,0,4).substr($tanggal,5,2);
+        $per=substr($periode,2,2);
         $prefix=$kode_lokasi."-AAT".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");        
@@ -626,13 +635,10 @@ class ApprovalController extends Controller
         $progress = "APP-VP";
         
         $str_format="0000";
-        // $periode="date('Y').date('m')";
-        // $tanggal=date('Y-m-d');
-
-        // $per=date('y').date('m');
-        $periode = "202006";
-        $per="2006";
-        $tanggal=date('Y-06-d');
+        
+        $tanggal=$request->tanggal;
+        $periode =substr($tanggal,0,4).substr($tanggal,5,2);
+        $per=substr($periode,2,2);
         $prefix=$kode_lokasi."-VDD".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");
@@ -697,13 +703,10 @@ class ApprovalController extends Controller
         $progress = "APP-DIRKUG";
         
         $str_format="0000";
-        // $periode="date('Y').date('m')";
-        // $tanggal=date('Y-m-d');
-
-        // $per=date('y').date('m');
-        $periode = "202006";
-        $per="2006";
-        $tanggal=date('Y-06-d');
+        
+        $tanggal=$request->tanggal;
+        $periode =substr($tanggal,0,4).substr($tanggal,5,2);
+        $per=substr($periode,2,2);
         $prefix=$kode_lokasi."-VDD".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");
@@ -768,13 +771,10 @@ class ApprovalController extends Controller
         $progress = "APP-DIRUT";
         
         $str_format="0000";
-        // $periode="date('Y').date('m')";
-        // $tanggal=date('Y-m-d');
-
-        // $per=date('y').date('m');
-        $periode = "202006";
-        $per="2006";
-        $tanggal=date('Y-06-d');
+       
+        $tanggal=$request->tanggal;
+        $periode =substr($tanggal,0,4).substr($tanggal,5,2);
+        $per=substr($periode,2,2);
         $prefix=$kode_lokasi."-VDD".$per.".";		
         
         $query = DB::connection('sqlsrvsju')->select("select right(isnull(max(no_ver),'".$prefix."0000'),".strlen($str_format).")+1 as id from sju_ver_m where no_ver like '$prefix%'");
