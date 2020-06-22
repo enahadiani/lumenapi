@@ -70,7 +70,8 @@ class RtrwController extends Controller
     
     public function getMenu(Request $request){
         $this->validate($request, [
-            'kode_menu' => 'required'
+            'kode_menu' => 'required',
+            'jenis_menu' => 'required',
         ]);
 
         try {
@@ -81,7 +82,7 @@ class RtrwController extends Controller
             }
 
             $kode_menu = $request->kode_menu;
-            $sql="select a.*,b.form  from menu a left join m_form b on a.kode_form=b.kode_form where kode_klp = '$kode_menu' and a.jenis_menu='tengah' order by kode_klp, rowindex ";
+            $sql="select a.*,b.form  from menu a left join m_form b on a.kode_form=b.kode_form where kode_klp = '$kode_menu' and a.jenis_menu='$request->jenis_menu' order by kode_klp, rowindex ";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -96,7 +97,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -132,7 +133,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -169,7 +170,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -207,7 +208,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -250,7 +251,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -283,7 +284,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -329,7 +330,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -390,7 +391,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -430,7 +431,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -493,7 +494,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -535,7 +536,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -594,7 +595,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -665,7 +666,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -725,7 +726,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -787,7 +788,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -850,7 +851,7 @@ class RtrwController extends Controller
                 $success['error_input'][0] = "Password lama salah ! Harap input password yang benar. ";
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -905,7 +906,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -957,7 +958,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -999,7 +1000,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1069,12 +1070,12 @@ class RtrwController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Kas berhasil disimpan. No Bukti: ".$id;
                 
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvrtrw')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kas gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -1139,7 +1140,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1215,12 +1216,12 @@ class RtrwController extends Controller
             $success['status'] = true;
             $success['message'] = "Pembayaran Iuran berhasil disimpan. No Bukti: ".$id;
                 
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvrtrw')->rollback();
             $success['status'] = false;
             $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -1285,7 +1286,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1383,12 +1384,12 @@ class RtrwController extends Controller
             $success['status'] = true;
             $success['message'] = "Pembayaran Iuran berhasil disimpan. No Bukti: ".$id." No Setor: ".$id_setor;
                 
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvrtrw')->rollback();
             $success['status'] = false;
             $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -1432,7 +1433,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1478,7 +1479,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1519,7 +1520,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1582,12 +1583,12 @@ class RtrwController extends Controller
             $success['status'] = true;
             $success['message'] = "Data setoran berhasil disimpan. No Bukti:".$id;
                 
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvrtrw')->rollback();
             $success['status'] = false;
             $success['message'] = "Data setoran gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
                 
     }
@@ -1632,7 +1633,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -1683,7 +1684,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
