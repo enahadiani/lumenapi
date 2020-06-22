@@ -22,7 +22,7 @@ class KeperluanController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select kode_perlu from rt_perlu where kode_perlu ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_perlu from rt_perlu where kode_perlu ='".$isi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
