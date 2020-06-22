@@ -556,7 +556,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -622,7 +622,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -691,7 +691,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -760,7 +760,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
