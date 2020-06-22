@@ -111,7 +111,7 @@ class PpController extends Controller
             
             if($this->isUnik($request->kode_pp,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into pp(kode_pp,kode_lokasi,nama) values (?, ?, ?)', array($request->kode_pp,$kode_lokasi,$request->nama));
+                $ins = DB::connection($this->sql)->insert('insert into pp(kode_pp,kode_lokasi,nama,level_spasi,rowindex) values (?, ?, ?, ?, ?)', array($request->kode_pp,$kode_lokasi,$request->nama,0,0));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
