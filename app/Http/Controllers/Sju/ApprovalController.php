@@ -556,9 +556,10 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
+            'tanggal' => 'required',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
-            'keterangan' => 'required',
+            'keterangan' => 'required'
         ]);
 
         if ($request->input('status') == "RETURN") {
@@ -621,9 +622,10 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
+            'tanggal' => 'required',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
-            'keterangan' => 'required',
+            'keterangan' => 'required'
         ]);
 
         if ($request->input('status') == "RETURN") {
@@ -689,9 +691,10 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
+            'tanggal' => 'required',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
-            'keterangan' => 'required',
+            'keterangan' => 'required'
         ]);
 
         if ($request->input('status') == "RETURN") {
@@ -757,9 +760,10 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
+            'tanggal' => 'required',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
-            'keterangan' => 'required',
+            'keterangan' => 'required'
         ]);
 
         if ($request->input('status') == "RETURN") {
