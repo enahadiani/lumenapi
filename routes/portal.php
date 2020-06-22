@@ -49,7 +49,7 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     //Master Blok
     $router->get('blok','Rtrw\BlokController@index');
     $router->post('blok','Rtrw\BlokController@store');
-    $router->post('blok-ubah','Rtrw\BlokController@update');
+    $router->put('blok','Rtrw\BlokController@update');
     $router->delete('blok','Rtrw\BlokController@destroy');
 
     //Master PP
