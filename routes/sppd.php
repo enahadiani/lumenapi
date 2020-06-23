@@ -24,16 +24,16 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     
-    $router->post('login', 'AuthController@loginYpt');
-    $router->get('hashPass', 'AuthController@hashPasswordYpt');
+    $router->post('login', 'AuthController@loginYptKug');
+    $router->get('hashPass', 'AuthController@hashPasswordYptKug');
 });
 
-$router->group(['middleware' => 'auth:ypt'], function () use ($router) {
+$router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
-    $router->get('profile', 'AdminYptController@profile');
-    $router->get('users/{id}', 'AdminYptController@singleUser');
-    $router->get('users', 'AdminYptController@allUsers');
-    $router->get('cekPayload', 'AdminYptController@cekPayload');
+    $router->get('profile', 'AdminYptKugController@profile');
+    $router->get('users/{id}', 'AdminYptKugController@singleUser');
+    $router->get('users', 'AdminYptKugController@allUsers');
+    $router->get('cekPayload', 'AdminYptKugController@cekPayload');
 
     $router->get('upload', 'UploadController@upload');
     $router->post('upload', 'UploadController@proses_upload');
