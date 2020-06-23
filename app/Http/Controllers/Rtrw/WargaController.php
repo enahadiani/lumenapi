@@ -147,7 +147,7 @@ class WargaController extends Controller
                 $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$request->kode_lokasi' and kode_blok ='$request->kode_blok' ");
                 $no_urut = intval($res[0]->nu)+1;
                 for($i=0; $i<count($request->nama);$i++){
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk));
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk));
                     $no_urut++;
                 }
             }
@@ -311,7 +311,7 @@ class WargaController extends Controller
                 $del3 = DB::connection($this->sql)->table('rt_warga_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 $no_urut = 1;
                 for($i=0; $i<count($request->nama);$i++){
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk));
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk));
                     $no_urut++;
                 }
             }
