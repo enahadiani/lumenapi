@@ -314,9 +314,6 @@ class SppdController extends Controller
                     $sts = false;						
                 }
                 else {
-
-                    
-
                     if ($datam[0]['total'] > $datam[0]['saldo_budget']) {   
                         $msg = "Transaksi tidak valid. Nilai transaksi melebihi saldo.";
                         $sts =false;						

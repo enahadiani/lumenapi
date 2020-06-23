@@ -834,4 +834,43 @@ class ApprovalController extends Controller
         }															
     }
 
+    public function getPeriodeAju(Request $request){
+
+        // $kode_lokasi= $request->input('kode_lokasi');
+        // $this->validate($request,[
+        //     'periode' => 'required'
+        // ]);
+        try {
+            
+            
+            if($data =  Auth::guard('sju')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select distinct periode from sju_pb_m where kode_lokasi='$kode_lokasi' ";
+
+            $aju = DB::connection('sqlsrvsju')->select($sql);
+            $aju = json_decode(json_encode($aju),true);
+            
+            if(count($aju) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $aju;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']= [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }

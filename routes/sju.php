@@ -122,5 +122,6 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
     $router->post('user_device','UserDeviceController@store');
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
+    $router->get('periode_aju', 'Sju\ApprovalController@getPeriodeAju');
     
 });
