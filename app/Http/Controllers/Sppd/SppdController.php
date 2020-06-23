@@ -386,7 +386,7 @@ class SppdController extends Controller
                             if(count($dataDok) > 0 ){
                                 for ($i=0;$i < count($dataDok);$i++){
                                   
-                                    $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi')";
+                                    $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
                                     $upload = DB::connection('sqlsrvypt')->insert($sql);
                                     $nu++;
                                 }	
