@@ -311,11 +311,11 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.kode_akun, b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
-            from sju_pb_j a 
-            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 					  
-            where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'";
+            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            from sju_pb_m a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
+            where a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') and a.no_pb='$no_aju'";
 
             $det = DB::connection('sqlsrvsju')->select($sql);
             $det = json_decode(json_encode($det),true);
