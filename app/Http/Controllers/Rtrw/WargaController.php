@@ -122,7 +122,7 @@ class WargaController extends Controller
             }else{
                 $no_bukti = "-";
             }
-            
+
             $arr_foto = array();
             $arr_nama = array();
             if($request->hasfile('foto'))
@@ -291,6 +291,7 @@ class WargaController extends Controller
                     }
                 }
 
+                $i=0;
                 foreach($request->file('foto') as $file)
                 {                
                     $nama_foto = uniqid()."_".$file->getClientOriginalName();
