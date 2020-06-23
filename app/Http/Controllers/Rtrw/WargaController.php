@@ -388,6 +388,8 @@ class WargaController extends Controller
             }
 
             $filter = "";
+            
+            $url = url('api/portal/storage');
             if(isset($request->no_rumah)){
                 if($request->no_rumah == "all" || $request->no_rumah == ""){
                     $filter .= "";
