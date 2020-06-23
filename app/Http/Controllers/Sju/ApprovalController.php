@@ -34,10 +34,10 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select case when no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_atasan,nilai_curr,due_date, progress 
-            from sju_pb_m 
-            where periode <='$request->periode' and kode_lokasi='$kode_lokasi' and progress='0' and no_atasan='-' 
-            and modul='PBPROSES' and no_kas='-' and nik_atasan='$nik' ";
+            $sql="select case when a.no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_atasan,a.nilai_curr,a.due_date, a.progress,b.nama as nama_pp 
+            from sju_pb_m a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.periode <='$request->periode' and a.kode_lokasi='$kode_lokasi' and a.progress='0' and a.no_atasan='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_atasan='$nik' ";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
@@ -80,9 +80,10 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select case when no_app1 ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_app1 as no_app,nilai_curr,due_date, 'APP-VP' as progress 
-            from sju_pb_m 
-            where periode <='$request->periode' and kode_lokasi='".$kode_lokasi."' and progress='2' and no_app1='-' and modul='PBPROSES' and no_kas='-' and nik_app1='".$nik."' ";
+            $sql="select case when a.no_app1 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app1 as no_app,a.nilai_curr,a.due_date, 'APP-VP' as progress,b.nama as nama_pp 
+            from sju_pb_m a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.periode <='$request->periode' and a.kode_lokasi='".$kode_lokasi."' and a.progress='2' and a.no_app1='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app1='".$nik."' ";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
@@ -125,9 +126,10 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select case when no_app2 ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_app2 as no_app,nilai_curr,due_date, 'APP-DIRKUG' as progress 
-            from sju_pb_m 
-            where periode <='$request->periode' and kode_lokasi='".$kode_lokasi."' and progress='3' and no_app2='-' and modul='PBPROSES' and no_kas='-' and nik_app2='".$nik."'			 
+            $aju = DB::connection('sqlsrvsju')->select("select case when a.no_app2 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app2 as no_app,a.nilai_curr,a.due_date, 'APP-DIRKUG' as progress,b.nama as nama_pp 
+            from sju_pb_m a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.periode <='$request->periode' and a.kode_lokasi='".$kode_lokasi."' and a.progress='3' and a.no_app2='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app2='".$nik."'			 
             ");
             $aju = json_decode(json_encode($aju),true);
             
@@ -169,9 +171,10 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select case when no_app3 ='-' then 'INPROG' else 'APPROVE' end as status, no_pb, convert(varchar,tanggal,103) as tgl,kode_pp,keterangan, nilai,kode_curr,kurs,no_app3 as no_app,nilai_curr,due_date, 'APP-DIRUT' as progress 
-            from sju_pb_m 
-            where periode <='$request->periode' and kode_lokasi='".$kode_lokasi."' and progress='4' and no_app3='-' and modul='PBPROSES' and no_kas='-' and nik_app3='".$nik."'			 
+            $aju = DB::connection('sqlsrvsju')->select("select case when a.no_app3 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app3 as no_app,a.nilai_curr,a.due_date, 'APP-DIRUT' as progress,b.nama as nama_pp 
+            from sju_pb_m a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.periode <='$request->periode' and a.kode_lokasi='".$kode_lokasi."' and a.progress='4' and a.no_app3='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app3='".$nik."'			 
             ");
             $aju = json_decode(json_encode($aju),true);
             
