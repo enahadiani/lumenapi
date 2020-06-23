@@ -122,7 +122,9 @@ class WargaController extends Controller
             }else{
                 $no_bukti = "-";
             }
-
+            
+            $arr_foto = array();
+            $arr_nama = array();
             if($request->hasfile('foto'))
             {
                 $i=0;
@@ -275,7 +277,8 @@ class WargaController extends Controller
             }
 
             $no_bukti = $request->no_bukti;
-
+            $arr_foto = array();
+            $arr_nama = array();
             if($request->hasfile('foto'))
             {
                 $res = DB::connection($this->sql)->select("select * from rt_warga_d where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
