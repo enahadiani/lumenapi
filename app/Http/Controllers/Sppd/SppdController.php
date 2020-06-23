@@ -379,6 +379,18 @@ class SppdController extends Controller
                             $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."')";
                             //$success['tmp7']=$sql;
                             $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
+
+                            //insert it_aju_dok
+                            $dataDok = $request->input("URL_DOK");
+                            $nu=1;
+                            if(count($dataDok) > 0 ){
+                                for ($i=0;$i < count($dataDok);$i++){
+                                  
+                                    $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi')";
+                                    $upload = DB::connection('sqlsrvypt')->insert($sql);
+                                    $nu++;
+                                }	
+                            }
                         } 
                     }
                 }
