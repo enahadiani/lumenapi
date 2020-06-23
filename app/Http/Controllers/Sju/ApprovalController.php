@@ -848,7 +848,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select distinct periode from sju_pb_m where kode_lokasi='$kode_lokasi' ";
+            $sql="select distinct periode from sju_pb_m where kode_lokasi='$kode_lokasi' order by periode desc";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
