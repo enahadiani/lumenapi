@@ -71,6 +71,40 @@ class PembayaranController extends Controller
         
     }
 
+    public function getKurs(Request $request)
+    {
+        $this->validate($request,[
+            'kode_curr' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select top 1 kurs from dgw_kurs where kd_curr = '".$request->kode_curr."' and kode_lokasi='".$kode_lokasi."' order by id DESC ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['kurs'] = $res[0]['kurs'];
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['kurs'] = 1;
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     public function getRegistrasi()
     {
         try {

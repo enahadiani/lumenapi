@@ -55,6 +55,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('pembayaran','Dago\PembayaranController@destroy');
     $router->get('pembayaran-rekbank','Dago\PembayaranController@getRekBank');
     $router->get('pembayaran-preview','Dago\PembayaranController@getPreview');
+    $router->get('pembayaran-kurs','Dago\PembayaranController@getKurs');
 
     //UploadDok
     $router->get('upload-dok','Dago\UploadDokController@index');
