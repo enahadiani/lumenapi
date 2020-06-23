@@ -34,7 +34,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select case when a.no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_atasan,a.nilai_curr,a.due_date, a.progress,b.nama as nama_pp,c.nama as nama_buat 
+            $sql="select case when a.no_atasan ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_atasan,a.nilai_curr,a.due_date, a.progress,b.nama as nama_pp,c.nama as nama_buat,a.modul 
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
@@ -81,7 +81,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select case when a.no_app1 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app1 as no_app,a.nilai_curr,a.due_date, 'APP-VP' as progress,b.nama as nama_pp,c.nama as nama_buat 
+            $sql="select case when a.no_app1 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app1 as no_app,a.nilai_curr,a.due_date, 'APP-VP' as progress,b.nama as nama_pp,c.nama as nama_buat,a.modul 
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
@@ -128,7 +128,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select case when a.no_app2 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app2 as no_app,a.nilai_curr,a.due_date, 'APP-DIRKUG' as progress,b.nama as nama_pp,c.nama as nama_buat 
+            $aju = DB::connection('sqlsrvsju')->select("select case when a.no_app2 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app2 as no_app,a.nilai_curr,a.due_date, 'APP-DIRKUG' as progress,b.nama as nama_pp,c.nama as nama_buat,a.modul 
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
@@ -174,7 +174,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrvsju')->select("select case when a.no_app3 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app3 as no_app,a.nilai_curr,a.due_date, 'APP-DIRUT' as progress,b.nama as nama_pp,c.nama as nama_buat 
+            $aju = DB::connection('sqlsrvsju')->select("select case when a.no_app3 ='-' then 'INPROG' else 'APPROVE' end as status, a.no_pb, convert(varchar,a.tanggal,103) as tgl,a.kode_pp,a.keterangan, a.nilai,a.kode_curr,a.kurs,a.no_app3 as no_app,a.nilai_curr,a.due_date, 'APP-DIRUT' as progress,b.nama as nama_pp,c.nama as nama_buat,a.modul 
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
@@ -575,7 +575,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required|date_format:Y-m-d',
+            'tanggal' => 'date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -588,8 +588,11 @@ class ApprovalController extends Controller
         }                    
         
         $str_format="0000";
-        
-        $tanggal=$request->tanggal;
+        if(isset($request->tanggal)){
+            $tanggal=$request->tanggal;
+        }else{
+            $tanggal=date('Y-m-d');
+        }
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
         $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-AAT".$per.".";		
@@ -642,7 +645,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required|date_format:Y-m-d',
+            'tanggal' => 'date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -655,10 +658,13 @@ class ApprovalController extends Controller
         }	
 
         $progress = "APP-VP";
-        
         $str_format="0000";
         
-        $tanggal=$request->tanggal;
+        if(isset($request->tanggal)){
+            $tanggal=$request->tanggal;
+        }else{
+            $tanggal=date('Y-m-d');
+        }
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
         $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-VDD".$per.".";		
@@ -712,7 +718,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required|date_format:Y-m-d',
+            'tanggal' => 'date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -728,7 +734,11 @@ class ApprovalController extends Controller
         
         $str_format="0000";
         
-        $tanggal=$request->tanggal;
+        if(isset($request->tanggal)){
+            $tanggal=$request->tanggal;
+        }else{
+            $tanggal=date('Y-m-d');
+        }
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
         $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-VDD".$per.".";		
@@ -782,7 +792,7 @@ class ApprovalController extends Controller
         }
 
         $this->validate($request, [
-            'tanggal' => 'required|date_format:Y-m-d',
+            'tanggal' => 'date_format:Y-m-d',
             'status' => 'required|in:APPROVE,RETURN',
             'no_aju' => 'required',
             'keterangan' => 'required'
@@ -798,7 +808,11 @@ class ApprovalController extends Controller
         
         $str_format="0000";
        
-        $tanggal=$request->tanggal;
+        if(isset($request->tanggal)){
+            $tanggal=$request->tanggal;
+        }else{
+            $tanggal=date('Y-m-d');
+        }
         $periode =substr($tanggal,0,4).substr($tanggal,5,2);
         $per=substr($periode,2,4);
         $prefix=$kode_lokasi."-VDD".$per.".";		
