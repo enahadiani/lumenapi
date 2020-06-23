@@ -430,7 +430,8 @@ class SppdController extends Controller
             $del4 = DB::connection('sqlsrvypt')->table('angg_r')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
             $del5 = DB::connection('sqlsrvypt')->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_spj','like' ,$no_agenda.'-%')->delete();
             $del6 = DB::connection('sqlsrvypt')->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_spj','like' ,$no_agenda.'-%')->delete();
-            $del4 = DB::connection('sqlsrvypt')->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
+            $del7 = DB::connection('sqlsrvypt')->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
+            $del8 = DB::connection('sqlsrvypt')->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
 
             DB::connection('sqlsrvypt')->commit();
             $success['no_agenda']=$no_agenda;
