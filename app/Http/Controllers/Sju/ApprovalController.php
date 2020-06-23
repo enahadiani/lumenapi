@@ -447,12 +447,14 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.kode_akun, b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
-            from sju_pb_j a 
-            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 					  
-            where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'";
-
+            $sql="
+			select a.no_ver as no_app,convert(varchar,a.tanggal,103) as tgl,c.catatan,a.nik_user,b.nama,a.modul,
+                            case when a.status in ('A','P','K','U') then 'reject' else 'approve' end as status,a.tgl_input
+                    from sju_ver_m a
+                    inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+                    inner join sju_ver_d c on a.no_ver=c.no_ver and a.kode_lokasi=c.kode_lokasi 
+                    where c.no_bukti='$no_aju' 
+					order by a.status";
            
             $det = DB::connection('sqlsrvsju')->select($sql);
             $det = json_decode(json_encode($det),true);
