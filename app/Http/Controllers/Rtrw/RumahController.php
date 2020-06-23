@@ -44,9 +44,9 @@ class RumahController extends Controller
             }
 
             $filter = "";
-            if(isset($request->kode_blok)){
-                if($request->kode_blok != "" || $request->kode_blok != "all"){
-                    $filter .= " and a.kode_blok='$request->kode_blok' ";
+            if(isset($request->blok)){
+                if($request->blok != "" || $request->blok != "all"){
+                    $filter .= " and a.blok='$request->blok' ";
                 }else{
                     $filter .= "";
                 }
