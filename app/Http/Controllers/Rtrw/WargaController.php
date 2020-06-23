@@ -374,4 +374,67 @@ class WargaController extends Controller
             return response()->json($success, $this->successStatus); 
         }	
     }
+
+    public function getDetailWarga(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->id_satpam;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->no_rumah)){
+                if($request->no_rumah == "all" || $request->no_rumah == ""){
+                    $filter .= "";
+                }else{
+                    $filter .= " and no_rumah='$request->no_rumah' ";
+                }
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->no_bukti)){
+                if($request->no_bukti == "all" || $request->no_bukti == ""){
+                    $filter .= "";
+                }else{
+                    $filter .= " and no_bukti='$request->no_bukti' ";
+                }
+            }else{
+                $filter .= "";
+            }
+
+            $sql= "select distinct no_bukti,tgl_masuk,sts_masuk,kode_blok,no_rumah from rt_warga_d where kode_lokasi='$kode_lokasi' $filter ";
+            
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2= "select a.no_urut,a.nama,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk as jk,a.kode_agama as agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter  ";
+            
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }
