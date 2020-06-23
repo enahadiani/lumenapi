@@ -43,10 +43,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->group(['middleware' => 'auth:sju'], function () use ($router) {
 
-    $router->get('profile', 'UserController@profile');
-    $router->get('users/{id}', 'UserController@singleUser');
-    $router->get('users', 'UserController@allUsers');
-    $router->get('cekPayload', 'UserController@cekPayload');
+    $router->get('profile', 'AdminSjuController@profile');
+    $router->get('users/{id}', 'AdminSjuController@singleUser');
+    $router->get('users', 'AdminSjuController@allUsers');
+    $router->get('cekPayload', 'AdminSjuController@cekPayload');
 
     $router->get('aju', function (Request $request) {
         if($data =  Auth::guard('sju')->user()){
