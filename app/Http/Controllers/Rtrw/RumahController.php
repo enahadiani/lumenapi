@@ -43,17 +43,28 @@ class RumahController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_rumah)){
-                if($request->kode_rumah == "all"){
-                    $filter = "";
+            $filter = "";
+            if(isset($request->kode_blok)){
+                if($request->kode_blok != "" || $request->kode_blok != "all"){
+                    $filter .= " and a.kode_blok='$request->kode_blok' ";
                 }else{
-                    $filter = " and a.kode_rumah='$request->kode_rumah' ";
+                    $filter .= "";
                 }
-                $sql= "select a.kode_rumah,a.kode_lokasi,a.rt,a.rw,a.blok,a.status_huni from rt_rumah a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select a.kode_rumah,a.kode_lokasi,a.rt,a.rw,a.blok,a.status_huni from rt_rumah a where a.kode_lokasi= '".$kode_lokasi."'";
+                $filter .= "";
             }
 
+            if(isset($request->kode_rumah)){
+                if($request->kode_rumah != "" || $request->kode_rumah != "all"){
+                    $filter .= "";
+                }else{
+                    $filter .= " and a.kode_rumah='$request->kode_rumah' ";
+                }
+            }else{
+                $filter .= "";
+            }
+            
+            $sql= "select a.kode_rumah,a.kode_lokasi,a.rt,a.rw,a.blok,a.status_huni from rt_rumah a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             

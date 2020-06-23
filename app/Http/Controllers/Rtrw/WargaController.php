@@ -20,17 +20,6 @@ class WargaController extends Controller
     public $sql = 'sqlsrvrtrw';
     public $guard = 'rtrw';
     public $guard2 = 'satpam';
-
-    // public function isUnik($isi,$no_rumah,$kode_lokasi){
-        
-    //     $auth = DB::connection($this->sql)->select("select no_rumah,no_urut,nik from rt_warga_d where nik ='".$isi."' and kode_lokasi='".$kode_lokasi."' and no_rumah='$no_rumah' ");
-    //     $auth = json_decode(json_encode($auth),true);
-    //     if(count($auth) > 0){
-    //         return false;
-    //     }else{
-    //         return true;
-    //     }
-    // }
     
     public function index(Request $request)
     {
@@ -45,23 +34,18 @@ class WargaController extends Controller
             }
 
             $filter = "";
-            $url = url('api/portal/storage');
             if(isset($request->no_rumah)){
-                if($request->no_rumah == "all"){
+                if($request->no_rumah == "all" || $request->no_rumah == ""){
                     $filter .= "";
                 }else{
-                    $filter .= " and a.no_rumah='$request->no_rumah' ";
+                    $filter .= " and no_rumah='$request->no_rumah' ";
                 }
-                if(isset($request->nik) && $request->nik != "all"){
-                    $filter .= " and a.nik='$request->nik' ";
-                }else{
-                    $filter .= "";
-                }
-                $sql= "select a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama from rt_warga_d a where a.kode_lokasi= '".$kode_lokasi."'";
+                $filter .= "";
             }
 
+            $sql= "select distinct no_bukti,tgl_masuk,sts_masuk,kode_blok,no_rumah from rt_warga_d where kode_lokasi='$kode_lokasi' $filter ";
+            
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -73,7 +57,6 @@ class WargaController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['sql'] = $sql;
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -185,9 +168,61 @@ class WargaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->id_satpam;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            $url = url('api/portal/storage');
+            if(isset($request->no_rumah)){
+                if($request->no_rumah == "all" || $request->no_rumah == ""){
+                    $filter .= "";
+                }else{
+                    $filter .= " and a.no_rumah='$request->no_rumah' ";
+                }
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->nik)){
+                if($request->nik != "" || $request->nik != "all"){
+                    $filter .= " and a.nik='$request->nik' ";
+                }else{
+                    $filter .= "";
+                }
+            }else{
+                $filter .= "";
+            }
+
+            $sql= "select a.kode_pp,a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
     /**

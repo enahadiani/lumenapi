@@ -113,7 +113,8 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->delete('rumah','Rtrw\RumahController@destroy');
 
     //Master Warga
-    $router->get('warga','Rtrw\WargaController@index');
+    $router->get('warga-list','Rtrw\WargaController@index');
+    $router->get('warga','Rtrw\WargaController@show');
     $router->post('warga','Rtrw\WargaController@store');
     $router->post('warga-ubah','Rtrw\WargaController@update');
     $router->delete('warga','Rtrw\WargaController@destroy'); 
