@@ -329,6 +329,45 @@ class WargaController extends Controller
         }		
     }
 
+    public function updatePerUser(Request $request)
+    {
+        $this->validate($request, [
+            'rt' => 'required',
+            'blok' => 'required',
+            'no_rumah' => 'required',
+            'nama' => 'required',
+            'nik' => 'required',
+            'no_hp' => 'required',
+            'foto.*' => 'file|image|mimes:jpeg,png,jpg|max:2048',
+            'jenis_kelamin' => 'required',
+            'agama' => 'required'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->id_satpam;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            //
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Warga berhasil diubah";
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Warga gagal diubah ".$e;
+            return response()->json($success, $this->successStatus); 
+        }		
+    }
+
     /**
      * Remove the specified resource from storage.
      *

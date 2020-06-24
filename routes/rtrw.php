@@ -119,7 +119,15 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('warga-ubah','Rtrw\WargaController@update');
     $router->delete('warga','Rtrw\WargaController@destroy'); 
 
-    // Midtrans Test
+    //Master Masakun
+    $router->get('masakun','Rtrw\MasakunController@index');
+    $router->get('masakun-detail','Rtrw\MasakunController@show');
+    $router->post('masakun','Rtrw\MasakunController@store');
+    $router->put('masakun','Rtrw\MasakunController@update');
+    $router->delete('masakun','Rtrw\MasakunController@destroy');
+    $router->get('masakun-curr','Rtrw\MasakunController@getCurrency');
+    $router->get('masakun-modul','Rtrw\MasakunController@getModul');
+
 });
 
 // $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
