@@ -183,7 +183,7 @@ class TamuController extends Controller
 
             $success['status'] = true;
             $success['message'] = "Data Tamu Masuk berhasil disimpan";
-            $success['qrcode'] = url("portal/storage/").$output_file;
+            $success['qrcode'] = url("api/portal/storage")."/".$output_file;
             $success['no_tamu'] = $no_bukti;
             $success['no_urut'] = $id_tamu; 
 
