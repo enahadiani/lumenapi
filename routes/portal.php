@@ -32,6 +32,14 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('s3')->response('rtrw/'.$filename); 
 });
 
+$router->get('storage2/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('rtrw/'.$filename)) {
+        abort(404);
+    }
+    return Storage::disk('s3')->url('rtrw/'.$filename); 
+});
+
 $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     $router->get('logout', 'AuthController@logoutSatpam');
     $router->get('profile', 'AdminSatpamController@profile');
@@ -92,12 +100,22 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
 
 });
 
-// $router->get('qrcode', function () {
-//     $image = QrCode::size(300)->generate('Hello Ena!');
-//     $output_file = 'qr-code-' . uniqid() . '.png';
-//     Storage::disk('s3')->put('rtrw/'.$output_file, $image);
-//     return url("api/portal/storage/").$output_file;
-// });
+$router->get('qrcode', function () {
+    // $image = QrCode::size(300)->generate('Hello Ena!');
+    $output_file = 'qr-code-' . uniqid() . '.png';
+    // // Storage::disk('s3')->put('rtrw/'.$output_file, $image);
+    // // return url("api/portal/storage/").$output_file;
+    // return response($image)->header('Content-type','image/png');
+    // $image = QrCode::size(250)
+    //     ->backgroundColor(255, 255, 204)
+    //     ->generate('MyNotePaper');
+    $image = QrCode::format('png')
+                        //  ->merge('uploads/1586243456_Winter.jpg', 0.5, true)
+                         ->size(300)->errorCorrection('H')
+                         ->generate('A simple example of QR code!');
+    Storage::disk('local')->put('qr-code/'.$output_file, $image);
+    return response($image)->header('Content-type','image/png');
+});
 
 
 ?>

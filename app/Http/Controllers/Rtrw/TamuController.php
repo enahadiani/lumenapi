@@ -164,7 +164,10 @@ class TamuController extends Controller
                 $foto="-";
             }
 
-            $image = QrCode::size(300)->generate($no_bukti);
+            // $image = QrCode::size(300)->generate($no_bukti);
+            $image = QrCode::format('png')
+                            ->size(300)->errorCorrection('H')
+                            ->generate($no_bukti);
             $output_file = 'tamuqr-' .uniqid(). '.png';
             Storage::disk('s3')->put('rtrw/'.$output_file, $image);
 

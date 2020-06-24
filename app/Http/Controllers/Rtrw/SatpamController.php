@@ -99,7 +99,10 @@ class SatpamController extends Controller
             foreach($get as $row){
                 if($row->qrcode == "" || $row->qrcode == "-"){
 
-                    $image = QrCode::size(300)->generate($row->id_satpam);
+                    // $image = QrCode::size(300)->generate($row->id_satpam);
+                    $image = QrCode::format('png')
+                            ->size(300)->errorCorrection('H')
+                            ->generate($row->id_satpam);
                     $output_file = 'qrcode-' .uniqid(). '.png';
                     Storage::disk('s3')->put('rtrw/'.$output_file, $image);
                     $update = AdminSatpam::where('id_satpam',$row->id_satpam)
@@ -165,7 +168,10 @@ class SatpamController extends Controller
                     $foto="-";
                 }
 
-                $image = QrCode::size(300)->generate($request->id_satpam);
+                // $image = QrCode::size(300)->generate($request->id_satpam);
+                $image = QrCode::format('png')
+                            ->size(300)->errorCorrection('H')
+                            ->generate($row->id_satpam);
                 $output_file = 'qrcode-' .uniqid(). '.png';
                 Storage::disk('s3')->put('rtrw/'.$output_file, $image);
                 $req = array(
