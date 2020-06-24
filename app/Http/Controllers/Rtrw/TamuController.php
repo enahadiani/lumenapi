@@ -66,9 +66,9 @@ class TamuController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.no_tamu,a.id_tamu,a.nama,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,DATEDIFF(second,a.tgljam_in,a.tgljam_out) as selisih
-            from rt_tamu_m a
-            inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
+            $sql = "select a.no_tamu,a.id_tamu,b.nama,b.nik,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,case when isnull(convert(varchar,a.tgljam_out,103),'-') = '-' then '-' else DATEDIFF(second,a.tgljam_in,a.tgljam_out) end as selisih
+                        from rt_tamu_m a
+                        inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi= '".$kode_lokasi."'";
 
             $rs = DB::connection($this->sql)->select($sql);
