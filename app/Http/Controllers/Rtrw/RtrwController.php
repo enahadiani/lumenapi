@@ -153,7 +153,7 @@ class RtrwController extends Controller
             $sql="select distinct a.tahun from (select (substring(a.periode,1,4)) as tahun 
             from gldt a 
             inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201') 
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201','11202') 
                 ) a
             order by a.tahun desc ";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
@@ -191,7 +191,7 @@ class RtrwController extends Controller
             from (select  a.periode 
             from gldt a 
             inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201') 
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201','11202')
             ) a
             order by (substring(a.periode,5,2)) desc  ";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
@@ -353,7 +353,7 @@ class RtrwController extends Controller
             // sql penerimaan
             $sql="select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'D' then nilai else -nilai end) as total
             from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201') and b.jenis ='PENERIMAAN'
+            where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENERIMAAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
@@ -362,14 +362,14 @@ class RtrwController extends Controller
             // sql pengeluaran 
             $sql2 = "select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'C' then nilai else -nilai end) as total
             from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201') and b.jenis ='PENGELUARAN'
+            where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENGELUARAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
             $res2 = DB::connection('sqlsrvrtrw')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             // sql saldo
-            $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201')
+            $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202')
             ";
             
             $res3 = DB::connection('sqlsrvrtrw')->select($sql2);
@@ -415,7 +415,7 @@ class RtrwController extends Controller
             $kode_drk = $request->kode_drk;
 
             $sql="select convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
-            from gldt where kode_akun in ('11101','11201') and kode_lokasi='$kode_lokasi' and kode_drk ='$kode_drk' and periode like '$tahun%'
+            from gldt where kode_akun in ('11101','11201','11202') and kode_lokasi='$kode_lokasi' and kode_drk ='$kode_drk' and periode like '$tahun%'
             order by tgl_input desc";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -456,7 +456,7 @@ class RtrwController extends Controller
             // sql penerimaan
             $sql="select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'D' then nilai else -nilai end) as total
             from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201') and b.jenis ='PENERIMAAN'
+            where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENERIMAAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
@@ -465,14 +465,14 @@ class RtrwController extends Controller
             // sql pengeluaran 
             $sql2 = "select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'C' then nilai else -nilai end) as total
             from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201') and b.jenis ='PENGELUARAN'
+            where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENGELUARAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
             $res2 = DB::connection('sqlsrvrtrw')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             // sql saldo
-            $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201')
+            $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202')
             ";
             
             $res3 = DB::connection('sqlsrvrtrw')->select($sql2);
@@ -520,7 +520,7 @@ class RtrwController extends Controller
             $bulan = $request->bulan;
 
             $sql="select convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
-            from gldt where kode_akun in ('11101','11201') and kode_lokasi='$kode_lokasi' and kode_drk ='$kode_drk' and substring(periode,1,4) = '$tahun' and substring(periode,5,2) = '$bulan'
+            from gldt where kode_akun in ('11101','11201','11202') and kode_lokasi='$kode_lokasi' and kode_drk ='$kode_drk' and substring(periode,1,4) = '$tahun' and substring(periode,5,2) = '$bulan'
             order by tgl_input desc";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -765,12 +765,15 @@ class RtrwController extends Controller
             when substring(a.periode,5,2) = '10' then 'OKT'
             when substring(a.periode,5,2) = '11' then 'NOV'
             when substring(a.periode,5,2) = '12' then 'DES'
-            end as periode,(a.nilai_rt+a.nilai_rw) as bill,isnull(b.bayar,0) as bayar
+            end as periode,(a.nilai_rt+a.nilai_rw) as bill,isnull(b.bayar,0) as bayar,isnull(b.tanggal,'-') as tanggal
             from rt_bill_d a 
             left join (
-                select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt+nilai_rw) as bayar
-                from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and periode_bill like '$tahun%' and kode_jenis='IWAJIB' group by periode_bill,kode_lokasi,kode_rumah
-                ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
+                select a.periode_bill,a.kode_lokasi,a.kode_rumah,convert(varchar,b.tanggal,103) as tanggal,sum(a.nilai_rt+a.nilai_rw) as bayar
+                from rt_angs_d a 
+                inner join trans_m b on a.no_angs=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode_bill like '$tahun%' and a.kode_jenis='IWAJIB' 
+                group by a.periode_bill,a.kode_lokasi,a.kode_rumah,b.tanggal
+            ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
             where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode like '$tahun%' and a.kode_jenis='IWAJIB'
             order by a.periode";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
@@ -1408,16 +1411,16 @@ class RtrwController extends Controller
             
             $kode_rumah = $request->kode_rumah;
 
-            $sql="
-            select a.periode,a.nilai_rt,a.nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,isnull(b.bayar,0) as bayar
+            $sql="select a.periode,a.nilai_rt-isnull(b.nilai_rt,0) as nilai_rt,a.nilai_rw-isnull(b.nilai_rw,0) as nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,a.nilai_rt+a.nilai_rw - (isnull(b.nilai_rt+b.nilai_rw,0)) as bayar
             from rt_bill_d a 
             left join (
-            select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt+nilai_rw) as bayar
-            from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' group by periode_bill,kode_lokasi,kode_rumah
+                select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt) as nilai_rt,sum(nilai_rw) as nilai_rw,sum(nilai_rt+nilai_rw) as bayar
+                from rt_angs_d 
+                where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' 
+                group by periode_bill,kode_lokasi,kode_rumah
             ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
             where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0
-            order by a.periode
-            ";
+            order by a.periode";
             
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1454,16 +1457,16 @@ class RtrwController extends Controller
             
             $kode_rumah = $request->kode_rumah;
 
-            $sql="
-            select a.periode,a.nilai_rt,a.nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,isnull(b.bayar,0) as bayar
+            $sql="select a.periode,a.nilai_rt-isnull(b.nilai_rt,0) as nilai_rt,a.nilai_rw-isnull(b.nilai_rw,0) as nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,a.nilai_rt+a.nilai_rw - (isnull(b.nilai_rt+b.nilai_rw,0)) as bayar 
             from rt_bill_d a 
             left join (
-            select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt+nilai_rw) as bayar
-            from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' group by periode_bill,kode_lokasi,kode_rumah
+                select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt) as nilai_rt,sum(nilai_rw) as nilai_rw,sum(nilai_rt+nilai_rw) as bayar
+                from rt_angs_d 
+                where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' 
+                group by periode_bill,kode_lokasi,kode_rumah
             ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
             where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0
-            order by a.periode
-            ";
+            order by a.periode";
             
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
