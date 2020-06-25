@@ -128,6 +128,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('masakun-curr','Rtrw\MasakunController@getCurrency');
     $router->get('masakun-modul','Rtrw\MasakunController@getModul');
 
+    //Master Relakun
+    $router->get('relakun-pp','Rtrw\RelakunPpController@index');
+    $router->get('relakun-pp-detail','Rtrw\RelakunPpController@show');
+    $router->post('relakun-pp','Rtrw\RelakunPpController@store');
+    $router->put('relakun-pp','Rtrw\RelakunPpController@update');
+    $router->delete('relakun-pp','Rtrw\RelakunPpController@destroy');
+
 });
 
 // $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
