@@ -92,6 +92,12 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('jadwal','Dago\JadwalController@index');
     $router->get('jadwal-detail','Dago\JadwalController@show');
     $router->put('jadwal','Dago\JadwalController@update');
+
+    //Kurs
+    $router->get('kurs','Dago\KursController@index');
+    $router->post('kurs','Dago\KursController@store');
+    $router->put('kurs','Dago\KursController@update');
+    $router->delete('kurs','Dago\KursController@destroy');
 });
 
 
