@@ -20,6 +20,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
     $router->post('login', 'AuthController@loginAdmin');
     $router->get('hash_pass', 'AuthController@hashPasswordAdmin');
+    $router->get('hash_by_nik','AuthController@hashPasswordByNIK');
 });
 
 $router->get('storage/{filename}', function ($filename)
