@@ -116,18 +116,18 @@ class AdminController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json($success, $this->successStatus);     
+                return response()->json($success, 200);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = false;
-                return response()->json($success, $this->successStatus);
+                return response()->json($success, 200);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json($success, 200);
         }
     }
 
@@ -152,20 +152,20 @@ class AdminController extends Controller
                 DB::connection('sqlsrv2')->commit();
                 $success['status'] = true;
                 $success['message'] = "Password berhasil diubah";
-                return response()->json($success, $this->successStatus);     
+                return response()->json($success, 200);     
             }
             else{
                 DB::connection('sqlsrv2')->rollback();
                 $success['status'] = false;
                 $success['message'] = "Password gagal diubah";
-                return response()->json($success, $this->successStatus);
+                return response()->json($success, 200);
             }
         } catch (\Throwable $e) {
             
             DB::connection('sqlsrv2')->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json($success, 200);
         }
     }
 
