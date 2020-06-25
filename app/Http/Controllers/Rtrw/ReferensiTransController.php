@@ -31,7 +31,8 @@ class ReferensiTransController extends Controller
     }
 
     public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query =DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $len = strlen($str_format)+1;
+        $query =DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%' and LEN($kolom_acuan) = $len ");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -58,8 +59,7 @@ class ReferensiTransController extends Controller
             }else{
                 $vKode = "T";
             }
-            $kode = $this->generateKode('trans_ref','kode_ref',$vKode,"001");
-            
+            $kode = $this->generateKode("trans_ref","kode_ref",$vKode,"001");
             $success['status'] = true;
             $success['kode'] = $kode;
             $success['message'] = "Success!";
