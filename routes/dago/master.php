@@ -15,6 +15,14 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('dago/'.$filename)) {
+        abort(404);
+    }
+    return Storage::disk('s3')->response('dago/'.$filename); 
+});
+
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Pekerjaan
     $router->get('pekerjaan','Dago\PekerjaanController@index');

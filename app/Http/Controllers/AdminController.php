@@ -97,6 +97,78 @@ class AdminController extends Controller
         }
     }
 
+    public function getProfile(){
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $url = url('api/dago-master/storage');
+
+            $sql="select a.no_peserta,a.nama,a.jk,a.status,a.alamat,a.email,a.telp,a.hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.tempat,a.tgl_lahir
+			from dgw_peserta a where a.no_peserta='$nik' and a.kode_lokasi='$kode_lokasi'";
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function updatePassword(Request $request){
+        $this->validate($request,[
+            'password' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            DB::connection('sqlsrv2')->beginTransaction();
+
+            $upd =  DB::connection('sqlsrv2')->table('hakakses')
+            ->where('nik', $nik)
+            ->update(['password' => app('hash')->make($request->password)]);
+            
+            if($upd){ //mengecek apakah data kosong atau tidak
+                DB::connection('sqlsrv2')->commit();
+                $success['status'] = true;
+                $success['message'] = "Password berhasil diubah";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                DB::connection('sqlsrv2')->rollback();
+                $success['status'] = false;
+                $success['message'] = "Password gagal diubah";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     /**
      * Get all User.
      *
