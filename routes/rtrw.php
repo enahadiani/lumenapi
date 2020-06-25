@@ -142,6 +142,20 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->put('reftrans','Rtrw\ReferensiTransController@update');
     $router->delete('reftrans','Rtrw\ReferensiTransController@destroy');
 
+    //Generate Iuran
+    $router->get('generate-iuran','Rtrw\ReferensiTransController@index');
+    $router->post('generate-iuran','Rtrw\ReferensiTransController@store');
+    $router->get('jenis-iuran','Rtrw\ReferensiTransController@getJenis');
+    $router->get('pp-login','Rtrw\ReferensiTransController@getPPLogin');
+    $router->get('generate-detail','Rtrw\ReferensiTransController@getDetail');
+    
+    //Setting saldo awal
+    $router->get('setting-saldo-awal','Rtrw\SettingSaldoController@index');
+    $router->get('setting-saldo-awal-detail','Rtrw\SettingSaldoController@show');
+    $router->post('setting-saldo-awal','Rtrw\SettingSaldoController@store');
+    $router->put('setting-saldo-awal','Rtrw\SettingSaldoController@update');
+    $router->delete('setting-saldo-awal','Rtrw\SettingSaldoController@destroy');
+
 });
 
 // $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
