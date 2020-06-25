@@ -331,6 +331,7 @@ class WargaController extends Controller
 
     public function updatePerUser(Request $request)
     {
+        //select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif,foto,qrcode   
         $this->validate($request, [
             'rt' => 'required',
             'blok' => 'required',
@@ -338,12 +339,10 @@ class WargaController extends Controller
             'nama' => 'required',
             'nik' => 'required',
             'no_hp' => 'required',
-            'foto.*' => 'file|image|mimes:jpeg,png,jpg|max:2048',
             'jenis_kelamin' => 'required',
-            'agama' => 'required'
+            'agama' => 'required',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
-
-        DB::connection($this->sql)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -353,19 +352,55 @@ class WargaController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            //
-            DB::connection($this->sql)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Warga berhasil diubah";
+           
+            $res = DB::connection($this->sql)->select("select foto from rt_warga_d where nik='$request->nik' and kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' ");
+            $foto = $res[0]->foto;
             
+            if($request->hasfile('foto')){
+                if($foto != "" || $foto != "-"){
+                    Storage::disk('s3')->delete('rtrw/'.$foto);
+                }
+                
+                $file = $request->file('foto');
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('rtrw/'.$foto)){
+                    Storage::disk('s3')->delete('rtrw/'.$foto);
+                }
+                Storage::disk('s3')->put('rtrw/'.$foto,file_get_contents($file));
+                
+            }
+
+            $update = DB::connection($this->sql)->table('rt_warga_d')
+            ->where('nik',$request->nik)
+            // ->where('no_hp',$request->no_hp)
+            ->where('kode_lokasi',$kode_lokasi)
+            ->where('no_rumah',$request->no_rumah)
+            ->update([
+                'kode_pp' => $request->rt,
+                'kode_blok' => $request->blok,
+                'no_rumah' => $request->no_rumah,
+                'nama' => $request->nama,
+                'nik' => $request->nik,
+                'no_hp' => $request->no_hp,
+                'kode_jk' => $request->jenis_kelamin,
+                'kode_agama' => $request->agama,
+                'foto' => $foto
+            ]);
+            
+            if($update){
+                $success['status'] = true;
+                $success['message'] = "Data Satpam berhasil diubah";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data Satpam gagal diubah";
+            }
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Warga gagal diubah ".$e;
+            $success['message'] = "Data Satpam gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
-        }		
+        }	
     }
 
     /**

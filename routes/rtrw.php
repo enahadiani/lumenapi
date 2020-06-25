@@ -117,6 +117,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('warga-detail','Rtrw\WargaController@getDetailWarga');
     $router->post('warga','Rtrw\WargaController@store');
     $router->post('warga-ubah','Rtrw\WargaController@update');
+    $router->post('warga-ubah-user','Rtrw\WargaController@updatePerUser');
     $router->delete('warga','Rtrw\WargaController@destroy'); 
 
     //Master Masakun
