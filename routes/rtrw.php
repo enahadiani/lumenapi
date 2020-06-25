@@ -135,6 +135,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->put('relakun-pp','Rtrw\RelakunPpController@update');
     $router->delete('relakun-pp','Rtrw\RelakunPpController@destroy');
 
+    //Master Ref Trans
+    $router->get('reftrans','Rtrw\ReferensiTransController@index');
+    $router->get('reftrans-detail','Rtrw\ReferensiTransController@show');
+    $router->post('reftrans','Rtrw\ReferensiTransController@store');
+    $router->put('reftrans','Rtrw\ReferensiTransController@update');
+    $router->delete('reftrans','Rtrw\ReferensiTransController@destroy');
+
 });
 
 // $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
