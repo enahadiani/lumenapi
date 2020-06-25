@@ -30,6 +30,48 @@ class ReferensiTransController extends Controller
         }
     }
 
+    public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query =DB::connection('sqlsrvypt')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
+    public function generateKodeByJenis(Request $request)
+    {
+        $this->validate($request,[
+            'jenis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->id_satpam;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+           
+            if ($request->jenis == "PENGELUARAN") {
+                $vKode = "K";
+            }else{
+                $vKode = "T";
+            }
+            $kode = $this->generateKode('trans_ref','kode_ref',$vKode,"001");
+            
+            $success['status'] = true;
+            $success['kode'] = $kode;
+            $success['message'] = "Success!";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['kode'] = "-";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }	
     public function index(Request $request)
     {
         try {

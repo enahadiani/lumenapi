@@ -137,6 +137,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->delete('relakun-pp','Rtrw\RelakunPpController@destroy');
 
     //Master Ref Trans
+    $router->get('reftrans-kode','Rtrw\ReferensiTransController@generateKodeByJenis');
     $router->get('reftrans','Rtrw\ReferensiTransController@index');
     $router->get('reftrans-detail','Rtrw\ReferensiTransController@show');
     $router->post('reftrans','Rtrw\ReferensiTransController@store');
