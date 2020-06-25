@@ -31,7 +31,7 @@ class ReferensiTransController extends Controller
     }
 
     public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query =DB::connection('sqlsrvypt')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query =DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
