@@ -411,7 +411,7 @@ class ApprovalController extends Controller
 
             $sql="select b.kode_jenis,b.nama,a.no_gambar 
             from pbh_dok a 
-            inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
+            inner join dok_jenis_pb b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
             where a.no_bukti = '$no_aju' and a.kode_lokasi='$kode_lokasi' 
             order by a.nu ";
           
@@ -493,17 +493,17 @@ class ApprovalController extends Controller
             }
 
             $sql="";
-            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.cabang,a.no_rek,a.nama_rek,a.bruto,a.pajak
-            from spm_rek a
+            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek
+            from sju_pb_rek a
             where a.no_bukti ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
             ");
             $rek = json_decode(json_encode($rek),true);
             
             if(count($rek) > 0){ //mengecek apakah data kosong atau tidak
-                for($i=0;$i<count($rek);$i++){
-                    $rek[$i]["bruto"] = number_format($rek[$i]["bruto"],0,",","."); 
-                    $rek[$i]["pajak"] = number_format($rek[$i]["pajak"],0,",","."); 
-                }
+                // for($i=0;$i<count($rek);$i++){
+                //     $rek[$i]["bruto"] = number_format($rek[$i]["bruto"],0,",","."); 
+                //     $rek[$i]["pajak"] = number_format($rek[$i]["pajak"],0,",","."); 
+                // }
                 $success['status'] = true;
                 $success['data'] = $rek;
                 $success['message'] = "Success!";
