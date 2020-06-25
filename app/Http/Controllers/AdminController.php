@@ -114,7 +114,7 @@ class AdminController extends Controller
             $upd =  DB::connection('sqlsrv2')->table('hakakses')
             ->where('nik', $nik)
             ->where('pass', $request->password_lama)
-            ->update(['pass' => $request->password_lama, 'password' => app('hash')->make($request->password_baru)]);
+            ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
             
             if($upd){ //mengecek apakah data kosong atau tidak
                 DB::connection('sqlsrv2')->commit();
