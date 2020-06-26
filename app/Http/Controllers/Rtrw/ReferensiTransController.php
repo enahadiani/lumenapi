@@ -160,7 +160,7 @@ class ReferensiTransController extends Controller
             }
 
             if($this->isUnik($request->kode_ref,$kode_lokasi)){
-                $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp') ");
+                $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp,kode_lokasi) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp','$kode_lokasi') ");
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -267,7 +267,7 @@ class ReferensiTransController extends Controller
 
             $del = DB::connection($this->sql)->table('trans_ref')->where('kode_lokasi', $kode_lokasi)->where('kode_ref', $request->kode_ref)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp') ");
+            $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp,kode_lokasi) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp','$kode_lokasi') ");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
