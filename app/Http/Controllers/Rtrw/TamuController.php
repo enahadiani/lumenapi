@@ -31,7 +31,7 @@ class TamuController extends Controller
             $detik=fmod($waktu,60);
             $menit=$waktu-$detik;
             $menit=$menit/60;
-            $lama=$menit." Menit ".number_format($detik,2)." detik";
+            $lama=$menit." Menit ".number_format($detik,0)." detik";
             return $lama;
         }
         elseif($waktu >3600){
@@ -39,7 +39,7 @@ class TamuController extends Controller
             $tempmenit=($waktu-$detik)/60;
             $menit=fmod($tempmenit,60);
             $jam=($tempmenit-$menit)/60;    
-            $lama=$jam." Jam ".$menit." Menit ".number_format($detik,2)." detik";
+            $lama=$jam." Jam ".$menit." Menit";
             return $lama;
         }
     }
