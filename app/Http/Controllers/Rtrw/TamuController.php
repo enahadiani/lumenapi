@@ -96,8 +96,9 @@ class TamuController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $sql = "select a.no_tamu,a.id_tamu,b.nama,b.nik,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,case when isnull(convert(varchar,a.tgljam_out,103),'-') = '-' then DATEDIFF(second,a.tgljam_in,getdate()) else DATEDIFF(second,a.tgljam_in,a.tgljam_out) end as selisih
+            
+            $url = url('api/portal/storage');
+            $sql = "select a.no_tamu,a.id_tamu,b.nama,b.nik,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,case when isnull(convert(varchar,a.tgljam_out,103),'-') = '-' then DATEDIFF(second,a.tgljam_in,getdate()) else DATEDIFF(second,a.tgljam_in,a.tgljam_out) end as selisih,case when a.ktp != '-' then '".$url."/'+a.ktp else '-' end as ktp
                         from rt_tamu_m a
                         inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi= '".$kode_lokasi."' and a.no_keluar = '-' and isnull(convert(varchar,a.tgljam_out,103),'-') = '-'
