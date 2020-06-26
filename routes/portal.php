@@ -117,5 +117,5 @@ $router->get('qrcode', function () {
     return response($image)->header('Content-type','image/png');
 });
 
-
+$router->get('konversi-waktu/{waktu}','Rtrw\TamuController@waktu');
 ?>

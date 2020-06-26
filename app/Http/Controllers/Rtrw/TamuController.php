@@ -22,6 +22,28 @@ class TamuController extends Controller
     public $guard = 'rtrw';
     public $guard2 = 'satpam';
 
+    public function waktu($waktu){
+        if(($waktu>0) and ($waktu<60)){
+            $lama=number_format($waktu,2)." detik";
+            return $lama;
+        }
+        if(($waktu>60) and ($waktu<3600)){
+            $detik=fmod($waktu,60);
+            $menit=$waktu-$detik;
+            $menit=$menit/60;
+            $lama=$menit." Menit ".number_format($detik,2)." detik";
+            return $lama;
+        }
+        elseif($waktu >3600){
+            $detik=fmod($waktu,60);
+            $tempmenit=($waktu-$detik)/60;
+            $menit=fmod($tempmenit,60);
+            $jam=($tempmenit-$menit)/60;    
+            $lama=$jam." Jam ".$menit." Menit ".number_format($detik,2)." detik";
+            return $lama;
+        }
+    }
+
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
@@ -75,10 +97,10 @@ class TamuController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.no_tamu,a.id_tamu,b.nama,b.nik,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,case when isnull(convert(varchar,a.tgljam_out,103),'-') = '-' then '-' else DATEDIFF(second,a.tgljam_in,a.tgljam_out) end as selisih
+            $sql = "select a.no_tamu,a.id_tamu,b.nama,b.nik,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,case when isnull(convert(varchar,a.tgljam_out,103),'-') = '-' then DATEDIFF(second,a.tgljam_in,getdate()) else DATEDIFF(second,a.tgljam_in,a.tgljam_out) end as selisih
                         from rt_tamu_m a
                         inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi= '".$kode_lokasi."'
+            where a.kode_lokasi= '".$kode_lokasi."' and a.no_keluar = '-' and isnull(convert(varchar,a.tgljam_out,103),'-') = '-'
             order by a.no_tamu";
 
             $rs = DB::connection($this->sql)->select($sql);
@@ -95,7 +117,9 @@ class TamuController extends Controller
                     //         $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/3600).' jam';
                     //     }
                     // }
-                    $res[$i]['selisih'] = intval((intval($res[$i]['selisih'])/60)).' menit';
+                    // $res[$i]['selisih'] = intval((intval($res[$i]['selisih'])/60)).' menit';
+                    
+                    $res[$i]['selisih'] = $this->waktu($res[$i]['selisih']);
                 }
                 $success['status'] = true;
                 $success['data'] = $res;
