@@ -258,13 +258,26 @@ class TamuController extends Controller
             }
             $periode = date('Ym');
 
+            $sql = "select a.id_tamu as no_urut
+            from rt_tamu_m a
+            inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi= '".$kode_lokasi."' and a.no_tamu='$request->qrcode'";
+
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+            if(count($rs) > 0){
+                $no_urut = $rs[0]['no_urut'];
+            }else{
+                $no_urut = "-";
+            }
+            
             if($this->cekValid($request->qrcode,$kode_lokasi)){
-                
                 $no_bukti = $this->generateKode("rt_tamu_m", "no_tamu", $kode_lokasi."-OUT".substr($periode,2,4).".", "000001");
                 
                 $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate(),status_keluar='normal' where no_tamu='$request->qrcode' and kode_lokasi='$kode_lokasi' ");
                 
                 $success['status'] = true;
+                $success['no_urut'] = $no_urut;
                 $success['message'] = "Data Tamu Keluar berhasil disimpan";
                 
                 DB::connection($this->sql)->commit();
@@ -274,12 +287,14 @@ class TamuController extends Controller
                 $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$request->qrcode', tgljam_out=getdate(), status_keluar='satpam' where no_tamu='$request->no_tamu' and kode_lokasi='$kode_lokasi' ");
                 
                 $success['status'] = true;
+                $success['no_urut'] = $no_urut;
                 $success['message'] = "Data Tamu Keluar berhasil disimpan";
                 
                 DB::connection($this->sql)->commit();
             }
             else{
                 $success['status'] = false;
+                $success['no_urut'] = $no_urut;
                 $success['message'] = "Qrcode tidak valid";
             }
 
@@ -287,6 +302,7 @@ class TamuController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
+            $success['no_urut'] = "-";
             $success['message'] = "Data Tamu Keluar gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }   
