@@ -41,6 +41,7 @@ class PaketController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $url = url('api/portal/storage');
             $filter = "";
 
             if(isset($request->id_paket)){
@@ -67,7 +68,7 @@ class PaketController extends Controller
                 }
             }
             $sql= "
-            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket,a.status_ambil from rt_paket_m a where kode_lokasi='".$kode_lokasi."' $filter ";
+            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket,a.status_ambil,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto from rt_paket_m a where kode_lokasi='".$kode_lokasi."' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
