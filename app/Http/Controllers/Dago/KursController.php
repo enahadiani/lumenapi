@@ -133,7 +133,8 @@ class KursController extends Controller
     {
         $this->validate($request, [
             'id' => 'required',
-            'kurs' => 'required'
+            'kurs' => 'required',
+            'kd_curr' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -144,7 +145,7 @@ class KursController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $ins = DB::connection($this->sql)->update("update dgw_kurs set kurs=".$request->kurs." where id='$request->id' and kode_lokasi='$kode_lokasi'
+            $ins = DB::connection($this->sql)->update("update dgw_kurs set kurs=".$request->kurs.",kd_curr=".$request->kd_curr."  where id='$request->id' and kode_lokasi='$kode_lokasi'
             ");
             
             DB::connection($this->sql)->commit();
