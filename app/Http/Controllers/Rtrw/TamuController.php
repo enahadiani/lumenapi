@@ -54,7 +54,7 @@ class TamuController extends Controller
 
     public function cekValidNo($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select no_tamu as kode from rt_tamu_m where no_tamu ='$isi' and kode_lokasi='$kode_lokasi' and no_keluar = '-' ");
+        $auth = DB::connection($this->sql)->select("select id_tamu as kode from rt_tamu_m where id_tamu ='$isi' and kode_lokasi='$kode_lokasi' and no_keluar = '-' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return true;
@@ -65,7 +65,7 @@ class TamuController extends Controller
 
     public function cekValid($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select no_tamu as kode from rt_tamu_m where no_tamu ='$isi' and kode_lokasi='$kode_lokasi' ");
+        $auth = DB::connection($this->sql)->select("select id_tamu as kode from rt_tamu_m where id_tamu ='$isi' and kode_lokasi='$kode_lokasi' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return true;
@@ -202,7 +202,7 @@ class TamuController extends Controller
             // $image = QrCode::size(300)->generate($no_bukti);
             $image = QrCode::format('png')
                             ->size(300)->errorCorrection('H')
-                            ->generate($no_bukti);
+                            ->generate($id_tamu);
             $output_file = 'tamuqr-' .uniqid(). '.png';
             Storage::disk('s3')->put('rtrw/'.$output_file, $image);
 
@@ -295,21 +295,10 @@ class TamuController extends Controller
             
             if($this->cekValid($request->qrcode,$kode_lokasi)){
                 if($this->cekValidNo($request->qrcode,$kode_lokasi)){
-                    $sql = "select a.id_tamu as no_urut
-                    from rt_tamu_m a
-                    inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
-                    where a.kode_lokasi= '".$kode_lokasi."' and a.no_tamu='$request->qrcode'";
-
-                    $rs = DB::connection($this->sql)->select($sql);
-                    $res = json_decode(json_encode($rs),true);
-                    if(count($res) > 0){
-                        $no_urut = $res[0]['no_urut'];
-                    }else{
-                        $no_urut = "-";
-                    }
+                    $no_urut = $request->qrcode;
                     $no_bukti = $this->generateKode("rt_tamu_m", "no_tamu", $kode_lokasi."-OUT".substr($periode,2,4).".", "000001");
                     
-                    $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate(),status_keluar='normal' where no_tamu='$request->qrcode' and kode_lokasi='$kode_lokasi' ");
+                    $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$no_bukti', tgljam_out=getdate(),status_keluar='normal' where id_tamu='$request->qrcode' and kode_lokasi='$kode_lokasi' ");
                     
                     $success['status'] = true;
                     $success['no_urut'] = $no_urut;
@@ -323,20 +312,9 @@ class TamuController extends Controller
                 }
             }
             else if($this->cekValidSatpam($request->qrcode,$kode_lokasi)){
-                if($this->cekValidNo($request->no_tamu,$kode_lokasi)){
-                    $sql = "select a.id_tamu as no_urut
-                    from rt_tamu_m a
-                    inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
-                    where a.kode_lokasi= '".$kode_lokasi."' and a.no_tamu='$request->no_tamu'";
-
-                    $rs = DB::connection($this->sql)->select($sql);
-                    $res = json_decode(json_encode($rs),true);
-                    if(count($res) > 0){
-                        $no_urut = $res[0]['no_urut'];
-                    }else{
-                        $no_urut = "-";
-                    }
-                    $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$request->qrcode', tgljam_out=getdate(), status_keluar='satpam' where no_tamu='$request->no_tamu' and kode_lokasi='$kode_lokasi' ");
+                if($this->cekValidNo($request->id_tamu,$kode_lokasi)){
+                    $no_urut = $request->id_tamu;
+                    $update = DB::connection($this->sql)->update("update rt_tamu_m set no_keluar ='$request->qrcode', tgljam_out=getdate(), status_keluar='satpam' where id_tamu='$request->id_tamu' and kode_lokasi='$kode_lokasi' ");
                     
                     $success['status'] = true;
                     $success['no_urut'] = $no_urut;
