@@ -394,7 +394,7 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (b.harga+b.harga_room-b.diskon)+i.biaya_tambah as biaya_paket,((b.harga+b.harga_room-b.diskon)+i.biaya_tambah)-(j.paket+j.tambahan+j.dokumen)+a.nilai_p+a.nilai_t+a.nilai_m as saldo, a.nilai_p+a.nilai_t+a.nilai_m as bayar,((b.harga+b.harga_room-b.diskon)+i.biaya_tambah)-(j.paket+j.tambahan+j.dokumen) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,b.no_marketing
+            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (b.harga+b.harga_room-b.diskon)+i.biaya_tambah as biaya_paket,((b.harga+b.harga_room-b.diskon)+i.biaya_tambah)-(j.paket+j.tambahan+j.dokumen)+a.nilai_p+a.nilai_t+a.nilai_m as saldo, a.nilai_p+a.nilai_t+a.nilai_m as bayar,((b.harga+b.harga_room-b.diskon)+i.biaya_tambah)-(j.paket+j.tambahan+j.dokumen) as sisa,a.tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,b.no_marketing
             from dgw_pembayaran a
             inner join dgw_reg b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
             inner join dgw_typeroom c on b.no_type=c.no_type and b.kode_lokasi=c.kode_lokasi
