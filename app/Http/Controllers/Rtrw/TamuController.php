@@ -78,22 +78,24 @@ class TamuController extends Controller
             $sql = "select a.no_tamu,a.id_tamu,b.nama,b.nik,a.keperluan,b.blok+'-'+b.nomor as rumah,a.tgljam_in,a.tgljam_out,case when isnull(convert(varchar,a.tgljam_out,103),'-') = '-' then '-' else DATEDIFF(second,a.tgljam_in,a.tgljam_out) end as selisih
                         from rt_tamu_m a
                         inner join rt_tamu_d b on a.no_tamu=b.no_tamu and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi= '".$kode_lokasi."'";
+            where a.kode_lokasi= '".$kode_lokasi."'
+            order by a.no_tamu";
 
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 for($i=0;$i<count($res);$i++){
-                    if(intval($res[$i]['selisih']) <=60){
-                        $res[$i]['selisih'] = $res[$i]['selisih'].' detik';
-                    }else if(intval($res[$i]['selisih']) > 60){
-                        if((intval($res[$i]['selisih'])/60) <= 3600){
-                            $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/60).' menit';
-                        }else{
-                            $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/3600).' jam';
-                        }
-                    }
+                    // if(intval($res[$i]['selisih']) <=60){
+                    //     $res[$i]['selisih'] = $res[$i]['selisih'].' detik';
+                    // }else if(intval($res[$i]['selisih']) > 60){
+                    //     if((intval($res[$i]['selisih'])/60) <= 3600){
+                    //         $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/60).' menit';
+                    //     }else{
+                    //         $res[$i]['selisih'] = intval(intval($res[$i]['selisih'])/3600).' jam';
+                    //     }
+                    // }
+                    $res[$i]['selisih'] = intval((intval($res[$i]['selisih'])/60)).' menit';
                 }
                 $success['status'] = true;
                 $success['data'] = $res;
