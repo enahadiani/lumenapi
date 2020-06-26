@@ -24,7 +24,7 @@ class TamuController extends Controller
 
     public function waktu($waktu){
         if(($waktu>0) and ($waktu<60)){
-            $lama=number_format($waktu,2)." detik";
+            $lama=number_format($waktu,0)." detik";
             return $lama;
         }
         if(($waktu>60) and ($waktu<3600)){
