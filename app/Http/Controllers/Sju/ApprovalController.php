@@ -23,9 +23,9 @@ class ApprovalController extends Controller
     public function pengajuan(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
-        $this->validate($request,[
-            'periode' => 'required'
-        ]);
+        // $this->validate($request,[
+        //     'periode' => 'required'
+        // ]);
         try {
             
             
@@ -38,7 +38,7 @@ class ApprovalController extends Controller
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
-            where a.periode <='$request->periode' and a.kode_lokasi='$kode_lokasi' and a.progress='0' and a.no_atasan='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_atasan='$nik' ";
+            where a.kode_lokasi='$kode_lokasi' and a.progress='0' and a.no_atasan='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_atasan='$nik' ";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
@@ -70,9 +70,9 @@ class ApprovalController extends Controller
     public function pengajuanfinal(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
-        $this->validate($request,[
-            'periode' => 'required'
-        ]);
+        // $this->validate($request,[
+        //     'periode' => 'required'
+        // ]);
         try {
             
             
@@ -85,7 +85,7 @@ class ApprovalController extends Controller
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
-            where a.periode <='$request->periode' and a.kode_lokasi='".$kode_lokasi."' and a.progress='2' and a.no_app1='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app1='".$nik."' ";
+            where a.kode_lokasi='".$kode_lokasi."' and a.progress='2' and a.no_app1='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app1='".$nik."' ";
 
             $aju = DB::connection('sqlsrvsju')->select($sql);
             $aju = json_decode(json_encode($aju),true);
@@ -117,9 +117,9 @@ class ApprovalController extends Controller
     public function pengajuankug(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
-        $this->validate($request,[
-            'periode' => 'required'
-        ]);
+        // $this->validate($request,[
+        //     'periode' => 'required'
+        // ]);
         try {
             
             
@@ -132,7 +132,7 @@ class ApprovalController extends Controller
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
-            where a.periode <='$request->periode' and a.kode_lokasi='".$kode_lokasi."' and a.progress='3' and a.no_app2='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app2='".$nik."'			 
+            where a.kode_lokasi='".$kode_lokasi."' and a.progress='3' and a.no_app2='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app2='".$nik."'			 
             ");
             $aju = json_decode(json_encode($aju),true);
             
@@ -163,9 +163,9 @@ class ApprovalController extends Controller
     public function pengajuandir(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');
-        $this->validate($request,[
-            'periode' => 'required'
-        ]);
+        // $this->validate($request,[
+        //     'periode' => 'required'
+        // ]);
         try {
             
             
@@ -178,7 +178,7 @@ class ApprovalController extends Controller
             from sju_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
 			inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
-            where a.periode <='$request->periode' and a.kode_lokasi='".$kode_lokasi."' and a.progress='4' and a.no_app3='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app3='".$nik."'			 
+            where a.kode_lokasi='".$kode_lokasi."' and a.progress='4' and a.no_app3='-' and a.modul='PBPROSES' and a.no_kas='-' and a.nik_app3='".$nik."'			 
             ");
             $aju = json_decode(json_encode($aju),true);
             
@@ -495,7 +495,7 @@ class ApprovalController extends Controller
             $sql="";
             $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek
             from sju_pb_rek a
-            where a.no_bukti ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
+            where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
             ");
             $rek = json_decode(json_encode($rek),true);
             
