@@ -146,11 +146,13 @@ class JuskebController extends Controller
             'dasar' => 'required',
             'total_barang' => 'required',
             'barang'=> 'required|array',
-            'barang_klp'=> 'require|arrayd',
-            'harga'=> 'require|arrayd',
-            'qty'=> 'require|arrayd',
-            'nilai'=> 'require|arrayd',
-            'nama_dok'=>'require|arrayd',
+            'barang_klp'=> 'require|array',
+            'harga'=> 'require|array',
+            'qty'=> 'require|array',
+            'nilai'=> 'require|array',
+            'ppn'=> 'require|array',
+            'grand_total'=> 'require|array',
+            'nama_dok'=>'require|array',
             'file.*'=>'file|max:3072'
         ]);
 
@@ -196,7 +198,7 @@ class JuskebController extends Controller
     
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i]));
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
                     }
                 }
     
@@ -362,6 +364,8 @@ class JuskebController extends Controller
             'harga'=> 'require|arrayd',
             'qty'=> 'require|arrayd',
             'nilai'=> 'require|arrayd',
+            'ppn'=> 'require|array',
+            'grand_total'=> 'require|array',
             'nama_dok'=>'require|arrayd',
             'file.*'=>'file|max:3072'
         ]);
@@ -421,7 +425,7 @@ class JuskebController extends Controller
 
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i]));
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
                     }
                 }
 
