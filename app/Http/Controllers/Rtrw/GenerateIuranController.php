@@ -20,6 +20,7 @@ class GenerateIuranController extends Controller
     public $guard2 = 'satpam';
 
     public function getPeriodeNext($periode){
+        
         $tahun = substr($periode,0,4);
         $bulan = intval(substr($periode,4,2))+1;
         if(strlen($bulan) == 1){
