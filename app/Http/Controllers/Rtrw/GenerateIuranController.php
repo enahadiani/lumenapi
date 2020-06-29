@@ -129,7 +129,7 @@ class GenerateIuranController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $res = DB::connection($this->sql)->select("select a.kode_rumah,isnull(b.nama,'-') as penghuni from rt_rumah a left join rt_warga b on a.kode_penghuni=b.nik where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$request->kode_pp' ");
+            $res = DB::connection($this->sql)->select("select a.kode_rumah,isnull(b.nama,'-') as penghuni from rt_rumah a left join rt_warga b on a.kode_penghuni=b.nik where a.kode_lokasi='$kode_lokasi' and a.rt='$request->kode_pp' ");
             $res = json_decode(json_encode($res),true);
 
             for ($i=0;$i<count($res);$i++){									
