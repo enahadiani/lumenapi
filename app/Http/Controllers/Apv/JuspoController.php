@@ -148,10 +148,13 @@ class JuspoController extends Controller
             'kegiatan' => 'required',
             'dasar' => 'required',
             'total_barang' => 'required',
-            'barang.*'=> 'required',
-            'harga.*'=> 'required',
-            'qty.*'=> 'required',
-            'subtotal.*'=> 'required'
+            'barang'=> 'required|array',
+            'barang_klp'=> 'required|array',
+            'harga'=> 'required|array',
+            'qty'=> 'required|array',
+            'subtotal'=> 'required|array',
+            'ppn'=> 'required|array',
+            'grand_total'=> 'required|array',
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -164,16 +167,19 @@ class JuspoController extends Controller
 
             $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
             
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal')]);
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
 
             $barang = $request->input('barang');
+            $barang_klp = $request->input('barang_klp');
             $harga = $request->input('harga');
             $qty = $request->input('qty');
             $subtotal = $request->input('subtotal');
+            $ppn = $request->input('ppn');
+            $grand_total = $request->input('grand_total');
 
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
-                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
+                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
                 }
             }
 
@@ -258,12 +264,12 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nilai,convert(varchar(10),tgl_input,121) as tgl_input, convert(varchar(10),tanggal,121) as tgl_juskeb from apv_juspo_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' ";
+            $sql="select no_bukti,no_juskeb,no_dokumen,kode_pp,kode_kota,waktu,kegiatan,dasar,nilai,convert(varchar(10),tgl_input,121) as tgl_input, convert(varchar(10),tanggal,121) as tgl_juskeb from apv_juspo_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juspo_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
+            $sql2="select a.no_bukti,a.barang,a.barang_klp,a.harga,a.jumlah,a.nilai,a.ppn,a.grand_total,b.nama as nama_klp from apv_juspo_d a left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi =b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti'  order by a.no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -304,12 +310,12 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  ";
+            $sql="select no_bukti,no_dokumen,kode_pp,kode_kota,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
+            $sql2="select a.no_bukti,a.barang,a.barang_klp,a.harga,a.jumlah,a.nilai,a.ppn,a.grand_total,b.nama as nama_klp from apv_juskeb_d a left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi =b.kode_lokasi where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -370,10 +376,13 @@ class JuspoController extends Controller
             'kegiatan' => 'required',
             'dasar' => 'required',
             'total_barang' => 'required',
-            'barang.*'=> 'required',
-            'harga.*'=> 'required',
-            'qty.*'=> 'required',
-            'subtotal.*'=> 'required'
+            'barang'=> 'required|array',
+            'barang_klp'=> 'required|array',
+            'harga'=> 'required|array',
+            'qty'=> 'required|array',
+            'subtotal'=> 'required|array',
+            'ppn'=> 'required|array',
+            'grand_total'=> 'required|array'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -388,7 +397,7 @@ class JuspoController extends Controller
             $del2 = DB::connection('sqlsrv2')->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del3 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal')]);
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
 
             $barang = $request->input('barang');
             $harga = $request->input('harga');
@@ -397,7 +406,7 @@ class JuspoController extends Controller
 
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
-                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
+                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
                 }
             }
 
@@ -532,15 +541,16 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen, convert(varchar(10),a.tanggal,121) as tanggal,a.kegiatan,a.waktu,a.dasar,a.nilai,a.kode_pp,b.nama as nama_pp 
+            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen, convert(varchar(10),a.tanggal,121) as tanggal,a.kegiatan,a.waktu,a.dasar,a.nilai,a.kode_pp,b.nama as nama_pp,a.kode_kota,c.nama as nama_kota 
             from apv_juspo_m a
             left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            left join apv_kota c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.no_urut,a.barang,a.jumlah,a.harga,a.nilai 
+            $sql2="select a.no_bukti,a.no_urut,a.barang,a.barang_klp,a.jumlah,a.harga,a.nilai,a.ppn,a.grand_total 
             from apv_juspo_d a            
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);

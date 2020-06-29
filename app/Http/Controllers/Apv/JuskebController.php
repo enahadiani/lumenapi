@@ -606,7 +606,7 @@ class JuskebController extends Controller
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.no_urut,a.barang,a.jumlah,a.harga,a.nilai 
+            $sql2="select a.no_bukti,a.no_urut,a.barang,a.barang_klp,a.jumlah,a.harga,a.nilai,a.ppn,a.grand_total 
             from apv_juskeb_d a            
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
