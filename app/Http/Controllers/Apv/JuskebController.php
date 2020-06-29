@@ -360,13 +360,13 @@ class JuskebController extends Controller
             'dasar' => 'required',
             'total_barang' => 'required',
             'barang'=> 'required|array',
-            'barang_klp'=> 'require|arrayd',
-            'harga'=> 'require|arrayd',
-            'qty'=> 'require|arrayd',
-            'nilai'=> 'require|arrayd',
+            'barang_klp'=> 'require|array',
+            'harga'=> 'require|array',
+            'qty'=> 'require|array',
+            'nilai'=> 'require|array',
             'ppn'=> 'require|array',
             'grand_total'=> 'require|array',
-            'nama_dok'=>'require|arrayd',
+            'nama_dok'=>'require|array',
             'file.*'=>'file|max:3072'
         ]);
 
