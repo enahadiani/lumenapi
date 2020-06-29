@@ -118,6 +118,8 @@ class GenerateIuranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $tahun = $request->tahun;
+            $bulan_awal = $request->bulan_awal;
+            $bulan_akhir = $request->bulan_akhir;
 
             $per_awal = $tahun.$bulan_awal;	
             $per_akhir = $tahun.$bulan_akhir;
