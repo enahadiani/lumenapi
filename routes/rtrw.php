@@ -145,11 +145,11 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->delete('reftrans','Rtrw\ReferensiTransController@destroy');
 
     //Generate Iuran
-    $router->get('generate-iuran','Rtrw\ReferensiTransController@index');
-    $router->post('generate-iuran','Rtrw\ReferensiTransController@store');
-    $router->get('jenis-iuran','Rtrw\ReferensiTransController@getJenis');
-    $router->get('pp-login','Rtrw\ReferensiTransController@getPPLogin');
-    $router->get('generate-detail','Rtrw\ReferensiTransController@getDetail');
+    $router->get('generate-iuran','Rtrw\GenerateIuranController@index');
+    $router->post('generate-iuran','Rtrw\GenerateIuranController@store');
+    $router->get('jenis-iuran','Rtrw\GenerateIuranController@getJenis');
+    $router->get('pp-login','Rtrw\GenerateIuranController@getPPLogin');
+    $router->get('generate-detail','Rtrw\GenerateIuranController@getDetail');
     
     //Setting saldo awal
     $router->get('setting-saldo-awal','Rtrw\SettingSaldoController@index');
