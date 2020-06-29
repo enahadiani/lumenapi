@@ -22,7 +22,7 @@ class GenerateIuranController extends Controller
     public function getPeriodeNext($periode){
         $tahun = substr($periode,0,4);
         $bulan = intval(substr($periode,4,2))+1;
-        if(strlen($bulan) > 1){
+        if(strlen($bulan) == 1){
             $bulan = "0".$bulan;
         }else{
             $bulan = $bulan;
