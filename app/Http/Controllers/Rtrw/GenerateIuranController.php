@@ -117,6 +117,7 @@ class GenerateIuranController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $tahun = $request->tahun;
 
             $per_awal = $tahun.$bulan_awal;	
             $per_akhir = $tahun.$bulan_akhir;
