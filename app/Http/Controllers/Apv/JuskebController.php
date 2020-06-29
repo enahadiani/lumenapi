@@ -673,4 +673,51 @@ class JuskebController extends Controller
         }
     }
 
+    public function getBarangKlp(Request $request)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->kode_barang)){
+                if($request->kode_barang == "all" || $request->kode_barang == ""){
+                    $filter .= "";
+                }else{
+
+                    $filter .= " and kode_barang='$request->kode_barang' ";
+                }
+            }else{
+                $filter .= "";
+            }
+
+
+            $sql="select kode_barang,nama from apv_klp_barang where kode_lokasi='".$kode_lokasi."' and jenis='A' $filter";
+            
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
