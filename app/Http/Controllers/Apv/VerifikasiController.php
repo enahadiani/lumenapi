@@ -203,6 +203,7 @@ class VerifikasiController extends Controller
             }
 
             $barang = $request->input('barang');
+            $barang_klp = $request->input('barang_klp');
             $harga = $request->input('harga');
             $qty = $request->input('qty');
             $subtotal = $request->input('subtotal');
@@ -212,7 +213,7 @@ class VerifikasiController extends Controller
             if(count($barang) > 0){
                 $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
                 for($i=0; $i<count($barang);$i++){
-                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_aju,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang_klp,barang,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_aju,$barang_klp[$i],$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
                 }
             }
 
@@ -316,7 +317,7 @@ class VerifikasiController extends Controller
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select no_bukti,barang,harga,jumlah,nilai,ppn,grand_total from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";					
+            $sql2="select no_bukti,barang_klp,barang,harga,jumlah,nilai,ppn,grand_total from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
