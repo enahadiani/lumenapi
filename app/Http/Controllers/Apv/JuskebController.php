@@ -146,13 +146,13 @@ class JuskebController extends Controller
             'dasar' => 'required',
             'total_barang' => 'required',
             'barang'=> 'required|array',
-            'barang_klp'=> 'require|array',
-            'harga'=> 'require|array',
-            'qty'=> 'require|array',
-            'nilai'=> 'require|array',
-            'ppn'=> 'require|array',
-            'grand_total'=> 'require|array',
-            'nama_dok'=>'require|array',
+            'barang_klp'=> 'required|array',
+            'harga'=> 'required|array',
+            'qty'=> 'required|array',
+            'nilai'=> 'required|array',
+            'ppn'=> 'required|array',
+            'grand_total'=> 'required|array',
+            'nama_dok'=>'required|array',
             'file.*'=>'file|max:3072'
         ]);
 
@@ -360,13 +360,13 @@ class JuskebController extends Controller
             'dasar' => 'required',
             'total_barang' => 'required',
             'barang'=> 'required|array',
-            'barang_klp'=> 'require|array',
-            'harga'=> 'require|array',
-            'qty'=> 'require|array',
-            'nilai'=> 'require|array',
-            'ppn'=> 'require|array',
-            'grand_total'=> 'require|array',
-            'nama_dok'=>'require|array',
+            'barang_klp'=> 'required|array',
+            'harga'=> 'required|array',
+            'qty'=> 'required|array',
+            'nilai'=> 'required|array',
+            'ppn'=> 'required|array',
+            'grand_total'=> 'required|array',
+            'nama_dok'=>'required|array',
             'file.*'=>'file|max:3072'
         ]);
 
