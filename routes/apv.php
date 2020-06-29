@@ -79,6 +79,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('juskeb','Apv\JuskebController@index');
     $router->get('juskeb/{no_bukti}','Apv\JuskebController@show');
     $router->get('kota','Apv\JuskebController@getKota');
+    $router->get('generate-dok/{tanggal}/{nama_pp}/{nama_kota}','Apv\JuskebController@generateDok');
     $router->post('juskeb','Apv\JuskebController@store');
     $router->post('juskeb/{no_bukti}','Apv\JuskebController@update');
     $router->delete('juskeb/{no_bukti}','Apv\JuskebController@destroy');

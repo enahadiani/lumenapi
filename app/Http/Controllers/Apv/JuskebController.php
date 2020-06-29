@@ -18,6 +18,11 @@ class JuskebController extends Controller
      */
     public $successStatus = 200;
 
+    public function reverseDate($ymd_or_dmy_date, $org_sep='-', $new_sep='-'){
+        $arr = explode($org_sep, $ymd_or_dmy_date);
+        return $arr[2].$new_sep.$arr[1].$new_sep.$arr[0];
+    }
+
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
         $auth = DB::connection('sqlsrv2')->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
@@ -57,13 +62,18 @@ class JuskebController extends Controller
         }  
     }
 
-    
-    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+    public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
         return $id;
+    }
+
+    public function generateDok($tanggal,$nama_pp,$nama_kota){
+        $format = reverseDate($tanggal,"-","-")."/".$nama_pp."/".$nama_kota."/";
+        $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
+        return $no_dokumen;
     }
 
     public function index()
@@ -128,7 +138,9 @@ class JuskebController extends Controller
             'tanggal' => 'required',
             'no_dokumen' => 'required',
             'kode_pp' => 'required',
+            'nama_pp' => 'required',
             'kode_kota' => 'required',
+            'nama_kota' => 'required',
             'waktu' => 'required',
             'kegiatan' => 'required',
             'dasar' => 'required',
@@ -171,8 +183,10 @@ class JuskebController extends Controller
                 }
     
                 $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
+                $format = reverseDate($request->tanggal,"-","-")."/".$request->nama_pp."/".$request->nama_kota."/";
+                $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
                 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_ta]);
+                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_ta]);
     
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
