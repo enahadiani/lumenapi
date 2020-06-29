@@ -189,7 +189,7 @@ class JuskebController extends Controller
                 $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->nama_pp."/".$request->nama_kota."/";
                 $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
                 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_ta]);
+                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota]);
     
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
@@ -198,7 +198,7 @@ class JuskebController extends Controller
     
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
                     }
                 }
     
@@ -416,7 +416,7 @@ class JuskebController extends Controller
                 $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_ta]);
+                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota]);
 
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
@@ -425,7 +425,7 @@ class JuskebController extends Controller
 
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
                     }
                 }
 
