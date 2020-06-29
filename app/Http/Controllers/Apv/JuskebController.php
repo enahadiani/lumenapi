@@ -70,8 +70,9 @@ class JuskebController extends Controller
         return $id;
     }
 
-    public function generateDok($tanggal,$nama_pp,$nama_kota){
-        $format = $this->reverseDate($tanggal,"-","-")."/".$nama_pp."/".$nama_kota."/";
+    public function generateDok(Request $request){
+       
+        $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->nama_pp."/".$request->nama_kota."/";
         $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
         return $no_dokumen;
     }
