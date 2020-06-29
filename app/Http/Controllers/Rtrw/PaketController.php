@@ -68,7 +68,7 @@ class PaketController extends Controller
                 }
             }
             $sql= "
-            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket,a.status_ambil,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto from rt_paket_m a where kode_lokasi='".$kode_lokasi."' $filter ";
+            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket,a.status_ambil,convert(varchar,a.tgl_input,113) as tanggal,a.id_satpam,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto from rt_paket_m a where kode_lokasi='".$kode_lokasi."' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -150,7 +150,7 @@ class PaketController extends Controller
                 $foto="-";
             }
 
-            $ins = DB::connection($this->sql)->insert("insert into rt_paket_m (no_paket,no_rumah,blok,nik,nama,kode_lokasi,tgl_input,nik_user,id_paket,foto,status_ambil) values ('$no_bukti','$request->no_rumah','$request->blok','$request->nik','$request->nama','$kode_lokasi',getdate(),'$nik_user','$id_paket','$foto','belum')");
+            $ins = DB::connection($this->sql)->insert("insert into rt_paket_m (no_paket,no_rumah,blok,nik,nama,kode_lokasi,tgl_input,nik_user,id_paket,foto,status_ambil,id_satpam) values ('$no_bukti','$request->no_rumah','$request->blok','$request->nik','$request->nama','$kode_lokasi',getdate(),'$nik_user','$id_paket','$foto','belum','$nik_user')");
 
             $success['status'] = true;
             $success['message'] = "Data Paket berhasil disimpan";
