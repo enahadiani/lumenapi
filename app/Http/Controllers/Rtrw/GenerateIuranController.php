@@ -133,8 +133,8 @@ class GenerateIuranController extends Controller
             $res = json_decode(json_encode($res),true);
 
             for ($i=0;$i<count($res);$i++){									
-                $blnAwal = intval($request->bulan_awal);
-                $blnAkhir = intval($request->bulan_akhir);
+                $blnAwal = $request->bulan_awal;
+                $blnAkhir = $request->bulan_akhir;
                 $period = $request->tahun.$request->bulan_awal;		
                 
                 for ($j=$blnAwal;$j <= $blnAkhir;$j++){	
