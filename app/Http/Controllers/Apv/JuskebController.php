@@ -146,6 +146,7 @@ class JuskebController extends Controller
             'dasar' => 'required',
             'total_barang' => 'required',
             'barang.*'=> 'required',
+            'barang_klp.*'=> 'required',
             'harga.*'=> 'required',
             'qty.*'=> 'required',
             'subtotal.*'=> 'required',
@@ -195,7 +196,7 @@ class JuskebController extends Controller
     
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i]));
                     }
                 }
     
@@ -357,6 +358,7 @@ class JuskebController extends Controller
             'dasar' => 'required',
             'total_barang' => 'required',
             'barang.*'=> 'required',
+            'barang_klp.*'=> 'required',
             'harga.*'=> 'required',
             'qty.*'=> 'required',
             'subtotal.*'=> 'required',
@@ -419,7 +421,7 @@ class JuskebController extends Controller
 
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai) values (?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i]));
+                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp) values (?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i]));
                     }
                 }
 
