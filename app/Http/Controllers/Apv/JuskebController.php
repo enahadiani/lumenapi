@@ -186,7 +186,7 @@ class JuskebController extends Controller
                 }
     
                 $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
-                $format = reverseDate($request->tanggal,"-","-")."/".$request->nama_pp."/".$request->nama_kota."/";
+                $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->nama_pp."/".$request->nama_kota."/";
                 $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
                 
                 $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_ta]);
