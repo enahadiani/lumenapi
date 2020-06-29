@@ -140,7 +140,7 @@ class GenerateIuranController extends Controller
                 for ($j=$blnAwal;$j <= $blnAkhir;$j++){	
 
                     $ins = DB::connection($this->sql)->insert("insert into rt_bill_d (kode_lokasi,kode_jenis,periode,kode_rumah,kode_pp,nilai_rt,nilai_rw) values('".$kode_lokasi."','".$request->kode_jenis."','".$period."','".$res[$i]['kode_rumah']."','".$request->kode_pp."', ".$request->nilai_rt.",".$request->nilai_rw.")");
-                    $period = $this->getNextPeriode($period);		
+                    $period = $this->getPeriodeNext($period);		
                 }
             }
             DB::connection($this->sql)->commit();
