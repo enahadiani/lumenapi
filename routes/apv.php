@@ -78,6 +78,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Justifikasi Kebutuhan
     $router->get('juskeb','Apv\JuskebController@index');
     $router->get('juskeb/{no_bukti}','Apv\JuskebController@show');
+    $router->get('kota','Apv\JuskebController@getKota');
     $router->post('juskeb','Apv\JuskebController@store');
     $router->post('juskeb/{no_bukti}','Apv\JuskebController@update');
     $router->delete('juskeb/{no_bukti}','Apv\JuskebController@destroy');
