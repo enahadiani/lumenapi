@@ -68,7 +68,7 @@ class PaketController extends Controller
                 }
             }
             $sql= "
-            select a.no_paket,a.nama,a.nik,a.no_rumah,a.id_paket,a.status_ambil,convert(varchar,a.tgl_input,113) as tanggal,a.id_satpam,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto,b.nama as nama_satpam 
+            select a.no_paket,a.nama,a.nik,a.blok+'-'+a.no_rumah as kode_rumah,a.id_paket,a.status_ambil,convert(varchar,a.tgl_input,113) as tanggal,a.id_satpam,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto,b.nama as nama_satpam 
             from rt_paket_m a 
             left join rt_satpam b on a.id_satpam=b.id_satpam and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' $filter ";
