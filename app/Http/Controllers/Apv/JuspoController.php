@@ -582,7 +582,8 @@ class JuspoController extends Controller
             from apv_flow a
             inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+            order by a.no_urut";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
