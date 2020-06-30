@@ -111,7 +111,7 @@ class JuspoApprovalController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai
+            $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
             from apv_flow a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user'
@@ -409,16 +409,18 @@ class JuspoApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,a.no_urut,c.nama as nama_pp
+            $sql="select a.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,a.no_urut,c.nama as nama_pp,d.nama as nama_kota
             from apv_flow a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             left join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            left join apv_kota d on b.kode_pp=d.kode_pp and b.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select no_bukti,barang,harga,jumlah,nilai from apv_juspo_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";					
+            $sql2="select a.no_bukti,a.barang_klp,a.barang,a.harga,a.jumlah,a.nilai,a.ppn,a.grand_total from apv_juspo_d a 
+            left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_aju' order by a.no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 

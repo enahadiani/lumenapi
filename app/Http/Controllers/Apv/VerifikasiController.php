@@ -71,9 +71,6 @@ class VerifikasiController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                $success['sql'] = "select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai
-                from apv_juskeb_m b 
-                where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') and kode_pp='$kode_pp'";
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
