@@ -139,7 +139,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Pihak ketiga
 
     //Laporan
-    $router->get('lap-posisi','Apv\LapInternalController@getPosisi');
+    $router->get('lap-posisi','Apv\LaporanController@getPosisi');
 
 });
 
