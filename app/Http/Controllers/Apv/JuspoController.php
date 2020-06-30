@@ -35,6 +35,12 @@ class JuspoController extends Controller
         }  
     }
 
+    public function generateDok(Request $request){
+       
+        $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
+        $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+        return $no_dokumen;
+    }
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
@@ -166,8 +172,10 @@ class JuspoController extends Controller
             }
 
             $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
-            
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
+            $format = $this->reverseDate($request->waktu,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
+            $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+                
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
 
             $barang = $request->input('barang');
             $barang_klp = $request->input('barang_klp');

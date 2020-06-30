@@ -111,6 +111,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('juspo/{no_bukti}','Apv\JuspoController@destroy');
     $router->get('juspo_history/{no_bukti}','Apv\JuspoController@getHistory');
     $router->get('juspo_preview/{no_bukti}','Apv\JuspoController@getPreview');
+    $router->get('generate-dok-juspo','Apv\JuspoController@generateDok');
 
     //Approval Justifikasi Pengadaan
     $router->get('juspo_app','Apv\JuspoApprovalController@index');
