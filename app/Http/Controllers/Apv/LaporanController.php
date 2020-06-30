@@ -15,8 +15,8 @@ class LaporanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'sqlsrvdago';
-    public $guard = 'dago';
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
     
     function getPosisi(Request $request){
         try {
