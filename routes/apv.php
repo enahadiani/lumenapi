@@ -131,15 +131,15 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('notif_send','Apv\NotifikasiController@sendNotif');
 
     //Filter Laporan
-    $router->get('filter-pp','Dago\FilterController@getFilterPP');
-    $router->get('filter-kota','Dago\FilterController@getFilterKota');
-    $router->get('filter-nobukti','Dago\FilterController@getFilterNoBukti');
-    $router->get('filter-nodokumen','Dago\FilterController@getFilterNoDokumen');
+    $router->get('filter-pp','Apv\FilterController@getFilterPP');
+    $router->get('filter-kota','Apv\FilterController@getFilterKota');
+    $router->get('filter-nobukti','Apv\FilterController@getFilterNoBukti');
+    $router->get('filter-nodokumen','Apv\FilterController@getFilterNoDokumen');
 
     //Pihak ketiga
 
     //Laporan
-    $router->get('lap-posisi','Dago\LapInternalController@getPosisi');
+    $router->get('lap-posisi','Apv\LapInternalController@getPosisi');
 
 });
 
