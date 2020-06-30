@@ -267,7 +267,7 @@ class JuspoController extends Controller
             $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tgl_input,121) as tgl_input, convert(varchar(10),a.tanggal,121) as tgl_juskeb,b.nama as nama_pp,c.nama as nama_klp 
             from apv_juspo_m a 
             left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            left join apv_pp c on a.kode_pp=c.kode_kota and a.kode_lokasi=c.kode_lokasi
+            left join apv_pp c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
@@ -321,7 +321,7 @@ class JuspoController extends Controller
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.barang,a.barang_klp,a.harga,a.jumlah,a.nilai,a.ppn,a.grand_total,b.nama as nama_klp from apv_juskeb_d a left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi =b.kode_lokasi where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
+            $sql2="select a.no_bukti,a.barang,a.barang_klp,a.harga,a.jumlah,a.nilai,a.ppn,a.grand_total,b.nama as nama_klp from apv_juskeb_d a left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi =b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti'  order by a.no_urut";					
             $res2 = DB::connection('sqlsrv2')->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
