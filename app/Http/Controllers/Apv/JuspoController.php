@@ -280,7 +280,7 @@ class JuspoController extends Controller
             $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tgl_input,121) as tgl_input, convert(varchar(10),a.tanggal,121) as tgl_juskeb,b.nama as nama_pp,c.nama as nama_klp 
             from apv_juspo_m a 
             left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            left join apv_pp c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
+            left join apv_kota c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
