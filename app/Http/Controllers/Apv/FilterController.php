@@ -59,7 +59,7 @@ class FilterController extends Controller
 
             $filter = "";
 
-            $sql="select a.kode_pp,a.nama from apv_unit a where a.kode_lokasi='$kode_lokasi' $filter";
+            $sql="select a.kode_pp,a.nama from apv_pp a where a.kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
