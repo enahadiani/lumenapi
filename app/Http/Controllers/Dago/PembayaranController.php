@@ -960,7 +960,7 @@ class PembayaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (b.harga+b.harga_room-b.diskon)+i.biaya_tambah as biaya_paket,((b.harga+b.harga_room-b.diskon)+i.biaya_tambah)-(j.paket+j.tambahan+j.dokumen)+a.nilai_p+a.nilai_t+a.nilai_m as saldo, a.nilai_p+a.nilai_t+a.nilai_m as bayar,((b.harga+b.harga_room-b.diskon)+i.biaya_tambah)-(j.paket+j.tambahan+j.dokumen) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user
+            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room))+i.biaya_tambah+j.dokumen as biaya_paket,(b.harga+b.harga_room)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user
             from dgw_pembayaran a
             inner join dgw_reg b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
             inner join dgw_typeroom c on b.no_type=c.no_type and b.kode_lokasi=c.kode_lokasi
@@ -968,7 +968,7 @@ class PembayaranController extends Controller
             inner join dgw_marketing h on b.no_marketing=h.no_marketing and b.kode_lokasi=h.kode_lokasi
             inner join dgw_peserta k on b.no_peserta=k.no_peserta and b.kode_lokasi=k.kode_lokasi 
             inner join dgw_paket l on b.no_paket=l.no_paket and b.kode_lokasi=l.kode_lokasi 
-            inner join trans_m m on a.no_kwitansi=m.no_bukti and a.kode_lokasi=m.kode_lokasi				
+            inner join trans_m m on a.no_kwitansi=m.no_bukti and a.kode_lokasi=m.kode_lokasi
             left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
                         from dgw_reg_biaya 
                         group by no_reg,kode_lokasi ) i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi
