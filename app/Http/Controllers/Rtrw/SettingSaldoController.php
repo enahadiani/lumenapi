@@ -31,7 +31,7 @@ class SettingSaldoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_akun,b.nama as nama_akun,a.so_akhir 
+            $sql = "select a.kode_akun,b.nama as nama_akun,a.so_akhir,substring(a.periode,1,4) as tahun 
             from glma_pp a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' ";
@@ -122,7 +122,7 @@ class SettingSaldoController extends Controller
         $this->validate($request,[
             'kode_akun' => 'required',
             'kode_pp' => 'required',
-            'periode' => 'required',
+            'tahun' => 'required',
         ]);
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -132,10 +132,11 @@ class SettingSaldoController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $akun = DB::connection($this->sql)->select("select a.kode_akun,b.nama as nama_akun,a.so_akhir 
+            $periode = $request->tahun.'01';
+            $akun = DB::connection($this->sql)->select("select a.kode_akun,b.nama as nama_akun,a.so_akhir,substring(a.periode,1,4) as tahun  
             from glma_pp a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$request->kode_pp' and a.periode='$request->periode' and a.kode_akun='$request->kode_akun'				 
+            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$request->kode_pp' and a.periode='".$periode."' and a.kode_akun='$request->kode_akun'				 
             ");
 
             $akun = json_decode(json_encode($akun),true);
