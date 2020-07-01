@@ -272,8 +272,11 @@ class SettingSaldoController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $tahun_depan=date('Y')+1;
             $akun = DB::connection($this->sql)->select("select distinct substring(periode,1,4) as tahun from glma_pp
             where kode_lokasi = '$kode_lokasi'
+            union 
+            select '$tahun_depan' as tahun
             ");
 
             $akun = json_decode(json_encode($akun),true);
