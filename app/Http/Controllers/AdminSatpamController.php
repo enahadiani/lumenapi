@@ -32,8 +32,9 @@ class AdminSatpamController extends Controller
         if($data =  Auth::guard('satpam')->user()){
             $id_satpam= $data->id_satpam;
             $kode_lokasi= $data->kode_lokasi;
-
-            $user = DB::connection('sqlsrvrtrw')->select("select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif from rt_satpam
+            
+            $url = url('api/portal/storage');
+            $user = DB::connection('sqlsrvrtrw')->select("select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto  from rt_satpam
             where id_satpam= '$id_satpam' 
             ");
             $user = json_decode(json_encode($user),true);
