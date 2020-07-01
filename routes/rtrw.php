@@ -2,6 +2,8 @@
 namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; 
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -21,6 +23,14 @@ $router->get('/', function () use ($router) {
 $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
+
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('rtrw/'.$filename)) {
+        abort(404);
+    }
+    return Storage::disk('s3')->response('rtrw/'.$filename); 
+});
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     
@@ -158,6 +168,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->put('setting-saldo-awal','Rtrw\SettingSaldoController@update');
     $router->delete('setting-saldo-awal','Rtrw\SettingSaldoController@destroy');
     $router->get('setting-saldo-tahun','Rtrw\SettingSaldoController@getTahun');
+
+    //Lokasi
+    $router->get('lokasi','Rtrw\LokasiController@index');
+    $router->get('lokasi-detail','Rtrw\LokasiController@show');
+    $router->post('lokasi','Rtrw\LokasiController@store');
+    $router->put('lokasi','Rtrw\LokasiController@update');
+    $router->delete('lokasi','Rtrw\LokasiController@destroy');
 
 });
 
