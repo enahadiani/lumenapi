@@ -277,9 +277,21 @@ class AuthController extends Controller
         }else{
             if($data = Auth::guard('satpam')->user()){
                 DB::connection('sqlsrvrtrw')->beginTransaction();
-        
                 try {
-                    $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_satpam_log (id_satpam,kode_lokasi,tgl_log_in,flag_aktif) values ('$data->id_satpam','$data->kode_lokasi',getdate(),1) ");
+
+                    //---------------- logout user sebelumnya	
+                    $get = DB::connection('sqlsrvrtrw')->select("select * from rt_satpam_log where id_satpam='$data->id_satpam' and kode_lokasi='$data->kode_lokasi' and flag_aktif='1' ");
+                    if(count($get) > 0 ){
+
+                        $upd = DB::connection('sqlsrvrtrw')->table('rt_satpam_log')
+                        ->where('id_satpam', $get[0]->id_satpam)       
+                        ->where('kode_lokasi', $get[0]->kode_lokasi)    
+                        ->where('flag_aktif', 1)
+                        ->update(['flag_aktif' => 0,'tgl_log_out' =>date('Y-m-d H:i:s')]);
+                        // Auth::guard('satpam')->invalidate($get[0]->token);
+                    }
+
+                    $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_satpam_log (id_satpam,kode_lokasi,tgl_log_in,flag_aktif,token) values ('$data->id_satpam','$data->kode_lokasi',getdate(),1,'$token') ");
                     DB::connection('sqlsrvrtrw')->commit();
                 } catch (\Throwable $e) {
                     DB::connection('sqlsrvrtrw')->rollback();

@@ -98,6 +98,9 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     $router->post('paket','Rtrw\PaketController@store');
     $router->put('paket','Rtrw\PaketController@update');
 
+    
+    $router->get('satpam-aktif','Rtrw\SatpamController@show');
+
 });
 
 $router->get('qrcode', function () {
