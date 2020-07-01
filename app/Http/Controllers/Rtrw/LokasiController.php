@@ -286,7 +286,7 @@ class LokasiController extends Controller
                 
             }
 
-            $del = DB::connection($this->sql)->table('lokasi')->where('kode_lokasi', $kode_lokasi)->delete();
+            $del = DB::connection($this->sql)->table('lokasi')->where('kode_lokasi', $request->kode_lokasi)->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into lokasi (kode_lokasi,nama,alamat,kota,kodepos,no_telp,no_fax,flag_konsol,logo,email,website,npwp,pic,kode_lokkonsol,tgl_pkp,flag_pusat ) values ('$request->kode_lokasi','$request->nama','$request->alamat','$request->kota','$request->kodepos','$request->no_telp','$request->no_fax','$request->flag_konsol','$logo','$request->email','$request->website','$request->npwp','$request->pic','$request->kode_lokkonsol','$request->tgl_pkp','$request->flag_pusat') ");
 
