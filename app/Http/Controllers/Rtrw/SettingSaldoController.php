@@ -31,8 +31,9 @@ class SettingSaldoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_akun,a.kode_pp,a.periode,a.so_akhir 
+            $sql = "select a.kode_akun,b.nama as nama_akun,a.so_akhir 
             from glma_pp a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' ";
 
             $res = DB::connection($this->sql)->select($sql);
@@ -131,8 +132,9 @@ class SettingSaldoController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $akun = DB::connection($this->sql)->select("select a.kode_akun,a.kode_pp,a.periode,a.so_akhir 
+            $akun = DB::connection($this->sql)->select("select a.kode_akun,b.nama as nama_akun,a.so_akhir 
             from glma_pp a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$request->kode_pp' and a.periode='$request->periode' and a.kode_akun='$request->kode_akun'				 
             ");
 
