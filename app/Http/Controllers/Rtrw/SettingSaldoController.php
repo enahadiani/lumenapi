@@ -262,4 +262,39 @@ class SettingSaldoController extends Controller
         }	
     }
 
+    public function getTahun(Request $request)
+    {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->id_satpam;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $akun = DB::connection($this->sql)->select("select distinct substring(periode,1,4) as tahun from glma_pp
+            where kode_lokasi = '$kode_lokasi'
+            ");
+
+            $akun = json_decode(json_encode($akun),true);
+
+            if(count($akun) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $akun;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] =[];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

@@ -157,6 +157,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('setting-saldo-awal','Rtrw\SettingSaldoController@store');
     $router->put('setting-saldo-awal','Rtrw\SettingSaldoController@update');
     $router->delete('setting-saldo-awal','Rtrw\SettingSaldoController@destroy');
+    $router->get('setting-saldo-tahun','Rtrw\SettingSaldoController@getTahun');
 
 });
 
