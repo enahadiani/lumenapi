@@ -190,7 +190,7 @@ class LokasiController extends Controller
             
             $url = url('api/rtrw/storage');
             $akun = DB::connection($this->sql)->select("select kode_lokasi,nama,alamat,kota,kodepos,no_telp,no_fax,flag_konsol,case when logo != '-' then '".$url."/'+logo else '-' end as logo,email,website,npwp,pic,kode_lokkonsol,tgl_pkp,flag_pusat from lokasi
-            where kode_lokasi='$requst->kode_lokasi'			 
+            where kode_lokasi='$request->kode_lokasi'			 
             ");
 
             $akun = json_decode(json_encode($akun),true);
