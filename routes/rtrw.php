@@ -173,7 +173,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('lokasi','Rtrw\LokasiController@index');
     $router->get('lokasi-detail','Rtrw\LokasiController@show');
     $router->post('lokasi','Rtrw\LokasiController@store');
-    $router->put('lokasi','Rtrw\LokasiController@update');
+    $router->post('lokasi-ubah','Rtrw\LokasiController@update');
     $router->delete('lokasi','Rtrw\LokasiController@destroy');
 
 });
