@@ -38,6 +38,33 @@ class PembayaranGroupController extends Controller
         return $id;
     }
 
+    public function getNoBukti(Request $request)
+    {
+        $this->validate($request,[
+            'tanggal' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $no_bukti = generateKode("trans_m","no_bukti",$kode_lokasi."-BM".substr($periode,2,4).".","0001");
+
+            $success['status'] = true;
+            $success['no_bukti'] = $no_bukti;
+            $success['message'] = "Success!";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['no_bukti'] = "-";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     public function index()
     {
         try {
@@ -78,6 +105,7 @@ class PembayaranGroupController extends Controller
             'no_peserta' =>'required',
             'no_paket' =>'required',
             'no_jadwal' =>'required',
+            'no_bukti' => 'required'
         ]);
         try {
             
@@ -94,12 +122,7 @@ class PembayaranGroupController extends Controller
             }
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
 
-            if (isset($request->no_bukti) && $request->no_bukti != "") {
-                $no_bukti = $request->no_bukti;
-            }
-			else {
-                $no_bukti = generateKode("trans_m","no_bukti",$kode_lokasi."-BM".substr($periode,2,4).".","0001");
-            }
+            $no_bukti = $request->no_bukti;
 
             $strSQL = "select a.nama, b.no_reg, b.no_peserta,round((b.harga+b.harga_room) - isnull(g.bayar_p,0),4) as saldo_p, 
                         isnull(h.nilai_t,0) - isnull(g.bayar_t,0) - b.diskon as saldo_t, 
@@ -966,7 +989,6 @@ class PembayaranGroupController extends Controller
     {
         $this->validate($request, [
             'no_bukti' => 'required',
-            'kode_lokasi' => 'required',
             'no_reg' => 'required',
             'kode_biaya' => 'required|array',
             'jenis_biaya' => 'required|array',
