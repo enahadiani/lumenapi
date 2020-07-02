@@ -52,12 +52,12 @@ class PembayaranGroupController extends Controller
 
             $no_bukti = generateKode("trans_m","no_bukti",$kode_lokasi."-BM".substr($periode,2,4).".","0001");
 
-            $success['status'] = true;
+            $success['status'] = "SUCCESS";
             $success['no_bukti'] = $no_bukti;
             $success['message'] = "Success!";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = "FAILED";
             $success['no_bukti'] = "-";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
