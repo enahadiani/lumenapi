@@ -92,7 +92,6 @@ class WargaController extends Controller
             'tgl_masuk' => 'required',
             'sts_masuk' => 'required',
             'nama' => 'required|array',
-            'alias' => 'required|array',
             'nik' => 'required|array',
             'no_hp' => 'required|array',
             'foto.*' => 'file|image|mimes:jpeg,png,jpg|max:2048|required',
@@ -148,7 +147,12 @@ class WargaController extends Controller
                 $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$request->kode_lokasi' and kode_blok ='$request->kode_blok' ");
                 $no_urut = intval($res[0]->nu)+1;
                 for($i=0; $i<count($request->nama);$i++){
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk,$request->alias));
+                    if(isset($request->alias[$i])){
+                        $alias = $request->alias[$i];
+                    }else{
+                        $alias = "-";
+                    }
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk,$alias));
                     $no_urut++;
                 }
             }
@@ -259,7 +263,6 @@ class WargaController extends Controller
             'tgl_masuk' => 'required',
             'sts_masuk' => 'required',
             'nama' => 'required|array',
-            'alias' => 'required|array',
             'nik' => 'required|array',
             'no_hp' => 'required|array',
             'foto.*' => 'file|image|mimes:jpeg,png,jpg|max:2048|required',
@@ -313,7 +316,12 @@ class WargaController extends Controller
                 $del3 = DB::connection($this->sql)->table('rt_warga_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 $no_urut = 1;
                 for($i=0; $i<count($request->nama);$i++){
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk,$request->alias));
+                    if(isset($request->alias[$i])){
+                        $alias = $request->alias[$i];
+                    }else{
+                        $alias = "-";
+                    }
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk,$alias));
                     $no_urut++;
                 }
             }
@@ -339,7 +347,6 @@ class WargaController extends Controller
             'blok' => 'required',
             'no_rumah' => 'required',
             'nama' => 'required',
-            'alias' => 'required',
             'nik' => 'required',
             'no_hp' => 'required',
             'jenis_kelamin' => 'required',
@@ -374,6 +381,12 @@ class WargaController extends Controller
                 
             }
 
+            if(isset($request->alias)){
+                $alias = $request->alias;
+            }else{
+                $alias = "-";
+            }
+
             $update = DB::connection($this->sql)->table('rt_warga_d')
             ->where('nik',$request->nik)
             // ->where('no_hp',$request->no_hp)
@@ -385,7 +398,7 @@ class WargaController extends Controller
                 'no_rumah' => $request->no_rumah,
                 'nama' => $request->nama,
                 'nik' => $request->nik,
-                'alias' => $request->alias,
+                'alias' => $alias,
                 'no_hp' => $request->no_hp,
                 'kode_jk' => $request->jenis_kelamin,
                 'kode_agama' => $request->agama,
