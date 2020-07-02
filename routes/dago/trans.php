@@ -63,6 +63,8 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('upload-dok','Dago\UploadDokController@store');
 
     //Pembayaran Group
+    
+    $router->get('pembayaran-group','Dago\PembayaranGroupController@index');
     $router->get('pembayaran-group-nobukti','Dago\PembayaranGroupController@getNoBukti');
     $router->get('pembayaran-group-reg','Dago\PembayaranGroupController@getRegistrasi');
     $router->get('pembayaran-group-det','Dago\PembayaranGroupController@getDetailBiaya');
