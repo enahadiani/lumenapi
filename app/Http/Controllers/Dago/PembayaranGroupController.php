@@ -49,7 +49,7 @@ class PembayaranGroupController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $periode = substr($request->tanggal,0,4).subtr($request->tanggal,5,2);
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("trans_m","no_bukti",$kode_lokasi."-BM".substr($periode,2,4).".","0001");
 
             $success['status'] = "SUCCESS";
