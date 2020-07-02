@@ -92,6 +92,7 @@ class WargaController extends Controller
             'tgl_masuk' => 'required',
             'sts_masuk' => 'required',
             'nama' => 'required|array',
+            'alias' => 'required|array',
             'nik' => 'required|array',
             'no_hp' => 'required|array',
             'foto.*' => 'file|image|mimes:jpeg,png,jpg|max:2048|required',
@@ -147,7 +148,7 @@ class WargaController extends Controller
                 $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$request->kode_lokasi' and kode_blok ='$request->kode_blok' ");
                 $no_urut = intval($res[0]->nu)+1;
                 for($i=0; $i<count($request->nama);$i++){
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk));
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk,$request->alias));
                     $no_urut++;
                 }
             }
@@ -207,7 +208,7 @@ class WargaController extends Controller
                 $filter .= "";
             }
 
-            $sql= "select a.kode_pp,a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            $sql= "select a.kode_pp,a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.alias,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -258,6 +259,7 @@ class WargaController extends Controller
             'tgl_masuk' => 'required',
             'sts_masuk' => 'required',
             'nama' => 'required|array',
+            'alias' => 'required|array',
             'nik' => 'required|array',
             'no_hp' => 'required|array',
             'foto.*' => 'file|image|mimes:jpeg,png,jpg|max:2048|required',
@@ -311,7 +313,7 @@ class WargaController extends Controller
                 $del3 = DB::connection($this->sql)->table('rt_warga_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 $no_urut = 1;
                 for($i=0; $i<count($request->nama);$i++){
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk));
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->blok,$request->no_rumah,$no_urut,$request->nama[$i],$request->nik[$i],$request->no_hp[$i],$arr_foto[$i],$kode_lokasi,$no_bukti,$request->jenis_kelamin[$i],$request->agama[$i],$request->rt,$request->tgl_masuk,$request->sts_masuk,$request->alias));
                     $no_urut++;
                 }
             }
@@ -337,6 +339,7 @@ class WargaController extends Controller
             'blok' => 'required',
             'no_rumah' => 'required',
             'nama' => 'required',
+            'alias' => 'required',
             'nik' => 'required',
             'no_hp' => 'required',
             'jenis_kelamin' => 'required',
@@ -382,6 +385,7 @@ class WargaController extends Controller
                 'no_rumah' => $request->no_rumah,
                 'nama' => $request->nama,
                 'nik' => $request->nik,
+                'alias' => $request->alias,
                 'no_hp' => $request->no_hp,
                 'kode_jk' => $request->jenis_kelamin,
                 'kode_agama' => $request->agama,
@@ -493,7 +497,7 @@ class WargaController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2= "select a.no_urut,a.nama,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk as jk,a.kode_agama as agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter  ";
+            $sql2= "select a.no_urut,a.nama,a.alias,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk as jk,a.kode_agama as agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter  ";
             
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
