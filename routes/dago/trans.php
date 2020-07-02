@@ -65,6 +65,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     //Pembayaran Group
     $router->get('pembayaran-group-nobukti','Dago\PembayaranGroupController@getNoBukti');
     $router->get('pembayaran-group-reg','Dago\PembayaranGroupController@getRegistrasi');
+    $router->get('pembayaran-group-det','Dago\PembayaranGroupController@getDetailBiaya');
     $router->post('pembayaran-group-det','Dago\PembayaranGroupController@simpanDetTmp');
 });
 
