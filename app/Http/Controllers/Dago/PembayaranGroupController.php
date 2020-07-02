@@ -50,7 +50,7 @@ class PembayaranGroupController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $no_bukti = generateKode("trans_m","no_bukti",$kode_lokasi."-BM".substr($periode,2,4).".","0001");
+            $no_bukti = $this->generateKode("trans_m","no_bukti",$kode_lokasi."-BM".substr($periode,2,4).".","0001");
 
             $success['status'] = "SUCCESS";
             $success['no_bukti'] = $no_bukti;
