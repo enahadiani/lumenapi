@@ -347,4 +347,11 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/portal.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ginas'
+], function ($router) {
+    require __DIR__.'/../routes/ginas.php';
+});
 return $app;

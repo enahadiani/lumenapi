@@ -51,6 +51,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'admintoko',
         ],
+        'ginas' => [
+            'driver' => 'jwt',
+            'provider' => 'adminginas',
+        ],
         'satpam' => [
             'driver' => 'jwt',
             'provider' => 'satpam',
@@ -97,6 +101,10 @@ return [
         'admintoko' => [
             'driver' => 'eloquent',
             'model' => \App\AdminToko::class
+        ],
+        'adminginas' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminGinas::class
         ],
         'satpam' => [
             'driver' => 'eloquent',

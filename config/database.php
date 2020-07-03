@@ -130,6 +130,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'sqlsrvginas' => [
+            'driver' => env('DB_CONNECTION10','sqlsrv'),
+            'host' => env('DB_HOST10', 'localhost'),
+            'port' => env('DB_PORT10', '1433'),
+            'database' => env('DB_DATABASE10', 'forge'),
+            'username' => env('DB_USERNAME10', 'forge'),
+            'password' => env('DB_PASSWORD10', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

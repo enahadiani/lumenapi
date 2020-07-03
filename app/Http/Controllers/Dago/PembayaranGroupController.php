@@ -31,7 +31,7 @@ class PembayaranGroupController extends Controller
     }
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -215,18 +215,52 @@ class PembayaranGroupController extends Controller
                         ) g on b.no_reg=g.no_reg and a.kode_lokasi=g.kode_lokasi 
                         where ( ((b.harga+b.harga_room) - isnull(g.bayar_p,0) > 0)  or  (isnull(h.nilai_t,0) - b.diskon - isnull(g.bayar_t,0) > 0)  or  (isnull(i.nilai_m,0) - isnull(g.bayar_m,0) > 0) ) and b.no_agen='".$request->no_agen."' and b.kode_lokasi='".$kode_lokasi."' ";
 
-
             $res = DB::connection($this->sql)->select($strSQL);
             $res = json_decode(json_encode($res),true);
+
+            $res2 = DB::connection($this->sql)->select("select a.kode_biaya, a.tarif, a.nilai, isnull(c.byr,0) as byr,a.nilai-isnull(c.byr,0) as saldo,a.jml, b.nama, 'IDR' as curr, b.jenis,b.akun_pdpt 
+            from dgw_reg_biaya a 
+            inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
+            inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+            left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_biaya,a.kode_lokasi ) c on a.kode_biaya=c.kode_biaya and a.kode_lokasi=c.kode_lokasi 
+                        and a.no_reg=c.no_reg 
+            where a.nilai <> 0  and a.kode_lokasi='$kode_lokasi' and c.no_peserta='$request->no_peserta' and c.no_paket='".$request->no_paket."' and c.no_jadwal='".$request->no_jadwal."' and c.no_agen='".$request->no_agen."'
+            union all 
+            select 'ROOM' as kode_biaya, a.harga_room as tarif, a.harga_room as nilai,isnull(c.byr,0) as byr,a.harga_room-isnull(c.byr,0) as saldo, 
+                    1 as jml, 'ROOM' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
+            from dgw_reg a 
+            left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.kode_biaya ='ROOM' and a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_lokasi ) c on a.kode_lokasi=c.kode_lokasi 
+                        and a.no_reg=c.no_reg 
+            where a.harga_room <> 0 and a.kode_lokasi='$kode_lokasi' and a.no_peserta='$request->no_peserta' and a.no_paket='".$request->no_paket."' and a.no_jadwal='".$request->no_jadwal."' and a.no_agen='".$request->no_agen."'
+            union all 
+            select 'PAKET' as kode_biaya, a.harga-isnull(a.diskon,0) as tarif, a.harga-isnull(a.diskon,0) as nilai,isnull(c.byr,0) as byr,a.harga-isnull(a.diskon,0)-isnull(c.byr,0) as saldo, 1 as jml, 'PAKET' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
+            from dgw_reg a 
+            left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
+                        from dgw_pembayaran_d a 
+                        where a.kode_biaya = 'PAKET' and a.no_kwitansi <>'".$no_bukti."'
+                        group by a.no_reg,a.kode_lokasi ) c on a.kode_lokasi=c.kode_lokasi 
+                        and a.no_reg=c.no_reg 
+            where a.harga <> 0 and a.kode_lokasi='$kode_lokasi' and a.no_peserta='$request->no_peserta' and a.no_paket='".$request->no_paket."' and a.no_jadwal='".$request->no_jadwal."' and a.no_agen='".$request->no_agen."'
+           
+            order by curr desc");
+            $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
+                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['data_detail'] = [];
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
