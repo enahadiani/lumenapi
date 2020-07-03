@@ -1055,6 +1055,7 @@ class PembayaranGroupController extends Controller
             'no_bukti' => 'required',
             'no_reg' => 'required',
             'kode_biaya' => 'required|array',
+            'kode_akunbiaya' => 'required|array',
             'jenis_biaya' => 'required|array',
             'nilai' => 'required|array',
             'nik_user' => 'required'
@@ -1069,7 +1070,7 @@ class PembayaranGroupController extends Controller
             }
             
             for($i=0; $i<count($request->kode_biaya);$i++){
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user) values(?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg,$request->kode_biaya[$i],$request->jenis_biaya[$i],$request->bayar[$i],$request->nik_user));
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg,$request->kode_biaya[$i],$request->jenis_biaya[$i],$request->nilai[$i],$request->nik_user,$request->kode_akun[$i]));
             }	
 
             DB::connection($this->sql)->commit();
