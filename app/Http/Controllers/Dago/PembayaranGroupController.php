@@ -1068,6 +1068,14 @@ class PembayaranGroupController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            $del = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $request->no_bukti)
+                ->where('nik_user', $request->nik_user)
+                ->where('no_reg', $request->no_reg)
+                ->delete();
+
             $total_d = 0;$total_t=0;$total_p=0;
             for($i=0; $i<count($request->kode_biaya);$i++){
                 if($request->jenis_biaya[$i] == "TAMBAHAN"){
