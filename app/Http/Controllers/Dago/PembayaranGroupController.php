@@ -1085,7 +1085,7 @@ class PembayaranGroupController extends Controller
                 }else{
                     $total_p+=floatval($request->nilai[$i]);
                 }
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg,$request->kode_biaya[$i],$request->jenis_biaya[$i],$request->nilai[$i],$request->nik_user,$request->kode_akun[$i]));
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg,$request->kode_biaya[$i],$request->jenis_biaya[$i],$request->nilai[$i],$request->nik_user,$request->kode_akunbiaya[$i]));
             }	
 
             DB::connection($this->sql)->commit();
