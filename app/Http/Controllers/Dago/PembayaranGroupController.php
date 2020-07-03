@@ -220,14 +220,14 @@ class PembayaranGroupController extends Controller
 
             $res2 = DB::connection($this->sql)->select("select a.kode_biaya, a.tarif, a.nilai, isnull(c.byr,0) as byr,a.nilai-isnull(c.byr,0) as saldo,a.jml, b.nama, 'IDR' as curr, b.jenis,b.akun_pdpt 
             from dgw_reg_biaya a 
-            inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
+            inner join dgw_reg d on a.no_reg=d.no_reg and a.kode_lokasi=d.kode_lokasi
             inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
             left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
                         where a.no_kwitansi <>'".$no_bukti."'
                         group by a.no_reg,a.kode_biaya,a.kode_lokasi ) c on a.kode_biaya=c.kode_biaya and a.kode_lokasi=c.kode_lokasi 
                         and a.no_reg=c.no_reg 
-            where a.nilai <> 0  and a.kode_lokasi='$kode_lokasi' and c.no_peserta='$request->no_peserta' and c.no_paket='".$request->no_paket."' and c.no_jadwal='".$request->no_jadwal."' and c.no_agen='".$request->no_agen."'
+            where a.nilai <> 0  and a.kode_lokasi='$kode_lokasi' and d.no_peserta='$request->no_peserta' and d.no_paket='".$request->no_paket."' and d.no_jadwal='".$request->no_jadwal."' and d.no_agen='".$request->no_agen."'
             union all 
             select 'ROOM' as kode_biaya, a.harga_room as tarif, a.harga_room as nilai,isnull(c.byr,0) as byr,a.harga_room-isnull(c.byr,0) as saldo, 
                     1 as jml, 'ROOM' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
