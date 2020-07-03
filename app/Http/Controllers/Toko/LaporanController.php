@@ -100,7 +100,7 @@ class LaporanController extends Controller
 
             $sql2="select no_jual,tanggal,keterangan,periode,nilai,diskon,no_close as no_bukti from brg_jualpiu_dloc
             where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb) " ;
-            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -180,7 +180,7 @@ class LaporanController extends Controller
             where a.kode_lokasi = '".$kode_lokasi."'  and a.no_bukti in ($nb) 
             order by a.no_bukti
             " ;
-            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -258,7 +258,7 @@ class LaporanController extends Controller
             where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti in ($nb) 
             order by a.kode_barang
             " ;
-            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -341,7 +341,7 @@ class LaporanController extends Controller
 			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga
             order by c.tanggal
             " ;
-            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -422,7 +422,7 @@ class LaporanController extends Controller
             where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETBELI' and a.no_bukti in ($nb)
             order by a.no_bukti
             " ;
-            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
