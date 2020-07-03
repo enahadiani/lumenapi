@@ -1068,14 +1068,24 @@ class PembayaranGroupController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            $total_d = 0;$total_t=0;$total_p=0;
             for($i=0; $i<count($request->kode_biaya);$i++){
+                if($request->jenis_biaya[$i] == "TAMBAHAN"){
+                    $total_t+=floatval($request->nilai[$i]);
+                }else if($request->jenis_biaya[$i] == "DOKUMEN"){
+                    $total_d+=floatval($request->nilai[$i]);
+                }else{
+                    $total_p+=floatval($request->nilai[$i]);
+                }
                 $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg,$request->kode_biaya[$i],$request->jenis_biaya[$i],$request->nilai[$i],$request->nik_user,$request->kode_akun[$i]));
             }	
 
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['no_kwitansi'] = $request->no_bukti;
+            $success['bayar_paket'] = $total_p;
+            $success['bayar_tambahan'] = $total_t;
+            $success['bayar_dokumen'] = $total_d;
             $success['message'] = "Data Detail Pembayaran berhasil disimpan. No Bukti:".$request->no_bukti;
             
             return response()->json($success, $this->successStatus);     
