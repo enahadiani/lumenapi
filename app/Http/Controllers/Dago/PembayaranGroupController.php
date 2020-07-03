@@ -1075,8 +1075,8 @@ class PembayaranGroupController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
-            $success['no_kwitansi'] = $no_bukti;
-            $success['message'] = "Data Detail Pembayaran berhasil disimpan. No Bukti:".$no_bukti;
+            $success['no_kwitansi'] = $request->no_bukti;
+            $success['message'] = "Data Detail Pembayaran berhasil disimpan. No Bukti:".$request->no_bukti;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
