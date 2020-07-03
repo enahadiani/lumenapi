@@ -1071,7 +1071,7 @@ class PembayaranGroupController extends Controller
 
             $del = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
+                ->where('no_kwitansi', $request->no_bukti)
                 ->where('nik_user', $request->nik_user)
                 ->where('no_reg', $request->no_reg)
                 ->delete();
