@@ -190,6 +190,8 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
     $router->get('cek_payload_warga', 'AdminWargaController@cekPayload');
 
     $router->post('ubah_profile', 'Rtrw\WargaController@updatePerUser');
+    $router->post('hash_pass_perwarga', 'Rtrw\WargaController@hashPassPerWarga');
+    
     
 });
 

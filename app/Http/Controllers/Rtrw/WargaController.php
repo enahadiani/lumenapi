@@ -557,4 +557,37 @@ class WargaController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function hashPassPerWarga(Request $request){
+        $this->validate($request,[
+            'no_bukti' => 'required',
+            'no_urut' => 'required',
+            'kode_pp' => 'required',
+            'kode_lokasi' => 'required',
+            'no_rumah' => 'required'
+        ]);
+        DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvrtrw')->table('rt_warga_d')
+                        ->where('no_bukti', $request->no_bukti)
+                        ->where('no_urut', $request->no_urut)
+                        ->where('kode_pp', $request->kode_pp)
+                        ->where('kode_lokasi', $request->kode_lokasi)
+                        ->where('no_rumah', $request->no_rumah)
+                        ->where('pass','<>',' ')
+                        ->update(['password' => app('hash')->make($request->pass)]);
+
+            DB::connection('sqlsrvrtrw')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
 }
