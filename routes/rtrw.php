@@ -51,6 +51,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     
     $router->post('login_warga', 'AuthController@loginWarga');
     $router->post('hash_pass_warga', 'AuthController@hashPassWarga');
+    $router->post('hash_pass_perwarga', 'Rtrw\WargaController@hashPassPerWarga');
 });
 
 $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
@@ -190,7 +191,6 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
     $router->get('cek_payload_warga', 'AdminWargaController@cekPayload');
 
     $router->post('ubah_profile', 'Rtrw\WargaController@updatePerUser');
-    $router->post('hash_pass_perwarga', 'Rtrw\WargaController@hashPassPerWarga');
     
     
 });
