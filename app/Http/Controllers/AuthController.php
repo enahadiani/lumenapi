@@ -354,6 +354,23 @@ class AuthController extends Controller
         
     }
 
+    public function loginWarga(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'no_hp' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['no_hp', 'password']);
+
+        if (! $token = Auth::guard('warga')->setTTL(1440)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token,'warga');
+    }
+
     public function hashPassword(){
         $users = User::all();
         DB::connection('sqlsrv')->beginTransaction();
@@ -695,6 +712,35 @@ class AuthController extends Controller
                 foreach ($users as $user) {
                     DB::connection('sqlsrvrtrw')->table('rt_satpam')
                         ->where('id_satpam', $user->id_satpam)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrvrtrw')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPassWarga(Request $request){
+        $users = AdminWarga::all();
+        DB::connection('sqlsrvrtrw')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvrtrw')->table('rt_warga_d')->orderBy('no_rumah')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrvrtrw')->table('rt_warga_d')
+                        ->where('no_bukti', $user->no_bukti)
+                        ->where('no_urut', $user->no_urut)
+                        ->where('kode_pp', $user->kode_pp)
+                        ->where('kode_lokasi', $user->kode_lokasi)
+                        ->where('no_rumah', $user->no_rumah)
                         ->update(['password' => app('hash')->make($user->pass)]);
                 }
             });

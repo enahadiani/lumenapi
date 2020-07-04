@@ -47,6 +47,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
         return $result;
         
     });
+
+    
+    $router->post('login_warga', 'AuthController@loginWarga');
+    $router->post('hash_pass_warga', 'AuthController@hashPassWarga');
 });
 
 $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
@@ -176,6 +180,17 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('lokasi-ubah','Rtrw\LokasiController@update');
     $router->delete('lokasi','Rtrw\LokasiController@destroy');
 
+});
+
+$router->group(['middleware' => 'auth:warga'], function () use ($router) {
+
+    $router->get('profile_warga', 'AdminWargaController@profile');
+    $router->get('users_warga/{id}', 'AdminWargaController@singleUser');
+    $router->get('users_warga', 'AdminWargaController@allUsers');
+    $router->get('cek_payload_warga', 'AdminWargaController@cekPayload');
+
+    $router->post('ubah_profile', 'Rtrw\WargaController@updatePerUser');
+    
 });
 
 // $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');

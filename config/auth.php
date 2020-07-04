@@ -58,6 +58,10 @@ return [
         'satpam' => [
             'driver' => 'jwt',
             'provider' => 'satpam',
+        ],
+        'warga' => [
+            'driver' => 'jwt',
+            'provider' => 'warga',
         ]
     ],
 
@@ -109,6 +113,10 @@ return [
         'satpam' => [
             'driver' => 'eloquent',
             'model' => \App\AdminSatpam::class
+        ],
+        'warga' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminWarga::class
         ]
     ]
 ];

@@ -20,6 +20,7 @@ class WargaController extends Controller
     public $sql = 'sqlsrvrtrw';
     public $guard = 'rtrw';
     public $guard2 = 'satpam';
+    public $guard3 = 'warga';
     
     public function index(Request $request)
     {
@@ -340,17 +341,11 @@ class WargaController extends Controller
     }
 
     public function updatePerUser(Request $request)
-    {
-        //select id_satpam,kode_lokasi,nama,alamat,status,no_hp,flag_aktif,foto,qrcode   
+    {  
         $this->validate($request, [
-            'rt' => 'required',
-            'blok' => 'required',
-            'no_rumah' => 'required',
             'nama' => 'required',
-            'nik' => 'required',
+            'alias' => 'required',
             'no_hp' => 'required',
-            'jenis_kelamin' => 'required',
-            'agama' => 'required',
             'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         
@@ -358,12 +353,28 @@ class WargaController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $rt = $request->rt;
+                $blok = $request->blok;
+                $no_rumah = $request->no_rumah;
+                $no_urut = $request->no_urut;
+                $no_bukti = $request->no_bukti;
             }else if($data =  Auth::guard($this->guard2)->user()){
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
+                $rt = $request->rt;
+                $blok = $request->blok;
+                $no_rumah = $request->no_rumah;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik= $data->no_hp;
+                $kode_lokasi= $data->kode_lokasi;
+                $rt = $data->kode_pp;
+                $blok = $data->kode_blok;
+                $no_rumah = $data->no_rumah;
+                $no_urut = $data->no_urut;
+                $no_bukti = $data->no_bukti;
             }
            
-            $res = DB::connection($this->sql)->select("select foto from rt_warga_d where nik='$request->nik' and kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' ");
+            $res = DB::connection($this->sql)->select("select foto from rt_warga_d where no_urut='$no_urut' and no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' and kode_pp='$rt' ");
             $foto = $res[0]->foto;
             
             if($request->hasfile('foto')){
@@ -387,35 +398,37 @@ class WargaController extends Controller
                 $alias = "-";
             }
 
+            if(isset($request->tgl_lahir)){
+                $tgl_lahir = $request->tgl_lahir;
+            }else{
+                $tgl_lahir = NULL;
+            }
+
             $update = DB::connection($this->sql)->table('rt_warga_d')
-            ->where('nik',$request->nik)
-            // ->where('no_hp',$request->no_hp)
+            ->where('no_bukti',$no_bukti)
+            ->where('no_urut',$no_urut)
+            ->where('no_rumah',$no_rumah)
+            ->where('kode_pp',$rt)
             ->where('kode_lokasi',$kode_lokasi)
-            ->where('no_rumah',$request->no_rumah)
             ->update([
-                'kode_pp' => $request->rt,
-                'kode_blok' => $request->blok,
-                'no_rumah' => $request->no_rumah,
                 'nama' => $request->nama,
-                'nik' => $request->nik,
                 'alias' => $alias,
                 'no_hp' => $request->no_hp,
-                'kode_jk' => $request->jenis_kelamin,
-                'kode_agama' => $request->agama,
+                'tgl_lahir' => $tgl_lahir,
                 'foto' => $foto
             ]);
             
             if($update){
                 $success['status'] = true;
-                $success['message'] = "Data Satpam berhasil diubah";
+                $success['message'] = "Data Warga berhasil diubah";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Data Satpam gagal diubah";
+                $success['message'] = "Data Warga gagal diubah";
             }
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data Satpam gagal diubah ".$e;
+            $success['message'] = "Data Warga gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
