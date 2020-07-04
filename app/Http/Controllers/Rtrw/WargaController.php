@@ -380,9 +380,10 @@ class WargaController extends Controller
                 $no_bukti = $data->no_bukti;
             }
            
-            $res = DB::connection($this->sql)->select("select foto,pass from rt_warga_d where no_urut='$no_urut' and no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' and kode_pp='$rt' ");
+            $res = DB::connection($this->sql)->select("select foto,pass,tgl_lahir from rt_warga_d where no_urut='$no_urut' and no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' and kode_pp='$rt' ");
             $foto = $res[0]->foto;
             $pass = $res[0]->pass;
+            $tgl_lahir = $res[0]->tgl_lahir;
             
             if($request->hasfile('foto')){
                 if($foto != "" || $foto != "-"){
@@ -408,7 +409,7 @@ class WargaController extends Controller
             if(isset($request->tgl_lahir)){
                 $tgl_lahir = $request->tgl_lahir;
             }else{
-                $tgl_lahir = NULL;
+                $tgl_lahir = $tgl_lahir;
             }
 
             if(isset($request->password)){
