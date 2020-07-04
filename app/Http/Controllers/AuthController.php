@@ -13,6 +13,7 @@ use  App\Admin;
 use  App\AdminYpt;
 use  App\AdminSatpam;
 use  App\AdminRtrw;
+use  App\AdminWarga;
 
 class AuthController extends Controller
 {
