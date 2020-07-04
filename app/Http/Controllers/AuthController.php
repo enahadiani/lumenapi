@@ -742,6 +742,7 @@ class AuthController extends Controller
                         ->where('kode_pp', $user->kode_pp)
                         ->where('kode_lokasi', $user->kode_lokasi)
                         ->where('no_rumah', $user->no_rumah)
+                        ->where('pass','<>',' ')
                         ->update(['password' => app('hash')->make($user->pass)]);
                 }
             });
