@@ -346,6 +346,7 @@ class WargaController extends Controller
             'nama' => 'required',
             'alias' => 'required',
             'no_hp' => 'required',
+            'password' => 'max:6',
             'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         
@@ -374,8 +375,9 @@ class WargaController extends Controller
                 $no_bukti = $data->no_bukti;
             }
            
-            $res = DB::connection($this->sql)->select("select foto from rt_warga_d where no_urut='$no_urut' and no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' and kode_pp='$rt' ");
+            $res = DB::connection($this->sql)->select("select foto,pass from rt_warga_d where no_urut='$no_urut' and no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' and kode_pp='$rt' ");
             $foto = $res[0]->foto;
+            $pass = $res[0]->pass;
             
             if($request->hasfile('foto')){
                 if($foto != "" || $foto != "-"){
@@ -404,6 +406,12 @@ class WargaController extends Controller
                 $tgl_lahir = NULL;
             }
 
+            if(isset($request->password)){
+                $pass = $request->password;
+            }else{
+                $pass = $pass;
+            }
+
             $update = DB::connection($this->sql)->table('rt_warga_d')
             ->where('no_bukti',$no_bukti)
             ->where('no_urut',$no_urut)
@@ -415,7 +423,9 @@ class WargaController extends Controller
                 'alias' => $alias,
                 'no_hp' => $request->no_hp,
                 'tgl_lahir' => $tgl_lahir,
-                'foto' => $foto
+                'foto' => $foto,
+                'pass' => $pass,
+                'password' => app('hash')->make($pass)
             ]);
             
             if($update){
