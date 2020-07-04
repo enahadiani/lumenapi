@@ -570,11 +570,13 @@ class WargaController extends Controller
             'no_urut' => 'required',
             'kode_pp' => 'required',
             'kode_lokasi' => 'required',
-            'no_rumah' => 'required'
+            'no_rumah' => 'required',
+            'password' => 'required'
         ]);
         DB::connection('sqlsrvrtrw')->beginTransaction();
         
         try {
+
             DB::connection('sqlsrvrtrw')->table('rt_warga_d')
                         ->where('no_bukti', $request->no_bukti)
                         ->where('no_urut', $request->no_urut)
@@ -582,7 +584,7 @@ class WargaController extends Controller
                         ->where('kode_lokasi', $request->kode_lokasi)
                         ->where('no_rumah', $request->no_rumah)
                         ->where('pass','<>',' ')
-                        ->update(['password' => app('hash')->make($request->pass)]);
+                        ->update(['password' => app('hash')->make($request->password)]);
 
             DB::connection('sqlsrvrtrw')->commit();
             $success['status'] = true;
