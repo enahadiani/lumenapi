@@ -282,29 +282,28 @@ class PembayaranGroupController extends Controller
     {
         $this->validate($request, [
             'tanggal' => 'required|date_format:Y-m-d',
-            'no_reg' => 'required',
-            'nama' => 'required',
             'deskripsi' => 'required',
             'kode_pp' => 'required',
             'kode_akun' => 'required',
             'kode_curr' => 'required',
             'kurs' => 'required',
-            'akun_titip' => 'required',
-            'kurs_closing' => 'required',
-            'akun_tambah' => 'required',
-            'akun_dokumen' => 'required', 
-            'paket' => 'required',
-            'tgl_berangkat' => 'required|date_format:Y-m-d',
             'status_bayar' => 'required|in:TUNAI,TRANSFER',
             'total_bayar' => 'required',
             'bayar_paket' => 'required',
             'bayar_tambahan' => 'required',
             'bayar_dok' => 'required',
-            'biaya' => 'required|array',
-            'biaya.*.kode_biaya' => 'required',
-            'biaya.*.jenis_biaya' => 'required',
-            'biaya.*.kode_akun' => 'required',
-            'biaya.*.bayar' => 'required'
+            'nik_user' => 'required',
+            'no_bukti' => 'required',
+            'no_reg' => 'required|array',
+            'nama' => 'required|array',
+            'paket' => 'required|array',
+            'akun_titip' => 'required|array',
+            'tgl_berangkat' => 'required|array',
+            'nilai_paket' => 'required|array',
+            'nilai_tambahan' => 'required|array',
+            'nilai_dok' => 'required|array',
+            'kurs_closing' => 'required|array',
+            'no_closing' => 'required|array',
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -329,11 +328,10 @@ class PembayaranGroupController extends Controller
             }	
 
             $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-BM'.substr($periode,2,4).".", "0001");
-            $bayarPaketIDR = floatval($request->bayar_paket)*floatval($request->kurs);
             
-            $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
+            $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBGROUP','F','-','-',$request->kode_pp,$request->tanggal,'-',$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,$request->no_agen,'-','-','-','-','-',$request->kode_akun,$request->status_bayar,'BM'));
 
-            $ins2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,0,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+            $ins2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,999,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
 
             //PENAMBAHAN KURS
             $totalOri = (floatval($request->kurs) *  floatval($request->bayar_paket)) + floatval($request->bayar_tambahan) + floatval($request->bayar_dok);							
@@ -348,124 +346,265 @@ class PembayaranGroupController extends Controller
 				}
 			}	
             //
+
+            for($i=0;$i<count($request->no_reg);$i++){
+
+
+                $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg[$i],$request->tgl_berangkat[$i],$request->tanggal,$request->paket[$i],$request->status_bayar,$kode_lokasi,$periode,$request->nilai_tambahan[$i],$request->nilai_paket[$i],$request->kode_curr,$request->kurs,$request->nilai_dok[$i]));
+
+                if(floatval($request->bayar_paket) > 0){
                     
-            $ins3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,1,$request->akun_titip,'C',$bayarPaketIDR,$request->bayar_paket,$request->deskripsi,'KB','TTPPAKET',$request->kode_curr,$request->kurs,$request->kode_pp,'-','-','-','-','-','-','-','-'));										
-
-            if (intval($request->bayar_tambahan) != 0 || intval($request->bayar_dok) != 0 || intval($request->bayar_paket) != 0) {
-               
-                $nilai_t=0;$nilai_d=0;$total_t=0;$total_d=0;$ser_t=array();$ser2_t=array();$ser_d=array();$ser2_d=array();$tes=array();
-                $biaya = $request->biaya;
-                for($i=0; $i<count($biaya);$i++){
-                
-                    if(intval($biaya[$i]['bayar']) != 0){
-
-                        if($biaya[$i]['jenis_biaya'] == 'TAMBAHAN'){
-                            $nilai_t = intval($biaya[$i]['bayar']);
-                            array_push($tes,$nilai_t);
-                            $isAda_t = false;
-                            $idx_t = 0;
-                            
-                            $akun_t = $biaya[$i]['kode_akun'];						
-                            for ($c=0;$c <= $i;$c++){
-                                if(isset($biaya[$c-1]['kode_akun'])){
-
-                                    if ($akun_t == $biaya[$c-1]['kode_akun']) {
-                                        $isAda_t = true;
-                                        $idx_t = $c;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!$isAda_t) {							
-                                array_push($ser_t,$biaya[$i]['kode_akun']);
-                                
-                                $ser2_t[$biaya[$i]['kode_akun']]=$nilai_t;
-                            } 
-                            else { 
-                                $total_t = $ser2_t[$biaya[$i]['kode_akun']];
-                                $total_t = $total_t + $nilai_t;
-                                $ser2_t[$biaya[$i]['kode_akun']]=$total_t;
-                            }		
-                        }else if($biaya[$i]['jenis_biaya'] == 'DOKUMEN'){
-                            $nilai_d = intval($biaya[$i]['bayar']);
-                            $isAda_d = false;
-                            $idx_d = 0;
-                            
-                            $akun_d = $biaya[$i]['kode_akun'];						
-                            for ($c=0;$c <= $i;$c++){
-                                if(isset($biaya[$c-1]['kode_akun'])){
-                                    if ($akun_d == $biaya[$c-1]['kode_akun']) {
-                                        $isAda_d = true;
-                                        $idx_d = $c;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!$isAda_d) {							
-                                array_push($ser_d,$biaya[$i]['kode_akun']);
-                                
-                                $ser2_d[$biaya[$i]['kode_akun']]=$nilai_d;
-                            } 
-                            else { 
-                                $total_d = $ser2_d[$biaya[$i]['kode_akun']];
-                                $total_d = $total_d + $nilai_d;
-                                $ser2_d[$biaya[$i]['kode_akun']]=$total_d;
-                            }
-                        }
+                    $bayarPaketIDR = floatval($request->nilai_paket[$i])*floatval($request->kurs);
     
-                        $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) values(?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,$request->no_reg,$biaya[$i]['kode_biaya'],$biaya[$i]['jenis_biaya'],$biaya[$i]['bayar']));
-                    } 
+                    $ins3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg[$i],$request->tanggal,1,$request->akun_titip[$i],'C',$bayarPaketIDR,$request->nilai_paket[$i],$request->deskripsi,'KB','KB',$request->kode_curr,$request->kurs,$request->kode_pp,'-','-','-','-','-','-','-','-'));				
+                }
+
+                //hitung selisih kurs pembyaran dan closing jadwal (untuk yg di piutang-kan - saat berangkat blm lunas)
+                //jika pembayran dilakukan setelah berangkat
+                if (floatval($request->no_closing[$i]) !="-"){
+                    if( floatval($request->kurs_closing[$i]) != 0 && floatval($request->kurs_closing[$i]) != floatval($request->kurs))  {
+
+                        $sls = (floatval($request->kurs) - floatval($request->kurs_closing[$i])) * floatval($request->nilai_paket[$i]);
+                        if ($sls !=0 ) {
+                            if ($sls > 0){ 
+                                $akunKurs = $lKurs;
+                                $dc = "C";
+                                $dcPiutang = "D";
+                            }
+                            else {
+                                $akunKurs = $rKurs;
+                                $dc = "D";
+                                $dcPiutang = "C";
+                            }
+                            $sls = abs($sls);
+                            
+                            $insk2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',777,'".$akunKurs."','".$dc."',".$sls.",".$sls.",'Selisih Kurs Piutang Closing','KB','SKURS','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
+                            
+                            $insk3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',778,'".$request->akun_titip[$i]."','".$dcPiutang."',".$sls.",".$sls.",'Selisih Kurs Piutang Closing','KB','SLSPIU','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");		
+                        }
+                    }
+                
+                }
+
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg'");
+
+                if (intval($request->nilai_tambahan[$i]) != 0 ) {
+
+                    $biaya_t = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
+                    from dgw_pembayaran_d_tmp 
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('TAMBAHAN')
+                    group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
+                    $biaya_t = json_decode(json_encode($biaya_t),true);
+	
+
+                    $nu = 1000+$i;
+                    for($x=0; $x<count($biaya_t);$x++){
+                            
+                        $ins4[$x] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg[$i],$request->tanggal,$nu,$biaya_t[$x]['kode_akun'],'C',$biaya_t[$x]['nilai'],$biaya_t[$x]['nilai'],'Pembayaran a.n Reg '.$request->no_reg[$i],'KB','PDTAMBAH','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                       
+                        $nu++;
+                            
+                    }
+                }
+
+                if (intval($request->nilai_dok[$i]) != 0 ){
+
+                    $biaya_d = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
+                    from dgw_pembayaran_d_tmp 
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('DOKUMEN')
+                    group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
+                    $biaya_d = json_decode(json_encode($biaya_d),true);
+    
+                    $nu = 3000+$i;
+                    for($x=0; $x<count($biaya_d);$x++){
+                        $ins5[$x] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg[$i],$request->tanggal,$nu,$biaya_d[$x]['kode_akun'],'C',$biaya_d[$x]['nilai'],$biaya_d[$x]['nilai'],'Pembayaran a.n Reg '.$request->no_reg[$i],'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                        
+                        $nu++; 
+                    }
                 }	
-                $nu =2;
-                for($x=0; $x<count($ser_t);$x++){
-                        
-                    if($request->akun_tambah == "" || $request->akun_tambah == "-"){
-
-                        $ins4[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$ser_t[$x],'C',$ser2_t[$ser_t[$x]],$ser2_t[$ser_t[$x]],$request->deskripsi,'KB','PDTAMBAH','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }else{
-                        $ins4[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$request->akun_tambah,'C',$ser2_t[$ser_t[$x]],$ser2_t[$ser_t[$x]],$request->deskripsi,'KB','PDTAMBAH','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }
-                    $nu++;
-                        
-                }
-
-                $nu =3;
-                for($x=0; $x<count($ser_d);$x++){
-                    if($request->akun_dokumen == "" || $request->akun_dokumen == "-"){   
-                        $ins5[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$ser_d[$x],'C',$ser2_d[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }else{
-                        $ins5[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$request->akun_dokumen,'C',$ser2_d[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }
-                    $nu++;
-                        
-                }
-            }		
-            
-            $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,$request->kode_curr,$request->kurs,$request->bayar_dok));
-
-            //hitung selisih kurs pembyaran dan closing jadwal (untuk yg di piutang-kan - saat berangkat blm lunas)
-            //jika pembayran dilakukan setelah berangkat
-			if (floatval($request->kurs_closing) != 0 && floatval($request->kurs_closing) != floatval($request->kurs))  {
-				$sls = (floatval($request->kurs) - floatval($request->kurs_closing)) * floatval($request->bayar_paket);
-				if ($sls !=0 ) {
-                    if ($sls > 0){ 
-                        $akunKurs = $lKurs;
-                        $dc = "C";
-                        $dcPiutang = "D";
-                    }
-                    else {
-                        $akunKurs = $rKurs;
-                        $dc = "D";
-                        $dcPiutang = "C";
-                    }
-                    $sls = abs($sls);
-                    
-                    $insk2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg."','".$request->tanggal."',777,'".$akunKurs."','".$dc."',".$sls.",".$sls.",'Selisih Kurs Piutang Closing','KB','SKURS','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
-                    
-                    $insk3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg."','".$request->tanggal."',778,'".$request->akun_titip."','".$dcPiutang."',".$sls.",".$sls.",'Selisih Kurs a.n ".$request->nama."','KB','SLSPIU','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");		
-				}
             }
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = "SUCCESS";
+            $success['no_kwitansi'] = $no_bukti;
+            $success['message'] = "Data Pembayaran berhasil disimpan. No Bukti:".$no_bukti;
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Pembayaran gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }		
+        
+    }
+
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'tanggal' => 'required|date_format:Y-m-d',
+            'deskripsi' => 'required',
+            'kode_pp' => 'required',
+            'kode_akun' => 'required',
+            'kode_curr' => 'required',
+            'kurs' => 'required',
+            'status_bayar' => 'required|in:TUNAI,TRANSFER',
+            'total_bayar' => 'required',
+            'bayar_paket' => 'required',
+            'bayar_tambahan' => 'required',
+            'bayar_dok' => 'required',
+            'nik_user' => 'required',
+            'no_bukti' => 'required',
+            'no_reg' => 'required|array',
+            'nama' => 'required|array',
+            'paket' => 'required|array',
+            'akun_titip' => 'required|array',
+            'tgl_berangkat' => 'required|array',
+            'nilai_paket' => 'required|array',
+            'nilai_tambahan' => 'required|array',
+            'nilai_dok' => 'required|array',
+            'kurs_closing' => 'required|array',
+            'no_closing' => 'required|array',
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $d = DB::connection($this->sql)->select("select kode_spro,flag from spro where kode_spro in ('LKURS','RKURS','AKUNT','AKUND','AKUNOI','AKUNOE') and kode_lokasi = '".$kode_lokasi."'");
+            $d = json_decode(json_encode($d),true);	
+            if (count($d) > 0){
+				for ($i=0;$i<count($d);$i++){
+					$line = $d[$i];	
+					if ($line['kode_spro'] == "AKUNOI") $akunOI = $line['flag'];
+                    if ($line['kode_spro'] == "AKUNOE") $akunOE = $line['flag'];
+                    if ($line['kode_spro'] == "LKURS") $lKurs = $line['flag'];
+                    if ($line['kode_spro'] == "RKURS") $rKurs = $line['flag'];
+				}
+            }	
+
+            $no_bukti = $request->no_bukti;
+
+            $del = DB::connection($this->sql)->table('trans_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $request->no_bukti)
+                ->delete();
+
+            $del2 = DB::connection($this->sql)->table('trans_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $request->no_bukti)
+                ->delete();
+            
+            $del3 = DB::connection($this->sql)->table('dgw_pembayaran')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_bukti)
+                ->delete();	
+            
+            $del4 = DB::connection($this->sql)->table('dgw_pembayaran_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_bukti)
+                ->delete();	
+            
+            $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBGROUP','F','-','-',$request->kode_pp,$request->tanggal,'-',$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,$request->no_agen,'-','-','-','-','-',$request->kode_akun,$request->status_bayar,'BM'));
+
+            $ins2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,999,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+
+            //PENAMBAHAN KURS
+            $totalOri = (floatval($request->kurs) *  floatval($request->bayar_paket)) + floatval($request->bayar_tambahan) + floatval($request->bayar_dok);							
+            $sls = floatval($request->total_bayar) - $totalOri;		
+            if ($sls != 0) {								
+				if ($sls < 0) {							
+					$sls = $sls * -1;
+                    $insk1 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',998,'".$akunOE."','D',".$sls.",".$sls.",'".$request->deskripsi."','KB','SLSKOMA','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
+                }
+				else {							
+					$insk1 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',998,'".$akunOI."','C',".$sls.",".$sls.",'".$request->deskripsi."','KB','SLSKOMA','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");											
+				}
+			}	
+            //
+
+            for($i=0;$i<count($request->no_reg);$i++){
+
+
+                $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg[$i],$request->tgl_berangkat[$i],$request->tanggal,$request->paket[$i],$request->status_bayar,$kode_lokasi,$periode,$request->nilai_tambahan[$i],$request->nilai_paket[$i],$request->kode_curr,$request->kurs,$request->nilai_dok[$i]));
+
+                if(floatval($request->bayar_paket) > 0){
                     
+                    $bayarPaketIDR = floatval($request->nilai_paket[$i])*floatval($request->kurs);
+    
+                    $ins3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg[$i],$request->tanggal,1,$request->akun_titip[$i],'C',$bayarPaketIDR,$request->nilai_paket[$i],$request->deskripsi,'KB','KB',$request->kode_curr,$request->kurs,$request->kode_pp,'-','-','-','-','-','-','-','-'));				
+                }
+
+                //hitung selisih kurs pembyaran dan closing jadwal (untuk yg di piutang-kan - saat berangkat blm lunas)
+                //jika pembayran dilakukan setelah berangkat
+                if (floatval($request->no_closing[$i]) !="-"){
+                    if( floatval($request->kurs_closing[$i]) != 0 && floatval($request->kurs_closing[$i]) != floatval($request->kurs))  {
+
+                        $sls = (floatval($request->kurs) - floatval($request->kurs_closing[$i])) * floatval($request->nilai_paket[$i]);
+                        if ($sls !=0 ) {
+                            if ($sls > 0){ 
+                                $akunKurs = $lKurs;
+                                $dc = "C";
+                                $dcPiutang = "D";
+                            }
+                            else {
+                                $akunKurs = $rKurs;
+                                $dc = "D";
+                                $dcPiutang = "C";
+                            }
+                            $sls = abs($sls);
+                            
+                            $insk2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',777,'".$akunKurs."','".$dc."',".$sls.",".$sls.",'Selisih Kurs Piutang Closing','KB','SKURS','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
+                            
+                            $insk3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',778,'".$request->akun_titip[$i]."','".$dcPiutang."',".$sls.",".$sls.",'Selisih Kurs Piutang Closing','KB','SLSPIU','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");		
+                        }
+                    }
+                
+                }
+
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg'");
+
+                if (intval($request->nilai_tambahan[$i]) != 0 ) {
+
+                    $biaya_t = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
+                    from dgw_pembayaran_d_tmp 
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('TAMBAHAN')
+                    group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
+                    $biaya_t = json_decode(json_encode($biaya_t),true);
+	
+
+                    $nu = 1000+$i;
+                    for($x=0; $x<count($biaya_t);$x++){
+                            
+                        $ins4[$x] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg[$i],$request->tanggal,$nu,$biaya_t[$x]['kode_akun'],'C',$biaya_t[$x]['nilai'],$biaya_t[$x]['nilai'],'Pembayaran a.n Reg '.$request->no_reg[$i],'KB','PDTAMBAH','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                       
+                        $nu++;
+                            
+                    }
+                }
+
+                if (intval($request->nilai_dok[$i]) != 0 ){
+
+                    $biaya_d = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
+                    from dgw_pembayaran_d_tmp 
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('DOKUMEN')
+                    group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
+                    $biaya_d = json_decode(json_encode($biaya_d),true);
+    
+                    $nu = 3000+$i;
+                    for($x=0; $x<count($biaya_d);$x++){
+                        $ins5[$x] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg[$i],$request->tanggal,$nu,$biaya_d[$x]['kode_akun'],'C',$biaya_d[$x]['nilai'],$biaya_d[$x]['nilai'],'Pembayaran a.n Reg '.$request->no_reg[$i],'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                        
+                        $nu++; 
+                    }
+                }	
+            }
+
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['no_kwitansi'] = $no_bukti;
@@ -746,234 +885,6 @@ class PembayaranGroupController extends Controller
             return response()->json($success, $this->successStatus);
         }
 
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request)
-    {
-        $this->validate($request, [
-            'no_bukti' => 'required',
-            'tanggal' => 'required|date_format:Y-m-d',
-            'no_reg' => 'required',
-            'nama' => 'required',
-            'deskripsi' => 'required',
-            'kode_pp' => 'required',
-            'kode_akun' => 'required',
-            'kode_curr' => 'required',
-            'kurs' => 'required',
-            'akun_titip' => 'required',
-            'kurs_closing' => 'required',
-            'akun_tambah' => 'required',
-            'akun_dokumen' => 'required', 
-            'paket' => 'required',
-            'tgl_berangkat' => 'required|date_format:Y-m-d',
-            'status_bayar' => 'required|in:TUNAI,TRANSFER',
-            'total_bayar' => 'required',
-            'bayar_paket' => 'required',
-            'bayar_tambahan' => 'required',
-            'bayar_dok' => 'required',
-            'biaya' => 'required|array',
-            'biaya.*.kode_biaya' => 'required',
-            'biaya.*.jenis_biaya' => 'required',
-            'biaya.*.kode_akun' => 'required',
-            'biaya.*.bayar' => 'required'
-        ]);
-
-        DB::connection($this->sql)->beginTransaction();
-        
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-            
-            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $d = DB::connection($this->sql)->select("select kode_spro,flag from spro where kode_spro in ('LKURS','RKURS','AKUNT','AKUND','AKUNOI','AKUNOE') and kode_lokasi = '".$kode_lokasi."'");
-            $d = json_decode(json_encode($d),true);	
-            if (count($d) > 0){
-				for ($i=0;$i<count($d);$i++){
-					$line = $d[$i];	
-					if ($line['kode_spro'] == "AKUNOI") $akunOI = $line['flag'];
-					if ($line['kode_spro'] == "AKUNOE") $akunOE = $line['flag'];
-				}
-            }	
-
-            $no_bukti = $request->no_bukti;
-            
-            $del = DB::connection($this->sql)->table('trans_m')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
-                ->delete();
-
-            $del2 = DB::connection($this->sql)->table('trans_j')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_bukti)
-                ->delete();
-            
-            $del3 = DB::connection($this->sql)->table('dgw_pembayaran')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_kwitansi', $request->no_bukti)
-                ->delete();	
-            
-            $del4 = DB::connection($this->sql)->table('dgw_pembayaran_d')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_kwitansi', $request->no_bukti)
-                ->delete();	
-                
-            $bayarPaketIDR = floatval($request->bayar_paket)*floatval($request->kurs);    
-            $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
-            $ins2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,0,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-            
-            //PENAMBAHAN KURS
-            $totalOri = (floatval($request->kurs) *  floatval($request->bayar_paket)) + floatval($request->bayar_tambahan) + floatval($request->bayar_dok);							
-            $sls = floatval($request->total_bayar) - $totalOri;		
-            if ($sls != 0) {								
-                if ($sls < 0) {							
-                    $sls = $sls * -1;
-                    $insk1 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',998,'".$akunOE."','D',".$sls.",".$sls.",'".$request->deskripsi."','KB','SLSKOMA','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
-                }
-                else {							
-                    $insk1 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',998,'".$akunOI."','C',".$sls.",".$sls.",'".$request->deskripsi."','KB','SLSKOMA','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");											
-                }
-            }	
-            //
-                
-            $ins3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,1,$request->akun_titip,'C',$bayarPaketIDR,$request->bayar_paket,$request->deskripsi,'KB','TTPPAKET',$request->kode_curr,$request->kurs,$request->kode_pp,'-','-','-','-','-','-','-','-'));										
-                
-            if (intval($request->bayar_tambahan) != 0 || intval($request->bayar_dok) != 0 || intval($request->bayar_paket) != 0) 
-            { 
-                $nilai_t=0;$nilai_d=0;$total_t=0;$total_d=0;$ser_t=array();$ser2_t=array();$ser_d=array();$ser2_d=array();$tes=array();
-                $biaya = $request->biaya;
-                for($i=0; $i<count($biaya);$i++){
-                    if(intval($biaya[$i]['bayar']) != 0){
-                        if($biaya[$i]['jenis_biaya'] == 'TAMBAHAN'){
-                            $nilai_t = intval($biaya[$i]['bayar']);
-                            array_push($tes,$nilai_t);
-                            $isAda_t = false;
-                            $idx_t = 0;
-                            
-                            $akun_t = $biaya[$i]['kode_akun'];						
-                            for ($c=0;$c <= $i;$c++)
-                            {
-                                if(isset($biaya[$c-1]['kode_akun']))
-                                {
-                                    
-                                    if ($akun_t == $biaya[$c-1]['kode_akun']) 
-                                    {
-                                        $isAda_t = true;
-                                        $idx_t = $c;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (!$isAda_t) {							
-                                array_push($ser_t,$biaya[$i]['kode_akun']);
-                                
-                                $ser2_t[$biaya[$i]['kode_akun']]=$nilai_t;
-                            } 
-                            else { 
-                                $total_t = $ser2_t[$biaya[$i]['kode_akun']];
-                                $total_t = $total_t + $nilai_t;
-                                $ser2_t[$biaya[$i]['kode_akun']]=$total_t;
-                            }		
-                        }else if($biaya[$i]['jenis_biaya'] == 'DOKUMEN'){
-                            $nilai_d = intval($biaya[$i]['bayar']);
-                            $isAda_d = false;
-                            $idx_d = 0;
-                            
-                            $akun_d = $biaya[$i]['kode_akun'];						
-                            for ($c=0;$c <= $i;$c++){
-                                if(isset($biaya[$c-1]['kode_akun'])){
-                                    if ($akun_d == $biaya[$c-1]['kode_akun']) {
-                                        $isAda_d = true;
-                                        $idx_d = $c;
-                                    break;
-                                    }
-                                }
-                            }
-                            if (!$isAda_d) {							
-                                array_push($ser_d,$biaya[$i]['kode_akun']);
-                                
-                                $ser2_d[$biaya[$i]['kode_akun']]=$nilai_d;
-                            } 
-                            else { 
-                                $total_d = $ser2_d[$biaya[$i]['kode_akun']];
-                                $total_d = $total_d + $nilai_d;
-                                $ser2_d[$biaya[$i]['kode_akun']]=$total_d;
-                            }
-                        }
-                    
-                        $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) values(?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,$request->no_reg,$biaya[$i]['kode_biaya'],$biaya[$i]['jenis_biaya'],$biaya[$i]['bayar']));
-                    } 
-                }	
-                $nu =2;
-                for($x=0; $x<count($ser_t);$x++){
-                    
-                    if($request->akun_tambah == "" || $request->akun_tambah == "-"){
-                        
-                        $ins4[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$ser_t[$x],'C',$ser2_t[$ser_t[$x]],$ser2_t[$ser_t[$x]],$request->deskripsi,'KB','PDTAMBAH','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }else{
-                        $ins4[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$request->akun_tambah,'C',$ser2_t[$ser_t[$x]],$ser2_t[$ser_t[$x]],$request->deskripsi,'KB','PDTAMBAH','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }
-                    $nu++;
-                    
-                }
-                
-                $nu =3;
-                for($x=0; $x<count($ser_d);$x++){
-                    if($request->akun_dokumen == "" || $request->akun_dokumen == "-"){   
-                        $ins5[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$ser_d[$x],'C',$ser2_d[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }else{
-                        $ins5[$i] =  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,$nu,$request->akun_dokumen,'C',$ser2_d[$ser_d[$x]],$ser2_d[$ser_d[$x]],$request->deskripsi,'KB','PDDOKUMEN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
-                    }
-                    $nu++;
-                    
-                }
-            }		
-        
-            $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,$request->kode_curr,$request->kurs,$request->bayar_dok));
-            
-            //hitung selisih kurs pembyaran dan closing jadwal (untuk yg di piutang-kan - saat berangkat blm lunas)
-            //jika pembayran dilakukan setelah berangkat
-            if (floatval($request->kurs_closing) != 0 && floatval($request->kurs_closing) != floatval($request->kurs))  {
-                $sls = (floatval($request->kurs) - floatval($request->kurs_closing)) * floatval($request->bayar_paket);
-                if ($sls !=0 ) {
-                    if ($sls > 0){ 
-                        $akunKurs = $lKurs;
-                        $dc = "C";
-                        $dcPiutang = "D";
-                    }
-                    else {
-                        $akunKurs = $rKurs;
-                        $dc = "D";
-                        $dcPiutang = "C";
-                    }
-                    $sls = abs($sls);
-                    
-                    $insk2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg."','".$request->tanggal."',777,'".$akunKurs."','".$dc."',".$sls.",".$sls.",'Selisih Kurs Piutang Closing','KB','SKURS','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
-                    
-                    $insk3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg."','".$request->tanggal."',778,'".$request->akun_titip."','".$dcPiutang."',".$sls.",".$sls.",'Selisih Kurs a.n ".$request->nama."','KB','SLSPIU','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");		
-                }
-            }
-            DB::connection($this->sql)->commit();
-            $success['status'] = "SUCCESS";
-            $success['no_kwitansi'] = $no_bukti;
-            $success['message'] = "Data Pembayaran berhasil diubah";
-            
-            return response()->json($success, $this->successStatus);     
-        } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
-            $success['status'] = "FAILED";
-            $success['message'] = "Data Pembayaran gagal diubah ".$e;
-            return response()->json($success, $this->successStatus); 
-        }		
     }
 
     /**

@@ -70,6 +70,9 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('pembayaran-group-det','Dago\PembayaranGroupController@getDetailBiaya');
     $router->post('pembayaran-group-det','Dago\PembayaranGroupController@simpanDetTmp');
     $router->post('pembayaran-group-det2','Dago\PembayaranGroupController@simpanDetTmp2');
+    $router->post('pembayaran-group','Dago\PembayaranGroupController@store');
+    $router->put('pembayaran-group','Dago\PembayaranGroupController@store');
+    $router->delete('pembayaran-group','Dago\PembayaranGroupController@destroy');
 });
 
 
