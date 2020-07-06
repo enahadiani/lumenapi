@@ -34,7 +34,7 @@ class AdminWargaController extends Controller
             $kode_lokasi= $data->kode_lokasi;
             
             $url = url('api/rtrw/storage');
-            $user = DB::connection('sqlsrvrtrw')->select("select a.no_hp,a.nama,a.tgl_lahir,a.kode_jk,a.kode_agama,a.kode_pp,a.kode_blok,a.no_urut,a.no_bukti,a.no_rumah,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto,b.status_huni from rt_warga_d a
+            $user = DB::connection('sqlsrvrtrw')->select("select a.no_hp,a.nama,a.alias,a.tgl_lahir,a.kode_jk,a.kode_agama,a.kode_pp,a.kode_blok,a.no_urut,a.no_bukti,a.no_rumah,case when a.foto != '-' then '".$url."/'+a.foto else '-' end as foto,b.status_huni from rt_warga_d a
             inner join rt_rumah b on a.no_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
             where a.no_hp= '$no_hp' 
             ");
