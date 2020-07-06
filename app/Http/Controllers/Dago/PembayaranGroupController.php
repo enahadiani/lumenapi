@@ -287,6 +287,7 @@ class PembayaranGroupController extends Controller
             'kode_akun' => 'required',
             'kode_curr' => 'required',
             'kurs' => 'required',
+            'no_agen' => 'required',
             'status_bayar' => 'required|in:TUNAI,TRANSFER',
             'total_bayar' => 'required',
             'bayar_paket' => 'required',
@@ -427,6 +428,7 @@ class PembayaranGroupController extends Controller
             $del5 = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kwitansi', $request->no_bukti)
+                ->where('nik_user', $request->nik_user)
                 ->delete();
 
             DB::connection($this->sql)->commit();
@@ -453,6 +455,7 @@ class PembayaranGroupController extends Controller
             'kode_akun' => 'required',
             'kode_curr' => 'required',
             'kurs' => 'required',
+            'no_agen' => 'required',
             'status_bayar' => 'required|in:TUNAI,TRANSFER',
             'total_bayar' => 'required',
             'bayar_paket' => 'required',
@@ -613,6 +616,7 @@ class PembayaranGroupController extends Controller
             $del5 = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kwitansi', $request->no_bukti)
+                ->where('nik_user', $request->nik_user)
                 ->delete();	
 
             DB::connection($this->sql)->commit();
@@ -944,6 +948,39 @@ class PembayaranGroupController extends Controller
             DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
             $success['message'] = "Data Pembayaran gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
+    public function destroyDetTmp(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'nik_user' => 'required'
+        ]);
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $del = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_bukti)
+                ->where('nik_user', $request->nik_user)
+                ->delete();
+
+            $success['status'] = true;
+            $success['message'] = "Data Detail Pembayaran tmp berhasil dihapus ";
+            DB::connection($this->sql)->commit();
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Detail Pembayaran tmp gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
