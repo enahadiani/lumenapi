@@ -1202,7 +1202,7 @@ class PembayaranGroupController extends Controller
                 $recAkhir = round($selisih + (floatval($bayar[$j]) * 100));
                 $recAkhir = $recAkhir/100;
 
-                $upd = DB::connection($this->sql)->update("update dwg_pembayaran_d set nilai=$recAkhir where no_kwitansi='$request->no_kwitansi' and kode_lokasi='$kode_lokasi' and no_reg='".$request->no_reg[$j]."' and nik_user='$request->nik_user' ");		
+                $upd = DB::connection($this->sql)->update("update dgw_pembayaran_d_tmp set nilai=$recAkhir where no_kwitansi='$request->no_kwitansi' and kode_lokasi='$kode_lokasi' and no_reg='".$request->no_reg[$j]."' and nik_user='$request->nik_user' ");		
             }
 
             DB::connection($this->sql)->commit();
