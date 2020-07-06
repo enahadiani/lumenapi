@@ -386,13 +386,13 @@ class PembayaranGroupController extends Controller
                 
                 }
 
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg'");
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."'");
 
                 if (intval($request->nilai_tambahan[$i]) != 0 ) {
 
                     $biaya_t = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
                     from dgw_pembayaran_d_tmp 
-                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('TAMBAHAN')
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."' and jenis in ('TAMBAHAN')
                     group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
                     $biaya_t = json_decode(json_encode($biaya_t),true);
 	
@@ -411,7 +411,7 @@ class PembayaranGroupController extends Controller
 
                     $biaya_d = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
                     from dgw_pembayaran_d_tmp 
-                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('DOKUMEN')
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."' and jenis in ('DOKUMEN')
                     group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
                     $biaya_d = json_decode(json_encode($biaya_d),true);
     
@@ -572,13 +572,13 @@ class PembayaranGroupController extends Controller
                 
                 }
 
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg'");
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."'");
 
                 if (intval($request->nilai_tambahan[$i]) != 0 ) {
 
                     $biaya_t = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
                     from dgw_pembayaran_d_tmp 
-                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('TAMBAHAN')
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."' and jenis in ('TAMBAHAN')
                     group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
                     $biaya_t = json_decode(json_encode($biaya_t),true);
 	
@@ -597,7 +597,7 @@ class PembayaranGroupController extends Controller
 
                     $biaya_d = DB::connection($this->sql)->select("select no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis,sum(nilai) as nilai 
                     from dgw_pembayaran_d_tmp 
-                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='$request->no_reg' and jenis in ('DOKUMEN')
+                    where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."' and jenis in ('DOKUMEN')
                     group by no_kwitansi,kode_lokasi,no_reg,kode_akun,jenis ");
                     $biaya_d = json_decode(json_encode($biaya_d),true);
     
