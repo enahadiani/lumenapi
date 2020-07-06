@@ -191,7 +191,7 @@ class PembayaranGroupController extends Controller
             $strSQL = "select a.nama, b.no_reg, b.no_peserta,round((b.harga+b.harga_room) - isnull(g.bayar_p,0),4) as saldo_p, 
                         isnull(h.nilai_t,0) - isnull(g.bayar_t,0) - b.diskon as saldo_t, 
                         isnull(i.nilai_m,0) - isnull(g.bayar_m,0) as saldo_m, 
-                        convert(varchar,c.tgl_berangkat,103) as tgl_berangkat, e.nama as paket, 
+                        convert(varchar,c.tgl_berangkat,103) as tgl_berangkat, e.nama as paket, b.no_paket,
                         case when c.no_closing ='-' then f.kode_akun else f.akun_piutang end as kode_akun, c.no_closing, c.kurs_closing 
                         from dgw_peserta a 
                         inner join dgw_reg b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi and b.no_paket='".$request->no_paket."' and b.no_jadwal='".$request->no_jadwal."' ".$jamaahRef." 
@@ -424,6 +424,11 @@ class PembayaranGroupController extends Controller
                 }	
             }
 
+            $del5 = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_bukti)
+                ->delete();
+
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['no_kwitansi'] = $no_bukti;
@@ -605,16 +610,21 @@ class PembayaranGroupController extends Controller
                 }	
             }
 
+            $del5 = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_bukti)
+                ->delete();	
+
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
             $success['no_kwitansi'] = $no_bukti;
-            $success['message'] = "Data Pembayaran berhasil disimpan. No Bukti:".$no_bukti;
+            $success['message'] = "Data Pembayaran berhasil diubah. No Bukti:".$no_bukti;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
-            $success['message'] = "Data Pembayaran gagal disimpan ".$e;
+            $success['message'] = "Data Pembayaran gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }		
         
