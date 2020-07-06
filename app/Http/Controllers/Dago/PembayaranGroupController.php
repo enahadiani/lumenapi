@@ -1139,4 +1139,57 @@ class PembayaranGroupController extends Controller
         }		
         
     }
+
+    public function simpanDetTmp2(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'no_reg' => 'required|array',
+            'kode_biaya' => 'required',
+            'kode_akunbiaya' => 'required',
+            'jenis_biaya' => 'required',
+            'nilai' => 'required',
+            'nik_user' => 'required'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $filter = "";
+            $del = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_kwitansi', $request->no_bukti)
+            ->where('nik_user', $request->nik_user)
+            ->where('kode_biaya', $request->kode_biaya[0])
+            ->delete();
+
+            for($i=0; $i<count($request->no_reg);$i++){
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg[$i],$request->kode_biaya,$request->jenis_biaya,$request->nilai,$request->nik_user,$request->kode_akunbiaya));
+            }	
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = "SUCCESS";
+            $success['no_kwitansi'] = $request->no_bukti;
+            $res = DB::connection($this->sql)->select("select isnull(sum(case when jenis = 'TAMBAHAN' then nilai else 0 end),0) as bayar_tambahan,isnull(sum(case when jenis = 'DOKUMEN' then nilai else 0 end),0) as bayar_dokumen,isnull(sum(case when jenis = '-' then nilai else 0 end),0) as bayar_paket
+            from dgw_pembayaran_d_tmp
+            where no_kwitansi='$request->no_bukti' and kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user' ");
+
+            $success['bayar_paket'] = $res[0]->bayar_paket;
+            $success['bayar_tambahan'] = $res[0]->bayar_tambahan;
+            $success['bayar_dokumen'] = $res[0]->bayar_dokumen;
+            $success['message'] = "Data Detail Pembayaran berhasil disimpan. No Bukti:".$request->no_bukti;
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Detail Pembayaran gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }		
+        
+    }
 }
