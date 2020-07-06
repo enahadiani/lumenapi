@@ -1167,7 +1167,7 @@ class PembayaranGroupController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_kwitansi', $request->no_bukti)
             ->where('nik_user', $request->nik_user)
-            ->where('kode_biaya', $request->kode_biaya[0])
+            ->where('kode_biaya', $request->kode_biaya)
             ->delete();
 
             $jmlRow = count($request->no_reg);
