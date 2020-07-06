@@ -1145,6 +1145,9 @@ class PembayaranGroupController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'no_reg' => 'required|array',
+            'saldo_paket' => 'required|array',
+            'saldo_tambahan' => 'required|array',
+            'saldo_dokumen' => 'required|array',
             'kode_biaya' => 'required',
             'kode_akunbiaya' => 'required',
             'jenis_biaya' => 'required',
@@ -1167,9 +1170,40 @@ class PembayaranGroupController extends Controller
             ->where('kode_biaya', $request->kode_biaya[0])
             ->delete();
 
-            for($i=0; $i<count($request->no_reg);$i++){
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg[$i],$request->kode_biaya,$request->jenis_biaya,$request->nilai,$request->nik_user,$request->kode_akunbiaya));
-            }	
+            $jmlRow = count($request->no_reg);
+            if ($request->nilai != "" && $request->nilai != "0" && $jmlRow != 0) {
+                $total = floatval($request->nilai) / $jmlRow;
+                $nilaiDis = round($total*100)/100;
+                $nTemp = 0;
+                $bayar = array();
+                for ($i=0;i < $jmlRow ;$i++){
+                    if($request->jenis_biaya == "TAMBAHAN"){
+                        $saldo = $request->saldo_tambahan[$i];
+                    }else if($request->jenis_biaya == "DOKUMEN"){
+                        $saldo = $request->saldo_dokumen[$i];
+                    }else if($request->jenis_biaya == "-"){
+                        $saldo = $request->saldo_paket[$i];
+                    }
+                    if (floatval($saldo)  > 0) {
+                        if (floatval($saldo) > $nilaiDis) {
+                            $bayar[$i] = $nilaiDis;
+                            $nTemp += $nilaiDis;
+                        }
+                        else {
+                            $bayar[$i] = floatval($saldo);
+                            $nTemp += floatval($saldo);
+                        }
+                        $j=$i;
+                        $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun) values(?, ?, ?, ?, ?, ?, ?, ?) ", array($request->no_bukti,$kode_lokasi,$request->no_reg[$i],$request->kode_biaya,$request->jenis_biaya,$bayar[$i],$request->nik_user,$request->kode_akunbiaya));
+                    }
+                }	
+
+                $selisih = ($nilaiUSD * 100) - ($nTemp * 100);
+                $recAkhir = round($selisih + (floatval($bayar[$j]) * 100));
+                $recAkhir = $recAkhir/100;
+
+                $upd = DB::connection($this->sql)->update("update dwg_pembayaran_d set nilai=$recAkhir where no_kwitansi='$request->no_kwitansi' and kode_lokasi='$kode_lokasi' and no_reg='".$request->no_reg[$j]."' and nik_user='$request->nik_user' ");		
+            }
 
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
