@@ -1198,7 +1198,7 @@ class PembayaranGroupController extends Controller
                     }
                 }	
 
-                $selisih = ($nilaiUSD * 100) - ($nTemp * 100);
+                $selisih = (floatval($request->nilai) * 100) - ($nTemp * 100);
                 $recAkhir = round($selisih + (floatval($bayar[$j]) * 100));
                 $recAkhir = $recAkhir/100;
 
