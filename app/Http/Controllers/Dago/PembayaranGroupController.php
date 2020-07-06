@@ -1176,7 +1176,7 @@ class PembayaranGroupController extends Controller
                 $nilaiDis = round($total*100)/100;
                 $nTemp = 0;
                 $bayar = array();
-                for ($i=0;i < $jmlRow ;$i++){
+                for ($i=0;$i < $jmlRow ;$i++){
                     if($request->jenis_biaya == "TAMBAHAN"){
                         $saldo = $request->saldo_tambahan[$i];
                     }else if($request->jenis_biaya == "DOKUMEN"){
