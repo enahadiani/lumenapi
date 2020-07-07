@@ -1180,4 +1180,46 @@ class PembayaranGroupController extends Controller
         }		
         
     }
+
+    public function getJamaahGroup(Request $request)
+    {
+        $this->validate($request, [
+            'paket' => 'required',
+            'jadwal' => 'required',
+            'agen' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "select a.no_peserta, b.nama
+            from dgw_reg a
+            inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_agen='$request->no_agen' and a.no_jadwal='$request->jadwal' and a.no_paket='$request->no_paket' ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['sql']= $sql;
+                $success['status'] = "SUCCESS";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
 }

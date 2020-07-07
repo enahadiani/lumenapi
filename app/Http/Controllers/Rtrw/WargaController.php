@@ -216,7 +216,7 @@ class WargaController extends Controller
                 $filter .= "";
             }
 
-            $sql= "select a.kode_pp,a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.alias,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            $sql= "select a.kode_pp,a.kode_blok,a.no_rumah,a.no_urut,a.nama,a.alias,a.nik,a.no_hp,case when foto != '-' then '".$url."/'+foto else '-' end as foto,a.kode_jk,a.kode_agama,a.id_device from rt_warga_d a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);

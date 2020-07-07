@@ -367,6 +367,14 @@ class AuthController extends Controller
 
         if (! $token = Auth::guard('warga')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
+        }else{
+            if(isset($request->id_device)){
+
+                DB::connection('sqlsrvrtrw')->table('rt_warga_d')
+                ->where('no_hp', $user->no_hp)
+                ->where('pass', $user->password)
+                ->update(['id_device' => $request->id_device]);
+            }
         }
 
         return $this->respondWithToken($token,'warga');

@@ -26,7 +26,7 @@ class AdminWarga extends Model implements AuthenticatableContract, AuthorizableC
      * @var array
      */
     protected $fillable = [
-        'kode_blok', 'no_rumah', 'no_urut', 'nama', 'alias', 'nik', 'kode_jk', 'tgl_lahir', 'kode_agama', 'no_bukti', 'kode_lokasi', 'kode_pp', 'foto', 'pass', 'password'
+        'kode_blok', 'no_rumah', 'no_urut', 'nama', 'alias', 'nik', 'kode_jk', 'tgl_lahir', 'kode_agama', 'no_bukti', 'kode_lokasi', 'kode_pp', 'foto', 'pass', 'password','id_device'
     ];
 
     /**
