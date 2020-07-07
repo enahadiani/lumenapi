@@ -644,7 +644,7 @@ class PembayaranGroupController extends Controller
     public function edit(Request $request)
     {
         $this->validate($request, [
-            'no_reg' => 'required'
+            'no_bukti' => 'required'
         ]);
         try {
             
@@ -653,33 +653,32 @@ class PembayaranGroupController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $id = $request->no_reg;
-            if(isset($request->no_bukti)){
-                $no_bukti = $request->no_bukti;
-                $sql = "select no_bukti,keterangan,param1 as kode_akun 
-                from trans_m 
-                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and no_ref1='".$id."'";
-                $res4 = DB::connection($this->sql)->select($sql);
-                $res4 = json_decode(json_encode($res4),true);
-                
-            }else{
-                $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-BM'.date('ym'), "0001");
-                $res4 = array();
-            }
+            $id = $request->no_bukti;
 
-            $sql = "select b.no_reg,a.nama,d.tgl_berangkat,e.nama as paket,e.kode_curr,b.harga + b.harga_room as harga_tot,  case when d.no_closing ='-' then f.kode_akun else f.akun_piutang end as kode_akun,d.kurs_closing, d.no_closing, f.akun_piutang, b.diskon 
-            from dgw_peserta a 
-                inner join dgw_reg b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
-                left join dgw_jadwal d on b.no_paket=d.no_paket and b.no_jadwal=d.no_jadwal and b.kode_lokasi=d.kode_lokasi 
-                inner join dgw_paket e on b.no_paket=e.no_paket and b.kode_lokasi=e.kode_lokasi 
-                inner join dgw_jenis_produk f on e.kode_produk=f.kode_produk and e.kode_lokasi=f.kode_lokasi
-            where b.no_reg='".$id."' and b.kode_lokasi='".$kode_lokasi."'";
+            $sql = "select b.nik1,a.sistem_bayar,a.kurs,sum(a.nilai_p) as nilai_p,sum(a.nilai_t) as nilai_t,b.param1,b.keterangan,b.nilai1 
+            from dgw_pembayaran a inner join trans_m b on a.no_kwitansi = b.no_bukti and a.kode_lokasi=b.kode_lokasi 
+            where a.no_kwitansi='".$id."' and a.kode_lokasi='".$kode_lokasi."' 
+            group by a.sistem_bayar,a.kurs,b.param1,b.nik1,b.keterangan,b.nilai1";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2= "select isnull(sum(nilai_p),0) as paket, isnull(sum(nilai_t),0) as tambahan, isnull(sum(nilai_m),0) as dokumen
-            from dgw_pembayaran 
-            where no_reg='".$id."' and kode_lokasi='".$kode_lokasi."' and no_kwitansi ='".$no_bukti."'";
+            $sql2= "select a.nama, b.no_reg, b.no_peserta, i.nilai_p,i.nilai_t,i.nilai_m, round((b.harga+b.harga_room) - isnull(g.bayar_p,0),4) as saldo_p, isnull(h.nilai_t,0) - isnull(g.bayar_t,0) - b.diskon as saldo_t, isnull(h.nilai_m,0) - isnull(g.bayar_m,0) as saldo_m, convert(varchar,c.tgl_berangkat,103) as tgl_berangkat, e.nama as paket, case when c.no_closing ='-' then f.kode_akun else f.akun_piutang end as kode_akun, c.no_closing, c.kurs_closing 
+            from dgw_peserta a 
+            inner join dgw_reg b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
+            inner join dgw_jadwal c on b.no_paket = c.no_paket and b.no_jadwal = c.no_jadwal  
+            inner join dgw_paket e on b.no_paket=e.no_paket and b.kode_lokasi=e.kode_lokasi 
+            inner join dgw_jenis_produk f on e.kode_produk=f.kode_produk and e.kode_lokasi=f.kode_lokasi 
+            inner join dgw_pembayaran i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi 
+            left join (
+                select a.no_reg,a.kode_lokasi, sum(case when b.jenis='TAMBAHAN' then a.nilai else 0 end) as nilai_t, sum(case when b.jenis='DOKUMEN' then a.nilai else 0 end) as nilai_m from dgw_reg_biaya a inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+                where a.kode_lokasi='".$kode_lokasi."' group by a.no_reg,a.kode_lokasi  
+            ) h on b.no_reg=h.no_reg and a.kode_lokasi=h.kode_lokasi 
+            left join (
+                select no_reg,kode_lokasi,sum(nilai_p) as bayar_p, sum(nilai_t) as bayar_t , sum(nilai_m) as bayar_m 
+                from dgw_pembayaran 
+                where kode_lokasi='".$kode_lokasi."' and no_kwitansi <> '".$id."' group by no_reg,kode_lokasi  
+            ) g on b.no_reg=g.no_reg and a.kode_lokasi=g.kode_lokasi 
+            where i.no_kwitansi='".$id."' and b.kode_lokasi='".$kode_lokasi."' ";
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -731,41 +730,19 @@ class PembayaranGroupController extends Controller
             order by curr desc");
             $res3 = json_decode(json_encode($res3),true);
 
-            $sql5 = " select a.no_kwitansi, a.tgl_bayar, a.no_reg, a.paket, a.jadwal, round(a.nilai_p,4) as nilai_p, a.nilai_t,nilai_m, (a.nilai_p * a.kurs) + a.nilai_t+a.nilai_m as total_idr 
-            from dgw_pembayaran a 
-            inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.posted='F' and b.form='KBREG' and a.no_kwitansi <> '$no_bukti' ";
-            $res5 = DB::connection($this->sql)->select( $sql5);
-            $res5 = json_decode(json_encode($res5),true);
-
+           
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $totTambah = $totDok = 0;
-                if (count($res3) > 0){
-                    for($i=0;$i<count($res3);$i++){
-                        if ($res3[$i]['jenis'] == "TAMBAHAN") $totTambah += floatval($res3[$i]['nilai']);
-                        if ($res3[$i]['jenis'] == "DOKUMEN") $totDok += floatval($res3[$i]['nilai']);	
-                    }
-                } 
-                
                 $success['status'] = "SUCCESS";
-                $success['data_jamaah'] = $res;
-                $success['detail_bayar'] = $res2;
+                $success['data'] = $res;
+                $success['detail_reg'] = $res2;
                 $success['detail_biaya'] = $res3;
-                $success['data_bayar'] = $res4;
-                $success['histori_bayar'] = $res5;
-                $success['totTambah']=$totTambah;
-                $success['totDok']=$totDok;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['biaya_tambahan'] = [];
-                $success['biaya_dokumen'] = [];
-                $success['data_bayar'] = [];
-                $success['histori_bayar'] = [];
-                $success['totTambah']=0;
-                $success['totDok']=0;
+                $success['detail_reg'] = [];
+                $success['detail_biaya'] = [];
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
