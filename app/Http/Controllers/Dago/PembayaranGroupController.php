@@ -685,52 +685,53 @@ class PembayaranGroupController extends Controller
             $res3 = DB::connection($this->sql)->select("select a.kode_biaya, a.tarif, a.nilai, isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.nilai-isnull(c.byr,0)-isnull(d.byr,0) as saldo,a.jml, b.nama, 'IDR' as curr, b.jenis,b.akun_pdpt 
             from dgw_reg_biaya a 
             inner join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi 
+            inner join dgw_pembayaran i on a.no_reg=i.no_reg and a.kode_lokasi=i.kode_lokasi
             left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
-                        where a.no_kwitansi = '$no_bukti'
+                        where a.no_kwitansi = '$id'
                         group by a.no_reg,a.kode_biaya,a.kode_lokasi ) c on a.kode_biaya=c.kode_biaya and a.kode_lokasi=c.kode_lokasi 
                         and a.no_reg=c.no_reg 
 			 left join ( select a.no_reg,a.kode_biaya,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
-                        where a.no_kwitansi <> '$no_bukti'
+                        where a.no_kwitansi <> '$id'
                         group by a.no_reg,a.kode_biaya,a.kode_lokasi ) d on a.kode_biaya=d.kode_biaya and a.kode_lokasi=d.kode_lokasi 
                         and a.no_reg=d.no_reg 
-            where a.nilai <> 0 and a.no_reg='$id' and a.kode_lokasi='$kode_lokasi' 
+            where a.nilai <> 0 and i.no_kwitansi='".$id."' and a.kode_lokasi='$kode_lokasi' 
             union all 
             select 'ROOM' as kode_biaya, a.harga_room as tarif, a.harga_room as nilai,isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.harga_room-isnull(c.byr,0)-isnull(d.byr,0) as saldo, 
                     1 as jml, 'ROOM' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
             from dgw_reg a 
+            inner join dgw_pembayaran i on a.no_reg=i.no_reg and a.kode_lokasi=i.kode_lokasi
             left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
-                        where a.kode_biaya ='ROOM' and a.no_kwitansi = '$no_bukti'
+                        where a.kode_biaya ='ROOM' and a.no_kwitansi = '$id'
                         group by a.no_reg,a.kode_lokasi ) c on a.kode_lokasi=c.kode_lokasi 
                         and a.no_reg=c.no_reg 
 			left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
-                        where a.kode_biaya ='ROOM' and a.no_kwitansi <> '$no_bukti'
+                        where a.kode_biaya ='ROOM' and a.no_kwitansi <> '$id'
                         group by a.no_reg,a.kode_lokasi ) d on a.kode_lokasi=d.kode_lokasi 
                         and a.no_reg=d.no_reg 
-            where a.harga_room <> 0 and a.no_reg='$id' and a.kode_lokasi='$kode_lokasi' 
+            where a.harga_room <> 0 and i.no_kwitansi='".$id."'  and a.kode_lokasi='$kode_lokasi' 
             union all 
             select 'PAKET' as kode_biaya, a.harga-a.diskon as tarif, a.harga-a.diskon as nilai,isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.harga-isnull(c.byr,0)-isnull(d.byr,0)-a.diskon as saldo, 1 as jml, 
                     'PAKET' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
             from dgw_reg a 
+            inner join dgw_pembayaran i on a.no_reg=i.no_reg and a.kode_lokasi=i.kode_lokasi
             left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
-                        where a.kode_biaya = 'PAKET' and a.no_kwitansi = '$no_bukti'
+                        where a.kode_biaya = 'PAKET' and a.no_kwitansi = '$id'
                         group by a.no_reg,a.kode_lokasi ) c on a.kode_lokasi=c.kode_lokasi 
                         and a.no_reg=c.no_reg 
 			left join ( select a.no_reg,a.kode_lokasi,sum(nilai) as byr 
                         from dgw_pembayaran_d a 
-                        where a.kode_biaya = 'PAKET' and a.no_kwitansi <> '$no_bukti'
+                        where a.kode_biaya = 'PAKET' and a.no_kwitansi <> '$id'
                         group by a.no_reg,a.kode_lokasi ) d on a.kode_lokasi=d.kode_lokasi 
                         and a.no_reg=d.no_reg 
-            where a.harga <> 0 and a.no_reg='$id' and a.kode_lokasi='$kode_lokasi' 
-            
+            where a.harga <> 0 and i.no_kwitansi='".$id."' and a.kode_lokasi='$kode_lokasi' 
             order by curr desc");
             $res3 = json_decode(json_encode($res3),true);
 
-           
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
