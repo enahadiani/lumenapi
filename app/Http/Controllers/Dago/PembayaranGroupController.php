@@ -658,7 +658,7 @@ class PembayaranGroupController extends Controller
             $sql = "select b.nik1,a.sistem_bayar,a.kurs,sum(a.nilai_p) as nilai_p,sum(a.nilai_t) as nilai_t,sum(a.nilai_m) as nilai_m,b.param1,b.keterangan,b.nilai1,convert(varchar,b.tanggal,105) as tanggal
             from dgw_pembayaran a inner join trans_m b on a.no_kwitansi = b.no_bukti and a.kode_lokasi=b.kode_lokasi 
             where a.no_kwitansi='".$id."' and a.kode_lokasi='".$kode_lokasi."' 
-            group by a.sistem_bayar,a.kurs,b.param1,b.nik1,b.keterangan,b.nilai1";
+            group by a.sistem_bayar,a.kurs,b.param1,b.nik1,b.keterangan,b.nilai1,convert(varchar,b.tanggal,105)";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
