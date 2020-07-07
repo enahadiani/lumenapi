@@ -371,8 +371,8 @@ class AuthController extends Controller
             if(isset($request->id_device)){
 
                 DB::connection('sqlsrvrtrw')->table('rt_warga_d')
-                ->where('no_hp', $user->no_hp)
-                ->where('pass', $user->password)
+                ->where('no_hp', $request->no_hp)
+                ->where('pass', $request->password)
                 ->update(['id_device' => $request->id_device]);
             }
         }
