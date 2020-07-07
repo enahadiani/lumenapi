@@ -663,7 +663,7 @@ class PembayaranGroupController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2= "select a.nama, b.no_reg, b.no_peserta, i.nilai_p,i.nilai_t,i.nilai_m, round((b.harga+b.harga_room) - isnull(g.bayar_p,0),4) as saldo_p, isnull(h.nilai_t,0) - isnull(g.bayar_t,0) - b.diskon as saldo_t, isnull(h.nilai_m,0) - isnull(g.bayar_m,0) as saldo_m, convert(varchar,c.tgl_berangkat,103) as tgl_berangkat, e.nama as paket, case when c.no_closing ='-' then f.kode_akun else f.akun_piutang end as kode_akun, c.no_closing, c.kurs_closing 
+            $sql2= "select a.nama, b.no_reg, b.no_peserta, i.nilai_p,i.nilai_t,i.nilai_m, round((b.harga+b.harga_room) - isnull(g.bayar_p,0),4) as saldo_p, isnull(h.nilai_t,0) - isnull(g.bayar_t,0) - b.diskon as saldo_t, isnull(h.nilai_m,0) - isnull(g.bayar_m,0) as saldo_m, convert(varchar,c.tgl_berangkat,103) as tgl_berangkat, e.nama as paket, case when c.no_closing ='-' then f.kode_akun else f.akun_piutang end as kode_akun, c.no_closing, c.kurs_closing,b.no_paket 
             from dgw_peserta a 
             inner join dgw_reg b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             inner join dgw_jadwal c on b.no_paket = c.no_paket and b.no_jadwal = c.no_jadwal  
