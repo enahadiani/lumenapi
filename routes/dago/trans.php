@@ -72,6 +72,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('pembayaran-group-det2','Dago\PembayaranGroupController@simpanDetTmp2');
     $router->delete('pembayaran-group-det','Dago\PembayaranGroupController@destroyDetTmp');
     $router->post('pembayaran-group','Dago\PembayaranGroupController@store');
+    $router->get('pembayaran-group-edit','Dago\PembayaranGroupController@edit');
     $router->put('pembayaran-group','Dago\PembayaranGroupController@store');
     $router->delete('pembayaran-group','Dago\PembayaranGroupController@destroy');
 });
