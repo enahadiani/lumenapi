@@ -644,7 +644,8 @@ class PembayaranGroupController extends Controller
     public function edit(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required'
+            'no_bukti' => 'required',
+            'nik_user' => 'required'
         ]);
         try {
             
@@ -734,6 +735,20 @@ class PembayaranGroupController extends Controller
              group by a.kode_biaya, a.tarif, a.nilai,a.jml, a.nama, a.curr, a.jenis,a.akun_pdpt");
             $res3 = json_decode(json_encode($res3),true);
 
+            DB::connection($this->sql)->beginTransaction();
+            $del = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
+                    ->where('no_kwitansi',$id)
+                    ->where('nik_user',$request->nik_user)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->delete();
+
+            $ins = DB::connection($this->sql)->insert("insert into dgw_pembayaran_d_tmp (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,nik_user,kode_akun)
+			select a.no_kwitansi,a.kode_lokasi,a.no_reg,a.kode_biaya,a.jenis,a.nilai,'$request->nik_user' as nik_user,isnull(b.akun_pdpt,'-') kode_akun
+			from dgw_pembayaran_d a
+			left join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi
+            where a.no_kwitansi='$id' and a.kode_lokasi='$kode_lokasi'");
+            DB::connection($this->sql)->commit();
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
