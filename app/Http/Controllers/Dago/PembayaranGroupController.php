@@ -699,7 +699,7 @@ class PembayaranGroupController extends Controller
                          and a.no_reg=d.no_reg 
              where a.nilai <> 0 and i.no_kwitansi='$id' and a.kode_lokasi='$kode_lokasi' 
              union all 
-             select 'ROOM' as kode_biaya, a.harga_room as tarif, a.harga_room as nilai,isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.harga_room-isnull(c.byr,0)-isnull(d.byr,0) as saldo, 
+             select 'ROOM' as kode_biaya, a.harga_room as tarif, a.harga_room as nilai,isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.harga_room-isnull(d.byr,0) as saldo, 
                      1 as jml, 'ROOM' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
              from dgw_reg a 
              inner join dgw_pembayaran i on a.no_reg=i.no_reg and a.kode_lokasi=i.kode_lokasi
@@ -715,7 +715,7 @@ class PembayaranGroupController extends Controller
                          and a.no_reg=d.no_reg 
              where a.harga_room <> 0 and i.no_kwitansi='$id'  and a.kode_lokasi='$kode_lokasi' 
              union all 
-             select 'PAKET' as kode_biaya, a.harga-a.diskon as tarif, a.harga-a.diskon as nilai,isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.harga-isnull(c.byr,0)-isnull(d.byr,0)-a.diskon as saldo, 1 as jml, 
+             select 'PAKET' as kode_biaya, a.harga-a.diskon as tarif, a.harga-a.diskon as nilai,isnull(c.byr,0) as byr_e,isnull(d.byr,0) as byr,a.harga-isnull(d.byr,0)-a.diskon as saldo, 1 as jml, 
                      'PAKET' as nama, 'USD' as curr, '-' as jenis,'-' as akun_pdpt 
              from dgw_reg a 
              inner join dgw_pembayaran i on a.no_reg=i.no_reg and a.kode_lokasi=i.kode_lokasi
