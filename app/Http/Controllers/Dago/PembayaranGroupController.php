@@ -966,6 +966,7 @@ class PembayaranGroupController extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kwitansi', $request->no_bukti)
                 ->where('nik_user', $request->nik_user)
+                ->orWhere("DATEDIFF(minute, created_at, getdate())",">",60)
                 ->delete();
 
             $success['status'] = true;
