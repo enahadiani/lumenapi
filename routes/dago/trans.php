@@ -75,7 +75,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('pembayaran-group-edit','Dago\PembayaranGroupController@edit');
     $router->put('pembayaran-group','Dago\PembayaranGroupController@update');
     $router->delete('pembayaran-group','Dago\PembayaranGroupController@destroy');
-    $router->get('jamaah-group','Dago\PembayranController@getJamaahGroup');
+    $router->get('jamaah-group','Dago\PembayaranController@getJamaahGroup');
 });
 
 
