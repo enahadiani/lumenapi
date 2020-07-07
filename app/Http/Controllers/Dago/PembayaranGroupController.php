@@ -1199,7 +1199,7 @@ class PembayaranGroupController extends Controller
             $sql = "select a.no_peserta, b.nama
             from dgw_reg a
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='".$kode_lokasi."' and a.no_agen='$request->agen' and a.no_jadwal='$request->jadwal' and a.no_paket='$request->paket' ";
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_agen='$request->agen' and a.no_jadwal='$request->jadwal' and a.no_paket='$request->paket' and a.flag_group='1' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
