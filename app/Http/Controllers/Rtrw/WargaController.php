@@ -622,7 +622,7 @@ class WargaController extends Controller
             if(count($request->no_hp) > 0){
                 for($i=0; $i<count($request->no_hp);$i++){
 
-                    $cek= DB::connection($this->sql)->select("select no_bukti from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' ");
+                    $cek= DB::connection($this->sql)->select("select no_bukti from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah[$i]' ");
                     $cek = json_decode(json_encode($cek),true);
                     if($cek > 0){
                         $no_bukti = $cek[0]['no_bukti'];
@@ -637,19 +637,19 @@ class WargaController extends Controller
                         $get = json_decode(json_encode($get),true);
                         $no_bukti = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
                     }
-                    $rs= DB::connection($this->sql)->select("select blok,rt from rt_rumah where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' ");
+                    $rs= DB::connection($this->sql)->select("select blok,rt from rt_rumah where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah[$i]' ");
                     $rs = json_decode(json_encode($rs),true);
                     $rt = $rs[0]['rt'];
                     $blok = $rs[0]['blok'];
 
-                    $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$kode_lokasi' ");
+                    $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah[$i]' and kode_lokasi='$kode_lokasi' ");
                     $no_urut = intval($res[0]->nu)+1;
                     $alias = $request->alias[$i];
                     
                     $pass = substr($request->no_hp[$i],6);
                     $password = app('hash')->make($pass);
 
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias,pass,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($blok,$request->no_rumah,$no_urut,$request->nama[$i],"-",$request->no_hp[$i],"-",$kode_lokasi,$no_bukti,"-","-",$rt,NULL,NULL,$alias,$pass,$password));
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias,pass,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($blok,$request->no_rumah[$i],$no_urut,$request->nama[$i],"-",$request->no_hp[$i],"-",$kode_lokasi,$no_bukti,"-","-",$rt,NULL,NULL,$alias,$pass,$password));
 
                 }
             }
