@@ -518,7 +518,7 @@ class JuspoApprovalController extends Controller
         
     }
 
-    public function getPreview($no_bukti)
+    public function getPreview($no_bukti,$id)
     {
         try {
             
@@ -528,15 +528,22 @@ class JuspoApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if($id == "default"){
+                $rs = DB::connection('sqlsrv2')->select("select max(id) as id
+                from apv_pesan a
+                left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
+                where a.kode_lokasi='$kode_lokasi' and a.modul='JP' and b.nik= '$nik' and a.no_bukti='$no_bukti'");
+                $id = $rs[0]->id;
+            }else{
+                $id = $id;
+            }
+
             $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan,b.nilai,b.nik_buat,convert(varchar,a.tanggal,105) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Return' end as status
             from apv_pesan a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             inner join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
             inner join apv_karyawan d on b.nik_buat=d.nik and b.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.modul='JP' and a.id=(select max(id) as id
-                        from apv_pesan a
-                        left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-                        where a.kode_lokasi='$kode_lokasi' and a.modul='JP' and b.nik= '$nik_user' and a.no_bukti='$no_bukti') ";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.modul='JP' and a.id='$id' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
