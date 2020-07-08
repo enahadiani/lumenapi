@@ -412,4 +412,43 @@ class VerifikasiController extends Controller
         
     }
 
+    public function getPreview($no_bukti)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_bukti,a.no_juskeb,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan,b.nilai,b.nik_buat,convert(varchar,a.tanggal,105) as tgl
+            from apv_ver_m a
+            inner join apv_juskeb_m b on a.no_juskeb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            inner join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            inner join apv_karyawan d on b.nik_buat=d.nik and b.kode_lokasi=d.kode_lokasi
+            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
+            
+            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
