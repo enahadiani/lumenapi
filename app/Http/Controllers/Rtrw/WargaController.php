@@ -639,8 +639,13 @@ class WargaController extends Controller
                     }
                     $rs= DB::connection($this->sql)->select("select blok,rt from rt_rumah where kode_lokasi='$kode_lokasi' and kode_rumah='".$request->no_rumah[$i]."' ");
                     $rs = json_decode(json_encode($rs),true);
-                    $rt = $rs[0]['rt'];
-                    $blok = $rs[0]['blok'];
+                    if(count($rs) > 0){
+                        $rt = $rs[0]['rt'];
+                        $blok = $rs[0]['blok'];
+                    }else{
+                        $rt = "-";
+                        $blok = "-";
+                    }
 
                     $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='".$request->no_rumah[$i]."' and kode_lokasi='$kode_lokasi' ");
                     $no_urut = intval($res[0]->nu)+1;
