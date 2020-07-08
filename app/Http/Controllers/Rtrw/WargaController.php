@@ -145,7 +145,7 @@ class WargaController extends Controller
 
             if(count($request->nama) > 0){
                 $del3 = DB::connection($this->sql)->table('rt_warga_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-                $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$request->kode_lokasi' and kode_blok ='$request->kode_blok' ");
+                $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$kode_lokasi' and kode_blok ='$request->kode_blok' ");
                 $no_urut = intval($res[0]->nu)+1;
                 for($i=0; $i<count($request->nama);$i++){
                     if(isset($request->alias[$i])){
@@ -597,5 +597,75 @@ class WargaController extends Controller
             return response()->json($success, 200);
         }	
 
+    }
+
+    public function uploadWarga(Request $request)
+    {
+        $this->validate($request, [
+            'nama' => 'required|array',
+            'alias' => 'required|array',
+            'no_rumah' => 'required|array',
+            'no_hp' => 'required|array'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->id_satpam;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(count($request->no_hp) > 0){
+                for($i=0; $i<count($request->no_hp);$i++){
+
+                    $cek= DB::connection($this->sql)->select("select no_bukti from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' ");
+                    $cek = json_decode(json_encode($cek),true);
+                    if($cek > 0){
+                        $no_bukti = $cek[0]['no_bukti'];
+                    }else{
+
+                        $str_format="0000";
+                        $periode=date('Y').date('m');
+                        $per=date('y').date('m');
+                        $prefix="WR".$per;
+                        $sql="select right(isnull(max(no_bukti),'00000'),".strlen($str_format).")+1 as id from rt_warga_d where no_bukti like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
+                        $get = DB::connection($this->sql)->select($sql);
+                        $get = json_decode(json_encode($get),true);
+                        $no_bukti = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+                    }
+                    $rs= DB::connection($this->sql)->select("select blok,rt from rt_rumah where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' ");
+                    $rs = json_decode(json_encode($rs),true);
+                    $rt = $rs[0]['rt'];
+                    $blok = $rs[0]['blok'];
+
+                    $res = DB::connection($this->sql)->select("select max(no_urut) as nu from rt_warga_d where no_rumah ='$request->no_rumah' and kode_lokasi='$kode_lokasi' ");
+                    $no_urut = intval($res[0]->nu)+1;
+                    $alias = $request->alias[$i];
+                    
+                    $pass = substr($request->no_hp[$i],6);
+                    $password = app('hash')->make($pass);
+
+                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias,pass,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($blok,$request->no_rumah,$no_urut,$request->nama[$i],"-",$request->no_hp[$i],"-",$kode_lokasi,$no_bukti,"-","-",$rt,NULL,NULL,$alias,$pass,$password));
+
+                }
+            }
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Upload Data Warga berhasil disimpan";
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Upload Data Warga gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
     }
 }

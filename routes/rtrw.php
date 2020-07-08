@@ -180,6 +180,8 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('lokasi','Rtrw\LokasiController@store');
     $router->post('lokasi-ubah','Rtrw\LokasiController@update');
     $router->delete('lokasi','Rtrw\LokasiController@destroy');
+    
+    $router->post('upload-warga','Rtrw\WargaController@uploadWarga');
 
 });
 
