@@ -649,7 +649,7 @@ class WargaController extends Controller
                     $pass = substr($request->no_hp[$i],6);
                     $password = app('hash')->make($pass);
 
-                    $ins = DB::connection($this->sql)->insert('insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias,pass,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($blok,$request->no_rumah[$i],$no_urut,$request->nama[$i],"-",$request->no_hp[$i],"-",$kode_lokasi,$no_bukti,"-","-",$rt,NULL,NULL,$alias,$pass,$password));
+                    $ins = DB::connection($this->sql)->insert("insert into rt_warga_d(kode_blok,no_rumah,no_urut,nama,nik,no_hp,foto,kode_lokasi,no_bukti,kode_jk,kode_agama,kode_pp,tgl_masuk,sts_masuk,alias,pass,password) values ('".$blok."','".$request->no_rumah[$i]."','".$no_urut."','".$request->nama[$i]."','-','".$request->no_hp[$i]."','-','$kode_lokasi','$no_bukti','-','-','$rt',NULL,NULL,'$alias','$pass','$password')");
 
                 }
             }
