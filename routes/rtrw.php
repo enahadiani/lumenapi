@@ -182,6 +182,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->delete('lokasi','Rtrw\LokasiController@destroy');
     
     $router->post('upload-warga','Rtrw\WargaController@uploadWarga');
+    $router->post('upload-warga2','Rtrw\WargaController@importExcel');
 
 });
 

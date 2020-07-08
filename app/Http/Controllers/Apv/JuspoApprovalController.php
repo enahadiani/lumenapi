@@ -538,11 +538,11 @@ class JuspoApprovalController extends Controller
                 $id = $id;
             }
 
-            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan,b.nilai,b.nik_buat,convert(varchar,a.tanggal,105) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Return' end as status
+            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan,b.nilai,convert(varchar,a.tanggal,105) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Return' end as status,e.nik
             from apv_pesan a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             inner join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
-            inner join apv_karyawan d on b.nik_buat=d.nik and b.kode_lokasi=d.kode_lokasi
+            inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut and a.kode_lokasi=e.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.modul='JP' and a.id='$id' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
