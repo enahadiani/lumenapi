@@ -622,7 +622,7 @@ class WargaController extends Controller
             if(count($request->no_hp) > 0){
                 for($i=0; $i<count($request->no_hp);$i++){
 
-                    $cek= DB::connection($this->sql)->select("select no_bukti from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$no_rumah' ");
+                    $cek= DB::connection($this->sql)->select("select no_bukti from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' ");
                     $cek = json_decode(json_encode($cek),true);
                     if($cek > 0){
                         $no_bukti = $cek[0]['no_bukti'];
