@@ -102,6 +102,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('juskeb_app','Apv\JuskebApprovalController@store');
     $router->get('juskeb_app_status','Apv\JuskebApprovalController@getStatus');
     $router->get('juskeb_app_preview/{no_bukti}','Apv\JuskebApprovalController@getPreview');
+    
 
     //Justifikasi Pengadaan
     $router->get('juspo','Apv\JuspoController@index');
