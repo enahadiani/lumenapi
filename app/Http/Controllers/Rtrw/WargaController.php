@@ -637,7 +637,7 @@ class WargaController extends Controller
                         $get = json_decode(json_encode($get),true);
                         $no_bukti = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
                     }
-                    $rs= DB::connection($this->sql)->select("select blok,rt from rt_rumah where kode_lokasi='$kode_lokasi' and no_rumah='".$request->no_rumah[$i]."' ");
+                    $rs= DB::connection($this->sql)->select("select blok,rt from rt_rumah where kode_lokasi='$kode_lokasi' and kode_rumah='".$request->no_rumah[$i]."' ");
                     $rs = json_decode(json_encode($rs),true);
                     $rt = $rs[0]['rt'];
                     $blok = $rs[0]['blok'];
