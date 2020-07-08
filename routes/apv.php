@@ -93,7 +93,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('verifikasi','Apv\VerifikasiController@store');
     $router->get('verifikasi_status','Apv\VerifikasiController@getStatus');
     $router->get('verifikasi_history','Apv\VerifikasiController@getHistory');
-    $router->get('verifikasi_preview','Apv\VerifikasiController@getPreview');
+    $router->get('verifikasi_preview/{no_bukti}','Apv\VerifikasiController@getPreview');
 
     //Approval Justifikasi Kebutuhan
     $router->get('juskeb_app','Apv\JuskebApprovalController@index');
