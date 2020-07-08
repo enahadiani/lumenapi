@@ -236,7 +236,7 @@ class RtrwController extends Controller
                 }
             }
 
-            $sql= "select distinct (substring(periode,1,4)) as tahun from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' $filter order by substring(periode,1,4) desc ";
+            $sql= "select distinct (substring(periode,1,4)) as tahun from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,1,4) desc ";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -695,7 +695,7 @@ class RtrwController extends Controller
             (
                 select sum(a.nilai_rt+a.nilai_rw) as nilai
                 from rt_bill_d a
-                where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode <='$periode' and a.kode_jenis='IWAJIB'
+                where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode <='$periode' and a.kode_jenis='IWAJIB' and a.flag_aktif='1'
                 union 
                 select -sum(a.nilai_rt+a.nilai_rw) as nilai
                 from rt_angs_d a
@@ -774,7 +774,7 @@ class RtrwController extends Controller
                 where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode_bill like '$tahun%' and a.kode_jenis='IWAJIB' 
                 group by a.periode_bill,a.kode_lokasi,a.kode_rumah,b.tanggal
             ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
-            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode like '$tahun%' and a.kode_jenis='IWAJIB'
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode like '$tahun%' and a.kode_jenis='IWAJIB' and a.flag_aktif='1'
             order by a.periode";
             $res = DB::connection('sqlsrvrtrw')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -936,7 +936,7 @@ class RtrwController extends Controller
                 select a.kode_rumah,sum(a.nilai_rt+a.nilai_rw) as nilai
                 from rt_bill_d a
                 inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi 
-                where a.kode_lokasi ='$kode_lokasi' and b.blok ='$blok' and a.periode <='$periode' and a.kode_jenis='IWAJIB'
+                where a.kode_lokasi ='$kode_lokasi' and b.blok ='$blok' and a.periode <='$periode' and a.kode_jenis='IWAJIB' and a.flag_aktif='1'
                 group by a.kode_rumah
                 union 
                 select a.kode_rumah,-sum(a.nilai_rt+a.nilai_rw) as nilai
@@ -1109,7 +1109,7 @@ class RtrwController extends Controller
                     select a.kode_rumah,a.kode_lokasi,sum(a.nilai_rt+a.nilai_rw) as nilai
                     from rt_bill_d a
                     inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi 
-                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode <='$periode' and a.kode_jenis='IWAJIB'
+                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode <='$periode' and a.kode_jenis='IWAJIB' and a.flag_aktif='1'
                     group by a.kode_rumah,a.kode_lokasi
                     union all
                     select a.kode_rumah,a.kode_lokasi,-sum(a.nilai_rt+a.nilai_rw) as nilai
@@ -1255,7 +1255,7 @@ class RtrwController extends Controller
                     select a.kode_rumah,a.kode_lokasi,sum(a.nilai_rt+a.nilai_rw) as nilai
                     from rt_bill_d a
                     inner join rt_rumah b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi 
-                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode <='$periode' and a.kode_jenis='IWAJIB'
+                    where a.kode_lokasi ='$kode_lokasi' $filter and a.periode <='$periode' and a.kode_jenis='IWAJIB' and a.flag_aktif='1'
                     group by a.kode_rumah,a.kode_lokasi
                     union all
                     select a.kode_rumah,a.kode_lokasi,-sum(a.nilai_rt+a.nilai_rw) as nilai
@@ -1419,7 +1419,7 @@ class RtrwController extends Controller
                 where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' 
                 group by periode_bill,kode_lokasi,kode_rumah
             ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
-            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0 and a.flag_aktif='1'
             order by a.periode";
             
             $res = DB::connection('sqlsrvrtrw')->select($sql);
@@ -1465,7 +1465,7 @@ class RtrwController extends Controller
                 where kode_lokasi ='$kode_lokasi' and kode_rumah ='$kode_rumah' and kode_jenis='IWAJIB' 
                 group by periode_bill,kode_lokasi,kode_rumah
             ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
-            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0
+            where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0 and a.flag_aktif='1'
             order by a.periode";
             
             $res = DB::connection('sqlsrvrtrw')->select($sql);

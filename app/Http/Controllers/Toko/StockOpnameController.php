@@ -105,9 +105,6 @@ class StockOpnameController extends Controller
 
     public function load(Request $request)
     {
-        $this->validate($request, [
-            'no_peserta' => 'required'
-        ]);
         
         try {
             
