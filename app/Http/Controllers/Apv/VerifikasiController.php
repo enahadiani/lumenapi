@@ -160,7 +160,7 @@ class VerifikasiController extends Controller
 
             $no_bukti = $this->generateKode("apv_ver_m", "no_bukti", $kode_lokasi."-VER".substr($periode,2,4).".", "0001");
 
-            $ins1 = DB::connection('sqlsrv2')->insert("insert into apv_ver_m (no_bukti,kode_lokasi,no_juskeb,status,keterangan,tanggal) values (?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$request->no_aju,$request->status,$request->keterangan,$request->tanggal]);
+            $ins1 = DB::connection('sqlsrv2')->insert("insert into apv_ver_m (no_bukti,kode_lokasi,no_juskeb,status,keterangan,tanggal,nik_user) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$request->no_aju,$request->status,$request->keterangan,$request->tanggal,$nik_user]);
 
             $upd =  DB::connection('sqlsrv2')->table('apv_juskeb_m')
             ->where('no_bukti', $request->input('no_aju'))    
