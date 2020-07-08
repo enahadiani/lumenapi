@@ -475,6 +475,8 @@ class JuspoController extends Controller
             $harga = $request->input('harga');
             $qty = $request->input('qty');
             $subtotal = $request->input('subtotal');
+            $ppn = $request->input('ppn');
+            $grand_total = $request->input('grand_total');
 
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
