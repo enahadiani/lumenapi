@@ -103,7 +103,6 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('juskeb_app_status','Apv\JuskebApprovalController@getStatus');
     $router->get('juskeb_app_preview/{no_bukti}','Apv\JuskebApprovalController@getPreview');
     
-
     //Justifikasi Pengadaan
     $router->get('juspo','Apv\JuspoController@index');
     $router->get('juspo_aju','Apv\JuspoController@getPengajuan');
@@ -124,6 +123,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('juspo_app','Apv\JuspoApprovalController@store');
     $router->put('juspo_app/{no_aju}','Apv\JuspoApprovalController@update');
     $router->delete('juspo_app/{no_aju}','Apv\JuspoApprovalController@destroy');
+    $router->get('juspo_app_preview/{no_bukti}','Apv\JuspoApprovalController@getPreview');
 
     //Dashboard
     $router->get('dash_databox','Apv\DashboardController@getDataBox');
