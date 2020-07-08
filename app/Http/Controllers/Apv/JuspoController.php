@@ -180,6 +180,28 @@ class JuspoController extends Controller
             $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
             $format = $this->reverseDate($request->waktu,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
             $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
+            $no_aju = $request->input('no_aju');
+
+            if($request->hasfile('file'))
+            {
+                foreach($request->file('file') as $file)
+                {                
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('apv/'.$foto)){
+                        Storage::disk('s3')->delete('apv/'.$foto);
+                    }
+                    Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = $request->input('nama_file')[$i];
+                    $i++;
+                }
+                
+            }
                 
             $ins = DB::connection('sqlsrv2')->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
 
@@ -194,6 +216,12 @@ class JuspoController extends Controller
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
                     $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                }
+            }
+
+            if(count($arr_nama) > 0){
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i]]); 
                 }
             }
 
@@ -414,6 +442,28 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
+            $no_aju = $request->input('no_aju');
+
+            if($request->hasfile('file'))
+            {
+                foreach($request->file('file') as $file)
+                {                
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('apv/'.$foto)){
+                        Storage::disk('s3')->delete('apv/'.$foto);
+                    }
+                    Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = $request->input('nama_file')[$i];
+                    $i++;
+                }
+                
+            }
+
             $del = DB::connection('sqlsrv2')->table('apv_juspo_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del2 = DB::connection('sqlsrv2')->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del3 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
@@ -428,6 +478,12 @@ class JuspoController extends Controller
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
                     $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                }
+            }
+
+            if(count($arr_nama) > 0){
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i]]); 
                 }
             }
 
