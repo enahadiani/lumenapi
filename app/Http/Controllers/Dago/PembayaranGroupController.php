@@ -666,7 +666,7 @@ class PembayaranGroupController extends Controller
             $sql2= "select a.nama, b.no_reg, b.no_peserta, i.nilai_p,i.nilai_t,i.nilai_m, round((b.harga+b.harga_room) - isnull(g.bayar_p,0),4) as saldo_p, isnull(h.nilai_t,0) - isnull(g.bayar_t,0) - b.diskon as saldo_t, isnull(h.nilai_m,0) - isnull(g.bayar_m,0) as saldo_m, convert(varchar,c.tgl_berangkat,103) as tgl_berangkat, e.nama as paket, case when c.no_closing ='-' then f.kode_akun else f.akun_piutang end as kode_akun, c.no_closing, c.kurs_closing,b.no_paket 
             from dgw_peserta a 
             inner join dgw_reg b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
-            inner join dgw_jadwal c on b.no_paket = c.no_paket and b.no_jadwal = c.no_jadwal  
+            inner join dgw_jadwal c on b.no_paket = c.no_paket and b.no_jadwal = c.no_jadwal and c.kode_lokasi=b.kode_lokasi  
             inner join dgw_paket e on b.no_paket=e.no_paket and b.kode_lokasi=e.kode_lokasi 
             inner join dgw_jenis_produk f on e.kode_produk=f.kode_produk and e.kode_lokasi=f.kode_lokasi 
             inner join dgw_pembayaran i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi 
@@ -748,12 +748,17 @@ class PembayaranGroupController extends Controller
 			left join dgw_biaya b on a.kode_biaya=b.kode_biaya and a.kode_lokasi=b.kode_lokasi
             where a.no_kwitansi='$id' and a.kode_lokasi='$kode_lokasi'");
             DB::connection($this->sql)->commit();
-            
+
+            $res4 = DB::connection($this->sql)->select("select a.no_agen,a.no_peserta,a.no_paket,a.no_jadwal from dgw_reg a
+			inner join dgw_pembayaran b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
+			where b.no_kwitansi='$id' and a.flag_group='1' and a.kode_lokasi='$kode_lokasi' ");
+            $res4 = json_decode(json_encode($res4));
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
                 $success['detail_reg'] = $res2;
                 $success['detail_biaya'] = $res3;
+                $success['data_filter'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
@@ -761,6 +766,7 @@ class PembayaranGroupController extends Controller
                 $success['data'] = [];
                 $success['detail_reg'] = [];
                 $success['detail_biaya'] = [];
+                $success['data_filter'] = [];
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
