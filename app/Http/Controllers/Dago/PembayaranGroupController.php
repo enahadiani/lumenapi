@@ -969,12 +969,20 @@ class PembayaranGroupController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del = DB::connection($this->sql)->table('dgw_pembayaran_d_tmp')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_kwitansi', $request->no_bukti)
-                ->where('nik_user', $request->nik_user)
-                ->orWhere("DATEDIFF(minute, created_at, getdate())",">",60)
-                ->delete();
+            $nik_user = $request->nik_user;
+            $no_bukti = $request->no_bukti;
+
+            $del = DB::connection($this->sql)->update("delete from dgw_pembayaran_d_tmp 
+            where (DATEDIFF(minute, created_at, getdate()) > 60) or ( kode_lokasi='$kode_lokasi' and no_kwitansi='$no_bukti' and nik_user='$nik_user' )
+            ");
+            // $del = DB::connection($this->sql)->update('dgw_pembayaran_d_tmp')
+            // ->orWhere(function ($del) use ($kode_lokasi,$no_bukti,$nik_user) {
+            //     $del->where('kode_lokasi', $kode_lokasi)
+            //     ->where('no_kwitansi', $no_bukti)
+            //     ->where('nik_user', $nik_user);
+            // })
+            // ->where("DATEDIFF(minute, created_at, getdate())",">",60)
+            // ->delete();
 
             $success['status'] = true;
             $success['message'] = "Data Detail Pembayaran tmp berhasil dihapus ";
