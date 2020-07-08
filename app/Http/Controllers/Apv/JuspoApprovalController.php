@@ -528,7 +528,7 @@ class JuspoApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan,b.nilai,b.nik_buat,convert(varchar,a.tanggal,105) as tgl,case when a.status = '2' then 'Approval' when a.status = '3' then 'Return' end as status
+            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan,b.nilai,b.nik_buat,convert(varchar,a.tanggal,105) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Return' end as status
             from apv_pesan a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             inner join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
