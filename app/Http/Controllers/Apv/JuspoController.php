@@ -527,6 +527,7 @@ class JuspoController extends Controller
                 $msg_email = "";
             }
             
+            $success['no_aju'] = $no_bukti;
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Pengadaan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
           
