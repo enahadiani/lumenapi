@@ -128,7 +128,7 @@ class KaryawanController extends Controller
             }
 
             
-            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$request->kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -265,7 +265,7 @@ class KaryawanController extends Controller
             
             $del = DB::connection($this->sql)->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$request->kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
             
             
 
