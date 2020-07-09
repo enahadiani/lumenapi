@@ -103,7 +103,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_pp)){
-                $ins = DB::connection($this->sql)->insert("insert into pp(kode_pp,nama_flag_aktif,flag_aktif) values ('".$request->kode_pp."','".$request->nama_flag_aktif."','".$request->flag_aktif."') ");
+                $ins = DB::connection($this->sql)->insert("insert into pp(kode_pp,nama_flag_aktif,flag_aktif) values ('".$request->kode_pp."','".$request->nama."','".$request->flag_aktif."') ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -163,7 +163,7 @@ class UnitController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into pp(kode_pp,nama_flag_aktif,flag_aktif) values ('".$request->kode_pp."','".$request->nama_flag_aktif."','".$request->flag_aktif."') ");
+            $ins = DB::connection($this->sql)->insert("insert into pp(kode_pp,nama_flag_aktif,flag_aktif) values ('".$request->kode_pp."','".$request->nama."','".$request->flag_aktif."') ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
