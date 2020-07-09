@@ -25,7 +25,7 @@ class MenuController extends Controller
         ]);
         try {
 
-            $menu = DB::connection($this->db)->select("select *,(rowindex*100)+rowindex as nu from menu where kode_klp='$kode_klp' order by rowindex");
+            $menu = DB::connection($this->db)->select("select *,(rowindex*100)+rowindex as nu from menu where kode_klp='$request->kode_klp' order by rowindex");
             $menu = json_decode(json_encode($menu),true);
             
             if(count($menu) > 0){ //mengecek apakah data kosong atau tidak
