@@ -103,7 +103,7 @@ class FormController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_form)){
-                $ins = DB::connection($this->sql)->insert("insert into m_form(kode_form,nama_form,form) values ('".$request->kode_form."','".$request->nama_form."','".$request->form."') ");
+                $ins = DB::connection($this->sql)->insert("insert into m_form(kode_form,nama_form,form) values ('".$request->kode_form."','".$request->nama."','".$request->form."') ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -163,7 +163,7 @@ class FormController extends Controller
             ->where('kode_form', $request->kode_form)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into m_form(kode_form,nama_form,form) values ('".$request->kode_form."','".$request->nama_form."','".$request->form."') ");
+            $ins = DB::connection($this->sql)->insert("insert into m_form(kode_form,nama_form,form) values ('".$request->kode_form."','".$request->nama."','".$request->form."') ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
