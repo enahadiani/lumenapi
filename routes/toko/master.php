@@ -77,6 +77,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Akses User
     $router->get('akses-user','Toko\HakaksesController@index');
     $router->post('akses-user','Toko\HakaksesController@store');
+    $router->get('akses-user-detail','Toko\HakaksesController@show');
     $router->put('akses-user','Toko\HakaksesController@update');
     $router->delete('akses-user','Toko\HakaksesController@destroy');
     $router->get('akses-user-menu','Toko\HakaksesController@getMenu');

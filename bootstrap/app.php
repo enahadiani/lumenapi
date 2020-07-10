@@ -97,6 +97,10 @@ $app->configure('dompdf');
 
 $app->alias('QrCode', SimpleSoftwareIO\QrCode\Facade::class);
 
+
+$app->configure('services');
+$app->alias('Socialite', Laravel\Socialite\Facades\Socialite::class);
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -145,6 +149,8 @@ $app->register(Barryvdh\DomPDF\ServiceProvider::class);
 // $app->register(Collective\Html\HtmlServiceProvider::class);
 //$app->register(PrettyRoutes\ServiceProvider::class);
 $app->register(SimpleSoftwareIO\QrCode\ServiceProvider::class);
+
+$app->register(Laravel\Socialite\SocialiteServiceProvider::class);
 
 
 
