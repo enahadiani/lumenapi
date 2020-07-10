@@ -196,9 +196,10 @@ class HakaksesController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $nik)
+    public function update(Request $request)
     {
         $this->validate($request, [
+            'nik' => 'required',
             'nama' => 'required',
             'kode_klp_menu' => 'required',
             'pass' => 'required',
@@ -214,6 +215,7 @@ class HakaksesController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $nik = $request->nik;
             
             $del = DB::connection($this->sql)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
@@ -237,8 +239,11 @@ class HakaksesController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function destroy($nik)
+    public function destroy(Request $request)
     {
+        $this->validate($request, [
+            'nik' => 'required'
+        ]);
         DB::connection($this->sql)->beginTransaction();
         
         try {
@@ -247,7 +252,7 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
+            $del = DB::connection($this->sql)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
