@@ -109,7 +109,8 @@ class PaketController extends Controller
             'data_jadwal.*.quota' => 'required|integer',
             'data_jadwal.*.quota_se' => 'required|integer',
             'data_jadwal.*.quota_e' => 'required|integer',
-            'data_jadwal.*.tgl_datang' => 'required|date_format:Y-m-d'
+            'data_jadwal.*.tgl_datang' => 'required|date_format:Y-m-d',
+            'data_jadwal.*.id_jadwal' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -132,21 +133,21 @@ class PaketController extends Controller
                     }						
                 }
 
-                $strSQL = "select isnull(max(no_jadwal),0) + 1 as id_jadwal from dgw_jadwal where no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";	
+                // $strSQL = "select isnull(max(no_jadwal),0) + 1 as id_jadwal from dgw_jadwal where no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";	
                 
-                $res = DB::connection($this->sql)->select($strSQL); 
-                $res = json_decode(json_encode($res),true);
-                if (count($res) > 0){
-                    $line = $res[0];							
-                    $idJadwal = intval($line['id_jadwal']);
-                } 
+                // $res = DB::connection($this->sql)->select($strSQL); 
+                // $res = json_decode(json_encode($res),true);
+                // if (count($res) > 0){
+                //     $line = $res[0];							
+                //     $idJadwal = intval($line['id_jadwal']);
+                // } 
 
                 $detJadwal = $request->data_jadwal;
                 if (count($detJadwal) > 0){
                     for ($i=0;$i < count($detJadwal);$i++){
                        
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into dgw_jadwal(no_paket,no_jadwal,tgl_berangkat,lama_hari,quota,quota_se,quota_e,kode_lokasi, no_closing,kurs_closing,id_pbb,tgl_datang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$idJadwal,$detJadwal[$i]['tgl_berangkat'],$detJadwal[$i]['lama_hari'],$detJadwal[$i]['quota'],$detJadwal[$i]['quota_se'],$detJadwal[$i]['quota_e'],$kode_lokasi,'-',0,'-',$detJadwal[$i]['tgl_datang']));   
-                        $idJadwal = $idJadwal + 1;	
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into dgw_jadwal(no_paket,no_jadwal,tgl_berangkat,lama_hari,quota,quota_se,quota_e,kode_lokasi, no_closing,kurs_closing,id_pbb,tgl_datang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$detJadwal[$i]['id_jadwal'],$detJadwal[$i]['tgl_berangkat'],$detJadwal[$i]['lama_hari'],$detJadwal[$i]['quota'],$detJadwal[$i]['quota_se'],$detJadwal[$i]['quota_e'],$kode_lokasi,'-',0,'-',$detJadwal[$i]['tgl_datang']));   
+                        // $idJadwal = $idJadwal + 1;	
                     }						
                 }
                 
@@ -255,7 +256,8 @@ class PaketController extends Controller
             'data_jadwal.*.quota' => 'required|integer',
             'data_jadwal.*.quota_se' => 'required|integer',
             'data_jadwal.*.quota_e' => 'required|integer',
-            'data_jadwal.*.tgl_datang' => 'required|date_format:Y-m-d'
+            'data_jadwal.*.tgl_datang' => 'required|date_format:Y-m-d',
+            'data_jadwal.*.id_jadwal' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -301,14 +303,14 @@ class PaketController extends Controller
                 }						
             }
             
-            $strSQL = "select isnull(max(no_jadwal),0) + 1 as id_jadwal from dgw_jadwal where no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";	
+            // $strSQL = "select isnull(max(no_jadwal),0) + 1 as id_jadwal from dgw_jadwal where no_paket='".$request->no_paket."' and kode_lokasi='".$kode_lokasi."'";	
             
-            $res = DB::connection($this->sql)->select($strSQL); 
-            $res = json_decode(json_encode($res),true);
-            if (count($res) > 0){
-                $line = $res[0];							
-                $idJadwal = intval($line['id_jadwal']);
-            } 
+            // $res = DB::connection($this->sql)->select($strSQL); 
+            // $res = json_decode(json_encode($res),true);
+            // if (count($res) > 0){
+            //     $line = $res[0];							
+            //     $idJadwal = intval($line['id_jadwal']);
+            // } 
             
             $del3 = DB::connection($this->sql)->table('dgw_jadwal')
             ->where('kode_lokasi', $kode_lokasi)
@@ -318,8 +320,8 @@ class PaketController extends Controller
             if (count($detJadwal) > 0){
                 for ($i=0;$i < count($detJadwal);$i++){
                     
-                    $ins3[$i] = DB::connection($this->sql)->insert("insert into dgw_jadwal(no_paket,no_jadwal,tgl_berangkat,lama_hari,quota,quota_se,quota_e,kode_lokasi, no_closing,kurs_closing,id_pbb,tgl_datang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$idJadwal,$detJadwal[$i]['tgl_berangkat'],$detJadwal[$i]['lama_hari'],$detJadwal[$i]['quota'],$detJadwal[$i]['quota_se'],$detJadwal[$i]['quota_e'],$kode_lokasi,'-',0,'-',$detJadwal[$i]['tgl_datang']));   
-                    $idJadwal = $idJadwal + 1;	
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into dgw_jadwal(no_paket,no_jadwal,tgl_berangkat,lama_hari,quota,quota_se,quota_e,kode_lokasi, no_closing,kurs_closing,id_pbb,tgl_datang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($request->no_paket,$detJadwal[$i]['id_jadwal'],$detJadwal[$i]['tgl_berangkat'],$detJadwal[$i]['lama_hari'],$detJadwal[$i]['quota'],$detJadwal[$i]['quota_se'],$detJadwal[$i]['quota_e'],$kode_lokasi,'-',0,'-',$detJadwal[$i]['tgl_datang']));   
+                    // $idJadwal = $idJadwal + 1;	
                 }						
             }
             
