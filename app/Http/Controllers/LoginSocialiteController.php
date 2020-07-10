@@ -63,7 +63,6 @@ class LoginSocialiteController extends Controller
 
         return new JsonResponse(
             [
-                'user' => $user,
                 'provider_user' => $providerUser
             ]
         );
