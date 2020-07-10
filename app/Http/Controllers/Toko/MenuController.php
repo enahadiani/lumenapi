@@ -202,7 +202,7 @@ class MenuController extends Controller
      * @param  \App\DevSiswa  $DevSiswa
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $nim)
+    public function update(Request $request)
     {
         $this->validate($request, [
             'kode_klp' => 'required',
@@ -251,7 +251,7 @@ class MenuController extends Controller
      * @param  \App\DevSiswa  $DevSiswa
      * @return \Illuminate\Http\Response
      */
-    public function destroy($nim)
+    public function destroy(Request $request)
     {
         $this->validate($request, [
             'kode_menu' => 'required',
