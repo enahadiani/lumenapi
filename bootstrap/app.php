@@ -360,4 +360,18 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/ginas.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sai-auth'
+], function ($router) {
+    require __DIR__.'/../routes/sai/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sai-master'
+], function ($router) {
+    require __DIR__.'/../routes/sai/master.php';
+});
 return $app;
