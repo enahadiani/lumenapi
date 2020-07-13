@@ -45,3 +45,5 @@ $router->get('routes/{modul}', ['middleware' => 'cors', function($modul) use ($r
 
 $router->get('auth/facebook/login', 'LoginSocialiteController@redirectToProvider');
 $router->get('auth/facebook/callback', 'LoginSocialiteController@handleProviderCallback');
+
+$router->post('send_notif_fcm', 'NotifController@sendNotif');
