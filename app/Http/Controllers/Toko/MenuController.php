@@ -98,7 +98,7 @@ class MenuController extends Controller
             'icon' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -106,44 +106,44 @@ class MenuController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $kode_klp = $request->kode_klp;
-            $del = DB::connection($this->sql)->table('menu_tmp')
+            $del = DB::connection($this->db)->table('menu_tmp')
             ->where('kode_klp', $kode_klp)
             ->delete(); 
 
             //insert menu tmp
-            $menu_tmp = DB::connection($this->sql)->update("insert into menu_tmp
+            $menu_tmp = DB::connection($this->db)->update("insert into menu_tmp
             select kode_menu, kode_form, kode_klp, nama, level_menu, (rowindex*100)+rowindex  as rowindex, jenis_menu, icon
             from menu 
             where kode_klp='$kode_klp'
             order by rowindex");
 
             //insert 1 row to menu_tmp
-            $sql = DB::connection($this->sql)->insert("insert into menu_tmp (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->nu."','".$request->jenis_menu."','".$request->icon."')");
+            $sql = DB::connection($this->db)->insert("insert into menu_tmp (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->nu."','".$request->jenis_menu."','".$request->icon."')");
 
             // del menu
-            $del = DB::connection($this->sql)->table('menu')
+            $del = DB::connection($this->db)->table('menu')
             ->where('kode_klp', $kode_klp)
             ->delete(); 
  
             //get menu dari tmp
-            $getmenu = DB::connection($this->sql)->select("select kode_menu, kode_form, kode_klp, nama, level_menu, (rowindex*100)+rowindex  as rowindex, jenis_menu, icon
+            $getmenu = DB::connection($this->db)->select("select kode_menu, kode_form, kode_klp, nama, level_menu, (rowindex*100)+rowindex  as rowindex, jenis_menu, icon
             from menu_tmp 
             where kode_klp='$kode_klp'
             order by rowindex"); 
             //insert menu
             $i=1;
             foreach($getmenu as $menu){
-                $ins = DB::connection($this->sql)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$row->kode_menu."','".$row->kode_form."','".$row->kode_klp."','".$row->nama."','".$row->level_menu."','".$i."','".$row->jenis_menu."','".$row->icon."')");
+                $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$row->kode_menu."','".$row->kode_form."','".$row->kode_klp."','".$row->nama."','".$row->level_menu."','".$i."','".$row->jenis_menu."','".$row->icon."')");
                 $i++;
             }
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Menu berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Menu gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -216,7 +216,7 @@ class MenuController extends Controller
             'icon' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -224,20 +224,20 @@ class MenuController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $kode_klp = $request->kode_klp;
-            $del = DB::connection($this->sql)->table('menu')
+            $del = DB::connection($this->db)->table('menu')
             ->where('kode_klp', $kode_klp)
             ->where('kode_menu', $request->kode_menu)
             ->delete(); 
            
-            $ins = DB::connection($this->sql)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu,icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->index."','".$request->jenis_menu."','".$request->icon."')");
+            $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu,icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->index."','".$request->jenis_menu."','".$request->icon."')");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Menu berhasil diubah";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Menu gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -257,7 +257,7 @@ class MenuController extends Controller
             'kode_menu' => 'required',
             'kode_klp' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -266,16 +266,16 @@ class MenuController extends Controller
             }
             $sql = "select kode_menu,rowindex from menu where kode_menu = '".$request->kode_menu."' and kode_klp='$request->kode_klp' 
             ";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){
-                $del = DB::connection($this->sql)->table('menu')
+                $del = DB::connection($this->db)->table('menu')
                 ->where('kode_klp', $request->kode_klp)
                 ->where('kode_menu', $request->kode_menu)
                 ->delete();
                
-                DB::connection($this->sql)->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Menu berhasil dihapus";
             }else{
@@ -284,7 +284,7 @@ class MenuController extends Controller
             }
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Menu gagal dihapus ".$e;
             
@@ -304,7 +304,7 @@ class MenuController extends Controller
             'icon' => 'required|array'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -316,17 +316,17 @@ class MenuController extends Controller
 
             if(count($req['kode_menu']) > 0){
 
-                $del = DB::connection($this->sql)->table('menu')
+                $del = DB::connection($this->db)->table('menu')
                 ->where('kode_klp', $kode_klp)
                 ->delete(); 
 
                 $nu=1;
                 for($i=0;$i<count($req['kode_menu']);$i++){
 
-                    $ins = DB::connection($this->sql)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$req['kode_menu'][$i]."','".$req['kode_form'][$i]."','".$kode_klp."','".$req['nama_menu'][$i]."','".$req['level_menu'][$i]."','".$nu."','".$req['jenis_menu'][$i]."','".$req['icon'][$i]."')");
+                    $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$req['kode_menu'][$i]."','".$req['kode_form'][$i]."','".$kode_klp."','".$req['nama_menu'][$i]."','".$req['level_menu'][$i]."','".$nu."','".$req['jenis_menu'][$i]."','".$req['icon'][$i]."')");
                 }
 
-                DB::connection($this->sql)->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Menu berhasil disimpan";
                 
@@ -336,7 +336,7 @@ class MenuController extends Controller
             }
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Menu gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 

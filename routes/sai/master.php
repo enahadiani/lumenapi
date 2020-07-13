@@ -23,6 +23,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('konten-ktg','Sai\KontenKtgController@store');
     $router->put('konten-ktg','Sai\KontenKtgController@update');
     $router->delete('konten-ktg','Sai\KontenKtgController@destroy');
+
+    $router->get('galeri','Sai\GaleriController@index');
+    $router->post('galeri','Sai\GaleriController@store');
+    $router->put('galeri','Sai\GaleriController@update');
+    $router->delete('galeri','Sai\GaleriController@destroy');
 });
 
 
