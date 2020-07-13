@@ -133,7 +133,7 @@ class MenuController extends Controller
             order by rowindex"); 
             //insert menu
             $i=1;
-            foreach($getmenu as $menu){
+            foreach($getmenu as $row){
                 $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$row->kode_menu."','".$row->kode_form."','".$row->kode_klp."','".$row->nama."','".$row->level_menu."','".$i."','".$row->jenis_menu."','".$row->icon."')");
                 $i++;
             }
