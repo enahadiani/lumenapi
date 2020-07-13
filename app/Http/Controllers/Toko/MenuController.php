@@ -292,4 +292,56 @@ class MenuController extends Controller
         }	
     }
 
+    public function simpanMove(Request $request)
+    {
+        $this->validate($request, [
+            'kode_klp' => 'required',
+            'kode_menu' => 'required|array',
+            'level_menu' => 'required|array',
+            'kode_form' => 'required|array',
+            'nama_menu' => 'required|array',
+            'jenis_menu' => 'required|array',
+            'icon' => 'required|array'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_klp = $request->kode_klp;
+            $req = $request->all();
+
+            if(count($req['kode_menu']) > 0){
+
+                $del = DB::connection($this->sql)->table('menu')
+                ->where('kode_klp', $kode_klp)
+                ->delete(); 
+
+                $nu=1;
+                for($i=0;$i<count($req['kode_menu']);$i++){
+
+                    $ins = DB::connection($this->sql)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$req['kode_menu'][$i]."','".$req['kode_form'][$i]."','".$kode_klp."','".$req['nama_menu'][$i]."','".$req['level_menu'][$i]."','".$nu."','".$req['jenis_menu'][$i]."','".$req['icon'][$i]."')");
+                }
+
+                DB::connection($this->sql)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Menu berhasil disimpan";
+                
+            }else{
+                $success['status'] = true;
+                $success['message'] = "Error data kosong!";
+            }
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Menu gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+                
+    }
+
 }
