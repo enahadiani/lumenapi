@@ -109,6 +109,7 @@ class JuspoController extends Controller
             left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
             where (a.kode_lokasi='$kode_lokasi' and a.progress='S') and (isnull(b.no_bukti,'-') = '-' OR b.progress = 'R')
             ");
+            
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
