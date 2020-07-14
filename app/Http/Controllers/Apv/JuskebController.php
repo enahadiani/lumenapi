@@ -624,7 +624,7 @@ class JuskebController extends Controller
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_user as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status
+			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_user as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_ver as no_app,case a.status when 'V' then 'Verifikasi' else 'Return' end as status
 			from apv_ver_m a
             inner join apv_karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi

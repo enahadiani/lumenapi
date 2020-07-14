@@ -28,7 +28,18 @@ class KontenKtgController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_ktg, nama FROM sai_konten_ktg as status where kode_lokasi= '".$kode_lokasi."' ";
+            $filter = "";
+            if(isset($request->kode_ktg)){
+                if($request->kode_ktg == "all"){
+                    $filter .= "";
+                }else{
+                    $filter .= " and kode_ktg='$request->kode_ktg' ";
+                }  
+            }else{
+                $filter .="";
+            }
+
+            $sql = "SELECT kode_ktg, nama FROM sai_konten_ktg as status where kode_lokasi= '".$kode_lokasi."' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
