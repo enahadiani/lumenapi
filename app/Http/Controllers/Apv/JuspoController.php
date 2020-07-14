@@ -332,7 +332,7 @@ class JuspoController extends Controller
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi'
-			order by c.no_urut ";
+			order by e.id,c.no_urut ";
             $res4 = DB::connection('sqlsrv2')->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
