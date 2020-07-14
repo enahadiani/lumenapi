@@ -326,11 +326,22 @@ class JuspoController extends Controller
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
+            $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' else 'REVISI' end as status,e.keterangan,c.nik 
+            from apv_juspo_m a
+            left join (select no_bukti,kode_lokasi,max(id) as maxid
+                        from apv_pesan 
+                        group by no_bukti,kode_lokasi) d on a.no_bukti=d.no_bukti
+            left join apv_pesan e on d.no_bukti=e.no_bukti and d.maxid=e.id
+            left join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
+            $res4 = DB::connection('sqlsrv2')->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
+                $success['data_histori'] = $res4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
@@ -339,6 +350,7 @@ class JuspoController extends Controller
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
+                $success['data_histori'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
