@@ -64,14 +64,14 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,case a.progress when 'S' then 'FINISH' when 'R' then 'Return' else isnull(b.nama_jab,'-') end as posisi,a.nilai,a.progress
+            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,case a.progress when 'S' then 'FINISH' else isnull(b.nama_jab,'-') end as posisi,a.nilai,a.progress
             from apv_juspo_m a
             left join (select a.no_bukti,b.nama as nama_jab
                     from apv_flow a
                     inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.status='1'
-                    )b on a.no_bukti=b.no_bukti
-            where a.kode_lokasi='".$kode_lokasi."'  and a.nik_buat='$nik_user'
+                    )b on a.no_bukti=b.no_bukti 
+            where a.kode_lokasi='".$kode_lokasi."' and a.nik_buat='$nik_user' and a.progress <> 'R'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -104,10 +104,10 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.nilai,a.progress
+            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.nilai,a.progress,b.progress
             from apv_juskeb_m a 
             left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.progress='S'  and isnull(b.no_bukti,'-') = '-'
+            where (a.kode_lokasi='$kode_lokasi' and a.progress='S') and (isnull(b.no_bukti,'-') = '-' OR b.progress = 'R')
             ");
             $res = json_decode(json_encode($res),true);
             

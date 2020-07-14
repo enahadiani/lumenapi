@@ -27,6 +27,14 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('galeri','Sai\GaleriController@store');
     $router->post('galeri-ubah','Sai\GaleriController@update');
     $router->delete('galeri','Sai\GaleriController@destroy');
+
+    $router->get('konten','Sai\KontenController@index');
+    $router->post('konten','Sai\KontenController@store');
+    $router->put('konten','Sai\KontenController@update');
+    $router->post('konten-draft','Sai\KontenController@draftKonten');
+    $router->put('konten-draft','Sai\KontenController@updateDraft');
+    $router->post('konten-publish','Sai\KontenController@publishKonten');
+    $router->delete('konten','Sai\KontenController@destroy');
 });
 
 
