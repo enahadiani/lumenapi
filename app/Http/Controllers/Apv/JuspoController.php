@@ -644,16 +644,20 @@ class JuspoController extends Controller
             // inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
             // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
             // order by a.no_urut";
-            $sql3="select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,-1 as nu
+            $sql3="select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,-1 as nu,'-' as no_app,'-' as status
 			from apv_juspo_m a
             inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,a.no_urut as nu
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,a.no_urut as nu,d.maxid as no_app,case e.status when '2' then 'APPROVE' when '3' then 'RETURN' else '-' end as status
             from apv_flow a
             inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+			left join (select no_bukti,no_urut,max(id) as maxid
+			from apv_pesan 
+			group by no_bukti,no_urut) d on a.no_bukti=d.no_bukti and a.no_urut=d.no_urut
+			left join apv_pesan e on d.no_bukti=e.no_bukti and d.no_urut=e.no_urut and d.maxid=e.id
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
             order by nu";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
