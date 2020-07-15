@@ -61,6 +61,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('stok-opname', 'Toko\StockOpnameController@update');
     $router->delete('stok-opname', 'Toko\StockOpnameController@destroy');
 
+    //PEMASUKAN PENGELUARAN PINBOOK
+    $router->get('kbdual','Toko\KasBankDualController@index');
+    $router->get('kbdual-detail','Toko\KasBankDualController@show');
+    $router->post('kbdual','Toko\KasBankDualController@store');
+    $router->put('kbdual','Toko\KasBankDualController@update');
+    $router->delete('kbdual','Toko\KasBankDualController@destroy');
+
 });
 
 
