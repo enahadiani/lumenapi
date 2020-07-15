@@ -155,8 +155,8 @@ class KasBankDualController extends Controller
 
             $ins3 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),1,$akunKredit,'C',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
 
-            $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
-            where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
+            // $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            // where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -291,8 +291,8 @@ class KasBankDualController extends Controller
 
             $ins3 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),1,$akunKredit,'C',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
 
-            $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
-            where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
+            // $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            // where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
