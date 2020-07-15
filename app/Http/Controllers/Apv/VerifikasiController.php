@@ -328,14 +328,14 @@ class VerifikasiController extends Controller
             from apv_juskeb_m a
             inner join apv_ver_m e on a.no_bukti=e.no_juskeb and a.kode_lokasi=e.kode_lokasi
             inner join apv_karyawan f on e.nik_user=f.nik and e.kode_lokasi=f.kode_lokasi
-            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi'
+            where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi'
 			union all
 			select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama 
             from apv_juskeb_m a
             inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
-            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
+            where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi' ";
             $res4 = DB::connection('sqlsrv2')->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             
