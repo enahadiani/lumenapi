@@ -56,10 +56,8 @@ class ReferensiTransController extends Controller
            
             if ($request->jenis == "PENGELUARAN") {
                 $vKode = "K";
-            }else if ($request->jenis == "PEMASUKAN"){
-                $vKode = "T";
             }else{
-                $vKode = "P";
+                $vKode = "T";
             }
             $kode = $this->generateKode("trans_ref","kode_ref",$vKode,"001");
             $success['status'] = true;
