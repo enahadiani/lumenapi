@@ -323,12 +323,23 @@ class VerifikasiController extends Controller
             $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
+
+            $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama 
+            from apv_juskeb_m a
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi'
+			order by e.id,c.no_urut ";
+            $res4 = DB::connection('sqlsrv2')->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
+                $success['data_histori'] = $res4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
@@ -337,6 +348,7 @@ class VerifikasiController extends Controller
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
+                $success['data_histori'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
