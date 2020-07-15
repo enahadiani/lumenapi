@@ -300,7 +300,7 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select no_bukti,no_dokumen,kode_pp,kode_kota,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' ";
+            $sql="select no_bukti,no_dokumen,kode_pp,kode_kota,kode_divisi,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' ";
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
