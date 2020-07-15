@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class RtrwController extends Controller
 {
     public $successStatus = 200;
+    public $sql = 'sqlsrvrtrw';
+    public $guard = 'rtrw';
+    public $guard3 = 'warga';
 
     public function toBulan($bln)
 	{
@@ -76,14 +79,17 @@ class RtrwController extends Controller
 
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $kode_menu = $request->kode_menu;
             $sql="select a.*,b.form  from menu a left join m_form b on a.kode_form=b.kode_form where kode_klp = '$kode_menu' and a.jenis_menu='$request->jenis_menu' order by kode_klp, rowindex ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -112,14 +118,17 @@ class RtrwController extends Controller
 
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $kode_menu = $request->kode_menu;
             $sql="select a.*,b.form  from menu a left join m_form b on a.kode_form=b.kode_form where kode_klp = '$kode_menu' and a.jenis_menu='tengah' order by kode_klp, rowindex ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -145,8 +154,11 @@ class RtrwController extends Controller
         
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -156,7 +168,7 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201','11202') 
                 ) a
             order by a.tahun desc ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -182,8 +194,11 @@ class RtrwController extends Controller
         
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -194,7 +209,7 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201','11202')
             ) a
             order by (substring(a.periode,5,2)) desc  ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -223,8 +238,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -237,7 +255,7 @@ class RtrwController extends Controller
             }
 
             $sql= "select distinct (substring(periode,1,4)) as tahun from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,1,4) desc ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -263,14 +281,17 @@ class RtrwController extends Controller
 
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $periode = date('Ym');
             $sql="select 'all' as periode union all select '$periode' as periode union all select distinct periode from rt_setor_m where kode_lokasi='$kode_lokasi' order by periode desc ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -298,15 +319,18 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $kode_pp = $request->kode_pp;
             $periode = date('Ym');
             $sql="select akun_kas from pp where kode_pp='$kode_pp'";
-            $cek = DB::connection('sqlsrvrtrw')->select($sql);
+            $cek = DB::connection($this->sql)->select($sql);
             $cek = json_decode(json_encode($cek),true);
             $kode_akun = $cek[0]['akun_kas'];
 
@@ -314,7 +338,7 @@ class RtrwController extends Controller
             from masakun a 
             inner join relakun_pp c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi and c.kode_pp='$kode_pp'
             inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag in ('001','009') where a.kode_lokasi='$kode_lokasi'   ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -344,8 +368,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -356,7 +383,7 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENERIMAAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             // sql pengeluaran 
@@ -365,14 +392,14 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENGELUARAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
-            $res2 = DB::connection('sqlsrvrtrw')->select($sql2);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             // sql saldo
             $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202')
             ";
             
-            $res3 = DB::connection('sqlsrvrtrw')->select($sql2);
+            $res3 = DB::connection($this->sql)->select($sql2);
             $res3 = json_decode(json_encode($res3),true);
 
             
@@ -406,8 +433,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -417,7 +447,7 @@ class RtrwController extends Controller
             $sql="select convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
             from gldt where kode_akun in ('11101','11201','11202') and kode_lokasi='$kode_lokasi' and kode_drk ='$kode_drk' and periode like '$tahun%'
             order by tgl_input desc";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -446,8 +476,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -459,7 +492,7 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENERIMAAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             // sql pengeluaran 
@@ -468,14 +501,14 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENGELUARAN'
             group by a.kode_drk,b.nama,b.jenis,b.idx
             order by b.jenis,b.idx";
-            $res2 = DB::connection('sqlsrvrtrw')->select($sql2);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             // sql saldo
             $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202')
             ";
             
-            $res3 = DB::connection('sqlsrvrtrw')->select($sql2);
+            $res3 = DB::connection($this->sql)->select($sql2);
             $res3 = json_decode(json_encode($res3),true);
 
             
@@ -510,8 +543,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -522,7 +558,7 @@ class RtrwController extends Controller
             $sql="select convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
             from gldt where kode_akun in ('11101','11201','11202') and kode_lokasi='$kode_lokasi' and kode_drk ='$kode_drk' and substring(periode,1,4) = '$tahun' and substring(periode,5,2) = '$bulan'
             order by tgl_input desc";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -552,8 +588,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -569,14 +608,14 @@ class RtrwController extends Controller
                 from gldt where kode_akun ='$kode_akun' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
             ) a
             ";
-            $cek = DB::connection('sqlsrvrtrw')->select($sql);
+            $cek = DB::connection($this->sql)->select($sql);
             $cek = json_decode(json_encode($cek),true);
             $saldo = $cek[0]['saldo'];
 
             $sql="select top 10 convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
             from gldt where kode_akun ='$kode_akun' and kode_pp ='$kode_pp' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
             order by tgl_input desc ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if((count($res) > 0)){ //mengecek apakah data kosong atau tidak
@@ -613,8 +652,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -630,14 +672,14 @@ class RtrwController extends Controller
                 from gldt where kode_akun ='$kode_akun' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
             ) a
             ";
-            $cek = DB::connection('sqlsrvrtrw')->select($sql);
+            $cek = DB::connection($this->sql)->select($sql);
             $cek = json_decode(json_encode($cek),true);
             $saldo = $cek[0]['saldo'];
 
             $sql2="select convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
             from gldt where kode_akun ='$kode_akun' and kode_pp ='$kode_pp' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
             order by tgl_input desc ";
-            $row = DB::connection('sqlsrvrtrw')->select($sql2);
+            $row = DB::connection($this->sql)->select($sql2);
             $row = json_decode(json_encode($row),true);
             $torecord = count($row);
 
@@ -647,7 +689,7 @@ class RtrwController extends Controller
 
             $sql = $sql2." 
             OFFSET ".$nextpage." ROWS FETCH NEXT 20 ROWS ONLY";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if((count($res) > 0)){ //mengecek apakah data kosong atau tidak
@@ -682,8 +724,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -702,14 +747,14 @@ class RtrwController extends Controller
                 where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode_bill <='$periode' and a.kode_jenis='IWAJIB'
             ) a ";
 
-            $cek = DB::connection('sqlsrvrtrw')->select($sql);
+            $cek = DB::connection($this->sql)->select($sql);
             $cek = json_decode(json_encode($cek),true);
             $saldo = $cek[0]['saldo'];
 
             $sql="select a.no_bukti, a.keterangan, convert(varchar,a.tanggal,105) as tgl,a.nilai1 as nilai1 from trans_m a 
             where a.periode <= '$periode' and a.kode_lokasi='$kode_lokasi' and a.param1='$kode_rumah' and a.param2='IWAJIB'
             order by a.no_bukti desc";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -743,8 +788,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -776,7 +824,7 @@ class RtrwController extends Controller
             ) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
             where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.periode like '$tahun%' and a.kode_jenis='IWAJIB' and a.flag_aktif='1'
             order by a.periode";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -807,8 +855,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -817,7 +868,7 @@ class RtrwController extends Controller
             $password_confirm = $request->password_confirm;
 
             $sql="select nik, pass from hakakses where nik='$nik' and kode_lokasi='$kode_lokasi' and pass='$password_lama'";
-            $cek = DB::connection('sqlsrvrtrw')->select($sql);
+            $cek = DB::connection($this->sql)->select($sql);
             $cek = json_decode(json_encode($cek),true);
 
             if(count($cek) > 0){
@@ -825,9 +876,9 @@ class RtrwController extends Controller
                 $konfir_data = $password_confirm;
                 if ($up_data == $konfir_data){
 
-                    DB::connection('sqlsrvrtrw')->beginTransaction();
+                    DB::connection($this->sql)->beginTransaction();
 
-                    $upd = DB::connection('sqlsrvrtrw')->table('hakakses')
+                    $upd = DB::connection($this->sql)->table('hakakses')
                     ->where('nik', $nik)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('pass', $password_lama)
@@ -837,11 +888,11 @@ class RtrwController extends Controller
                     if($upd){
                         $success['status'] = TRUE;
                         $success['message'] = 'Data berhasil disimpan';
-                        DB::connection('sqlsrvrtrw')->commit();
+                        DB::connection($this->sql)->commit();
                     }else{
                         $success['status'] = FALSE;
                         $success['message'] = "Data gagal disimpan ke database";
-                        DB::connection('sqlsrvrtrw')->rollback();
+                        DB::connection($this->sql)->rollback();
                     }
                 }else{
                     $success['status'] = FALSE;
@@ -869,8 +920,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
@@ -882,12 +936,12 @@ class RtrwController extends Controller
                 $filter = " and kode_pp='$request->kode_pp' ";
 
                 $sql="select kode_rumah from hakakses where kode_lokasi='$kode_lokasi' and nik='$nik' ";
-                $cek = DB::connection('sqlsrvrtrw')->select($sql);
+                $cek = DB::connection($this->sql)->select($sql);
                 $cek = json_decode(json_encode($cek),true);
                 $kode_rumah=$cek[0]['kode_rumah'];
     
                 $sqlBlok="select blok from rt_rumah where kode_lokasi='$kode_lokasi' and kode_rumah='$kode_rumah' ";
-                $cek = DB::connection('sqlsrvrtrw')->select($sqlBlok);
+                $cek = DB::connection($this->sql)->select($sqlBlok);
                 $cek = json_decode(json_encode($cek),true);
                 $blok=$cek[0]['blok'];
                 $success['blok'] = $blok;
@@ -895,7 +949,7 @@ class RtrwController extends Controller
 
             $kode_pp = $request->kode_pp;
             $sql = "select blok from rt_blok where kode_lokasi='$kode_lokasi' $filter order by blok ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -924,8 +978,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             $periode = $request->periode;
@@ -947,7 +1004,7 @@ class RtrwController extends Controller
                 ) a
                 group by a.kode_rumah 
             ";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -975,8 +1032,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -989,7 +1049,7 @@ class RtrwController extends Controller
             from trans_ref a inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik'
             where a.jenis='$jenis' and a.kode_lokasi='$kode_lokasi'";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1022,13 +1082,17 @@ class RtrwController extends Controller
             'nilai' => 'required'
         ]);
 
-        DB::connection('sqlsrvrtrw')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
+                $kode_lokasi= $data->kode_lokasi;
             }
+
             if($request->kode_jenis == 'Keluar'){
                 $jenis="BK";
             }else{
@@ -1039,7 +1103,7 @@ class RtrwController extends Controller
             $periode=date('Y').date('m');
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-".$jenis.$per.".";
-            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
+            $query = DB::connection($this->sql)->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
             $query = json_decode(json_encode($query),true);
             
             $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -1049,7 +1113,7 @@ class RtrwController extends Controller
             inner join masakun b on a.akun_debet=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join masakun c on a.akun_kredit=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
             where a.kode_ref='".$request->kode_ref."' and a.kode_lokasi='".$kode_lokasi."'";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             $akunDebet=$res[0]['akun_debet'];
             $akunKredit=$res[0]['akun_kredit'];
@@ -1060,22 +1124,22 @@ class RtrwController extends Controller
                 $akunDebet = $request->kode_akun;
             }
 
-            $ins = DB::connection('sqlsrvrtrw')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBDUAL','T','-','-',$request->kode_pp,date('Y-m-d H:i:s'),'-',$request->keterangan,'IDR','1',$request->nilai,0,0,$nik,'-','-','-','-','-',$request->kode_ref,'TUNAI',$jenis]);
+            $ins = DB::connection($this->sql)->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBDUAL','T','-','-',$request->kode_pp,date('Y-m-d H:i:s'),'-',$request->keterangan,'IDR','1',$request->nilai,0,0,$nik,'-','-','-','-','-',$request->kode_ref,'TUNAI',$jenis]);
 
-            $ins2 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunDebet,'D',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
+            $ins2 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunDebet,'D',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
 
-            $ins3 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKredit,'C',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
+            $ins3 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKredit,'C',$request->nilai,$request->nilai,$request->keterangan,'KB',$jenis,'IDR',1,$request->kode_pp,$request->kode_ref,'-','-','-','-','-','-','-']);
 
-            $ins4 = DB::connection('sqlsrvrtrw')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
             where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
             
-            DB::connection('sqlsrvrtrw')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kas berhasil disimpan. No Bukti: ".$id;
                 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvrtrw')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kas gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -1088,8 +1152,11 @@ class RtrwController extends Controller
         
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1129,7 +1196,7 @@ class RtrwController extends Controller
             ) b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
             ";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1167,11 +1234,14 @@ class RtrwController extends Controller
             'nilai_rt.*' => 'required',
         ]);
 
-        DB::connection('sqlsrvrtrw')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1181,7 +1251,7 @@ class RtrwController extends Controller
             $periode=date('Y').date('m');
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-".$jenis.$per.".";
-            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
+            $query = DB::connection($this->sql)->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
             $query = json_decode(json_encode($query),true);
             
             $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -1189,39 +1259,39 @@ class RtrwController extends Controller
             $sql="select a.kode_pp,a.akun_kas,a.akun_kastitip, a.akun_titip,a.akun_pdpt 
             from pp a inner join rt_rumah b on a.kode_pp=b.rt and a.kode_lokasi=b.kode_lokasi 
             where b.kode_rumah='".$request->kode_rumah."' and a.kode_lokasi='".$kode_lokasi."'";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             $akunTitip=$res[0]['akun_titip'];
 
             $akunKas = $request->kode_akun;
             $keterangan ="Penerimaan Iuran Wajib atas rumah ".$request->kode_rumah." periode ".$periode;
 
-            $ins = DB::connection('sqlsrvrtrw')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'RTRW','KBIUR','T','0','0',$request->kode_pp,date('Y-m-d H:i:s'),'-',$keterangan,'IDR','1',$request->bayar,0,0,'-','-','-',$request->status_bayar,'-','-',$request->kode_rumah,'IWAJIB','-']);
+            $ins = DB::connection($this->sql)->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'RTRW','KBIUR','T','0','0',$request->kode_pp,date('Y-m-d H:i:s'),'-',$keterangan,'IDR','1',$request->bayar,0,0,'-','-','-',$request->status_bayar,'-','-',$request->kode_rumah,'IWAJIB','-']);
 
             $nilai_iur= intval($request->total_rw)+intval($request->total_rt);
 
-            $ins2 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKas,'D',$nilai_iur,$nilai_iur,$keterangan,'RTRW','KBRW','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-']);
+            $ins2 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKas,'D',$nilai_iur,$nilai_iur,$keterangan,'RTRW','KBRW','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-']);
 
-            $ins3 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunTitip,'C',$nilai_iur,$nilai_iur,$keterangan,'RTRW','TITIP','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-']);
+            $ins3 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunTitip,'C',$nilai_iur,$nilai_iur,$keterangan,'RTRW','TITIP','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-']);
 
             for($a=0; $a<count($request->periode_bill);$a++){
                 // if ($_POST['toggle'][$a] == "on"){
-                $sqldet[$a] =  DB::connection('sqlsrvrtrw')->insert("insert into rt_angs_d (no_angs,kode_rumah,kode_jenis,periode_bill,periode_angs,nilai_rt,nilai_rw,kode_lokasi,kode_pp,dc,modul,jenis,no_setor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array(
+                $sqldet[$a] =  DB::connection($this->sql)->insert("insert into rt_angs_d (no_angs,kode_rumah,kode_jenis,periode_bill,periode_angs,nilai_rt,nilai_rw,kode_lokasi,kode_pp,dc,modul,jenis,no_setor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array(
                                 $id,$request->kode_rumah,'IWAJIB',$request->periode[$a],$periode,$request->nilai_rt[$a],$request->nilai_rw[$a],$kode_lokasi,$request->kode_pp,'D','KBIUR','KAS','-'));
                     	
                 // }
             }
 
-            $ins4 = DB::connection('sqlsrvrtrw')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
             where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
             
-            DB::connection('sqlsrvrtrw')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Pembayaran Iuran berhasil disimpan. No Bukti: ".$id;
                 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvrtrw')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -1234,8 +1304,11 @@ class RtrwController extends Controller
         
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1275,7 +1348,7 @@ class RtrwController extends Controller
             ) b on a.kode_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
             ";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1313,11 +1386,14 @@ class RtrwController extends Controller
             'nilai_rt.*' => 'required',
         ]);
 
-        DB::connection('sqlsrvrtrw')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1327,14 +1403,14 @@ class RtrwController extends Controller
             $periode=date('Y').date('m');
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-".$jenis.$per.".";
-            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
+            $query = DB::connection($this->sql)->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' ");
             $query = json_decode(json_encode($query),true);
             
             $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
 
             //id setor
             $prefix2=$kode_lokasi."-STR".$per.".";
-            $query2 = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_setor),'0000'),".strlen($str_format).")+1 as id from rt_setor_m where no_setor like '$prefix2%' ");
+            $query2 = DB::connection($this->sql)->select("select right(isnull(max(no_setor),'0000'),".strlen($str_format).")+1 as id from rt_setor_m where no_setor like '$prefix2%' ");
             $query2 = json_decode(json_encode($query2),true);
 
             $id_setor = $prefix2.str_pad($query2[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -1342,7 +1418,7 @@ class RtrwController extends Controller
             $sql="select a.kode_pp,a.akun_kas,a.akun_kastitip, a.akun_titip,a.akun_pdpt,b.rt 
             from pp a inner join rt_rumah b on a.kode_pp=b.rt and a.kode_lokasi=b.kode_lokasi 
             where b.kode_rumah='".$request->kode_rumah."' and a.kode_lokasi='".$kode_lokasi."'";
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             $akunTitip=$res[0]['akun_titip'];
             $rt=$res[0]['rt'];
@@ -1351,23 +1427,23 @@ class RtrwController extends Controller
             $akunKas = $request->kode_akun;
             $keterangan ="Penerimaan Iuran Wajib atas rumah ".$request->kode_rumah." periode ".$periode;
 
-            $ins = DB::connection('sqlsrvrtrw')->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'RTRW','KBIUR','T','0','0',$rt,date('Y-m-d H:i:s'),'-',$keterangan,'IDR','1',$request->bayar,0,0,'-','-','-',$request->status_bayar,'-','-',$request->kode_rumah,'IWAJIB','-']);
+            $ins = DB::connection($this->sql)->insert('insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'RTRW','KBIUR','T','0','0',$rt,date('Y-m-d H:i:s'),'-',$keterangan,'IDR','1',$request->bayar,0,0,'-','-','-',$request->status_bayar,'-','-',$request->kode_rumah,'IWAJIB','-']);
 
             $nilai_iur= intval($request->total_rw)+intval($request->total_rt);
 
-            $ins2 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKas,'D',$nilai_iur,$nilai_iur,$keterangan,'RTRW','KBRW','IDR',1,$request->kode_pp,$kode_drk,'-','-','-','-','-','-','-']);
+            $ins2 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunKas,'D',$nilai_iur,$nilai_iur,$keterangan,'RTRW','KBRW','IDR',1,$request->kode_pp,$kode_drk,'-','-','-','-','-','-','-']);
 
-            $ins3 = DB::connection('sqlsrvrtrw')->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunTitip,'C',$nilai_iur,$nilai_iur,$keterangan,'RTRW','TITIP','IDR',1,$rt,$kode_drk,'-','-','-','-','-','-','-']);
+            $ins3 = DB::connection($this->sql)->insert('insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',date('Y-m-d H:i:s'),0,$akunTitip,'C',$nilai_iur,$nilai_iur,$keterangan,'RTRW','TITIP','IDR',1,$rt,$kode_drk,'-','-','-','-','-','-','-']);
 
             for($a=0; $a<count($request->periode_bill);$a++){
                 // if ($_POST['toggle'][$a] == "on"){
-                $sqldet[$a] =  DB::connection('sqlsrvrtrw')->insert("insert into rt_angs_d (no_angs,kode_rumah,kode_jenis,periode_bill,periode_angs,nilai_rt,nilai_rw,kode_lokasi,kode_pp,dc,modul,jenis,no_setor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array(
+                $sqldet[$a] =  DB::connection($this->sql)->insert("insert into rt_angs_d (no_angs,kode_rumah,kode_jenis,periode_bill,periode_angs,nilai_rt,nilai_rw,kode_lokasi,kode_pp,dc,modul,jenis,no_setor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array(
                                 $id,$request->kode_rumah,'IWAJIB',$request->periode[$a],$periode,$request->nilai_rt[$a],$request->nilai_rw[$a],$kode_lokasi,$rt,'D','KBIUR','KAS',$id_setor));
                     	
                 // }
             }
 
-            $ins4 = DB::connection('sqlsrvrtrw')->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
+            $ins4 = DB::connection($this->sql)->update("insert into gldt (no_bukti,no_urut,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,kurs,nilai_curr,tgl_input,nik_user,kode_cust,kode_proyek,kode_task,kode_vendor,kode_lokarea,nik) select no_bukti,nu,kode_lokasi,modul,jenis,no_dokumen,tanggal,kode_akun,dc,nilai,keterangan,kode_pp,periode,kode_drk,kode_curr,1,nilai,tgl_input,nik_user,'-','-','-','-','-','-' from trans_j 
             where kode_lokasi='".$kode_lokasi."' and no_bukti='".$id."' ");
 
             //SIMPAN SETORAN
@@ -1381,15 +1457,15 @@ class RtrwController extends Controller
             $setor= $kasRW+$sumbangan;
 
 
-            $ins5 = DB::connection('sqlsrvrtrw')->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id_setor,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$rt,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
+            $ins5 = DB::connection($this->sql)->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id_setor,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$rt,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
             
-            DB::connection('sqlsrvrtrw')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Pembayaran Iuran berhasil disimpan. No Bukti: ".$id." No Setor: ".$id_setor;
                 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvrtrw')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Pembayaran Iuran gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -1404,8 +1480,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1422,7 +1501,7 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0 and a.flag_aktif='1'
             order by a.periode";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1450,8 +1529,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1468,7 +1550,7 @@ class RtrwController extends Controller
             where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$kode_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0 and a.flag_aktif='1'
             order by a.periode";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1497,8 +1579,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1509,7 +1594,7 @@ class RtrwController extends Controller
             from rt_angs_d where kode_lokasi ='$kode_lokasi' and kode_pp='$kode_pp' and no_setor='-' and kode_jenis='IWAJIB' group by kode_lokasi,kode_rumah
             "; 
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1545,11 +1630,14 @@ class RtrwController extends Controller
             'nilai_rt.*' => 'required',
         ]);
 
-        DB::connection('sqlsrvrtrw')->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1558,7 +1646,7 @@ class RtrwController extends Controller
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-STR".$per.".";
 
-            $query = DB::connection('sqlsrvrtrw')->select("select right(isnull(max(no_setor),'0000'),".strlen($str_format).")+1 as id from rt_setor_m where no_setor like '$prefix%' ");
+            $query = DB::connection($this->sql)->select("select right(isnull(max(no_setor),'0000'),".strlen($str_format).")+1 as id from rt_setor_m where no_setor like '$prefix%' ");
             $query = json_decode(json_encode($query),true);
             
             $id = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -1571,10 +1659,10 @@ class RtrwController extends Controller
             $kasRW = $request->bayar - $request->total_rt - $gaji;
             $setor= $kasRW +$sumbangan;
 
-            $ins = DB::connection('sqlsrvrtrw')->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$request->kode_pp,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
+            $ins = DB::connection($this->sql)->insert("insert into rt_setor_m (no_setor,kode_lokasi,tanggal,keterangan,kode_pp,modul,periode,nilai,tgl_input,nik_user,no_kas, jml_iuran,sumbangan,gaji_bersih,kas_rt,kas_rw ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),$keterangan,$request->kode_pp,'IWAJIB',$periode,$request->total_rw,date('Y-m-d H:i:s'),$nik,'-', $jml_iuran,$sumbangan,$gaji,$kasRT,$kasRW));	
 
             for($i=0;$i < count($request->kode_rumah);$i++){
-                $upd[$i] = DB::connection('sqlsrvrtrw')->table('rt_angs_d')
+                $upd[$i] = DB::connection($this->sql)->table('rt_angs_d')
                     ->where('no_setor', '-')    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('kode_rumah', $request->kode_rumah[$i])
@@ -1582,13 +1670,13 @@ class RtrwController extends Controller
                     ->update(['no_setor' => $id]);
             }
             
-            DB::connection('sqlsrvrtrw')->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data setoran berhasil disimpan. No Bukti:".$id;
                 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvrtrw')->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data setoran gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -1602,8 +1690,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1622,7 +1713,7 @@ class RtrwController extends Controller
 
             $sql="select no_setor,convert(varchar,tanggal,103) as tanggal,isnull(sum(nilai),0)+isnull(sum(kas_rt),0)+isnull(sum(sumbangan),0) as total from rt_setor_m where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' and modul='IWAJIB' $filter  group by no_setor,tanggal order by no_setor desc ";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1650,8 +1741,11 @@ class RtrwController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('rtrw')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else if($data =  Auth::guard($this->guard3)->user()){
+                $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
@@ -1673,7 +1767,7 @@ class RtrwController extends Controller
             where kode_lokasi ='$kode_lokasi' and kode_pp='$kode_pp' and kode_jenis='IWAJIB' $filter
             group by kode_rumah,periode_bill order by kode_rumah,periode_bill ";
             
-            $res = DB::connection('sqlsrvrtrw')->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
