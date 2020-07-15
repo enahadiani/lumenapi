@@ -741,9 +741,23 @@ class JuskebController extends Controller
             if($data =  Auth::guard('admin')->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
             }
 
-            $sql="select kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."'  ";
+            $sql = "select kode_divisi from apv_karyawan where nik='$nik_user' ";
+            $cek = DB::connection('sqlsrv2')->select($sql);
+            if(count($cek) > 0){
+                $kode_divisi = $cek[0]->kode_divisi;
+            }else{
+                $kode_divisi = "-";
+            }
+
+            if($status_admin == "U"){
+                $sql="select kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."' and kode_divisi='$kode_divisi'  ";
+            }else{
+
+                $sql="select kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."'  ";
+            }
             
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -751,12 +765,14 @@ class JuskebController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['kode_divisi'] = $kode_divisi;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
+                $success['kode_divisi'] = $kode_divisi;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
