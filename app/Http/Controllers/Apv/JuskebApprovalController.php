@@ -428,7 +428,7 @@ class JuskebApprovalController extends Controller
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
-            $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user,f.nama 
+            $sql4="select a.no_bukti,case e.status when 'V' then 'APPROVE' when 'R' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama 
             from apv_juskeb_m a
             inner join apv_ver_m e on a.no_bukti=e.no_juskeb and a.kode_lokasi=e.kode_lokasi
             inner join apv_karyawan f on e.nik_user=f.nik and e.kode_lokasi=f.kode_lokasi
