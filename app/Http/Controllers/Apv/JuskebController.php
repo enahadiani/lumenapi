@@ -394,7 +394,7 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($this->isUnik($request->no_dokumen,$kode_lokasi,$request->kode_pp,$no_bukti)){
+            // if($this->isUnik($request->no_dokumen,$kode_lokasi,$request->kode_pp,$no_bukti)){
 
                 $arr_foto = array();
                 $arr_nama = array();
@@ -503,12 +503,12 @@ class JuskebController extends Controller
                 $success['no_aju'] = $no_bukti;
                 $success['token_players'] = $token_players;
 
-            }else{
-                $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Dokumen sudah ada di database !";
-                $success['no_aju'] = '-';
-                $success['token_players'] = [];
-            }
+            // }else{
+            //     $success['status'] = false;
+            //     $success['message'] = "Error : Duplicate entry. No Dokumen sudah ada di database !";
+            //     $success['no_aju'] = '-';
+            //     $success['token_players'] = [];
+            // }
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
