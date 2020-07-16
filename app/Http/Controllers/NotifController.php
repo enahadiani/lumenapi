@@ -35,7 +35,8 @@ class NotifController extends Controller
 	    // https://code.google.com/apis/console/
 	    //------------------------------
 		global $apiKey;
-		$apiKey = "AIzaSyARBIGBtlVHp2JlhS3HRaP4IPysLBYwXg8";
+		// $apiKey = "AIzaSyARBIGBtlVHp2JlhS3HRaP4IPysLBYwXg8";
+		$apiKey = "AAAAC2oDJwE:APA91bF6a5lG4gSH0udRsIMB6SbdG-92CME7Y9wBycdXS4ZseKgSz4G1ghN6j3SPcU338wc8a9ifiO5_nVLU2o-MwSzXxHQRuL8IxsKzwkqJzVaFhDIydXe-E-DqiCUr4LIRU1dDXCns";
 	    //------------------------------
 	    // Define URL to GCM endpoint
 	    //------------------------------
