@@ -581,21 +581,38 @@ class RtrwController extends Controller
     }
 
     public function getRiwayatTrans(Request $request){
-        $this->validate($request, [
-            'kode_pp' => 'required',
-            'kode_akun' => 'required',
-            'tahun' => 'required'
-        ]);
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }else if($data =  Auth::guard($this->guard3)->user()){
-                $nik = $data->no_rumah;
-                $kode_lokasi= $data->kode_lokasi;
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $this->validate($request, [
+                'kode_pp' => 'required',
+                'kode_akun' => 'required',
+                'tahun' => 'required'
+            ]);
+        }else if($data =  Auth::guard($this->guard3)->user()){
+            $nik = $data->no_rumah;
+            $kode_lokasi= $data->kode_lokasi;
+            $kode_pp= $data->kode_pp;
+            $this->validate($request, [
+                'tahun' => 'required'
+            ]);
+            $request->merge([
+                'kode_pp' => $kode_pp,
+            ]);
+            $req = $this->getAkun($request);
+            if(count($req->original['data']) > 0){
+                $request->merge([
+                    'kode_akun' => $req->original['data'][0]['kode_akun'],
+                ]);
+            }else{
+                $request->merge([
+                    'kode_akun' => '-',
+                ]);
             }
-            
+
+        }
+        try {
+                        
             $tahun = $request->tahun;
             $kode_pp = $request->kode_pp;
             $kode_akun = $request->kode_akun;

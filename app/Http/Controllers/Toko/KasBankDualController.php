@@ -189,6 +189,22 @@ class KasBankDualController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
+            if(isset($request->jenis)){
+                if($request->jenis == 'PENGELUARAN'){
+                    $jenis="BK";
+                }else if($request->jenis == 'PEMASUKAN'){
+                    $jenis="BM";
+                }else{
+                    $jenis="PIN";
+                }
+
+                $filter .= " and a.param3 ='$jenis' ";
+                
+            }else{
+                $filter .= "";
+            }
+
             $akun = DB::connection($this->sql)->select("select a.no_bukti,a.param1 as kode_ref,case a.param3 when 'BM' then 'PEMASUKAN' when 'BK' then 'PENGELUARAN' when 'PIN' then 'PINDAH BUKU' end as kode_jenis,a.kode_pp,a.keterangan,a.nilai1 from trans_m a 
             where a.kode_lokasi='".$kode_lokasi."' and a.form = 'KBDUAL' and a.posted ='F' $filter 
             ");
