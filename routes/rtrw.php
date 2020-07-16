@@ -226,5 +226,10 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
 
     $router->get('rekap_setoran_wr', 'Rtrw\RtrwController@getRekapSetoran');
     $router->get('rekap_setoran_detail_wr', 'Rtrw\RtrwController@getDetailRekapSetoran');
+
     
+});
+
+$router->group(['middleware' => 'auth:satpam'], function () use ($router) {
+    $router->post('send_notif_fcm', 'Rtrw\NotifController@sendNotif');
 });
