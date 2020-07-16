@@ -193,8 +193,38 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
     $router->get('cek_payload_warga', 'AdminWargaController@cekPayload');
 
     $router->post('ubah_profile', 'Rtrw\WargaController@updatePerUser');
+
+    $router->get('filter_tahun_wr', 'Rtrw\RtrwController@getTahun');
+    $router->get('filter_bulan_wr', 'Rtrw\RtrwController@getBulan');
+    $router->get('filter_tahun_bill_wr', 'Rtrw\RtrwController@getTahunBill');
+    $router->get('filter_periode_setor_wr', 'Rtrw\RtrwController@getPeriodeSetor');
+    $router->get('filter_akun_wr', 'Rtrw\RtrwController@getAkun');
+    $router->get('filter_blok_wr', 'Rtrw\RtrwController@getBlok');
+    $router->get('filter_ref_akun_wr', 'Rtrw\RtrwController@getRefAkun');
     
+    $router->get('rekap_rw_wr', 'Rtrw\RtrwController@getRekapRw');
+    $router->get('rekap_rw_detail_wr', 'Rtrw\RtrwController@getDetailRekapRw');
+    $router->get('rekap_rw_bulan_wr', 'Rtrw\RtrwController@getRekapBulananRw');
+    $router->get('rekap_rw_bulan_detail_wr', 'Rtrw\RtrwController@getDetailRekapBulananRw');
+    $router->get('riwayat_trans_wr', 'Rtrw\RtrwController@getRiwayatTrans');
+    $router->get('riwayat_trans_detail_wr', 'Rtrw\RtrwController@getRiwayatTransDetail');
+    $router->get('riwayat_iuran_wr', 'Rtrw\RtrwController@getRiwayatIuran');
+    $router->get('iuran_detail_wr', 'Rtrw\RtrwController@getDetailIuran');
+    $router->get('kartu_iuran_wr', 'Rtrw\RtrwController@getKartuIuran');
+
+    $router->post('ubah_password_wr', 'Rtrw\RtrwController@ubahPassword');
+    $router->post('simpan_kas_wr', 'Rtrw\RtrwController@simpanKas');
+
+    $router->get('bayar_iuran_wr', 'Rtrw\RtrwController@getBayarIuran');
+    $router->post('simpan_iuran_wr', 'Rtrw\RtrwController@simpanIuran');
+    $router->get('bayar_iuran_rw_wr', 'Rtrw\RtrwController@getBayarIuranRw');
+    $router->post('simpan_iuran_rw_wr', 'Rtrw\RtrwController@simpanIuranRw');
+    $router->get('bayar_detail_wr', 'Rtrw\RtrwController@getDetailBayar');
+    $router->get('bayar_detail_rw_wr', 'Rtrw\RtrwController@getDetailBayarRw');
+    $router->get('setoran_wr', 'Rtrw\RtrwController@getSetoran');
+    $router->post('simpan_setoran_wr', 'Rtrw\RtrwController@simpanSetoran');
+
+    $router->get('rekap_setoran_wr', 'Rtrw\RtrwController@getRekapSetoran');
+    $router->get('rekap_setoran_detail_wr', 'Rtrw\RtrwController@getDetailRekapSetoran');
     
 });
-
-// $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
