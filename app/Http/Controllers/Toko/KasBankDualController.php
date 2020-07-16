@@ -206,7 +206,7 @@ class KasBankDualController extends Controller
             }
 
             $akun = DB::connection($this->sql)->select("select a.no_bukti,a.param1 as kode_ref,case a.param3 when 'BM' then 'PEMASUKAN' when 'BK' then 'PENGELUARAN' when 'PIN' then 'PINDAH BUKU' end as kode_jenis,a.kode_pp,a.keterangan,a.nilai1 from trans_m a 
-            where a.kode_lokasi='".$kode_lokasi."' and a.form = 'KBDUAL' and a.posted ='F' $filter 
+            where a.kode_lokasi='".$kode_lokasi."' and a.form = 'KBDUAL' and a.no_bukti='$request->no_bukti' and a.posted ='F' $filter 
             ");
 
             $akun = json_decode(json_encode($akun),true);
