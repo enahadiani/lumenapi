@@ -165,7 +165,7 @@ class VerifikasiController extends Controller
             $upd =  DB::connection('sqlsrv2')->table('apv_juskeb_m')
             ->where('no_bukti', $request->input('no_aju'))    
             ->where('kode_lokasi', $kode_lokasi)
-            ->update(['progress' => $request->input('status'),'nilai'=>$request->input('total_barang')]);
+            ->update(['progress' => $request->input('status'),'nilai'=>$request->input('total_barang'),'nik_ver'=>$nik_user]);
 
             $arr_foto = array();
             $arr_nama = array();
