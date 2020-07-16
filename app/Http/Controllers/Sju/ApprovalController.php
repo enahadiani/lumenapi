@@ -493,8 +493,9 @@ class ApprovalController extends Controller
             }
 
             $sql="";
-            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek
+            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek,b.nilai,b.keterangan
             from sju_pb_rek a
+            inner join sju_pb_m b on a.no_pb=b.no_pb and a.kode_lokasi=b.kode_lokasi
             where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
             ");
             $rek = json_decode(json_encode($rek),true);
