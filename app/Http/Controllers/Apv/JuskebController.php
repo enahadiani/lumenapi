@@ -808,14 +808,12 @@ class JuskebController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['kode_divisi'] = $kode_divisi;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
-                $success['kode_divisi'] = $kode_divisi;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
