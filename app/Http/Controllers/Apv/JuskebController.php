@@ -657,11 +657,14 @@ class JuskebController extends Controller
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_user as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_bukti as no_app,case a.status when 'V' then 'APPROVE' else 'REVISI' end as status
-			from apv_ver_m a
-            inner join apv_karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+
+			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status
+			from apv_juskeb_m a
+            inner join apv_karyawan c on a.nik_ver=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_juskeb='$no_bukti'
+			left join apv_ver_m d on a.no_bukti=d.no_juskeb and a.kode_lokasi=d.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+
 			union all
 			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status
             from apv_flow a
