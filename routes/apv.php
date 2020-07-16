@@ -80,6 +80,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('juskeb/{no_bukti}','Apv\JuskebController@show');
     $router->get('kota','Apv\JuskebController@getKota');
     $router->get('divisi','Apv\JuskebController@getDivisi');
+    $router->get('nik_verifikasi','Apv\JuskebController@getNIKVerifikasi');
     $router->get('barang-klp','Apv\JuskebController@getBarangKlp');
     $router->get('generate-dok','Apv\JuskebController@generateDok');
     $router->post('juskeb','Apv\JuskebController@store');
