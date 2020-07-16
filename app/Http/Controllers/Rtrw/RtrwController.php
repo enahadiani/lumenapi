@@ -740,7 +740,6 @@ class RtrwController extends Controller
             'periode' => 'required'
         ]);
         try {
-            
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
@@ -748,6 +747,7 @@ class RtrwController extends Controller
                 $nik = $data->no_rumah;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            
             
             $kode_pp = $request->kode_pp;
             $kode_rumah = $request->kode_rumah;
@@ -797,21 +797,29 @@ class RtrwController extends Controller
     }
 
     public function getDetailIuran(Request $request){
-        $this->validate($request, [
-            'kode_pp' => 'required',
-            'kode_rumah' => 'required',
-            'tahun' => 'required',
-            'periode' => 'required'
-        ]);
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $this->validate($request, [
+                'kode_pp' => 'required',
+                'kode_rumah' => 'required',
+                'tahun' => 'required'
+                ]);
+        }else if($data =  Auth::guard($this->guard3)->user()){
+            $nik = $data->no_rumah;
+            $kode_lokasi= $data->kode_lokasi;
+            $this->validate($request, [
+                'tahun' => 'required'
+            ]);
+            $kode_pp = $data->kode_pp;
+            $kode_rumah = $data->no_rumah;
+            $request->merge([
+                'kode_pp' => $kode_pp,
+                'kode_rumah' => $kode_rumah,
+            ]);
+        }
         try {
             
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }else if($data =  Auth::guard($this->guard3)->user()){
-                $nik = $data->no_rumah;
-                $kode_lokasi= $data->kode_lokasi;
-            }
             
             $kode_pp = $request->kode_pp;
             $kode_rumah = $request->kode_rumah;

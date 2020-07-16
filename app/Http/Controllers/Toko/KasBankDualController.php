@@ -277,6 +277,9 @@ class KasBankDualController extends Controller
             }else{
                 $jenis="PIN";
             }
+            
+            $periode=date('Y').date('m');
+            $per=date('y').date('m');
 
             $del = DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $request->no_bukti)->delete();
             $del2 = DB::connection($this->sql)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $request->no_bukti)->delete();
