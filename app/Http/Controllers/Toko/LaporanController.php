@@ -516,7 +516,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = $res2;
                 $success['message'] = "Success!"; 
                 $success["auth_status"] = 1;    
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
@@ -524,7 +524,7 @@ class LaporanController extends Controller
                 $success['sql'] = $sql;
                 $success['data'] = [];
                 $success['data_detail'] = [];
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -621,14 +621,14 @@ class LaporanController extends Controller
                 $success['data']=$res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data']=[];
                 $success['status'] = true;
                 $success['sql'] = $sql;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -675,14 +675,14 @@ class LaporanController extends Controller
                 $success['data'] = $res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
                 // $success['sql'] = $sql;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
