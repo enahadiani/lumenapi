@@ -21,6 +21,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginAdmin');
     $router->get('hash_pass', 'AuthController@hashPasswordAdmin');
     $router->get('hash_by_nik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');
+    $router->get('hash_pass_dago','AuthController@hashPassDago');
 });
 
 $router->get('storage/{filename}', function ($filename)

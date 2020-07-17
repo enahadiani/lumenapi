@@ -766,4 +766,34 @@ class AuthController extends Controller
         }	
 
     }
+
+    public function hashPassDago(Request $request){
+        $users = Admin::all();
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrv2')
+            ->table('hakakses')
+            ->where('kode_lokasi', '11')
+            ->where('kode_klp_menu','LIKE', 'DAGO%')
+            ->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrv2')->table('hakakses')
+                        ->where('kode_lokasi', '11')
+                        ->where('kode_klp_menu','LIKE', 'DAGO%')
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
 }
