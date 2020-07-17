@@ -800,23 +800,38 @@ class JuskebController extends Controller
             $filter = "";
             if(isset($request->kode_pp)){
                 if($request->kode_pp != ""){
-                    $filter .= " and kode_pp='$request->kode_pp' ";
+                    $filter .= " and a.kode_pp='$request->kode_pp' ";
                 }
             }
-            $sql="select nik,nama from apv_karyawan where kode_lokasi='".$kode_lokasi."' $filter  ";
+
+            $sql = "select a.kode_role,a.kode_pp,b.kode_jab,c.nik,c.nama 
+            from apv_role a
+            inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+            inner join apv_karyawan c on b.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+            where a.modul='JV' $filter";
+            $cek = DB::connection('sqlsrv2')->select($sql);
+            if(count($cek) > 0){
+                $nik_ver = $cek[0]->nik;
+            }else{
+                $nik_ver = "-";
+            }
+
+            // $sql="select a.nik,a.nama from apv_karyawan a where a.kode_lokasi='".$kode_lokasi."' $filter  ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
-            $res = json_decode(json_encode($res),true);
+            // $res = DB::connection('sqlsrv2')->select($sql);
+            // $res = json_decode(json_encode($res),true);
             
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($cek) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $cek;
+                $success['nik_ver'] = $nik_ver;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
+                $success['nik_ver'] = $nik_ver;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
