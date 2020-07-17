@@ -157,38 +157,38 @@ class NotifController extends Controller
 		}
 
 		DB::connection($this->sql)->beginTransaction();
-        // try{
+        try{
             $token = $request->token;
 			$payload = $request->data;
-			print_r($payload);
-			print_r($token);
-			// $res = $this->gcm($token,$payload);
-			// $hasil= json_decode($res,true);
-			// $success['hasil'] = $hasil;
-			// if(isset($hasil['success'])){
-			// 	if($hasil['failure'] > 0){
-			// 		$sts = 0;
-			// 	}else{
-			// 		$sts = 1;
-			// 	}
-			// 	for($i=0;$i<count($request->token);$i++){
+			// print_r($payload);
+			// print_r($token);
+			$res = $this->gcm($token,$payload);
+			$hasil= json_decode($res,true);
+			$success['hasil'] = $hasil;
+			if(isset($hasil['success'])){
+				if($hasil['failure'] > 0){
+					$sts = 0;
+				}else{
+					$sts = 1;
+				}
+				for($i=0;$i<count($request->token);$i++){
 
-			// 		$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."') ");
-			// 	}
-			// 	DB::connection($this->sql)->commit();
-			// 	$success['status'] = true;
-			// 	$success['message'] = "Sukses";
-			// }else{
-			// 	$success['status'] = false;
-			// 	$success['message'] = "Gagal";
-			// }
-            // return response()->json($success, 200);
-        // } catch (\Throwable $e) {
-		// 	DB::connection($this->sql)->rollback();
-        //     $success['status'] = false;
-        //     $success['message'] = "Error ".$e;
-        //     return response()->json($success, 200);
-        // }
+					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."') ");
+				}
+				DB::connection($this->sql)->commit();
+				$success['status'] = true;
+				$success['message'] = "Sukses";
+			}else{
+				$success['status'] = false;
+				$success['message'] = "Gagal";
+			}
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
     }
 
 }
