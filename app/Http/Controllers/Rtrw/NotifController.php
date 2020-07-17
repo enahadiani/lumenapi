@@ -193,11 +193,6 @@ class NotifController extends Controller
 	
 	public function tes(Request $request)
 	{
-		$this->validate($request,[
-			"token" => 'required',
-			"data" => 'required'
-		]);
-
 		if($auth =  Auth::guard($this->guard)->user()){
 			$nik= $auth->nik;
 			$kode_lokasi= $auth->kode_lokasi;
@@ -211,7 +206,7 @@ class NotifController extends Controller
 
 		$token = $request->token;
 		$payload = $request->data;
-		return $request->all();
+		print_r($request->all());
 		
 	}
 }
