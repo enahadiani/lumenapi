@@ -160,7 +160,8 @@ class NotifController extends Controller
         // try{
             $token = $request->token;
 			$payload = $request->data;
-			return $payload;
+			print_r($payload);
+			print_r($token);
 			// $res = $this->gcm($token,$payload);
 			// $hasil= json_decode($res,true);
 			// $success['hasil'] = $hasil;
