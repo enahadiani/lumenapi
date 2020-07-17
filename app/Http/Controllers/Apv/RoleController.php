@@ -44,7 +44,7 @@ class RoleController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.kode_role,a.nama,a.kode_pp,a.bawah,a.atas,case a.modul when 'JK' then 'Justifikasi Kebutuhan' else 'Justifikasi Pengadaan' end as modul
+            $res = DB::connection('sqlsrv2')->select("select a.kode_role,a.nama,a.kode_pp,a.bawah,a.atas,case a.modul when 'JK' then 'Justifikasi Kebutuhan' when 'JP' then 'Justifikasi Pengadaan' when 'JV' then 'Verifikasi' else '-' end as modul
             from apv_role a
             where a.kode_lokasi='".$kode_lokasi."'
             ");
