@@ -229,7 +229,3 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
 
     
 });
-
-$router->group(['middleware' => 'auth:satpam'], function () use ($router) {
-    $router->post('send_notif_fcm', 'Rtrw\NotifController@sendNotif');
-});

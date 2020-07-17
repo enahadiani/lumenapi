@@ -75,6 +75,13 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('form','Apv\HakaksesController@getForm');
     $router->get('menu','Apv\HakaksesController@getMenu');
 
+    //Master Kota
+    $router->get('kota','Apv\KotaController@index');
+    $router->get('kota/{nik}','Apv\KotaController@show');
+    $router->post('kota','Apv\KotaController@store');
+    $router->post('kota/{nik}','Apv\KotaController@update');
+    $router->delete('kota/{nik}','Apv\KotaController@destroy');
+
     //Justifikasi Kebutuhan
     $router->get('juskeb','Apv\JuskebController@index');
     $router->get('juskeb/{no_bukti}','Apv\JuskebController@show');

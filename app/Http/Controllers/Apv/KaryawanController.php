@@ -101,8 +101,19 @@ class KaryawanController extends Controller
                 $foto="-";
             }
 
-            
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp')]);
+            if(isset($request->kode_kota)){
+                $kode_kota = $request->kode_kota;
+            }else{
+                $kode_kota = "-";
+            }
+
+            if(isset($request->kode_divisi)){
+                $kode_divisi = $request->kode_divisi;
+            }else{
+                $kode_divisi = "-";
+            }
+
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
             
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
@@ -136,7 +147,7 @@ class KaryawanController extends Controller
 
             $url = url('api/apv/storage');
 
-            $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+            $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp,kota,kode_divisi from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
             ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -230,9 +241,19 @@ class KaryawanController extends Controller
             
             $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp) values (?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp')]);
-            
-            
+            if(isset($request->kode_kota)){
+                $kode_kota = $request->kode_kota;
+            }else{
+                $kode_kota = "-";
+            }
+
+            if(isset($request->kode_divisi)){
+                $kode_divisi = $request->kode_divisi;
+            }else{
+                $kode_divisi = "-";
+            }
+
+            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
 
             DB::connection('sqlsrv2')->commit();
             $success['status'] = true;
