@@ -189,6 +189,30 @@ class NotifController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
         }
+	}
+	
+	public function tes(Request $request)
+	{
+		$this->validate($request,[
+			"token" => 'required',
+			"data" => 'required'
+		]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}else if($auth =  Auth::guard($this->guard2)->user()){
+			$nik = $auth->id_satpam;
+			$kode_lokasi= $auth->kode_lokasi;
+		}else if($auth =  Auth::guard($this->guard3)->user()){
+			$nik = $auth->no_hp;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+
+		$token = $request->token;
+		$payload = $request->data;
+		print_r($request->all());
+		
     }
 
 }
