@@ -457,8 +457,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_akun');
-            $db_col_name = array('a.periode','a.kode_akun');
+            $col_array = array('periode','kode_akun','kode_pp');
+            $db_col_name = array('a.periode','a.kode_akun','a.kode_pp');
             $filter = "where a.kode_lokasi='$kode_lokasi'";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
@@ -541,8 +541,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_akun','kode_fs','kode_neraca');
-            $db_col_name = array('a.periode','a.kode_akun','b.kode_fs','b.kode_neraca');
+            $col_array = array('periode','kode_akun','kode_pp');
+            $db_col_name = array('a.periode','a.kode_akun','a.kode_pp');
             $filter = "where a.kode_lokasi='$kode_lokasi'";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
