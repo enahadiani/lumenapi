@@ -92,7 +92,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('user')->attempt($credentials)) {
+        if (! $token = Auth::guard('user')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -109,7 +109,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('admin')->attempt($credentials)) {
+        if (! $token = Auth::guard('admin')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -126,7 +126,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('ypt')->attempt($credentials)) {
+        if (! $token = Auth::guard('ypt')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -143,7 +143,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('yptkug')->attempt($credentials)) {
+        if (! $token = Auth::guard('yptkug')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -160,7 +160,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('sju')->attempt($credentials)) {
+        if (! $token = Auth::guard('sju')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -177,7 +177,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('rtrw')->attempt($credentials)) {
+        if (! $token = Auth::guard('rtrw')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -194,7 +194,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('tarbak')->attempt($credentials)) {
+        if (! $token = Auth::guard('tarbak')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -211,7 +211,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('siswa')->attempt($credentials)) {
+        if (! $token = Auth::guard('siswa')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -228,7 +228,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('dago')->attempt($credentials)) {
+        if (! $token = Auth::guard('dago')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -290,7 +290,7 @@ class AuthController extends Controller
         $user = AdminSatpam::where('id_satpam', '=', $request->qrcode)->first();
         $credentials = array('id_satpam' => $request->qrcode, 'password' => $user->pass);
 
-        if (! $token = Auth::guard('satpam')->setTTL(1440)->attempt($credentials)) {
+        if (! $token = Auth::guard('satpam')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }else{
             if($data = Auth::guard('satpam')->user()){
@@ -365,7 +365,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['no_hp', 'password']);
 
-        if (! $token = Auth::guard('warga')->setTTL(1440)->attempt($credentials)) {
+        if (! $token = Auth::guard('warga')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }else{
             if(isset($request->id_device)){
