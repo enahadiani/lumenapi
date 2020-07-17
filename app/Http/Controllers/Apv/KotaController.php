@@ -184,7 +184,6 @@ class KotaController extends Controller
     public function update(Request $request, $kode_kota)
     {
         $this->validate($request, [
-            'kode_kota' => 'required',
             'nama' => 'required',
             'kode_pp' => 'required'
         ]);

@@ -184,7 +184,6 @@ class DivisiController extends Controller
     public function update(Request $request, $kode_divisi)
     {
         $this->validate($request, [
-            'kode_divisi' => 'required',
             'nama' => 'required'
         ]);
 
