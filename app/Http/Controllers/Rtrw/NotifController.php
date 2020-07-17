@@ -211,8 +211,7 @@ class NotifController extends Controller
 
 		$token = $request->token;
 		$payload = $request->data;
-		print_r($request->all());
+		return $request->all();
 		
-    }
-
+	}
 }
