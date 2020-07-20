@@ -102,7 +102,6 @@ $router->group(['middleware' => 'auth:satpam'], function () use ($router) {
     $router->get('satpam-aktif','Rtrw\SatpamController@show');
     $router->post('send-notif-fcm', 'Rtrw\NotifController@sendNotif');
     $router->post('cek-request', 'Rtrw\NotifController@tes');
-    $router->post('send-notif-fcm2', 'Rtrw\NotifController@sendNotifSimple');
 
 });
 

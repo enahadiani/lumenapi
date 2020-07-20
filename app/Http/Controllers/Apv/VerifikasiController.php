@@ -57,7 +57,7 @@ class VerifikasiController extends Controller
 
             $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
             from apv_juskeb_m b 
-            where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') and kode_pp='$kode_pp'
+            where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') and b.nik_ver='$nik_user'
             ");
             $res = json_decode(json_encode($res),true);
             

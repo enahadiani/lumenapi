@@ -374,4 +374,27 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/sai/master.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sai-trans'
+], function ($router) {
+    require __DIR__.'/../routes/sai/trans.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sai-report'
+], function ($router) {
+    require __DIR__.'/../routes/sai/report.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sai-dash'
+], function ($router) {
+    require __DIR__.'/../routes/sai/dash.php';
+});
 return $app;
