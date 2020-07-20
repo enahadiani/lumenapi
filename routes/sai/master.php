@@ -35,6 +35,17 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->put('konten-draft','Sai\KontenController@updateDraft');
     $router->post('konten-publish','Sai\KontenController@publishKonten');
     $router->delete('konten','Sai\KontenController@destroy');
+
+    $router->get('karyawan','Sai\KaryawanController@index');
+    $router->post('karyawan','Sai\KaryawanController@store');
+    $router->post('karyawan-ubah','Sai\KaryawanController@update');
+    $router->delete('karyawan','Sai\KaryawanController@destroy');
+
+    $router->get('customer','Sai\CustomerController@index');
+    $router->post('customer','Sai\CustomerController@store');
+    $router->post('customer-ubah','Sai\CustomerController@update');
+    $router->delete('customer','Sai\CustomerController@destroy');
+
 });
 
 
