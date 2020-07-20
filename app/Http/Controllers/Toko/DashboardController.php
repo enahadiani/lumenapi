@@ -184,7 +184,7 @@ class DashboardController extends Controller
             }
 
             $periode = $request->periode;
-            $res = DB::connection($this->sql)->select(" select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
+            $res = DB::connection('sqlsrvginas')->select(" select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
             from db_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi,sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as nilai
                        from db_grafik_d a
@@ -195,7 +195,7 @@ class DashboardController extends Controller
             where a.kode_grafik in ('DB11') and a.kode_lokasi='$kode_lokasi' ");
             $res = json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->sql)->select("   select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
+            $res2 = DB::connection('sqlsrvginas')->select("   select a.kode_grafik,a.nama,case format when 'Satuan' then isnull(b.nilai,0) when 'Ribuan' then isnull(b.nilai/1000,0) when 'Jutaan' then isnull(b.nilai/1000000,0) end as nilai 
             from db_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi,sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as nilai
                        from db_grafik_d a
@@ -209,6 +209,7 @@ class DashboardController extends Controller
             $success['status'] = true;
             $success['cash'] = $res[0]['nilai'];
             $success['pend'] = $res2[0]['nilai'];
+            $success['turn_over'] = 0;
             $success['message'] = "Success!";
             return response()->json($success, $this->successStatus);     
             
