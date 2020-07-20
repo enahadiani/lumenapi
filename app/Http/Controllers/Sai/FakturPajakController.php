@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Mail;
 
-class KontrakController extends Controller
+class FakturPajakController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,34 +23,6 @@ class KontrakController extends Controller
     public function reverseDate($ymd_or_dmy_date, $org_sep='-', $new_sep='-'){
         $arr = explode($org_sep, $ymd_or_dmy_date);
         return $arr[2].$new_sep.$arr[1].$new_sep.$arr[0];
-    }
-
-    public function isUnik($isi,$kode_lokasi){
-        
-        $auth = DB::connection($this->sql)->select("select no_dokumen from sai_kontrak where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
-        $auth = json_decode(json_encode($auth),true);
-        if(count($auth) > 0){
-            return false;
-        }else{
-            return true;
-        }
-    }
-
-    function sendMail($email,$to_name,$data){
-        try {
-
-            
-            $template_data = array("name"=>$to_name,"body"=>$data);
-            Mail::send('mail', $template_data,
-            function ($message) use ($email) {
-                $message->to($email)
-                ->subject('Pengajuan Kontrak (SAI LUMEN)');
-            });
-            
-            return array('status' => 200, 'msg' => 'Sent successfully');
-        } catch (Exception $ex) {
-            return array('status' => 200, 'msg' => 'Something went wrong, please try later.');
-        }  
     }
 
     public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
@@ -70,8 +42,8 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai 
-            from sai_kontrak a
+            $res = DB::connection($this->sql)->select("select a.no_fp,a.tanggal,a.no_bill,a.periode,a.keterangan
+            from sai_bill_fp a
             where a.kode_lokasi='".$kode_lokasi."'
             ");
             $res = json_decode(json_encode($res),true);
@@ -115,12 +87,11 @@ class KontrakController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'no_dokumen' => 'required',
-            'tgl_awal' => 'required',
-            'tgl_akhir' => 'required',
-            'kode_cust' => 'required',
-            'keterangan' => 'required',
-            'nilai'=>'required'
+            'no_fp' => 'required',
+            'tanggal' => 'required',
+            'no_bill' => 'required',
+            'periode' => 'required',
+            'keterangan' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -131,31 +102,17 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($this->isUnik($request->no_dokumen,$kode_lokasi)){
+            $ins = DB::connection($this->sql)->insert("insert into sai_bill_fp (no_fp,kode_lokasi,tanggal,no_bill,periode,keterangan,nik_user,tgl_input) values ('$request->no_fp','$kode_lokasi','$request->tanggal','$request->no_bill','$request->periode','$request->keterangan','$nik_user',getdate()) ");
 
-                $periode = date('Ym');
-                $per = substr($periode,2,4);
-                $no_bukti = $this->generateKode("sai_kontrak", "no_kontrak", $kode_lokasi."-KTR".$per.".", "0001");
-
-                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi') ");
-    
-                
-                DB::connection($this->sql)->commit();
-                $success['status'] = true;
-                $success['message'] = "Data Kontrak berhasil disimpan. No Kontrak:".$no_bukti;
-                $success['no_kontrak'] = $no_bukti;
-              
-            }else{
-                $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Dokumen sudah ada di database !";
-                $success['no_kontrak'] = '-';
-            }
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Faktur Pajak berhasil disimpan.";
 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Kontrak gagal disimpan ".$e;
+            $success['message'] = "Data Faktur Pajak gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -171,7 +128,7 @@ class KontrakController extends Controller
     public function show(Request $request)
     {
         $this->validate($request,[
-            'no_kontrak' => 'required'
+            'no_fp' => 'required'
         ]);
         try {
             
@@ -181,7 +138,9 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
+            $sql="select a.no_fp,a.tanggal,a.no_bill,a.periode,a.keterangan
+            from sai_bill_fp a 
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_fp='$request->no_fp' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -226,12 +185,11 @@ class KontrakController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_dokumen' => 'required',
-            'tgl_awal' => 'required',
-            'tgl_akhir' => 'required',
-            'kode_cust' => 'required',
-            'keterangan' => 'required',
-            'nilai'=>'required'
+            'no_fp' => 'required',
+            'tanggal' => 'required',
+            'no_bill' => 'required',
+            'periode' => 'required',
+            'keterangan' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -242,25 +200,19 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('sai_kontrak')->where('kode_lokasi', $kode_lokasi)->where('no_kontrak', $request->no_kontrak)->delete();
+            $del = DB::connection($this->sql)->table('sai_bill_fp')->where('kode_lokasi', $kode_lokasi)->where('no_fp', $request->no_fp)->delete();
 
-            $periode = date('Ym');
-            $per = substr($periode,2,4);
-            $no_bukti = $request->no_kontrak;
-
-            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi') ");
-
+            $ins = DB::connection($this->sql)->insert("insert into sai_bill_fp (no_fp,kode_lokasi,tanggal,no_bill,periode,keterangan,nik_user,tgl_input) values ('$request->no_fp','$kode_lokasi','$request->tanggal','$request->no_bill','$request->periode','$request->keterangan','$nik_user',getdate()) ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Kontrak berhasil diubah. No Kontrak:".$no_bukti;
-            $success['no_kontrak'] = $no_bukti;
+            $success['message'] = "Data Faktur Pajak berhasil diubah.";
           
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Kontrak gagal diubah ".$e;
+            $success['message'] = "Data Faktur Pajak gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -274,7 +226,7 @@ class KontrakController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request,[
-            'no_kontrak' => 'required'
+            'no_fp' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -284,17 +236,17 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('sai_kontrak')->where('kode_lokasi', $kode_lokasi)->where('no_kontrak', $request->no_kontrak)->delete();
+            $del = DB::connection($this->sql)->table('sai_bill_fp')->where('kode_lokasi', $kode_lokasi)->where('no_fp', $request->no_fp)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Kontrak berhasil dihapus";
+            $success['message'] = "Data Faktur Pajak berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Kontrak gagal dihapus ".$e;
+            $success['message'] = "Data Faktur Pajak gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
@@ -303,7 +255,7 @@ class KontrakController extends Controller
     public function getPreview(Request $request)
     {
         $this->validate($request,[
-            'no_kontrak' => 'required'
+            'no_fp' => 'required'
         ]);
         try {
             

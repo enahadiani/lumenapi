@@ -29,6 +29,17 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->put('tagihan','Sai\TagihanController@update');
     $router->delete('tagihan','Sai\TagihanController@destroy');
 
+    $router->get('faktur-pajak','Sai\FakturPajakController@index');
+    $router->post('faktur-pajak','Sai\FakturPajakController@store');
+    $router->get('faktur-pajak-detail','Sai\FakturPajakController@show');
+    $router->put('faktur-pajak','Sai\FakturPajakController@update');
+    $router->delete('faktur-pajak','Sai\FakturPajakController@destroy');
+
+    $router->get('pembayaran','Sai\PembayaranController@index');
+    $router->post('pembayaran','Sai\PembayaranController@store');
+    $router->get('pembayaran-detail','Sai\PembayaranController@show');
+    $router->put('pembayaran','Sai\PembayaranController@update');
+    $router->delete('pembayaran','Sai\PembayaranController@destroy');
 });
 
 

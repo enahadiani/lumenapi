@@ -92,13 +92,13 @@ class TagihanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -230,12 +230,12 @@ class TagihanController extends Controller
                 $success['no_bukti'] = '-';
             }
 
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Tagihan gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -278,7 +278,7 @@ class TagihanController extends Controller
                 $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
@@ -286,7 +286,7 @@ class TagihanController extends Controller
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -408,12 +408,12 @@ class TagihanController extends Controller
                 $success['message'] = "Data Tagihan berhasil diubah. No Bukti:".$no_bukti;
                 $success['no_bukti'] = $no_bukti;
           
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Tagihan gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -456,13 +456,13 @@ class TagihanController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Tagihan berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Tagihan gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -495,7 +495,7 @@ class TagihanController extends Controller
                 $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
@@ -503,7 +503,7 @@ class TagihanController extends Controller
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
