@@ -209,4 +209,106 @@ class NotifController extends Controller
 		return $request->all();
 		
 	}
+
+	public function getNotif(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+			$this->validate($request,[
+				'id_device' => 'required',
+				'no_rumah' => 'required',
+				'kode_pp' => 'required'
+			]);
+			$no_rumah = $request->no_rumah;
+			$kode_pp = $request->kode_pp;
+		}else if($auth =  Auth::guard($this->guard3)->user()){
+			$nik = $auth->no_hp;
+			$kode_lokasi= $auth->kode_lokasi;
+			$no_rumah = $auth->no_rumah;
+			$kode_pp = $auth->kode_pp;
+			$this->validate($request,[
+				'id_device' => 'required'
+			]);
+		}
+
+        try{
+
+			$periode = date('Ym');
+			$id_device = $request->id_device;
+		   
+			$strSQL = "select a.periode,a.nilai_rt-isnull(b.nilai_rt,0) as nilai_rt,a.nilai_rw-isnull(b.nilai_rw,0) as nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,a.nilai_rt+a.nilai_rw - (isnull(b.nilai_rt+b.nilai_rw,0)) as bayar
+			from rt_bill_d a 
+			left join (
+				select periode_bill,kode_lokasi,kode_rumah,sum(nilai_rt) as nilai_rt,sum(nilai_rw) as nilai_rw,sum(nilai_rt+nilai_rw) as bayar
+				from rt_angs_d 
+				where kode_lokasi ='$kode_lokasi' and kode_rumah ='$no_rumah' and kode_jenis='IWAJIB' 
+				group by periode_bill,kode_lokasi,kode_rumah
+			) b on a.periode=periode_bill and a.kode_lokasi=b.kode_lokasi and a.kode_rumah=b.kode_rumah 
+			where a.kode_lokasi ='$kode_lokasi' and a.kode_rumah ='$no_rumah' and a.kode_jenis='IWAJIB' and (a.nilai_rt+a.nilai_rw) - isnull(b.bayar,0) > 0 and a.flag_aktif='1' and a.periode='$periode'
+			order by a.periode ";
+			$cek_tagihan =  DB::connection($this->sql)->select($strSQL);
+			if(count($cek_tagihan) > 0){
+				$saldo = $cek_tagihan[0]->bayar;
+			}else{
+				$saldo = 0;
+			}
+
+			$cek_notif = DB::connection($this->sql)->select("select pesan from user_message where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
+			if(count($cek_notif) > 0){
+				$insnotif = true;
+			}else{
+				$insnotif = false;
+			}
+			if($tgl <= 10){
+				if($saldo > 0){
+					if(!$insnotif){
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','".$request->id_device."')");
+					}
+				}else{
+					if($insnotif){
+						$insert = DB::connection($this->sql)->update("update user_message set status ='P0' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
+					}
+				}
+			}else if($tgl > 10){
+				if($saldo > 0){
+					if(!$insnotif){
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','".$request->id_device."')");
+					}else{
+						$insert = DB::connection($this->sql)->update("update user_message set status ='P2',pesan='Tagihan iuran periode $periode sudah jatuh tempo' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
+					}
+				}else{
+					if($insnotif){
+						$insert = DB::connection($this->sql)->update("update user_message set status ='P0' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
+					}
+				}
+			}
+		
+			$get = DB::connection($this->sql)->select("select id,judul,pesan,tgl_input,status 
+			from user_message
+			where periode ='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2')
+			union all
+			select id,judul,pesan,tgl_input,status,id_device 
+			from user_message
+			where status in ('1') and id_device='$id_device'");
+			$get = json_decode(json_encode($get),true);
+			if(count($get) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $get;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
 }

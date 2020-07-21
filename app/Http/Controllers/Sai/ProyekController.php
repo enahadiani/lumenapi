@@ -106,8 +106,7 @@ class ProyekController extends Controller
             'nama' => 'required',
             'kode_cust' => 'required',
             'tgl_mulai' => 'required',
-            'tgl_selesai' => 'required',
-            'file_dok' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'tgl_selesai' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -119,24 +118,7 @@ class ProyekController extends Controller
             }
             if($this->isUnik($request->nik)){
 
-                if($request->hasfile('file_dok')){
-                    $file = $request->file('file_dok');
-                    
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                    $filetype =  $file->getmimeType();
-                    // $picName = uniqid() . '_' . $picName;
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('sai/'.$foto)){
-                        Storage::disk('s3')->delete('sai/'.$foto);
-                    }
-                    Storage::disk('s3')->put('sai/'.$foto,file_get_contents($file));
-                }else{
-                    
-                    $foto="-";
-                    $filetype = "-";
-                }
-
-                $ins = DB::connection($this->sql)->insert("insert into sai_proyek(no_proyek,nama,kode_cust,tgl_mulai,kode_lokasi,tgl_selesai,file_dok) values ('".$request->no_proyek."','".$request->nama."','".$request->kode_cust."','".$request->tgl_mulai."','".$kode_lokasi."','".$request->tgl_selesai."','".$foto."')");
+                $ins = DB::connection($this->sql)->insert("insert into sai_proyek(no_proyek,nama,kode_cust,tgl_mulai,kode_lokasi,tgl_selesai) values ('".$request->no_proyek."','".$request->nama."','".$request->kode_cust."','".$request->tgl_mulai."','".$kode_lokasi."','".$request->tgl_selesai."')");
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -183,8 +165,7 @@ class ProyekController extends Controller
             'nama' => 'required',
             'kode_cust' => 'required',
             'tgl_mulai' => 'required',
-            'tgl_selesai' => 'required',
-            'file_dok' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'tgl_selesai' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -194,41 +175,13 @@ class ProyekController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $sql = "select file_dok from sai_proyek where kode_lokasi='".$kode_lokasi."' and no_proyek='$request->no_proyek' 
-            ";
-            $res = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){
-                $foto = $res[0]['file_dok'];
-            }else{
-                $foto = "-";
-            }
-            
-            if($request->hasfile('file_dok')){
-                if($foto != "" || $foto != "-"){
-                    Storage::disk('s3')->delete('sai/'.$foto);
-                }
-                
-                $file = $request->file('file_dok');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                $filetype = $file->getmimeType();
-                if(Storage::disk('s3')->exists('sai/'.$foto)){
-                    Storage::disk('s3')->delete('sai/'.$foto);
-                }
-                Storage::disk('s3')->put('sai/'.$foto,file_get_contents($file));
-                
-            }
             
             $del = DB::connection($this->sql)->table('sai_proyek')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_proyek', $request->no_proyek)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into sai_proyek(no_proyek,nama,kode_cust,tgl_mulai,kode_lokasi,tgl_selesai,file_dok) values ('".$request->no_proyek."','".$request->nama."','".$request->kode_cust."','".$request->tgl_mulai."','".$kode_lokasi."','".$request->tgl_selesai."','".$foto."')");
+            $ins = DB::connection($this->sql)->insert("insert into sai_proyek(no_proyek,nama,kode_cust,tgl_mulai,kode_lokasi,tgl_selesai) values ('".$request->no_proyek."','".$request->nama."','".$request->kode_cust."','".$request->tgl_mulai."','".$kode_lokasi."','".$request->tgl_selesai."')");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -260,18 +213,7 @@ class ProyekController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql = "select file_dok from sai_proyek where kode_lokasi='".$kode_lokasi."' and no_proyek='$request->no_proyek' 
-            ";
-            $res = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($res),true);
             
-            if(count($res) > 0){
-                $foto = $res[0]['file_dok'];
-                if($foto != ""){
-                    Storage::disk('s3')->delete('sai/'.$foto);
-                }
-            }
-
             $del = DB::connection($this->sql)->table('sai_proyek')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_proyek', $request->no_proyek)
