@@ -71,7 +71,7 @@ class NotifController extends Controller
 						 
 						);
 		}else{
-			
+
 			$post = array(
 				'registration_ids'  => $ids,
 				'notification'              => array (
@@ -235,7 +235,7 @@ class NotifController extends Controller
 		
 	}
 
-	public function getNotif(Request $request){
+	public function getInfo(Request $request){
 
 		if($auth =  Auth::guard($this->guard)->user()){
 			$nik= $auth->nik;
@@ -257,7 +257,6 @@ class NotifController extends Controller
 			]);
 		}
 
-		
 		DB::connection($this->sql)->beginTransaction(); 
 		
         try{
@@ -327,7 +326,7 @@ class NotifController extends Controller
 			union all
 			select id,judul,pesan,tgl_input,status 
 			from user_message
-			where status in ('1') and id_device='$id_device'";
+			where status in ('1') and id_device='$id_device' and jenis in ('PKT','TM')  ";
 
 			$get = DB::connection($this->sql)->select($sql);
 			$get = json_decode(json_encode($get),true);
@@ -347,6 +346,65 @@ class NotifController extends Controller
         } catch (\Throwable $e) {
 			
             DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+	}
+	
+	public function getNotif(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+			$this->validate($request,[
+				'id_device' => 'required',
+				'no_rumah' => 'required',
+				'kode_pp' => 'required'
+			]);
+			$no_rumah = $request->no_rumah;
+			$kode_pp = $request->kode_pp;
+		}else if($auth =  Auth::guard($this->guard3)->user()){
+			$nik = $auth->no_hp;
+			$kode_lokasi= $auth->kode_lokasi;
+			$no_rumah = $auth->no_rumah;
+			$kode_pp = $auth->kode_pp;
+			$this->validate($request,[
+				'id_device' => 'required'
+			]);
+		}
+		
+        try{
+
+			$periode = date('Ym');
+			$tgl = intval(date('d'));
+			$id_device = $request->id_device;
+		   
+			$sql = "select id,judul,pesan,tgl_input,status 
+			from user_message
+			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P0')
+			union all
+			select id,judul,pesan,tgl_input,status 
+			from user_message
+			where status in ('1') and id_device='$id_device' ";
+
+			$get = DB::connection($this->sql)->select($sql);
+			$get = json_decode(json_encode($get),true);
+			if(count($get) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $get;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
