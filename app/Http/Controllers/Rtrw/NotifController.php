@@ -232,9 +232,13 @@ class NotifController extends Controller
 			]);
 		}
 
+		
+		DB::connection($this->sql)->beginTransaction(); 
+		
         try{
 
 			$periode = date('Ym');
+			$tgl = intval(date('d'));
 			$id_device = $request->id_device;
 		   
 			$strSQL = "select a.periode,a.nilai_rt-isnull(b.nilai_rt,0) as nilai_rt,a.nilai_rw-isnull(b.nilai_rw,0) as nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,a.nilai_rt+a.nilai_rw - (isnull(b.nilai_rt+b.nilai_rw,0)) as bayar
@@ -253,6 +257,7 @@ class NotifController extends Controller
 			}else{
 				$saldo = 0;
 			}
+			$success['saldo'] = $saldo;
 
 			$cek_notif = DB::connection($this->sql)->select("select pesan from user_message where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
 			if(count($cek_notif) > 0){
@@ -260,10 +265,14 @@ class NotifController extends Controller
 			}else{
 				$insnotif = false;
 			}
+			
+			$success['ins_notif'] = $insnotif;
+			
+			$success['tgl'] = $tgl;
 			if($tgl <= 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','".$request->id_device."')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','".$request->id_device."','$periode','$kode_pp','$no_rumah')");
 					}
 				}else{
 					if($insnotif){
@@ -273,7 +282,7 @@ class NotifController extends Controller
 			}else if($tgl > 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','".$request->id_device."')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','".$request->id_device."','$periode','$kode_pp','$no_rumah')");
 					}else{
 						$insert = DB::connection($this->sql)->update("update user_message set status ='P2',pesan='Tagihan iuran periode $periode sudah jatuh tempo' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
 					}
@@ -283,12 +292,15 @@ class NotifController extends Controller
 					}
 				}
 			}
+
+			
+            DB::connection($this->sql)->commit();
 		
 			$get = DB::connection($this->sql)->select("select id,judul,pesan,tgl_input,status 
 			from user_message
 			where periode ='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2')
 			union all
-			select id,judul,pesan,tgl_input,status,id_device 
+			select id,judul,pesan,tgl_input,status 
 			from user_message
 			where status in ('1') and id_device='$id_device'");
 			$get = json_decode(json_encode($get),true);
@@ -306,6 +318,8 @@ class NotifController extends Controller
             $success['message'] = "Sukses ";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
+			
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);

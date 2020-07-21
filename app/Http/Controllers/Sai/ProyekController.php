@@ -47,7 +47,7 @@ class ProyekController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $url = url('api/sai-auth/storage');
+            // $url = url('api/sai-auth/storage');
             $filter = "";
             if(isset($request->no_proyek)){
                 if($request->no_proyek == "all"){
@@ -55,7 +55,7 @@ class ProyekController extends Controller
                 }else{
                     $filter .= " and no_proyek='$request->no_proyek' ";
                 }   
-                $sql = "select no_proyek,nama,kode_cust,convert(varchar(10),tgl_mulai,121) as tgl_mulai,convert(varchar(10),tgl_selesai,121) as tgl_selesai,case when file_dok != '-' then '".$url."/'+file_dok else '-' end as file_dok from sai_proyek where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql = "select no_proyek,nama,kode_cust,convert(varchar(10),tgl_mulai,121) as tgl_mulai,convert(varchar(10),tgl_selesai,121) as tgl_selesai from sai_proyek where kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 
                 $sql = "select no_proyek,nama,kode_cust,convert(varchar(10),tgl_mulai,103) as tgl_mulai,convert(varchar(10),tgl_selesai,103) as tgl_selesai from sai_proyek where kode_lokasi='".$kode_lokasi."' ";
