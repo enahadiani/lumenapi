@@ -35,8 +35,8 @@ $router->get('storage/{filename}', function ($filename)
 $router->group(['middleware' => 'cors'], function () use ($router) {
     
     $router->post('login', 'AuthController@loginRtrw');
-    $router->get('hash-pass', 'AuthController@hashPasswordRtrw');
-    $router->get('hash-pass-user/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
+    $router->get('hash_pass', 'AuthController@hashPasswordRtrw');
+    $router->get('hash_pass_user/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     $router->get('db', function () {
         
         $sql = DB::connection('sqlsrvrtrw')->select("select * from hakakses ");
@@ -49,9 +49,9 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     });
 
     
-    $router->post('login-warga', 'AuthController@loginWarga');
-    $router->post('hash-pass-warga', 'AuthController@hashPassWarga');
-    $router->post('hash-pass-perwarga', 'Rtrw\WargaController@hashPassPerWarga');
+    $router->post('login_warga', 'AuthController@loginWarga');
+    $router->post('hash_pass_warga', 'AuthController@hashPassWarga');
+    $router->post('hash_pass_perwarga', 'Rtrw\WargaController@hashPassPerWarga');
 });
 
 $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
@@ -59,42 +59,42 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('profile', 'AdminRtrwController@profile');
     $router->get('users/{id}', 'AdminRtrwController@singleUser');
     $router->get('users', 'AdminRtrwController@allUsers');
-    $router->get('cek-payload', 'AdminRtrwController@cekPayload');
+    $router->get('cek_payload', 'AdminRtrwController@cekPayload');
 
     $router->get('menu', 'Rtrw\RtrwController@getMenu');
     $router->get('menu2', 'Rtrw\RtrwController@getMenu2');
-    $router->get('filter-tahun', 'Rtrw\RtrwController@getTahun');
-    $router->get('filter-bulan', 'Rtrw\RtrwController@getBulan');
-    $router->get('filter-tahun-bill', 'Rtrw\RtrwController@getTahunBill');
-    $router->get('filter-periode-setor', 'Rtrw\RtrwController@getPeriodeSetor');
-    $router->get('filter-akun', 'Rtrw\RtrwController@getAkun');
-    $router->get('filter-blok', 'Rtrw\RtrwController@getBlok');
-    $router->get('filter-ref-akun', 'Rtrw\RtrwController@getRefAkun');
+    $router->get('filter_tahun', 'Rtrw\RtrwController@getTahun');
+    $router->get('filter_bulan', 'Rtrw\RtrwController@getBulan');
+    $router->get('filter_tahun_bill', 'Rtrw\RtrwController@getTahunBill');
+    $router->get('filter_periode_setor', 'Rtrw\RtrwController@getPeriodeSetor');
+    $router->get('filter_akun', 'Rtrw\RtrwController@getAkun');
+    $router->get('filter_blok', 'Rtrw\RtrwController@getBlok');
+    $router->get('filter_ref_akun', 'Rtrw\RtrwController@getRefAkun');
     
-    $router->get('rekap-rw', 'Rtrw\RtrwController@getRekapRw');
-    $router->get('rekap-rw-detail', 'Rtrw\RtrwController@getDetailRekapRw');
-    $router->get('rekap-rw-bulan', 'Rtrw\RtrwController@getRekapBulananRw');
-    $router->get('rekap-rw-bulan-detail', 'Rtrw\RtrwController@getDetailRekapBulananRw');
-    $router->get('riwayat-trans', 'Rtrw\RtrwController@getRiwayatTrans');
-    $router->get('riwayat-trans-detail', 'Rtrw\RtrwController@getRiwayatTransDetail');
-    $router->get('riwayat-iuran', 'Rtrw\RtrwController@getRiwayatIuran');
-    $router->get('iuran-detail', 'Rtrw\RtrwController@getDetailIuran');
-    $router->get('kartu-iuran', 'Rtrw\RtrwController@getKartuIuran');
+    $router->get('rekap_rw', 'Rtrw\RtrwController@getRekapRw');
+    $router->get('rekap_rw_detail', 'Rtrw\RtrwController@getDetailRekapRw');
+    $router->get('rekap_rw_bulan', 'Rtrw\RtrwController@getRekapBulananRw');
+    $router->get('rekap_rw_bulan_detail', 'Rtrw\RtrwController@getDetailRekapBulananRw');
+    $router->get('riwayat_trans', 'Rtrw\RtrwController@getRiwayatTrans');
+    $router->get('riwayat_trans_detail', 'Rtrw\RtrwController@getRiwayatTransDetail');
+    $router->get('riwayat_iuran', 'Rtrw\RtrwController@getRiwayatIuran');
+    $router->get('iuran_detail', 'Rtrw\RtrwController@getDetailIuran');
+    $router->get('kartu_iuran', 'Rtrw\RtrwController@getKartuIuran');
 
-    $router->post('ubah-password', 'Rtrw\RtrwController@ubahPassword');
-    $router->post('simpan-kas', 'Rtrw\RtrwController@simpanKas');
+    $router->post('ubah_password', 'Rtrw\RtrwController@ubahPassword');
+    $router->post('simpan_kas', 'Rtrw\RtrwController@simpanKas');
 
-    $router->get('bayar-iuran', 'Rtrw\RtrwController@getBayarIuran');
-    $router->post('simpan-iuran', 'Rtrw\RtrwController@simpanIuran');
-    $router->get('bayar-iuran-rw', 'Rtrw\RtrwController@getBayarIuranRw');
-    $router->post('simpan-iuran-rw', 'Rtrw\RtrwController@simpanIuranRw');
-    $router->get('bayar-detail', 'Rtrw\RtrwController@getDetailBayar');
-    $router->get('bayar-detail-rw', 'Rtrw\RtrwController@getDetailBayarRw');
+    $router->get('bayar_iuran', 'Rtrw\RtrwController@getBayarIuran');
+    $router->post('simpan_iuran', 'Rtrw\RtrwController@simpanIuran');
+    $router->get('bayar_iuran_rw', 'Rtrw\RtrwController@getBayarIuranRw');
+    $router->post('simpan_iuran_rw', 'Rtrw\RtrwController@simpanIuranRw');
+    $router->get('bayar_detail', 'Rtrw\RtrwController@getDetailBayar');
+    $router->get('bayar_detail_rw', 'Rtrw\RtrwController@getDetailBayarRw');
     $router->get('setoran', 'Rtrw\RtrwController@getSetoran');
-    $router->post('simpan-setoran', 'Rtrw\RtrwController@simpanSetoran');
+    $router->post('simpan_setoran', 'Rtrw\RtrwController@simpanSetoran');
 
-    $router->get('rekap-setoran', 'Rtrw\RtrwController@getRekapSetoran');
-    $router->get('rekap-setoran-detail', 'Rtrw\RtrwController@getDetailRekapSetoran');
+    $router->get('rekap_setoran', 'Rtrw\RtrwController@getRekapSetoran');
+    $router->get('rekap_setoran_detail', 'Rtrw\RtrwController@getDetailRekapSetoran');
 
     //Master Satpam
     $router->get('satpam','Rtrw\SatpamController@index');
@@ -187,46 +187,47 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
 
-    $router->get('profile-warga', 'AdminWargaController@profile');
-    $router->get('users-warga/{id}', 'AdminWargaController@singleUser');
-    $router->get('users-warga', 'AdminWargaController@allUsers');
-    $router->get('cek-payload-warga', 'AdminWargaController@cekPayload');
+    $router->get('profile_warga', 'AdminWargaController@profile');
+    $router->get('users_warga/{id}', 'AdminWargaController@singleUser');
+    $router->get('users_warga', 'AdminWargaController@allUsers');
+    $router->get('cek_payload_warga', 'AdminWargaController@cekPayload');
 
-    $router->post('ubah-profile', 'Rtrw\WargaController@updatePerUser');
+    $router->post('ubah_profile', 'Rtrw\WargaController@updatePerUser');
 
-    $router->get('filter-tahun-wr', 'Rtrw\RtrwController@getTahun');
-    $router->get('filter-bulan-wr', 'Rtrw\RtrwController@getBulan');
-    $router->get('filter-tahun-bill-wr', 'Rtrw\RtrwController@getTahunBill');
-    $router->get('filter-periode-setor-wr', 'Rtrw\RtrwController@getPeriodeSetor');
-    $router->get('filter-akun-wr', 'Rtrw\RtrwController@getAkun');
-    $router->get('filter-blok-wr', 'Rtrw\RtrwController@getBlok');
-    $router->get('filter-ref-akun-wr', 'Rtrw\RtrwController@getRefAkun');
+    $router->get('filter_tahun_wr', 'Rtrw\RtrwController@getTahun');
+    $router->get('filter_bulan_wr', 'Rtrw\RtrwController@getBulan');
+    $router->get('filter_tahun_bill_wr', 'Rtrw\RtrwController@getTahunBill');
+    $router->get('filter_periode_setor_wr', 'Rtrw\RtrwController@getPeriodeSetor');
+    $router->get('filter_akun_wr', 'Rtrw\RtrwController@getAkun');
+    $router->get('filter_blok_wr', 'Rtrw\RtrwController@getBlok');
+    $router->get('filter_ref_akun_wr', 'Rtrw\RtrwController@getRefAkun');
     
-    $router->get('rekap-rw-wr', 'Rtrw\RtrwController@getRekapRw');
-    $router->get('rekap-rw-detail-wr', 'Rtrw\RtrwController@getDetailRekapRw');
-    $router->get('rekap-rw-bulan-wr', 'Rtrw\RtrwController@getRekapBulananRw');
-    $router->get('rekap-rw-bulan-detail-wr', 'Rtrw\RtrwController@getDetailRekapBulananRw');
-    $router->get('riwayat-trans-wr', 'Rtrw\RtrwController@getRiwayatTrans');
-    $router->get('riwayat-trans-detail-wr', 'Rtrw\RtrwController@getRiwayatTransDetail');
-    $router->get('riwayat-iuran-wr', 'Rtrw\RtrwController@getRiwayatIuran');
-    $router->get('iuran-detail-wr', 'Rtrw\RtrwController@getDetailIuran');
-    $router->get('kartu-iuran-wr', 'Rtrw\RtrwController@getKartuIuran');
+    $router->get('rekap_rw_wr', 'Rtrw\RtrwController@getRekapRw');
+    $router->get('rekap_rw_detail_wr', 'Rtrw\RtrwController@getDetailRekapRw');
+    $router->get('rekap_rw_bulan_wr', 'Rtrw\RtrwController@getRekapBulananRw');
+    $router->get('rekap_rw_bulan_detail_wr', 'Rtrw\RtrwController@getDetailRekapBulananRw');
+    $router->get('riwayat_trans_wr', 'Rtrw\RtrwController@getRiwayatTrans');
+    $router->get('riwayat_trans_detail_wr', 'Rtrw\RtrwController@getRiwayatTransDetail');
+    $router->get('riwayat_iuran_wr', 'Rtrw\RtrwController@getRiwayatIuran');
+    $router->get('iuran_detail_wr', 'Rtrw\RtrwController@getDetailIuran');
+    $router->get('kartu_iuran_wr', 'Rtrw\RtrwController@getKartuIuran');
 
-    $router->post('ubah-password-wr', 'Rtrw\RtrwController@ubahPassword');
-    $router->post('simpan-kas-wr', 'Rtrw\RtrwController@simpanKas');
+    $router->post('ubah_password_wr', 'Rtrw\RtrwController@ubahPassword');
+    $router->post('simpan_kas_wr', 'Rtrw\RtrwController@simpanKas');
 
-    $router->get('bayar-iuran-wr', 'Rtrw\RtrwController@getBayarIuran');
-    $router->post('simpan-iuran-wr', 'Rtrw\RtrwController@simpanIuran');
-    $router->get('bayar-iuran-rw-wr', 'Rtrw\RtrwController@getBayarIuranRw');
-    $router->post('simpan-iuran-rw-wr', 'Rtrw\RtrwController@simpanIuranRw');
-    $router->get('bayar-detail-wr', 'Rtrw\RtrwController@getDetailBayar');
-    $router->get('bayar-detail-rw-wr', 'Rtrw\RtrwController@getDetailBayarRw');
-    $router->get('setoran-wr', 'Rtrw\RtrwController@getSetoran');
-    $router->post('simpan-setoran-wr', 'Rtrw\RtrwController@simpanSetoran');
+    $router->get('bayar_iuran_wr', 'Rtrw\RtrwController@getBayarIuran');
+    $router->post('simpan_iuran_wr', 'Rtrw\RtrwController@simpanIuran');
+    $router->get('bayar_iuran_rw_wr', 'Rtrw\RtrwController@getBayarIuranRw');
+    $router->post('simpan_iuran_rw_wr', 'Rtrw\RtrwController@simpanIuranRw');
+    $router->get('bayar_detail_wr', 'Rtrw\RtrwController@getDetailBayar');
+    $router->get('bayar_detail_rw_wr', 'Rtrw\RtrwController@getDetailBayarRw');
+    $router->get('setoran_wr', 'Rtrw\RtrwController@getSetoran');
+    $router->post('simpan_setoran_wr', 'Rtrw\RtrwController@simpanSetoran');
 
-    $router->get('rekap-setoran-wr', 'Rtrw\RtrwController@getRekapSetoran');
-    $router->get('rekap-setoran-detail-wr', 'Rtrw\RtrwController@getDetailRekapSetoran');
-    $router->get('info-wr', 'Rtrw\NotifController@getInfo');
-    $router->get('notif-wr-all', 'Rtrw\NotifController@getNotif');
+    $router->get('rekap_setoran_wr', 'Rtrw\RtrwController@getRekapSetoran');
+    $router->get('rekap_setoran_detail_wr', 'Rtrw\RtrwController@getDetailRekapSetoran');
+    $router->get('notif_wr', 'Rtrw\NotifController@getInfo');
+    $router->get('notif_wr_all', 'Rtrw\NotifController@getNotif');
+
     
 });
