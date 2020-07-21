@@ -227,6 +227,7 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
     $router->get('rekap_setoran_wr', 'Rtrw\RtrwController@getRekapSetoran');
     $router->get('rekap_setoran_detail_wr', 'Rtrw\RtrwController@getDetailRekapSetoran');
     $router->get('notif_wr', 'Rtrw\NotifController@getNotif');
+    $router->get('notif_wr_all', 'Rtrw\NotifController@getNotif');
 
     
 });

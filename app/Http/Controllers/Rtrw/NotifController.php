@@ -52,15 +52,35 @@ class NotifController extends Controller
 	    //------------------------------
 	    // Set GCM post variables
 	    // (Device IDs and push payload)
-	    //------------------------------
-	    $post = array(
-						'registration_ids'  => $ids,
-						'notification'              => array (
-									"body" => $data["message"],
-									"title" => $data["title"],
+		//------------------------------
+		if(isset($data['click_action'])){
+
+			$post = array(
+							'registration_ids'  => $ids,
+							'notification'              => array (
+										"body" => $data["message"],
+										"title" => $data["title"],
+								),
+							'data'              => $data,
+							"android" => array (
+								"ttl" => "86400s",
+								"notification" => array (
+								  "click_action" => $data["click_action"]
+								)
 							),
-	                    'data'              => $data,
-	                    );
+						 
+						);
+		}else{
+			
+			$post = array(
+				'registration_ids'  => $ids,
+				'notification'              => array (
+							"body" => $data["message"],
+							"title" => $data["title"],
+					),
+				'data'              => $data
+			);
+		}
 	
 	    //------------------------------
 	    // Set CURL request headers
@@ -171,9 +191,14 @@ class NotifController extends Controller
 				}else{
 					$sts = 1;
 				}
+				if(isset($request->jenis)){
+					$jenis = $request->jenis;
+				}else{
+					$jenis = "-";
+				}
 				for($i=0;$i<count($request->token);$i++){
 
-					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."') ");
+					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,jenis) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."','$jenis') ");
 				}
 				DB::connection($this->sql)->commit();
 				$success['status'] = true;
@@ -272,7 +297,7 @@ class NotifController extends Controller
 			if($tgl <= 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','".$request->id_device."','$periode','$kode_pp','$no_rumah')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','".$request->id_device."','$periode','$kode_pp','$no_rumah','IURAN')");
 					}
 				}else{
 					if($insnotif){
@@ -282,7 +307,7 @@ class NotifController extends Controller
 			}else if($tgl > 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','".$request->id_device."','$periode','$kode_pp','$no_rumah')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','".$request->id_device."','$periode','$kode_pp','$no_rumah','IURAN')");
 					}else{
 						$insert = DB::connection($this->sql)->update("update user_message set status ='P2',pesan='Tagihan iuran periode $periode sudah jatuh tempo' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
 					}
@@ -296,13 +321,15 @@ class NotifController extends Controller
 			
             DB::connection($this->sql)->commit();
 		
-			$get = DB::connection($this->sql)->select("select id,judul,pesan,tgl_input,status 
+			$sql = "select id,judul,pesan,tgl_input,status 
 			from user_message
-			where periode ='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2')
+			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2')
 			union all
 			select id,judul,pesan,tgl_input,status 
 			from user_message
-			where status in ('1') and id_device='$id_device'");
+			where status in ('1') and id_device='$id_device'";
+
+			$get = DB::connection($this->sql)->select($sql);
 			$get = json_decode(json_encode($get),true);
 			if(count($get) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
