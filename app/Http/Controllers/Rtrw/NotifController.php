@@ -320,11 +320,11 @@ class NotifController extends Controller
 			
             DB::connection($this->sql)->commit();
 		
-			$sql = "select id,judul,pesan,tgl_input,status 
+			$sql = "select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
 			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2')
 			union all
-			select id,judul,pesan,tgl_input,status 
+			select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
 			where status in ('1') and id_device='$id_device' and jenis in ('PKT','TM')  ";
 
@@ -380,11 +380,11 @@ class NotifController extends Controller
 			$tgl = intval(date('d'));
 			$id_device = $request->id_device;
 		   
-			$sql = "select id,judul,pesan,tgl_input,status 
+			$sql = "select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
 			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P0')
 			union all
-			select id,judul,pesan,tgl_input,status 
+			select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
 			where status in ('1') and id_device='$id_device' ";
 
