@@ -96,7 +96,7 @@ class JuskebController extends Controller
             when a.progress = 'S' and c.progress ='S' then 'Finish Pengadaan' 
             when a.progress = 'S' and c.progress ='R' then 'Return Approval' 
             when a.progress = 'S' and c.progress not in ('R','S') then isnull(y.nama_jab,'-')
-            end as posisi
+            end as posisi,a.progress
             from apv_juskeb_m a
             left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
                         FROM apv_ver_m
