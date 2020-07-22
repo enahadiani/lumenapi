@@ -303,7 +303,7 @@ class NotifController extends Controller
 			if($tgl <= 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp','-','iuran')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp','-','ic_iuran')");
 					}
 				}else{
 					if($insnotif){
@@ -313,7 +313,7 @@ class NotifController extends Controller
 			}else if($tgl > 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp','-','iuran')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp','-','ic_iuran')");
 					}else{
 						$insert = DB::connection($this->sql)->update("update user_message set status ='P2',pesan='Tagihan iuran periode $periode sudah jatuh tempo' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
 					}
