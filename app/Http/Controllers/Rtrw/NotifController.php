@@ -196,9 +196,14 @@ class NotifController extends Controller
 				}else{
 					$jenis = "-";
 				}
+				if(isset($request->no_hp)){
+					$no_hp = $request->no_hp;
+				}else{
+					$no_hp = "-";
+				}
 				for($i=0;$i<count($request->token);$i++){
 
-					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,jenis) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."','$jenis') ");
+					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,jenis,no_hp) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."','$jenis','".$no_hp."') ");
 				}
 				DB::connection($this->sql)->commit();
 				$success['status'] = true;
@@ -241,20 +246,19 @@ class NotifController extends Controller
 			$nik= $auth->nik;
 			$kode_lokasi= $auth->kode_lokasi;
 			$this->validate($request,[
-				'id_device' => 'required',
+				'no_hp' => 'required',
 				'no_rumah' => 'required',
 				'kode_pp' => 'required'
 			]);
 			$no_rumah = $request->no_rumah;
 			$kode_pp = $request->kode_pp;
+			$no_hp = $request->no_hp;
 		}else if($auth =  Auth::guard($this->guard3)->user()){
 			$nik = $auth->no_hp;
 			$kode_lokasi= $auth->kode_lokasi;
 			$no_rumah = $auth->no_rumah;
 			$kode_pp = $auth->kode_pp;
-			$this->validate($request,[
-				'id_device' => 'required'
-			]);
+			$no_hp = $auth->no_hp;
 		}
 
 		DB::connection($this->sql)->beginTransaction(); 
@@ -263,7 +267,6 @@ class NotifController extends Controller
 
 			$periode = date('Ym');
 			$tgl = intval(date('d'));
-			$id_device = $request->id_device;
 		   
 			$strSQL = "select a.periode,a.nilai_rt-isnull(b.nilai_rt,0) as nilai_rt,a.nilai_rw-isnull(b.nilai_rw,0) as nilai_rw,(a.nilai_rt+a.nilai_rw) as bill,a.nilai_rt+a.nilai_rw - (isnull(b.nilai_rt+b.nilai_rw,0)) as bayar
 			from rt_bill_d a 
@@ -296,7 +299,7 @@ class NotifController extends Controller
 			if($tgl <= 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','".$request->id_device."','$periode','$kode_pp','$no_rumah','IURAN')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp')");
 					}
 				}else{
 					if($insnotif){
@@ -306,7 +309,7 @@ class NotifController extends Controller
 			}else if($tgl > 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','".$request->id_device."','$periode','$kode_pp','$no_rumah','IURAN')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp')");
 					}else{
 						$insert = DB::connection($this->sql)->update("update user_message set status ='P2',pesan='Tagihan iuran periode $periode sudah jatuh tempo' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
 					}
@@ -326,7 +329,7 @@ class NotifController extends Controller
 			union all
 			select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
-			where status in ('1') and id_device='$id_device' and jenis in ('PKT','TM')  ";
+			where status in ('1') and no_hp='$no_hp' and jenis in ('PKT','TM')  ";
 
 			$get = DB::connection($this->sql)->select($sql);
 			$get = json_decode(json_encode($get),true);
@@ -358,27 +361,25 @@ class NotifController extends Controller
 			$nik= $auth->nik;
 			$kode_lokasi= $auth->kode_lokasi;
 			$this->validate($request,[
-				'id_device' => 'required',
+				'no_hp' => 'required',
 				'no_rumah' => 'required',
 				'kode_pp' => 'required'
 			]);
 			$no_rumah = $request->no_rumah;
 			$kode_pp = $request->kode_pp;
+			$no_hp = $request->no_hp;
 		}else if($auth =  Auth::guard($this->guard3)->user()){
 			$nik = $auth->no_hp;
 			$kode_lokasi= $auth->kode_lokasi;
 			$no_rumah = $auth->no_rumah;
 			$kode_pp = $auth->kode_pp;
-			$this->validate($request,[
-				'id_device' => 'required'
-			]);
+			$no_hp = $auth->no_hp;
 		}
 		
         try{
 
 			$periode = date('Ym');
 			$tgl = intval(date('d'));
-			$id_device = $request->id_device;
 		   
 			$sql = "select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
@@ -386,7 +387,7 @@ class NotifController extends Controller
 			union all
 			select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
-			where status in ('1') and id_device='$id_device' ";
+			where status in ('1') and no_hp='$no_hp' ";
 
 			$get = DB::connection($this->sql)->select($sql);
 			$get = json_decode(json_encode($get),true);
