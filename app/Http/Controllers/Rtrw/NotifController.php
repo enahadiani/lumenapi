@@ -389,7 +389,7 @@ class NotifController extends Controller
 			from user_message
 			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P0')
 			union all
-			select id,judul,pesan,tgl_input,status,jenis 
+			select id,judul,pesan,tgl_input,status,jenis,subtitle,icon  
 			from user_message
 			where status in ('1') and no_hp='$no_hp' ";
 
