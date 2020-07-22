@@ -68,6 +68,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('kbdual','Toko\KasBankDualController@update');
     $router->delete('kbdual','Toko\KasBankDualController@destroy');
 
+    //Penjualan (POS)
+    $router->post('penjualan-langsung','Toko\PenjualanLangsungController@store');
+    $router->get('penjualan-langsung-nota','Toko\PenjualanLangsungController@getNota');
+    $router->get('penjualan-langsung-bonus','Toko\PenjualanLangsungController@cekBonus');
+
 });
 
 

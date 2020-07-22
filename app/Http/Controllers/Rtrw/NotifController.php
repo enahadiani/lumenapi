@@ -329,7 +329,7 @@ class NotifController extends Controller
 		
 			$sql = "select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
-			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2')
+			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P3')
 			union all
 			select id,judul,pesan,tgl_input,status,jenis 
 			from user_message
@@ -387,7 +387,7 @@ class NotifController extends Controller
 		   
 			$sql = "select id,judul,pesan,tgl_input,status,jenis,subtitle,icon 
 			from user_message
-			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P0')
+			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P0','P3')
 			union all
 			select id,judul,pesan,tgl_input,status,jenis,subtitle,icon  
 			from user_message
