@@ -66,6 +66,18 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('bonus','Toko\BonusController@update');
     $router->delete('bonus','Toko\BonusController@destroy');
 
+    //Jasa Kirim
+    $router->get('jasa-kirim','Toko\JasaKirimController@index');
+    $router->post('jasa-kirim','Toko\JasaKirimController@store');
+    $router->put('jasa-kirim','Toko\JasaKirimController@update');
+    $router->delete('jasa-kirim','Toko\JasaKirimController@destroy');
+
+    //Customer OL
+    $router->get('cust-ol','Toko\CustomerOLController@index');
+    $router->post('cust-ol','Toko\CustomerOLController@store');
+    $router->put('cust-ol','Toko\CustomerOLController@update');
+    $router->delete('cust-ol','Toko\CustomerOLController@destroy');
+
     //ADMIN
     //Menu
     $router->get('menu','Toko\MenuController@index');
