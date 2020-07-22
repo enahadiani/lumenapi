@@ -390,11 +390,17 @@ $app->router->group([
     require __DIR__.'/../routes/sai/report.php';
 });
 
-
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sai-dash'
 ], function ($router) {
     require __DIR__.'/../routes/sai/dash.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/warga'
+], function ($router) {
+    require __DIR__.'/../routes/warga.php';
 });
 return $app;
