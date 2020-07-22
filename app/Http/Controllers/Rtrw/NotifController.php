@@ -58,9 +58,11 @@ class NotifController extends Controller
 			$post = array(
 							'registration_ids'  => $ids,
 							'notification'              => array (
-										"body" => $data["message"],
-										"title" => $data["title"],
-								),
+								"body" => $data["message"],
+								"title" => $data["title"],
+								"subtitle" => $data["subtitle"],
+								"icon" => $data["icon"],
+							),
 							'data'              => $data,
 							"android" => array (
 								"ttl" => "86400s",
@@ -75,9 +77,11 @@ class NotifController extends Controller
 			$post = array(
 				'registration_ids'  => $ids,
 				'notification'              => array (
-							"body" => $data["message"],
-							"title" => $data["title"],
-					),
+					"body" => $data["message"],
+					"title" => $data["title"],
+					"subtitle" => $data["subtitle"],
+					"icon" => $data["icon"],
+				),
 				'data'              => $data
 			);
 		}
@@ -203,7 +207,7 @@ class NotifController extends Controller
 				}
 				for($i=0;$i<count($request->token);$i++){
 
-					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,jenis,no_hp) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."','$jenis','".$no_hp."') ");
+					$ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','".$request->data['title']."','".$request->data['message']."',getdate(),'$sts','".$request->token[$i]."','$jenis','".$no_hp."','".$request->data['subtitle']."','".$request->data['icon']."') ");
 				}
 				DB::connection($this->sql)->commit();
 				$success['status'] = true;
@@ -299,7 +303,7 @@ class NotifController extends Controller
 			if($tgl <= 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sebesar 150.000',getdate(),'P1','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp','-','iuran')");
 					}
 				}else{
 					if($insnotif){
@@ -309,7 +313,7 @@ class NotifController extends Controller
 			}else if($tgl > 10){
 				if($saldo > 0){
 					if(!$insnotif){
-						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp')");
+						$insert = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,pesan,tgl_input,status,id_device,periode,kode_pp,no_rumah,jenis,no_hp,subtitle,icon) values ('$kode_lokasi','Tagihan iuran','Tagihan iuran periode $periode sudah jatuh tempo',getdate(),'P2','-','$periode','$kode_pp','$no_rumah','IURAN','$no_hp','-','iuran')");
 					}else{
 						$insert = DB::connection($this->sql)->update("update user_message set status ='P2',pesan='Tagihan iuran periode $periode sudah jatuh tempo' where periode='$periode' and no_rumah='$no_rumah' and kode_pp='$kode_pp' ");
 					}
@@ -381,7 +385,7 @@ class NotifController extends Controller
 			$periode = date('Ym');
 			$tgl = intval(date('d'));
 		   
-			$sql = "select id,judul,pesan,tgl_input,status,jenis 
+			$sql = "select id,judul,pesan,tgl_input,status,jenis,subtitle,icon 
 			from user_message
 			where no_rumah='$no_rumah' and kode_pp='$kode_pp' and status in ('P1','P2','P0')
 			union all
