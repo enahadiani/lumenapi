@@ -172,7 +172,7 @@ class CustomerOLController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('cust')
+            $del = DB::connection($this->sql)->table('ol_cust')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_cust', $request->kode_cust)
             ->delete();
