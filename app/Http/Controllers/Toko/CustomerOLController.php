@@ -49,7 +49,7 @@ class CustomerOLController extends Controller
                 $filter .= "";
             }
             
-            $sql= "select kode_cust,nama,alamat,no_tel,email,pic,id_lain,kota,provinsi from ol_cust a 
+            $sql= "select kode_cust,nama,alamat,no_tel,email,pic,id_lain,kota,provinsi,kecamatan from ol_cust a 
             where kode_lokasi='".$kode_lokasi."' $filter ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -100,7 +100,8 @@ class CustomerOLController extends Controller
             'pic' => 'required|max:50',
             'id_lain' => 'max:30',
             'kota' => 'required|max:150',
-            'provinsi' => 'required|max:150'
+            'provinsi' => 'required|max:150',
+            'kecamatan' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -112,7 +113,7 @@ class CustomerOLController extends Controller
             }
             if($this->isUnik($request->kode_cust,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi') ");
+                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi,kecamatan) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan') ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -161,7 +162,8 @@ class CustomerOLController extends Controller
             'no_tel' => 'required|max:50',
             'email' => 'required|email|max:50',
             'pic' => 'required|max:50',
-            'id_lain' => 'max:30'
+            'id_lain' => 'max:30',
+            'kecamatan' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -177,7 +179,7 @@ class CustomerOLController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi') ");
+            $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan') ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
