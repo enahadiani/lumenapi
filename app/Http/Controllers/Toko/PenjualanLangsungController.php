@@ -314,9 +314,16 @@ class PenjualanLangsungController extends Controller
 
             $query = array();
             if(isset($request->id)){
-                $query = array(
+                $kota = array(
                     'id' => $request->id
                 );
+                $query = array_merge($query,$kota);
+            }
+            if(isset($request->province)){
+                $provinsi = array(
+                    'province' => $request->province
+                );
+                $query = array_merge($query,$provinsi);
             }
             $client = new Client();
             $response = $client->request('GET', 'https://api.rajaongkir.com/starter/city',[
