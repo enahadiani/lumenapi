@@ -74,6 +74,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('penjualan-langsung-bonus','Toko\PenjualanLangsungController@cekBonus');
     $router->get('provinsi','Toko\PenjualanLangsungController@getProvinsi');
     $router->get('kota','Toko\PenjualanLangsungController@getKota');
+    $router->get('kecamatan','Toko\PenjualanLangsungController@getKecamatan');
     $router->get('nilai-ongkir','Toko\PenjualanLangsungController@getService');
 
 });

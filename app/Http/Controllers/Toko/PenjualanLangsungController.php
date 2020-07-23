@@ -20,6 +20,7 @@ class PenjualanLangsungController extends Controller
     public $sql = 'tokoaws';
     public $guard = 'toko';
     public $apiKey = 'fcbeeb755353ac41ab2914806d956f26';
+    public $url_api = 'https://pro.rajaongkir.com/api/';
 
     /**
      * Store a newly created resource in storage.
@@ -37,9 +38,13 @@ class PenjualanLangsungController extends Controller
             'alamat_cust'=>'required',
             'kota_cust'=>'required',
             'prop_cust'=>'required',
+            'kecamatan_cust'=>'required',
             'catatan'=>'required',
             'kode_kirim'=>'required',
             'no_resi'=>'required',
+            'service'=>'required',
+            'lama_hari'=>'required',
+            'berat'=>'required',
             'nilai_ongkir'=>'required',
             'nilai_pesan'=>'required',
             'kode_barang' => 'required|array',
@@ -75,12 +80,12 @@ class PenjualanLangsungController extends Controller
             $get4 = DB::connection($this->sql)->select($sqlg);
             $get4 = json_decode(json_encode($get4),true);
             if(count($get4) > 0){
-                $upd = DB::connection($this->sql)->update("update ol_cust set nama = '$request->nama_cust',alamat='$request->alamat_cust',no_tel='$request->notel_cust',kota='$request->kota_cust',provinsi='$request->prop_cust' where kode_cust='$request->kode_cust' and kode_lokasi='$kode_lokasi'  ");
+                $upd = DB::connection($this->sql)->update("update ol_cust set nama = '$request->nama_cust',alamat='$request->alamat_cust',no_tel='$request->notel_cust',kota='$request->kota_cust',provinsi='$request->prop_cust',kecamatan='$request->kecamatan_cust' where kode_cust='$request->kode_cust' and kode_lokasi='$kode_lokasi'  ");
             }else{
-                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,kode_lokasi,kota,provinsi) values ('$request->kode_cust','$request->nama_cust','$request->alamat_cust','$request->notel_cust','$kode_lokasi','$request->kota_cust','$request->prop_cust') ");
+                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,kode_lokasi,kota,provinsi,kecamatan) values ('$request->kode_cust','$request->nama_cust','$request->alamat_cust','$request->notel_cust','$kode_lokasi','$request->kota_cust','$request->prop_cust','$request->kecamatan_cust') ");
             }
 
-            $ins =DB::connection($this->sql)->insert("insert into ol_pesan_m (no_pesan,kode_lokasi,tanggal,kode_cust,nama_cust,notel_cust,alamat_cust,kota_cust,prop_cust,catatan,status_pesan,kode_kirim,no_resi,nilai_ongkir,nilai_pesan,no_ref1) values ('$id','$kode_lokasi',getdate(),'$request->kode_cust','$request->nama_cust','$request->notel_cust','$request->alamat_cust','$request->kota_cust','$request->prop_cust','$request->catatan','input','$request->kode_kirim','$request->no_resi',$request->nilai_ongkir,$request->nilai_pesan,'-') ");		
+            $ins =DB::connection($this->sql)->insert("insert into ol_pesan_m (no_pesan,kode_lokasi,tanggal,kode_cust,nama_cust,notel_cust,alamat_cust,kota_cust,prop_cust,catatan,status_pesan,kode_kirim,no_resi,nilai_ongkir,nilai_pesan,no_ref1,service,berat,lama_hari,kecamatan) values ('$id','$kode_lokasi',getdate(),'$request->kode_cust','$request->nama_cust','$request->notel_cust','$request->alamat_cust','$request->kota_cust','$request->prop_cust','$request->catatan','input','$request->kode_kirim','$request->no_resi',$request->nilai_ongkir,$request->nilai_pesan,'-','$request->service',$request->berat,'$request->lama_hari','$request->kecamatan') ");		
 
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
@@ -254,7 +259,7 @@ class PenjualanLangsungController extends Controller
                 );
             }
             $client = new Client();
-            $response = $client->request('GET', 'https://api.rajaongkir.com/starter/province',[
+            $response = $client->request('GET', $this->url_api.'province',[
                 'headers' => [
                     'key' => $this->apiKey,
                     'Accept'     => 'application/json',
@@ -326,7 +331,86 @@ class PenjualanLangsungController extends Controller
                 $query = array_merge($query,$provinsi);
             }
             $client = new Client();
-            $response = $client->request('GET', 'https://api.rajaongkir.com/starter/city',[
+            $response = $client->request('GET', $this->url_api.'city',[
+                'headers' => [
+                    'key' => $this->apiKey,
+                    'Accept'     => 'application/json',
+                ],
+                'query' => $query
+            ]);
+
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                $data = json_decode($response_data,true);
+                $res = $data["rajaongkir"];
+                $status = $res["status"]["code"];
+                $msg = $res["status"]["description"];
+                $result = $res["results"];
+
+            }else{
+                $status = 500;
+            }   
+            
+            if($status == 200){ //mengecek apakah data kosong atau tidak 
+                if(count($result) > 0){
+                    $success['status'] = true;
+                    $success['data'] = $result;
+                    $success['message'] = $msg;
+                }else{
+                    $success['message'] = "Data Kosong!";
+                    $success['data'] = [];
+                    $success['status'] = false;
+                }
+            }else if($status == 400){
+                $success['message'] = $msg;
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            else{
+                $success['message'] = "Error";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getKecamatan(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $query = array();
+            if(isset($request->id)){
+                $kota = array(
+                    'id' => $request->id
+                );
+                $query = array_merge($query,$kota);
+            }
+            if(isset($request->province)){
+                $provinsi = array(
+                    'province' => $request->province
+                );
+                $query = array_merge($query,$provinsi);
+            }
+
+            if(isset($request->city)){
+                $provinsi = array(
+                    'city' => $request->city
+                );
+                $query = array_merge($query,$provinsi);
+            }
+            $client = new Client();
+            $response = $client->request('GET', $this->url_api.'subdistrict',[
                 'headers' => [
                     'key' => $this->apiKey,
                     'Accept'     => 'application/json',
@@ -386,12 +470,15 @@ class PenjualanLangsungController extends Controller
 
             $query = array(
                 'origin' => $request->origin,
+                'originType'=>'city',
                 'destination' => $request->destination,
+                'destinationType'=>'subdistrict',
                 'weight' => $request->weight,
                 'courier' => $request->courier,
             );
+
             $client = new Client();
-            $response = $client->request('POST', 'https://api.rajaongkir.com/starter/cost',[
+            $response = $client->request('POST', $this->url_api.'cost',[
                 'headers' => [
                     'key' => $this->apiKey,
                     'Accept'     => 'application/json',
