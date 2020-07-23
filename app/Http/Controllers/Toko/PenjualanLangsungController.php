@@ -66,7 +66,7 @@ class PenjualanLangsungController extends Controller
             $periode=date('Y').date('m');
             $per=date('y').date('m');
             $prefix=$kode_lokasi."-PJL".$per.".";
-            $sql="select right(isnull(max(no_bukti),'00000'),".strlen($str_format).")+1 as id from ol_pesan_m where no_bukti like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
+            $sql="select right(isnull(max(no_pesan),'00000'),".strlen($str_format).")+1 as id from ol_pesan_m where no_pesan like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
             $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
@@ -513,7 +513,7 @@ class PenjualanLangsungController extends Controller
                     $success['status'] = true;
                     $success['data'] = $arr_data;
                     $success['message'] = $msg;
-                    $success['query'] = $query;
+                    // $success['query'] = $query;
                 }else{
                     $success['message'] = "Data Kosong!";
                     $success['data'] = [];
