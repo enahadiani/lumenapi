@@ -403,4 +403,12 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/warga.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/apv-mobile'
+], function ($router) {
+    require __DIR__.'/../routes/apv_mobile.php';
+});
+
 return $app;

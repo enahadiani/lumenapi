@@ -97,6 +97,43 @@ class AdminController extends Controller
         }
     }
 
+    public function profileMobileApv()
+    {
+        if($data =  Auth::guard('admin')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+
+            $user = DB::connection('sqlsrv2')->select("select a.nik, c.nama,
+            case when foto != '-' then '".$url."/'+foto else '-' end as,b.logo,c.no_telp,c.kode_jab,c.email,e.nama as jabatan
+                  from hakakses a 
+                  inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
+                  left join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
+                  left join apv_pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi 
+                  left join apv_jabatan e on c.kode_jab=e.kode_jab and c.kode_lokasi=e.kode_lokasi 
+                  left join m_form e on a.path_view=e.kode_form 
+                  where a.nik='$nik'
+            ");
+            $user = json_decode(json_encode($user),true);
+            
+            if(count($user) > 0){ //mengecek apakah data kosong atau tidak
+                $periode = DB::connection('sqlsrv2')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                ");
+                $periode = json_decode(json_encode($periode),true);
+
+                $fs = DB::connection('sqlsrv2')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                ");
+                $fs = json_decode(json_encode($fs),true);
+
+                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs], 200);
+            }
+            else{
+                return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+            }
+        }else{
+            return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+        }
+    }
+
     public function updatePassword(Request $request){
         $this->validate($request,[
             'password_lama' => 'required',
