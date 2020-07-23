@@ -26,7 +26,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('tagihan','Sai\TagihanController@index');
     $router->post('tagihan','Sai\TagihanController@store');
     $router->get('tagihan-detail','Sai\TagihanController@show');
-    $router->put('tagihan','Sai\TagihanController@update');
+    $router->post('tagihan-ubah','Sai\TagihanController@update');
     $router->delete('tagihan','Sai\TagihanController@destroy');
 
     $router->get('faktur-pajak','Sai\FakturPajakController@index');
