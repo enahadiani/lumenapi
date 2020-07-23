@@ -258,6 +258,7 @@ class TagihanController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
             $no_bukti = $request->no_bukti;
 
             $sql="select no_bill,no_dokumen,tanggal,keterangan,nilai,nilai_ppn,kode_cust,no_kontrak,bank,cabang,no_rek,nama_rek from sai_bill_m where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti' ";
@@ -265,7 +266,7 @@ class TagihanController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select nu,item,harga,jumlah from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu ";					
+            $sql2="select nu,item,harga,jumlah from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti'  order by nu ";					
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
