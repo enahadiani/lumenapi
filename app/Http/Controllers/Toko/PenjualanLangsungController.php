@@ -75,7 +75,7 @@ class PenjualanLangsungController extends Controller
                 $id = "-";
             }
 
-            $sqlg="select a.kode_cust from cust a where a.kode_lokasi='$kode_lokasi' and a.kode_cust='$request->kode_cust'  ";
+            $sqlg="select a.kode_cust from ol_cust a where a.kode_lokasi='$kode_lokasi' and a.kode_cust='$request->kode_cust'  ";
 
             $get4 = DB::connection($this->sql)->select($sqlg);
             $get4 = json_decode(json_encode($get4),true);
