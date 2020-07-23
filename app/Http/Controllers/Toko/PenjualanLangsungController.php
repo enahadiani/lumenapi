@@ -85,6 +85,17 @@ class PenjualanLangsungController extends Controller
                 $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,kode_lokasi,kota,provinsi,kecamatan) values ('$request->kode_cust','$request->nama_cust','$request->alamat_cust','$request->notel_cust','$kode_lokasi','$request->kota_cust','$request->prop_cust','$request->kecamatan_cust') ");
             }
 
+            $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
+
+            $gd = DB::connection($this->sql)->select($sqlg);
+            $gd = json_decode(json_encode($gd),true);
+            if(count($gd) > 0){
+                $kodeGudang=$gd[0]['kode_gudang'];
+            }else{
+                $kodeGudang="-";
+            }
+
+
             $ins =DB::connection($this->sql)->insert("insert into ol_pesan_m (no_pesan,kode_lokasi,tanggal,kode_cust,nama_cust,notel_cust,alamat_cust,kota_cust,prop_cust,catatan,status_pesan,kode_kirim,no_resi,nilai_ongkir,nilai_pesan,no_ref1,service,berat,lama_hari,kecamatan_cust) values ('$id','$kode_lokasi',getdate(),'$request->kode_cust','$request->nama_cust','$request->notel_cust','$request->alamat_cust','$request->kota_cust','$request->prop_cust','$request->catatan','input','$request->kode_kirim','$request->no_resi',$request->nilai_ongkir,$request->nilai_pesan,'-','$request->service',$request->berat,'$request->lama_hari','$request->kecamatan_cust') ");		
 
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
