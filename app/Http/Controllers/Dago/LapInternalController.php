@@ -383,8 +383,8 @@ class LapInternalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','no_kwitansi');
-            $db_col_name = array('a.periode','a.no_kwitansi');
+            $col_array = array('periode','no_kwitansi','no_reg');
+            $db_col_name = array('a.periode','a.no_kwitansi','a.no_reg');
                         
             $filter = "where a.kode_lokasi='$kode_lokasi'";
             for($i = 0; $i<count($col_array); $i++){
