@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 class PenjualanLangsungController extends Controller
 {
@@ -17,6 +19,7 @@ class PenjualanLangsungController extends Controller
     public $successStatus = 200;
     public $sql = 'tokoaws';
     public $guard = 'toko';
+    public $apiKey = 'fcbeeb755353ac41ab2914806d956f26';
 
     /**
      * Store a newly created resource in storage.
@@ -223,6 +226,211 @@ class PenjualanLangsungController extends Controller
                 $success["jumlah"] = $jumlah_brg;
                 $success["diskon"] = 0;
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getProvinsi(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $query = array();
+            if(isset($request->id)){
+                $query = array(
+                    'id' => $request->id
+                );
+            }
+            $client = new Client();
+            $response = $client->request('GET', 'https://api.rajaongkir.com/starter/province',[
+                'headers' => [
+                    'key' => $this->apiKey,
+                    'Accept'     => 'application/json',
+                ],
+                'query' => $query
+            ]);
+
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                $data = json_decode($response_data,true);
+                $res = $data["rajaongkir"];
+                $status = $res["status"]["code"];
+                $msg = $res["status"]["description"];
+                $result = $res["results"];
+
+            }else{
+                $status = 500;
+            }   
+            
+            if($status == 200){ //mengecek apakah data kosong atau tidak 
+                if(count($result) > 0){
+                    $success['status'] = true;
+                    $success['data'] = $result;
+                    $success['message'] = $msg;
+                }else{
+                    $success['message'] = "Data Kosong!";
+                    $success['data'] = [];
+                    $success['status'] = false;
+                }
+            }else if($status == 400){
+                $success['message'] = $msg;
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            else{
+                $success['message'] = "Error";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getKota(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $query = array();
+            if(isset($request->id)){
+                $query = array(
+                    'id' => $request->id
+                );
+            }
+            $client = new Client();
+            $response = $client->request('GET', 'https://api.rajaongkir.com/starter/city',[
+                'headers' => [
+                    'key' => $this->apiKey,
+                    'Accept'     => 'application/json',
+                ],
+                'query' => $query
+            ]);
+
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                $data = json_decode($response_data,true);
+                $res = $data["rajaongkir"];
+                $status = $res["status"]["code"];
+                $msg = $res["status"]["description"];
+                $result = $res["results"];
+
+            }else{
+                $status = 500;
+            }   
+            
+            if($status == 200){ //mengecek apakah data kosong atau tidak 
+                if(count($result) > 0){
+                    $success['status'] = true;
+                    $success['data'] = $result;
+                    $success['message'] = $msg;
+                }else{
+                    $success['message'] = "Data Kosong!";
+                    $success['data'] = [];
+                    $success['status'] = false;
+                }
+            }else if($status == 400){
+                $success['message'] = $msg;
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            else{
+                $success['message'] = "Error";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getService(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $query = array(
+                'origin' => $request->origin,
+                'destination' => $request->destination,
+                'weight' => $request->weight,
+                'courier' => $request->courier,
+            );
+            $client = new Client();
+            $response = $client->request('POST', 'https://api.rajaongkir.com/starter/cost',[
+                'headers' => [
+                    'key' => $this->apiKey,
+                    'Accept'     => 'application/json',
+                ],
+                'form_params' => $query
+            ]);
+
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                $data = json_decode($response_data,true);
+                $res = $data["rajaongkir"];
+                $status = $res["status"]["code"];
+                $msg = $res["status"]["description"];
+                $result = $res["results"][0]["costs"];
+
+            }else{
+                $status = 500;
+            }   
+            
+            if($status == 200){ //mengecek apakah data kosong atau tidak 
+                if(count($result) > 0){
+                    for($i=0;$i<count($result);$i++){
+                        $cost = $result[$i]['cost'];
+                        $arr_data[$i] = array(
+                            'service' => $result[$i]['service'],
+                            'description' => $result[$i]['description'],
+                            'cost' => $cost[0]['value'],
+                            'etd' => $cost[0]['etd'],
+                            'note' => $cost[0]['note'],
+                        );
+                    }
+                    $success['status'] = true;
+                    $success['data'] = $arr_data;
+                    $success['message'] = $msg;
+                }else{
+                    $success['message'] = "Data Kosong!";
+                    $success['data'] = [];
+                    $success['status'] = false;
+                }
+            }else if($status == 400){
+                $success['message'] = $msg;
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            else{
+                $success['message'] = "Error";
                 $success['data'] = [];
                 $success['status'] = false;
             }
