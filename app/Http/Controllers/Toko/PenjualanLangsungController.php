@@ -513,6 +513,7 @@ class PenjualanLangsungController extends Controller
                     $success['status'] = true;
                     $success['data'] = $arr_data;
                     $success['message'] = $msg;
+                    $success['query'] = $query;
                 }else{
                     $success['message'] = "Data Kosong!";
                     $success['data'] = [];
