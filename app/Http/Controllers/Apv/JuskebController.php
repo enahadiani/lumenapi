@@ -618,7 +618,7 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select b.no_bukti,b.keterangan,b.tanggal,c.nama,-1 as id,case b.status when '2' then 'APPROVE' when 'F' then 'RETURN' else '-' end as status
+            $sql="select b.no_bukti,b.keterangan,b.tanggal,c.nama,-1 as id,case b.status when 'V' then 'APPROVE' when 'F' then 'RETURN' else '-' end as status
             from apv_juskeb_m a
             inner join apv_ver_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
 			inner join apv_karyawan d on b.nik_user=d.nik and b.kode_lokasi=d.kode_lokasi
