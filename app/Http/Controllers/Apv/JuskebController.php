@@ -346,7 +346,14 @@ class JuskebController extends Controller
             inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
-            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
+            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' 
+            union all
+            select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama 
+            from apv_juspo_m a
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            where a.no_juskeb='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
             $res4 = DB::connection('sqlsrv2')->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             
@@ -693,14 +700,12 @@ class JuskebController extends Controller
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-
 			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status
 			from apv_juskeb_m a
             inner join apv_karyawan c on a.nik_ver=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
 			left join apv_ver_m d on a.no_bukti=d.no_juskeb and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
-
 			union all
 			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status
             from apv_flow a
@@ -711,7 +716,22 @@ class JuskebController extends Controller
                         GROUP BY no_bukti,kode_lokasi
                         ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
 			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+			union all
+            select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status
+            from apv_flow a
+			inner join apv_juspo_m f on a.no_bukti=f.no_bukti and a.kode_lokasi=f.kode_lokasi
+            inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+            inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+			left join (SELECT no_bukti,kode_lokasi,MAX(id) as maxid
+                        FROM apv_pesan
+                        GROUP BY no_bukti,kode_lokasi
+                        ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
+            where a.kode_lokasi='$kode_lokasi' and f.no_juskeb='$no_bukti'
+			order by no_app,kode_jab
+			
+            ";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
