@@ -103,13 +103,15 @@ class AdminController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
+            
+            $url = url('api/apv/storage');
             $user = DB::connection('sqlsrv2')->select("select a.nik, c.nama,
-            case when foto != '-' then '".$url."/'+foto else '-' end as,b.logo,c.no_telp,c.kode_jab,c.email,e.nama as jabatan
+            case when foto != '-' then '".$url."/'+foto else '-' end as foto,b.logo,c.no_telp,c.kode_jab,c.email,f.nama as jabatan
                   from hakakses a 
                   inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                   left join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
                   left join apv_pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi 
-                  left join apv_jabatan e on c.kode_jab=e.kode_jab and c.kode_lokasi=e.kode_lokasi 
+                  left join apv_jab f on c.kode_jab=f.kode_jab and c.kode_lokasi=f.kode_lokasi 
                   left join m_form e on a.path_view=e.kode_form 
                   where a.nik='$nik'
             ");
