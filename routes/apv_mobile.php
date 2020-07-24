@@ -100,7 +100,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
         }
     });
 
-    $router->get('app', function (Request $request) {
+    $router->post('app', function (Request $request) {
         if($data =  Auth::guard('admin')->user()){
             $nik= $data->nik;
             $kode_menu = $data->kode_klp_menu;
