@@ -111,9 +111,10 @@ class JuspoApprovalController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
+            $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota,isnull(c.nama,'-') as nama_kota
             from apv_flow a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            left join apv_kota c on b.kode_kota=c.kode_kota and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user'
             ");
             $res = json_decode(json_encode($res),true);
@@ -428,7 +429,7 @@ class JuspoApprovalController extends Controller
             $res3 = DB::connection('sqlsrv2')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
-            $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tgl  
+            $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto   
             from apv_juspo_m a
             inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
