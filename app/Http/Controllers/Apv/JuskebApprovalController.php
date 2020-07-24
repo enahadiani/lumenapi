@@ -64,7 +64,7 @@ class JuskebApprovalController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.kegiatan,a.tanggal,isnull(c.kode_kota,'-') as kode_kota,isnull(d.nama,'-') as nama_kota,c.nilai
+            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.kegiatan,a.tanggal,isnull(c.kode_kota,'-') as kode_kota,isnull(d.nama,'-') as nama_kota,c.nilai,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status
             from apv_pesan a
 			inner join apv_juskeb_m c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi
 			left join apv_kota d on c.kode_kota=d.kode_kota and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp
