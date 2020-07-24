@@ -55,10 +55,10 @@ class CustomerController extends Controller
                 }else{
                     $filter .= " and kode_cust='$request->kode_cust' ";
                 }   
-                $sql="select kode_cust,nama,alamat,pic,case when gambar != '-' then '".$url."/'+gambar else '-' end as file_gambar,email,no_telp from sai_cust where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql="select kode_cust,nama,alamat,pic,case when gambar != '-' then '".$url."/'+gambar else '-' end as file_gambar,email,no_telp,bank,cabang,no_rek,nama_rek from sai_cust where kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 
-                $sql = "select kode_cust,nama,alamat,pic,email,no_telp from sai_cust where kode_lokasi='".$kode_lokasi."' ";
+                $sql = "select kode_cust,nama,alamat,pic,email,no_telp,bank,cabang,no_rek,nama_rek from sai_cust where kode_lokasi='".$kode_lokasi."' ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -108,7 +108,11 @@ class CustomerController extends Controller
             'pic' => 'required',
             'email' => 'required',
             'no_telp' => 'required',
-            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048',
+            'bank' => 'required',
+            'cabang' => 'required',
+            'no_rek' => 'required',
+            'nama_rek' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -137,7 +141,7 @@ class CustomerController extends Controller
                     $filetype = "-";
                 }
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."')");
+                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek')");
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -186,7 +190,11 @@ class CustomerController extends Controller
             'pic' => 'required',
             'email' => 'required',
             'no_telp' => 'required',
-            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048',
+            'bank' => 'required',
+            'cabang' => 'required',
+            'no_rek' => 'required',
+            'nama_rek' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -230,7 +238,7 @@ class CustomerController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."')");
+            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek')");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
