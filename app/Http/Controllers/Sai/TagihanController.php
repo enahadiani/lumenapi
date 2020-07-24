@@ -141,6 +141,7 @@ class TagihanController extends Controller
             'item'=> 'required|array',
             'harga'=> 'required|array',
             'jumlah'=> 'required|array',
+            'nama_file'=>'array',
             'file.*'=>'file|max:3072'
         ]);
 
@@ -155,27 +156,8 @@ class TagihanController extends Controller
             if($this->isUnik($request->no_dokumen,$kode_lokasi)){
 
                 $arr_foto = array();
+                $arr_nama = array();
                 $i=0;
-                // $cek = $request->file;
-                // if(!isEmpty($cek)){
-                //     foreach($request->file('file') as $file)
-                //     {   
-                //         if($file->getClientOriginalName()){
-                //             $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                //             $foto = $nama_foto;
-                //             if(Storage::disk('s3')->exists('apv/'.$foto)){
-                //                 Storage::disk('s3')->delete('apv/'.$foto);
-                //             }
-                //             Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
-                //             $arr_foto[] = $foto;
-                //         }else if($request->file != "") {
-                //             $arr_foto[] = str_replace(' ', '_', $request->file);
-                //         }else{
-                //             $arr_foto[] = "-";
-                //         }          
-                //         $i++;
-                //     }
-                // }
                 if($request->hasfile('file'))
                 {
                     foreach($request->file('file') as $file)
@@ -187,6 +169,7 @@ class TagihanController extends Controller
                         }
                         Storage::disk('s3')->put('sai/'.$foto,file_get_contents($file));
                         $arr_foto[] = $foto;
+                        $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
                         $i++;
                     }
                 }
@@ -210,10 +193,10 @@ class TagihanController extends Controller
                     }
                 }
     
-                if(count($arr_foto) > 0){
+                if(count($arr_nama) > 0){
                     $nu=1;
-                    for($i=0; $i<count($arr_foto);$i++){
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK02','$kode_lokasi') ");
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,nama) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK02','$kode_lokasi','".$arr_nama[$i]."') ");
                         $nu++; 
                     }
                 }
@@ -270,7 +253,7 @@ class TagihanController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select no_bukti,no_gambar,nu,kode_jenis from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu";
+            $sql3="select no_bukti,no_gambar,nu,kode_jenis,nama from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu";
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -333,6 +316,7 @@ class TagihanController extends Controller
             'item'=> 'required|array',
             'harga'=> 'required|array',
             'jumlah'=> 'required|array',
+            'nama_file'=>'array',
             'file.*'=>'file|max:3072'
         ]);
 
@@ -345,7 +329,9 @@ class TagihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
                 $no_bukti = $request->no_bukti;
+
                 $arr_foto = array();
+                $arr_nama = array();
                 $i=0;
                 if($request->hasfile('file'))
                 {
@@ -358,6 +344,7 @@ class TagihanController extends Controller
                         }
                         Storage::disk('s3')->put('sai/'.$foto,file_get_contents($file));
                         $arr_foto[] = $foto;
+                        $arr_nama[] = $request->input('nama_file')[$i];
                         $i++;
                     }
 
@@ -396,10 +383,10 @@ class TagihanController extends Controller
                     }
                 }
     
-                if(count($arr_foto) > 0){
+                if(count($arr_nama) > 0){
                     $nu=1;
-                    for($i=0; $i<count($arr_foto);$i++){
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK02','$kode_lokasi') ");
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,nama) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK02','$kode_lokasi','".$arr_nama[$i]."') ");
                         $nu++; 
                     }
                 }

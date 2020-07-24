@@ -91,7 +91,9 @@ class FakturPajakController extends Controller
             'tanggal' => 'required',
             'no_bill' => 'required',
             'periode' => 'required',
-            'keterangan' => 'required'
+            'keterangan' => 'required',
+            'nama_file'=>'array',
+            'file.*'=>'file|max:3072'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -102,7 +104,34 @@ class FakturPajakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
+            if($request->hasfile('file'))
+            {
+                foreach($request->file('file') as $file)
+                {                
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('sai/'.$foto)){
+                        Storage::disk('s3')->delete('sai/'.$foto);
+                    }
+                    Storage::disk('s3')->put('sai/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                    $i++;
+                }
+            }
+
             $ins = DB::connection($this->sql)->insert("insert into sai_bill_fp (no_fp,kode_lokasi,tanggal,no_bill,periode,keterangan,nik_user,tgl_input) values ('$request->no_fp','$kode_lokasi','$request->tanggal','$request->no_bill','$request->periode','$request->keterangan','$nik_user',getdate()) ");
+
+            if(count($arr_nama) > 0){
+                $nu=1;
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,nama) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK03','$kode_lokasi','".$arr_nama[$i]."') ");
+                    $nu++; 
+                }
+            }
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -144,16 +173,22 @@ class FakturPajakController extends Controller
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $sql3="select no_bukti,no_gambar,nu,kode_jenis,nama from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_fp'  order by nu";
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['data_dokumen'] = $res3;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
+                $success['data_dokumen'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus); 
             }
@@ -189,7 +224,9 @@ class FakturPajakController extends Controller
             'tanggal' => 'required',
             'no_bill' => 'required',
             'periode' => 'required',
-            'keterangan' => 'required'
+            'keterangan' => 'required',
+            'nama_file'=>'array',
+            'file.*'=>'file|max:3072'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -199,11 +236,50 @@ class FakturPajakController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            $no_bukti = $request->no_fp;
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
+            if($request->hasfile('file'))
+            {
+                foreach($request->file('file') as $file)
+                {                
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('sai/'.$foto)){
+                        Storage::disk('s3')->delete('sai/'.$foto);
+                    }
+                    Storage::disk('s3')->put('sai/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = $request->input('nama_file')[$i];
+                    $i++;
+                }
+                
+                $sql3="select no_bukti,no_gambar,nu from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu";
+                $res3 = DB::connection($this->sql)->select($sql3);
+                $res3 = json_decode(json_encode($res3),true);
+                
+                if(count($res3) > 0){
+                    for($i=0;$i<count($res3);$i++){
+                        Storage::disk('s3')->delete('sai/'.$res3[$i]['no_gambar']);
+                    }
+                }
+                
+                $del3 = DB::connection($this->sql)->table('sai_bill_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            }
+
             $del = DB::connection($this->sql)->table('sai_bill_fp')->where('kode_lokasi', $kode_lokasi)->where('no_fp', $request->no_fp)->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into sai_bill_fp (no_fp,kode_lokasi,tanggal,no_bill,periode,keterangan,nik_user,tgl_input) values ('$request->no_fp','$kode_lokasi','$request->tanggal','$request->no_bill','$request->periode','$request->keterangan','$nik_user',getdate()) ");
             
+            if(count($arr_nama) > 0){
+                $nu=1;
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,nama) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK03','$kode_lokasi','".$arr_nama[$i]."') ");
+                    $nu++; 
+                }
+            }
+
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Faktur Pajak berhasil diubah.";
@@ -236,7 +312,22 @@ class FakturPajakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('sai_bill_fp')->where('kode_lokasi', $kode_lokasi)->where('no_fp', $request->no_fp)->delete();
+            $no_bukti= $request->no_fp;
+            $del = DB::connection($this->sql)->table('sai_bill_fp')->where('kode_lokasi', $kode_lokasi)->where('no_fp', $no_bukti)->delete();
+
+
+            $sql3="select no_bukti,no_gambar from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu";
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+
+            if(count($res3) > 0){
+                for($i=0;$i<count($res3);$i++){
+
+                    Storage::disk('s3')->delete('sai/'.$res3[$i]['no_gambar']);
+                }
+            }
+
+            $del3 = DB::connection($this->sql)->table('sai_bill_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
