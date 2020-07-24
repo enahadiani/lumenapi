@@ -114,7 +114,7 @@ class JuspoApprovalController extends Controller
             $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota,isnull(c.nama,'-') as nama_kota
             from apv_flow a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            left join apv_kota c on b.kode_kota=c.kode_kota and b.kode_lokasi=c.kode_lokasi
+            left join apv_kota c on b.kode_kota=c.kode_kota and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
             where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user'
             ");
             $res = json_decode(json_encode($res),true);
