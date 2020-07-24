@@ -694,20 +694,20 @@ class JuskebController extends Controller
             // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' 
             // order by a.no_urut";
             
-            $sql3 = "select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status
+            $sql3 = "select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-3 as nu
 			from apv_juskeb_m a
             inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status
+			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,-2 as nu
 			from apv_juskeb_m a
             inner join apv_karyawan c on a.nik_ver=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
 			left join apv_ver_m d on a.no_bukti=d.no_juskeb and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-1 as nu
             from apv_flow a
             inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
@@ -718,7 +718,7 @@ class JuskebController extends Controller
 			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
 			union all
-            select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status
+            select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,a.no_urut as nu
             from apv_flow a
 			inner join apv_juspo_m f on a.no_bukti=f.no_bukti and a.kode_lokasi=f.kode_lokasi
             inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
@@ -729,7 +729,7 @@ class JuskebController extends Controller
                         ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
 			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
             where a.kode_lokasi='$kode_lokasi' and f.no_juskeb='$no_bukti'
-			order by no_app,kode_jab
+			order by nu
 			
             ";
             $res3 = DB::connection('sqlsrv2')->select($sql3);
