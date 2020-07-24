@@ -344,7 +344,7 @@ class TagihanController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+                $no_bukti = $request->no_bukti;
                 $arr_foto = array();
                 $i=0;
                 if($request->hasfile('file'))
