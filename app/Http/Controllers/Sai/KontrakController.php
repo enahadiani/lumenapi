@@ -166,7 +166,7 @@ class KontrakController extends Controller
                 if(count($request->deskripsi_modul) > 0){
                     $nu=1;
                     for($i=0; $i<count($request->deskripsi_modul);$i++){
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->keterangan_modul[$i]."',$request->nilai_modul[$i]) ");
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',$request->nilai_modul[$i]) ");
                         $nu++; 
                     }
                 }
