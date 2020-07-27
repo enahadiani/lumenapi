@@ -495,6 +495,45 @@ class TagihanMaintainController extends Controller
         }	
     }
 
+    public function loadData(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode;
+
+            $sql="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan,a.nilai
+            from sai_kontrak a inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
+            where a.kode_lokasi='$kode_lokasi' and a.periode_tagih='$periode'";
+            
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getPreview($no_bukti)
     {
         try {

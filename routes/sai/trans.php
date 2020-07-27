@@ -41,11 +41,12 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('pembayaran-ubah','Sai\PembayaranController@update');
     $router->delete('pembayaran','Sai\PembayaranController@destroy');
 
-    $router->get('tagihan-maintain','Sai\TagihanController@index');
-    $router->post('tagihan-maintain','Sai\TagihanController@store');
-    $router->get('tagihan-maintain-detail','Sai\TagihanController@show');
-    $router->post('tagihan-maintain-ubah','Sai\TagihanController@update');
-    $router->delete('tagihan-maintain','Sai\TagihanController@destroy');
+    $router->get('tagihan-maintain','Sai\TagihanMaintainController@index');
+    $router->get('tagihan-maintain-load','Sai\TagihanMaintainController@loadData');
+    $router->post('tagihan-maintain','Sai\TagihanMaintainController@store');
+    $router->get('tagihan-maintain-detail','Sai\TagihanMaintainController@show');
+    $router->post('tagihan-maintain-ubah','Sai\TagihanMaintainController@update');
+    $router->delete('tagihan-maintain','Sai\TagihanMaintainController@destroy');
 });
 
 
