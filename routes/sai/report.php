@@ -17,7 +17,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
-    
+    $router->get('filter-periode','Sai\FilterController@getFilterPeriode');
+    $router->get('filter-cust','Sai\FilterController@getFilterCust');
+    $router->get('filter-kontrak','Sai\FilterController@getFilterKontrak');
+    $router->get('filter-bukti','Sai\FilterController@getFilterNoBukti');
+
     $router->get('lap-tagihan','Sai\LaporanController@getReportTagihan');    
 
 });
