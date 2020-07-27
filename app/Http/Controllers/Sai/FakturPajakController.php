@@ -103,7 +103,8 @@ class FakturPajakController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            
+            $no_bukti = $request->no_fp;
             $arr_foto = array();
             $arr_nama = array();
             $i=0;
