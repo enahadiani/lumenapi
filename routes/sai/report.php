@@ -16,9 +16,9 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 
-$router->group(['middleware' => 'auth:toko'], function () use ($router) {
+$router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
-    
+    $router->get('lap-tagihan','Sai\LaporanController@getReportTagihan');    
 
 });
 
