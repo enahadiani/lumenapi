@@ -280,6 +280,7 @@ class KontrakController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
+            'no_kontrak' => 'required',
             'no_dokumen' => 'required',
             'tgl_awal' => 'required',
             'tgl_akhir' => 'required',
