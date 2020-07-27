@@ -66,7 +66,7 @@ class LaporanController extends Controller
                 $i++;
             }
 
-            $sql2="select a.nu,a.item,a.harga,a.jumlah,a.nilai,a.nilai_ppn 
+            $sql2="select a.no_bill,a.nu,a.item,a.harga,a.jumlah,a.nilai,a.nilai_ppn 
             from sai_bill_d a
             where a.no_bill in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_cust in ($kode_cust) and a.no_kontrak in ($no_kontrak) ";
             $res2 = DB::connection($this->sql)->select($sql2);
