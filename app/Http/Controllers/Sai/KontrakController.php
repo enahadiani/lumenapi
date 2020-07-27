@@ -121,6 +121,8 @@ class KontrakController extends Controller
             'kode_cust' => 'required',
             'keterangan' => 'required',
             'nilai'=>'required',
+            'deskripsi_modul'=>'required|array',
+            'nilai_modul'=>'required|array',
             'nama_file'=>'array',
             'file.*'=>'file|max:3072'
         ]);
@@ -158,12 +160,21 @@ class KontrakController extends Controller
                 $per = substr($periode,2,4);
                 $no_bukti = $this->generateKode("sai_kontrak", "no_kontrak", $kode_lokasi."-KTR".$per.".", "0001");
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi') ");
+                $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
+                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi','$periode_tagih','$request->kode_cust') ");
+
+                if(count($request->deskripsi_modul) > 0){
+                    $nu=1;
+                    for($i=0; $i<count($request->deskripsi_modul);$i++){
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->keterangan_modul[$i]."',$request->nilai_modul[$i]) ");
+                        $nu++; 
+                    }
+                }
 
                 if(count($arr_nama) > 0){
                     $nu=1;
                     for($i=0; $i<count($arr_nama);$i++){
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,nama) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK01','$kode_lokasi','".$arr_nama[$i]."') ");
+                        $ins4[$i] = DB::connection($this->sql)->insert("insert into sai_bill_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,nama) values ('$no_bukti','".$arr_foto[$i]."',$nu,'DK01','$kode_lokasi','".$arr_nama[$i]."') ");
                         $nu++; 
                     }
                 }
@@ -312,11 +323,21 @@ class KontrakController extends Controller
             }
             
             $del = DB::connection($this->sql)->table('sai_kontrak')->where('kode_lokasi', $kode_lokasi)->where('no_kontrak', $request->no_kontrak)->delete();
+            $del2 = DB::connection($this->sql)->table('sai_kontrak_d')->where('kode_lokasi', $kode_lokasi)->where('no_kontrak', $request->no_kontrak)->delete();
 
             $periode = date('Ym');
             $per = substr($periode,2,4);
 
-            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi') ");
+            $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
+            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi','$periode_tagih','$request->kode_cust') ");
+            
+            if(count($request->deskripsi_modul) > 0){
+                $nu=1;
+                for($i=0; $i<count($request->deskripsi_modul);$i++){
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->keterangan_modul[$i]."',$request->nilai_modul[$i]) ");
+                    $nu++; 
+                }
+            }
 
             if(count($arr_nama) > 0){
                 $nu=1;
@@ -360,6 +381,9 @@ class KontrakController extends Controller
             }
             $no_bukti= $request->no_kontrak;
             $del = DB::connection($this->sql)->table('sai_kontrak')->where('kode_lokasi', $kode_lokasi)->where('no_kontrak', $no_bukti)->delete();
+
+            
+            $del2 = DB::connection($this->sql)->table('sai_kontrak_d')->where('kode_lokasi', $kode_lokasi)->where('no_kontrak', $request->no_kontrak)->delete();
 
             $sql3="select no_bukti,no_gambar from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu";
             $res3 = DB::connection($this->sql)->select($sql3);
