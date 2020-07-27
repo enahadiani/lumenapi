@@ -249,7 +249,7 @@ class TagihanController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek,b.no_kontrak,b.kode_cust 
+            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek,b.no_kontrak,b.kode_cust,a.nik_app 
             from sai_bill_m a
             inner join sai_bill_d b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and b.nu=1 where a.kode_lokasi='".$kode_lokasi."' and a.no_bill='$no_bukti' ";
             
