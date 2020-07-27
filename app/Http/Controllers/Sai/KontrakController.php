@@ -160,13 +160,15 @@ class KontrakController extends Controller
                 $per = substr($periode,2,4);
                 $no_bukti = $this->generateKode("sai_kontrak", "no_kontrak", $kode_lokasi."-KTR".$per.".", "0001");
 
+                $tgl_awal = $request->tgl_awal.date(" H:i:s");
+                $tgl_akhir = $request->tgl_akhir.date(" H:i:s");
                 $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
-                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust) values ('$no_bukti','$request->no_dokumen','$request->tgl_awal','$request->tgl_akhir','$request->keterangan',$request->nilai,'$kode_lokasi','$periode_tagih','$request->kode_cust') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust') ");
 
                 if(count($request->deskripsi_modul) > 0){
                     $nu=1;
                     for($i=0; $i<count($request->deskripsi_modul);$i++){
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',$request->nilai_modul[$i]) ");
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',".$request->nilai_modul[0].") ");
                         $nu++; 
                     }
                 }
