@@ -467,22 +467,28 @@ class TagihanController extends Controller
     {
         try {
             
-            
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="";
-            
+            $sql="select a.no_dokumen,a.no_bill,b.kode_cust,c.nama as nama_cust,a.nik_app,d.nama,a.nilai,a.nilai_ppn,a.nilai+a.nilai_ppn as total,b.no_kontrak,e.tgl_awal as tgl_kontrak,e.keterangan as keterangan_kontrak,c.alamat as alamat_cust
+            from sai_bill_m a
+            inner join sai_bill_d b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and b.nu='1'
+            left join sai_cust c on b.kode_cust=c.kode_cust and b.kode_lokasi=c.kode_lokasi
+            left join sai_karyawan d on a.nik_app=d.nik and a.kode_lokasi=d.kode_lokasi
+            left join sai_kontrak e on b.no_kontrak=e.no_kontrak and a.kode_lokasi=e.kode_lokasi
+            where a.no_bill='$no_bukti' ";
+
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="";					
+            $sql2=" select a.nu,a.item,a.harga,a.jumlah,a.nilai,a.nilai_ppn from sai_bill_d a
+            where a.no_bill='$no_bukti'";					
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
-            $sql3 = " ";
+            $sql3 = "select a.bank,a.cabang,a.no_rek,a.nama_rek from sai_bank a where a.kode_lokasi='$kode_lokasi' ";
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
@@ -490,7 +496,7 @@ class TagihanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
-                $success['data_dokumen'] = $res3;
+                $success['data_bank'] = $res3;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
