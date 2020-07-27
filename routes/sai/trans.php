@@ -40,6 +40,12 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('pembayaran-detail','Sai\PembayaranController@show');
     $router->post('pembayaran-ubah','Sai\PembayaranController@update');
     $router->delete('pembayaran','Sai\PembayaranController@destroy');
+
+    $router->get('tagihan-maintain','Sai\TagihanController@index');
+    $router->post('tagihan-maintain','Sai\TagihanController@store');
+    $router->get('tagihan-maintain-detail','Sai\TagihanController@show');
+    $router->post('tagihan-maintain-ubah','Sai\TagihanController@update');
+    $router->delete('tagihan-maintain','Sai\TagihanController@destroy');
 });
 
 

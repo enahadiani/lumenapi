@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Mail;
 
-class TagihanController extends Controller
+class TagihanMaintainController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,6 +34,21 @@ class TagihanController extends Controller
         }else{
             return true;
         }
+    }
+
+    public function nextNPeriode($periode, $n) 
+    {
+        $bln = intval(substr($periode,4,2));
+        $thn = intval(substr($periode,0,4));
+        for ($i = 1; $i <= $n;$i++){
+            if ($bln < 12) $bln++;
+            else {
+                $bln = 1;
+                $thn++;
+            }
+        }
+        if ($bln < 10) $bln = "0".$bln;
+        return $thn."".$bln;
     }
 
     public function isUnik2($isi,$kode_lokasi,$no_bukti){
@@ -132,13 +147,13 @@ class TagihanController extends Controller
             'keterangan' => 'required',
             'total_nilai' => 'required',
             'total_nilai_ppn' => 'required',
-            'kode_cust' => 'required',
-            'no_kontrak' => 'required',
             'nik_app' => 'required',
             'bank' => 'required',
             'cabang'=> 'required',
             'no_rek'=> 'required',
             'nama_rek'=> 'required',
+            'kode_cust' => 'required|array',
+            'no_kontrak' => 'required|array',
             'item'=> 'required|array',
             'harga'=> 'required|array',
             'jumlah'=> 'required|array',
@@ -190,13 +205,17 @@ class TagihanController extends Controller
                 $nilai = $request->input('nilai');
                 $nilai_ppn = $request->input('nilai_ppn');
     
-                if(count($item) > 0){
+                if(count($request->kode_cust) > 0){
                     $nu=1;
-                    for($i=0; $i<count($item);$i++){
-                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','$request->no_kontrak','$request->kode_cust') ");
+                    for($i=0; $i<count($request->kode_cust);$i++){
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','".$request->no_kontrak[$i]."','".$request->kode_cust[$i]."') ");
                         $nu++;
                     }
                 }
+
+                $perNext = $this->nextNPeriode($periode,1); 
+                $upd1 = DB::connection($this->sql)->insert("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
     
                 if(count($arr_nama) > 0){
                     $nu=1;
@@ -249,14 +268,14 @@ class TagihanController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek,b.no_kontrak,b.kode_cust 
+            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek
             from sai_bill_m a
-            inner join sai_bill_d b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and b.nu=1 where a.kode_lokasi='".$kode_lokasi."' and a.no_bill='$no_bukti' ";
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_bill='$no_bukti' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select nu,item,harga,jumlah,nilai,nilai_ppn from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti'  order by nu ";					
+            $sql2="select nu,item,harga,jumlah,nilai,nilai_ppn,kode_kontrak,kode_cust from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti'  order by nu ";					
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -370,14 +389,19 @@ class TagihanController extends Controller
                     $del3 = DB::connection($this->sql)->table('sai_bill_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 }
 
-                $del = DB::connection($this->sql)->table('sai_bill_m')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
-                $del2 = DB::connection($this->sql)->table('sai_bill_d')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
-                $del3 = DB::connection($this->sql)->table('sai_bill_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
-                
                 $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
                 $per = substr($periode,2,4);
 
                 $no_bukti = $request->no_bukti;
+
+                $del = DB::connection($this->sql)->table('sai_bill_m')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
+                $del2 = DB::connection($this->sql)->table('sai_bill_d')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
+                $del3 = DB::connection($this->sql)->table('sai_bill_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
+                $perBefore = $periode;
+
+                $upd = DB::connection($this->sql)->update("update a set a.per_tagih='".$perBefore."'
+                      from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                      where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
 
                 $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->nilai,$request->nilai_ppn,'$nik_user','$request->nik_app','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL') ");
     
@@ -386,15 +410,19 @@ class TagihanController extends Controller
                 $jumlah = $request->input('jumlah');
                 $nilai = $request->input('nilai');
                 $nilai_ppn = $request->input('nilai_ppn');
-    
-                if(count($item) > 0){
+
+                if(count($request->kode_cust) > 0){
                     $nu=1;
-                    for($i=0; $i<count($item);$i++){
-                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','$request->no_kontrak','$request->kode_cust') ");
+                    for($i=0; $i<count($request->kode_cust);$i++){
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','".$request->no_kontrak[$i]."','".$request->kode_cust[$i]."') ");
                         $nu++;
                     }
                 }
-    
+
+                $perNext = $this->nextNPeriode($periode,1); 
+                $upd1 = DB::connection($this->sql)->update("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
+
                 if(count($arr_nama) > 0){
                     $nu=1;
                     for($i=0; $i<count($arr_nama);$i++){
