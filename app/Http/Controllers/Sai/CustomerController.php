@@ -53,25 +53,38 @@ class CustomerController extends Controller
                 if($request->kode_cust == "all"){
                     $filter .= "";
                 }else{
-                    $filter .= " and kode_cust='$request->kode_cust' ";
+                    $filter .= " and a.kode_cust='$request->kode_cust' ";
                 }   
-                $sql="select kode_cust,nama,alamat,pic,case when gambar != '-' then '".$url."/'+gambar else '-' end as file_gambar,email,no_telp,bank,cabang,no_rek,nama_rek from sai_cust where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql="select a.kode_cust,a.nama,a.alamat,a.pic,case when a.gambar != '-' then '".$url."/'+gambar else '-' end as file_gambar,a.email,a.no_telp,a.bank,a.cabang,a.no_rek,a.nama_rek,a.tgl_tagih from sai_cust a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+
+                $sql2="select a.kode_lampiran,b.nama from sai_cust_d a 
+                inner join sai_lampiran b on a.kode_lampiran=b.kode_lampiran and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' $filter 
+                order by a.nu ";
+                $res2 = DB::connection($this->sql)->select($sql2);
+                $res2 = json_decode(json_encode($res2),true);
             }else{
                 
-                $sql = "select kode_cust,nama,alamat,pic,email,no_telp,bank,cabang,no_rek,nama_rek from sai_cust where kode_lokasi='".$kode_lokasi."' ";
+                $sql = "select kode_cust,nama,alamat,pic,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih from sai_cust where kode_lokasi='".$kode_lokasi."' ";
             }
-
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                if(isset($res2)){
+                    $success['data_lampiran'] = $res2;
+                }
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                if(isset($res2)){
+                    $success['data_lampiran'] = [];
+                }
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -112,7 +125,9 @@ class CustomerController extends Controller
             'bank' => 'required',
             'cabang' => 'required',
             'no_rek' => 'required',
-            'nama_rek' => 'required'
+            'nama_rek' => 'required',
+            'tgl_tagih' => 'required',
+            'kode_lampiran' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -141,7 +156,15 @@ class CustomerController extends Controller
                     $filetype = "-";
                 }
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek')");
+                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->tgl_tagih')");
+
+                if(count($request->kode_lampiran) > 0){
+                    $nu=1;
+                    for($i=0; $i<count($request->kode_lampiran);$i++){
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_cust_d (kode_cust,kode_lokasi,kode_lampiran,nu) values ('$request->kode_cust','$kode_lokasi','".$request->kode_lampiran[$i]."',$nu) ");
+                        $nu++;
+                    }
+                }
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -194,7 +217,8 @@ class CustomerController extends Controller
             'bank' => 'required',
             'cabang' => 'required',
             'no_rek' => 'required',
-            'nama_rek' => 'required'
+            'nama_rek' => 'required',
+            'kode_lampiran' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -238,7 +262,20 @@ class CustomerController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek')");
+            $del2 = DB::connection($this->sql)->table('sai_cust_d')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_cust', $request->kode_cust)
+            ->delete();
+
+            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->tgl_tagih')");
+
+            if(count($request->kode_lampiran) > 0){
+                $nu=1;
+                for($i=0; $i<count($request->kode_lampiran);$i++){
+                    $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_cust_d (kode_cust,kode_lokasi,kode_lampiran,nu) values ('$request->kode_cust','$kode_lokasi','".$request->kode_lampiran[$i]."',$nu) ");
+                    $nu++;
+                }
+            }
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -283,6 +320,11 @@ class CustomerController extends Controller
             }
 
             $del = DB::connection($this->sql)->table('sai_cust')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_cust', $request->kode_cust)
+            ->delete();
+
+            $del2 = DB::connection($this->sql)->table('sai_cust_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_cust', $request->kode_cust)
             ->delete();

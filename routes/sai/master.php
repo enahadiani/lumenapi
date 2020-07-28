@@ -58,6 +58,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('user','Sai\HakaksesController@destroy');
     $router->get('user-menu','Sai\HakaksesController@getMenu');
 
+    $router->get('lampiran','Sai\LampiranController@index');
+    $router->post('lampiran','Sai\LampiranController@store');
+    $router->put('lampiran','Sai\LampiranController@update');
+    $router->delete('lampiran','Sai\LampiranController@destroy');
+
 });
 
 
