@@ -38,6 +38,9 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->get('users/{id}', 'AdminSiloController@singleUser');
     $router->get('users', 'AdminSiloController@allUsers');
     $router->get('cek_payload', 'AdminSiloController@cekPayload');
+    
+    //Menu
+    $router->get('side-menu/{kode_klp}', 'Apv\HakaksesController@getSideMenu');
 
     //Master Karyawan
     $router->get('karyawan','Apv\KaryawanController@index');
