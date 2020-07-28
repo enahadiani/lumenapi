@@ -37,9 +37,9 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->get('profile', 'AdminSiloController@profile2');
     $router->get('users/{id}', 'AdminSiloController@singleUser');
     $router->get('users', 'AdminSiloController@allUsers');
-    $router->get('cek_payload', 'AdminSiloController@cekPayload');
+    $router->get('cek-payload', 'AdminSiloController@cekPayload');
     
-    $router->post('update_password', 'AdminSiloController@updatePassword');
+    $router->post('update-password', 'AdminSiloController@updatePassword');
     
     //Menu
     $router->get('side-menu/{kode_klp}', 'Apv\HakaksesController@getSideMenu');
