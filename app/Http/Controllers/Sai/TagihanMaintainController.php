@@ -97,9 +97,9 @@ class TagihanMaintainController extends Controller
             }
 
             $res = DB::connection($this->sql)->select("
-            select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn
-            from sai_bill_m a
-            where a.kode_lokasi='".$kode_lokasi."'
+                select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.jenis
+                from sai_bill_m a
+                where a.kode_lokasi='".$kode_lokasi."'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -147,7 +147,7 @@ class TagihanMaintainController extends Controller
             'keterangan' => 'required',
             'total_nilai' => 'required',
             'total_nilai_ppn' => 'required',
-            'nik_app' => 'required',
+            // 'nik_app' => 'required',
             'bank' => 'required',
             'cabang'=> 'required',
             'no_rek'=> 'required',
@@ -155,12 +155,11 @@ class TagihanMaintainController extends Controller
             'kode_cust' => 'required|array',
             'no_kontrak' => 'required|array',
             'item'=> 'required|array',
-            'harga'=> 'required|array',
-            'jumlah'=> 'required|array',
             'nilai' => 'required|array',
             'nilai_ppn' => 'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:3072',
+            'status_kontrak' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -197,11 +196,11 @@ class TagihanMaintainController extends Controller
 
                 $no_bukti = $this->generateKode("sai_bill_m", "no_bill", $kode_lokasi."-BILL".$per.".", "0001");
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->nilai,$request->nilai_ppn,'$nik_user','$request->nik_app','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul,jenis) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->nilai,$request->nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL','$request->status_kontrak') ");
     
                 $item = $request->input('item');
-                $harga = $request->input('harga');
-                $jumlah = $request->input('jumlah');
+                $harga = $request->input('nilai');
+                $jumlah = 1;
                 $nilai = $request->input('nilai');
                 $nilai_ppn = $request->input('nilai_ppn');
     
@@ -268,7 +267,7 @@ class TagihanMaintainController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek
+            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek,a.jenis
             from sai_bill_m a
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bill='$no_bukti' ";
             
@@ -334,7 +333,7 @@ class TagihanMaintainController extends Controller
             'total_nilai_ppn' => 'required',
             'kode_cust' => 'required',
             'no_kontrak' => 'required',
-            'nik_app' => 'required',
+            // 'nik_app' => 'required',
             'bank' => 'required',
             'cabang'=> 'required',
             'no_rek'=> 'required',
@@ -403,11 +402,11 @@ class TagihanMaintainController extends Controller
                       from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                       where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->nilai,$request->nilai_ppn,'$nik_user','$request->nik_app','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL') ");
-    
+                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul,jenis) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->nilai,$request->nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL','$request->status_kontrak') ");
+
                 $item = $request->input('item');
-                $harga = $request->input('harga');
-                $jumlah = $request->input('jumlah');
+                $harga = $request->input('nilai');
+                $jumlah = 1;
                 $nilai = $request->input('nilai');
                 $nilai_ppn = $request->input('nilai_ppn');
 
@@ -497,9 +496,6 @@ class TagihanMaintainController extends Controller
 
     public function loadData(Request $request)
     {
-        $this->validate($request,[
-            'periode' => 'required'
-        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -508,10 +504,37 @@ class TagihanMaintainController extends Controller
             }
 
             $periode = $request->periode;
+            $filter= "";
+            if(isset($request->kode_cust)){
+                $filter .= " and a.kode_cust='$request->kode_cust' ";
+            }else{
+                $filter .= "";
+            }
 
-            $sql="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan,a.nilai
+            $filter= "";
+            if(isset($request->tgl_tagih)){
+                $filter .= " and b.tgl_tagih='$request->tgl_tagih' ";
+            }else{
+                $filter .= "";
+            }
+
+            $filter= "";
+            if(isset($request->periode)){
+                $filter .= " and a.periode_tagih='$request->periode' ";
+            }else{
+                $filter .= "";
+            }
+
+            $filter= "";
+            if(isset($request->status)){
+                $filter .= " and a.status_kontrak='$request->status' ";
+            }else{
+                $filter .= "";
+            }
+
+            $sql="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih
             from sai_kontrak a inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
-            where a.kode_lokasi='$kode_lokasi' and a.periode_tagih='$periode'";
+            where a.kode_lokasi='$kode_lokasi' $filter ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);

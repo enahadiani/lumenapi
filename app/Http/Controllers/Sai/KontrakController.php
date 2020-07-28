@@ -164,7 +164,18 @@ class KontrakController extends Controller
 
                 $tgl_awal = $request->tgl_awal.date(" H:i:s");
                 $tgl_akhir = $request->tgl_akhir.date(" H:i:s");
-                $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
+
+                $get = DB::connection($this->sql)->select("select tgl_tagih from sai_cust where kode_cust ='$request->kode_cust' ");
+                if(count($get)>0){
+                    $tgl_tagih = $get[0]->tgl_tagih;
+                    if($tgl_tagih == ""){
+                        $tgl_tagih = $request->tgl_awal;
+                    }
+                }else{
+                    $tgl_tagih = $request->tgl_awal;
+                }
+
+                $periode_tagih = substr($tgl_tagih,0,4).substr($tgl_tagih,5,2);
                 $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak') ");
 
                 if(count($request->deskripsi_modul) > 0){
@@ -344,7 +355,17 @@ class KontrakController extends Controller
 
             $tgl_awal = $request->tgl_awal.date(" H:i:s");
             $tgl_akhir = $request->tgl_akhir.date(" H:i:s");
-            $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
+            $get = DB::connection($this->sql)->select("select tgl_tagih from sai_cust where kode_cust ='$request->kode_cust' ");
+            if(count($get)>0){
+                $tgl_tagih = $get[0]->tgl_tagih;
+                if($tgl_tagih == ""){
+                    $tgl_tagih = $request->tgl_awal;
+                }
+            }else{
+                $tgl_tagih = $request->tgl_awal;
+            }
+
+            $periode_tagih = substr($tgl_tagih,0,4).substr($tgl_tagih,5,2);
             $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak') ");
 
             if(count($request->deskripsi_modul) > 0){
