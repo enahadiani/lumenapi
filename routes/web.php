@@ -2,6 +2,10 @@
 namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
+use Illuminate\Support\Facades\Storage; 
+use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
+use Milon\Barcode\Facades\DNS2DFacade as DNS2D;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -47,3 +51,21 @@ $router->get('auth/facebook/login', 'LoginSocialiteController@redirectToProvider
 $router->get('auth/facebook/callback', 'LoginSocialiteController@handleProviderCallback');
 
 $router->post('send_notif_fcm', 'NotifController@sendNotif');
+
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('local')->exists($filename)) {
+        abort(404);
+    }
+    return Storage::disk('local')->response($filename); 
+});
+
+$router->get('barcode',function(){
+    // echo DNS1D::getBarcodeHTML('4445645656', 'C39');
+    Storage::disk('local')->put('test2.png',base64_decode(DNS1D::getBarcodePNG('04-PJL2007.00002', 'C39')));
+
+    echo "<img src=''></img>";
+
+});
+
+

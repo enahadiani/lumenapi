@@ -151,6 +151,7 @@ $app->register(Barryvdh\DomPDF\ServiceProvider::class);
 $app->register(SimpleSoftwareIO\QrCode\ServiceProvider::class);
 
 $app->register(Laravel\Socialite\SocialiteServiceProvider::class);
+$app->register(Milon\Barcode\BarcodeServiceProvider::class);
 
 
 
