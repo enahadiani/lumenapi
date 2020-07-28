@@ -70,7 +70,7 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai 
+            $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.tgl_sepakat,a.status_kontrak 
             from sai_kontrak a
             where a.kode_lokasi='".$kode_lokasi."'
             ");
@@ -124,7 +124,9 @@ class KontrakController extends Controller
             'deskripsi_modul'=>'required|array',
             'nilai_modul'=>'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:3072',
+            'tgl_sepakat' => 'required',
+            'status_kontrak' => 'required|in:MAINTENANCE,PROYEK'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -163,7 +165,7 @@ class KontrakController extends Controller
                 $tgl_awal = $request->tgl_awal.date(" H:i:s");
                 $tgl_akhir = $request->tgl_akhir.date(" H:i:s");
                 $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
-                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak') ");
 
                 if(count($request->deskripsi_modul) > 0){
                     $nu=1;
@@ -222,7 +224,7 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_kontrak,a.kode_cust,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
+            $sql="select a.no_kontrak,a.kode_cust,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.status_kontrak,a.tgl_sepakat from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -288,7 +290,9 @@ class KontrakController extends Controller
             'keterangan' => 'required',
             'nilai'=>'required',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:3072',
+            'tgl_sepakat' => 'required',
+            'status_kontrak' => 'required|in:MAINTENANCE,PROYEK'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -341,7 +345,7 @@ class KontrakController extends Controller
             $tgl_awal = $request->tgl_awal.date(" H:i:s");
             $tgl_akhir = $request->tgl_akhir.date(" H:i:s");
             $periode_tagih = substr($request->tgl_awal,0,4).substr($request->tgl_awal,5,2);
-            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust') ");
+            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak') ");
 
             if(count($request->deskripsi_modul) > 0){
                 $nu=1;
