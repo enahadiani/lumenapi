@@ -14,6 +14,7 @@ use  App\AdminYpt;
 use  App\AdminSatpam;
 use  App\AdminRtrw;
 use  App\AdminWarga;
+use  App\AdminSilo;
 
 class AuthController extends Controller
 {
@@ -267,6 +268,23 @@ class AuthController extends Controller
         }
 
         return $this->respondWithToken($token,'ginas');
+    }
+
+    public function loginAdminSilo(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('silo')->setTTL(60)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token,'silo');
     }
 
     // $id_satpam = $request->input('qrcode');
@@ -795,5 +813,29 @@ class AuthController extends Controller
             return response()->json($success, 200);
         }	
 
+    }
+
+    public function hashPasswordAdminSilo(){
+        $users = AdminSilo::all();
+        DB::connection('dbsilo')->beginTransaction();
+        
+        try {
+            DB::connection('dbsilo')->table('hakakses')->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('dbsilo')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('dbsilo')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('dbsilo')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
     }
 }

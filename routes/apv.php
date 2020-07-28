@@ -18,8 +18,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
-    $router->post('login', 'AuthController@loginAdmin');
-    $router->get('hash_pass', 'AuthController@hashPasswordAdmin');
+    $router->post('login', 'AuthController@loginAdminSilo');
+    $router->get('hash_pass', 'AuthController@hashPasswordAdminSilo');
 });
 
 $router->get('storage/{filename}', function ($filename)
