@@ -185,6 +185,11 @@ class PembayaranController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
+            $sql2="select a.no_bayar,a.no_bill,a.nilai from sai_bayar_d a where a.kode_lokasi='".$kode_lokasi."' and a.no_bayar='$request->no_bukti' ";
+            
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
             $sql3="select no_bukti,no_gambar,nu,kode_jenis,nama from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti'  order by nu";
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
@@ -192,6 +197,7 @@ class PembayaranController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
@@ -199,6 +205,7 @@ class PembayaranController extends Controller
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
+                $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus); 
