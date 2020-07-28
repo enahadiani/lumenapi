@@ -185,7 +185,7 @@ class PembayaranController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql3="select no_bukti,no_gambar,nu,kode_jenis,nama from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by nu";
+            $sql3="select no_bukti,no_gambar,nu,kode_jenis,nama from sai_bill_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti'  order by nu";
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
