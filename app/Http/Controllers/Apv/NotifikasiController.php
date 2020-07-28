@@ -21,25 +21,27 @@ class NotifikasiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     public function register(Request $request)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select nik,kode_lokasi from api_token_auth where nik='".$nik."' and kode_lokasi='".$kode_lokasi."' and token='".$request->token."' ");
+            $res = DB::connection($this->db)->select("select nik,kode_lokasi from api_token_auth where nik='".$nik."' and kode_lokasi='".$kode_lokasi."' and token='".$request->token."' ");
             $res = json_decode(json_encode($res),true);
 
             if(count($res)>0){
                 $success['message'] = 'Already registered';
             }else{
                 $api_key = Str::random(20);
-                $token_sql = DB::connection('sqlsrv2')->insert('insert into api_token_auth (nik,api_key,token,kode_lokasi,os,ver,model,uuid,tgl_login) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,$api_key,$request->token,$kode_lokasi,'BROWSER','',
+                $token_sql = DB::connection($this->db)->insert('insert into api_token_auth (nik,api_key,token,kode_lokasi,os,ver,model,uuid,tgl_login) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,$api_key,$request->token,$kode_lokasi,'BROWSER','',
                 '','',date('Y-m-d H:i:s')]);
                 if($token_sql){
                     $success['message'] = "ID registered";
@@ -48,13 +50,13 @@ class NotifikasiController extends Controller
                 }
             }
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['api'] = $api_key;
             $success['token'] = $request->token;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 

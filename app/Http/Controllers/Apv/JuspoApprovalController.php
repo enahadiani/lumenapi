@@ -17,6 +17,8 @@ class JuspoApprovalController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     function sendMail($email,$to_name,$data){
         try {
@@ -37,7 +39,7 @@ class JuspoApprovalController extends Controller
 
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -48,12 +50,12 @@ class JuspoApprovalController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_jab
+            $get = DB::connection($this->db)->select("select a.kode_jab
             from apv_karyawan a
             where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             ");
@@ -64,7 +66,7 @@ class JuspoApprovalController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.kegiatan,a.tanggal,isnull(c.kode_kota,'-') as kode_kota,isnull(d.nama,'-') as nama_kota,c.nilai,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.kegiatan,a.tanggal,isnull(c.kode_kota,'-') as kode_kota,isnull(d.nama,'-') as nama_kota,c.nilai,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status
             from apv_pesan a
 			inner join apv_juspo_m c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi
 			left join apv_kota d on c.kode_kota=d.kode_kota and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp
@@ -97,12 +99,12 @@ class JuspoApprovalController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_jab
+            $get = DB::connection($this->db)->select("select a.kode_jab
             from apv_karyawan a
             where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             ");
@@ -113,7 +115,7 @@ class JuspoApprovalController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota,isnull(c.nama,'-') as nama_kota
+            $res = DB::connection($this->db)->select("select b.no_bukti,b.no_juskeb,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota,isnull(c.nama,'-') as nama_kota
             from apv_flow a
             inner join apv_juspo_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             left join apv_kota c on b.kode_kota=c.kode_kota and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
@@ -168,10 +170,10 @@ class JuspoApprovalController extends Controller
             'no_urut' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -181,26 +183,26 @@ class JuspoApprovalController extends Controller
             $token_player = array();
             $token_player2 = array();
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JP']);
+            $ins = DB::connection($this->db)->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JP']);
 
-            $upd =  DB::connection('sqlsrv2')->table('apv_flow')
+            $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_urut', $request->input('no_urut'))
             ->update(['status' => $request->input('status'),'tgl_app'=>$request->input('tanggal')]);
 
-            $max = DB::connection('sqlsrv2')->select("select max(no_urut) as nu from apv_flow where no_bukti='".$no_bukti."' and kode_lokasi='$kode_lokasi' 
+            $max = DB::connection($this->db)->select("select max(no_urut) as nu from apv_flow where no_bukti='".$no_bukti."' and kode_lokasi='$kode_lokasi' 
             ");
             $max = json_decode(json_encode($max),true);
 
-            $min = DB::connection('sqlsrv2')->select("select min(no_urut) as nu from apv_flow where no_bukti='".$no_bukti."' and kode_lokasi='$kode_lokasi' 
+            $min = DB::connection($this->db)->select("select min(no_urut) as nu from apv_flow where no_bukti='".$no_bukti."' and kode_lokasi='$kode_lokasi' 
             ");
             $min = json_decode(json_encode($min),true);
 
             if($request->status == 2){ // APPROVE
                 $nu = $request->no_urut+1;
 
-                $upd2 =  DB::connection('sqlsrv2')->table('apv_flow')
+                $upd2 =  DB::connection($this->db)->table('apv_flow')
                 ->where('no_bukti', $no_bukti)    
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
@@ -216,7 +218,7 @@ class JuspoApprovalController extends Controller
                     left join api_token_auth c on b.nik=c.nik and b.kode_lokasi=c.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
 
-                    $rs = DB::connection('sqlsrv2')->select($sqlapp);
+                    $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
                     if(count($rs)>0){
                         $token_player = array();
@@ -235,17 +237,17 @@ class JuspoApprovalController extends Controller
                         $exec_notif = array();
                         for($t=0;$t<count($token_player);$t++){
 
-                            $insert[$t] = DB::connection('sqlsrv2')->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?,?) ",[$kode_lokasi,$nik_app1,$token_player[$t],$title,$content,date('Y-m-d'),'-']);
+                            $insert[$t] = DB::connection($this->db)->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?,?) ",[$kode_lokasi,$nik_app1,$token_player[$t],$title,$content,date('Y-m-d'),'-']);
 
                         }
                     }
 
-                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
+                    $upd3 =  DB::connection($this->db)->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => $request->status]);
                 }else{
-                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
+                    $upd3 =  DB::connection($this->db)->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'S']);
@@ -260,7 +262,7 @@ class JuspoApprovalController extends Controller
                 inner join apv_karyawan c on b.nik_buat=c.nik 
                 inner join api_token_auth d on c.nik=d.nik and c.kode_lokasi=d.kode_lokasi
                 where a.no_bukti='".$no_bukti."' and a.kode_lokasi='$kode_lokasi' ";
-                $rs2 = DB::connection('sqlsrv2')->select($sqlbuat);
+                $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
                     $token_player2 = array();
@@ -278,7 +280,7 @@ class JuspoApprovalController extends Controller
                     $exec_notif2 = array();
                     for($t=0;$t<count($token_player2);$t++){
 
-                        $insert2[$t] = DB::connection('sqlsrv2')->insert(" insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player2[$t],$title,$content,date('Y-m-d'),'-']);
+                        $insert2[$t] = DB::connection($this->db)->insert(" insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player2[$t],$title,$content,date('Y-m-d'),'-']);
 
                     }
                     
@@ -287,7 +289,7 @@ class JuspoApprovalController extends Controller
             }else{
                 $nu=$request->no_urut-1;
 
-                $upd2 =  DB::connection('sqlsrv2')->table('apv_flow')
+                $upd2 =  DB::connection($this->db)->table('apv_flow')
                 ->where('no_bukti', $no_bukti)    
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
@@ -302,7 +304,7 @@ class JuspoApprovalController extends Controller
                     left join apv_karyawan b on a.kode_jab=b.kode_jab 
                     left join api_token_auth c on b.nik=c.nik and b.kode_lokasi=c.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi' ";
-                    $rs = DB::connection('sqlsrv2')->select($sqlapp);
+                    $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
                     if(count($rs)>0){
                         $token_player = array();
@@ -320,16 +322,16 @@ class JuspoApprovalController extends Controller
                         // $psn = "Menunggu approval $nik_app1 ";
                         $exec_notif = array();
                         for($t=0;$t<count($token_player);$t++){
-                            $insert[$t] = DB::connection('sqlsrv2')->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_app1,$token_player[$t],$title,$content,date('Y-m-d'),'-']);
+                            $insert[$t] = DB::connection($this->db)->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_app1,$token_player[$t],$title,$content,date('Y-m-d'),'-']);
                             
                         }
                     }
-                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
+                    $upd3 =  DB::connection($this->db)->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'B']);
                 }else{
-                    $upd3 =  DB::connection('sqlsrv2')->table('apv_juspo_m')
+                    $upd3 =  DB::connection($this->db)->table('apv_juspo_m')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'R']);
@@ -343,7 +345,7 @@ class JuspoApprovalController extends Controller
                 inner join apv_karyawan c on b.nik_buat=c.nik 
                 inner join api_token_auth d on c.nik=d.nik and c.kode_lokasi=d.kode_lokasi
                 where a.no_bukti='".$no_bukti."' ";
-                $rs2 = DB::connection('sqlsrv2')->select($sqlbuat);
+                $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
                     $token_player2 = array();
@@ -361,14 +363,14 @@ class JuspoApprovalController extends Controller
                     $exec_notif2 = array();
                     for($t=0;$t<count($token_player2);$t++){
 
-                        $insert[$t] = DB::connection('sqlsrv2')->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player2[$t],$title,$content,date('Y-m-d'),'-']);
+                        $insert[$t] = DB::connection($this->db)->insert("insert into apv_notif_m (kode_lokasi,nik,token,title,isi,tgl_input,kode_pp) values (?, ?, ?, ?, ?, ?, ?) ",[$kode_lokasi,$nik_buat,$token_player2[$t],$title,$content,date('Y-m-d'),'-']);
 
                     }
                 }
                 $success['approval'] = "Return";
             }
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Approval Justifikasi Pengadaan berhasil disimpan. No Bukti:".$no_bukti;
             $success['no_aju'] = $no_bukti;
@@ -380,7 +382,7 @@ class JuspoApprovalController extends Controller
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Approval Justifikasi Pengadaan gagal disimpan ".$e;
             $success['no_aju'] = "";
@@ -407,7 +409,7 @@ class JuspoApprovalController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -419,16 +421,16 @@ class JuspoApprovalController extends Controller
             left join apv_kota d on b.kode_pp=d.kode_pp and b.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1' ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2="select a.no_bukti,a.barang_klp,a.barang,a.harga,a.jumlah,a.nilai,a.ppn,a.grand_total,b.nama as nama_klp from apv_juspo_d a 
             left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_aju' order by a.no_urut";					
-            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             $sql3="select a.no_bukti,a.nama,a.file_dok from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_aju'  order by a.no_urut";
-            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto   
@@ -439,14 +441,14 @@ class JuspoApprovalController extends Controller
 			inner join apv_jab g on f.kode_jab=g.kode_jab and f.kode_lokasi=g.kode_lokasi
             where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi'
 			order by e.id,c.no_urut ";
-            $res4 = DB::connection('sqlsrv2')->select($sql4);
+            $res4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
 
             $sql5="select a.no_bukti,count(barang_klp) as jum_klp,sum(grand_total) as tot_barang,count(jumlah) as jum_barang  
             from apv_juspo_d a 
             where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi'
             group by a.no_bukti";
-            $res5 = DB::connection('sqlsrv2')->select($sql5);
+            $res5 = DB::connection($this->db)->select($sql5);
             $res5 = json_decode(json_encode($res5),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -514,12 +516,12 @@ class JuspoApprovalController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in ('2','3')
+            $res = DB::connection($this->db)->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in ('2','3')
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -548,13 +550,13 @@ class JuspoApprovalController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             if($id == "default"){
-                $rs = DB::connection('sqlsrv2')->select("select max(id) as id
+                $rs = DB::connection($this->db)->select("select max(id) as id
                 from apv_pesan a
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                 where a.kode_lokasi='$kode_lokasi' and a.modul='JP' and b.nik= '$nik' and a.no_bukti='$no_bukti'");
@@ -570,7 +572,7 @@ class JuspoApprovalController extends Controller
             inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut and a.kode_lokasi=e.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.modul='JP' and a.id='$id' ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

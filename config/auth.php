@@ -62,6 +62,10 @@ return [
         'warga' => [
             'driver' => 'jwt',
             'provider' => 'warga',
+        ],
+        'silo' => [
+            'driver' => 'jwt',
+            'provider' => 'silo',
         ]
     ],
 
@@ -117,6 +121,10 @@ return [
         'warga' => [
             'driver' => 'eloquent',
             'model' => \App\AdminWarga::class
+        ],
+        'silo' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminSilo::class
         ]
     ]
 ];

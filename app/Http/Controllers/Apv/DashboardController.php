@@ -17,34 +17,36 @@ class DashboardController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     public function getDataBox()
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard(guard($this->guard))->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $aju = DB::connection('sqlsrv2')->select("select count(*) as jum from apv_juskeb_m where kode_lokasi='$kode_lokasi'");
+            $aju = DB::connection($this->db)->select("select count(*) as jum from apv_juskeb_m where kode_lokasi='$kode_lokasi'");
             $juskeb = json_decode(json_encode($aju),true);
             $juskeb = $juskeb[0]["jum"];
 
-            $ver =DB::connection('sqlsrv2')->select("select count(distinct no_juskeb) as jum from apv_ver_m  where kode_lokasi='$kode_lokasi'");
+            $ver =DB::connection($this->db)->select("select count(distinct no_juskeb) as jum from apv_ver_m  where kode_lokasi='$kode_lokasi'");
             $ver = json_decode(json_encode($ver),true);
             $ver = $ver[0]["jum"];
 
-            $appkeb =DB::connection('sqlsrv2')->select("select count(*) as jum from apv_juskeb_m where kode_lokasi='$kode_lokasi' and progress in ('S')");
+            $appkeb =DB::connection($this->db)->select("select count(*) as jum from apv_juskeb_m where kode_lokasi='$kode_lokasi' and progress in ('S')");
             $appjuskeb = json_decode(json_encode($appkeb),true);
             $appjuskeb = $appjuskeb[0]["jum"];
 
             
-            $ajup =DB::connection('sqlsrv2')->select("select count(*) as jum from apv_juspo_m where kode_lokasi='$kode_lokasi'");
+            $ajup =DB::connection($this->db)->select("select count(*) as jum from apv_juspo_m where kode_lokasi='$kode_lokasi'");
             $juspeng = json_decode(json_encode($ajup),true);
             $juspeng = $juspeng[0]["jum"];
 
-            $appp =DB::connection('sqlsrv2')->select("select count(*) as jum from apv_juspo_m where kode_lokasi='$kode_lokasi' and progress in ('S')");
+            $appp =DB::connection($this->db)->select("select count(*) as jum from apv_juspo_m where kode_lokasi='$kode_lokasi' and progress in ('S')");
             $appjuspeng = json_decode(json_encode($appp),true);
             $appjuspeng = $appjuspeng[0]["jum"];
 
@@ -71,7 +73,7 @@ class DashboardController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard(guard($this->guard))->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -101,7 +103,7 @@ class DashboardController extends Controller
                         break;
                     }
         
-                    $res = DB::connection('sqlsrv2')->select($sql);
+                    $res = DB::connection($this->db)->select($sql);
                     $res = json_decode(json_encode($res),true);
                     $array_no = "";
                     for($i=0;$i<count($res);$i++){
@@ -119,7 +121,7 @@ class DashboardController extends Controller
                 $filter = "";
             }
 
-            $aju = DB::connection('sqlsrv2')->select(" select a.no_bukti,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,case a.progress when 'S' then 'FINISH' when 'F' then 'Return Verifikasi' when 'R' then 'Return Approval' else isnull(b.nama_jab,'-') end as posisi,a.nilai,a.progress,c.progress as progress2,case c.progress when 'S' then 'FINISH' when 'F' then 'Return Verifikasi' when 'R' then 'Return Approval' else isnull(d.nama_jab,'-') end as posisi2
+            $aju = DB::connection($this->db)->select(" select a.no_bukti,a.no_dokumen,a.kode_pp,convert(varchar,a.waktu,103) as waktu,a.kegiatan,case a.progress when 'S' then 'FINISH' when 'F' then 'Return Verifikasi' when 'R' then 'Return Approval' else isnull(b.nama_jab,'-') end as posisi,a.nilai,a.progress,c.progress as progress2,case c.progress when 'S' then 'FINISH' when 'F' then 'Return Verifikasi' when 'R' then 'Return Approval' else isnull(d.nama_jab,'-') end as posisi2
             from apv_juskeb_m a
             left join (select a.no_bukti,b.nama as nama_jab
                     from apv_flow a

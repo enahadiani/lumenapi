@@ -140,6 +140,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'dbsilo' => [
+            'driver' => env('DB_CONNECTION11','sqlsrv'),
+            'host' => env('DB_HOST11', 'localhost'),
+            'port' => env('DB_PORT11', '1433'),
+            'database' => env('DB_DATABASE11', 'forge'),
+            'username' => env('DB_USERNAME11', 'forge'),
+            'password' => env('DB_PASSWORD11', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',

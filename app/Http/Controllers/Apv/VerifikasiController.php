@@ -17,6 +17,8 @@ class VerifikasiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     function sendMail($email,$to_name,$data){
         try {
@@ -37,7 +39,7 @@ class VerifikasiController extends Controller
 
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -48,14 +50,14 @@ class VerifikasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $kode_pp = $request->kode_pp;
 
-            $res = DB::connection('sqlsrv2')->select("select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
+            $res = DB::connection($this->db)->select("select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
             from apv_juskeb_m b 
             where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') and b.nik_ver='$nik_user'
             ");
@@ -85,7 +87,7 @@ class VerifikasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -97,7 +99,7 @@ class VerifikasiController extends Controller
             inner join apv_juskeb_m b on a.no_juskeb=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
             where b.kode_lokasi='$kode_lokasi'  and b.kode_pp='$kode_pp'
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -149,10 +151,10 @@ class VerifikasiController extends Controller
             'file.*'=>'file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -160,9 +162,9 @@ class VerifikasiController extends Controller
 
             $no_bukti = $this->generateKode("apv_ver_m", "no_bukti", $kode_lokasi."-VER".substr($periode,2,4).".", "0001");
 
-            $ins1 = DB::connection('sqlsrv2')->insert("insert into apv_ver_m (no_bukti,kode_lokasi,no_juskeb,status,keterangan,tanggal,nik_user) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$request->no_aju,$request->status,$request->keterangan,$request->tanggal,$nik_user]);
+            $ins1 = DB::connection($this->db)->insert("insert into apv_ver_m (no_bukti,kode_lokasi,no_juskeb,status,keterangan,tanggal,nik_user) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$request->no_aju,$request->status,$request->keterangan,$request->tanggal,$nik_user]);
 
-            $upd =  DB::connection('sqlsrv2')->table('apv_juskeb_m')
+            $upd =  DB::connection($this->db)->table('apv_juskeb_m')
             ->where('no_bukti', $request->input('no_aju'))    
             ->where('kode_lokasi', $kode_lokasi)
             ->update(['progress' => $request->input('status'),'nilai'=>$request->input('total_barang'),'nik_ver'=>$nik_user]);
@@ -188,7 +190,7 @@ class VerifikasiController extends Controller
                 }
                 
                 $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";
-                $res3 = DB::connection('sqlsrv2')->select($sql3);
+                $res3 = DB::connection($this->db)->select($sql3);
                 $res3 = json_decode(json_encode($res3),true);
                 
                 if(count($res3) > 0){
@@ -208,16 +210,16 @@ class VerifikasiController extends Controller
             $grand_total = $request->input('grand_total');
 
             if(count($barang) > 0){
-                $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
+                $del2 = DB::connection($this->db)->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
                 for($i=0; $i<count($barang);$i++){
-                    $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang_klp,barang,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_aju,$barang_klp[$i],$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang_klp,barang,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_aju,$barang_klp[$i],$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
                 }
             }
 
             if(count($arr_nama) > 0){
-                $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
+                $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i]]); 
                 }
             }
 
@@ -228,18 +230,18 @@ class VerifikasiController extends Controller
             where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
             order by b.no_urut";
 
-            $role = DB::connection('sqlsrv2')->select($sql);
+            $role = DB::connection($this->db)->select($sql);
             $role = json_decode(json_encode($role),true);
             $token_player = array();
 
 
-            $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
+            $del4 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
 
             for($i=0;$i<count($role);$i++){
                 
                 if($i == 0){
                     $prog = 1;
-                    $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
+                    $rst = DB::connection($this->db)->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
                     $rst = json_decode(json_encode($rst),true);
                     for($t=0;$t<count($rst);$t++){
                         array_push($token_player,$rst[$t]["token"]);
@@ -249,7 +251,7 @@ class VerifikasiController extends Controller
                 }else{
                     $prog = 0;
                 }
-                $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_aju,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,1,$role[$i]['nik']]);
+                $ins4[$i] = DB::connection($this->db)->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_aju,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,1,$role[$i]['nik']]);
             }
 
             if($request->status == "V"){
@@ -265,7 +267,7 @@ class VerifikasiController extends Controller
             }else{
 
                 $token_player = array();
-                $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+                $rst = DB::connection($this->db)->select("select a.nik_buat,b.token 
                 from apv_juskeb_m a
                 inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
                 where a.no_bukti='$request->no_aju' ");
@@ -281,10 +283,10 @@ class VerifikasiController extends Controller
                 $success['message'] = "Data Verifikasi Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
             }
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Verifikasi Justifikasi Kebutuhan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -304,7 +306,7 @@ class VerifikasiController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -313,15 +315,15 @@ class VerifikasiController extends Controller
             from apv_juskeb_m b 
             where b.kode_lokasi='$kode_lokasi' and b.no_bukti='$no_aju' and b.progress in ('A','R') ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2="select no_bukti,barang_klp,barang,harga,jumlah,nilai,ppn,grand_total from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";					
-            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";
-            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             $sql4="select a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama 
@@ -336,7 +338,7 @@ class VerifikasiController extends Controller
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi' ";
-            $res4 = DB::connection('sqlsrv2')->select($sql4);
+            $res4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -402,12 +404,12 @@ class VerifikasiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in ('V','F') 
+            $res = DB::connection($this->db)->select("select status, nama from apv_status where kode_lokasi='$kode_lokasi' and status in ('V','F') 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -436,7 +438,7 @@ class VerifikasiController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -447,7 +449,7 @@ class VerifikasiController extends Controller
             inner join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
             where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

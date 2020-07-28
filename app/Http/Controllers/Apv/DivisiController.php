@@ -15,16 +15,18 @@ class DivisiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     function isUnik($isi){
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }
     
         $strSQL = "select kode_divisi from apv_divisi where kode_divisi = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
     
-        $auth = DB::connection('sqlsrv2')->select($strSQL);
+        $auth = DB::connection($this->db)->select($strSQL);
         $auth = json_decode(json_encode($auth),true);
     
         if(count($auth) > 0){
@@ -39,12 +41,12 @@ class DivisiController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."' 
+            $res = DB::connection($this->db)->select("select kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -91,19 +93,19 @@ class DivisiController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
             if($this->isUnik($request->kode_divisi)){
 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_divisi(kode_divisi,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_divisi'),$request->input('nama'),$kode_lokasi]);
+                $ins = DB::connection($this->db)->insert('insert into apv_divisi(kode_divisi,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_divisi'),$request->input('nama'),$kode_lokasi]);
                 
-                DB::connection('sqlsrv2')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Divisi berhasil disimpan";
             }else{
@@ -113,7 +115,7 @@ class DivisiController extends Controller
 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Divisi gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -133,7 +135,7 @@ class DivisiController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -141,7 +143,7 @@ class DivisiController extends Controller
             $sql = "select 
             kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."' and kode_divisi='$kode_divisi'
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -187,24 +189,24 @@ class DivisiController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_divisi')->where('kode_lokasi', $kode_lokasi)->where('kode_divisi', $kode_divisi)->delete();
+            $del = DB::connection($this->db)->table('apv_divisi')->where('kode_lokasi', $kode_lokasi)->where('kode_divisi', $kode_divisi)->delete();
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_divisi(kode_divisi,nama,kode_lokasi) values (?, ?, ?)', [$kode_divisi,$request->input('nama'),$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_divisi(kode_divisi,nama,kode_lokasi) values (?, ?, ?)', [$kode_divisi,$request->input('nama'),$kode_lokasi]);
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Divisi berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Divisi gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -219,23 +221,23 @@ class DivisiController extends Controller
      */
     public function destroy($kode_divisi)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_divisi')->where('kode_lokasi', $kode_lokasi)->where('kode_divisi', $kode_divisi)->delete();
+            $del = DB::connection($this->db)->table('apv_divisi')->where('kode_lokasi', $kode_lokasi)->where('kode_divisi', $kode_divisi)->delete();
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Divisi berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Divisi gagal dihapus ".$e;
             

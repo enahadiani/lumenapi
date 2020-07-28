@@ -16,17 +16,19 @@ class KaryawanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     public function index()
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select nik,nama,kode_pp,kode_jab,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."'
+            $res = DB::connection($this->db)->select("select nik,nama,kode_pp,kode_jab,email,no_telp from apv_karyawan where kode_lokasi='".$kode_lokasi."'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -78,10 +80,10 @@ class KaryawanController extends Controller
             'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -113,14 +115,14 @@ class KaryawanController extends Controller
                 $kode_divisi = "-";
             }
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Karyawan berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Karyawan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -140,7 +142,7 @@ class KaryawanController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -149,7 +151,7 @@ class KaryawanController extends Controller
 
             $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp,kota,kode_divisi from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -201,10 +203,10 @@ class KaryawanController extends Controller
             'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -213,7 +215,7 @@ class KaryawanController extends Controller
 
                 $sql = "select foto as file_gambar from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
                 ";
-                $res = DB::connection('sqlsrv2')->select($sql);
+                $res = DB::connection($this->db)->select($sql);
                 $res = json_decode(json_encode($res),true);
 
                 if(count($res) > 0){
@@ -239,7 +241,7 @@ class KaryawanController extends Controller
                 $foto="-";
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
+            $del = DB::connection($this->db)->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
             if(isset($request->kode_kota)){
                 $kode_kota = $request->kode_kota;
@@ -253,14 +255,14 @@ class KaryawanController extends Controller
                 $kode_divisi = "-";
             }
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Karyawan berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Karyawan gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -275,23 +277,23 @@ class KaryawanController extends Controller
      */
     public function destroy($nik)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
+            $del = DB::connection($this->db)->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Karyawan berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Karyawan gagal dihapus ".$e;
             

@@ -33,12 +33,12 @@ $router->get('storage/{filename}', function ($filename)
 });
 
 
-$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+$router->group(['middleware' => 'auth:silo'], function () use ($router) {
     
-    $router->get('profile', 'AdminController@profileMobileApv');
+    $router->get('profile', 'AdminSiloController@profileMobileApv');
 
     $router->get('aju', function (Request $request) {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard('silo')->user()){
             $nik= $data->nik;
             $kode_menu = $data->kode_klp_menu;
             switch($kode_menu){
@@ -59,7 +59,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     });
 
     $router->get('detail/{no_aju}', function ($no_aju) {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard('silo')->user()){
             $nik= $data->nik;
             $kode_menu = $data->kode_klp_menu;
             switch($kode_menu){
@@ -80,7 +80,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     });
 
     $router->get('histori', function () {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard('silo')->user()){
             $nik= $data->nik;
             $kode_menu = $data->kode_klp_menu;
             switch($kode_menu){
@@ -101,7 +101,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     });
 
     $router->post('app', function (Request $request) {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard('silo')->user()){
             $nik= $data->nik;
             $kode_menu = $data->kode_klp_menu;
             switch($kode_menu){

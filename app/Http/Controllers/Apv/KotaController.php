@@ -15,16 +15,18 @@ class KotaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     function isUnik($isi,$kode_pp){
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }
     
         $strSQL = "select kode_kota from apv_kota where kode_kota = '".$isi."' and kode_lokasi='".$kode_lokasi."' and kode_pp='$kode_pp' ";
     
-        $auth = DB::connection('sqlsrv2')->select($strSQL);
+        $auth = DB::connection($this->db)->select($strSQL);
         $auth = json_decode(json_encode($auth),true);
     
         if(count($auth) > 0){
@@ -39,12 +41,12 @@ class KotaController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select kode_kota,nama,kode_pp from apv_kota where kode_lokasi='".$kode_lokasi."' 
+            $res = DB::connection($this->db)->select("select kode_kota,nama,kode_pp from apv_kota where kode_lokasi='".$kode_lokasi."' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -92,18 +94,18 @@ class KotaController extends Controller
             'kode_pp' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_kota,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_kota(kode_kota,nama,kode_pp,kode_lokasi) values (?, ?, ?, ?)', [$request->input('kode_kota'),$request->input('nama'),$request->input('kode_pp'),$kode_lokasi]);
+                $ins = DB::connection($this->db)->insert('insert into apv_kota(kode_kota,nama,kode_pp,kode_lokasi) values (?, ?, ?, ?)', [$request->input('kode_kota'),$request->input('nama'),$request->input('kode_pp'),$kode_lokasi]);
                 
-                DB::connection('sqlsrv2')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Kota berhasil disimpan";
             }else{
@@ -113,7 +115,7 @@ class KotaController extends Controller
 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kota gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -133,7 +135,7 @@ class KotaController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -141,7 +143,7 @@ class KotaController extends Controller
             $sql = "select 
             kode_kota,nama,kode_pp from apv_kota where kode_lokasi='".$kode_lokasi."' and kode_kota='$kode_kota'
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -188,24 +190,24 @@ class KotaController extends Controller
             'kode_pp' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_kota')->where('kode_lokasi', $kode_lokasi)->where('kode_kota', $kode_kota)->delete();
+            $del = DB::connection($this->db)->table('apv_kota')->where('kode_lokasi', $kode_lokasi)->where('kode_kota', $kode_kota)->delete();
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_kota(kode_kota,nama,kode_pp,kode_lokasi) values (?, ?, ?, ?)', [$kode_kota,$request->input('nama'),$request->kode_pp,$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_kota(kode_kota,nama,kode_pp,kode_lokasi) values (?, ?, ?, ?)', [$kode_kota,$request->input('nama'),$request->kode_pp,$kode_lokasi]);
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kota berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kota gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -220,23 +222,23 @@ class KotaController extends Controller
      */
     public function destroy($kode_kota)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_kota')->where('kode_lokasi', $kode_lokasi)->where('kode_kota', $kode_kota)->delete();
+            $del = DB::connection($this->db)->table('apv_kota')->where('kode_lokasi', $kode_lokasi)->where('kode_kota', $kode_kota)->delete();
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kota berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kota gagal dihapus ".$e;
             

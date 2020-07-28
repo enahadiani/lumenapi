@@ -15,17 +15,19 @@ class UnitController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     public function index()
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' 
+            $res = DB::connection($this->db)->select("select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -72,22 +74,22 @@ class UnitController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi]);
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Unit berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Unit gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -107,14 +109,14 @@ class UnitController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $sql = "select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' and kode_pp='$kode_pp'
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -161,24 +163,24 @@ class UnitController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
+            $del = DB::connection($this->db)->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
 
-            $ins = DB::connection('sqlsrv2')->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$kode_pp,$request->input('nama'),$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$kode_pp,$request->input('nama'),$kode_lokasi]);
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Unit berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Unit gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -193,23 +195,23 @@ class UnitController extends Controller
      */
     public function destroy($kode_pp)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
+            $del = DB::connection($this->db)->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Unit berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Unit gagal dihapus ".$e;
             

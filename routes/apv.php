@@ -32,12 +32,12 @@ $router->get('storage/{filename}', function ($filename)
 });
 
 
-$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+$router->group(['middleware' => 'auth:silo'], function () use ($router) {
     
-    $router->get('profile', 'AdminController@profile2');
-    $router->get('users/{id}', 'AdminController@singleUser');
-    $router->get('users', 'AdminController@allUsers');
-    $router->get('cek_payload', 'AdminController@cekPayload');
+    $router->get('profile', 'AdminSiloController@profile2');
+    $router->get('users/{id}', 'AdminSiloController@singleUser');
+    $router->get('users', 'AdminSiloController@allUsers');
+    $router->get('cek_payload', 'AdminSiloController@cekPayload');
 
     //Master Karyawan
     $router->get('karyawan','Apv\KaryawanController@index');

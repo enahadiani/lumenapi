@@ -15,8 +15,8 @@ class FilterController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'sqlsrv2';
-    public $guard = 'admin';
+    public $db = 'dbsilo';
+    public $guard = 'silo';
 
     function getFilterPeriode(Request $request){
         try {
@@ -27,7 +27,7 @@ class FilterController extends Controller
             }
           
             $sql="select distinct periode from dgw_reg where kode_lokasi='$kode_lokasi' ";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -60,7 +60,7 @@ class FilterController extends Controller
             $filter = "";
 
             $sql="select a.kode_pp,a.nama from apv_pp a where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -100,7 +100,7 @@ class FilterController extends Controller
             $sql="select a.kode_kota,a.nama 
             from apv_kota a  
             where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -146,7 +146,7 @@ class FilterController extends Controller
             $sql="select a.no_bukti,a.kegiatan 
                 from apv_juskeb_m a 
                 where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -198,7 +198,7 @@ class FilterController extends Controller
             $sql="select a.no_dokumen 
             from apv_juskeb_m a 
             where a.kode_lokasi='$kode_lokasi' $filter";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

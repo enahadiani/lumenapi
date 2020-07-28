@@ -15,8 +15,8 @@ class LaporanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'sqlsrv2';
-    public $guard = 'admin';
+    public $guard = 'silo';
+    public $db = 'dbsilo';
     
     function getPosisi(Request $request){
         try {
@@ -77,7 +77,7 @@ class LaporanController extends Controller
                                 )y on c.no_bukti=y.no_bukti
                                        
             $filter ";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

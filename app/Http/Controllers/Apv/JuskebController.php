@@ -17,6 +17,8 @@ class JuskebController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
     public function reverseDate($ymd_or_dmy_date, $org_sep='-', $new_sep='-'){
         $arr = explode($org_sep, $ymd_or_dmy_date);
@@ -25,7 +27,7 @@ class JuskebController extends Controller
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrv2')->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -36,7 +38,7 @@ class JuskebController extends Controller
 
     public function isUnik2($isi,$kode_lokasi,$kode_pp,$no_bukti){
         
-        $auth = DB::connection('sqlsrv2')->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' and no_bukti <> '$no_bukti' ");
+        $auth = DB::connection($this->db)->select("select no_dokumen from apv_juskeb_m where no_dokumen ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' and no_bukti <> '$no_bukti' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -63,7 +65,7 @@ class JuskebController extends Controller
     }
 
     public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -81,12 +83,12 @@ class JuskebController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrv2')->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,
             a.nilai,
             case when a.progress = 'A' then 'Verifikasi' 
             when a.progress='F' then 'Return Verifikasi' 
@@ -177,10 +179,10 @@ class JuskebController extends Controller
             'file.*'=>'file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -217,7 +219,7 @@ class JuskebController extends Controller
                     $kode_divisi = '-';
                 }
 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota,$kode_divisi,$request->nik_ver]);
+                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota,$kode_divisi,$request->nik_ver]);
     
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
@@ -226,13 +228,13 @@ class JuskebController extends Controller
     
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
                     }
                 }
     
                 if(count($arr_nama) > 0){
                     for($i=0; $i<count($arr_nama);$i++){
-                        $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                        $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
                     }
                 }
     
@@ -243,7 +245,7 @@ class JuskebController extends Controller
                 where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
                 order by b.no_urut";
     
-                $role = DB::connection('sqlsrv2')->select($sql);
+                $role = DB::connection($this->db)->select($sql);
                 $role = json_decode(json_encode($role),true);
                 $token_player = array();
                 
@@ -251,7 +253,7 @@ class JuskebController extends Controller
                     
                     if($i == 0){
                         $prog = 1;
-                        // $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
+                        // $rst = DB::connection($this->db)->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
                         // $rst = json_decode(json_encode($rst),true);
                         // for($t=0;$t<count($rst);$t++){
                         //     array_push($token_player,$rst[$t]["token"]);
@@ -261,10 +263,10 @@ class JuskebController extends Controller
                     }else{
                         $prog = 0;
                     }
-                    $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
+                    $ins4[$i] = DB::connection($this->db)->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
                 }
                 
-                DB::connection('sqlsrv2')->commit();
+                DB::connection($this->db)->commit();
                 if(isset($request->email) && isset($request->nama_email)){
     
                     $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
@@ -274,7 +276,7 @@ class JuskebController extends Controller
                 }
     
                 $token_players = array();
-                $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+                $rst = DB::connection($this->db)->select("select a.nik_buat,b.token 
                 from apv_juskeb_m a
                 inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
                 where a.no_bukti='$no_bukti' ");
@@ -297,7 +299,7 @@ class JuskebController extends Controller
 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Justifikasi Kebutuhan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -317,22 +319,22 @@ class JuskebController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $sql="select no_bukti,no_dokumen,kode_pp,kode_kota,kode_divisi,waktu,kegiatan,dasar,nilai,convert(varchar(10),tanggal,121) as tanggal,nik_ver from apv_juskeb_m where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2="select no_bukti,barang_klp,barang,harga,jumlah,nilai,ppn,grand_total from apv_juskeb_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";					
-            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
-            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             $sql4="select a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama 
@@ -354,7 +356,7 @@ class JuskebController extends Controller
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_juskeb='$no_bukti' and a.kode_lokasi='$kode_lokasi' ";
-            $res4 = DB::connection('sqlsrv2')->select($sql4);
+            $res4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -423,10 +425,10 @@ class JuskebController extends Controller
             'file.*'=>'file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -452,7 +454,7 @@ class JuskebController extends Controller
                     }
 
                     $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
-                    $res3 = DB::connection('sqlsrv2')->select($sql3);
+                    $res3 = DB::connection($this->db)->select($sql3);
                     $res3 = json_decode(json_encode($res3),true);
 
                     if(count($res3) > 0){
@@ -462,12 +464,12 @@ class JuskebController extends Controller
                         }
                     }
 
-                    $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                    $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 }
 
-                $del = DB::connection('sqlsrv2')->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-                $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-                $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del = DB::connection($this->db)->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del2 = DB::connection($this->db)->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del4 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 
                 if(isset($request->kode_divisi)){
                     $kode_divisi = $request->kode_divisi;
@@ -476,7 +478,7 @@ class JuskebController extends Controller
                     $kode_divisi = '-';
                 }
 
-                $ins = DB::connection('sqlsrv2')->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota,$kode_divisi,$request->nik_ver]);
+                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota,$kode_divisi,$request->nik_ver]);
 
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
@@ -485,13 +487,13 @@ class JuskebController extends Controller
 
                 if(count($barang) > 0){
                     for($i=0; $i<count($barang);$i++){
-                        $ins2[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,harga,jumlah,no_urut,nilai,barang_klp,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$request->barang_klp[$i],$request->ppn[$i],$request->grand_total[$i]));
                     }
                 }
 
                 if(count($arr_nama) > 0){
                     for($i=0; $i<count($arr_nama);$i++){
-                        $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                        $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
                     }
                 }
 
@@ -502,7 +504,7 @@ class JuskebController extends Controller
                 where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
                 order by b.no_urut";
 
-                $role = DB::connection('sqlsrv2')->select($sql);
+                $role = DB::connection($this->db)->select($sql);
                 $role = json_decode(json_encode($role),true);
                 $token_player = array();
                 
@@ -510,7 +512,7 @@ class JuskebController extends Controller
                     
                     if($i == 0){
                         $prog = 1;
-                        $rst = DB::connection('sqlsrv2')->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
+                        $rst = DB::connection($this->db)->select("select token from api_token_auth where nik='".$role[$i]["nik"]."' ");
                         $rst = json_decode(json_encode($rst),true);
                         for($t=0;$t<count($rst);$t++){
                             array_push($token_player,$rst[$t]["token"]);
@@ -520,10 +522,10 @@ class JuskebController extends Controller
                     }else{
                         $prog = 0;
                     }
-                    $ins4[$i] = DB::connection('sqlsrv2')->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
+                    $ins4[$i] = DB::connection($this->db)->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,sts_ver,nik) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,0,$role[$i]["nik"]]);
                 }
                 
-                DB::connection('sqlsrv2')->commit();
+                DB::connection($this->db)->commit();
                 if(isset($request->email) && isset($request->nama_email)){
 
                     $mail = $this->sendMail($request->email,$request->nama_email,"Pengajuan Justifikasi kebutuhan $no_bukti berhasil dikirim, menunggu verifikasi");
@@ -533,7 +535,7 @@ class JuskebController extends Controller
                 }
                 
                 $token_players = array();
-                $rst = DB::connection('sqlsrv2')->select("select a.nik_buat,b.token 
+                $rst = DB::connection($this->db)->select("select a.nik_buat,b.token 
                 from apv_juskeb_m a
                 inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
                 where a.no_bukti='$no_bukti' ");
@@ -556,7 +558,7 @@ class JuskebController extends Controller
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Justifikasi Kebutuhan gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -571,18 +573,18 @@ class JuskebController extends Controller
      */
     public function destroy($no_bukti)
     {
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrv2')->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del2 = DB::connection('sqlsrv2')->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del = DB::connection($this->db)->table('apv_juskeb_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del2 = DB::connection($this->db)->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
-            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             if(count($res3) > 0){
@@ -592,16 +594,16 @@ class JuskebController extends Controller
                 }
             }
 
-            $del3 = DB::connection('sqlsrv2')->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del4 = DB::connection('sqlsrv2')->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del4 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Justifikasi Kebutuhan berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Justifikasi Kebutuhan gagal dihapus ".$e;
             
@@ -613,7 +615,7 @@ class JuskebController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -640,7 +642,7 @@ class JuskebController extends Controller
 			order by id
             ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -667,7 +669,7 @@ class JuskebController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -678,14 +680,14 @@ class JuskebController extends Controller
             left join apv_kota c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2="select a.no_bukti,a.no_urut,a.barang,a.barang_klp,a.jumlah,a.harga,a.nilai,a.ppn,a.grand_total,b.nama as nama_klp 
             from apv_juskeb_d a        
             left join apv_klp_barang b on a.barang_klp=b.kode_barang and a.kode_lokasi=b.kode_lokasi    
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";					
-            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             // $sql3="select a.kode_role,a.kode_jab,a.no_urut,b.nama as nama_jab,c.nik,c.nama as nama_kar,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal
@@ -733,7 +735,7 @@ class JuskebController extends Controller
 			order by nu
 			
             ";
-            $res3 = DB::connection('sqlsrv2')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -767,14 +769,14 @@ class JuskebController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
             $sql="select kode_kota,nama from apv_kota where kode_lokasi='".$kode_lokasi."' and kode_pp='$request->kode_pp' ";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -800,14 +802,14 @@ class JuskebController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $status_admin= $data->status_admin;
             }
 
             $sql = "select kode_divisi from apv_karyawan where nik='$nik_user' ";
-            $cek = DB::connection('sqlsrv2')->select($sql);
+            $cek = DB::connection($this->db)->select($sql);
             if(count($cek) > 0){
                 $kode_divisi = $cek[0]->kode_divisi;
             }else{
@@ -821,7 +823,7 @@ class JuskebController extends Controller
                 $sql="select kode_divisi,nama from apv_divisi where kode_lokasi='".$kode_lokasi."'  ";
             }
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -849,7 +851,7 @@ class JuskebController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $status_admin= $data->status_admin;
@@ -866,7 +868,7 @@ class JuskebController extends Controller
             inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on b.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
             where a.modul='JV' $filter";
-            $cek = DB::connection('sqlsrv2')->select($sql);
+            $cek = DB::connection($this->db)->select($sql);
             if(count($cek) > 0){
                 $nik_ver = $cek[0]->nik;
             }else{
@@ -875,7 +877,7 @@ class JuskebController extends Controller
 
             // $sql="select a.nik,a.nama from apv_karyawan a where a.kode_lokasi='".$kode_lokasi."' $filter  ";
             
-            // $res = DB::connection('sqlsrv2')->select($sql);
+            // $res = DB::connection($this->db)->select($sql);
             // $res = json_decode(json_encode($res),true);
             
             if(count($cek) > 0){ //mengecek apakah data kosong atau tidak
@@ -904,7 +906,7 @@ class JuskebController extends Controller
         try {
             
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -924,7 +926,7 @@ class JuskebController extends Controller
 
             $sql="select kode_barang,nama from apv_klp_barang where kode_lokasi='".$kode_lokasi."' and jenis='A' $filter";
             
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
