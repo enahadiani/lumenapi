@@ -70,7 +70,7 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.tgl_sepakat,a.status_kontrak 
+            $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.nilai_ppn,a.tgl_sepakat,a.status_kontrak 
             from sai_kontrak a
             where a.kode_lokasi='".$kode_lokasi."'
             ");
@@ -121,8 +121,10 @@ class KontrakController extends Controller
             'kode_cust' => 'required',
             'keterangan' => 'required',
             'nilai'=>'required',
+            'nilai_ppn'=>'required',
             'deskripsi_modul'=>'required|array',
             'nilai_modul'=>'required|array',
+            'nilai_modul_ppn'=>'required|array',
             'nama_file'=>'array',
             'file.*'=>'file|max:3072',
             'tgl_sepakat' => 'required',
@@ -176,12 +178,12 @@ class KontrakController extends Controller
                 }
 
                 $periode_tagih = substr($tgl_tagih,0,4).substr($tgl_tagih,5,2);
-                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak,nilai_ppn) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak','$request->nilai_ppn') ");
 
                 if(count($request->deskripsi_modul) > 0){
                     $nu=1;
                     for($i=0; $i<count($request->deskripsi_modul);$i++){
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',".$request->nilai_modul[0].") ");
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai,nilai_ppn) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',".$request->nilai_modul[0].",".$request->nilai_modul_ppn[0].") ");
                         $nu++; 
                     }
                 }
@@ -235,12 +237,12 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_kontrak,a.kode_cust,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.status_kontrak,a.tgl_sepakat from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
+            $sql="select a.no_kontrak,a.kode_cust,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.status_kontrak,a.tgl_sepakat,a.nilai_ppn from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_kontrak,a.nu,a.keterangan,a.nilai from sai_kontrak_d a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
+            $sql2="select a.no_kontrak,a.nu,a.keterangan,a.nilai,a.nilai_ppn from sai_kontrak_d a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
             
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
@@ -300,6 +302,10 @@ class KontrakController extends Controller
             'kode_cust' => 'required',
             'keterangan' => 'required',
             'nilai'=>'required',
+            'nilai_ppn'=>'required',
+            'deskripsi_modul'=>'required|array',
+            'nilai_modul'=>'required|array',
+            'nilai_modul_ppn'=>'required|array',
             'nama_file'=>'array',
             'file.*'=>'file|max:3072',
             'tgl_sepakat' => 'required',
@@ -366,12 +372,12 @@ class KontrakController extends Controller
             }
 
             $periode_tagih = substr($tgl_tagih,0,4).substr($tgl_tagih,5,2);
-            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak') ");
+            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak,nilai_ppn) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak','$request->nilai_ppn') ");
 
             if(count($request->deskripsi_modul) > 0){
                 $nu=1;
                 for($i=0; $i<count($request->deskripsi_modul);$i++){
-                    $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',".$request->nilai_modul[0].") ");
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into sai_kontrak_d (no_kontrak,kode_lokasi,nu,keterangan,nilai,nilai_ppn) values ('$no_bukti','".$kode_lokasi."',$nu,'".$request->deskripsi_modul[$i]."',".$request->nilai_modul[0].",".$request->nilai_modul_ppn[0].") ");
                     $nu++; 
                 }
             }
