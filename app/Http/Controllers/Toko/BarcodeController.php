@@ -66,7 +66,7 @@ class BarcodeController extends Controller
             
             $sql= "select no_pesan,tanggal,nama_cust,nilai_pesan,kode_kirim 
             from ol_pesan_m
-            where kode_lokasi='".$kode_lokasi."' and status='input' $filter";
+            where kode_lokasi='".$kode_lokasi."' and status_pesan='input' $filter";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -127,7 +127,7 @@ class BarcodeController extends Controller
                     }
                     Storage::disk('s3')->put('toko/barcode-'.$request->no_bukti[$a],base64_decode(DNS1D::getBarcodePNG($request->no_bukti[$a], 'C39')));
 
-                    $update[$a] = DB::connection($this->sql)->update("update ol_pesan_m set status='barcode' where no_pesan='".$request->no_bukti[$a]."' and kode_lokasi='$kode_lokasi' ");
+                    $update[$a] = DB::connection($this->sql)->update("update ol_pesan_m set status_pesan='barcode' where no_pesan='".$request->no_bukti[$a]."' and kode_lokasi='$kode_lokasi' ");
                     $nbukti = $row->no_bukti[$a];
                     if($i == 0){
                         $nb .= "'$nbukti'";
@@ -141,7 +141,7 @@ class BarcodeController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "select no_pesan, nama_cust, alamat_cust, kecamatan_cust,kota_cust,prop_cust,berat,kode_kirim,kode_cust from ol_pesan_m
-            where kode_lokasi='".$kode_lokasi."' and status='barcode' and no_pesan in ($nb) ";
+            where kode_lokasi='".$kode_lokasi."' and status_pesan='barcode' and no_pesan in ($nb) ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
