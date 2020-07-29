@@ -51,7 +51,6 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('retur-beli-barang','Toko\ReturPembelianController@getBarang');
 
     //Stok Opname
-    
     $router->get('stok-opname', 'Toko\StockOpnameController@index');
     $router->post('stok-opname-load', 'Toko\StockOpnameController@load');
     $router->post('upload-barang-fisik', 'Toko\StockOpnameController@importExcel');
@@ -68,7 +67,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('kbdual','Toko\KasBankDualController@update');
     $router->delete('kbdual','Toko\KasBankDualController@destroy');
 
-    //Penjualan (POS)
+    //Penjualan (OL pesan)
     $router->post('penjualan-langsung','Toko\PenjualanLangsungController@store');
     $router->get('penjualan-langsung-nota','Toko\PenjualanLangsungController@getNota');
     $router->get('penjualan-langsung-bonus','Toko\PenjualanLangsungController@cekBonus');
@@ -76,6 +75,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('kota','Toko\PenjualanLangsungController@getKota');
     $router->get('kecamatan','Toko\PenjualanLangsungController@getKecamatan');
     $router->get('nilai-ongkir','Toko\PenjualanLangsungController@getService');
+
+    //Barcode pesan
+    $router->get('barcode-load','Toko\BarcodeController@loadData');
+    $router->post('barcode','Toko\BarcodeController@store');
 
 });
 
