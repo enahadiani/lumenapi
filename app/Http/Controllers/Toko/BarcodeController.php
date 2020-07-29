@@ -140,8 +140,10 @@ class BarcodeController extends Controller
             }
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "select no_pesan, nama_cust, alamat_cust, kecamatan_cust,kota_cust,prop_cust,berat,kode_kirim,kode_cust from ol_pesan_m
-            where kode_lokasi='".$kode_lokasi."' and status_pesan='barcode' and no_pesan in ($nb) ";
+            $res = DB::connection($this->sql)->select("select no_pesan, nama_cust, alamat_cust, kecamatan_cust,kota_cust,prop_cust,berat,kode_kirim,kode_cust from ol_pesan_m
+            where kode_lokasi='".$kode_lokasi."' and status_pesan='barcode' and no_pesan in ($nb) ");
+            $success['data'] =  json_decode(json_encode($res),true);
+            $success['message'] = "Data Barcode berhasil disimpan";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
