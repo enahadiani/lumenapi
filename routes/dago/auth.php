@@ -32,7 +32,7 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('s3')->response('dago/'.$filename); 
 });
 
-$router->group(['middleware' => 'auth:admindago'], function () use ($router) {
+$router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('profile', 'AdminDagoController@profile');
     $router->post('update_password', 'AdminDagoController@updatePassword');
     $router->get('users/{id}', 'AdminDagoController@singleUser');
