@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use  App\dago;
 
-class dagoDagoController extends Controller
+class AdminDagoController extends Controller
 {
      /**
      * Instantiate a new UserController instance.
