@@ -31,7 +31,7 @@ class AdminDagoController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrvdago')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_dago, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::connection('sqlsrvdago')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
 			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
@@ -67,7 +67,7 @@ class AdminDagoController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrvdago')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_dago, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::connection('sqlsrvdago')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
             c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,c.email
                   from hakakses a 
                   inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
