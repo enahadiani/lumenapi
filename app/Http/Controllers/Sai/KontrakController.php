@@ -61,7 +61,7 @@ class KontrakController extends Controller
         return $id;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             
@@ -69,10 +69,16 @@ class KontrakController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
+            if(isset($request->status)){
+                $filter .= " and a.status_kontrak ='$request->status' ";
+            }else{
+                $filter .= "";
+            }
 
             $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.nilai_ppn,a.tgl_sepakat,a.status_kontrak 
             from sai_kontrak a
-            where a.kode_lokasi='".$kode_lokasi."'
+            where a.kode_lokasi='".$kode_lokasi."' $filter
             ");
             $res = json_decode(json_encode($res),true);
             
