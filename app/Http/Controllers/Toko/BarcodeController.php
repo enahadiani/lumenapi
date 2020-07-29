@@ -128,7 +128,7 @@ class BarcodeController extends Controller
                     Storage::disk('s3')->put('toko/barcode-'.$request->no_bukti[$a],base64_decode(DNS1D::getBarcodePNG($request->no_bukti[$a], 'C39')));
 
                     $update[$a] = DB::connection($this->sql)->update("update ol_pesan_m set status_pesan='barcode' where no_pesan='".$request->no_bukti[$a]."' and kode_lokasi='$kode_lokasi' ");
-                    $nbukti = $row->no_bukti[$a];
+                    $nbukti = $request->no_bukti[$a];
                     if($i == 0){
                         $nb .= "'$nbukti'";
                     }else{
