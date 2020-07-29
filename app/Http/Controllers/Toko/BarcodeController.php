@@ -129,7 +129,7 @@ class BarcodeController extends Controller
 
                     $update[$a] = DB::connection($this->sql)->update("update ol_pesan_m set status_pesan='barcode' where no_pesan='".$request->no_bukti[$a]."' and kode_lokasi='$kode_lokasi' ");
                     $nbukti = $request->no_bukti[$a];
-                    if($i == 0){
+                    if($a == 0){
                         $nb .= "'$nbukti'";
                     }else{
     
