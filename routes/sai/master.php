@@ -62,6 +62,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('lampiran','Sai\LampiranController@store');
     $router->put('lampiran','Sai\LampiranController@update');
     $router->delete('lampiran','Sai\LampiranController@destroy');
+    
+    $router->get('modul','Sai\ModulController@index');
+    $router->post('modul','Sai\ModulController@store');
+    $router->put('modul','Sai\ModulController@update');
+    $router->delete('modul','Sai\ModulController@destroy');
 
 });
 
