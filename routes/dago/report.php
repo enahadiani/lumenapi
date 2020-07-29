@@ -15,7 +15,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
-$router->group(['middleware' => 'auth:admindago'], function () use ($router) {
+$router->group(['middleware' => 'auth:dago'], function () use ($router) {
     //Filter Laporan
     $router->get('filter-periode','Dago\FilterController@getFilterPeriode');
     $router->get('filter-paket','Dago\FilterController@getFilterPaket');

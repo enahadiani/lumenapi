@@ -23,7 +23,7 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('s3')->response('dago/'.$filename); 
 });
 
-$router->group(['middleware' => 'auth:admindago'], function () use ($router) {
+$router->group(['middleware' => 'auth:dago'], function () use ($router) {
     //Pekerjaan
     $router->get('pekerjaan','Dago\PekerjaanController@index');
     $router->post('pekerjaan','Dago\PekerjaanController@store');
