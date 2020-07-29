@@ -16,8 +16,8 @@ class RegistrasiGroupController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'sqlsrv2';
-    public $guard = 'admin';
+    public $sql = 'sqlsrvdago';
+    public $guard = 'dago';
 
     public function isUnik($isi,$kode_lokasi){
         

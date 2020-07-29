@@ -15,7 +15,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
-$router->group(['middleware' => 'auth:admin'], function () use ($router) {
+$router->group(['middleware' => 'auth:admindago'], function () use ($router) {
     //
 });
 
