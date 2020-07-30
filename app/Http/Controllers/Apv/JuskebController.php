@@ -237,13 +237,24 @@ class JuskebController extends Controller
                         $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i]]); 
                     }
                 }
-    
-                $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
-                from apv_role a
-                inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
-                inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
-                order by b.no_urut";
+
+                if($request->kode_pp == "7"){
+
+                    $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
+                    from apv_role a
+                    inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+                    inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota'
+                    order by b.no_urut";
+                }else{
+
+                    $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
+                    from apv_role a
+                    inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+                    inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
+                    order by b.no_urut";
+                }    
     
                 $role = DB::connection($this->db)->select($sql);
                 $role = json_decode(json_encode($role),true);
@@ -497,12 +508,23 @@ class JuskebController extends Controller
                     }
                 }
 
-                $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
-                from apv_role a
-                inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
-                inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
-                order by b.no_urut";
+                if($request->kode_pp == "7"){
+
+                    $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
+                    from apv_role a
+                    inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+                    inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota'
+                    order by b.no_urut";
+                }else{
+
+                    $sql = "select a.kode_role,b.kode_jab,b.no_urut,c.nik,c.no_telp
+                    from apv_role a
+                    inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
+                    inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp'
+                    order by b.no_urut";
+                }
 
                 $role = DB::connection($this->db)->select($sql);
                 $role = json_decode(json_encode($role),true);
