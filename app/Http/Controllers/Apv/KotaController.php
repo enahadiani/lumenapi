@@ -81,7 +81,7 @@ class KotaController extends Controller
 
             $res = DB::connection($this->db)->select("select a.kode_kota,a.nama,a.kode_pp 
             from apv_kota a 
-            inner join apv_karyawan b on a.kode_kota=b.kode_kota and a.kode_lokasi=b.kode_lokasi
+            inner join apv_karyawan b on a.kode_kota=b.id_kota and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and b.nik='$nik_user'
             ");
             $res = json_decode(json_encode($res),true);
