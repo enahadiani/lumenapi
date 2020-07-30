@@ -148,7 +148,7 @@ class VerifikasiController extends Controller
             'status' => 'required',
             'keterangan' => 'required',
             'total_barang' => 'required',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->db)->beginTransaction();

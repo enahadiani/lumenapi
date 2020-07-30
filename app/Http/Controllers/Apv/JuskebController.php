@@ -176,7 +176,7 @@ class JuskebController extends Controller
             'ppn'=> 'required|array',
             'grand_total'=> 'required|array',
             'nama_dok'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -422,7 +422,7 @@ class JuskebController extends Controller
             'ppn'=> 'required|array',
             'grand_total'=> 'required|array',
             'nama_dok'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->db)->beginTransaction();

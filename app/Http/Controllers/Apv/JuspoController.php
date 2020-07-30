@@ -170,6 +170,8 @@ class JuspoController extends Controller
             'subtotal'=> 'required|array',
             'ppn'=> 'required|array',
             'grand_total'=> 'required|array',
+            'nama_dok'=>'array',
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -457,7 +459,9 @@ class JuspoController extends Controller
             'qty'=> 'required|array',
             'subtotal'=> 'required|array',
             'ppn'=> 'required|array',
-            'grand_total'=> 'required|array'
+            'grand_total'=> 'required|array',
+            'nama_dok'=>'array',
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->db)->beginTransaction();
