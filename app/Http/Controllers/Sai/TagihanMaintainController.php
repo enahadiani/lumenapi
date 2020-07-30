@@ -326,6 +326,7 @@ class TagihanMaintainController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
+            'no_bukti' => 'required',
             'tanggal' => 'required',
             'no_dokumen' => 'required',
             'keterangan' => 'required',
@@ -389,11 +390,8 @@ class TagihanMaintainController extends Controller
                 $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
                 $per = substr($periode,2,4);
 
-                $no_bukti = $request->no_bukti;
-
                 $del = DB::connection($this->sql)->table('sai_bill_m')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
                 $del2 = DB::connection($this->sql)->table('sai_bill_d')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
-                $del3 = DB::connection($this->sql)->table('sai_bill_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
                 $perBefore = $periode;
 
                 $upd = DB::connection($this->sql)->update("update a set a.per_tagih='".$perBefore."'
@@ -417,7 +415,7 @@ class TagihanMaintainController extends Controller
                 }
 
                 $perNext = $this->nextNPeriode($periode,1); 
-                $upd1 = DB::connection($this->sql)->update("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                $upd1 = DB::connection($this->sql)->update("update a set a.periode_tagih='".$perNext."',a.kode_cust=b.kode_cust from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                 where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
 
                 if(count($arr_nama) > 0){
