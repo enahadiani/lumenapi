@@ -394,7 +394,7 @@ class TagihanMaintainController extends Controller
                 $del2 = DB::connection($this->sql)->table('sai_bill_d')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
                 $perBefore = $periode;
 
-                $upd = DB::connection($this->sql)->update("update a set a.per_tagih='".$perBefore."'
+                $upd = DB::connection($this->sql)->update("update a set a.periode_tagih='".$perBefore."'
                       from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                       where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
 
