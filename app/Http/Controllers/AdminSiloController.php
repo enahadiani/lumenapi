@@ -108,7 +108,7 @@ class AdminSiloController extends Controller
             
             $url = url('api/apv/storage');
             $user = DB::connection($this->db)->select("select a.nik, c.nama,
-            case when foto != '-' then '".$url."/'+foto else '-' end as foto,b.logo,c.no_telp,c.kode_jab,c.email,f.nama as jabatan
+            case when foto != '-' then '".$url."/'+foto else '-' end as foto,b.logo,c.no_telp,c.kode_jab,c.email,f.nama as jabatan,c.id_device
                   from hakakses a 
                   inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                   left join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
