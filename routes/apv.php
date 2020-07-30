@@ -104,6 +104,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->get('kota','Apv\JuskebController@getKota');
     $router->get('divisi','Apv\JuskebController@getDivisi');
     $router->get('nik_verifikasi','Apv\JuskebController@getNIKVerifikasi');
+    $router->get('nik_verifikasi2','Apv\JuskebController@getNIKVerifikasi2');
     $router->get('barang-klp','Apv\JuskebController@getBarangKlp');
     $router->get('generate-dok','Apv\JuskebController@generateDok');
     $router->post('juskeb','Apv\JuskebController@store');

@@ -901,6 +901,54 @@ class JuskebController extends Controller
         }
     }
 
+    public function getNIKVerifikasi2(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+            $filter = "";
+            if(isset($request->kode_kota)){
+                if($request->kode_kota != ""){
+                    $filter .= " and a.kode_kota='$request->kode_kota' ";
+                }
+            }
+
+            $sql = "select a.nik,a.nama
+			from apv_karyawan a
+			where a.kode_jab='JV07' $filter";
+            $cek = DB::connection($this->db)->select($sql);
+            if(count($cek) > 0){
+                $nik_ver = $cek[0]->nik;
+            }else{
+                $nik_ver = "-";
+            }
+            
+            if(count($cek) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $cek;
+                $success['nik_ver'] = $nik_ver;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['nik_ver'] = $nik_ver;
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getBarangKlp(Request $request)
     {
         try {
