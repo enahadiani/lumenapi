@@ -274,7 +274,7 @@ class TagihanMaintainController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select nu,item,harga,jumlah,nilai,nilai_ppn,kode_kontrak,kode_cust from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti'  order by nu ";					
+            $sql2="select nu,item,harga,jumlah,nilai,nilai_ppn,no_kontrak,kode_cust from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti'  order by nu ";					
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
