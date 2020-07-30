@@ -174,7 +174,9 @@ class BarcodeController extends Controller
             }
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $sql = "select no_pesan, nama_cust, alamat_cust, kecamatan_cust,kota_cust,prop_cust,berat,kode_kirim,kode_cust from ol_pesan_m
+            $sql = "select a.no_pesan, a.nama_cust, a.alamat_cust, a.kecamatan_cust,a.kota_cust,a.prop_cust,a.berat,a.kode_kirim,a.kode_cust,b.nama as nama_lokasi,b.no_telp as no_telp_lokasi,b.alamat as alamat_lokasi,b.kota as kota_lokasi 
+            from ol_pesan_m a
+            inner join lokasi b on a.kode_lokasi=b.kode_lokasi            
             where kode_lokasi='".$kode_lokasi."' and status_pesan='barcode' and no_pesan in ($nb) ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
