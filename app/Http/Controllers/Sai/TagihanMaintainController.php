@@ -213,7 +213,7 @@ class TagihanMaintainController extends Controller
                 }
 
                 $perNext = $this->nextNPeriode($periode,1); 
-                $upd1 = DB::connection($this->sql)->insert("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                $upd1 = DB::connection($this->sql)->insert("update a set a.periode_tagih='".$perNext."',a.kode_cust=b.kode_cust from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                 where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
     
                 if(count($arr_nama) > 0){
