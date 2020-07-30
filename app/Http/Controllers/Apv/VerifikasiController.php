@@ -289,7 +289,7 @@ class VerifikasiController extends Controller
             $rsi = DB::connection($this->db)->select("select a.nik,b.nama,b.id_device
             from apv_flow a
             inner join apv_karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
-            where a.no_bukti='$no_bukti' and a.status='1' and a.sts_ver='1' ");
+            where a.no_bukti='$request->no_aju' and a.status='1' and a.sts_ver='1' ");
             if(count($rsi) > 0){
                 $success['id_device_app'] = $rsi[0]->id_device; 
                 $success['nik_device_app'] = $rsi[0]->nik; 
