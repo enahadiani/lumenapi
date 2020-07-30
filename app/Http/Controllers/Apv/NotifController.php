@@ -172,7 +172,7 @@ class NotifController extends Controller
 			$kode_lokasi= $auth->kode_lokasi;
 		}
 
-		DB::connection($this->sql)->beginTransaction();
+		DB::connection($this->db)->beginTransaction();
         try{
             $token = $request->token;
             if($token != "-"){
@@ -189,9 +189,9 @@ class NotifController extends Controller
                     }
                     for($i=0;$i<count($request->token);$i++){
     
-                        $ins[$i] = DB::connection($this->sql)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->data['title']."','-','".$request->data['message']."','".$request->data['nik']."','".$request->token[$i]."','$sts',getdate(),'".$request->data['icon']."') ");
+                        $ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->data['title']."','-','".$request->data['message']."','".$request->data['nik']."','".$request->token[$i]."','$sts',getdate(),'".$request->data['icon']."') ");
                     }
-                    DB::connection($this->sql)->commit();
+                    DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Sukses";
                 }else{
@@ -204,7 +204,7 @@ class NotifController extends Controller
             }
             return response()->json($success, 200);
         } catch (\Throwable $e) {
-			DB::connection($this->sql)->rollback();
+			DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
@@ -227,7 +227,7 @@ class NotifController extends Controller
 			where nik='$nik' and status in ('1')
 			";
 
-			$get = DB::connection($this->sql)->select($sql);
+			$get = DB::connection($this->db)->select($sql);
 			$get = json_decode(json_encode($get),true);
 			if(count($get) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
