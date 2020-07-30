@@ -297,6 +297,7 @@ class VerifikasiController extends Controller
                 $success['id_device_app'] = '-'; 
                 $success['nik_device_app'] = '-'; 
             }
+            $success['jum_id'] = count($rsi);
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
