@@ -145,6 +145,7 @@ class VerifikasiController extends Controller
             'tanggal' => 'required',
             'no_aju' => 'required',
             'kode_pp' => 'required',
+            'kode_kota' => 'required',
             'status' => 'required',
             'keterangan' => 'required',
             'total_barang' => 'required',
