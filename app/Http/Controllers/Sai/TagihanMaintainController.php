@@ -339,8 +339,6 @@ class TagihanMaintainController extends Controller
             'no_rek'=> 'required',
             'nama_rek'=> 'required',
             'item'=> 'required|array',
-            'harga'=> 'required|array',
-            'jumlah'=> 'required|array',
             'nilai' => 'required|array',
             'nilai_ppn' => 'required|array',
             'nama_file'=>'array',

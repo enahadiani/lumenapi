@@ -19,7 +19,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
     $router->post('login', 'AuthController@loginAdminSilo');
-    $router->get('hash_pass', 'AuthController@hashPasswordAdminSilo');
+    $router->get('hash-pass', 'AuthController@hashPasswordAdminSilo');
+    $router->get('hash-by-nik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');
 });
 
 $router->get('storage/{filename}', function ($filename)
