@@ -57,9 +57,7 @@ class NotifController extends Controller
 							'registration_ids'  => $ids,
 							'notification'              => array (
 								"body" => $data["message"],
-								"title" => $data["title"],
-								"subtitle" => $data["subtitle"],
-								"icon" => $data["icon"],
+								"title" => $data["title"]
 							),
 							'data'              => $data,
 							"android" => array (
@@ -76,9 +74,7 @@ class NotifController extends Controller
 				'registration_ids'  => $ids,
 				'notification'              => array (
 					"body" => $data["message"],
-					"title" => $data["title"],
-					"subtitle" => $data["subtitle"],
-					"icon" => $data["icon"],
+					"title" => $data["title"]
 				),
 				'data'              => $data
 			);
@@ -177,7 +173,7 @@ class NotifController extends Controller
             $token = $request->token;
             if($token != "-"){
                 
-                $payload = $request->data;
+				$payload = $request->data;
                 $res = $this->gcm($token,$payload);
                 $hasil= json_decode($res,true);
                 $success['hasil'] = $hasil;
@@ -189,7 +185,7 @@ class NotifController extends Controller
                     }
                     for($i=0;$i<count($request->token);$i++){
     
-                        $ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->data['title']."','-','".$request->data['message']."','".$request->data['nik']."','".$request->token[$i]."','$sts',getdate(),'".$request->data['icon']."') ");
+                        $ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->data['title']."','-','".$request->data['message']."','".$request->data['nik']."','".$request->token[$i]."','$sts',getdate(),'-') ");
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
