@@ -109,13 +109,19 @@ class KaryawanController extends Controller
                 $kode_kota = "-";
             }
 
+            if(isset($request->nama_kota)){
+                $nama_kota = $request->nama_kota;
+            }else{
+                $nama_kota = "-";
+            }
+
             if(isset($request->kode_divisi)){
                 $kode_divisi = $request->kode_divisi;
             }else{
                 $kode_divisi = "-";
             }
 
-            $ins = DB::connection($this->db)->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi,id_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$nama_kota,$kode_divisi,$kode_kota]);
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -243,10 +249,17 @@ class KaryawanController extends Controller
             
             $del = DB::connection($this->db)->table('apv_karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
+            
             if(isset($request->kode_kota)){
                 $kode_kota = $request->kode_kota;
             }else{
                 $kode_kota = "-";
+            }
+
+            if(isset($request->nama_kota)){
+                $nama_kota = $request->nama_kota;
+            }else{
+                $nama_kota = "-";
             }
 
             if(isset($request->kode_divisi)){
@@ -255,7 +268,7 @@ class KaryawanController extends Controller
                 $kode_divisi = "-";
             }
 
-            $ins = DB::connection($this->db)->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$kode_kota,$kode_divisi]);
+            $ins = DB::connection($this->db)->insert('insert into apv_karyawan (nik,nama,kode_lokasi,kode_pp,kode_jab,foto,email,no_telp,kota,kode_divisi,id_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_pp'),$request->input('kode_jab'),$foto,$request->input('email'),$request->input('no_telp'),$nama_kota,$kode_divisi,$nama_kota]);
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
