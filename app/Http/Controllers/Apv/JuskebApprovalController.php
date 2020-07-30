@@ -369,6 +369,18 @@ class JuskebApprovalController extends Controller
                 
                 $success['approval'] = "Return";
             }
+
+            DB::connection($this->db)->commit();
+            
+            $rsi = DB::connection($this->db)->select("select a.nik,b.nama,b.id_device
+            from apv_flow a
+            inner join apv_karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
+            where a.no_bukti='$no_bukti' and a.status='1' ");
+            if(count($rsi) > 0){
+                $success['id_device_app'] = $rsi[0]->id_device;
+            }else{
+                $success['id_device_app'] = '-';
+            }
             
             $success['status'] = true;
             $success['message'] = "Data Approval Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
@@ -379,7 +391,6 @@ class JuskebApprovalController extends Controller
             $success['token_players_app'] = $token_player;
             $success['token_players_buat'] = $token_player2;
             
-            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
