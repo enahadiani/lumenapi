@@ -286,14 +286,16 @@ class VerifikasiController extends Controller
             
             DB::connection($this->db)->commit();
 
-            $rst = DB::connection($this->db)->select("select a.nik,b.nama,b.id_device
+            $rsi = DB::connection($this->db)->select("select a.nik,b.nama,b.id_device
             from apv_flow a
             inner join apv_karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
             where a.no_bukti='$no_bukti' and a.status='1' and a.sts_ver='1' ");
-            if(count($rst) > 0){
-                $success['id_device_app'] = $rst[0]->id_device;
+            if(count($rsi) > 0){
+                $success['id_device_app'] = $rsi[0]->id_device; 
+                $success['nik_device_app'] = $rsi[0]->nik; 
             }else{
-                $success['id_device_app'] = '-';
+                $success['id_device_app'] = '-'; 
+                $success['nik_device_app'] = '-'; 
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {

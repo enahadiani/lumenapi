@@ -213,7 +213,7 @@ class TagihanMaintainController extends Controller
                 }
 
                 $perNext = $this->nextNPeriode($periode,1); 
-                $upd1 = DB::connection($this->sql)->insert("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                $upd1 = DB::connection($this->sql)->insert("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                 where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
     
                 if(count($arr_nama) > 0){
@@ -399,7 +399,7 @@ class TagihanMaintainController extends Controller
                 $perBefore = $periode;
 
                 $upd = DB::connection($this->sql)->update("update a set a.per_tagih='".$perBefore."'
-                      from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                      from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                       where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
 
                 $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul,jenis) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->total_nilai,$request->total_nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL','$request->status_kontrak') ");
@@ -419,7 +419,7 @@ class TagihanMaintainController extends Controller
                 }
 
                 $perNext = $this->nextNPeriode($periode,1); 
-                $upd1 = DB::connection($this->sql)->update("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak_m a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
+                $upd1 = DB::connection($this->sql)->update("update a set a.periode_tagih='".$perNext."',b.kode_cust=a.kode_cust from sai_kontrak a inner join sai_bill_d b on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi 
                 where b.no_bill='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."'"); 
 
                 if(count($arr_nama) > 0){
