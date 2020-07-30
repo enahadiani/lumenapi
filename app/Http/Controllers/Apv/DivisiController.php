@@ -70,6 +70,42 @@ class DivisiController extends Controller
         
     }
 
+    public function getDivisiByNIK()
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_divisi,a.nama 
+            from apv_divisi a 
+            inner join apv_karyawan b on a.kode_divisi=b.kode_divisi and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."' and b.nik='$nik_user'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     /**
      * Show the form for creating a new resource.
      *

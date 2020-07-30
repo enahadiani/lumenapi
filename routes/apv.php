@@ -88,6 +88,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->post('kota','Apv\KotaController@store');
     $router->put('kota/{kode_kota}','Apv\KotaController@update');
     $router->delete('kota/{kode_kota}','Apv\KotaController@destroy');
+    $router->get('kota-aju','Apv\KotaController@getKotaByNIK');
 
     //Master Divisi
     $router->get('divisi_all','Apv\DivisiController@index');
@@ -95,6 +96,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->post('divisi','Apv\DivisiController@store');
     $router->put('divisi/{kode_divisi}','Apv\DivisiController@update');
     $router->delete('divisi/{kode_divisi}','Apv\DivisiController@destroy');
+    $router->get('divisi-aju','Apv\DivisiController@getDivisiByNIK');
 
     //Justifikasi Kebutuhan
     $router->get('juskeb','Apv\JuskebController@index');
