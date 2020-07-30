@@ -78,6 +78,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     //Barcode pesan
     $router->get('barcode-load','Toko\BarcodeController@loadData');
+    $router->get('periode','Toko\BarcodeController@getPeriode');
     $router->post('barcode','Toko\BarcodeController@store');
 
 });
