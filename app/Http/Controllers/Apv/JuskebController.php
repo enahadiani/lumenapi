@@ -914,7 +914,7 @@ class JuskebController extends Controller
             $filter = "";
             if(isset($request->kode_kota)){
                 if($request->kode_kota != ""){
-                    $filter .= " and a.kode_kota='$request->kode_kota' ";
+                    $filter .= " and a.id_kota='$request->kode_kota' ";
                 }
             }
 
