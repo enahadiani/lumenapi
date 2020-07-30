@@ -177,7 +177,7 @@ class BarcodeController extends Controller
             $sql = "select a.no_pesan, a.nama_cust, a.alamat_cust, a.kecamatan_cust,a.kota_cust,a.prop_cust,a.berat,a.kode_kirim,a.kode_cust,b.nama as nama_lokasi,b.no_telp as no_telp_lokasi,b.alamat as alamat_lokasi,b.kota as kota_lokasi 
             from ol_pesan_m a
             inner join lokasi b on a.kode_lokasi=b.kode_lokasi            
-            where kode_lokasi='".$kode_lokasi."' and status_pesan='barcode' and no_pesan in ($nb) ";
+            where a.kode_lokasi='".$kode_lokasi."' and a.status_pesan='barcode' and a.no_pesan in ($nb) ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['data'] =  $res;
