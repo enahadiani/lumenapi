@@ -98,7 +98,7 @@ class JuskebController extends Controller
             when a.progress = 'S' and c.progress ='S' then 'Finish Pengadaan' 
             when a.progress = 'S' and c.progress ='R' then 'Return Approval' 
             when a.progress = 'S' and c.progress not in ('R','S') then isnull(y.nama_jab,'-')
-            end as posisi,a.progress
+            end as posisi,a.progress,isnull(z.nilai,0) as nilai_finish
             from apv_juskeb_m a
             left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
                         FROM apv_ver_m
@@ -115,6 +115,7 @@ class JuskebController extends Controller
                                 inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )y on c.no_bukti=y.no_bukti
+            left join apv_juspo_m z on a.no_bukti=z.no_juskeb and a.kode_lokasi=z.kode_lokasi
 			where a.kode_lokasi='$kode_lokasi' and a.nik_buat='$nik_user'
                                        
             ");
