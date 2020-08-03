@@ -116,7 +116,70 @@ class JuskebController extends Controller
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )y on c.no_bukti=y.no_bukti
             left join apv_juspo_m z on a.no_bukti=z.no_juskeb and a.kode_lokasi=z.kode_lokasi
-			where a.kode_lokasi='$kode_lokasi' and a.nik_buat='$nik_user'
+			where a.kode_lokasi='$kode_lokasi' and a.nik_buat='$nik_user' and c.progress  <> 'S'
+                                       
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+
+    public function getJuskebFinish()
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,
+            a.nilai,
+            case when a.progress = 'A' then 'Verifikasi' 
+            when a.progress='F' then 'Return Verifikasi' 
+            when a.progress='R' then 'Return Approval' 
+            when a.progress not in ('R','S','F') then isnull(x.nama_jab,'-')
+            when a.progress = 'S' and isnull(c.progress,'-') ='-' then 'Finish Kebutuhan' 
+            when a.progress = 'S' and c.progress ='S' then 'Finish Pengadaan' 
+            when a.progress = 'S' and c.progress ='R' then 'Return Approval' 
+            when a.progress = 'S' and c.progress not in ('R','S') then isnull(y.nama_jab,'-')
+            end as posisi,a.progress,isnull(z.nilai,0) as nilai_finish
+            from apv_juskeb_m a
+            left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
+                        FROM apv_ver_m
+                        GROUP BY no_juskeb,kode_lokasi,tanggal
+                        ) b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
+            left join apv_juspo_m c on a.no_bukti=c.no_juskeb and a.kode_lokasi=c.kode_lokasi
+            left join (select a.no_bukti,b.nama as nama_jab
+                                from apv_flow a
+                                inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                                where a.kode_lokasi='$kode_lokasi' and a.status='1'
+                                )x on a.no_bukti=x.no_bukti
+            left join (select a.no_bukti,b.nama as nama_jab
+                                from apv_flow a
+                                inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                                where a.kode_lokasi='$kode_lokasi' and a.status='1'
+                                )y on c.no_bukti=y.no_bukti
+            left join apv_juspo_m z on a.no_bukti=z.no_juskeb and a.kode_lokasi=z.kode_lokasi
+			where a.kode_lokasi='$kode_lokasi' and a.nik_buat='$nik_user' and c.progress  = 'S'
                                        
             ");
             $res = json_decode(json_encode($res),true);

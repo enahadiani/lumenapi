@@ -100,6 +100,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
 
     //Justifikasi Kebutuhan
     $router->get('juskeb','Apv\JuskebController@index');
+    $router->get('juskeb-finish','Apv\JuskebController@getJuskebFinish');
     $router->get('juskeb/{no_bukti}','Apv\JuskebController@show');
     $router->get('kota','Apv\JuskebController@getKota');
     $router->get('divisi','Apv\JuskebController@getDivisi');
