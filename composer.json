@@ -19,6 +19,7 @@
         "midtrans/midtrans-php": "^2.2",
         "milon/barcode": "^7.0",
         "phpoffice/phpspreadsheet": "^1.11",
+        "pusher/pusher-php-server": "^4.1",
         "simplesoftwareio/simple-qrcode": "^3.0",
         "tymon/jwt-auth": "dev-develop"
     },

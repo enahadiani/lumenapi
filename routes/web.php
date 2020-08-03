@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage; 
 use Milon\Barcode\Facades\DNS1DFacade as DNS1D;
 use Milon\Barcode\Facades\DNS2DFacade as DNS2D;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -52,6 +53,12 @@ $router->get('auth/facebook/callback', 'LoginSocialiteController@handleProviderC
 
 $router->post('send_notif_fcm', 'NotifController@sendNotif');
 
+
+$router->get('pusher/{message}/{id}', function ($message,$id) {
+    event(new \App\Events\NotifApv($message,$id));
+
+    return "Event has been sent!";
+});
 
 
 

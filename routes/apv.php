@@ -112,6 +112,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->delete('juskeb/{no_bukti}','Apv\JuskebController@destroy');
     $router->get('juskeb_history/{no_bukti}','Apv\JuskebController@getHistory');
     $router->get('juskeb_preview/{no_bukti}','Apv\JuskebController@getPreview');
+    $router->get('juskeb_preview2/{no_bukti}','Apv\JuskebController@getPreview2');
 
     // Verifikasi
     $router->get('verifikasi','Apv\VerifikasiController@index');
