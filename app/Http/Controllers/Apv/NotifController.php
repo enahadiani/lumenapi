@@ -289,7 +289,7 @@ class NotifController extends Controller
 		
         try{
             
-			$sql = "select id,judul,pesan,tgl_input,status,icon,convert(varchar,tgl_input,105) as tgl, convert(varchar,tgl_input,108) as jam
+			$sql = "select top 5 id,judul,pesan,tgl_input,status,icon,convert(varchar,tgl_input,105) as tgl, convert(varchar,tgl_input,108) as jam
 			from user_message
 			where nik='$nik' and status in ('1')
 			order by id desc
