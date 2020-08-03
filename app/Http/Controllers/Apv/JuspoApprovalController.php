@@ -572,7 +572,7 @@ class JuspoApprovalController extends Controller
                 $rs = DB::connection($this->db)->select("select max(id) as id
                 from apv_pesan a
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-                where a.kode_lokasi='$kode_lokasi' and a.modul='JP' and b.nik= '$nik' and a.no_bukti='$no_bukti'");
+                where a.kode_lokasi='$kode_lokasi' and a.modul='JP' and b.nik= '$nik_user' and a.no_bukti='$no_bukti'");
                 $id = $rs[0]->id;
             }else{
                 $id = $id;
