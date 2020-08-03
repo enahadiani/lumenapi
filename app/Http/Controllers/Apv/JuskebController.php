@@ -116,7 +116,7 @@ class JuskebController extends Controller
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )y on c.no_bukti=y.no_bukti
             left join apv_juspo_m z on a.no_bukti=z.no_juskeb and a.kode_lokasi=z.kode_lokasi
-			where a.kode_lokasi='$kode_lokasi' and a.nik_buat='$nik_user' and c.progress  <> 'S'
+			where a.kode_lokasi='$kode_lokasi' and a.nik_buat='$nik_user'  and isnull(c.progress,'-')  <> 'S'
                                        
             ");
             $res = json_decode(json_encode($res),true);
