@@ -11,11 +11,13 @@ class NotifApv extends Event implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;
 
+    public $title;
     public $message;
     public $id;
 
-    public function __construct($message,$id)
+    public function __construct($title,$message,$id)
     {
+        $this->title = $title;
         $this->message = $message;
         $this->id = $id;
     }

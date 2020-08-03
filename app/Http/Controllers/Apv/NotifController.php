@@ -244,5 +244,78 @@ class NotifController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
         }
-    }
+	}
+	
+	public function sendPusher(Request $request)
+	{
+		$this->validate($request,[
+			"title" => 'required',
+			"message" => 'required',
+			"id" => 'required|array'
+		]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			for($i=0;$i<count($request->id);$i++){
+
+				event(new \App\Events\NotifApv($request->title,$request->message,$request->id[$i]));
+				$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->title."','-','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-') ");
+
+			}
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = "Sukses";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+	}
+
+	public function getNotifPusher(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+		
+        try{
+            
+			$sql = "select id,judul,pesan,tgl_input,status,icon,convert(varchar,tgl_input,105) as tgl, convert(varchar,tgl_input,108) as jam
+			from user_message
+			where nik='$nik' and status in ('1')
+			order by id desc
+			";
+
+			$get = DB::connection($this->db)->select($sql);
+			$get = json_decode(json_encode($get),true);
+			if(count($get) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $get;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+	}
+	
 }

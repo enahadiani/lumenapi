@@ -173,7 +173,14 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->post('notif', 'Apv\NotifController@sendNotif');
     $router->get('notif', 'Apv\NotifController@getNotif');
 
+    
+    
+    // $router->post('notif_send','Apv\NotifikasiController@sendNotif');
+    
+    $router->post('notif-pusher', 'Apv\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Apv\NotifController@getNotifPusher');
 });
+
 
 
 
