@@ -251,7 +251,8 @@ class NotifController extends Controller
 		$this->validate($request,[
 			"title" => 'required',
 			"message" => 'required',
-			"id" => 'required|array'
+			"id" => 'required|array',
+			"sts_insert" => 'required'
 		]);
 
 		if($auth =  Auth::guard($this->guard)->user()){
@@ -265,7 +266,10 @@ class NotifController extends Controller
 			for($i=0;$i<count($request->id);$i++){
 
 				event(new \App\Events\NotifApv($request->title,$request->message,$request->id[$i]));
-				$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->title."','-','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-') ");
+				if($request->sts_insert == '1'){
+
+					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon) values ('$kode_lokasi','".$request->title."','-','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-') ");
+				}
 
 			}
 			DB::connection($this->db)->commit();
