@@ -288,15 +288,16 @@ class JuskebController extends Controller
                 }
     
                 $token_players = array();
-                $rst = DB::connection($this->db)->select("select a.nik_buat,b.token 
-                from apv_juskeb_m a
-                inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
-                where a.no_bukti='$no_bukti' ");
-                $rst = json_decode(json_encode($rst),true);
-                for($t=0;$t<count($rst);$t++){
-                    array_push($token_players,$rst[$t]["token"]);
-                }
-                
+                // $rst = DB::connection($this->db)->select("select a.nik_buat,b.token 
+                // from apv_juskeb_m a
+                // inner join api_token_auth b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+                // where a.no_bukti='$no_bukti' ");
+                // $rst = json_decode(json_encode($rst),true);
+                // for($t=0;$t<count($rst);$t++){
+                //     array_push($token_players,$rst[$t]["token"]);
+                // }
+
+                $success['nik_ver'] = $request->nik_ver;
                 $success['status'] = true;
                 $success['message'] = "Data Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
                 $success['no_aju'] = $no_bukti;
@@ -307,6 +308,7 @@ class JuskebController extends Controller
                 $success['message'] = "Error : Duplicate entry. No Dokumen sudah ada di database !";
                 $success['no_aju'] = '-';
                 $success['token_players'] = [];
+                $success['nik_ver'] = '-';
             }
 
             return response()->json(['success'=>$success], $this->successStatus);     
@@ -571,6 +573,7 @@ class JuskebController extends Controller
                 $success['message'] = "Data Justifikasi Kebutuhan berhasil diubah. No Bukti:".$no_bukti.$msg_email;
                 $success['no_aju'] = $no_bukti;
                 $success['token_players'] = $token_players;
+                $success['nik_ver'] = $request->nik_ver;
 
             // }else{
             //     $success['status'] = false;
