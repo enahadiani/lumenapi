@@ -134,6 +134,7 @@ class KontrakController extends Controller
             'nama_file'=>'array',
             'file.*'=>'file|max:3072',
             'tgl_sepakat' => 'required',
+            'due_date' => 'required',
             'status_kontrak' => 'required|in:MAINTENANCE,PROYEK'
         ]);
 
@@ -184,7 +185,7 @@ class KontrakController extends Controller
                 }
 
                 $periode_tagih = substr($tgl_tagih,0,4).substr($tgl_tagih,5,2);
-                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak,nilai_ppn) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak','$request->nilai_ppn') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak,nilai_ppn,progress,due_date) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak','$request->nilai_ppn','0',$request->due_date) ");
 
                 if(count($request->deskripsi_modul) > 0){
                     $nu=1;
@@ -243,7 +244,7 @@ class KontrakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_kontrak,a.kode_cust,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.status_kontrak,a.tgl_sepakat,a.nilai_ppn from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
+            $sql="select a.no_kontrak,a.kode_cust,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.status_kontrak,a.tgl_sepakat,a.nilai_ppn,a.due_date from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.no_kontrak='$request->no_kontrak' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -270,6 +271,7 @@ class KontrakController extends Controller
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus); 
             }
@@ -315,6 +317,7 @@ class KontrakController extends Controller
             'nama_file'=>'array',
             'file.*'=>'file|max:3072',
             'tgl_sepakat' => 'required',
+            'due_date' => 'required',
             'status_kontrak' => 'required|in:MAINTENANCE,PROYEK'
         ]);
 
@@ -378,7 +381,7 @@ class KontrakController extends Controller
             }
 
             $periode_tagih = substr($tgl_tagih,0,4).substr($tgl_tagih,5,2);
-            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak,nilai_ppn) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak','$request->nilai_ppn') ");
+            $ins = DB::connection($this->sql)->insert("insert into sai_kontrak (no_kontrak,no_dokumen,tgl_awal,tgl_akhir,keterangan,nilai,kode_lokasi,periode_tagih,kode_cust,tgl_sepakat,status_kontrak,nilai_ppn,progress,due_date) values ('$no_bukti','$request->no_dokumen','$tgl_awal','$tgl_akhir','$request->keterangan',".$request->nilai.",'$kode_lokasi','$periode_tagih','$request->kode_cust','$request->tgl_sepakat','$request->status_kontrak','$request->nilai_ppn','0',$request->due_date) ");
 
             if(count($request->deskripsi_modul) > 0){
                 $nu=1;

@@ -182,7 +182,7 @@ class TagihanController extends Controller
 
                 $no_bukti = $this->generateKode("sai_bill_m", "no_bill", $kode_lokasi."-BILL".$per.".", "0001");
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->total_nilai,$request->total_nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->total_nilai,$request->total_nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'0','BILL') ");
     
                 $item = $request->input('item');
                 $harga = $request->input('harga');
@@ -193,7 +193,7 @@ class TagihanController extends Controller
                 if(count($item) > 0){
                     $nu=1;
                     for($i=0; $i<count($item);$i++){
-                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','$request->no_kontrak','$request->kode_cust') ");
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust,no_dokumen,bank,cabang,no_rek,nama_rek) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','$request->no_kontrak','$request->kode_cust','$request->no_dokumen','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek') ");
                         $nu++;
                     }
                 }
@@ -375,7 +375,7 @@ class TagihanController extends Controller
 
                 $no_bukti = $request->no_bukti;
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->total_nilai,$request->total_nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL') ");
+                $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,progress,modul) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->keterangan','IDR','1',$request->total_nilai,$request->total_nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'0','BILL') ");
     
                 $item = $request->input('item');
                 $harga = $request->input('harga');
@@ -386,7 +386,7 @@ class TagihanController extends Controller
                 if(count($item) > 0){
                     $nu=1;
                     for($i=0; $i<count($item);$i++){
-                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','$request->no_kontrak','$request->kode_cust') ");
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust,no_dokumen,bank,cabang,no_rek,nama_rek) values ('$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',".$harga[$i].",".$jumlah[$i].",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','$request->no_kontrak','$request->kode_cust','$request->no_dokumen','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek') ");
                         $nu++;
                     }
                 }
