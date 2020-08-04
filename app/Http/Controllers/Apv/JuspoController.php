@@ -193,7 +193,7 @@ class JuspoController extends Controller
             {
                 foreach($request->file('file') as $file)
                 {                
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                     $foto = $nama_foto;
                     if(Storage::disk('s3')->exists('apv/'.$foto)){
                         Storage::disk('s3')->delete('apv/'.$foto);
@@ -477,7 +477,7 @@ class JuspoController extends Controller
             {
                 foreach($request->file('file') as $file)
                 {                
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                     $foto = $nama_foto;
                     if(Storage::disk('s3')->exists('apv/'.$foto)){
                         Storage::disk('s3')->delete('apv/'.$foto);
