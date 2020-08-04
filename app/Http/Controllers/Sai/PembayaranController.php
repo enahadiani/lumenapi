@@ -94,7 +94,7 @@ class PembayaranController extends Controller
             'no_bill' => 'required|array',
             'nilai' => 'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240',
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -243,7 +243,7 @@ class PembayaranController extends Controller
             'keterangan' => 'required',
             'kode_cust' => 'required',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240',
         ]);
 
         DB::connection($this->sql)->beginTransaction();

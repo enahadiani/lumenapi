@@ -93,7 +93,7 @@ class FakturPajakController extends Controller
             'periode' => 'required',
             'keterangan' => 'required',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -227,7 +227,7 @@ class FakturPajakController extends Controller
             'periode' => 'required',
             'keterangan' => 'required',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->sql)->beginTransaction();

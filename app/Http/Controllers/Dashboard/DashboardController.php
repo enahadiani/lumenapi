@@ -1266,5 +1266,39 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function getMenu2($kode_klp){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $row = DB::connection('sqlsrvyptkug')->select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' and (isnull(a.jenis_menu,'-') = '-' OR a.jenis_menu = '') order by kode_klp, rowindex
+            ");
+            $row = json_decode(json_encode($row),true);
+            
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $row;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 }

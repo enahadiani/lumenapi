@@ -132,7 +132,7 @@ class KontrakController extends Controller
             'nilai_modul'=>'required|array',
             'nilai_modul_ppn'=>'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072',
+            'file.*'=>'file|max:10240',
             'tgl_sepakat' => 'required',
             'due_date' => 'required',
             'status_kontrak' => 'required|in:MAINTENANCE,PROYEK'
@@ -315,7 +315,7 @@ class KontrakController extends Controller
             'nilai_modul'=>'required|array',
             'nilai_modul_ppn'=>'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072',
+            'file.*'=>'file|max:10240',
             'tgl_sepakat' => 'required',
             'due_date' => 'required',
             'status_kontrak' => 'required|in:MAINTENANCE,PROYEK'

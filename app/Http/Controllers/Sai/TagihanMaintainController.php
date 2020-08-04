@@ -166,7 +166,7 @@ class TagihanMaintainController extends Controller
             'nilai' => 'required|array',
             'nilai_ppn' => 'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072',
+            'file.*'=>'file|max:10240',
             'status_kontrak' => 'required'
         ]);
 
@@ -356,7 +356,7 @@ class TagihanMaintainController extends Controller
             'nilai' => 'required|array',
             'nilai_ppn' => 'required|array',
             'nama_file'=>'array',
-            'file.*'=>'file|max:3072'
+            'file.*'=>'file|max:10240'
         ]);
 
 
