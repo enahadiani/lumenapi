@@ -551,9 +551,8 @@ class TagihanMaintainController extends Controller
             $sql="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih,a.nilai_ppn
             from sai_kontrak a 
             inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
-            left join sai_bill_d c on a.no_kontrak=b.no_kontrak and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' $filter 
-            
+            left join sai_bill_d c on a.no_kontrak=c.no_kontrak and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' $filter
             ";
             
             $res = DB::connection($this->sql)->select($sql);
