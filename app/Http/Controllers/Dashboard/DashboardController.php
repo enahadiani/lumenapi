@@ -1291,7 +1291,6 @@ class DashboardController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
