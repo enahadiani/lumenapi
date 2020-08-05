@@ -50,6 +50,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('upload', 'UploadController@proses_upload');
     $router->get('upload/{file}', 'UploadController@show');
     $router->get('menu/{kode_klp}', 'Dashboard\DashboardController@getMenu');
+    $router->get('menu2/{kode_klp}', 'Dashboard\DashboardController@getMenu2');
 
     //PAGE 1
     $router->get('pencapaianYoY/{periode}', 'Dashboard\DashboardController@pencapaianYoY');
@@ -94,5 +95,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('user_device','UserDeviceController@store');
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
+
+    
+    $router->get('growth-rka', 'Dashboard\DashboardController@getBCGrowthRKA');
 
 });

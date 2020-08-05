@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Menu;
 
 class DashboardController extends Controller
 {
@@ -1276,12 +1277,13 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $row = DB::connection('sqlsrvyptkug')->select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' and (isnull(a.jenis_menu,'-') = '-' OR a.jenis_menu = '') order by kode_klp, rowindex
-            ");
-            $row = json_decode(json_encode($row),true);
-            
-            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
-                $success['data'] = $row;
+            // $menus = Menu::where('kode_induk',0)->where('kode_klp',$kode_klp)->get();
+
+            $allMenus = Menu::with('children')->where('kode_klp',$kode_klp)->where('level_menu',1)->get();
+    
+            if(count($allMenus) > 0){ //mengecek apakah data kosong atau tidak
+                // $success['menu'] = $menus;
+                $success['allmenu'] = $allMenus;
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
@@ -1289,8 +1291,93 @@ class DashboardController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
+                // $success['menu'] = [];
+                $success['allmenu'] = [];
                 $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBCGrowthRKA(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+            $bulan = substr($periode,4,2);
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun 
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun 
+            union all
+            select '2020' as tahun 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $row =  DB::connection('sqlsrvyptkug')->select("select 'Pendapatan' as nama,'411' as kode_neraca,44.08 as n2015,63.03 as n2016,60.37 as n2017,58.38 as n2018,48.46 as n2019,20.92 as n2020
+            union all
+            select 'Beban' as nama,'511' as kode_neraca,18.36 as n15,52.40,29.51,57.42,39.66,18.25
+            union all
+            select 'SDM' as nama,'412' as kode_neraca,19.11,24.20,17.93,34.56,19.08,18.16
+            union all
+            select 'SHU' as nama,'611' as kode_neraca,25.72,10.63,30.86,0.97,8.80,2.67 ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode-neraca"=>$row[$i]["kode-neraca"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {

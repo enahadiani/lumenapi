@@ -185,7 +185,7 @@ class NotifController extends Controller
                     }
                     for($i=0;$i<count($request->token);$i++){
     
-                        $ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read) values ('$kode_lokasi','".$request->data['title']."','-','".$request->data['message']."','".$request->data['nik']."','".$request->token[$i]."','$sts',getdate(),'-','0') ");
+                        $ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read,sts_read_mob) values ('$kode_lokasi','".$request->data['title']."','-','".$request->data['message']."','".$request->data['nik']."','".$request->token[$i]."','$sts',getdate(),'-','0','0') ");
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
@@ -218,7 +218,7 @@ class NotifController extends Controller
 		
         try{
             
-			$sql = "select id,judul,pesan,tgl_input,status,icon 
+			$sql = "select id,judul,pesan,tgl_input,status,icon,sts_read_mob 
 			from user_message
 			where nik='$nik' and status in ('1')
 			";
@@ -268,7 +268,7 @@ class NotifController extends Controller
 				event(new \App\Events\NotifApv($request->title,$request->message,$request->id[$i]));
 				if($request->sts_insert == '1'){
 
-					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read) values ('$kode_lokasi','".$request->title."','-','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-','0') ");
+					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read,sts_read_mob) values ('$kode_lokasi','".$request->title."','-','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-','0','0') ");
 				}
 
 			}
@@ -348,6 +348,34 @@ class NotifController extends Controller
             
 			
 			$upd = DB::connection($this->db)->insert("update user_message set sts_read = '1' where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = "Sukses";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+	}
+
+	public function updateStatusReadMobile(Request $request)
+	{
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+
+		$this->validate($request,[
+			'id' => 'required'
+		]);
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			$upd = DB::connection($this->db)->insert("update user_message set sts_read_mob = '1' where nik='$nik' and id='$request->id' and kode_lokasi='$kode_lokasi' ");
 
 			DB::connection($this->db)->commit();
 			$success['status'] = true;

@@ -123,6 +123,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     
     $router->post('notif', 'Apv\NotifController@sendNotif');
     $router->get('notif', 'Apv\NotifController@getNotif');
+    $router->get('update-notif-status', 'Apv\NotifController@updateStatusReadMobile');
     
 });
 
