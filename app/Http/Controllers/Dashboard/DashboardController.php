@@ -1527,9 +1527,18 @@ class DashboardController extends Controller
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
                 for($i=0;$i<count($row);$i++){
 
-                    $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
-                    );
+                    if($row[$i]['kode_neraca'] == '411'){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }else{
+                        
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            
+                        );
+                    }
                 }
 
                 $success['status'] = true;
