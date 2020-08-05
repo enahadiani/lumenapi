@@ -1303,6 +1303,90 @@ class DashboardController extends Controller
         }
     }
 
+    public function getBCRKA(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select '2014' as tahun 
+            union all
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun 
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun 
+            union all
+            select '2020' as tahun 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $row =  DB::connection('sqlsrvyptkug')->select("select 'Pendapatan' as nama,'411' as kode_neraca,248.04	as n2014,292.13 as n2015,355.15 as n2016,415.52 as n2017,473.90 as n2018,522.37 as n2019,	543.28 as n2020
+            union all
+            select 'Beban' as nama,'511' as kode_neraca,220.04,238.40,290.79,320.30,377.72,417.38,435.63
+            union all
+            select 'SDM' as nama,'412' as kode_neraca,107.65,126.76,150.95,168.89,203.44,222.52,240.68
+            union all
+            select 'SHU' as nama,'611' as kode_neraca,28.01,53.73,64.36,95.22,96.18,104.98,107.65 ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getBCGrowthRKA(Request $request){
         try {
             
@@ -1314,8 +1398,6 @@ class DashboardController extends Controller
                 $nik= '';
                 $kode_lokasi= '';
             }
-            
-            $bulan = substr($periode,4,2);
 
             $rs = DB::connection('sqlsrvyptkug')->select("
             select '2015' as tahun 
@@ -1355,7 +1437,170 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode-neraca"=>$row[$i]["kode-neraca"],"tahun"=>$ctg[$c]);
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBCTuiTion(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select '2014' as tahun 
+            union all
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun 
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun 
+            union all
+            select '2020' as tahun 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $row =  DB::connection('sqlsrvyptkug')->select("select 'Total Pendapatan' as nama,'411' as kode_neraca,248.04 as n2014,292.13 as n2015,355.15 as n2016,415.52 as n2017,473.90 as n2018,522.37 as n2019,543.28 as n2020
+            union all
+            select 'Tuition Fee' as nama,'511' as kode_neraca,218.19,260.18,307.08,365.32,413.84,453.11,451.08
+            union all
+            select 'Non Tuition Fee' as nama,'412' as kode_neraca,29.85,30.37,46.02,46.93,57.95,66.84,91.77");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBCGrowthTuition(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun 
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun 
+            union all
+            select '2020' as tahun 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $row =  DB::connection('sqlsrvyptkug')->select("select 'Total Pendapatan' as nama,'411' as kode_neraca,44.08 as n2015,63.03 as n2016,60.37 as n2017,58.38 as n2018,48.46 as n2019,20.92 as n2020
+            union all
+            select 'Tuition Fee' as nama,'511' as kode_neraca,41.99,46.90,58.24,48.52,39.27,-2.03
+            union all
+            select 'Non Tuition Fee' as nama,'412' as kode_neraca,0.51,15.66,0.90,11.02,8.89,24.93
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
                         $c++;          
                     }
                 }

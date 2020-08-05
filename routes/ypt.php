@@ -95,8 +95,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('user_device','UserDeviceController@store');
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
-
     
-    $router->get('growth-rka', 'Dashboard\DashboardController@getBCGrowthRKA');
-
+    $router->get('rka','Dashboard\DashboardController@getBCRKA');
+    $router->get('growth-rka','Dashboard\DashboardController@getBCGrowthRKA');
+    $router->get('tuition','Dashboard\DashboardController@getBCTuition');
+    $router->get('growth-tuition','Dashboard\DashboardController@getBCGrowthTuition');
 });
