@@ -100,4 +100,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('growth-rka','Dashboard\DashboardController@getBCGrowthRKA');
     $router->get('tuition','Dashboard\DashboardController@getBCTuition');
     $router->get('growth-tuition','Dashboard\DashboardController@getBCGrowthTuition');
+    
+    $router->post('notif-pusher', 'Dashboard\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Dashboard\NotifController@getNotifPusher');
+    $router->put('notif-update-status', 'Dashboard\NotifController@updateStatusRead');
 });
