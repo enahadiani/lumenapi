@@ -1,7 +1,9 @@
 <?php
 namespace App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;  
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; 
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -21,6 +23,15 @@ $router->get('/', function () use ($router) {
 $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
+
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('telu/'.$filename)) {
+        $success['message'] = 'Dokumen tidak tersedia!';
+        $success['status'] = false;
+    }
+    return Storage::disk('s3')->response('telu/'.$filename); 
+});
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     
@@ -45,6 +56,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('users/{id}', 'AdminYptKugController@singleUser');
     $router->get('users', 'AdminYptKugController@allUsers');
     $router->get('cekPayload', 'AdminYptKugController@cekPayload');
+    
+    $router->post('update-password', 'AdminYptKugController@updatePassword');
+    $router->post('update-foto', 'AdminYptKugController@updatePhoto');
 
     $router->get('upload', 'UploadController@upload');
     $router->post('upload', 'UploadController@proses_upload');

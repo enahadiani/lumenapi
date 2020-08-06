@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use  App\AdminYpt;
+use Illuminate\Support\Facades\Storage; 
 
 class AdminYptKugController extends Controller
 {
@@ -95,4 +96,113 @@ class AdminYptKugController extends Controller
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }
+
+    public function updatePassword(Request $request){
+        $this->validate($request,[
+            'password_lama' => 'required',
+            'password_baru' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            DB::connection('sqlsrvyptkug')->beginTransaction();
+
+            $upd =  DB::connection('sqlsrvyptkug')->table('hakakses')
+            ->where('nik', $nik)
+            ->where('pass', $request->password_lama)
+            ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
+            
+            if($upd){ //mengecek apakah data kosong atau tidak
+                DB::connection('sqlsrvyptkug')->commit();
+                $success['status'] = true;
+                $success['message'] = "Password berhasil diubah";
+                return response()->json($success, 200);     
+            }
+            else{
+                DB::connection('sqlsrvyptkug')->rollback();
+                $success['status'] = false;
+                $success['message'] = "Password gagal diubah";
+                return response()->json($success, 200);
+            }
+        } catch (\Throwable $e) {
+            
+            DB::connection('sqlsrvyptkug')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function updatePhoto(Request $request){
+        $this->validate($request,[
+            'foto' => 'required|image|mimes:jpeg,png,jpg'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            DB::connection('sqlsrvyptkug')->beginTransaction();
+
+            if($request->hasfile('foto')){
+
+                $sql = "select foto as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+                ";
+                $res = DB::connection('sqlsrvyptkug')->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_gambar'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('telu/'.$foto);
+                    }
+                }else{
+                    $foto = "-";
+                }
+                
+                $file = $request->file('foto');
+                
+                $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('telu/'.$foto)){
+                    Storage::disk('s3')->delete('telu/'.$foto);
+                }
+                Storage::disk('s3')->put('telu/'.$foto,file_get_contents($file));
+                
+            }else{
+
+                $foto="-";
+            }
+
+            $upd =  DB::connection('sqlsrvyptkug')->table('karyawan')
+            ->where('nik', $nik)
+            ->update(['foto' => $foto]);
+            
+            if($upd){ //mengecek apakah data kosong atau tidak
+                DB::connection('sqlsrvyptkug')->commit();
+                $success['status'] = true;
+                $success['message'] = "Foto berhasil diubah";
+                return response()->json($success, 200);     
+            }
+            else{
+                DB::connection('sqlsrvyptkug')->rollback();
+                $success['status'] = false;
+                $success['message'] = "Foto gagal diubah";
+                return response()->json($success, 200);
+            }
+        } catch (\Throwable $e) {
+            
+            DB::connection('sqlsrvyptkug')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
 }
