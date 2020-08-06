@@ -207,4 +207,45 @@ class AdminYptKugController extends Controller
         }
     }
 
+    public function searchForm(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select(" select a.kode_form,a.nama,c.form 
+            from menu a
+            inner join m_form c on a.kode_form=c.kode_form
+            inner join hakakses b on a.kode_klp=b.kode_klp_menu
+            where b.nik='telu2' and a.kode_form<>'-' and a.nama like '%$request->cari%' 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $rs;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
