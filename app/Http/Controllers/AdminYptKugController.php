@@ -262,8 +262,8 @@ class AdminYptKugController extends Controller
                 $kode_lokasi= '';
             }
 
-            if(isset($request->query)){
-                $filter = " and a.nama like '%$request->query%' ";
+            if(isset($request->cari)){
+                $filter = " and a.nama like '%$request->cari%' ";
             }else{
                 $filter = " ";
             }
