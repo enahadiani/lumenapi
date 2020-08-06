@@ -118,4 +118,6 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('notif-pusher', 'Dashboard\NotifController@sendPusher');
     $router->get('notif-pusher', 'Dashboard\NotifController@getNotifPusher');
     $router->put('notif-update-status', 'Dashboard\NotifController@updateStatusRead');
+
+    $router->post('search-form', 'AdminYptKugController@searchForm');
 });

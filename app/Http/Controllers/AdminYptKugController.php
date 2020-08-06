@@ -33,7 +33,7 @@ class AdminYptKugController extends Controller
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan
+			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.flag_menu
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -201,6 +201,48 @@ class AdminYptKugController extends Controller
         } catch (\Throwable $e) {
             
             DB::connection('sqlsrvyptkug')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function searchForm(Request $request){
+        $this->validate($request,[
+            'cari' => 'required'
+        ]);
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select(" select a.kode_form,a.nama,c.form 
+            from menu a
+            inner join m_form c on a.kode_form=c.kode_form
+            inner join hakakses b on a.kode_klp=b.kode_klp_menu
+            where b.nik='$nik' and a.kode_form<>'-' and a.nama like '%$request->cari%' 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $rs;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], 200);     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], 200);
+            }
+        } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
