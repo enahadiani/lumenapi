@@ -25,7 +25,7 @@ class AdminYptKug extends Model implements AuthenticatableContract, Authorizable
      * @var array
      */
     protected $fillable = [
-        'kode_klp_menu','nik','nama','status_admin','kode_lokasi','klp_akses','menu_mobile','path_view','kode_menu_lab'
+        'kode_klp_menu','nik','nama','status_admin','kode_lokasi','klp_akses','menu_mobile','path_view','kode_menu_lab','flag_menu'
     ];
 
     /**
