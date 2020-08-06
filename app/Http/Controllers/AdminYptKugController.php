@@ -208,9 +208,10 @@ class AdminYptKugController extends Controller
     }
 
     public function searchForm(Request $request){
+        $this->validate($request,[
+            'cari' => 'required'
+        ]);
         try {
-            
-            
             if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
@@ -232,19 +233,19 @@ class AdminYptKugController extends Controller
                 $success['data'] = $rs;
                 $success['message'] = "Success!";
                 
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json(['success'=>$success], 200);     
             }
             else{
                 $success['status'] = false;
                 $success['data'] = [];
                 $success['message'] = "Data Kosong!";
                 
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json(['success'=>$success], 200);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json($success, 200);
         }
     }
 
