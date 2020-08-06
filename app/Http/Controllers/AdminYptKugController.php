@@ -187,12 +187,14 @@ class AdminYptKugController extends Controller
             if($upd){ //mengecek apakah data kosong atau tidak
                 DB::connection('sqlsrvyptkug')->commit();
                 $success['status'] = true;
+                $success['foto'] = $foto;
                 $success['message'] = "Foto berhasil diubah";
                 return response()->json($success, 200);     
             }
             else{
                 DB::connection('sqlsrvyptkug')->rollback();
                 $success['status'] = false;
+                $success['foto'] = "-";
                 $success['message'] = "Foto gagal diubah";
                 return response()->json($success, 200);
             }
