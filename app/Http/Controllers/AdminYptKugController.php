@@ -33,7 +33,7 @@ class AdminYptKugController extends Controller
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password
+			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password,isnull(c.background,'-') as background
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -205,6 +205,76 @@ class AdminYptKugController extends Controller
                 $success['status'] = false;
                 $success['foto'] = "-";
                 $success['message'] = "Foto gagal diubah";
+                return response()->json($success, 200);
+            }
+        } catch (\Throwable $e) {
+            
+            DB::connection('sqlsrvyptkug')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function updateBackground(Request $request){
+        $this->validate($request,[
+            'foto' => 'required|image|mimes:jpeg,png,jpg'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            DB::connection('sqlsrvyptkug')->beginTransaction();
+
+            if($request->hasfile('foto')){
+
+                $sql = "select background as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+                ";
+                $res = DB::connection('sqlsrvyptkug')->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_gambar'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('telu/'.$foto);
+                    }
+                }else{
+                    $foto = "-";
+                }
+                
+                $file = $request->file('foto');
+                
+                $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('telu/'.$foto)){
+                    Storage::disk('s3')->delete('telu/'.$foto);
+                }
+                Storage::disk('s3')->put('telu/'.$foto,file_get_contents($file));
+                
+            }else{
+
+                $foto="-";
+            }
+
+            $upd =  DB::connection('sqlsrvyptkug')->table('karyawan')
+            ->where('nik', $nik)
+            ->update(['background' => $foto]);
+            
+            if($upd){ //mengecek apakah data kosong atau tidak
+                DB::connection('sqlsrvyptkug')->commit();
+                $success['status'] = true;
+                $success['foto'] = $foto;
+                $success['message'] = "Background berhasil diubah";
+                return response()->json($success, 200);     
+            }
+            else{
+                DB::connection('sqlsrvyptkug')->rollback();
+                $success['status'] = false;
+                $success['foto'] = "-";
+                $success['message'] = "Background gagal diubah";
                 return response()->json($success, 200);
             }
         } catch (\Throwable $e) {
