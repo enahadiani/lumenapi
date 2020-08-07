@@ -111,24 +111,33 @@ class AdminYptKugController extends Controller
             
             DB::connection('sqlsrvyptkug')->beginTransaction();
 
-            $upd =  DB::connection('sqlsrvyptkug')->table('hakakses')
-            ->where('nik', $nik)
-            ->where('pass', $request->password_lama)
-            ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
-            
-            if($upd){ //mengecek apakah data kosong atau tidak
-                DB::connection('sqlsrvyptkug')->commit();
-                $success['status'] = true;
-                $success['message'] = "Password berhasil diubah";
-                return response()->json($success, 200);     
-            }
-            else{
+            $cek =  DB::connection('sqlsrvyptkug')->select("select pass from hakakses where nik='$nik' and pass='$request->password_lama' ");
+            if(count($cek) > 0){
+
+                $upd =  DB::connection('sqlsrvyptkug')->table('hakakses')
+                ->where('nik', $nik)
+                ->where('pass', $request->password_lama)
+                ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
+                
+                if($upd){ //mengecek apakah data kosong atau tidak
+                    DB::connection('sqlsrvyptkug')->commit();
+                    $success['status'] = true;
+                    $success['message'] = "Password berhasil diubah";
+                    return response()->json($success, 200);     
+                }
+                else{
+                    DB::connection('sqlsrvyptkug')->rollback();
+                    $success['status'] = false;
+                    $success['message'] = "Password gagal diubah";
+                    return response()->json($success, 200);
+                }
+            }else{
                 DB::connection('sqlsrvyptkug')->rollback();
                 $success['status'] = false;
-                $success['message'] = "Password gagal diubah";
+                $success['message'] = "Password lama tidak valid";
                 return response()->json($success, 200);
             }
-        } catch (\Throwable $e) {
+        }catch (\Throwable $e) {
             
             DB::connection('sqlsrvyptkug')->rollback();
             $success['status'] = false;
