@@ -224,22 +224,22 @@ class JuskebController extends Controller
     {
         $this->validate($request, [
             'tanggal' => 'required',
-            'no_dokumen' => 'required',
-            'kode_pp' => 'required',
-            'kode_kota' => 'required',
-            'nik_ver' => 'required',
+            'no_dokumen' => 'required|max:50',
+            'kode_pp' => 'required|max:10',
+            'kode_kota' => 'required|max:20',
+            'nik_ver' => 'required|max:20',
             'waktu' => 'required',
-            'kegiatan' => 'required',
-            'dasar' => 'required',
+            'kegiatan' => 'required|max:300',
+            'dasar' => 'required|max:500',
             'total_barang' => 'required',
-            'barang'=> 'required|array',
-            'barang_klp'=> 'required|array',
+            'barang'=> 'required|array|max:150',
+            'barang_klp'=> 'required|array|max:30',
             'harga'=> 'required|array',
             'qty'=> 'required|array',
             'subtotal'=> 'required|array',
             'ppn'=> 'required|array',
             'grand_total'=> 'required|array',
-            'nama_dok'=>'array',
+            'nama_dok'=>'array|max:100',
             'file.*'=>'file|max:10240'
         ]);
 
@@ -483,22 +483,22 @@ class JuskebController extends Controller
     {
         $this->validate($request, [
             'tanggal' => 'required',
-            'no_dokumen' => 'required',
-            'kode_pp' => 'required',
-            'kode_kota' => 'required',
-            'nik_ver' => 'required',
+            'no_dokumen' => 'required|max:50',
+            'kode_pp' => 'required|max:10',
+            'kode_kota' => 'required|max:20',
+            'nik_ver' => 'required|max:20',
             'waktu' => 'required',
-            'kegiatan' => 'required',
-            'dasar' => 'required',
+            'kegiatan' => 'required|max:300',
+            'dasar' => 'required|max:500',
             'total_barang' => 'required',
-            'barang'=> 'required|array',
-            'barang_klp'=> 'required|array',
+            'barang'=> 'required|array|max:150',
+            'barang_klp'=> 'required|array|max:30',
             'harga'=> 'required|array',
             'qty'=> 'required|array',
             'subtotal'=> 'required|array',
             'ppn'=> 'required|array',
             'grand_total'=> 'required|array',
-            'nama_dok'=>'array',
+            'nama_dok'=>'array|max:100',
             'file.*'=>'file|max:10240'
         ]);
 

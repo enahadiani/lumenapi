@@ -127,8 +127,8 @@ class DivisiController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_divisi' => 'required',
-            'nama' => 'required'
+            'kode_divisi' => 'required|max:10',
+            'nama' => 'required|max:50'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -224,7 +224,7 @@ class DivisiController extends Controller
     public function update(Request $request, $kode_divisi)
     {
         $this->validate($request, [
-            'nama' => 'required'
+            'nama' => 'required|max:50'
         ]);
 
         DB::connection($this->db)->beginTransaction();

@@ -251,7 +251,7 @@ class AdminYptKugController extends Controller
 
     public function searchFormList(Request $request){
         // $this->validate($request,[
-        //     'query' => 'required'
+        //     'cari' => 'required'
         // ]);
         try {
             if($data =  Auth::guard('yptkug')->user()){

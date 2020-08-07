@@ -164,9 +164,9 @@ class JuspoApprovalController extends Controller
     {
         $this->validate($request, [
             'tanggal' => 'required',
-            'no_aju' => 'required',
-            'status' => 'required',
-            'keterangan' => 'required',
+            'no_aju' => 'required|max:20',
+            'status' => 'required|max:1',
+            'keterangan' => 'required|max:150',
             'no_urut' => 'required'
         ]);
 

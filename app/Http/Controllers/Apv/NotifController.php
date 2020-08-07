@@ -159,7 +159,7 @@ class NotifController extends Controller
 	public function sendNotif(Request $request)
 	{
 		$this->validate($request,[
-			"token" => 'required',
+			"token" => 'required|max:300',
 			"data" => 'required'
 		]);
 
@@ -249,10 +249,10 @@ class NotifController extends Controller
 	public function sendPusher(Request $request)
 	{
 		$this->validate($request,[
-			"title" => 'required',
-			"message" => 'required',
-			"id" => 'required|array',
-			"sts_insert" => 'required'
+			"title" => 'required|max:50',
+			"message" => 'required|max:200',
+			"id" => 'required|array|max:300',
+			"sts_insert" => 'required|max:2'
 		]);
 
 		if($auth =  Auth::guard($this->guard)->user()){
@@ -369,7 +369,7 @@ class NotifController extends Controller
 		}
 
 		$this->validate($request,[
-			'id' => 'required'
+			'id' => 'required|max:300'
 		]);
 
 		DB::connection($this->db)->beginTransaction();

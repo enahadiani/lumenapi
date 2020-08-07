@@ -71,13 +71,16 @@ class KaryawanController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nik' => 'required',
-            'nama' => 'required',
-            'kode_pp' => 'required',
-            'kode_jab' => 'required',
-            'email' => 'required',
-            'no_telp' => 'required',
-            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'nik' => 'required|max:20',
+            'nama' => 'required|max:150',
+            'kode_pp' => 'required|max:10',
+            'kode_jab' => 'required|max:10',
+            'email' => 'required|max:50',
+            'no_telp' => 'required|max:20',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:3072',
+            'kode_kota' => 'max:20',
+            'nama_kota' => 'max:100',
+            'kode_divisi' => 'max:10'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -201,12 +204,15 @@ class KaryawanController extends Controller
     public function update(Request $request, $nik)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kode_pp' => 'required',
-            'kode_jab' => 'required',
-            'email' => 'required',
-            'no_telp' => 'required',
-            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'nama' => 'required|max:150',
+            'kode_pp' => 'required|max:10',
+            'kode_jab' => 'required|max:10',
+            'email' => 'required|max:50',
+            'no_telp' => 'required|max:20',
+            'foto' => 'file|image|mimes:jpeg,png,jpg|max:3072',
+            'kode_kota' => 'max:20',
+            'nama_kota' => 'max:100',
+            'kode_divisi' => 'max:10'
         ]);
 
         DB::connection($this->db)->beginTransaction();

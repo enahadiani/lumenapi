@@ -89,13 +89,13 @@ class HakaksesController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nik' => 'required',
-            'nama' => 'required',
-            'kode_klp_menu' => 'required',
-            'pass' => 'required',
-            'status_admin' => 'required',
-            'klp_akses' => 'required',
-            'kode_menu_lab'=> 'required'
+            'nik' => 'required|max:10',
+            'nama' => 'required|max:100',
+            'kode_klp_menu' => 'required|max:10',
+            'pass' => 'required|max:10',
+            'status_admin' => 'required|max:1',
+            'klp_akses' => 'required|max:20',
+            'kode_menu_lab'=> 'required|max:20'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -196,12 +196,12 @@ class HakaksesController extends Controller
     public function update(Request $request, $nik)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kode_klp_menu' => 'required',
-            'pass' => 'required',
-            'status_admin' => 'required',
-            'klp_akses' => 'required',
-            'kode_menu_lab'=> 'required'
+            'nama' => 'required|max:100',
+            'kode_klp_menu' => 'required|max:10',
+            'pass' => 'required|max:10',
+            'status_admin' => 'required|max:1',
+            'klp_akses' => 'required|max:20',
+            'kode_menu_lab'=> 'required|max:20'
         ]);
 
         DB::connection($this->db)->beginTransaction();

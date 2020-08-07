@@ -70,8 +70,8 @@ class UnitController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_pp' => 'required',
-            'nama' => 'required'
+            'kode_pp' => 'required|max:10',
+            'nama' => 'required|max:150'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -160,7 +160,7 @@ class UnitController extends Controller
     public function update(Request $request, $kode_pp)
     {
         $this->validate($request, [
-            'nama' => 'required'
+            'nama' => 'required|max:150'
         ]);
 
         DB::connection($this->db)->beginTransaction();

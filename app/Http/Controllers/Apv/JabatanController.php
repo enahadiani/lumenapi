@@ -70,9 +70,9 @@ class JabatanController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_jab' => 'required',
-            'nama' => 'required',
-            'flag_aktif' => 'required'
+            'kode_jab' => 'required|max:10',
+            'nama' => 'required|max:100',
+            'flag_aktif' => 'required|max:1'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -161,8 +161,8 @@ class JabatanController extends Controller
     public function update(Request $request, $kode_jab)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'flag_aktif' => 'required'
+            'nama' => 'required|max:100',
+            'flag_aktif' => 'required|max:1'
         ]);
 
         DB::connection($this->db)->beginTransaction();
