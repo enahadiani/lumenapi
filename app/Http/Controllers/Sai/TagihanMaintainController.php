@@ -159,6 +159,7 @@ class TagihanMaintainController extends Controller
             // 'cabang'=> 'required',
             // 'no_rek'=> 'required',
             // 'nama_rek'=> 'required',
+            'status'=>'required|array',
             'kode_cust' => 'required|array',
             'no_kontrak' => 'required|array',
             'no_dokumen' => 'required|array',
@@ -217,8 +218,8 @@ class TagihanMaintainController extends Controller
                 for($i=0; $i<count($item);$i++){
                     
                     $ins2[$i] = DB::connection($this->sql)->insert("
-                    insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust,no_dokumen,bank,cabang,no_rek,nama_rek,due_date) 
-                    select '$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',0,".$jumlah.",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','".$request->no_kontrak[$i]."','".$request->kode_cust[$i]."','".$request->no_dokumen[$i]."',b.bank,b.cabang,b.no_rek,b.nama_rek,'".$request->due_date[$i]."'
+                    insert into sai_bill_d (no_bill,kode_lokasi,nu,item,harga,jumlah,nilai,nilai_ppn,periode,no_kontrak,kode_cust,no_dokumen,bank,cabang,no_rek,nama_rek,due_date,status) 
+                    select '$no_bukti','$kode_lokasi',$nu,'".$item[$i]."',0,".$jumlah.",".$nilai[$i].",".$nilai_ppn[$i].",'$periode','".$request->no_kontrak[$i]."','".$request->kode_cust[$i]."','".$request->no_dokumen[$i]."',b.bank,b.cabang,b.no_rek,b.nama_rek,'".$request->due_date[$i]."','".$request->status[$i]."'
                     from sai_kontrak a
                     inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
                     where a.no_kontrak='".$request->no_kontrak[$i]."' and a.kode_lokasi='$kode_lokasi' ");
@@ -278,7 +279,7 @@ class TagihanMaintainController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.bank,a.cabang,a.no_rek,a.nama_rek,a.jenis
+            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.jenis
             from sai_bill_m a
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bill='$no_bukti' ";
             
@@ -525,60 +526,90 @@ class TagihanMaintainController extends Controller
                 $filter .= "";
             }
 
-            $filter= "";
+            // $filter= "";
             if(isset($request->tgl_tagih)){
                 $filter .= " and b.tgl_tagih='$request->tgl_tagih' ";
             }else{
                 $filter .= "";
             }
 
-            $filter= "";
+            // $filter= "";
             if(isset($request->periode)){
                 $periode = $request->periode;
-                $filter .= " and $request->periode between substring(convert(varchar,a.tgl_awal,112),1,6) and  substring(convert(varchar,a.tgl_akhir,112),1,6) and isnull(b.periode,'-') <> $request->periode ";
+                $filter .= " and c.periode = '$request->periode' ";
             }else{
-                $filter .= "";
-                
+                $filter .= " and c.periode = '".date('Ym')."' ";                
                 $periode = date('Ym');
             }
 
-            $filter= "";
+            // $filter= "";
             if(isset($request->status)){
                 $filter .= " and a.status_kontrak='$request->status' ";
-            }else{
-                $filter .= "";
             }
 
-            $sql="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih,a.nilai_ppn,a.due_date,DATEADD(day, a.due_date, a.tgl_awal) AS tgl_duedate,'-' as no_dokumen 
+            $sql1="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih,a.nilai_ppn,a.due_date,DATEADD(day, a.due_date, a.tgl_awal) AS tgl_duedate,'-' as no_dokumen 
             from sai_kontrak a 
             inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
             left join sai_bill_d c on a.no_kontrak=c.no_kontrak and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' $filter
+            where a.kode_lokasi='$kode_lokasi'
+            ";
+            $sql2="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih,a.nilai_ppn,a.due_date,DATEADD(day, a.due_date, a.tgl_awal) AS tgl_duedate,'-' as no_dokumen 
+            from sai_kontrak a 
+            inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
+            left join sai_bill_d c on a.no_kontrak=c.no_kontrak and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and c.status='0' $filter
             ";
             
-            $res = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $prefix = "/SAI-01/$periode";
-                $str_format = "001";
-                $query = DB::connection($this->sql)->select("select left(isnull(max(no_dokumen),'000'), ".strlen($str_format).")+1 as id from sai_bill_d where no_dokumen like '%$str_format' ");
-                $query = json_decode(json_encode($query),true);
-                $kode = $query[0]['id'];
-                for($i=0;$i<count($res);$i++){
-                    $res[$i]['no_dokumen'] = str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT).$prefix;
-                    $kode++;
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+            if(count($res2) > 0) {
+                var_dump($sql2);
+            }else {
+                $res = DB::connection($this->sql)->select($sql1);
+                $res = json_decode(json_encode($res),true);
+                if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                    $prefix = "/SAI-01/$periode";
+                    $str_format = "001";
+                    $query = DB::connection($this->sql)->select("select left(isnull(max(no_dokumen),'000'), ".strlen($str_format).")+1 as id from sai_bill_d where no_dokumen like '%$str_format' ");
+                    $query = json_decode(json_encode($query),true);
+                    $kode = $query[0]['id'];
+                    for($i=0;$i<count($res);$i++){
+                        $res[$i]['no_dokumen'] = str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT).$prefix;
+                        $kode++;
+                    }
+                    $success['status'] = true;
+                    $success['data'] = $res;
+                    $success['message'] = "Success!";
+                    return response()->json($success, $this->successStatus);     
                 }
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json($success, $this->successStatus);     
+                else{
+                    $success['message'] = "Data Tidak ditemukan!";
+                    $success['data'] = [];
+                    $success['status'] = false;
+                    return response()->json($success, $this->successStatus); 
+                }
             }
-            else{
-                $success['message'] = "Data Tidak ditemukan!";
-                $success['data'] = [];
-                $success['status'] = false;
-                return response()->json($success, $this->successStatus); 
-            }
+            // if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            //     $prefix = "/SAI-01/$periode";
+            //     $str_format = "001";
+            //     $query = DB::connection($this->sql)->select("select left(isnull(max(no_dokumen),'000'), ".strlen($str_format).")+1 as id from sai_bill_d where no_dokumen like '%$str_format' ");
+            //     $query = json_decode(json_encode($query),true);
+            //     $kode = $query[0]['id'];
+            //     for($i=0;$i<count($res);$i++){
+            //         $res[$i]['no_dokumen'] = str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT).$prefix;
+            //         $kode++;
+            //     }
+            //     $success['status'] = true;
+            //     $success['data'] = $res;
+            //     $success['message'] = "Success!";
+            //     return response()->json($success, $this->successStatus);     
+            // }
+            // else{
+            //     $success['message'] = "Data Tidak ditemukan!";
+            //     $success['data'] = [];
+            //     $success['status'] = false;
+            //     return response()->json($success, $this->successStatus); 
+            // }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
