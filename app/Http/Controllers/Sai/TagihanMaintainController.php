@@ -553,7 +553,7 @@ class TagihanMaintainController extends Controller
             left join sai_bill_d c on a.no_kontrak=c.no_kontrak and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi'
             ";
-            $sql2="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih,a.nilai_ppn,a.due_date,DATEADD(day, a.due_date, a.tgl_awal) AS tgl_duedate,'-' as no_dokumen 
+            $sql2="select b.kode_cust+' - '+b.nama as cust,a.no_kontrak,a.keterangan as item,a.nilai,a.status_kontrak,b.tgl_tagih,a.nilai_ppn,a.due_date,c.no_dokumen 
             from sai_kontrak a 
             inner join sai_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
             left join sai_bill_d c on a.no_kontrak=c.no_kontrak and a.kode_lokasi=c.kode_lokasi
