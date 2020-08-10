@@ -22,7 +22,9 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginAdminSilo');
     $router->get('hash-pass', 'AuthController@hashPasswordAdminSilo');
     $router->get('hash-by-nik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');
-    Log::info('Showing user: ');
+    $router->get('log_tes',function(){
+        Log::error('Showing user: ');
+    });
 });
 
 $router->get('storage/{filename}', function ($filename)

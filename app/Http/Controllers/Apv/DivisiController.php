@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class DivisiController extends Controller
 {
@@ -64,7 +65,8 @@ class DivisiController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
         
@@ -102,7 +104,8 @@ class DivisiController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
         
@@ -155,7 +158,8 @@ class DivisiController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Divisi gagal disimpan ".$e;
+            $success['message'] = "Data Divisi gagal disimpan. Internal Server Error";
+            Log::error($e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -198,7 +202,8 @@ class DivisiController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -246,7 +251,8 @@ class DivisiController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Divisi gagal diubah ".$e;
+            $success['message'] = "Data Divisi gagal diubah. Internal Server Error";
+            Log::error($e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -277,8 +283,8 @@ class DivisiController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Divisi gagal dihapus ".$e;
-            
+            $success['message'] = "Data Divisi gagal dihapus. Internal Server Error";
+            Log::error($e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
