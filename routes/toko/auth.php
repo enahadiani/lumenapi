@@ -47,8 +47,22 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('users/{id}', 'AdminTokoController@singleUser');
     $router->get('users', 'AdminTokoController@allUsers');
     $router->get('cek-payload', 'AdminTokoController@cekPayload');
+
+    
+    $router->post('update-password', 'AdminTokoController@updatePassword');
+    $router->post('update-foto', 'AdminTokoController@updatePhoto');
+    $router->post('update-background', 'AdminTokoController@updateBackground');
+
     //Menu
     $router->get('menu/{kode_klp}', 'Toko\MenuController@show');
+
+    
+    $router->post('notif-pusher', 'Toko\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Toko\NotifController@getNotifPusher');
+    $router->put('notif-update-status', 'Toko\NotifController@updateStatusRead');
+
+    $router->post('search-form', 'AdminTokoController@searchForm');
+    $router->get('search-form-list', 'AdminTokoController@searchFormList');
 
 });
 

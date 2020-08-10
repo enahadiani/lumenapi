@@ -311,10 +311,13 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
+            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,a.nilai - isnull(d.nilai,0) as potongan, isnull(d.nilai,0) as nilai
             from sju_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
+            left join (select no_pb,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as nilai 
+            from sju_pb_j 
+            group by no_pb,kode_lokasi) d on a.no_pb=d.no_pb and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') and a.no_pb='$no_aju'";
 
             $det = DB::connection('sqlsrvsju')->select($sql);
@@ -323,6 +326,8 @@ class ApprovalController extends Controller
             if(count($det) > 0){ //mengecek apakah data kosong atau tidak
                 for($i=0;$i<count($det);$i++){
                     $det[$i]["nilai"] = number_format($det[$i]["nilai"],0,",","."); 
+                    $det[$i]["nilai_seb"] = number_format($det[$i]["nilai_seb"],0,",","."); 
+                    $det[$i]["potongan"] = number_format($det[$i]["potongan"],0,",","."); 
                 }
                 $success['status'] = true;
                 $success['data'] = $det;
@@ -493,7 +498,7 @@ class ApprovalController extends Controller
             }
 
             $sql="";
-            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek,isnull(b.nilai,0) as nilai,c.keterangan
+            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek,isnull(b.nilai,0) as nilai,c.keterangan,c.nilai as nilai_seb,c.nilai - isnull(b.nilai,0) as potongan
             from sju_pb_rek a
 			inner join sju_pb_m c on a.no_pb=c.no_pb and a.kode_lokasi=c.kode_lokasi
             left join (select no_pb,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as nilai 
@@ -504,10 +509,11 @@ class ApprovalController extends Controller
             $rek = json_decode(json_encode($rek),true);
             
             if(count($rek) > 0){ //mengecek apakah data kosong atau tidak
-                // for($i=0;$i<count($rek);$i++){
-                //     $rek[$i]["bruto"] = number_format($rek[$i]["bruto"],0,",","."); 
-                //     $rek[$i]["pajak"] = number_format($rek[$i]["pajak"],0,",","."); 
-                // }
+                for($i=0;$i<count($rek);$i++){
+                    $rek[$i]["nilai"] = number_format($rek[$i]["nilai"],0,",","."); 
+                    $rek[$i]["nilai_seb"] = number_format($rek[$i]["nilai_seb"],0,",",".");
+                    $rek[$i]["potongan"] = number_format($rek[$i]["potongan"],0,",",".");  
+                }
                 $success['status'] = true;
                 $success['data'] = $rek;
                 $success['message'] = "Success!";
