@@ -563,7 +563,10 @@ class TagihanMaintainController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             if(count($res2) > 0) {
-                var_dump($sql2);
+                $success['status'] = true;
+                $success['data'] = $res2;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);
             }else {
                 $res = DB::connection($this->sql)->select($sql1);
                 $res = json_decode(json_encode($res),true);
