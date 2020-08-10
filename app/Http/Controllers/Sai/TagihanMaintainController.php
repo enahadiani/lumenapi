@@ -406,7 +406,7 @@ class TagihanMaintainController extends Controller
                 // $del2 = DB::connection($this->sql)->table('sai_bill_d')->where('kode_lokasi', $kode_lokasi)->where('no_bill', $no_bukti)->delete();
                 // $perBefore = $periode;
 
-                $upd = DB::connection($this->sql)->update("update sai_bill_m set keterangan='$request->keterangan'"); 
+                $upd = DB::connection($this->sql)->update("update sai_bill_m set keterangan='$request->keterangan', tanggal='$request->tanggal'"); 
 
                 // $ins = DB::connection($this->sql)->insert("insert into sai_bill_m (no_bill,kode_lokasi,no_dokumen,tanggal,keterangan,kode_curr,kurs,nilai,nilai_ppn,nik_buat,nik_app,periode,nik_user,tgl_input,bank,cabang,no_rek,nama_rek,progress,modul,jenis) values ('$no_bukti','$kode_lokasi','-','$request->tanggal','$request->keterangan','IDR','1',$request->total_nilai,$request->total_nilai_ppn,'$nik_user','$nik_user','$periode','$nik_user',getdate(),'$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','0','BILL','$request->status_kontrak') ");
 
