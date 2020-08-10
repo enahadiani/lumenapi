@@ -280,14 +280,14 @@ class TagihanMaintainController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $sql="select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.jenis
+            $sql="select a.no_bill,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn,a.periode
             from sai_bill_m a
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bill='$no_bukti' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select nu,item,harga,jumlah,nilai,nilai_ppn,no_kontrak,kode_cust from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti'  order by nu ";					
+            $sql2="select no_dokumen,kode_cust,no_kontrak,item,nilai,nilai_ppn,due_date from sai_bill_d where kode_lokasi='".$kode_lokasi."' and no_bill='$no_bukti' and status='1'  order by nu ";					
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
