@@ -12,6 +12,46 @@ class DashboardController extends Controller
 {
     public $successStatus = 200;
 
+    public function getPeriode(){
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+            $res = DB::connection('sqlsrvyptkug')->select("select distinct a.periode
+            from exs_neraca a
+            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' 
+            order by a.periode desc
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function pencapaianYoY($periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {

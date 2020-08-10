@@ -59,6 +59,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->post('update-password', 'AdminYptKugController@updatePassword');
     $router->post('update-foto', 'AdminYptKugController@updatePhoto');
+    $router->post('update-background', 'AdminYptKugController@updateBackground');
 
     $router->get('upload', 'UploadController@upload');
     $router->post('upload', 'UploadController@proses_upload');
@@ -120,4 +121,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->put('notif-update-status', 'Dashboard\NotifController@updateStatusRead');
 
     $router->post('search-form', 'AdminYptKugController@searchForm');
+    $router->get('search-form-list', 'AdminYptKugController@searchFormList');
+
+    $router->get('periode', 'Dashboard\DashboardController@getPeriode');
 });

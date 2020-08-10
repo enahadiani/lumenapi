@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage; 
+use Log;
 
 
 $router->get('/', function () use ($router) {
@@ -21,6 +22,9 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginAdminSilo');
     $router->get('hash-pass', 'AuthController@hashPasswordAdminSilo');
     $router->get('hash-by-nik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');
+    $router->get('log_tes',function(){
+        Log::error('Showing user: ');
+    });
 });
 
 $router->get('storage/{filename}', function ($filename)

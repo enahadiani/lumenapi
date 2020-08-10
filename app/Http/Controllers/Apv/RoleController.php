@@ -91,13 +91,13 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_role' => 'required',
-            'nama' => 'required',
-            'kode_pp' => 'required',
+            'kode_role' => 'required|max:10',
+            'nama' => 'required|max:100',
+            'kode_pp' => 'required|max:10',
             'bawah' => 'required',
             'atas' => 'required',
-            'modul' => 'required',
-            'detail.*.kode_jab'=> 'required'
+            'modul' => 'required|max:10',
+            'detail.*.kode_jab'=> 'required|max:10'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -213,12 +213,12 @@ class RoleController extends Controller
     public function update(Request $request, $kode_role)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kode_pp' => 'required',
+            'nama' => 'required|max:100',
+            'kode_pp' => 'required|max:10',
             'bawah' => 'required',
             'atas' => 'required',
-            'modul' => 'required',
-            'detail.*.kode_jab'=> 'required'
+            'modul' => 'required|max:10',
+            'detail.*.kode_jab'=> 'required|max:10'
         ]);
 
         DB::connection($this->db)->beginTransaction();

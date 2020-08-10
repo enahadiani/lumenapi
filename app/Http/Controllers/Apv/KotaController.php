@@ -127,9 +127,9 @@ class KotaController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_kota' => 'required',
-            'nama' => 'required',
-            'kode_pp' => 'required'
+            'kode_kota' => 'required|max:20',
+            'nama' => 'required|max:100',
+            'kode_pp' => 'required|max:20'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -224,8 +224,8 @@ class KotaController extends Controller
     public function update(Request $request, $kode_kota)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kode_pp' => 'required'
+            'nama' => 'required|max:100',
+            'kode_pp' => 'required|max:20'
         ]);
 
         DB::connection($this->db)->beginTransaction();

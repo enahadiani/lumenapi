@@ -493,9 +493,12 @@ class ApprovalController extends Controller
             }
 
             $sql="";
-            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek,b.nilai,b.keterangan
+            $rek = DB::connection('sqlsrvsju')->select("select a.bank,a.no_rek,a.nama_rek,isnull(b.nilai,0) as nilai,c.keterangan
             from sju_pb_rek a
-            inner join sju_pb_m b on a.no_pb=b.no_pb and a.kode_lokasi=b.kode_lokasi
+			inner join sju_pb_m c on a.no_pb=c.no_pb and a.kode_lokasi=c.kode_lokasi
+            left join (select no_pb,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as nilai 
+						from sju_pb_j 
+						group by no_pb,kode_lokasi) b on a.no_pb=b.no_pb and a.kode_lokasi=b.kode_lokasi
             where a.no_pb ='$no_aju' and a.kode_lokasi='$kode_lokasi'					 
             ");
             $rek = json_decode(json_encode($rek),true);
