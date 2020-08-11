@@ -163,6 +163,13 @@ class AuthController extends Controller
 
         if (! $token = Auth::guard('sju')->setTTL(60)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
+        }else{
+            if(isset($request->id_device)){
+
+                DB::connection('sqlsrvsju')->table('karyawan')
+                ->where('nik', $request->nik)
+                ->update(['id_device' => $request->id_device]);
+            }
         }
 
         return $this->respondWithToken($token,'sju');
