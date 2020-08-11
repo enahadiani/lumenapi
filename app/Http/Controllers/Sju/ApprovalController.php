@@ -633,10 +633,14 @@ class ApprovalController extends Controller
                 DB::connection('sqlsrvsju')->commit();
                 $success['status'] = true;
                 $success['id'] = $no_bukti;
+                $success['id_device'] = "-";
+                $success['nik_app'] = "-";
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['id']= "-";
+                $success['id_device'] = "-";
+                $success['nik_app'] = "-";
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
@@ -704,12 +708,27 @@ class ApprovalController extends Controller
                     ->update(['progress' => $vStatus,'no_app1' =>$no_bukti]);
 
                 DB::connection('sqlsrvsju')->commit();
+
+                $res = DB::connection('sqlsrvsju')->select("select a.nik_app2,isnull(b.id_device,'-') as id_device
+                from sju_pb_m a 
+                left join karyawan b on a.nik_app2=b.nik and a.kode_lokasi=b.kode_lokasi where a.no_pb='$request->no_aju' and a.kode_lokasi='$kode_lokasi'
+                ");
+                if(count($res) > 0){
+                    $success['id_device'] = $res[0]->id_device;
+                    $success['nik_app'] = $res[0]->nik_app2;
+                }else{
+                    $success['id_device'] = '-';
+                    $success['nik_app'] = '-';
+                }
+
                 $success['status'] = true;
                 $success['id'] = $no_bukti;
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['id']= "-";
+                $success['id_device'] = '-';
+                $success['nik_app'] = '-';
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
@@ -778,12 +797,27 @@ class ApprovalController extends Controller
                     ->update(['progress' => $vStatus,'no_app2' =>$no_bukti]);
                     
                 DB::connection('sqlsrvsju')->commit();
+
+                $res = DB::connection('sqlsrvsju')->select("select a.nik_app3,isnull(b.id_device,'-') as id_device
+                from sju_pb_m a 
+                left join karyawan b on a.nik_app3=b.nik and a.kode_lokasi=b.kode_lokasi where a.no_pb='$request->no_aju' and a.kode_lokasi='$kode_lokasi'
+                ");
+                if(count($res) > 0){
+                    $success['id_device'] = $res[0]->id_device;
+                    $success['nik_app'] = $res[0]->nik_app3;
+                }else{
+                    $success['id_device'] = '-';
+                    $success['nik_app'] = '-';
+                }
+
                 $success['status'] = true;
                 $success['id'] = $no_bukti;
                 $success['message'] = "Data approval berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['id']= "-";
+                $success['id_device'] = '-';
+                $success['nik_app'] = '-';
                 $success['message'] = "Data status tidak valid";
             }
             return response()->json($success, $this->successStatus);
@@ -855,10 +889,16 @@ class ApprovalController extends Controller
                 $success['status'] = true;
                 $success['id'] = $no_bukti;
                 $success['message'] = "Data approval berhasil disimpan";
+                
+                $success['id_device'] = '-';
+                $success['nik_app'] = '-';
             }else{
                 $success['status'] = false;
                 $success['id']= "-";
                 $success['message'] = "Data status tidak valid";
+                
+                $success['id_device'] = '-';
+                $success['nik_app'] = '-';
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
