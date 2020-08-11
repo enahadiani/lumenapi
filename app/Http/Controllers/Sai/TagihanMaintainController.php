@@ -204,7 +204,7 @@ class TagihanMaintainController extends Controller
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $per = substr($periode,2,4);
 
-            $cekBillPeriode = "select a.no_bill from sai_bill_m where kode_lokasi='$kode_lokasi' and periode='$request->periode'";
+            $cekBillPeriode = "select no_bill from sai_bill_m where kode_lokasi='$kode_lokasi' and periode='$request->periode'";
             $res = DB::connection($this->sql)->select($cekBillPeriode);
             // $no_bukti = $this->generateKode("sai_bill_m", "no_bill", $kode_lokasi."-BILL".$per.".", "0001");
 
