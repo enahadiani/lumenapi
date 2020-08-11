@@ -1680,5 +1680,151 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    //INVESTASI
+    public function komponenInvestasi(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+            $komponen = DB::connection('sqlsrvyptkug')->select("select '121' as kode_neraca,'Gedung dan Bangunan' as nama, 90000000 as n1
+			union all
+			select '122' as kode_neraca,'Sarpen' as nama, 40000000 as n1
+			union all
+			select '123' as kode_neraca,'Alat Catu Daya' as nama, 50000000 as n1
+			union all
+			select '124' as kode_neraca,'Akreditasi' as nama, 90000000 as n1
+			union all
+			select '125' as kode_neraca,'A' as nama, 40000000 as n1
+			union all
+			select '126' as kode_neraca,'B' as nama, 10000000 as n1
+			union all
+			select '127' as kode_neraca,'C' as nama, 40000000 as n1
+            ");
+            $komponen = json_decode(json_encode($komponen),true);
+            
+            if(count($komponen) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar = array();
+                for($i=0;$i<count($komponen);$i++){
+                    $daftar[] = array("y"=>floatval($komponen[$i]['n1']),"name"=>$komponen[$i]['nama'],"key"=>$komponen[$i]['kode_neraca']); 
+                
+                }
+                $success['status'] = true;
+                $success['data'] = $daftar;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function rkaVSRealInvestasi(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun 
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun 
+            union all
+            select '2020' as tahun 
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $row =  DB::connection('sqlsrvyptkug')->select("select 'RKA' as nama,'411' as kode_neraca,248.04 as n2014,292.13 as n2015,355.15 as n2016,415.52 as n2017,473.90 as n2018,522.37 as n2019,543.28 as n2020
+            union all
+            select 'Real' as nama,'511' as kode_neraca,218.19,260.18,307.08,365.32,413.84,453.11,451.08
+            union all
+            select 'On Progress' as nama,'412' as kode_neraca,29.85,30.37,46.02,46.93,57.95,66.84,91.77");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    if($row[$i]['kode_neraca'] == '412'){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }else{
+                        
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 }

@@ -122,5 +122,9 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
     $router->get('periode_aju', 'Sju\ApprovalController@getPeriodeAju');
+
+    $router->post('notif', 'Sju\NotifController@sendNotif');
+    $router->get('notif', 'Sju\NotifController@getNotif');
+    $router->get('update-notif-status', 'Sju\NotifController@updateStatusReadMobile');
     
 });
