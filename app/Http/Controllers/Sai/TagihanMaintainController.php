@@ -245,7 +245,6 @@ class TagihanMaintainController extends Controller
 
             DB::connection($this->sql)->commit();
             
-            $success['result'] = $res;
             $success['status'] = true;
             $success['message'] = "Data Tagihan berhasil disimpan. No Bukti:".$no_bukti;
             $success['no_bukti'] = $no_bukti;
