@@ -249,7 +249,7 @@ class TagihanMaintainController extends Controller
             
             $success['result'] = $res;
             $success['status'] = true;
-            $success['message'] = "Data Tagihan berhasil disimpan. No Bukti:".$no_bukti;
+            // $success['message'] = "Data Tagihan berhasil disimpan. No Bukti:".$no_bukti;
             // $success['no_bukti'] = $no_bukti;
 
             return response()->json($success, $this->successStatus);     
