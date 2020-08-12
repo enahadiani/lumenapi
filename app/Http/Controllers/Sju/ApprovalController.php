@@ -456,7 +456,7 @@ class ApprovalController extends Controller
 
             $sql="
 			select a.no_ver as no_app,convert(varchar,a.tanggal,103) as tgl,c.catatan,a.nik_user,b.nama,a.modul,
-                            case when a.status in ('A','P','K','U') then 'reject' else 'approve' end as status,a.tgl_input
+                            case when a.status in ('A','P','K','U') then 'reject' else 'approve' end as status,a.tgl_input,isnull(c.jabatan,'-') as jabatan
                     from sju_ver_m a
                     inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
                     inner join sju_ver_d c on a.no_ver=c.no_ver and a.kode_lokasi=c.kode_lokasi 
