@@ -335,7 +335,7 @@ class TagihanMaintainController extends Controller
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
                 $success['status'] = false;
-                return response()->json($success, 400); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -607,7 +607,7 @@ class TagihanMaintainController extends Controller
                     $success['message'] = "Tagihan di periode ini sudah digenerate semua!";
                     $success['data'] = [];
                     $success['status'] = false;
-                    return response()->json($success, $this->successStatus);     
+                    return response()->json($success, 400);     
                 }
                 else{
                     $prefix = "/SAI-01/$periode";
