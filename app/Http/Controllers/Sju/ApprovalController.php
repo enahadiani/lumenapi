@@ -311,7 +311,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,a.nilai - isnull(d.nilai,0) as potongan, isnull(d.nilai,0) as nilai
+            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,a.nilai - isnull(d.nilai,0) as potongan, isnull(d.nilai,0) as nilai,c.jabatan
             from sju_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -456,7 +456,7 @@ class ApprovalController extends Controller
 
             $sql="
 			select a.no_ver as no_app,convert(varchar,a.tanggal,103) as tgl,c.catatan,a.nik_user,b.nama,a.modul,
-                            case when a.status in ('A','P','K','U') then 'reject' else 'approve' end as status,a.tgl_input
+                            case when a.status in ('A','P','K','U') then 'reject' else 'approve' end as status,a.tgl_input,isnull(b.jabatan,'-') as jabatan
                     from sju_ver_m a
                     inner join  karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
                     inner join sju_ver_d c on a.no_ver=c.no_ver and a.kode_lokasi=c.kode_lokasi 
@@ -597,7 +597,9 @@ class ApprovalController extends Controller
             $vStatus = "A";
         } else if ($request->input('status') == "APPROVE") {
             $vStatus = "1";	
-        }                    
+        }       
+        
+        date_default_timezone_set('Asia/Jakarta');             
         
         $str_format="0000";
         if(isset($request->tanggal)){
@@ -620,7 +622,7 @@ class ApprovalController extends Controller
 
             if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
                
-                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,'ATASAN',$request->no_aju,'-']);
+                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,date('Y-m-d H:i:s'),$nik,$vStatus,'ATASAN',$request->no_aju,'-']);
 
                 $insdet = DB::connection('sqlsrvsju')->insert('insert into sju_ver_d (no_ver,status,modul,no_bukti,kode_lokasi,catatan) values (?, ?, ?, ?, ?, ?)', [$no_bukti,$vStatus,'PBPROSES',$request->no_aju,$kode_lokasi,$request->keterangan]);
     
@@ -673,6 +675,9 @@ class ApprovalController extends Controller
             $vStatus = "3";	
         }	
 
+        
+        date_default_timezone_set('Asia/Jakarta');
+
         $progress = "APP-VP";
         $str_format="0000";
         
@@ -697,7 +702,7 @@ class ApprovalController extends Controller
            
             if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
                     
-                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$progress,$request->no_aju,'-']);
+                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,date('Y-m-d H:i:s'),$nik,$vStatus,$progress,$request->no_aju,'-']);
                     
                 $insdet = DB::connection('sqlsrvsju')->insert('insert into sju_ver_d (no_ver,status,modul,no_bukti,kode_lokasi,catatan) values (?, ?, ?, ?, ?, ?)', [$no_bukti,$vStatus,'PBPROSES',$request->no_aju,$kode_lokasi,$request->keterangan]);
                     
@@ -761,6 +766,8 @@ class ApprovalController extends Controller
             $vStatus = "4";	
         }	
 
+        date_default_timezone_set('Asia/Jakarta');
+
         $progress = "APP-DIRKUG";
         
         $str_format="0000";
@@ -786,7 +793,7 @@ class ApprovalController extends Controller
            
             if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
                     
-                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$progress,$request->no_aju,'-']);
+                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,date('Y-m-d H:i:s'),$nik,$vStatus,$progress,$request->no_aju,'-']);
                     
                 $insdet = DB::connection('sqlsrvsju')->insert('insert into sju_ver_d (no_ver,status,modul,no_bukti,kode_lokasi,catatan) values (?, ?, ?, ?, ?, ?)', [$no_bukti,$vStatus,'PBPROSES',$request->no_aju,$kode_lokasi,$request->keterangan]);
                     
@@ -844,6 +851,8 @@ class ApprovalController extends Controller
             'keterangan' => 'required'
         ]);
 
+        date_default_timezone_set('Asia/Jakarta');
+
         if ($request->input('status') == "RETURN") {
             $vStatus = "U";
         } else {
@@ -875,7 +884,7 @@ class ApprovalController extends Controller
            
             if ($request->input('status') == "APPROVE" || $request->input('status') == "RETURN" ) {
                     
-                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,$tanggal,$nik,$vStatus,$progress,$request->no_aju,'-']);
+                $ins = DB::connection('sqlsrvsju')->insert('insert into sju_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,no_dokumen,no_verseb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$tanggal,$periode,date('Y-m-d H:i:s'),$nik,$vStatus,$progress,$request->no_aju,'-']);
                     
                 $insdet = DB::connection('sqlsrvsju')->insert('insert into sju_ver_d (no_ver,status,modul,no_bukti,kode_lokasi,catatan) values (?, ?, ?, ?, ?, ?)', [$no_bukti,$vStatus,'PBPROSES',$request->no_aju,$kode_lokasi,$request->keterangan]);
                     
