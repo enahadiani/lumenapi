@@ -335,7 +335,7 @@ class TagihanMaintainController extends Controller
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
                 $success['status'] = false;
-                return response()->json($success, $this->successStatus); 
+                return response()->json($success, 400); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
