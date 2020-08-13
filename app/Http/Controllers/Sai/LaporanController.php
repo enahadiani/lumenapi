@@ -20,28 +20,28 @@ class LaporanController extends Controller
 
     function convertBilangan($nilai) {
 		$nilai = abs($nilai);
-		$huruf = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+		$huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
 		$temp = "";
 		if ($nilai < 12) {
 			$temp = " ". $huruf[$nilai];
 		} else if ($nilai <20) {
-			$temp = $this->convertBilangan($nilai - 10). " belas";
+			$temp = $this->convertBilangan($nilai - 10). " Belas";
 		} else if ($nilai < 100) {
-			$temp = $this->convertBilangan($nilai/10)." puluh". $this->convertBilangan($nilai % 10);
+			$temp = $this->convertBilangan($nilai/10)." Puluh". $this->convertBilangan($nilai % 10);
 		} else if ($nilai < 200) {
 			$temp = " seratus" . $this->convertBilangan($nilai - 100);
 		} else if ($nilai < 1000) {
-			$temp = $this->convertBilangan($nilai/100) . " ratus" . $this->convertBilangan($nilai % 100);
+			$temp = $this->convertBilangan($nilai/100) . " Ratus" . $this->convertBilangan($nilai % 100);
 		} else if ($nilai < 2000) {
 			$temp = " seribu" . $this->convertBilangan($nilai - 1000);
 		} else if ($nilai < 1000000) {
-			$temp = $this->convertBilangan($nilai/1000) . "ribu" . $this->convertBilangan($nilai % 1000);
+			$temp = $this->convertBilangan($nilai/1000) . "Ribu" . $this->convertBilangan($nilai % 1000);
 		} else if ($nilai < 1000000000) {
-			$temp = $this->convertBilangan($nilai/1000000) . " juta" . $this->convertBilangan($nilai % 1000000);
+			$temp = $this->convertBilangan($nilai/1000000) . " Juta" . $this->convertBilangan($nilai % 1000000);
 		} else if ($nilai < 1000000000000) {
-			$temp = $this->convertBilangan($nilai/1000000000) . " milyar" . $this->convertBilangan(fmod($nilai,1000000000));
+			$temp = $this->convertBilangan($nilai/1000000000) . " Milyar" . $this->convertBilangan(fmod($nilai,1000000000));
 		} else if ($nilai < 1000000000000000) {
-			$temp = $this->convertBilangan($nilai/1000000000000) . " trilyun" . $this->convertBilangan(fmod($nilai,1000000000000));
+			$temp = $this->convertBilangan($nilai/1000000000000) . " Trilyun" . $this->convertBilangan(fmod($nilai,1000000000000));
 		}     
 		return $temp;
     }
@@ -52,7 +52,7 @@ class LaporanController extends Controller
 		} else {
 			$hasil = trim($this->convertBilangan($nilai));
 		}     		
-		return $hasil;
+		return $hasil." "."Rupiah";
 	}
 
     function getNamaBulan($bulan) {
