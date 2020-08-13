@@ -81,6 +81,17 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('periode','Toko\BarcodeController@getPeriode');
     $router->post('barcode','Toko\BarcodeController@store');
 
+    $router->get('jurnal','Toko\JurnalController@index');
+    $router->get('jurnal/{no_bukti}','Toko\JurnalController@show');
+    $router->post('jurnal','Toko\JurnalController@store');
+    $router->put('jurnal','Toko\JurnalController@update');
+    $router->delete('jurnal/{no_bukti}','Toko\JurnalController@destroy');
+    $router->get('pp-list','Toko\JurnalController@getPP');
+    $router->get('akun','Toko\JurnalController@getAkun');
+    $router->get('nikperiksa','Toko\JurnalController@getNIKPeriksa');
+    $router->get('nikperiksa/{nik}','Toko\JurnalController@getNIKPeriksaByNIK');
+    $router->get('jurnal-periode','Toko\JurnalController@getPeriodeJurnal');
+
 });
 
 
