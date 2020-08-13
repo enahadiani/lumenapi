@@ -18,6 +18,49 @@ class LaporanController extends Controller
     public $guard = 'admin';
     public $sql = 'sqlsrv2';
 
+    function convertBilangan($nilai) {
+		$nilai = abs($nilai);
+		$huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+		$temp = "";
+		if ($nilai < 12) {
+			$temp = " ". $huruf[$nilai];
+		} else if ($nilai <20) {
+			$temp = $this->convertBilangan($nilai - 10). " Belas";
+		} else if ($nilai < 100) {
+			$temp = $this->convertBilangan($nilai/10)." Puluh". $this->convertBilangan($nilai % 10);
+		} else if ($nilai < 200) {
+			$temp = " seratus" . $this->convertBilangan($nilai - 100);
+		} else if ($nilai < 1000) {
+			$temp = $this->convertBilangan($nilai/100) . " Ratus" . $this->convertBilangan($nilai % 100);
+		} else if ($nilai < 2000) {
+			$temp = " seribu" . $this->convertBilangan($nilai - 1000);
+		} else if ($nilai < 1000000) {
+			$temp = $this->convertBilangan($nilai/1000) . "Ribu" . $this->convertBilangan($nilai % 1000);
+		} else if ($nilai < 1000000000) {
+			$temp = $this->convertBilangan($nilai/1000000) . " Juta" . $this->convertBilangan($nilai % 1000000);
+		} else if ($nilai < 1000000000000) {
+			$temp = $this->convertBilangan($nilai/1000000000) . " Milyar" . $this->convertBilangan(fmod($nilai,1000000000));
+		} else if ($nilai < 1000000000000000) {
+			$temp = $this->convertBilangan($nilai/1000000000000) . " Trilyun" . $this->convertBilangan(fmod($nilai,1000000000000));
+		}     
+		return $temp;
+    }
+    
+    function bilanganAngka($nilai) {
+		if($nilai<0) {
+			$hasil = "minus ". trim($this->convertBilangan($nilai));
+		} else {
+			$hasil = trim($this->convertBilangan($nilai));
+		}     		
+		return $hasil." "."Rupiah";
+	}
+
+    function getNamaBulan($bulan) {
+        $arrayBulan = array('Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 
+        'September', 'Oktober', 'November', 'Desember');
+        return $arrayBulan[$bulan-1];
+    }
+
     function getReportTagihanDetail(Request $request) {
         try {
 
@@ -29,7 +72,46 @@ class LaporanController extends Controller
             $no_dokumen = $request->input('no_dokumen');
             $customer   = $request->input('kode_cust');
             
-            $sqlTagihan = "select";
+            $sqlTagihan = "select a.tanggal, a.no_bill, c.nama, c.alamat, c.provinsi, c.jabatan_pic, d.no_dokumen, d.tgl_sepakat, d.keterangan, d.nilai, d.nilai_ppn, d.nilai + d.nilai_ppn as 'nilai_akhir', d.due_date 
+            from sai_bill_m a
+            inner join sai_bill_d b on a.kode_lokasi=b.kode_lokasi and a.no_bill=b.no_bill
+            inner join sai_cust c on b.kode_lokasi=c.kode_lokasi and b.kode_cust=c.kode_cust
+            inner join sai_kontrak d on c.kode_cust=d.kode_cust and a.kode_lokasi=d.kode_lokasi
+            where b.no_dokumen = '$no_dokumen' and a.kode_lokasi = '$kode_lokasi' and c.kode_cust = '$customer'";
+
+            $rs1 = DB::connection($this->sql)->select($sqlTagihan);
+            $res1 = json_decode(json_encode($rs1),true);
+            $totalNilai = floatval($res1[0]['nilai_akhir']);
+
+            $sqlSaiBank = "select a.bank,a.cabang,a.no_rek,a.nama_rek from sai_bank a where a.kode_lokasi='$kode_lokasi'";
+
+            $rs2 = DB::connection($this->sql)->select($sqlSaiBank);
+            $res2 = json_decode(json_encode($rs2),true);
+
+            $sqlLampiran = "select b.nama from sai_cust_d a inner join sai_lampiran b 
+            on a.kode_lokasi=b.kode_lokasi and a.kode_lampiran=b.kode_lampiran
+            where a.kode_lokasi = '$kode_lokasi' and  a.kode_cust = '$customer'";
+
+            $rs3 = DB::connection($this->sql)->select($sqlLampiran);
+            $res3 = json_decode(json_encode($rs3),true);
+
+            $convertDateTagihan = date('m',strtotime($res1[0]['tanggal']));
+            $convertFloatTagihan = floatval($convertDateTagihan);
+
+            $convertDateSepakat = date('m',strtotime($res1[0]['tgl_sepakat']));
+            $convertFloatSepakat = floatval($convertDateSepakat);
+
+            $success['status'] = true;
+            $success['terbilang'] = $this->bilanganAngka($totalNilai);
+            $success['bulan_tagihan'] = $this->getNamaBulan($convertFloatTagihan);
+            $success['bulan_sepakat'] = $this->getNamaBulan($convertFloatSepakat);
+            $success['data'] = $res1;
+            $success['data_bank'] = $res2;
+            $success['data_lampiran'] = $res3;
+            $success['message'] = "Success!";
+            $success["auth_status"] = 1;        
+
+            return response()->json($success, $this->successStatus);
 
 
         } catch (\Throwable $e) {
