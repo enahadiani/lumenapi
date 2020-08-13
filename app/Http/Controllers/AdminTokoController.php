@@ -305,7 +305,7 @@ class AdminTokoController extends Controller
             from menu a
             inner join m_form c on a.kode_form=c.kode_form
             inner join hakakses b on a.kode_klp=b.kode_klp_menu
-            where b.nik='$nik' and a.kode_form<>'-' and a.nama like '%$request->cari%' 
+            where b.nik='$nik' and a.kode_form<>'-' and a.nama = '$request->cari' 
             ");
             $rs = json_decode(json_encode($rs),true);
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
