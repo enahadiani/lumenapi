@@ -95,12 +95,16 @@ class LaporanController extends Controller
             $rs3 = DB::connection($this->sql)->select($sqlLampiran);
             $res3 = json_decode(json_encode($rs3),true);
 
-            $convertDate = date('m',strtotime($res1[0]['tanggal']));
-            $convertFloat = floatval($convertDate);
+            $convertDateTagihan = date('m',strtotime($res1[0]['tanggal']));
+            $convertFloatTagihan = floatval($convertDateTagihan);
+
+            $convertDateSepakat = date('m',strtotime($res1[0]['tgl_sepakat']));
+            $convertFloatSepakat = floatval($convertDateSepakat);
 
             $success['status'] = true;
             $success['terbilang'] = $this->bilanganAngka($totalNilai);
-            $success['bulan'] = $this->getNamaBulan($convertFloat);
+            $success['bulan_tagihan'] = $this->getNamaBulan($convertFloatTagihan);
+            $success['bulan_sepakat'] = $this->getNamaBulan($convertFloatSepakat);
             $success['data'] = $res1;
             $success['data_bank'] = $res2;
             $success['data_lampiran'] = $res3;
