@@ -35,7 +35,7 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.no_bill,b.kode_cust+' - '+c.nama as cust,e.keterangan as keterangan_kontrak,e.nilai as nilai_kontrak,e.nilai_ppn as nilai_ppn_kontrak
+            $sql="select b.no_dokumen,b.kode_cust+' - '+c.nama as cust,e.keterangan as keterangan_kontrak,e.nilai as nilai_kontrak,e.nilai_ppn as nilai_ppn_kontrak
             from sai_bill_m a
             inner join sai_bill_d b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi
             left join sai_cust c on b.kode_cust=c.kode_cust and b.kode_lokasi=c.kode_lokasi
