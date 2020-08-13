@@ -30,25 +30,25 @@ class JurnalController extends Controller
     function doCekPeriode2($modul,$status,$periode) {
         try{
             
-            $perValid = false;
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+            // $perValid = false;
+            // if($data =  Auth::guard($this->guard)->user()){
+            //     $nik= $data->nik;
+            //     $kode_lokasi= $data->kode_lokasi;
+            // }
             
-            if ($status == "A") {
+            // if ($status == "A") {
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
-            }else{
+            //     $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
+            // }else{
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
-            }
+            //     $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
+            // }
 
-            $auth = DB::connection($this->db)->select($strSQL);
-            $auth = json_decode(json_encode($auth),true);
-            if(count($auth) > 0){
+            // $auth = DB::connection($this->db)->select($strSQL);
+            // $auth = json_decode(json_encode($auth),true);
+            // if(count($auth) > 0){
                 $perValid = true;
-            }
+            // }
             $msg = "ok";
         } catch (\Throwable $e) {		
             $msg= " error " .  $e;
@@ -56,7 +56,7 @@ class JurnalController extends Controller
         } 	
         $result['status'] = $perValid;
         $result['message'] = $msg;
-        $result['sql'] = $strSQL;
+        // $result['sql'] = $strSQL;
         return $result;		
     }
 
