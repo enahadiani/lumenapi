@@ -53,12 +53,12 @@ class LaporanController extends Controller
 
                 $resdata[]=(array)$row;
                 if($i == 0){
-                    $nb .= "'$row->no_bill'";
+                    $nb .= "'$row->no_dokumen'";
                     $kode_cust .= "'$row->cust'";
                     // $no_kontrak .= "'$row->no_kontrak'";
                 }else{
 
-                    $nb .= ","."'$row->no_bill'";
+                    $nb .= ","."'$row->no_dokumen'";
                     $kode_cust .= ","."'$row->cust'";
                     // $no_kontrak .= ","."'$row->no_kontrak'";
                 }
