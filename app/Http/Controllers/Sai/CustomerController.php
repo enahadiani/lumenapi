@@ -119,6 +119,8 @@ class CustomerController extends Controller
             'nama' => 'required',
             'alamat' => 'required',
             'pic' => 'required',
+            'jabatan_pic' => 'required',
+            'provinsi' => 'required',
             'email' => 'required',
             'no_telp' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048',
@@ -156,7 +158,7 @@ class CustomerController extends Controller
                     $filetype = "-";
                 }
 
-                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->tgl_tagih')");
+                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih,jabatan_pic,provinsi) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->tgl_tagih','$request->jabatan_pic','$request->provinsi')");
 
                 if(count($request->kode_lampiran) > 0){
                     $nu=1;
@@ -211,6 +213,8 @@ class CustomerController extends Controller
             'nama' => 'required',
             'alamat' => 'required',
             'pic' => 'required',
+            'jabatan_pic' => 'required',
+            'provinsi' => 'required',
             'email' => 'required',
             'no_telp' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048',
@@ -267,7 +271,7 @@ class CustomerController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->tgl_tagih')");
+            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,gambar,email,no_telp,bank,cabang,no_rek,nama_rek,tgl_tagih,jabatan_pic,provinsi) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$foto."','".$request->email."','".$request->no_telp."','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->tgl_tagih','$request->jabatan_pic','$request->provinsi')");
 
             if(count($request->kode_lampiran) > 0){
                 $nu=1;

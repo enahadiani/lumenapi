@@ -18,6 +18,27 @@ class LaporanController extends Controller
     public $guard = 'admin';
     public $sql = 'sqlsrv2';
 
+    function getReportTagihanDetail(Request $request) {
+        try {
+
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $no_dokumen = $request->input('no_dokumen');
+            $customer   = $request->input('kode_cust');
+            
+            $sqlTagihan = "select";
+
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }   
+
     function getReportTagihan(Request $request){
         try {
             
