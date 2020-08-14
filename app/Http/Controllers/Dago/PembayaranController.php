@@ -464,6 +464,12 @@ class PembayaranController extends Controller
             $res5 = DB::connection($this->sql)->select( $sql5);
             $res5 = json_decode(json_encode($res5),true);
 
+            $sql6= "select isnull(sum(nilai_p),0) as paket, isnull(sum(nilai_t),0) as tambahan, isnull(sum(nilai_m),0) as dokumen
+            from dgw_pembayaran 
+            where no_reg='".$id."' and kode_lokasi='".$kode_lokasi."' and no_kwitansi <>'".$no_bukti."'";
+            $res6 = DB::connection($this->sql)->select($sql6);
+            $res6 = json_decode(json_encode($res6),true);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $totTambah = $totDok = 0;
                 if (count($res3) > 0){
@@ -479,17 +485,19 @@ class PembayaranController extends Controller
                 $success['detail_biaya'] = $res3;
                 $success['data_bayar'] = $res4;
                 $success['histori_bayar'] = $res5;
+                $success['detail_bayar_lain'] = $res6;
                 $success['totTambah']=$totTambah;
                 $success['totDok']=$totDok;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['biaya_tambahan'] = [];
-                $success['biaya_dokumen'] = [];
+                $success['data_jamaah'] = [];
+                $success['detail_bayar'] = [];
+                $success['detail_biaya'] = [];
                 $success['data_bayar'] = [];
                 $success['histori_bayar'] = [];
+                $success['detail_bayar_lain'] = [];
                 $success['totTambah']=0;
                 $success['totDok']=0;
                 $success['status'] = "FAILED";
