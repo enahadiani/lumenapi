@@ -384,7 +384,7 @@ class PembayaranController extends Controller
                 $sql = "select a.no_bukti,a.keterangan,a.param1 as kode_akun 
                 from trans_m a
                 inner join dgw_pembayaran b on a.no_bukti=b.no_kb and a.kode_lokasi=b.kode_lokasi
-                where b.no_kb='$no_bukti' and a.kode_lokasi='$kode_lokasi' and a.no_ref1='".$id."'";
+                where b.no_kwitansi='$no_bukti' and a.kode_lokasi='$kode_lokasi' and a.no_ref1='".$id."'";
                 $res4 = DB::connection($this->sql)->select($sql);
                 $res4 = json_decode(json_encode($res4),true);
                 
@@ -533,7 +533,7 @@ class PembayaranController extends Controller
                 $sql = "select a.no_bukti,a.keterangan,a.param1 as kode_akun 
                 from trans_m a
                 inner join dgw_pembayaran b on a.no_bukti=b.no_kb and a.kode_lokasi=b.kode_lokasi
-                where b.no_kb='$no_bukti' and a.kode_lokasi='$kode_lokasi' and a.no_ref1='".$id."'";
+                where b.no_kwitansi='$no_bukti' and a.kode_lokasi='$kode_lokasi' and a.no_ref1='".$id."'";
                 $res4 = DB::connection($this->sql)->select($sql);
                 $res4 = json_decode(json_encode($res4),true);
                 
