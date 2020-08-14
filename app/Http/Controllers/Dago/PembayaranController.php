@@ -206,7 +206,7 @@ class PembayaranController extends Controller
             }	
 
             $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-TT'.substr($periode,2,4).".", "0001");
-            $no_kb = $this->generateKode("trans_m", "no_kb", $kode_lokasi.'-BM'.substr($periode,2,4).".", "0001");
+            $no_kb = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-BM'.substr($periode,2,4).".", "0001");
             $bayarPaketIDR = floatval($request->bayar_paket)*floatval($request->kurs);
             
             $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
