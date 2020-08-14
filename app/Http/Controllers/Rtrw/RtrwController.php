@@ -386,6 +386,18 @@ class RtrwController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
+            $sqlto1="select sum(a.total) as total from (select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'D' then nilai else -nilai end) as total
+            from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENERIMAAN'
+            group by a.kode_drk,b.nama,b.jenis,b.idx
+            ) a ";
+            $resto1 = DB::connection($this->sql)->select($sqlto1);
+            if(count($resto1) > 0){
+                $total1 = $resto1[0]->total;
+            }else{
+                $total1 = 0;
+            }
+
             // sql pengeluaran 
             $sql2 = "select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'C' then nilai else -nilai end) as total
             from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
@@ -395,26 +407,49 @@ class RtrwController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
+
+            $sqlto2="select sum(a.total) as total from (select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'C' then nilai else -nilai end) as total
+            from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENGELUARAN'
+            group by a.kode_drk,b.nama,b.jenis,b.idx
+            ) a ";
+            $resto2 = DB::connection($this->sql)->select($sqlto2);
+            if(count($resto2) > 0){
+                $total2 = $resto2[0]->total;
+            }else{
+                $total2 = 0;
+            }
+
+            $net = $total1-$total2;
+
             // sql saldo
             $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202')
             ";
-            
             $res3 = DB::connection($this->sql)->select($sql3);
-            $res3 = json_decode(json_encode($res3),true);
+            if(count($res3) > 0){
+                $saldo = $res3[0]->so_akhir;
+            }else{
+                $saldo = 0;
+            }
 
+            $saldo_ak = intval($saldo)+$net;
             
             if((count($res) > 0) || (count($res2) > 0) || (count($res3) > 0) ){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['penerimaan'] = $res;
                 $success['pengeluaran'] = $res2;
-                $success['saldo'] = $res3;
+                $success['mutasi'] = $net;
+                $success['saldo_akhir'] = $saldo_ak;
+                $success['saldo_awal'] = intval($saldo);
                 $success['message'] = "Success!";
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['penerimaan'] = [];
                 $success['pengeluaran'] = [];
-                $success['saldo'] = [];
+                $success['mutasi'] = $net;
+                $success['saldo_akhir'] = $saldo_ak;
+                $success['saldo_awal'] = intval($saldo);
                 $success['status'] = true;
             }
 
@@ -495,6 +530,18 @@ class RtrwController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
+            $sqlto1="select sum(a.total) as total from (select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'D' then nilai else -nilai end) as total
+            from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENERIMAAN'
+            group by a.kode_drk,b.nama,b.jenis,b.idx
+            ) a ";
+            $resto1 = DB::connection($this->sql)->select($sqlto1);
+            if(count($resto1) > 0){
+                $total1 = $resto1[0]->total;
+            }else{
+                $total1 = 0;
+            }
+
             // sql pengeluaran 
             $sql2 = "select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'C' then nilai else -nilai end) as total
             from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
@@ -504,26 +551,49 @@ class RtrwController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
+            $sqlto2="select sum(a.total) as total from (select a.kode_drk,b.nama,b.jenis,b.idx,sum(case a.dc when 'C' then nilai else -nilai end) as total
+            from gldt a inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202') and b.jenis ='PENGELUARAN'
+            group by a.kode_drk,b.nama,b.jenis,b.idx
+            ) a ";
+            $resto2 = DB::connection($this->sql)->select($sqlto2);
+            if(count($resto2) > 0){
+                $total2 = $resto2[0]->total;
+            }else{
+                $total2 = 0;
+            }
+
+            $net = $total1-$total2;
+
             // sql saldo
             $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202')
             ";
             
             $res3 = DB::connection($this->sql)->select($sql3);
-            $res3 = json_decode(json_encode($res3),true);
+            if(count($res3) > 0){
+                $saldo = $res3[0]->so_akhir;
+            }else{
+                $saldo = 0;
+            }
 
-            
+            $saldo_ak = intval($saldo)+$net;
+
             if((count($res) > 0) || (count($res2) > 0) || (count($res3) > 0) ){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['penerimaan'] = $res;
                 $success['pengeluaran'] = $res2;
-                $success['saldo'] = $res3;
+                $success['mutasi'] = $net;
+                $success['saldo_akhir'] = $saldo_ak;
+                $success['saldo_awal'] = intval($saldo);
                 $success['message'] = "Success!";
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['penerimaan'] = [];
                 $success['pengeluaran'] = [];
-                $success['saldo'] = [];
+                $success['mutasi'] = $net;
+                $success['saldo_akhir'] = $saldo_ak;
+                $success['saldo_awal'] = intval($saldo);
                 $success['status'] = true;
             }
 
