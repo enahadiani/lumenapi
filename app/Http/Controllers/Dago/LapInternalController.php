@@ -383,8 +383,8 @@ class LapInternalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','no_kwitansi','no_reg');
-            $db_col_name = array('a.periode','a.no_kwitansi','a.no_reg');
+            $col_array = array('periode','no_kb','no_reg');
+            $db_col_name = array('a.periode','a.no_kb','a.no_reg');
                         
             $filter = "where a.kode_lokasi='$kode_lokasi'";
             for($i = 0; $i<count($col_array); $i++){
@@ -393,7 +393,7 @@ class LapInternalController extends Controller
                 }
             }
 
-            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room)) as biaya_paket,(b.harga+b.harga_room)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp
+            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room)) as biaya_paket,(b.harga+b.harga_room)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp,a.no_kb
             from dgw_pembayaran a
             inner join dgw_reg b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
             inner join dgw_typeroom c on b.no_type=c.no_type and b.kode_lokasi=c.kode_lokasi
@@ -401,7 +401,7 @@ class LapInternalController extends Controller
             inner join dgw_marketing h on b.no_marketing=h.no_marketing and b.kode_lokasi=h.kode_lokasi
             inner join dgw_peserta k on b.no_peserta=k.no_peserta and b.kode_lokasi=k.kode_lokasi 
             inner join dgw_paket l on b.no_paket=l.no_paket and b.kode_lokasi=l.kode_lokasi 
-            inner join trans_m m on a.no_kwitansi=m.no_bukti and a.kode_lokasi=m.kode_lokasi
+            inner join trans_m m on a.no_kb=m.no_bukti and a.kode_lokasi=m.kode_lokasi
             inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.dc='D'
 			inner join masakun p on o.kode_akun=p.kode_akun and o.kode_lokasi=p.kode_lokasi
             left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
@@ -414,7 +414,70 @@ class LapInternalController extends Controller
 			left join (select no_reg,kode_lokasi,count(no_kwitansi) as cicil_ke
                         from dgw_pembayaran 
                         group by no_reg,kode_lokasi ) n on b.no_reg=n.no_reg and b.kode_lokasi=n.kode_lokasi
-            $filter  ";
+            $filter  and a.flag_ver='1' ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getTandaTerima(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','no_kwitansi','no_reg');
+            $db_col_name = array('a.periode','a.no_kwitansi','a.no_reg');
+                        
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+
+            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room)) as biaya_paket,(b.harga+b.harga_room)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp,a.no_kb
+            from dgw_pembayaran a
+            inner join dgw_reg b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
+            inner join dgw_typeroom c on b.no_type=c.no_type and b.kode_lokasi=c.kode_lokasi
+            inner join dgw_agent e on b.no_agen=e.no_agen and b.kode_lokasi=e.kode_lokasi 
+            inner join dgw_marketing h on b.no_marketing=h.no_marketing and b.kode_lokasi=h.kode_lokasi
+            inner join dgw_peserta k on b.no_peserta=k.no_peserta and b.kode_lokasi=k.kode_lokasi 
+            inner join dgw_paket l on b.no_paket=l.no_paket and b.kode_lokasi=l.kode_lokasi 
+            inner join trans_m m on a.no_kb=m.no_bukti and a.kode_lokasi=m.kode_lokasi
+            inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.dc='D'
+			inner join masakun p on o.kode_akun=p.kode_akun and o.kode_lokasi=p.kode_lokasi
+            left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
+                        from dgw_reg_biaya 
+                        group by no_reg,kode_lokasi ) i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi
+            left join (select no_reg,kode_lokasi,isnull(sum(nilai_p),0) as paket, 
+                        isnull(sum(nilai_t),0) as tambahan, isnull(sum(nilai_m),0) as dokumen
+                        from dgw_pembayaran 
+                        group by no_reg,kode_lokasi ) j on b.no_reg=j.no_reg and b.kode_lokasi=j.kode_lokasi
+			left join (select no_reg,kode_lokasi,count(no_kwitansi) as cicil_ke
+                        from dgw_pembayaran 
+                        group by no_reg,kode_lokasi ) n on b.no_reg=n.no_reg and b.kode_lokasi=n.kode_lokasi
+            $filter ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
