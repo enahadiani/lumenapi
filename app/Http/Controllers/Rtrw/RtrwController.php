@@ -399,7 +399,7 @@ class RtrwController extends Controller
             $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and a.periode like '$tahun%' and a.kode_akun in ('11101','11201','11202')
             ";
             
-            $res3 = DB::connection($this->sql)->select($sql2);
+            $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             
@@ -508,7 +508,7 @@ class RtrwController extends Controller
             $sql3 = "select sum(a.so_akhir) as so_akhir from glma_pp a where a.kode_lokasi ='$kode_lokasi' and substring(a.periode,1,4) = '$tahun' and substring(a.periode,5,2) = '$bulan' and a.kode_akun in ('11101','11201','11202')
             ";
             
-            $res3 = DB::connection($this->sql)->select($sql2);
+            $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             
