@@ -179,7 +179,7 @@ class JamaahController extends Controller
             if($cekKtp) {
                  $success['status'] = "FAILED";
                  $success['message'] = "KTP Jamaah sudah tersimpan di sistem";
-                 return response()->json($success, 400);
+                 return response()->json($success, $this->successStatus);
             }else {
                 $tahun = date('y');
                 $no_peserta = $this->generateKode("dgw_peserta", "no_peserta", $tahun, "00001");
