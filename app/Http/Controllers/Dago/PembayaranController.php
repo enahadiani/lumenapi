@@ -901,7 +901,7 @@ class PembayaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+            $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_kwitansi='$no_bukti' and kode_lokasi='$kode_lokasi' ");
             $kas = json_decode(json_encode($nk),true);	
             if (count($kas) > 0){
                 $no_kb = $kas[0]->no_kb;
