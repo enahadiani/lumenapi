@@ -30,6 +30,17 @@ class JamaahController extends Controller
         }
     }
 
+    
+    public function cekKTP($no_ktp, $kode_lokasi) {
+        $auth = DB::connection($this->sql)->select("select id_peserta from dgw_peserta where id_peserta ='".$no_ktp."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
@@ -163,33 +174,40 @@ class JamaahController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $tahun = date('y');
-            $no_peserta = $this->generateKode("dgw_peserta", "no_peserta", $tahun, "00001");
 
-            if($request->hasfile('foto')){
+            $cekKtp = $this->cekKTP($request->id_peserta, $kode_lokasi);
+            if($cekKtp) {
+                 $success['status'] = "FAILED";
+                 $success['message'] = "KTP Jamaah sudah tersimpan di sistem";
+                 return response()->json($success, 400);
+            }else {
+                $tahun = date('y');
+                $no_peserta = $this->generateKode("dgw_peserta", "no_peserta", $tahun, "00001");
 
-                $file = $request->file('foto');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('dago/'.$foto)){
-                    Storage::disk('s3')->delete('dago/'.$foto);
+                if($request->hasfile('foto')){
+
+                    $file = $request->file('foto');
+                    
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('dago/'.$foto)){
+                        Storage::disk('s3')->delete('dago/'.$foto);
+                    }
+                    Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
+                    
+                }else{
+
+                    $foto="-";
                 }
-                Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
+
+                $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
                 
-            }else{
-
-                $foto="-";
-            }
-
-            $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
-            
-            DB::connection($this->sql)->commit();
-            $success['status'] = "SUCCESS";
-            $success['message'] = "Data Jamaah berhasil disimpan. No jamaah:".$no_peserta;
-            
-            return response()->json($success, $this->successStatus);     
+                DB::connection($this->sql)->commit();
+                $success['status'] = "SUCCESS";
+                $success['message'] = "Data Jamaah berhasil disimpan. No jamaah:".$no_peserta;
+                
+                return response()->json($success, $this->successStatus);
+            }     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
