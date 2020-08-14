@@ -111,7 +111,7 @@ class LaporanController extends Controller
             $success['message'] = "Success!";
             $success["auth_status"] = 1;        
 
-            return response()->json($success, $this->successStatus);
+            return response()->json(['data'=>$success, $this->successStatus]);
 
 
         } catch (\Throwable $e) {
