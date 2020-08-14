@@ -205,7 +205,8 @@ class PembayaranController extends Controller
 				}
             }	
 
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-BM'.substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-TT'.substr($periode,2,4).".", "0001");
+            $no_kb = $this->generateKode("trans_m", "no_kb", $kode_lokasi.'-BM'.substr($periode,2,4).".", "0001");
             $bayarPaketIDR = floatval($request->bayar_paket)*floatval($request->kurs);
             
             $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
@@ -318,7 +319,7 @@ class PembayaranController extends Controller
                 }
             }		
             
-            $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,$request->kode_curr,$request->kurs,$request->bayar_dok));
+            $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m,flag_ver,no_kb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,$request->kode_curr,$request->kurs,$request->bayar_dok,'0',$no_kb));
 
             //hitung selisih kurs pembyaran dan closing jadwal (untuk yg di piutang-kan - saat berangkat blm lunas)
             //jika pembayran dilakukan setelah berangkat
@@ -387,7 +388,7 @@ class PembayaranController extends Controller
                 $res4 = json_decode(json_encode($res4),true);
                 
             }else{
-                $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-BM'.date('ym'), "0001");
+                $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-TT'.date('ym'), "0001");
                 $res4 = array();
             }
 
@@ -682,6 +683,15 @@ class PembayaranController extends Controller
             }	
 
             $no_bukti = $request->no_bukti;
+
+            $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+            $kas = json_decode(json_encode($nk),true);	
+            if (count($kas) > 0){
+                $no_kb = $kas[0]->no_kb;
+            }else{
+                $no_kb = "-";
+            }
+
             
             $del = DB::connection($this->sql)->table('trans_m')
                 ->where('kode_lokasi', $kode_lokasi)
@@ -701,10 +711,23 @@ class PembayaranController extends Controller
             $del4 = DB::connection($this->sql)->table('dgw_pembayaran_d')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kwitansi', $request->no_bukti)
+                ->delete();
+                
+            $del5 = DB::connection($this->sql)->table('dgw_ver_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_kb)
                 ->delete();	
+            
+            $del6 = DB::connection($this->sql)->table('dgw_ver_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $request->no_kb)
+                ->delete();
+            
+            $no_ver = $this->generateKode("dgw_ver_m", "no_ver", $kode_lokasi.'-VER'.date('ym'), "0001");
                 
             $bayarPaketIDR = floatval($request->bayar_paket)*floatval($request->kurs);    
             $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'KB','KBREG','F','-','-',$request->kode_pp,$request->tanggal,$request->no_reg,$request->deskripsi,$request->kode_curr,$request->kurs,$request->total_bayar,0,0,'-','-','-',$request->no_reg,'-','-',$request->kode_akun,'-','BM'));
+
             $ins2 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,$request->no_reg,$request->tanggal,0,$request->kode_akun,'D',$request->total_bayar,$request->total_bayar,$request->deskripsi,'KB','KB','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
             
             //PENAMBAHAN KURS
@@ -815,7 +838,7 @@ class PembayaranController extends Controller
                 }
             }		
         
-            $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,$request->kode_curr,$request->kurs,$request->bayar_dok));
+            $insp = DB::connection($this->sql)->update("insert into dgw_pembayaran (no_kwitansi,no_reg,jadwal,tgl_bayar,paket,sistem_bayar,kode_lokasi,periode,nilai_t,nilai_p,kode_curr,kurs,nilai_m,flag_ver,no_kb) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_reg,$request->tgl_berangkat,$request->tanggal,$request->paket,$request->status_bayar,$kode_lokasi,$periode,$request->bayar_tambahan,$request->bayar_paket,$request->kode_curr,$request->kurs,$request->bayar_dok,'1',$no_kb));
             
             //hitung selisih kurs pembyaran dan closing jadwal (untuk yg di piutang-kan - saat berangkat blm lunas)
             //jika pembayran dilakukan setelah berangkat
@@ -839,9 +862,15 @@ class PembayaranController extends Controller
                     $insk3 = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg."','".$request->tanggal."',778,'".$request->akun_titip."','".$dcPiutang."',".$sls.",".$sls.",'Selisih Kurs a.n ".$request->nama."','KB','SLSPIU','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");		
                 }
             }
+
+            $insVerm = DB::connection($this->sql)->insert("insert into dgw_ver_m (no_ver,kode_lokasi,tanggal,keterangan,nik_ver,nik_user,tgl_input,no_kwitansi) values ('$no_ver','$kode_lokasi',getdate(),'$request->deskripsi','$nik','$nik',getdate(),'$no_kb') ");
+
+            $insVerd = DB::connection($this->sql)->insert("insert into dgw_ver_d (no_ver,kode_lokasi,no_kwitansi) values ('$no_ver','$kode_lokasi','$no_kb')");
+
             DB::connection($this->sql)->commit();
             $success['status'] = "SUCCESS";
-            $success['no_kwitansi'] = $no_bukti;
+            $success['no_terima'] = $no_bukti;
+            $success['no_kwitansi'] = $no_kb;
             $success['message'] = "Data Pembayaran berhasil diubah";
             
             return response()->json($success, $this->successStatus);     
@@ -872,6 +901,14 @@ class PembayaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+            $kas = json_decode(json_encode($nk),true);	
+            if (count($kas) > 0){
+                $no_kb = $kas[0]->no_kb;
+            }else{
+                $no_kb = "-";
+            }
+
             $del = DB::connection($this->sql)->table('trans_m')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
@@ -890,6 +927,16 @@ class PembayaranController extends Controller
             $del4 = DB::connection($this->sql)->table('dgw_pembayaran_d')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kwitansi', $request->no_bukti)
+                ->delete();	
+
+            $del5 = DB::connection($this->sql)->table('dgw_ver_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $no_kb)
+                ->delete();	
+
+            $del6 = DB::connection($this->sql)->table('dgw_ver_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kwitansi', $no_kb)
                 ->delete();	
 
             $success['status'] = true;
