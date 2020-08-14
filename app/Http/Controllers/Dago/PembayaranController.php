@@ -684,10 +684,9 @@ class PembayaranController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
-            $kas = json_decode(json_encode($nk),true);	
-            if (count($kas) > 0){
-                $no_kb = $kas[0]->no_kb;
+            $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");	
+            if (count($nk) > 0){
+                $no_kb = $nk[0]->no_kb;
             }else{
                 $no_kb = "-";
             }
@@ -902,9 +901,8 @@ class PembayaranController extends Controller
             }
 
             $nk = DB::connection($this->sql)->select("select no_kb from dgw_pembayaran where no_kwitansi='$request->no_bukti' and kode_lokasi='$kode_lokasi' ");
-            $kas = json_decode(json_encode($nk),true);	
-            if (count($kas) > 0){
-                $no_kb = $kas[0]->no_kb;
+            if (count($nk) > 0){
+                $no_kb = $nk[0]->no_kb;
             }else{
                 $no_kb = "-";
             }
