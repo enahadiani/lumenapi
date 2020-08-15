@@ -466,13 +466,13 @@ class VerifikasiController extends Controller
             $success['status'] = "SUCCESS";
             $success['no_terima'] = $no_bukti;
             $success['no_kwitansi'] = $no_kb;
-            $success['message'] = "Data Pembayaran berhasil diubah";
+            $success['message'] = "Data Verifikasi berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = "FAILED";
-            $success['message'] = "Data Pembayaran gagal diubah ".$e;
+            $success['message'] = "Data Verifikasi gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }		
     }
