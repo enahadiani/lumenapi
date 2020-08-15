@@ -49,7 +49,7 @@ class PembayaranController extends Controller
 
             $res = DB::connection($this->sql)->select("select a.no_kwitansi, a.tgl_bayar, a.no_reg, a.paket, a.jadwal, round(a.nilai_p,4) as nilai_p, a.nilai_t, (a.nilai_p * a.kurs) + a.nilai_t as total_idr,isnull(a.jenis,'-') as jenis 
             from dgw_pembayaran a inner join trans_m b on a.no_kb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            where b.kode_lokasi='".$kode_lokasi."' and b.posted='F' and b.form='KBREG' and a.flag_ver = '0' ");
+            where b.kode_lokasi='".$kode_lokasi."' and b.posted='F' and b.form='KBREG' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
