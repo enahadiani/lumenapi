@@ -47,7 +47,7 @@ class PembayaranNonCashController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,f.nama as nama_paket,e.tgl_berangkat,case when ( ((a.harga+harga_room) > isnull(c.bayar_paket,0)+a.diskon) or (isnull(d.tot_tambahan,0) > isnull(c.bayar_tambahan,0) ) ) then '-' else 'Lunas' end as status
+            $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,f.nama as nama_paket,e.tgl_berangkat,(a.harga+harga_room) as nilai_paket,isnull(c.bayar_paket,0)+a.diskon as bayar_paket,(a.harga+harga_room) - isnull(c.bayar_paket,0)+a.diskon as saldo_paket, case when ( ((a.harga+harga_room) > isnull(c.bayar_paket,0)+a.diskon) or (isnull(d.tot_tambahan,0) > isnull(c.bayar_tambahan,0) ) ) then '-' else 'Lunas' end as status
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             
