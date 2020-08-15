@@ -57,6 +57,12 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('pembayaran-preview','Dago\PembayaranController@getPreview');
     $router->get('pembayaran-kurs','Dago\PembayaranController@getKurs');
 
+    //NON CASH
+    $router->get('noncash','Dago\NonCashController@getRegistrasi');
+    $router->post('noncash','Dago\NonCashController@store');
+    $router->get('noncash-detail','Dago\NonCashController@show');
+    $router->get('noncash-rekbank','Dago\NonCashController@getRekBank');
+
     //Verifikasi
     $router->get('verifikasi','Dago\VerifikasiController@index');
     $router->get('verifikasi-edit','Dago\VerifikasiController@edit');
