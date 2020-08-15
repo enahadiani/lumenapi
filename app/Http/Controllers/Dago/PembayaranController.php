@@ -401,7 +401,7 @@ class PembayaranController extends Controller
                 inner join dgw_paket e on b.no_paket=e.no_paket and b.kode_lokasi=e.kode_lokasi 
                 inner join dgw_jenis_produk f on e.kode_produk=f.kode_produk and e.kode_lokasi=f.kode_lokasi
                 left join dgw_pembayaran g on b.no_reg=g.no_reg and a.kode_lokasi=g.kode_lokasi
-            where b.no_reg='".$id."' and b.kode_lokasi='".$kode_lokasi."'";
+            where b.no_reg='".$id."' and b.kode_lokasi='".$kode_lokasi."' and g.no_kwitansi='$no_bukti' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
