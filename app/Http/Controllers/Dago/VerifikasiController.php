@@ -476,4 +476,41 @@ class VerifikasiController extends Controller
         }		
     }
 
+
+    public function histori()
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select a.no_ver,a.tanggal,a.keterangan,a.nik_ver,a.no_kwitansi,b.no_kwitansi as no_tt 
+            from dgw_ver_m a
+            inner join dgw_pembayaran b on a.no_kwitansi=b.no_kb and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+
 }
