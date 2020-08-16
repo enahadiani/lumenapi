@@ -626,7 +626,7 @@ class LapInternalController extends Controller
                 $sql="select a.no_reg,a.no_kwitansi,a.kode_lokasi,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,a.nilai_p,a.nilai_t,a.nilai_m
                 from dgw_pembayaran a
                 inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
-                inner join trans_m b on a.no_kwitansi=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+                inner join trans_m b on a.no_kb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' and a.no_reg in ($no_reg)
                 order by b.tanggal ";
                 $rs2 = DB::connection($this->sql)->select($sql);
