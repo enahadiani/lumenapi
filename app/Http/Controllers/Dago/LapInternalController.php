@@ -897,7 +897,7 @@ class LapInternalController extends Controller
                 case when a.dc='C' then a.nilai else 0 end as kredit 
                 from trans_j a 
                 inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                $filter and modul in ('KB','MI') order by a.no_bukti ";
+                $filter and a.modul in ('KB','MI') order by a.no_bukti ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
