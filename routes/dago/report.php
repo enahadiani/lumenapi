@@ -25,6 +25,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('filter-kwitansi','Dago\FilterController@getFilterKwitansi');
     $router->get('filter-jk','Dago\FilterController@getFilterJK');
     $router->get('filter-terima','Dago\FilterController@getFilterTerima');
+    $router->get('filter-periode-bayar','Dago\FilterController@getFilterPeriodeBayar');
 
     //Pihak ketiga
    
@@ -44,6 +45,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('lap-detail-bayar','Dago\LapInternalController@getDetailBayar');
     $router->get('lap-kartu-pembayaran','Dago\LapInternalController@getKartuPembayaran');
     $router->get('lap-terima','Dago\LapInternalController@getTandaTerima');
+    $router->get('lap-jurnal','Dago\LapInternalController@getJurnal');
 
 });
 

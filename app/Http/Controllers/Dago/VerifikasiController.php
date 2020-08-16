@@ -496,7 +496,7 @@ class VerifikasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.no_ver,a.tanggal,a.keterangan,a.nik_ver,a.no_kwitansi,b.no_kwitansi as no_tt,b.no_reg
+            $res = DB::connection($this->sql)->select("select a.no_ver,a.tanggal,a.keterangan,a.nik_ver,a.no_kwitansi,b.no_kwitansi as no_tt,b.no_reg,b.no_kb
             from dgw_ver_m a
             inner join dgw_pembayaran b on a.no_kwitansi=b.no_kb and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi'
