@@ -902,48 +902,46 @@ class LapInternalController extends Controller
                 $filter and a.modul in ('KB','MI') order by a.no_bukti ";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
-
-            // $resdata = array();
-            // $no_bukti = "";
-            // $i=0;
-            // foreach($rs as $row){
-                
-            //     $resdata[]=(array)$row;
-            //     if($i == 0){
-            //         $no_bukti .= "'$row->no_bukti'";
-            //     }else{
+          
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $resdata = array();
+                $no_bukti = "";
+                $i=0;
+                foreach($rs as $row){
                     
-            //         $no_bukti .= ","."'$row->no_bukti'";
-            //     }
-            //     $i++;
-            // }
-
-
-            // $sql2="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
-            //     case when a.dc='D' then a.nilai else 0 end as debet,
-            //     case when a.dc='C' then a.nilai else 0 end as kredit 
-            //     from trans_j a 
-            //     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            //     $filter and a.no_bukti in ($no_bukti) order by a.no_bukti ";
-            // $res2 = DB::connection($this->sql)->select($sql2);
-            // $res2 = json_decode(json_encode($res2),true);
-            
-            // if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-            //     $success['status'] = true;
-            //     $success['data'] = $res;
-            //     // $success['detail_jurnal'] = $res2;
-            //     $success['message'] = "Success!";
-            //     $success["auth_status"] = 1;    
-            //     return response()->json($success, $this->successStatus);     
-            // }
-            // else{
-            //     $success['message'] = "Data Kosong!";
-            //     $success['data'] = [];
-            //     // $success['detail_jurnal'] = [];
-            //     $success['status'] = true;
-            //     return response()->json($success, $this->successStatus);
-            // }
-            return response()->json($sql,$this->successStatus);
+                    $resdata[]=(array)$row;
+                    if($i == 0){
+                        $no_bukti .= "'$row->no_bukti'";
+                    }else{
+                        
+                        $no_bukti .= ","."'$row->no_bukti'";
+                    }
+                    $i++;
+                }
+    
+                $sql2="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
+                    case when a.dc='D' then a.nilai else 0 end as debet,
+                    case when a.dc='C' then a.nilai else 0 end as kredit 
+                    from trans_j a 
+                    inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                    $filter and a.no_bukti in ($no_bukti) order by a.no_bukti ";
+                $res2 = DB::connection($this->sql)->select($sql2);
+                $res2 = json_decode(json_encode($res2),true);
+                
+                $success['detail_jurnal'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail_jurnal'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
