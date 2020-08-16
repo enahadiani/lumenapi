@@ -900,13 +900,13 @@ class LapInternalController extends Controller
                 left join karyawan b on a.nik1=b.nik and a.kode_lokasi=b.kode_lokasi
                 left join karyawan c on a.nik1=c.nik and a.kode_lokasi=c.kode_lokasi
                 $filter and a.modul in ('KB','MI') order by a.no_bukti ";
-            $res = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($res),true);
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
 
             $resdata = array();
             $no_bukti = "";
             $i=0;
-            foreach($res as $row){
+            foreach($rs as $row){
                 
                 $resdata[]=(array)$row;
                 if($i == 0){
