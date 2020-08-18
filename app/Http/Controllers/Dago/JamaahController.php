@@ -182,6 +182,8 @@ class JamaahController extends Controller
             'sp' => 'required',
             'th_haji' => 'required',
             'th_umroh' => 'required',
+            'brkt_dgn' => 'required',
+            'hubungan' => 'required',
             'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048',
             'pendidikan' => 'required'
         ]);
@@ -219,7 +221,7 @@ class JamaahController extends Controller
                     $foto="-";
                 }
 
-                $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan));
+                $ins = DB::connection($this->sql)->insert('insert into dgw_peserta(no_peserta,kode_lokasi,id_peserta,nama,tempat,tgl_lahir,jk,status,ibu,alamat,kode_pos,telp,hp,email,pekerjaan,bank,norek,cabang,namarek,nopass,issued,ex_pass,kantor_mig,ec_telp,ec_hp,sp,th_haji,th_umroh,foto,ayah,pendidikan,brkt_dgn,hubungan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($no_peserta,$kode_lokasi,$request->id_peserta,$request->nama, $request->tempat, $request->tgl_lahir,$request->jk,$request->status,$request->ibu,$request->alamat,$request->kode_pos,$request->telp,$request->hp,$request->email,$request->pekerjaan,$request->bank,$request->norek,$request->cabang,$request->namarek,$request->nopass,$request->issued,$request->ex_pass,$request->kantor_mig,$request->ec_telp,$request->hp,$request->sp,$request->th_haji,$request->th_umroh,$foto,$request->ayah,$request->pendidikan,$request->brkt_dgn,$request->hubungan));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = "SUCCESS";
