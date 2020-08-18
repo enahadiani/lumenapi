@@ -35,9 +35,9 @@ class JamaahController extends Controller
         $auth = DB::connection($this->sql)->select("select id_peserta from dgw_peserta where id_peserta ='".$no_ktp."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
-            return false;
-        }else{
             return true;
+        }else{
+            return false;
         }
     }
 
