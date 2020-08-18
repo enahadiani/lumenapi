@@ -55,7 +55,7 @@ class JamaahController extends Controller
         if($cek) {
             $success['status'] = "FAILED";
             $success['message'] = "KTP Jamaah sudah tersimpan di sistem";
-            return response()->json($success, 422);
+            return response()->json($success, $this->successStatus);
         }else{
             return;
         }
