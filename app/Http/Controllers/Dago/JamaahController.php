@@ -62,7 +62,9 @@ class JamaahController extends Controller
             $success['message'] = "KTP Jamaah sudah tersimpan di sistem";
             return response()->json($success, $this->successStatus);
         }else{
-            return;
+            $success['status'] = "SUCCESS";
+            $success['message'] = "";
+            return response()->json($success, $this->successStatus);
         }
     }
 
