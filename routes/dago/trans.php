@@ -24,6 +24,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('jamaah-detail-id','Dago\JamaahController@editById');
     $router->post('jamaah-ubah','Dago\JamaahController@update');
     $router->delete('jamaah','Dago\JamaahController@destroy');
+    $router->get('cek-ktp','Dago\JamaahController@cekKTPChange');
 
     //Registrasi
     $router->get('registrasi','Dago\RegistrasiController@index');

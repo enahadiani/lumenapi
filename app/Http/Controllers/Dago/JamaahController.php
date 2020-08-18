@@ -49,6 +49,18 @@ class JamaahController extends Controller
         return $id;
     }
 
+    public function cekKTPChange(Request $request) {
+        $ktp = $request->no_ktp;
+        $cek = $this->cekKTP($ktp);
+        if($cek) {
+            $success['status'] = "FAILED";
+            $success['message'] = "KTP Jamaah sudah tersimpan di sistem";
+            return response()->json($success, 422);
+        }else{
+            return;
+        }
+    }
+
     public function index(Request $request)
     {
         // $this->validate($request, [
