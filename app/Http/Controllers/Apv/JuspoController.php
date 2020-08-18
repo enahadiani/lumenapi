@@ -106,11 +106,12 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             // $sql = "case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai";
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.progress,case isnull(b.progress,'-')  when 'R' then 'REVISI' when 'A' then 'Approval Pusat 1' else '-' end as status,isnull(b.no_bukti,'-') as id
+            $sql = "select a.no_bukti,a.no_dokumen,a.kode_pp,case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.progress,case isnull(b.progress,'-')  when 'R' then 'REVISI' when 'A' then 'Approval Pusat 1' else '-' end as status,isnull(b.no_bukti,'-') as id
             from apv_juskeb_m a 
             left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
-            where (a.kode_lokasi='$kode_lokasi' and a.progress='S') and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A'))
-            ");
+            where (a.kode_lokasi='$kode_lokasi' and a.progress='S') and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
+            ";
+            $res = DB::connection($this->db)->select($sql);
 
             $res = json_decode(json_encode($res),true);
             
@@ -169,7 +170,9 @@ class JuspoController extends Controller
             'qty'=> 'required|array',
             'subtotal'=> 'required|array',
             'ppn'=> 'required|array',
-            'grand_total'=> 'required|array'
+            'grand_total'=> 'required|array',
+            'status' => 'required',
+            'keterangan' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -180,9 +183,42 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
-            $format = $this->reverseDate($request->waktu,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
-            $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+            //cek udah pernah pengadaan belum
+            $cek = DB::connection($this->db)->select("select no_bukti,no_dokumen from apv_juspo_m where no_juskeb='$request->no_aju' and kode_lokasi='$kode_lokasi' ");
+            if(count($cek) > 0 ){
+                $no_bukti = $cek[0]->no_bukti;
+                $no_dokumen = $cek[0]->no_dokumen;
+
+                $del = DB::connection($this->db)->table('apv_juspo_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del2 = DB::connection($this->db)->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                $del3 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+
+            }else{
+                
+                $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
+                $format = $this->reverseDate($request->waktu,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
+                $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+            }
+
+            $inshis = DB::connection($this->db)->insert("insert into apv_juspo_his (no_juspo,keterangan,status,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->keterangan','$request->status','$kode_lokasi','$nik_user',getdate())");
+
+            //cek status
+            if($request->status == 2){
+                $progress = "A";
+            }else{
+                //update juskeb m 
+                $upd2 =  DB::connection($this->db)->table('apv_flow')
+                ->where('no_bukti', $request->no_aju)    
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_urut', 0)
+                ->update(['status' => '1','tgl_app'=>NULL]);
+                $upd2 =  DB::connection($this->db)->table('apv_juskeb_m')
+                ->where('no_bukti', $request->no_aju)    
+                ->where('kode_lokasi', $kode_lokasi)
+                ->update(['progress' => 'V']);
+                $progress = "Z";
+            }
+
 
             $arr_foto = array();
             $arr_nama = array();
@@ -206,7 +242,7 @@ class JuspoController extends Controller
                 
             }
                 
-            $ins = DB::connection($this->db)->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
+            $ins = DB::connection($this->db)->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),$progress,$request->input('tanggal'),$request->kode_kota]);
 
             $barang = $request->input('barang');
             $barang_klp = $request->input('barang_klp');
@@ -253,6 +289,11 @@ class JuspoController extends Controller
                 }else{
                     $prog = 0;
                 }
+
+                if($request->status != 2){
+                    $prog = 0;
+                }
+
                 $ins4[$i] = DB::connection($this->db)->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,nik) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,$role[$i]["nik"]]);
             }
             
@@ -321,7 +362,7 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tgl_input,121) as tgl_input, convert(varchar(10),a.tanggal,121) as tgl_juskeb,b.nama as nama_pp,c.nama as nama_klp 
+            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tgl_input,121) as tgl_input, convert(varchar(10),a.tanggal,121) as tgl_juskeb,b.nama as nama_pp,c.nama as nama_klp
             from apv_juspo_m a 
             left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             left join apv_kota c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
@@ -340,13 +381,19 @@ class JuspoController extends Controller
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
-            $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama 
+            $sql4="select e.id,a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut 
             from apv_juspo_m a
             inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi'
-			order by e.id,c.no_urut ";
+			union all
+			select e.id,a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user,f.nama,-1 as no_urut 
+            from apv_juspo_m a
+            inner join apv_juspo_his e on a.no_bukti=e.no_juspo and a.kode_lokasi=e.kode_lokasi
+            inner join apv_karyawan f on e.nik_user=f.nik and e.kode_lokasi=f.kode_lokasi
+            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi'
+			order by id,no_urut ";
             $res4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -384,7 +431,9 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tanggal,121) as tanggal from apv_juskeb_m a where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti'  ";
+            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tanggal,121) as tanggal
+            from apv_juskeb_m a 
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti'  ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -457,7 +506,9 @@ class JuspoController extends Controller
             'qty'=> 'required|array',
             'subtotal'=> 'required|array',
             'ppn'=> 'required|array',
-            'grand_total'=> 'required|array'
+            'grand_total'=> 'required|array',
+            'status' => 'required',
+            'keterangan' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -493,8 +544,28 @@ class JuspoController extends Controller
             $del = DB::connection($this->db)->table('apv_juspo_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del2 = DB::connection($this->db)->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del3 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del4 = DB::connection($this->db)->table('apv_juspo_his')->where('kode_lokasi', $kode_lokasi)->where('no_juspo', $no_bukti)->delete();
+
+            $inshis = DB::connection($this->db)->insert("insert into apv_juspo_his (no_juspo,keterangan,status,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->keterangan','$request->status','$kode_lokasi','$nik_user',getdate())");
+
+            //cek status
+            if($request->status == 2){
+                $progress = "A";
+            }else{
+                //update juskeb m 
+                $upd2 =  DB::connection($this->db)->table('apv_flow')
+                ->where('no_bukti', $request->no_aju)    
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_urut', 0)
+                ->update(['status' => '1','tgl_app'=>NULL]);
+                $upd2 =  DB::connection($this->db)->table('apv_juskeb_m')
+                ->where('no_bukti', $request->no_aju)    
+                ->where('kode_lokasi', $kode_lokasi)
+                ->update(['progress' => 'V']);
+                $progress = "Z";
+            }
             
-            $ins = DB::connection($this->db)->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),'A',$request->input('tanggal'),$request->kode_kota]);
+            $ins = DB::connection($this->db)->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$request->input('no_dokumen'),$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),$progress,$request->input('tanggal'),$request->kode_kota]);
 
             $barang = $request->input('barang');
             $barang_klp = $request->input('barang_klp');
@@ -539,6 +610,10 @@ class JuspoController extends Controller
                     $no_telp = $role[$i]["no_telp"];
                     $app_nik=$role[$i]["nik"];
                 }else{
+                    $prog = 0;
+                }
+
+                if($request->status != 2){
                     $prog = 0;
                 }
                 $ins4[$i] = DB::connection($this->db)->insert("insert into apv_flow (no_bukti,kode_lokasi,kode_role,kode_jab,no_urut,status,nik) values (?, ?, ?, ?, ?, ?, ?) ",[$no_bukti,$kode_lokasi,$role[$i]['kode_role'],$role[$i]['kode_jab'],$i,$prog,$role[$i]["nik"]]);
@@ -622,11 +697,16 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.keterangan,b.tanggal,c.nama
+            $sql="select b.id,a.no_bukti,b.keterangan,b.tanggal,c.nama
             from apv_flow a
             inner join apv_pesan b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
             left join apv_jab c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' 
+            union all 
+            select a.id,a.no_juspo as no_bukti,a.keterangan,a.tgl_input,c.nama
+            from apv_juspo_his a 
+            inner join apv_karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_juspo='$no_bukti' ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
