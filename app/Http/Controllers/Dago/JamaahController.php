@@ -50,8 +50,12 @@ class JamaahController extends Controller
     }
 
     public function cekKTPChange(Request $request) {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
         $ktp = $request->no_ktp;
-        $cek = $this->cekKTP($ktp);
+        $cek = $this->cekKTP($ktp, $kode_lokasi);
         if($cek) {
             $success['status'] = "FAILED";
             $success['message'] = "KTP Jamaah sudah tersimpan di sistem";
