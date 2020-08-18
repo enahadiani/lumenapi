@@ -709,10 +709,10 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select b.no_bukti,b.keterangan,b.tanggal,c.nama,-1 as id,case b.status when 'V' then 'APPROVE' when 'F' then 'RETURN' else '-' end as status,'green' as color
+            $sql = "select b.no_bukti,b.keterangan,b.tanggal,c.nama,-1 as id,case b.status when 'V' then 'APPROVE' when 'F' then 'RETURN' else '-' end as status,'green' as color
             from apv_juskeb_m a
             inner join apv_ver_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
-			inner join apv_karyawan d on b.nik_user=d.nik and b.kode_lokasi=d.kode_lokasi
+            inner join apv_karyawan d on b.nik_user=d.nik and b.kode_lokasi=d.kode_lokasi
             left join apv_jab c on d.kode_jab=c.kode_jab and d.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
             union all
@@ -721,15 +721,20 @@ class JuskebController extends Controller
             inner join apv_pesan b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
             left join apv_jab c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
-			union all 
-			select a.no_bukti,b.keterangan,b.tanggal,c.nama,b.id,case b.status when '2' then 'APPROVE' when '3' then 'RETURN' else '-' end as status,'blue' as color
+            union all 
+            select a.no_bukti,a.keterangan,a.tanggal,c.nama,a.id,case a.status when '2' then 'APPROVE' when '3' then 'RETURN' else '-' end as status,'blue' as color
+            from apv_pesan a
+            inner join apv_juspo_m d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+            left join apv_karyawan c on d.nik_buat=c.nik and d.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and d.no_juskeb='$no_bukti' and a.modul='PO'
+            union all 
+            select a.no_bukti,b.keterangan,b.tanggal,c.nama,b.id,case b.status when '2' then 'APPROVE' when '3' then 'RETURN' else '-' end as status,'blue' as color
             from apv_flow a
             inner join apv_pesan b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-			inner join apv_juspo_m d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+            inner join apv_juspo_m d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
             left join apv_jab c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and d.no_juskeb='$no_bukti'
-			order by id
-            ";
+            order by id ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
