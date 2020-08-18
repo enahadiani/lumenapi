@@ -336,6 +336,8 @@ class JuspoController extends Controller
             $success['message'] = "Data Justifikasi Pengadaan berhasil disimpan. No Bukti:".$no_bukti.$msg_email;
             $success['no_aju'] = $no_bukti;
             $success['token_players'] = $token_players;
+            $success['arr_nama'] = $arr_nama;
+            $success['arr_foto'] = $arr_foto;
           
           
             return response()->json(['success'=>$success], $this->successStatus);     
