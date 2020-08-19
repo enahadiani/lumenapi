@@ -232,20 +232,13 @@ class RtrwController extends Controller
     }
 
     public function getTahunBill(Request $request){
-        $this->validate($request, [
-            'kode_menu' => 'required',
-            'kode_pp'=>'required'
-        ]);
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }else if($data =  Auth::guard($this->guard3)->user()){
-                $nik = $data->no_rumah;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
+        if($data =  Auth::guard($this->guard)->user()){
+            $this->validate($request, [
+                'kode_menu' => 'required',
+                'kode_pp'=>'required'
+            ]);
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
             if(isset($request->kode_menu)){
                 if($request->kode_menu == "MOBILERW"){
                     $filter = "";
@@ -253,6 +246,12 @@ class RtrwController extends Controller
                     $filter = " and kode_pp='$request->kode_pp' ";
                 }
             }
+        }else if($data =  Auth::guard($this->guard3)->user()){
+            $nik = $data->no_rumah;
+            $kode_lokasi= $data->kode_lokasi;
+            $filter = " and kode_pp='$request->kode_pp' ";
+        }
+        try {
 
             $sql= "select distinct (substring(periode,1,4)) as tahun from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,1,4) desc ";
             $res = DB::connection($this->sql)->select($sql);
