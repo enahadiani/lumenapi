@@ -276,6 +276,51 @@ class RtrwController extends Controller
         }
     }
 
+    public function getPeriodeBill(Request $request){
+        if($data =  Auth::guard($this->guard)->user()){
+            $this->validate($request, [
+                'kode_menu' => 'required',
+                'kode_pp'=>'required'
+            ]);
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            if(isset($request->kode_menu)){
+                if($request->kode_menu == "MOBILERW"){
+                    $filter = "";
+                }else{
+                    $filter = " and kode_pp='$request->kode_pp' ";
+                }
+            }
+        }else if($data =  Auth::guard($this->guard3)->user()){
+            $nik = $data->no_rumah;
+            $kode_lokasi= $data->kode_lokasi;
+            $filter = " and kode_pp='$request->kode_pp' ";
+        }
+        try {
+
+            $sql= "select distinct (substring(periode,5,2)) as bulan,datename(m,cast(substring(periode,1,4)+'-'+substring(periode,5,2)+'-'+'01' as datetime)) as nama from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,1,4) desc ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+            }
+            else{
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+            }
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getPeriodeSetor(){
 
         try {
