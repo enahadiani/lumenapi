@@ -298,7 +298,7 @@ class RtrwController extends Controller
         }
         try {
 
-            $sql= "select distinct (substring(periode,5,2)) as bulan,datename(m,cast(substring(periode,1,4)+'-'+substring(periode,5,2)+'-'+'01' as datetime)) as nama from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,1,4) desc ";
+            $sql= "select distinct (substring(periode,5,2)) as bulan,datename(m,cast(substring(periode,1,4)+'-'+substring(periode,5,2)+'-'+'01' as datetime)) as nama from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,5,2) desc ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
