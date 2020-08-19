@@ -711,7 +711,7 @@ class LaporanController extends Controller
             $nik_user=$nik."_".uniqid();
             $periode=$request->input('periode');
 
-            $sql="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
+            $sql="exec sp_glma_tmp '$kode_lokasi','$periode','$nik_user' ";
             $res = DB::connection($this->sql)->update($sql);
 
             $mutasi="";
@@ -723,37 +723,40 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.kode_akun,a.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+            $sql="select a.kode_akun,b.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
             case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
             case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
             case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
             case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
             from glma_tmp a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             $filter and a.nik_user='$nik_user'  $mutasi
             order by a.kode_akun ";
             if($request->input('trail') != ""){
 
                 if ($request->input('trail') =="1")
                 {
-                    $sql = "select a.kode_akun,a.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+                    $sql = "select a.kode_akun,c.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
                     case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
                     case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
                     case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
                     case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
                     from glma_tmp a
                     inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                    inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                     $filter and a.nik_user='$nik_user' $mutasi
                     order by a.kode_akun";
                 }
                 if ($request->input('trail')=="2")
                 {
-                    $sql = "select a.kode_akun,a.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+                    $sql = "select a.kode_akun,c.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
                     case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
                     case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
                     case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
                     case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
                     from glma_tmp a
                     inner join konsol_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                    inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                     $filter and a.nik_user='$nik_user' $mutasi
                     order by a.kode_akun";
                 }
@@ -764,7 +767,6 @@ class LaporanController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data']=$res;
-                $success['sql']=$sql;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -773,7 +775,6 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data']=[];
                 $success['status'] = true;
-                $success['sql'] = $sql;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
