@@ -249,7 +249,7 @@ class RtrwController extends Controller
         }else if($data =  Auth::guard($this->guard3)->user()){
             $nik = $data->no_rumah;
             $kode_lokasi= $data->kode_lokasi;
-            $filter = " and kode_pp='$request->kode_pp' ";
+            $filter = " and kode_pp='$data->kode_pp' ";
         }
         try {
 
@@ -294,11 +294,11 @@ class RtrwController extends Controller
         }else if($data =  Auth::guard($this->guard3)->user()){
             $nik = $data->no_rumah;
             $kode_lokasi= $data->kode_lokasi;
-            $filter = " and kode_pp='$request->kode_pp' ";
+            $filter = " and kode_pp='$data->kode_pp' ";
         }
         try {
 
-            $sql= "select distinct (substring(periode,5,2)) as bulan,datename(m,cast(substring(periode,1,4)+'-'+substring(periode,5,2)+'-'+'01' as datetime)) as nama from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by substring(periode,5,2) desc ";
+            $sql= "select distinct periode,(substring(periode,5,2)) as bulan,datename(m,cast(substring(periode,1,4)+'-'+substring(periode,5,2)+'-'+'01' as datetime)) as nama, substring(periode,1,4) as tahun from rt_bill_d where kode_lokasi='$kode_lokasi' and kode_jenis='IWAJIB' and flag_aktif='1' $filter order by periode desc ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -310,6 +310,7 @@ class RtrwController extends Controller
             else{
                 $success['data'] = [];
                 $success['message'] = "Data Kosong!";
+                $success['sql'] = $sql;
                 $success['status'] = true;
             }
 
