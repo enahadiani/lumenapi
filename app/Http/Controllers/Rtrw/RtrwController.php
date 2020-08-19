@@ -202,13 +202,13 @@ class RtrwController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql=" select distinct (substring(a.periode,5,2)) as bulan,datename(m,cast(substring(a.periode,1,4)+'-'+substring(a.periode,5,2)+'-'+'01' as datetime)) as nama
+            $sql=" select distinct a.periode,substring(a.periode,1,4) as tahun,(substring(a.periode,5,2)) as bulan,datename(m,cast(substring(a.periode,1,4)+'-'+substring(a.periode,5,2)+'-'+'01' as datetime)) as nama
             from (select  a.periode 
             from gldt a 
             inner join trans_ref b on a.kode_drk=b.kode_ref and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi ='$kode_lokasi' and a.kode_akun in ('11101','11201','11202')
             ) a
-            order by (substring(a.periode,5,2)) desc  ";
+            order by a.periode desc  ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -702,14 +702,14 @@ class RtrwController extends Controller
             $this->validate($request, [
                 'kode_pp' => 'required',
                 'kode_akun' => 'required',
-                'tahun' => 'required'
+                'periode' => 'required'
             ]);
         }else if($data =  Auth::guard($this->guard3)->user()){
             $nik = $data->no_rumah;
             $kode_lokasi= $data->kode_lokasi;
             $kode_pp= $data->kode_pp;
             $this->validate($request, [
-                'tahun' => 'required'
+                'periode' => 'required'
             ]);
             $request->merge([
                 'kode_pp' => $kode_pp,
@@ -728,16 +728,16 @@ class RtrwController extends Controller
         }
         try {
                         
-            $tahun = $request->tahun;
+            $periode = $request->periode;
             $kode_pp = $request->kode_pp;
             $kode_akun = $request->kode_akun;
 
             $sql="select sum(nilai) as saldo from
             (
-                select so_akhir as nilai from glma_pp where kode_akun ='$kode_akun' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
+                select so_akhir as nilai from glma_pp where kode_akun ='$kode_akun' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and periode = '$periode'
                 union 
                 select sum(case dc when 'D' then nilai else -nilai end) as nilai 
-                from gldt where kode_akun ='$kode_akun' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
+                from gldt where kode_akun ='$kode_akun' and kode_lokasi='$kode_lokasi' and periode = '$periode'
             ) a
             ";
             $cek = DB::connection($this->sql)->select($sql);
@@ -745,7 +745,7 @@ class RtrwController extends Controller
             $saldo = $cek[0]['saldo'];
 
             $sql="select top 10 convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
-            from gldt where kode_akun ='$kode_akun' and kode_pp ='$kode_pp' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
+            from gldt where kode_akun ='$kode_akun' and kode_pp ='$kode_pp' and kode_lokasi='$kode_lokasi' and periode = '$periode'
             order by tgl_input desc ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -754,7 +754,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['saldo'] = $saldo;
-                $success['tahun'] = $tahun;
+                $success['periode'] = $periode;
                 $success['message'] = "Success!";
             }
             else{
@@ -762,7 +762,7 @@ class RtrwController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['saldo'] = $saldo;
-                $success['tahun'] = $tahun;
+                $success['periode'] = $periode;
                 $success['status'] = true;
             }
 
@@ -778,7 +778,7 @@ class RtrwController extends Controller
         $this->validate($request, [
             'kode_pp' => 'required',
             'kode_akun' => 'required',
-            'tahun' => 'required',
+            'periode' => 'required',
             'page' => 'required',
             'nextpage' => 'required'
         ]);
@@ -792,16 +792,16 @@ class RtrwController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $tahun = $request->tahun;
+            $periode = $request->periode;
             $kode_pp = $request->kode_pp;
             $kode_akun = $request->kode_akun;
             
             $sql="select sum(nilai) as saldo from
             (
-                select so_akhir as nilai from glma_pp where kode_akun ='$kode_akun' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
+                select so_akhir as nilai from glma_pp where kode_akun ='$kode_akun' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and periode = '$periode'
                 union 
                 select sum(case dc when 'D' then nilai else -nilai end) as nilai 
-                from gldt where kode_akun ='$kode_akun' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
+                from gldt where kode_akun ='$kode_akun' and kode_lokasi='$kode_lokasi' and periode = '$periode'
             ) a
             ";
             $cek = DB::connection($this->sql)->select($sql);
@@ -809,7 +809,7 @@ class RtrwController extends Controller
             $saldo = $cek[0]['saldo'];
 
             $sql2="select convert(varchar,tanggal,103) as tgl,keterangan,dc,nilai as nilai1,jenis,tgl_input
-            from gldt where kode_akun ='$kode_akun' and kode_pp ='$kode_pp' and kode_lokasi='$kode_lokasi' and periode like '$tahun%'
+            from gldt where kode_akun ='$kode_akun' and kode_pp ='$kode_pp' and kode_lokasi='$kode_lokasi' and periode = '$periode'
             order by tgl_input desc ";
             $row = DB::connection($this->sql)->select($sql2);
             $row = json_decode(json_encode($row),true);
@@ -828,7 +828,7 @@ class RtrwController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['saldo'] = $saldo;
-                $success['tahun'] = $tahun;
+                $success['periode'] = $periode;
                 $success['message'] = "Success!";
             }
             else{
@@ -836,7 +836,7 @@ class RtrwController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['saldo'] = $saldo;
-                $success['tahun'] = $tahun;
+                $success['periode'] = $periode;
                 $success['status'] = true;
             }
 
