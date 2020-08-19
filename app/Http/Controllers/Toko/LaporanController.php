@@ -691,6 +691,98 @@ class LaporanController extends Controller
         }
     }
 
+    function getNrcLajur(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_akun','kode_fs','kode_neraca');
+            $db_col_name = array('a.periode','a.kode_akun','b.kode_fs','b.kode_neraca');
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            
+            $nik_user=$nik."_".uniqid();
+            $periode=$request->input('periode');
+
+            $sql="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
+            $res = DB::connection($this->sql)->update($sql);
+
+            $mutasi="";
+            if($request->input('jenis') != ""){
+
+                if ($request->input('jenis')=="Tidak")
+                {
+                    $mutasi="and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0) ";
+                }
+            }
+
+            $sql="select a.kode_akun,a.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+            case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
+            case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
+            case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
+            case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
+            from glma_tmp a 
+            $filter and a.nik_user='$nik_user'  $mutasi
+            order by a.kode_akun ";
+            if($request->input('trail') != ""){
+
+                if ($request->input('trail') =="1")
+                {
+                    $sql = "select a.kode_akun,a.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+                    case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
+                    case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
+                    case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
+                    case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
+                    from glma_tmp a
+                    inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                    $filter and a.nik_user='$nik_user' $mutasi
+                    order by a.kode_akun";
+                }
+                if ($request->input('trail')=="2")
+                {
+                    $sql = "select a.kode_akun,a.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+                    case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
+                    case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
+                    case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
+                    case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
+                    from glma_tmp a
+                    inner join konsol_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                    $filter and a.nik_user='$nik_user' $mutasi
+                    order by a.kode_akun";
+                }
+            }
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data']=$res;
+                $success['sql']=$sql;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']=[];
+                $success['status'] = true;
+                $success['sql'] = $sql;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 
 }
