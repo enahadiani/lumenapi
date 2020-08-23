@@ -701,15 +701,25 @@ class LaporanController extends Controller
             
             $col_array = array('periode','kode_akun','kode_fs','kode_neraca');
             $db_col_name = array('a.periode','a.kode_akun','b.kode_fs','b.kode_neraca');
-            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            // for($i = 0; $i<count($col_array); $i++){
+            //     if($request->input($col_array[$i]) !=""){
+            //         $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+            //     }
+            // }
             for($i = 0; $i<count($col_array); $i++){
-                if($request->input($col_array[$i]) !=""){
-                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }
                 }
             }
+
             
             $nik_user=$nik."_".uniqid();
-            $periode=$request->input('periode');
+            $periode=$request->input('periode')[1];
 
             $sql="exec sp_glma_tmp '$kode_lokasi','$periode','$nik_user' ";
             $res = DB::connection($this->sql)->update($sql);
@@ -730,7 +740,7 @@ class LaporanController extends Controller
             case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
             from glma_tmp a 
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            $filter and a.nik_user='$nik_user'  $mutasi
+            $where and a.nik_user='$nik_user'  $mutasi
             order by a.kode_akun ";
             if($request->input('trail') != ""){
 

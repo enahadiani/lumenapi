@@ -33,6 +33,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-nik-retur','Toko\FilterController@getFilterNIKRetur');
     $router->get('filter-bukti-retur','Toko\FilterController@getFilterNoBuktiRetur');
     $router->get('filter-akun','Toko\FilterController@getFilterAkun');
+    $router->get('filter-periode-keu','Toko\FilterController@getFilterPeriodeKeuangan');
 
     //Laporan
     $router->get('lap-barang','Toko\LaporanController@getReportBarang');
