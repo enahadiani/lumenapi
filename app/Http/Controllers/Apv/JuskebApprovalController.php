@@ -427,6 +427,15 @@ class JuskebApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $cek = "select no_bukti from apv_juspo_m where no_juskeb = '$no_aju' ";
+            $rs = DB::connection($this->db)->select($cek);
+            $rs = json_decode(json_encode($rs),true);
+            if(count($rs)> 0){
+                $no_juspo = $rs[0]['no_bukti'];
+            }else{
+                $no_juspo = "-";
+            }
+
             $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.kode_kota,b.waktu,b.kegiatan,b.dasar,b.nilai,a.no_urut,c.nama as nama_pp,d.nama as nama_kota
             from apv_flow a
             inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
@@ -446,20 +455,47 @@ class JuskebApprovalController extends Controller
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
-            $sql4="select a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,a.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto  
+            // $sql4="select a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,a.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto  
+            // from apv_juskeb_m a
+            // inner join apv_ver_m e on a.no_bukti=e.no_juskeb and a.kode_lokasi=e.kode_lokasi
+            // inner join apv_karyawan f on e.nik_user=f.nik and e.kode_lokasi=f.kode_lokasi
+			// inner join apv_jab g on f.kode_jab=g.kode_jab and f.kode_lokasi=g.kode_lokasi
+            // where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi'
+			// union all
+			// select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto  
+            // from apv_juskeb_m a
+            // inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            // inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            // inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+			// inner join apv_jab g on f.kode_jab=g.kode_jab and f.kode_lokasi=g.kode_lokasi
+            // where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi' ";
+            $sql4 = "select e.no_bukti as id,a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama,-3 as no_urut,-4 as id2 
             from apv_juskeb_m a
             inner join apv_ver_m e on a.no_bukti=e.no_juskeb and a.kode_lokasi=e.kode_lokasi
             inner join apv_karyawan f on e.nik_user=f.nik and e.kode_lokasi=f.kode_lokasi
-			inner join apv_jab g on f.kode_jab=g.kode_jab and f.kode_lokasi=g.kode_lokasi
             where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi'
 			union all
-			select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto  
+			select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2 
             from apv_juskeb_m a
             inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
             inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
-			inner join apv_jab g on f.kode_jab=g.kode_jab and f.kode_lokasi=g.kode_lokasi
-            where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi' ";
+            where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi' 
+            union all
+select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2 
+            from apv_juspo_m a
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            where a.no_bukti='$no_juspo' and a.kode_lokasi='$kode_lokasi'
+			union all
+select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,a.nik_buat as nik,f.nama,-1 as no_urut,e.id as id2
+            from apv_juspo_m a
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_karyawan f on a.nik_buat=f.nik and a.kode_lokasi=f.kode_lokasi
+            where a.no_bukti='$no_juspo' and a.kode_lokasi='$kode_lokasi' and e.modul='PO'
+			order by id2
+	        ";
             $res4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
 

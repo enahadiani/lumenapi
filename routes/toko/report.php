@@ -32,6 +32,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-periode-retur','Toko\FilterController@getFilterPeriodeRetur');
     $router->get('filter-nik-retur','Toko\FilterController@getFilterNIKRetur');
     $router->get('filter-bukti-retur','Toko\FilterController@getFilterNoBuktiRetur');
+    $router->get('filter-akun','Toko\FilterController@getFilterAkun');
+    $router->get('filter-periode-keu','Toko\FilterController@getFilterPeriodeKeuangan');
 
     //Laporan
     $router->get('lap-barang','Toko\LaporanController@getReportBarang');
@@ -43,7 +45,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     $router->get('lap_kartu','Toko\LaporanController@getGlReportBukuBesar');
     $router->get('lap_saldo','Toko\LaporanController@getGlReportNeracaLajur');
-    // $router->get('lap_laba_rugi','Toko\LaporanController@getGlReportLabaRugi');
+    $router->get('lap_nrclajur','Toko\LaporanController@getNrcLajur');
     
 
 });

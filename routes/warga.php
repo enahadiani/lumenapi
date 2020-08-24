@@ -51,6 +51,7 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
     $router->get('filter-tahun', 'Rtrw\RtrwController@getTahun');
     $router->get('filter-bulan', 'Rtrw\RtrwController@getBulan');
     $router->get('filter-tahun-bill', 'Rtrw\RtrwController@getTahunBill');
+    $router->get('filter-bulan-bill', 'Rtrw\RtrwController@getPeriodeBill');
     $router->get('filter-periode-setor', 'Rtrw\RtrwController@getPeriodeSetor');
     $router->get('filter-akun', 'Rtrw\RtrwController@getAkun');
     $router->get('filter-blok', 'Rtrw\RtrwController@getBlok');
