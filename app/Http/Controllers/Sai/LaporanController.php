@@ -68,7 +68,7 @@ class LaporanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            $arrayListAlphabet = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
             $no_dokumen = $request->input('no_dokumen');
             $customer   = $request->input('kode_cust');
             
@@ -95,6 +95,12 @@ class LaporanController extends Controller
             $rs3 = DB::connection($this->sql)->select($sqlLampiran);
             $res3 = json_decode(json_encode($rs3),true);
 
+            $lampiran = array();
+            for($i=0;$i<count($res3); $i++) {
+                $list = $arrayListAlphabet[$i];
+                $lampiran[$i] = $list.". ".str_replace('"','',json_encode($res3[$i]['nama'],true)); 
+            }
+
             $convertDateTagihan = date('m',strtotime($res1[0]['tanggal']));
             $convertFloatTagihan = floatval($convertDateTagihan);
 
@@ -107,7 +113,7 @@ class LaporanController extends Controller
             $success['bulan_sepakat'] = $this->getNamaBulan($convertFloatSepakat);
             $success['data'] = $res1;
             $success['data_bank'] = $res2;
-            $success['data_lampiran'] = $res3;
+            $success['data_lampiran'] = $lampiran;
             $success['message'] = "Success!";
             $success["auth_status"] = 1;        
 
