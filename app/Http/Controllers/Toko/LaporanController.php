@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LaporanNrcLajur;
 
 class LaporanController extends Controller
 {
@@ -17,6 +19,31 @@ class LaporanController extends Controller
     public $successStatus = 200;
     public $guard = 'toko';
     public $sql = 'tokoaws';
+
+    public function sendMail(Request $request){
+        $this->validate($request,[
+            'to_name' => 'required',
+            'data' => 'required',
+            'subject' => 'required',
+            'email' => 'required'
+        ]);
+        $to_name = $request->to_name;
+        $data = $request->data;
+        $subject = $request->subject;        
+        $email = $request->email;
+        try {
+            $template_data = array("name"=>$to_name,"body"=>$data);
+            Mail::send('mail', $template_data,
+            function ($message) use ($email,$subject,$data) {
+                $message->to($email)
+                ->subject($subject)
+                ->setBody($data,"text/html");
+            });
+            return response()->json(array('status' => true, 'message' => 'Sent successfully'), $this->successStatus); 
+        } catch (Exception $ex) {
+            return response()->json(array('status' => false, 'message' => 'Something went wrong, please try later.'), $this->successStatus); 
+        }  
+    }
 
     function getReportBarang(Request $request){
         try {
