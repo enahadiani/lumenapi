@@ -857,6 +857,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
 			left join (SELECT no_bukti,kode_lokasi,MAX(id) as maxid
                         FROM apv_pesan
+						where modul <> 'PO'
                         GROUP BY no_bukti,kode_lokasi
                         ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
 			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 

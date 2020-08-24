@@ -32,17 +32,23 @@ class LaporanController extends Controller
         $subject = $request->subject;        
         $email = $request->email;
         try {
-            $template_data = array("name"=>$to_name,"body"=>$data);
-            Mail::send('mail', $template_data,
-            function ($message) use ($email,$subject,$data) {
-                $message->to($email)
-                ->subject($subject)
-                ->setBody($data,"text/html");
-            });
+        //     $template_data = array("name"=>$to_name,"body"=>$data);
+        //     Mail::send('mail', $template_data,
+        //     function ($message) use ($email,$subject,$data) {
+        //         $message->to($email)
+        //         ->subject($subject)
+        //         ->setBody($data,"html");
+        //     });
+            $rs = $this->getNrcLajur($request);
+            $res = json_decode(json_encode($rs),true);
+            $data_array = $res["original"]["success"]["data"];
+            Mail::to("testing@malasngoding.com")->send(new LaporanNrcLajur($data_array));
+            
             return response()->json(array('status' => true, 'message' => 'Sent successfully'), $this->successStatus); 
         } catch (Exception $ex) {
             return response()->json(array('status' => false, 'message' => 'Something went wrong, please try later.'), $this->successStatus); 
         }  
+        // return view('toko.rptNrcLajur')->with('data_array', $data_array);
     }
 
     function getReportBarang(Request $request){
