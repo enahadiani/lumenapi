@@ -22,11 +22,9 @@ class LaporanController extends Controller
 
     public function sendMail(Request $request){
         $this->validate($request,[
-            'to_name' => 'required',
             'email' => 'required'
         ]);
-
-        $to_name = $request->to_name;     
+  
         $email = $request->email;
         try {
             $rs = $this->getNrcLajur($request);
