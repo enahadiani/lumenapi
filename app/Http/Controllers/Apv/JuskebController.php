@@ -707,6 +707,8 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['no_aju'] = $no_bukti;
                 $success['token_players'] = $token_players;
                 $success['nik_ver'] = $request->nik_ver;
+                $success['nama_file'] = $request->nama_file;
+                $success['arr_nama'] = $request->arr_nama;
 
             // }else{
             //     $success['status'] = false;
