@@ -583,7 +583,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                                 
                             }     
                             $arr_nama[] = $request->input('nama_file')[$i];
-                            $arr_nama2[$i] = $request->input('nama_file')[$i];
+                            $arr_nama2[] = isset($request->file('file')[$i]);
                         }
     
                         $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
