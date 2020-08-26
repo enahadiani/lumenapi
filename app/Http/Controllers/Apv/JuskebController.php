@@ -713,8 +713,10 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['token_players'] = $token_players;
                 $success['nik_ver'] = $request->nik_ver;
                 $success['nama_file'] = $request->nama_file;
-                $success['arr_nama'] = $arr_nama2;
-                $success['arr_foto'] = $arr_foto2;
+                $success['arr_nama'] = $arr_nama;
+                $success['arr_foto'] = $arr_foto;
+                $success['arr_nama2'] = $arr_nama2;
+                $success['arr_foto2'] = $arr_foto2;
 
             // }else{
             //     $success['status'] = false;
