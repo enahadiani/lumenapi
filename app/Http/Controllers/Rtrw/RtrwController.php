@@ -883,8 +883,8 @@ class RtrwController extends Controller
             $cek = json_decode(json_encode($cek),true);
             $saldo = $cek[0]['saldo'];
 
-            $sql="select a.no_bukti, a.keterangan, convert(varchar,a.tanggal,105) as tgl,a.nilai1 as nilai1 from trans_m a 
-            where a.periode <= '$periode' and a.kode_lokasi='$kode_lokasi' and a.param1='$kode_rumah' and a.param2='IWAJIB'
+            $sql="select a.no_bukti, a.keterangan, convert(varchar,a.tanggal,105) as tgl,a.nilai1 as nilai1,a.param2 from trans_m a 
+            where a.periode <= '$periode' and a.kode_lokasi='$kode_lokasi' and a.param1='$kode_rumah' 
             order by a.no_bukti desc";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
