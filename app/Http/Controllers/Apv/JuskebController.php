@@ -554,9 +554,9 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 //cek upload file tidak kosong
                 if(!empty($cek)){
 
-                    if(count($request->nama_dok) > 0){
+                    if(count($request->nama_file) > 0){
                         //looping berdasarkan nama dok
-                        for($i=0;$i<count($request->nama_dok);$i++){
+                        for($i=0;$i<count($request->nama_file);$i++){
                             //cek row i ada file atau tidak
                             if(isset($request->file('file')[$i])){
                                 $file = $request->file('file')[$i];
