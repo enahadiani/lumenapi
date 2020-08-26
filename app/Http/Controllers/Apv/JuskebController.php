@@ -575,11 +575,8 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                                 }
                                 Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                                 $arr_foto[] = $foto;
-                                $arr_foto2[$i] = $foto;
                             }else{
                                 $arr_foto[] = $request->nama_file_seb[$i];
-                                $arr_foto2[$i] = $request->nama_file_seb[$i];
-                                
                             }     
                             $arr_nama[] = $request->input('nama_file')[$i];
                             $arr_nama2[] = count($request->nama_file).'|'.$i;
@@ -712,10 +709,10 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['token_players'] = $token_players;
                 $success['nik_ver'] = $request->nik_ver;
                 $success['nama_file'] = $request->nama_file;
+                $success['nama_file_seb'] = $request->nama_file_seb;
                 $success['arr_nama'] = $arr_nama;
                 $success['arr_foto'] = $arr_foto;
                 $success['arr_nama2'] = $arr_nama2;
-                $success['arr_foto2'] = $arr_foto2;
 
             // }else{
             //     $success['status'] = false;
