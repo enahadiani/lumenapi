@@ -764,6 +764,9 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             $del4 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del5 = DB::connection($this->db)->table('apv_pesan')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
+            
+            $del11 = DB::connection($this->db)->table('apv_ver_m')->where('kode_lokasi', $kode_lokasi)->where('no_juskeb', $no_bukti)->delete();
+
             $sql6="select no_bukti from apv_juspo_m where kode_lokasi='".$kode_lokasi."' and no_juskeb='$no_bukti' ";
             $res6 = DB::connection($this->db)->select($sql6);
             if(count($res6) > 0){
