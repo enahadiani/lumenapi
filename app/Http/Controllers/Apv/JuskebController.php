@@ -762,6 +762,18 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
 
             $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del4 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del5 = DB::connection($this->db)->table('apv_pesan')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+
+            $sql6="select no_bukti from apv_juspo_m where kode_lokasi='".$kode_lokasi."' and no_juskeb='$no_bukti' ";
+            $res6 = DB::connection($this->db)->select($sql6);
+            if(count($res6) > 0){
+                $no_juspo = $res6[0]->no_bukti;
+                $del6 =  DB::connection($this->db)->table('apv_juspo_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_juspo)->delete();
+                $del7 =  DB::connection($this->db)->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_juspo)->delete();
+                $del8 =  DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_juspo)->delete();
+                $del9 =  DB::connection($this->db)->table('apv_pesan')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_juspo)->delete();
+                $del10 =  DB::connection($this->db)->table('apv_juspo_his')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_juspo)->delete();
+            }
 
             DB::connection($this->db)->commit();
             $success['status'] = true;

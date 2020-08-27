@@ -25,6 +25,19 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('log_tes',function(){
         Log::error('Showing user: ');
     });
+    $router->get('cek', function (Request $request) {
+        if (password_verify($request->pass, $request->hash)) {
+            echo 'Password is valid!';
+        } else {
+            echo 'Invalid password.';
+        }
+        // if(app('hash')->check($request->pass,$request->hash)){
+        //     echo 'Password is valid!';
+        // } else {
+        //     echo 'Invalid password.';
+        // }
+    });
+
 });
 
 $router->get('storage/{filename}', function ($filename)
