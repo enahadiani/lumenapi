@@ -20,6 +20,8 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     
     $router->get('menu', 'Webjava\WebController@getMenu');
     $router->get('gallery', 'Webjava\WebController@getGallery');
+    $router->get('kontak', 'Webjava\WebController@getKontak');
+    $router->get('page/{id}', 'Webjava\WebController@getPage');
 
     $router->post('login', 'AuthController@loginWebjava');
     $router->get('hash-pass', 'AuthController@hassPassWebjava');

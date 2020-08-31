@@ -134,6 +134,21 @@ class WebController extends Controller
 
             $res2 = DB::connection($this->sql)->select("SELECT a.nama, keterangan, file_gambar, tgl_input, b.kode_ktg as nama_ktg FROM lab_konten_galeri a inner join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi where a.jenis='Galeri' and b.nama <> '-' and b.nama <> '_' and flag_aktif = '1' and a.kode_lokasi='22'");
             $success["daftar_gambar"] =  json_decode(json_encode($res2),true);
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getKontak(Request $request)
+    {
+        try {
+            $res = DB::connection($this->sql)->select("SELECT judul, keterangan, latitude, longitude FROM lab_konten_kontak a where flag_aktif='1' and a.kode_lokasi='22' ");
+            $success["kontak"] =  json_decode(json_encode($res),true);
             
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
@@ -144,4 +159,24 @@ class WebController extends Controller
         
     }
 
+    public function getPage($id)
+    {
+        try {
+            $sql="select a.id, a.judul, b.file_gambar as header_url, a.tgl_input, a.nik_user, a.keterangan  
+            from lab_konten a 
+            left join lab_konten_galeri b on a.header_url=b.id and a.kode_lokasi=b.kode_lokasi
+            where a.id=$id and a.kode_klp='KLP02' and a.kode_lokasi='22' ";
+        
+            $res = DB::connection($this->sql)->select($sql);
+
+            $success["page"] =  json_decode(json_encode($res),true);
+            
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
 }
