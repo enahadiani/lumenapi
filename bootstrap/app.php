@@ -412,4 +412,11 @@ $app->router->group([
     require __DIR__.'/../routes/apv_mobile.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/webjava'
+], function ($router) {
+    require __DIR__.'/../routes/webjava/web.php';
+});
+
 return $app;

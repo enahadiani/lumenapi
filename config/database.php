@@ -150,6 +150,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'dbsaife' => [
+            'driver' => env('DB_CONNECTION12','sqlsrv'),
+            'host' => env('DB_HOST12', 'localhost'),
+            'port' => env('DB_PORT12', '1433'),
+            'database' => env('DB_DATABASE12', 'forge'),
+            'username' => env('DB_USERNAME12', 'forge'),
+            'password' => env('DB_PASSWORD12', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',
