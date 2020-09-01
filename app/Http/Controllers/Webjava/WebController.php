@@ -27,6 +27,12 @@ class WebController extends Controller
         return "$id/$seo";
     }
 
+    function filterChar($str){
+        $filtered = str_replace(" ", "-", strtolower($str));
+        $filtered = str_replace(array("(",")","'","/","'\'",':','"',',','?','%'), "", $filtered);
+        return $filtered;
+    }
+
     public function getMenu(Request $request)
     {
         try {
@@ -181,7 +187,7 @@ class WebController extends Controller
         
     }
 
-    public function news(Request $request)
+    public function getNews(Request $request)
     {
         if(isset($request->page)){
             $page = $request->page;
@@ -219,9 +225,9 @@ class WebController extends Controller
                 $offset = ($page - 1) * $items_per_page;
 
                 $success["item_per_page"] = $items_per_page;
-                $success["jumlah_artikel"] = $count[0]->jumlah;
+                $success["jumlah_artikel"] = $count[0]->jml;
 
-                if($count[0]->jumlah > 0){
+                if($count[0]->jml > 0){
                     $res = DB::connection($this->sql)->select("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
 
                     $success["daftar_artikel"] = json_decode(json_encode($res),true);
@@ -244,5 +250,126 @@ class WebController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function readItem(Request $request)
+    {
+         
+        $id = $request->id;
+
+        if(isset($request->name)){
+            $name = $request->name;
+        }else{
+            $name = null;
+        }
+
+        try{
+
+            if(ctype_digit($id)){
+
+                $sql="select a.id, judul, b.file_gambar as header_url, b.file_type, a.tgl_input, a.nik_user, a.keterangan, a.tag, a.kode_klp 
+                from lab_konten a 
+                left join lab_konten_galeri b on a.header_url=b.id  and a.kode_lokasi=b.kode_lokasi 
+                where a.id='$id' and a.kode_lokasi='".$this->lokasi."' ";
+                
+                $res = DB::connection($this->sql)->select($sql);
+                $success["artikel"] = json_decode(json_encode($res),true);             
+                
+                if(ISSET($res[0]->judul)){
+
+                    $judul_seo = $this->filterChar($res[0]->judul);
+
+                    $res2 = DB::connection($this->sql)->select("select count(a.id) as jml, month(tanggal) as bulan, year(tanggal) as tahun from lab_konten a where a.kode_klp='".$res[0]->kode_klp."' and a.kode_lokasi='".$this->lokasi."' group by month(tanggal), year(tanggal) ");
+                    $success["archive"] = json_decode(json_encode($res2),true); 
+                    
+                    $res3 = DB::connection($this->sql)->select("select count(id) as jml, b.kode_kategori, b.nama from lab_konten a left join lab_konten_kategori b on a.kode_kategori=b.kode_kategori and a.kode_lokasi=b.kode_lokasi where a.kode_klp='".$res[0]->kode_klp."' and a.kode_lokasi='".$this->lokasi."' group by b.nama, b.kode_kategori");
+
+                    $success["categories"] =  json_decode(json_encode($res3),true); 
+                    
+                }else{
+                    $success["archive"] = [];
+                    $success["categories"] = [];
+                }
+                
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);
+            }else{
+                $success['status'] = false;
+                $success['message'] = "ID tidak valid ";
+                return response()->json($success, $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    // public function search(Request $request){
+    //     $konten=null, $jenis=null, $page='1';
+
+    //     $search_string = $this->input->get('str', TRUE);
+        
+        
+    //     if(($konten != null OR in_array($konten, array('all', 'news', 'article'))) AND $jenis != null AND ISSET($search_string)){
+
+    //         $acceptable = array('tag','categories','string');
+
+    //         if(in_array($jenis, $acceptable)){
+    //             if($konten == 'news'){
+    //                 $kode_klp = "and a.kode_klp = 'KLP01'";
+    //             }else if($konten =='article'){
+    //                 $kode_klp = "and a.kode_klp = 'KLP03'";
+    //             }else{
+    //                 $kode_klp = "and (a.kode_klp = 'KLP01' OR a.kode_klp = 'KLP03')";
+    //             }
+
+    //             // $search_string = $this->db->qstr($search_string);
+    //             switch($jenis){
+    //                 case 'tag': 
+    //                     $where = "a.tag like ".$this->db->qstr("%$search_string%");
+    //                 break;
+    //                 case 'categories': 
+    //                     $where = "a.kode_kategori = ".$this->db->qstr("$search_string");
+    //                 break;
+    //                 // case 'date': 
+    //                 //     $where = "and a.month(tanggal) = ".$this->db->qstr($bln)." and a.year(tanggal) = ".$this->db->qstr($thn);
+    //                 // break;
+    //                 case 'string': 
+    //                     $where = "a.keterangan like ".$this->db->qstr("%$search_string%");
+    //                 break;
+    //             }
+            
+    //             $data['active_page'] = $page;
+    //             $items_per_page = 5;
+    
+    //             $count = $this->sai->getRowArray("select count(a.id) as jml from lab_konten a where a.kode_lokasi='".$this->lokasi."' $kode_klp and $where");
+    
+    //             // $number_of_item = ($count['jml']/$page >= $items_per_page ? $items_per_page : ($count['jml'] % $items_per_page));
+                
+    //             // $offset = $page - 1;
+    //             $offset = ($page - 1) * $items_per_page;
+    
+    //             $data["item_per_page"] = $items_per_page;
+    //             $data["jumlah_artikel"] = $count["jml"];
+    
+    //             if($count["jml"] > 0){
+    //                 $data["daftar_artikel"] = $this->sai->getResultArray("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='".$this->lokasi."' $kode_klp and $where order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
+    //             }else{
+    //                 $data["daftar_artikel"] = array();
+    //             }
+
+    //             $data["search_string"] = $search_string;
+    //             $data["url_paging"] = "/webjava/Index/search/$konten/$jenis";
+    //             $data["page"] = "webjava/vSearchResult";
+    //             $this->load->view("webjava/templateWeb", $data);
+    //         }else{
+    //             redirect('/');
+    //         }
+    //     }else{
+    //         redirect('/');
+    //     }
+    // }
     
 }
