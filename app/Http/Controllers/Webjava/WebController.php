@@ -18,6 +18,7 @@ class WebController extends Controller
     public $successStatus = 200;
     public $sql = 'dbsaife';
     public $guard = 'webjava';
+    public $lokasi = '22';
 
     function generateSEO($id, $judul)
     {
@@ -97,7 +98,7 @@ class WebController extends Controller
                     </li>";
             }
 
-            $logo = DB::connection($this->sql)->select("SELECT logo FROM lokasi where kode_lokasi='22'");
+            $logo = DB::connection($this->sql)->select("SELECT logo FROM lokasi where kode_lokasi='".$this->lokasi."'");
             if(count($logo) > 0){
                 $success['logo'] = $logo[0]->logo;
             }else{
@@ -129,10 +130,10 @@ class WebController extends Controller
     {
         try {
 
-            $res = DB::connection($this->sql)->select("SELECT kode_ktg, nama FROM lab_konten_ktg where jenis='Gambar' and nama <> '-' and nama <> '_' and kode_lokasi='22'");
+            $res = DB::connection($this->sql)->select("SELECT kode_ktg, nama FROM lab_konten_ktg where jenis='Gambar' and nama <> '-' and nama <> '_' and kode_lokasi='".$this->lokasi."' ");
             $success["daftar_kategori"] = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select("SELECT a.nama, keterangan, file_gambar, tgl_input, b.kode_ktg as nama_ktg FROM lab_konten_galeri a inner join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi where a.jenis='Galeri' and b.nama <> '-' and b.nama <> '_' and flag_aktif = '1' and a.kode_lokasi='22'");
+            $res2 = DB::connection($this->sql)->select("SELECT a.nama, keterangan, file_gambar, tgl_input, b.kode_ktg as nama_ktg FROM lab_konten_galeri a inner join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi where a.jenis='Galeri' and b.nama <> '-' and b.nama <> '_' and flag_aktif = '1' and a.kode_lokasi='".$this->lokasi."' ");
             $success["daftar_gambar"] =  json_decode(json_encode($res2),true);
 
             return response()->json($success, $this->successStatus);
@@ -147,7 +148,7 @@ class WebController extends Controller
     public function getKontak(Request $request)
     {
         try {
-            $res = DB::connection($this->sql)->select("SELECT judul, keterangan, latitude, longitude FROM lab_konten_kontak a where flag_aktif='1' and a.kode_lokasi='22' ");
+            $res = DB::connection($this->sql)->select("SELECT judul, keterangan, latitude, longitude FROM lab_konten_kontak a where flag_aktif='1' and a.kode_lokasi='".$this->lokasi."' ");
             $success["kontak"] =  json_decode(json_encode($res),true);
             
             return response()->json($success, $this->successStatus);
@@ -165,7 +166,7 @@ class WebController extends Controller
             $sql="select a.id, a.judul, b.file_gambar as header_url, a.tgl_input, a.nik_user, a.keterangan  
             from lab_konten a 
             left join lab_konten_galeri b on a.header_url=b.id and a.kode_lokasi=b.kode_lokasi
-            where a.id=$id and a.kode_klp='KLP02' and a.kode_lokasi='22' ";
+            where a.id=$id and a.kode_klp='KLP02' and a.kode_lokasi='".$this->lokasi."' ";
         
             $res = DB::connection($this->sql)->select($sql);
 
@@ -179,4 +180,69 @@ class WebController extends Controller
         }
         
     }
+
+    public function news(Request $request)
+    {
+        if(isset($request->page)){
+            $page = $request->page;
+        }else{
+            $page='1';
+        }
+
+        if(isset($request->bln)){
+            $bln = $request->bln;
+        }else{
+            $bln=null;
+        }
+
+        if(isset($request->thn)){
+            $thn = $request->thn;
+        }else{
+            $thn=null;
+        }
+
+        try {
+            if(ctype_digit($page) AND $page > 0){
+                
+                $success['active_page'] = $page;
+                $items_per_page = 5;
+
+                // periode filter
+                if(ctype_digit($bln) AND ctype_digit($thn) AND $bln != null AND $thn != null){
+                    $periode = "and month(tanggal) = '".$bln."' and year(tanggal) = '".$thn."' ";
+                }else{
+                    $periode = "";
+                }
+
+                $count = DB::connection($this->sql)->select("select count(a.id) as jml from lab_konten a where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode ");
+
+                $offset = ($page - 1) * $items_per_page;
+
+                $success["item_per_page"] = $items_per_page;
+                $success["jumlah_artikel"] = $count[0]->jumlah;
+
+                if($count[0]->jumlah > 0){
+                    $res = DB::connection($this->sql)->select("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
+
+                    $success["daftar_artikel"] = json_decode(json_encode($res),true);
+                }else{
+                    $success["daftar_artikel"] = array();
+                }
+
+                $res2 = DB::connection($this->sql)->select("select count(a.id) as jml, month(tanggal) as bulan, year(tanggal) as tahun from lab_konten a where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' group by month(tanggal), year(tanggal)");
+
+                $success["archive"] = json_decode(json_encode($res2),true);
+
+                $res3 = DB::connection($this->sql)->select("select count(id) as jml, b.kode_kategori, b.nama from lab_konten a join lab_konten_kategori b on a.kode_kategori=b.kode_kategori and a.kode_lokasi=b.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' group by b.nama, b.kode_kategori");
+
+                $success["categories"] = json_decode(json_encode($res3),true); 
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+    
 }
