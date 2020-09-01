@@ -207,7 +207,36 @@ class WebController extends Controller
             $thn=null;
         }
 
+        if(isset($request->jenis)){
+            $jenis = $request->jenis;
+        }else{
+            $jenis=null;
+        }
+
+        if(isset($request->str)){
+            $search_string = $request->str;
+        }else{
+            $search_string=null;
+        }
+        
+        switch($jenis){
+            case 'tag': 
+                $where = " and a.tag like '%".$search_string."%' ";
+            break;
+            case 'categories': 
+                $where = " and a.kode_kategori = '".$search_string."' " ;
+            break;
+            case 'string': 
+                $where = " and a.keterangan like '%".$search_string."%' ";
+            break;
+            default : 
+                $where = "";
+            break;
+        }
+    
+
         try {
+            $success['page'] = $page;
             if(ctype_digit($page) AND $page > 0){
                 
                 $success['active_page'] = $page;
@@ -220,7 +249,7 @@ class WebController extends Controller
                     $periode = "";
                 }
 
-                $count = DB::connection($this->sql)->select("select count(a.id) as jml from lab_konten a where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode ");
+                $count = DB::connection($this->sql)->select("select count(a.id) as jml from lab_konten a where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode $where ");
 
                 $offset = ($page - 1) * $items_per_page;
 
@@ -228,7 +257,7 @@ class WebController extends Controller
                 $success["jumlah_artikel"] = $count[0]->jml;
 
                 if($count[0]->jml > 0){
-                    $res = DB::connection($this->sql)->select("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
+                    $res = DB::connection($this->sql)->select("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' $periode  $where order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
 
                     $success["daftar_artikel"] = json_decode(json_encode($res),true);
                 }else{
@@ -240,6 +269,99 @@ class WebController extends Controller
                 $success["archive"] = json_decode(json_encode($res2),true);
 
                 $res3 = DB::connection($this->sql)->select("select count(id) as jml, b.kode_kategori, b.nama from lab_konten a join lab_konten_kategori b on a.kode_kategori=b.kode_kategori and a.kode_lokasi=b.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' group by b.nama, b.kode_kategori");
+
+                $success["categories"] = json_decode(json_encode($res3),true); 
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getArticle(Request $request)
+    {
+        if(isset($request->page)){
+            $page = $request->page;
+        }else{
+            $page='1';
+        }
+
+        if(isset($request->bln)){
+            $bln = $request->bln;
+        }else{
+            $bln=null;
+        }
+
+        if(isset($request->thn)){
+            $thn = $request->thn;
+        }else{
+            $thn=null;
+        }
+
+        if(isset($request->jenis)){
+            $jenis = $request->jenis;
+        }else{
+            $jenis=null;
+        }
+
+        if(isset($request->str)){
+            $search_string = $request->str;
+        }else{
+            $search_string=null;
+        }
+        
+        switch($jenis){
+            case 'tag': 
+                $where = " and a.tag like '%".$search_string."%' ";
+            break;
+            case 'categories': 
+                $where = " and a.kode_kategori = '".$search_string."' " ;
+            break;
+            case 'string': 
+                $where = " and a.keterangan like '%".$search_string."%' ";
+            break;
+            default : 
+                $where = "";
+            break;
+        }
+    
+
+        try {
+            $success['page'] = $page;
+            if(ctype_digit($page) AND $page > 0){
+                
+                $success['active_page'] = $page;
+                $items_per_page = 5;
+
+                // periode filter
+                if(ctype_digit($bln) AND ctype_digit($thn) AND $bln != null AND $thn != null){
+                    $periode = "and month(tanggal) = '".$bln."' and year(tanggal) = '".$thn."' ";
+                }else{
+                    $periode = "";
+                }
+
+                $count = DB::connection($this->sql)->select("select count(a.id) as jml from lab_konten a where a.kode_klp='KLP03' and a.kode_lokasi='".$this->lokasi."' $periode $where ");
+
+                $offset = ($page - 1) * $items_per_page;
+
+                $success["item_per_page"] = $items_per_page;
+                $success["jumlah_artikel"] = $count[0]->jml;
+
+                if($count[0]->jml > 0){
+                    $res = DB::connection($this->sql)->select("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_klp='KLP03' and a.kode_lokasi='".$this->lokasi."' $periode  $where order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
+
+                    $success["daftar_artikel"] = json_decode(json_encode($res),true);
+                }else{
+                    $success["daftar_artikel"] = array();
+                }
+
+                $res2 = DB::connection($this->sql)->select("select count(a.id) as jml, month(tanggal) as bulan, year(tanggal) as tahun from lab_konten a where a.kode_klp='KLP03' and a.kode_lokasi='".$this->lokasi."' group by month(tanggal), year(tanggal)");
+
+                $success["archive"] = json_decode(json_encode($res2),true);
+
+                $res3 = DB::connection($this->sql)->select("select count(id) as jml, b.kode_kategori, b.nama from lab_konten a join lab_konten_kategori b on a.kode_kategori=b.kode_kategori and a.kode_lokasi=b.kode_lokasi where a.kode_klp='KLP03' and a.kode_lokasi='".$this->lokasi."' group by b.nama, b.kode_kategori");
 
                 $success["categories"] = json_decode(json_encode($res3),true); 
             }
@@ -306,70 +428,6 @@ class WebController extends Controller
         }
     }
 
-    // public function search(Request $request){
-    //     $konten=null, $jenis=null, $page='1';
-
-    //     $search_string = $this->input->get('str', TRUE);
-        
-        
-    //     if(($konten != null OR in_array($konten, array('all', 'news', 'article'))) AND $jenis != null AND ISSET($search_string)){
-
-    //         $acceptable = array('tag','categories','string');
-
-    //         if(in_array($jenis, $acceptable)){
-    //             if($konten == 'news'){
-    //                 $kode_klp = "and a.kode_klp = 'KLP01'";
-    //             }else if($konten =='article'){
-    //                 $kode_klp = "and a.kode_klp = 'KLP03'";
-    //             }else{
-    //                 $kode_klp = "and (a.kode_klp = 'KLP01' OR a.kode_klp = 'KLP03')";
-    //             }
-
-    //             // $search_string = $this->db->qstr($search_string);
-    //             switch($jenis){
-    //                 case 'tag': 
-    //                     $where = "a.tag like ".$this->db->qstr("%$search_string%");
-    //                 break;
-    //                 case 'categories': 
-    //                     $where = "a.kode_kategori = ".$this->db->qstr("$search_string");
-    //                 break;
-    //                 // case 'date': 
-    //                 //     $where = "and a.month(tanggal) = ".$this->db->qstr($bln)." and a.year(tanggal) = ".$this->db->qstr($thn);
-    //                 // break;
-    //                 case 'string': 
-    //                     $where = "a.keterangan like ".$this->db->qstr("%$search_string%");
-    //                 break;
-    //             }
-            
-    //             $data['active_page'] = $page;
-    //             $items_per_page = 5;
     
-    //             $count = $this->sai->getRowArray("select count(a.id) as jml from lab_konten a where a.kode_lokasi='".$this->lokasi."' $kode_klp and $where");
-    
-    //             // $number_of_item = ($count['jml']/$page >= $items_per_page ? $items_per_page : ($count['jml'] % $items_per_page));
-                
-    //             // $offset = $page - 1;
-    //             $offset = ($page - 1) * $items_per_page;
-    
-    //             $data["item_per_page"] = $items_per_page;
-    //             $data["jumlah_artikel"] = $count["jml"];
-    
-    //             if($count["jml"] > 0){
-    //                 $data["daftar_artikel"] = $this->sai->getResultArray("select a.id, tanggal, judul, a.keterangan, a.nik_user, a.tgl_input, c.file_gambar as header_url, c.file_type from lab_konten a left join lab_konten_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi left join lab_konten_galeri c on a.header_url=c.id and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='".$this->lokasi."' $kode_klp and $where order by tanggal desc OFFSET $offset ROWS FETCH NEXT $items_per_page ROWS ONLY");
-    //             }else{
-    //                 $data["daftar_artikel"] = array();
-    //             }
-
-    //             $data["search_string"] = $search_string;
-    //             $data["url_paging"] = "/webjava/Index/search/$konten/$jenis";
-    //             $data["page"] = "webjava/vSearchResult";
-    //             $this->load->view("webjava/templateWeb", $data);
-    //         }else{
-    //             redirect('/');
-    //         }
-    //     }else{
-    //         redirect('/');
-    //     }
-    // }
     
 }
