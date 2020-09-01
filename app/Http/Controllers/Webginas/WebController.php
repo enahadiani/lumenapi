@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Webjava;
+namespace App\Http\Controllers\Webginas;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -17,8 +17,8 @@ class WebController extends Controller
      */
     public $successStatus = 200;
     public $sql = 'dbsaife';
-    public $guard = 'webjava';
-    public $lokasi = '22';
+    public $guard = 'webginas';
+    public $lokasi = '17';
 
     function generateSEO($id, $judul)
     {
@@ -54,7 +54,7 @@ class WebController extends Controller
                     $data_menu1 = json_decode(json_encode($data_menu1),true);
                     // $link = str_replace("_","/", $data_menu1[0]["id_form"]);
                     $tmp = explode("_",$data_menu1[0]["id_form"]);
-                    $link = $tmp[2];
+                    $link = $tmp[1];
                     $link_induk = "<a href='#' class='a_link' data-href='".$url."/".$link."'>".$res[$ctr]["nama"]."</a>";
                 }else{
                     $data_menu1 = DB::connection($this->sql)->select("select id, judul from lab_konten a left join lab_domain b on a.kode_lokasi=b.kode_lokasi where domain='$domain' and id='".$res[$ctr]["link"]."'");
@@ -87,7 +87,7 @@ class WebController extends Controller
 
                         // $link = str_replace("_","/", $data_menu1["id_form"]);
                         $tmp = explode("_",$data_menu1[0]["id_form"]);
-                        $link = $tmp[2];
+                        $link = $tmp[1];
                         $link_induk = "<a href='#' class='a_link' data-href='".$url."/".$link."'>".$data["nama"]."</a>";
                     }else{
                         $data_menu1 = DB::connection($this->sql)->select("select id, judul from lab_konten a left join lab_domain b on a.kode_lokasi=b.kode_lokasi where domain='$domain' and id='".$data["link"]."'");
@@ -123,6 +123,24 @@ class WebController extends Controller
                 $success['html'] = "";
                 $success['status'] = false;
             }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getHome(Request $request)
+    {
+        try {
+
+            $success["top_slider"] = json_decode(json_encode(DB::connection($this->sql)->select("select * from lab_konten_galeri where  jenis='Slider Atas' and kode_lokasi = '$this->lokasi'"),true));
+            $success["slider"] = json_decode(json_encode(DB::connection($this->sql)->select("select * from lab_konten_galeri where  jenis='Slider' and kode_lokasi = '$this->lokasi'"),true));
+            $success["ads_slider"] = json_decode(json_encode(DB::connection($this->sql)->select("select * from lab_konten_galeri where  jenis='Slider Kanan' and kode_lokasi = '$this->lokasi'"),true));
+            $success["bottom_slider"] = json_decode(json_encode(DB::connection($this->sql)->select("select * from lab_konten_galeri where jenis='Slider Bawah' and kode_lokasi = '$this->lokasi'"),true));
+            
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -206,7 +224,7 @@ class WebController extends Controller
         }else{
             $thn=null;
         }
-
+        
         if(isset($request->jenis)){
             $jenis = $request->jenis;
         }else{
@@ -271,6 +289,7 @@ class WebController extends Controller
                 $res3 = DB::connection($this->sql)->select("select count(id) as jml, b.kode_kategori, b.nama from lab_konten a join lab_konten_kategori b on a.kode_kategori=b.kode_kategori and a.kode_lokasi=b.kode_lokasi where a.kode_klp='KLP01' and a.kode_lokasi='".$this->lokasi."' group by b.nama, b.kode_kategori");
 
                 $success["categories"] = json_decode(json_encode($res3),true); 
+                $success["periode"] = $bln."-".$thn;
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {

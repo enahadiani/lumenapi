@@ -419,4 +419,48 @@ $app->router->group([
     require __DIR__.'/../routes/webjava/web.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/webginas'
+], function ($router) {
+    require __DIR__.'/../routes/webginas/web.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/wisata-auth'
+], function ($router) {
+    require __DIR__.'/../routes/wisata/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/wisata-master'
+], function ($router) {
+    require __DIR__.'/../routes/wisata/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/wisata-trans'
+], function ($router) {
+    require __DIR__.'/../routes/wisata/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/wisata-report'
+], function ($router) {
+    require __DIR__.'/../routes/wisata/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/wisata-dash'
+], function ($router) {
+    require __DIR__.'/../routes/wisata/dash.php';
+});
+
+
 return $app;
