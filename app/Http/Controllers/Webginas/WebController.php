@@ -447,6 +447,37 @@ class WebController extends Controller
         }
     }
 
+    public function getVideo()
+    {
+        try {
+            $success["daftar_video"] = json_decode(json_encode(DB::connection($this->sql)->select("SELECT id, tgl_input, link, judul from lab_konten_video where flag_aktif = '1' and kode_lokasi = '".$this->lokasi."'")),true);
+
+            $success["daftar_video_new"] = json_decode(json_encode(DB::connection($this->sql)->select("SELECT id, tgl_input, file_gambar as link, nama as judul from lab_konten_galeri where flag_aktif = '1' and kode_lokasi = '".$this->lokasi."' and file_type like 'video%' ")),true);
+            
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getWatch($id)
+    {
+        try {
+            $success["video"] = json_decode(json_encode(DB::connection($this->sql)->select("select id, tgl_input, link, judul, cast(keterangan as varchar(max)) as keterangan, 'youtube' as file_type from lab_konten_video where id='$id' and kode_lokasi = '".$this->lokasi."'
+            UNION
+            select id, tgl_input, file_gambar as link, nama as judul, keterangan, 'upload' as file_type from lab_konten_galeri where id='$id' and kode_lokasi = '".$this->lokasi."' ")),true);
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     
     
 }

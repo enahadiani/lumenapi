@@ -26,6 +26,8 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('news', 'Webginas\WebController@getNews');
     $router->get('article', 'Webginas\WebController@getArticle');
     $router->get('read-item', 'Webginas\WebController@readItem');
+    $router->get('video', 'Webginas\WebController@getVideo');
+    $router->get('watch/{id}', 'Webginas\WebController@getWatch');
 
     $router->post('login', 'AuthController@loginWebginas');
     $router->get('hash-pass', 'AuthController@hassPassWebginas');
