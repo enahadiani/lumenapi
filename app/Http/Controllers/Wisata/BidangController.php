@@ -104,7 +104,7 @@ class BidangController extends Controller
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into par_bidang(kode_bidang,kode_lokasi,nama) values ('".$request->kode_bidang."','".$request->nama."','".$kode_lokasi."')");
+                $ins = DB::connection($this->sql)->insert("insert into par_bidang(kode_bidang,nama,kode_lokasi) values ('".$request->kode_bidang."','".$request->nama."','".$kode_lokasi."')");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -164,7 +164,7 @@ class BidangController extends Controller
             ->where('kode_bidang', $request->kode_bidang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into par_bidang(kode_bidang,kode_lokasi,nama) values ('".$request->kode_bidang."','".$request->nama."','".$kode_lokasi."')");
+            $ins = DB::connection($this->sql)->insert("insert into par_bidang(kode_bidang,nama,kode_lokasi) values ('".$request->kode_bidang."','".$request->nama."','".$kode_lokasi."')");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
