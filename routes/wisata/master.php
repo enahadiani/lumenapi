@@ -18,12 +18,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
    
-    //Vendor
-    $router->get('vendor','Toko\VendorController@index');
-    $router->post('vendor','Toko\VendorController@store');
-    $router->put('vendor','Toko\VendorController@update');
-    $router->delete('vendor','Toko\VendorController@destroy');
-    $router->get('vendor-akun','Toko\VendorController@getAkun');
+    //Bidang
+    $router->get('bidang','Wisata\BidangController@index');
+    $router->post('bidang','Wisata\BidangController@store');
+    $router->put('bidang','Wisata\BidangController@update');
+    $router->delete('bidang','Wisata\BidangController@destroy');    
 
 });
 
