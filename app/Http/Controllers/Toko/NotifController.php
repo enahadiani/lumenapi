@@ -32,6 +32,7 @@ class NotifController extends Controller
 	{
 		$this->validate($request,[
 			"title" => 'required',
+			"subtitle" => 'required',
 			"message" => 'required',
 			"id" => 'required|array',
 			"sts_insert" => 'required'
@@ -50,7 +51,7 @@ class NotifController extends Controller
 				event(new \App\Events\NotifToko($request->title,$request->message,$request->id[$i]));
 				if($request->sts_insert == '1'){
 
-					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read,sts_read_mob) values ('$kode_lokasi','".$request->title."','-','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-','0','0') ");
+					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read,sts_read_mob) values ('$kode_lokasi','".$request->title."','".$request->subtitle."','".$request->message."','".$request->id[$i]."','".$request->id[$i]."','1',getdate(),'-','0','0') ");
 				}
 
 			}
@@ -76,7 +77,7 @@ class NotifController extends Controller
 		
         try{
             
-			$sql = "select top 5 id,judul,pesan,tgl_input,status,icon,convert(varchar,tgl_input,105) as tgl, convert(varchar,tgl_input,108) as jam
+			$sql = "select top 5 id,judul,subjudul,pesan,tgl_input,status,icon,convert(varchar,tgl_input,103) as tgl, convert(varchar,tgl_input,108) as jam
 			from user_message
 			where nik='$nik' and status in ('1')
 			order by id desc
