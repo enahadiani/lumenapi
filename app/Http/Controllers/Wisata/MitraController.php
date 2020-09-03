@@ -43,10 +43,10 @@ class MitraController extends Controller
                 }else{
                     $filter = " and kode_mitra='".$request->kode_mitra."' ";
                 }
-                $sql= "select kode_mitra,nama,alamat from par_mitra where kode_lokasi='".$kode_lokasi."' ".$filter;
+                $sql= "select kode_mitra,nama,alamat,kecamatan,no_tel,pic,no_hp,website,email,status from par_mitra where kode_lokasi='".$kode_lokasi."' ".$filter;
             }
             else {
-                $sql = "select kode_mitra,nama,alamat from par_mitra where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_mitra,nama,alamat,kecamatan,no_tel,pic,no_hp,website,email,status from par_mitra where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
