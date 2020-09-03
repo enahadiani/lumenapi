@@ -24,6 +24,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('bidang','Wisata\BidangController@update');
     $router->delete('bidang','Wisata\BidangController@destroy');    
 
+    //Mitra
+    $router->get('mitra','Wisata\MitraController@index');
+    $router->post('mitra','Wisata\MitraController@store');
+    $router->put('mitra','Wisata\MitraController@update');
+    $router->delete('mitra','Wisata\MitraController@destroy');    
+
 });
 
 
