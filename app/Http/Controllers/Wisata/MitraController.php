@@ -183,17 +183,7 @@ class MitraController extends Controller
         
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Fs $Fs)
-    {
-        //
-    }
-
+    
     /**
      * Update the specified resource in storage.
      *
