@@ -86,7 +86,7 @@ class MitraController extends Controller
             $res = DB::connection($this->sql)->select("select * from par_mitra where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select( "select a.kode_bidang,a.nama from par_bidang a left join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi where b.kode_mitra='".$request->kode_mitra."' and a.kode_lokasi='".$kode_lokasi."' ");
+            $res2 = DB::connection($this->sql)->select( "select a.kode_bidang,a.nama, case when b.kode_bidang is null then 'NON' else 'CEK' end as status from par_bidang a left join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
             $res2 = json_decode(json_encode($res2),true);
 
 
