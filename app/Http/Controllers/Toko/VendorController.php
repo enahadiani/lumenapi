@@ -125,9 +125,12 @@ class VendorController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_vendor;
                 $success['message'] = "Data Vendor berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['kode'] = "-";
+                $success['jenis'] = "duplicate";
                 $success['message'] = "Error : Duplicate entry. No Vendor sudah ada di database!";
             }
             
@@ -202,11 +205,13 @@ class VendorController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_vendor;
             $success['message'] = "Data Vendor berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
+            $success['kode'] = "-";
             $success['message'] = "Data Vendor gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	

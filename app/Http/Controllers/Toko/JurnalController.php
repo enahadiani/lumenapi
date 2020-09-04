@@ -194,12 +194,14 @@ class JurnalController extends Controller
             if($sts){
                 DB::connection($this->db)->commit();
                 $success['status'] = $sts;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Jurnal berhasil disimpan ";
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = $sts;
+                $success['no_bukti'] = "-";
                 $success['message'] = $tmp;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
@@ -300,12 +302,14 @@ class JurnalController extends Controller
             if($sts){
                 DB::connection($this->db)->commit();
                 $success['status'] = $sts;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Jurnal berhasil diubah ";
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = $sts;
+                $success['no_bukti'] = "-";
                 $success['message'] = $msg;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
