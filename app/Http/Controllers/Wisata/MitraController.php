@@ -71,6 +71,47 @@ class MitraController extends Controller
         
     }
 
+    public function edit(Request $request)
+    {
+        $this->validate($request, [
+            'kode_mitra' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select * from par_mitra where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."'");
+            $res = json_decode(json_encode($res),true);
+
+            $res2 = DB::connection($this->sql)->select( "select a.kode_bidang,a.nama from par_bidang a left join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi where b.kode_mitra='".$request->kode_mitra."' and a.kode_lokasi='".$kode_lokasi."' ");
+            $res2 = json_decode(json_encode($res2),true);
+
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['arrbid'] = $res2;                                
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['arrbid'] = [];                
+                $success['status'] = "FAILED";
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+
+    }
+
+
     /**
      * Show the form for creating a new resource.
      *

@@ -26,6 +26,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     //Mitra
     $router->get('mitra','Wisata\MitraController@index');
+    $router->get('mitrabid','Wisata\MitraController@edit');
     $router->post('mitra','Wisata\MitraController@store');
     $router->put('mitra','Wisata\MitraController@update');
     $router->delete('mitra','Wisata\MitraController@destroy');    
