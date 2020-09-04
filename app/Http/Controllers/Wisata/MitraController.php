@@ -99,7 +99,10 @@ class MitraController extends Controller
             'email' => 'required|max:100',            
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
-            'status' => 'required|max:50'         
+            'status' => 'required|max:50',             
+            'arrbidang'=>'required|array',
+            'arrbidang.*.kode_bidang' => 'required'            
+
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -114,6 +117,13 @@ class MitraController extends Controller
                 $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                            ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
 
+                $arrbidang = $request->arrbidang;
+                if (count($arrbidang) > 0){
+                    for ($i=0;$i <count($arrbidang);$i++){                
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
+                                                                        ('".$request->kode_mitra."','".$arrbidang[$i]['kode_bidang']."','".$kode_lokasi."')");                    
+                    }						
+                }	                                          
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Mitra berhasil disimpan";
@@ -162,7 +172,9 @@ class MitraController extends Controller
             'email' => 'required|max:100',            
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
-            'status' => 'required|max:50'            
+            'status' => 'required|max:50',
+            'bidang'=>'required|array',
+            'bidang.*.kode_bidang' => 'required'                        
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -178,8 +190,21 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
+            $del2 = DB::connection($this->sql)->table('par_mitra_bid')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_mitra', $request->kode_mitra)
+            ->delete();
+
             $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                       ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
+                                          
+            $arrbidang = $request->arrbidang;
+            if (count($arrbidang) > 0){
+                for ($i=0;$i <count($arrbidang);$i++){                
+                    $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
+                                                                    ('".$request->kode_mitra."','".$arrbidang[$i]['kode_bidang']."','".$kode_lokasi."')");                    
+                }						
+            }
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -213,6 +238,11 @@ class MitraController extends Controller
             }
             
             $del = DB::connection($this->sql)->table('par_mitra')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_mitra', $request->kode_mitra)
+            ->delete();
+
+            $del2 = DB::connection($this->sql)->table('par_mitra_bid')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
