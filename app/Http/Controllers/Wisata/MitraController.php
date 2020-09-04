@@ -204,8 +204,8 @@ class MitraController extends Controller
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',
-            'bidang'=>'required|array',
-            'bidang.*.kode_bidang' => 'required'                        
+            'arrbidang'=>'required|array',
+            'arrbidang.*.kode_bidang' => 'required'                        
         ]);
 
         DB::connection($this->sql)->beginTransaction();
