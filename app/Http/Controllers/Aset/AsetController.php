@@ -831,6 +831,7 @@ class AsetController extends Controller
             'no_ruangan' => 'required',
             'kode_aset' => 'required',
             'kondisi' => 'required',
+            'catatan' => 'required|max:300',
             'file_gambar.*' => 'file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
@@ -879,7 +880,7 @@ class AsetController extends Controller
             //     $foto="-";
             // }
 
-            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),'-']);
+            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto,catatan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),'-',$request->catatan]);
 
             $arr_foto = array();
             $arr_nama = array();
