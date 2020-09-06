@@ -727,7 +727,7 @@ class AsetController extends Controller
 
                 $get = DB::connection('sqlsrv2')->select("select a.kode_pp
                 from karyawan a
-                where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
+                where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik."' 
                 ");
                 $get = json_decode(json_encode($get),true);
                 if(count($get) > 0){
