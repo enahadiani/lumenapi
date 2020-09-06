@@ -699,10 +699,10 @@ class AsetController extends Controller
                         where a.kode_lokasi='$kode_lokasi'
                         group by a.no_ruang,a.kode_lokasi 
                       ) b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi  
-            left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_baik 
+            left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_mon 
                         from amu_mon_asset_bergerak a 
                         inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti 
-                        where a.status='Berfungsi' and a.kode_lokasi='$kode_lokasi'
+                        where a.kode_lokasi='$kode_lokasi'
                         group by a.no_ruangan,a.kode_lokasi 
                       ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST((isnull(c.jum_mon,0) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 = 100 ";
