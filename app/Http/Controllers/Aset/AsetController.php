@@ -253,7 +253,7 @@ class AsetController extends Controller
             ,kd_asset
             ,sumber_dana
             ,nama_inv as nama
-            ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruangan='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
+            ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
