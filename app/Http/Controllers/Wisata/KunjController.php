@@ -297,8 +297,7 @@ class KunjController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'no_bukti' => 'required|max:20',
+        $this->validate($request, [            
             'tanggal' => 'required|date_format: Y-m-d',
             'kode_mitra' => 'required|max:10',
             'kode_bidang' => 'required|max:10',            
