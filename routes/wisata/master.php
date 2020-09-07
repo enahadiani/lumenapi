@@ -32,7 +32,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('mitra','Wisata\MitraController@destroy');    
 
     //Kunjungan
+    $router->get('getMitra','Wisata\KunjController@getMitra');
+    $router->get('getMitraBid/{kode_mitra}','Wisata\KunjController@getMitraBid');
+    $router->get('getTahunList','Wisata\KunjController@getTahunList');
+    $router->get('getTglServer','Wisata\KunjController@getTglServer');
+    $router->get('getJumTgl','Wisata\KunjController@getJumTgl');
     $router->get('kunj','Wisata\KunjController@index');
+
     $router->post('kunj','Wisata\KunjController@store');
     $router->put('kunj','Wisata\KunjController@update');
     $router->delete('kunj','Wisata\KunjController@destroy');    
