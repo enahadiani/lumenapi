@@ -15,7 +15,7 @@ class KunjController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'tokoaws';
+    public $db = 'tokoaws';
     public $guard = 'toko';
 
     // public function cekBukti($kode_mitra,$kode_bidang,$tahun,$bulan,$kode_lokasi){        
