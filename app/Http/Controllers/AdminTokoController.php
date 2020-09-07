@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use  App\AdminToko;
+use Illuminate\Support\Facades\Storage; 
 
 class AdminTokoController extends Controller
 {
@@ -171,7 +172,7 @@ class AdminTokoController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('telu/'.$foto);
+                        Storage::disk('s3')->delete('toko/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -181,10 +182,10 @@ class AdminTokoController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('telu/'.$foto)){
-                    Storage::disk('s3')->delete('telu/'.$foto);
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
                 }
-                Storage::disk('s3')->put('telu/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
                 
             }else{
 
@@ -241,7 +242,7 @@ class AdminTokoController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('telu/'.$foto);
+                        Storage::disk('s3')->delete('toko/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -251,10 +252,10 @@ class AdminTokoController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('telu/'.$foto)){
-                    Storage::disk('s3')->delete('telu/'.$foto);
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
                 }
-                Storage::disk('s3')->put('telu/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
                 
             }else{
 
