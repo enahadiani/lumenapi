@@ -206,7 +206,7 @@ class KunjController extends Controller
                       where a.kode_lokasi='".$kode_lokasi."' ";
             }
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -239,10 +239,10 @@ class KunjController extends Controller
     //             $kode_lokasi= $data->kode_lokasi;
     //         }
 
-    //         $res = DB::connection($this->sql)->select("select * from par_mitra where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."'");
+    //         $res = DB::connection($this->db)->select("select * from par_mitra where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."'");
     //         $res = json_decode(json_encode($res),true);
 
-    //         $res2 = DB::connection($this->sql)->select( "select a.kode_bidang,a.nama, case when b.kode_bidang is null then 'NON' else 'CEK' end as status from par_bidang a left join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
+    //         $res2 = DB::connection($this->db)->select( "select a.kode_bidang,a.nama, case when b.kode_bidang is null then 'NON' else 'CEK' end as status from par_bidang a left join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
     //         $res2 = json_decode(json_encode($res2),true);
 
 
@@ -302,7 +302,7 @@ class KunjController extends Controller
 
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -311,17 +311,17 @@ class KunjController extends Controller
             }
             if($this->isUnik($request->kode_mitra,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
+                $ins = DB::connection($this->db)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                            ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
 
                 $arrbidang = $request->arrbidang;
                 if (count($arrbidang) > 0){
                     for ($i=0;$i <count($arrbidang);$i++){                
-                        $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
                                                                         ('".$request->kode_mitra."','".$arrbidang[$i]['kode_bidang']."','".$kode_lokasi."')");                    
                     }						
                 }	                                          
-                DB::connection($this->sql)->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Mitra berhasil disimpan";
             }else{
@@ -331,7 +331,7 @@ class KunjController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Mitra gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -364,7 +364,7 @@ class KunjController extends Controller
             'arrbidang.*.kode_bidang' => 'required'                        
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -372,33 +372,33 @@ class KunjController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('par_mitra')
+            $del = DB::connection($this->db)->table('par_mitra')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $del2 = DB::connection($this->sql)->table('par_mitra_bid')
+            $del2 = DB::connection($this->db)->table('par_mitra_bid')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
+            $ins = DB::connection($this->db)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                       ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
                                           
             $arrbidang = $request->arrbidang;
             if (count($arrbidang) > 0){
                 for ($i=0;$i <count($arrbidang);$i++){                
-                    $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
                                                                     ('".$request->kode_mitra."','".$arrbidang[$i]['kode_bidang']."','".$kode_lokasi."')");                    
                 }						
             }
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Mitra berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Mitra gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -416,7 +416,7 @@ class KunjController extends Controller
         $this->validate($request, [
             'kode_mitra' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -424,23 +424,23 @@ class KunjController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('par_mitra')
+            $del = DB::connection($this->db)->table('par_mitra')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $del2 = DB::connection($this->sql)->table('par_mitra_bid')
+            $del2 = DB::connection($this->db)->table('par_mitra_bid')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Mitra berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Mitra gagal dihapus ".$e;
             
