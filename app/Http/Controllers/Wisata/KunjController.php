@@ -18,15 +18,15 @@ class KunjController extends Controller
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
-    public function cekBukti($kode_mitra,$kode_bidang,$tahun,$bulan,$kode_lokasi){        
-        $auth = DB::connection($this->sql)->select("select no_bukti from par_kunj_m where kode_mitra ='".$kode_mitra."' and kode_bidang ='".$kode_bidang."' and tahun ='".$tahun."' and bulan ='".$bulan."' and kode_lokasi='".$kode_lokasi."' ");
-        $auth = json_decode(json_encode($auth),true);
-        if(count($auth) > 0){
-            return false;
-        }else{
-            return true;
-        }
-    }
+    // public function cekBukti($kode_mitra,$kode_bidang,$tahun,$bulan,$kode_lokasi){        
+    //     $auth = DB::connection($this->sql)->select("select no_bukti from par_kunj_m where kode_mitra ='".$kode_mitra."' and kode_bidang ='".$kode_bidang."' and tahun ='".$tahun."' and bulan ='".$bulan."' and kode_lokasi='".$kode_lokasi."' ");
+    //     $auth = json_decode(json_encode($auth),true);
+    //     if(count($auth) > 0){
+    //         return false;
+    //     }else{
+    //         return true;
+    //     }
+    // }
 
     public function getMitra() {
         try {
@@ -203,7 +203,7 @@ class KunjController extends Controller
                       from par_kunj_m a 
                       inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi 
                       inner join par_bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi 
-                      where a.kode_lokasi='".$kode_lokasi."' "
+                      where a.kode_lokasi='".$kode_lokasi."' ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
