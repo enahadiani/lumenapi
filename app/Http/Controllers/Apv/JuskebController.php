@@ -72,10 +72,20 @@ class JuskebController extends Controller
         return $id;
     }
 
+    public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' ");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
     public function generateDok(Request $request){
        
         $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
-        $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
+        $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
+        $tahun = substr($request->tanggal,0,4);
+        $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2,$tahun);
         return $no_dokumen;
     }
 
