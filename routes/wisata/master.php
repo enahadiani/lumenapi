@@ -40,8 +40,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('kunj','Wisata\KunjController@index');
 
     $router->post('kunj','Wisata\KunjController@store');
-    $router->put('kunj','Wisata\KunjController@update');
-    $router->delete('kunj','Wisata\KunjController@destroy');    
+    // $router->put('kunj','Wisata\KunjController@update');
+    // $router->delete('kunj','Wisata\KunjController@destroy');    
 
 });
 
