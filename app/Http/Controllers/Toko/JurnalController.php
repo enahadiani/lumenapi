@@ -605,6 +605,7 @@ class JurnalController extends Controller
             Storage::disk('local')->put($nama_file,file_get_contents($file));
             $excel = Excel::import(new JurnalImport, $nama_file);
             Storage::disk('local')->delete($nama_file);
+            
             $success['status'] = true;
             $success['message'] = "File berhasil diupload!";
             return response()->json($success, $this->successStatus);

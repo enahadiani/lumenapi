@@ -42,10 +42,24 @@ class JuspoController extends Controller
         return $arr[2].$new_sep.$arr[1].$new_sep.$arr[0];
     }
 
+    public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun,$kode_lokasi){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
     public function generateDok(Request $request){
-       
+        if($dt =  Auth::guard($this->guard)->user()){
+            $nik_log= $dt->nik;
+            $kode_lok_log= $dt->kode_lokasi;
+        }
+
         $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
-        $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+        $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
+        $tahun = substr($request->tanggal,0,4);
+        $no_dokumen = $this->generateKode2("apv_juspo_m", "no_dokumen", $format, "00001", $format2,$tahun,$kode_lok_log);
         return $no_dokumen;
     }
     
@@ -198,7 +212,9 @@ class JuspoController extends Controller
                 
                 $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
                 $format = $this->reverseDate($request->waktu,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
-                $no_dokumen = $this->generateKode("apv_juspo_m", "no_dokumen", $format, "00001");
+                $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
+                $tahun = substr($request->tanggal,0,4);
+                $no_dokumen = $this->generateKode2("apv_juspo_m", "no_dokumen", $format, "00001", $format2,$tahun,$kode_lokasi);
             }
 
             $inshis = DB::connection($this->db)->insert("insert into apv_juspo_his (no_juspo,keterangan,status,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->keterangan','$request->status','$kode_lokasi','$nik_user',getdate())");
