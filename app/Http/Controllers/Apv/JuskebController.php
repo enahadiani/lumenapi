@@ -284,7 +284,9 @@ class JuskebController extends Controller
     
                 $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
                 $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
-                $no_dokumen = $this->generateKode("apv_juskeb_m", "no_dokumen", $format, "00001");
+                $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
+                $tahun = substr($request->tanggal,0,4);
+                $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2,$tahun);
                 
                 if(isset($request->kode_divisi)){
                     $kode_divisi = $request->kode_divisi;
