@@ -327,7 +327,7 @@ class KunjController extends Controller
                 $arrtgl = $request->arrtgl;
                 if (count($arrtgl) > 0){
                     for ($i=0;$i <count($arrtgl);$i++){                
-                        $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,kode_mitra,kode_bidang,tanggal,jumlah,kode_lokasi) values  
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_d(no_bukti,kode_mitra,kode_bidang,tanggal,jumlah,kode_lokasi) values  
                                                                       ('".$no_bukti."','".$request->kode_mitra."','".$request->kode_bidang."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
                     }						
                 }	
