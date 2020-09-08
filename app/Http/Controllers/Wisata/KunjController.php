@@ -298,13 +298,13 @@ class KunjController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [            
-            'tanggal' => 'required|date_format: Y-m-d',
+            'tanggal' => 'required',
             'kode_mitra' => 'required|max:10',
             'kode_bidang' => 'required|max:10',            
             'tahun' => 'required|max:4',            
             'bulan' => 'required|max:2',
             'arrtgl'=>'required|array',
-            'arrtgl.*.tanggal' => 'required|date_format: Y-m-d',                                    
+            'arrtgl.*.tanggal' => 'required',                                    
             'arrtgl.*.jumlah' => 'required|integer'                                    
         ]);
 
