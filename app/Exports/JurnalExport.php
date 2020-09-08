@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Exports;
+
+use App\JurnalTmp;
+use Maatwebsite\Excel\Concerns\FromCollection;
+
+use Maatwebsite\Excel\Concerns\WithHeadings;
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; 
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+
+class JurnalExport implements FromCollection, WithHeadings
+{
+    public function __construct($nik_user,$kode_lokasi)
+    {
+        $this->nik_user = $nik_user;
+        $this->kode_lokasi = $kode_lokasi;
+    }
+
+    public function collection()
+    {
+        return JurnalTmp::select('kode_akun','dc','keterangan','nilai','kode_pp','status','ket_status')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->get();
+    }
+
+    public function headings(): array
+    {
+        return [
+
+            'kode_akun',
+            'dc',
+            'keterangan',
+            'nilai',
+            'kode_pp',
+            'status',
+            'keterangan_status'
+        ];
+
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'A' => DataType::TYPE_STRING,
+            'E' => DataType::TYPE_STRING,
+        ];
+    }
+}

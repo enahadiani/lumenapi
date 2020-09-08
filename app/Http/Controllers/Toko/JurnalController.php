@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Imports\JurnalImport;
+use App\Exports\JurnalExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
+use App\JurnalTmp;
 
 class JurnalController extends Controller
 {
@@ -584,18 +586,67 @@ class JurnalController extends Controller
         
     }
 
+    
+    public function validateJurnal($kode_akun,$kode_pp,$dc,$ket,$nilai,$kode_lokasi){
+        $keterangan = "";
+        $auth = DB::connection($this->db)->select("select kode_akun from masakun where kode_akun='$kode_akun' and kode_lokasi='$kode_lokasi'
+        ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Kode Akun $kode_akun tidak valid. ";
+        }
+
+        $auth2 = DB::connection($this->db)->select("select kode_pp from pp where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi'
+        ");
+        $auth2 = json_decode(json_encode($auth2),true);
+        if(count($auth2) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Kode PP $kode_pp tidak valid. ";
+        }
+
+        if(floatval($nilai) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Nilai tidak valid. ";
+        }
+
+        if($ket != ""){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Keterangan tidak valid. ";
+        }
+
+        if($dc == "D" || $dc == "C"){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "DC $dc tidak valid. ";
+        }
+
+        return $keterangan;
+        // return $keterangan;
+
+    }
+
+
     public function importExcel(Request $request)
     {
         $this->validate($request, [
             'file' => 'required|mimes:csv,xls,xlsx',
             'nik_user' => 'required'
         ]);
+
+        DB::connection($this->db)->beginTransaction();
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            
+            $del1 = DB::connection($this->db)->table('jurnal_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->delete();
 
             // menangkap file excel
             $file = $request->file('file');
@@ -604,17 +655,60 @@ class JurnalController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $excel = Excel::import(new JurnalImport($request->nik_user), $nama_file);
+            // $excel = Excel::import(new JurnalImport($request->nik_user), $nama_file);
+            $dt = Excel::toArray(new JurnalImport($request->nik_user),$nama_file);
+            $excel = $dt[0];
+            $x = array();
+            $status_validate = true;
+            foreach($excel as $row){
+                if($row[0] != ""){
+                    $ket = $this->validateJurnal(strval($row[0]),strval($row[4]),strval($row[1]),strval($row[2]),floatval($row[3]),$kode_lokasi);
+                    if($ket != ""){
+                        $sts = 0;
+                        $status_validate = false;
+                    }else{
+                        $sts = 1;
+                    }
+                    $x[] = JurnalTmp::create([
+                        'kode_akun' => strval($row[0]),
+                        'dc' => strval($row[1]),
+                        'keterangan' => strval($row[2]),
+                        'nilai' => floatval($row[3]),
+                        'kode_pp' => strval($row[4]),
+                        'kode_lokasi' => $kode_lokasi,
+                        'nik_user' => $request->nik_user,
+                        'tgl_input' => date('Y-m-d H:i:s'),
+                        'status' => $sts,
+                        'ket_status' => $ket
+                    ]);
+                }
+            }
+            
+            DB::connection($this->db)->commit();
             Storage::disk('local')->delete($nama_file);
+            if($status_validate){
+                $msg = "File berhasil diupload!";
+            }else{
+                $msg = "Ada error!";
+            }
             
             $success['status'] = true;
-            $success['message'] = "File berhasil diupload!";
+            $success['validate'] = $status_validate;
+            $success['message'] = $msg;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function export(Request $request) 
+    {
+        $nik_user = $request->nik_user;
+        $kode_lokasi = $request->kode_lokasi;
+        return Excel::download(new JurnalExport($nik_user,$kode_lokasi), 'jurnal.xlsx');
     }
 }

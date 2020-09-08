@@ -95,6 +95,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
 });
 
+$router->get('export', 'Toko\JurnalController@export');
+
 
 
 ?>
