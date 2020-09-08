@@ -392,24 +392,24 @@ class KunjController extends Controller
             ->delete();
 
             $ins = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,tanggal,kode_lokasi,tgl_input,nik_user,kode_mitra,kode_bidang,tahun,bulan) values 
-                                                    ('".$no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_bidang."','".$request->tahun."','".$request->bulan."')");
+                                                    ('".$request->no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_bidang."','".$request->tahun."','".$request->bulan."')");
 
             $arrtgl = $request->arrtgl;
             if (count($arrtgl) > 0){
                 for ($i=0;$i <count($arrtgl);$i++){                
                     $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_d(no_bukti,kode_mitra,kode_bidang,tanggal,jumlah,kode_lokasi) values  
-                                                                  ('".$no_bukti."','".$request->kode_mitra."','".$request->kode_bidang."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
+                                                                  ('".$request->no_bukti."','".$request->kode_mitra."','".$request->kode_bidang."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
                 }						
             }	
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Mitra berhasil diubah";
+            $success['message'] = "Data Kunjungan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Mitra gagal diubah ".$e;
+            $success['message'] = "Data Kunjungan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
