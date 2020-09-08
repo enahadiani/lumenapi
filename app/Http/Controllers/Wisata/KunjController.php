@@ -305,7 +305,7 @@ class KunjController extends Controller
             'bulan' => 'required|max:2',
             'arrtgl'=>'required|array',
             'arrtgl.*.tanggal' => 'required|date_format: Y-m-d',                                    
-            'arrtgl.*.jumlah' => 'required|number'                                    
+            'arrtgl.*.jumlah' => 'required|integer'                                    
         ]);
 
         DB::connection($this->db)->beginTransaction();
