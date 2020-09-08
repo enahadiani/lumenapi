@@ -360,8 +360,6 @@ class JurnalController extends Controller
         }	
     }
 
-    
-
     public function show($no_bukti)
     {
         try {
@@ -660,6 +658,7 @@ class JurnalController extends Controller
             $excel = $dt[0];
             $x = array();
             $status_validate = true;
+            $no=1;
             foreach($excel as $row){
                 if($row[0] != ""){
                     $ket = $this->validateJurnal(strval($row[0]),strval($row[4]),strval($row[1]),strval($row[2]),floatval($row[3]),$kode_lokasi);
@@ -679,8 +678,10 @@ class JurnalController extends Controller
                         'nik_user' => $request->nik_user,
                         'tgl_input' => date('Y-m-d H:i:s'),
                         'status' => $sts,
-                        'ket_status' => $ket
+                        'ket_status' => $ket,
+                        'nu' => $no
                     ]);
+                    $no++;
                 }
             }
             
@@ -711,4 +712,43 @@ class JurnalController extends Controller
         $kode_lokasi = $request->kode_lokasi;
         return Excel::download(new JurnalExport($nik_user,$kode_lokasi), 'jurnal.xlsx');
     }
+
+    public function getJurnalTmp(Request $request)
+    {
+        
+        $nik_user = $request->nik_user;
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp 
+            from jurnal_tmp a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['detail'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['detail'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
 }
+

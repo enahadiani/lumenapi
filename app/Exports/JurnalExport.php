@@ -22,20 +22,20 @@ class JurnalExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return JurnalTmp::select('kode_akun','dc','keterangan','nilai','kode_pp','status','ket_status')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->get();
+        return JurnalTmp::select('kode_akun','dc','keterangan','nilai','kode_pp','status','ket_status','nu')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->orderBy('nu')->get();
     }
 
     public function headings(): array
     {
         return [
-
             'kode_akun',
             'dc',
             'keterangan',
             'nilai',
             'kode_pp',
             'status',
-            'keterangan_status'
+            'keterangan_status',
+            'no_urut'
         ];
 
     }
