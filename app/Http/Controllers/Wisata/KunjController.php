@@ -319,7 +319,7 @@ class KunjController extends Controller
             if($this->getBukti($request->kode_mitra,$request->kode_bidang,$request->tahun,$request->bulan,$kode_lokasi)){
 
                 $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
-                $no_bukti = $this->generateKode("pr_kunj_m", "no_bukti", $kode_lokasi."-KJ".$periode.".", "0001");
+                $no_bukti = $this->generateKode("par_kunj_m", "no_bukti", $kode_lokasi."-KJ".$periode.".", "0001");
 
                 $ins = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,tanggal,kode_lokasi,tgl_input,nik_user,kode_mitra,kode_bidang,tahun,bulan) values 
                                                         ('".$no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_bidang."','".$request->tahun."','".$request->bulan."')");
