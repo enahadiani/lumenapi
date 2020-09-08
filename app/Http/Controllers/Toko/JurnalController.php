@@ -587,7 +587,8 @@ class JurnalController extends Controller
     public function importExcel(Request $request)
     {
         $this->validate($request, [
-            'file' => 'required|mimes:csv,xls,xlsx'
+            'file' => 'required|mimes:csv,xls,xlsx',
+            'nik_user' => 'required'
         ]);
         try {
             
@@ -603,7 +604,7 @@ class JurnalController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $excel = Excel::import(new JurnalImport, $nama_file);
+            $excel = Excel::import(new JurnalImport($request->nik_user), $nama_file);
             Storage::disk('local')->delete($nama_file);
             
             $success['status'] = true;

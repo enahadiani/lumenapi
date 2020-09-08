@@ -14,44 +14,75 @@ class JurnalImport implements ToCollection, WithStartRow
 {
     public $sql = 'tokoaws';
     public $guard = 'toko';
+    public $ket = "";
+
+    public function  __construct($nik_user)
+    {
+        $this->nik_user= $nik_user;
+    }
 
     public function startRow(): int
     {
         return 2;
     }
 
-    // public function cekValidBaris($isi,$kode_lokasi){
-    //     $ket = "";
-    //     $auth = DB::connection($this->sql)->select("
-    //         select kode_akun as kode, 'Kode Akun tidak valid' as error_msg from masakun where kode_lokasi='$kode_lokasi' and kode_akun not in (select kode_akun from masakun where kode_lokasi='$kode_lokasi')
-    //         union all
-    //         select kode_pp as kode, 'Kode PP tidak valid' as error_msg from agg_abt_tmp where kode_lokasi='$kode_lokasi' and kode_pp not in (select kode_pp from pp where kode_lokasi='$kode_lokasi')
-    //         union all
-    //         select kode_drk as kode, 'Kode Drk tidak valid' as error_msg from agg_abt_tmp where kode_lokasi='$kode_lokasi' and kode_drk not in (select kode_drk from drk where kode_lokasi='$kode_lokasi' and tahun='$tahun')
-    //     ");
-    //     $auth = json_decode(json_encode($auth),true);
-    //     if(count($auth) > 0){
-    //         for($i=0;$i<$auth;$i++){
+    public function validateJurnal($kode_akun,$kode_pp,$dc,$ket,$nilai,$kode_lokasi){
 
-    //         }
-    //         return "";
-    //     }else{
-    //         return "";
-    //     }
-    // }
+        $auth = DB::connection($this->sql)->select("select kode_akun from masakun where kode_akun='$kode_akun' and kode_lokasi='$kode_lokasi'
+        ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $this->ket .= "";
+        }else{
+            $this->ket .= "Kode Akun $kode_akun tidak valid. ";
+        }
+
+        $auth2 = DB::connection($this->sql)->select("select kode_pp from pp where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi'
+        ");
+        $auth2 = json_decode(json_encode($auth2),true);
+        if(count($auth2) > 0){
+            $this->ket .= "";
+        }else{
+            $this->ket .= "Kode PP $kode_pp tidak valid. ";
+        }
+
+        if(floatval($nilai) > 0){
+            $this->ket .= "";
+        }else{
+            $this->ket .= "Nilai tidak valid. ";
+        }
+
+        if($ket != ""){
+            $this->ket .= "";
+        }else{
+            $this->ket .= "Keterangan tidak valid. ";
+        }
+
+        if($dc == "D" || $dc == "C"){
+            $this->ket .= "";
+        }else{
+            $this->ket .= "DC $dc tidak valid ";
+        }
+
+    }
 
     public function collection(Collection $rows)
     {
         if($data =  Auth::guard($this->guard)->user()){
-            $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
+            $del1 = DB::connection($this->sql)->table('jurnal_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $this->nik_user)->delete();
             foreach ($rows as $row) 
             {
+                $this->ket = "";
                 if($row[0] == ""){
                     //
                 }else{
-                    $ket = "";
-
+                    $this->validateJurnal($row[0],$row[5],$row[2],$row[3],$row[4],$kode_lokasi);
+                    if($this->ket != ""){
+                        $sts = 0;
+                    }else{
+                        $sts = 1;
+                    }
                     JurnalTmp::create([
                         'kode_akun' => $row[0],
                         'dc' => $row[2],
@@ -59,10 +90,10 @@ class JurnalImport implements ToCollection, WithStartRow
                         'nilai' => $row[4],
                         'kode_pp' => $row[5],
                         'kode_lokasi' => $kode_lokasi,
-                        'nik_user' => $nik,
+                        'nik_user' => $this->nik_user,
                         'tgl_input' => date('Y-m-d H:i:s'),
-                        'status' => 1,
-                        'ket_status' => '-'
+                        'status' => $sts,
+                        'ket_status' => "tes"
                     ]);
                 }
             }
