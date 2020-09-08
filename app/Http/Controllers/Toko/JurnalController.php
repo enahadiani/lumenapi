@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Imports\JurnalImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage; 
 
 class JurnalController extends Controller
 {
@@ -573,6 +576,38 @@ class JurnalController extends Controller
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function importExcel(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xls,xlsx'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            // menangkap file excel
+            $file = $request->file('file');
+    
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
+
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $excel = Excel::import(new JurnalImport, $nama_file);
+            Storage::disk('local')->delete($nama_file);
+            $success['status'] = true;
+            $success['message'] = "File berhasil diupload!";
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;

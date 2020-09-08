@@ -91,6 +91,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('nikperiksa','Toko\JurnalController@getNIKPeriksa');
     $router->get('nikperiksa/{nik}','Toko\JurnalController@getNIKPeriksaByNIK');
     $router->get('jurnal-periode','Toko\JurnalController@getPeriodeJurnal');
+    $router->post('import-excel','Toko\JurnalController@importExcel');
 
 });
 
