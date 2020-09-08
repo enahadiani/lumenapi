@@ -38,7 +38,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('getTglServer','Wisata\KunjController@getTglServer');
     $router->get('getJumTgl/{tahun}/{bulan}','Wisata\KunjController@getJumTgl');
     $router->get('kunj','Wisata\KunjController@index');
-    $router->get('getEdit/{no_bukti}','Wisata\KunjController@edit');
+    $router->get('getEdit','Wisata\KunjController@edit');
     $router->post('kunj','Wisata\KunjController@store');
     $router->put('kunj','Wisata\KunjController@update');
     $router->delete('kunj','Wisata\KunjController@destroy');    
