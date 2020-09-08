@@ -1695,19 +1695,9 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
             
-            $komponen = DB::connection('sqlsrvyptkug')->select("select '121' as kode_neraca,'Gedung dan Bangunan' as nama, 90000000 as n1
-			union all
-			select '122' as kode_neraca,'Sarpen' as nama, 40000000 as n1
-			union all
-			select '123' as kode_neraca,'Alat Catu Daya' as nama, 50000000 as n1
-			union all
-			select '124' as kode_neraca,'Akreditasi' as nama, 90000000 as n1
-			union all
-			select '125' as kode_neraca,'A' as nama, 40000000 as n1
-			union all
-			select '126' as kode_neraca,'B' as nama, 10000000 as n1
-			union all
-			select '127' as kode_neraca,'C' as nama, 40000000 as n1
+            $komponen = DB::connection('sqlsrvyptkug')->select("select kode_neraca,nama,n1,n4,0 as on_progress 
+            from exs_neraca 
+            where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
             ");
             $komponen = json_decode(json_encode($komponen),true);
             
