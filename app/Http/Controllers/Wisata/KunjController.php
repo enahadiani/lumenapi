@@ -435,12 +435,12 @@ class KunjController extends Controller
             
             $del = DB::connection($this->db)->table('par_kunj_m')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $this->nobukti)
+            ->where('no_bukti', $request->no_bukti)
             ->delete();
 
             $del2 = DB::connection($this->db)->table('par_kunj_d')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $this->nobukti)
+            ->where('no_bukti', $request->no_bukti)
             ->delete();
 
             DB::connection($this->db)->commit();
