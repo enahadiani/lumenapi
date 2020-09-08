@@ -72,8 +72,8 @@ class JuskebController extends Controller
         return $id;
     }
 
-    public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun){
-        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' ");
+    public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun,$kode_lokasi){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -81,11 +81,15 @@ class JuskebController extends Controller
     }
 
     public function generateDok(Request $request){
-       
+        if($dt =  Auth::guard($this->guard)->user()){
+            $nik_log= $dt->nik;
+            $kode_lok_log= $dt->kode_lokasi;
+        }
+
         $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
         $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
         $tahun = substr($request->tanggal,0,4);
-        $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2,$tahun);
+        $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2,$tahun,$kode_lok_log);
         return $no_dokumen;
     }
 
@@ -286,7 +290,7 @@ class JuskebController extends Controller
                 $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
                 $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
                 $tahun = substr($request->tanggal,0,4);
-                $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2,$tahun);
+                $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2,$tahun,$kode_lokasi);
                 
                 if(isset($request->kode_divisi)){
                     $kode_divisi = $request->kode_divisi;
