@@ -18,6 +18,12 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
    
+    //Kecamatan
+    $router->get('camat','Wisata\CamatController@index');
+    $router->post('camat','Wisata\CamatController@store');
+    $router->put('camat','Wisata\CamatController@update');
+    $router->delete('camat','Wisata\CamatController@destroy');    
+
     //Bidang
     $router->get('bidang','Wisata\BidangController@index');
     $router->post('bidang','Wisata\BidangController@store');

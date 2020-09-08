@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class BidangController extends Controller
+class CamatController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,7 +20,7 @@ class BidangController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select kode_bidang from par_bidang where kode_bidang ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_camat from par_camat where kode_camat ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,16 +38,16 @@ class BidangController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_bidang)){
-                if($request->kode_bidang == "all"){
+            if(isset($request->kode_camat)){
+                if($request->kode_camat == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and kode_bidang='".$request->kode_bidang."' ";
+                    $filter = " and kode_camat='".$request->kode_camat."' ";
                 }
-                $sql= "select kode_bidang,nama from par_bidang where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select kode_camat,nama from par_camat where kode_lokasi='".$kode_lokasi."' $filter ";
             }
             else {
-                $sql = "select kode_bidang,nama from par_bidang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_camat,nama from par_camat where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -91,7 +91,7 @@ class BidangController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_bidang' => 'required|max:10',
+            'kode_camat' => 'required|max:10',
             'nama' => 'required|max:100'            
         ]);
 
@@ -102,23 +102,23 @@ class BidangController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_bidang,$kode_lokasi)){
+            if($this->isUnik($request->kode_camat,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into par_bidang(kode_bidang,nama,kode_lokasi) values ('".$request->kode_bidang."','".$request->nama."','".$kode_lokasi."')");
+                $ins = DB::connection($this->sql)->insert("insert into par_camat(kode_camat,nama,kode_lokasi) values ('".$request->kode_camat."','".$request->nama."','".$kode_lokasi."')");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Bidang berhasil disimpan";
+                $success['message'] = "Data Kecamatan berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode Bidang sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode Kecamatan sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Bidang gagal disimpan ".$e;
+            $success['message'] = "Data Kecamatan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -147,7 +147,7 @@ class BidangController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_bidang' => 'required|max:10',
+            'kode_camat' => 'required|max:10',
             'nama' => 'required|max:100'            
         ]);
 
@@ -159,21 +159,21 @@ class BidangController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('par_bidang')
+            $del = DB::connection($this->sql)->table('par_camat')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_bidang', $request->kode_bidang)
+            ->where('kode_camat', $request->kode_camat)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into par_bidang(kode_bidang,nama,kode_lokasi) values ('".$request->kode_bidang."','".$request->nama."','".$kode_lokasi."')");
+            $ins = DB::connection($this->sql)->insert("insert into par_camat(kode_camat,nama,kode_lokasi) values ('".$request->kode_camat."','".$request->nama."','".$kode_lokasi."')");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Bidang berhasil diubah";
+            $success['message'] = "Data Kecamatan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Bidang gagal diubah ".$e;
+            $success['message'] = "Data Kecamatan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -187,7 +187,7 @@ class BidangController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_bidang' => 'required'
+            'kode_camat' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -197,20 +197,20 @@ class BidangController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('par_bidang')
+            $del = DB::connection($this->sql)->table('par_camat')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_bidang', $request->kode_bidang)
+            ->where('kode_camat', $request->kode_camat)
             ->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Bidang berhasil dihapus";
+            $success['message'] = "Data Kecamatan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Bidang gagal dihapus ".$e;
+            $success['message'] = "Data Kecamatan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
