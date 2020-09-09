@@ -710,7 +710,9 @@ class JurnalController extends Controller
     {
         $nik_user = $request->nik_user;
         $kode_lokasi = $request->kode_lokasi;
-        return Excel::download(new JurnalExport($nik_user,$kode_lokasi), 'jurnal.xlsx');
+        $nik = $request->nik;
+        date_default_timezone_set("Asia/Bangkok");
+        return Excel::download(new JurnalExport($nik_user,$kode_lokasi), 'Jurnal_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
     }
 
     public function getJurnalTmp(Request $request)
