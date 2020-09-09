@@ -1816,5 +1816,69 @@ class DashboardController extends Controller
         }
     }
 
+    public function penyerapanInvestasi(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select kode_neraca,nama,n1,n4,0 as on_progress
+            from exs_neraca 
+            where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $ctg = array();
+                $dt[0] = array();
+                $dt[1] = array();
+                $dt[2] = array();
+                if(count($rs) > 0){
+                    $i=1;
+                    for($x=0;$x<count($rs);$x++){
+                        array_push($ctg,$rs[$x]['nama']);
+                        array_push($dt[0],floatval($rs[$x]['n1']));
+                        array_push($dt[1],floatval($rs[$x]['n4']));
+                        array_push($dt[2],floatval($rs[$x]['on_progress']));
+                        $i++;
+                    }
+                }
+                $success['ctg']=$ctg;
+
+                $color = array('#0004FF','#FF8F01','#A5A5A5');
+                $name = array('RKA','Real','On Progress');
+                $type = array('area','column','column');
+                for($i=0;$i<count($name);$i++){
+                    $success["series"][$i]= array(
+                        "name"=> $name[$i], "color"=>$color[$i],"data"=>$dt[$i],"type"=>$type[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 }
