@@ -1838,7 +1838,7 @@ class DashboardController extends Controller
             $jumnprog = floatval($rs[0]->on_progress);
 
             $rs = DB::connection('sqlsrvyptkug')->select("
-            select kode_neraca,nama,n1/$jumn1 as n1,n4/$jumn4 as n4,0 as on_progress
+            select kode_neraca,nama,(n1/$jumn1)*100 as n1,(n4/$jumn4)*100 as n4,0 as on_progress
             from exs_neraca 
             where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
             ");
