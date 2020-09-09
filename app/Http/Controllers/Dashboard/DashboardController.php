@@ -1829,7 +1829,16 @@ class DashboardController extends Controller
             }
 
             $rs = DB::connection('sqlsrvyptkug')->select("
-            select kode_neraca,nama,n1,n4,0 as on_progress
+            select sum(n1) as n1,sum(n4) as n4, 1 as on_progress
+            from exs_neraca 
+            where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
+            ");
+            $jumn1 = floatval($rs[0]->n1);
+            $jumn4 = floatval($rs[0]->n4);
+            $jumnprog = floatval($rs[0]->on_progress);
+
+            $rs = DB::connection('sqlsrvyptkug')->select("
+            select kode_neraca,nama,n1/$jumn1 as n1,n4/$jumn4 as n4,0 as on_progress
             from exs_neraca 
             where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
             ");
@@ -1844,9 +1853,9 @@ class DashboardController extends Controller
                     $i=1;
                     for($x=0;$x<count($rs);$x++){
                         array_push($ctg,$rs[$x]['nama']);
-                        array_push($dt[0],floatval($rs[$x]['n1']));
-                        array_push($dt[1],floatval($rs[$x]['n4']));
-                        array_push($dt[2],floatval($rs[$x]['on_progress']));
+                        array_push($dt[0],round(floatval($rs[$x]['n1']),2));
+                        array_push($dt[1],round(floatval($rs[$x]['n4']),2));
+                        array_push($dt[2],round(floatval($rs[$x]['on_progress']),2));
                         $i++;
                     }
                 }
