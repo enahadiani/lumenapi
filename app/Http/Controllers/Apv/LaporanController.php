@@ -101,4 +101,98 @@ class LaporanController extends Controller
         }
     }
 
+    function getCattApp(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('no_bukti','no_dokumen','kode_pp','kode_kota');
+            $db_col_name = array('a.no_bukti','a.no_dokumen','a.kode_pp','a.kode_kota');
+
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+
+            $sql="select no_bukti from apv_juskeb_m a
+            $filter ";
+            $rs = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            
+            $nb = "";
+            $i=0;
+            foreach($rs as $row){
+                if($i == 0){
+                    $nb .= "'".$row->no_bukti."'";
+                }else{
+
+                    $nb .= ",'".$row->no_bukti."'";
+                }
+                $i++;
+            }
+
+            $sql2="
+            select e.no_bukti as id,a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama,-3 as no_urut,-4 as id2,convert(varchar,e.tanggal,103) as tanggal  
+            from apv_juskeb_m a
+            inner join apv_ver_m e on a.no_bukti=e.no_juskeb and a.kode_lokasi=e.kode_lokasi
+            inner join apv_karyawan f on e.nik_user=f.nik and e.kode_lokasi=f.kode_lokasi
+            where a.no_bukti in ($nb) and a.kode_lokasi='$kode_lokasi' 
+
+            union all
+			select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tanggal 
+            from apv_juskeb_m a
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            where a.no_bukti in ($nb)  and a.kode_lokasi='$kode_lokasi' 
+
+            union all
+            select convert(varchar,e.id) as id,b.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tanggal 
+            from apv_juspo_m a
+			inner join apv_juskeb_m b on a.no_juskeb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            where b.no_bukti in ($nb)  and a.kode_lokasi='$kode_lokasi'
+            
+            union all
+            select convert(varchar,e.id) as id,b.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,a.nik_buat as nik,f.nama,-1 as no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tanggal
+            from apv_juspo_m a
+			inner join apv_juskeb_m b on a.no_juskeb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_karyawan f on a.nik_buat=f.nik and a.kode_lokasi=f.kode_lokasi
+            where b.no_bukti in ($nb)  and a.kode_lokasi='$kode_lokasi' and e.modul='PO'
+			order by id2 ";
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

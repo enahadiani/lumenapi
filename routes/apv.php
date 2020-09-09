@@ -188,6 +188,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
 
     //Laporan
     $router->get('lap-posisi','Apv\LaporanController@getPosisi');
+    $router->get('lap-catt-app','Apv\LaporanController@getCattApp');
     $router->post('notif', 'Apv\NotifController@sendNotif');
     $router->get('notif', 'Apv\NotifController@getNotif');
 
