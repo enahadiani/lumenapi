@@ -462,5 +462,40 @@ $app->router->group([
     require __DIR__.'/../routes/wisata/dash.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yakes-auth'
+], function ($router) {
+    require __DIR__.'/../routes/yakes/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yakes-master'
+], function ($router) {
+    require __DIR__.'/../routes/yakes/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yakes-trans'
+], function ($router) {
+    require __DIR__.'/../routes/yakes/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yakes-report'
+], function ($router) {
+    require __DIR__.'/../routes/yakes/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yakes-dash'
+], function ($router) {
+    require __DIR__.'/../routes/yakes/dash.php';
+});
+
 
 return $app;

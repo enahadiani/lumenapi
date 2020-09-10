@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
-use  App\AdminToko;
+use  App\AdminYakes;
 use Illuminate\Support\Facades\Storage; 
 
-class AdminTokoController extends Controller
+class AdminYakesController extends Controller
 {
      /**
      * Instantiate a new UserController instance.
@@ -26,8 +26,8 @@ class AdminTokoController extends Controller
      *
      * @return Response
      */
-    public $db = 'tokoaws';
-    public $guard = 'toko';
+    public $db = 'dbsapkug';
+    public $guard = 'yakes';
     public function profile()
     {
         if($data =  Auth::guard($this->guard)->user()){
@@ -71,7 +71,7 @@ class AdminTokoController extends Controller
      */
     public function allUsers()
     {
-         return response()->json(['users' =>  AdminToko::all()], 200);
+         return response()->json(['users' =>  AdminYakes::all()], 200);
     }
 
     /**
@@ -82,7 +82,7 @@ class AdminTokoController extends Controller
     public function singleUser($id)
     {
         try {
-            $user = AdminToko::findOrFail($id);
+            $user = AdminYakes::findOrFail($id);
 
             return response()->json(['user' => $user], 200);
 

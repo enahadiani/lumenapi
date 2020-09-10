@@ -160,6 +160,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'dbsapkug' => [
+            'driver' => env('DB_CONNECTION13','sqlsrv'),
+            'host' => env('DB_HOST13', 'localhost'),
+            'port' => env('DB_PORT13', '1433'),
+            'database' => env('DB_DATABASE13', 'forge'),
+            'username' => env('DB_USERNAME13', 'forge'),
+            'password' => env('DB_PASSWORD13', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
     
     ],
     'migrations' => 'migrations',
