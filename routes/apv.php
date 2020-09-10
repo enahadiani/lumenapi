@@ -157,7 +157,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->post('juspo/{no_bukti}','Apv\JuspoController@update');
     $router->delete('juspo/{no_bukti}','Apv\JuspoController@destroy');
     $router->get('juspo_history/{no_bukti}','Apv\JuspoController@getHistory');
-    $router->get('juspo_preview/{no_bukti}','Apv\JuspoController@getPreview');
+    $router->get('juspo_preview/{no_bukti}/{no_juskeb}','Apv\JuspoController@getPreview');
     $router->get('generate-dok-juspo','Apv\JuspoController@generateDok');
 
     //Approval Justifikasi Pengadaan
