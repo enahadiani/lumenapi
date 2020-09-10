@@ -761,7 +761,7 @@ class LaporanController extends Controller
             $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
                 case when a.dc='D' then a.nilai else 0 end as debet,
                 case when a.dc='C' then a.nilai else 0 end as kredit 
-                from trans_j a 
+                from gldt a 
                 inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                 $where order by a.no_bukti ";
             $res2 = DB::connection($this->sql)->select($sql);
@@ -778,7 +778,7 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['detail_jurnal'] = [];
+                $success['detail_jurnal'] = $sql;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
@@ -849,7 +849,7 @@ class LaporanController extends Controller
             $sql2="select a.kode_akun,a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
                 case when a.dc='D' then a.nilai else 0 end as debet,
                 case when a.dc='C' then a.nilai else 0 end as kredit 
-                from trans_j a 
+                from gldt a 
                 inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                 $where order by a.no_bukti ";
             $res2 = DB::connection($this->sql)->select($sql2);
@@ -859,6 +859,9 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
+                $success['sqlex'] = $sqlex;
+                $success['sql'] = $sql;
+                $success['sql2'] = $sql2;
                 $success['message'] = "Success!"; 
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
