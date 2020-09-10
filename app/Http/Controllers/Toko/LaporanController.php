@@ -1058,6 +1058,151 @@ class LaporanController extends Controller
         }
     }
 
+    function getNeraca(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $nik_user=$nik."_".uniqid();
+            $periode=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
+            $level = $request->input('level')[1];
+            $format = $request->input('format')[1];
+
+            $sql="exec sp_neraca_dw '$kode_fs','A','K','$level','$periode','$kode_lokasi','$nik_user' ";
+            $res = DB::connection($this->sql)->update($sql);
+
+            $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
+            $rs = DB::connection($this->sql)->select($sql2);
+            $row = $rs->FetchNextObject($toupper=false);
+            $periode_aktif = $row[0]->periode;
+            $nama_periode="";
+            if ($periode > $periode_aktif)
+            {
+                $nama_periode="<br>(UnClosing)";
+            }
+
+            $sql3 = "select '$kode_lokasi' as kode_lokasi,kode_neraca1,kode_neraca2,nama1,tipe1,nilai1,level_spasi1,nama2,tipe2,nilai2,level_spasi2 
+				from neraca_skontro 
+				where nik_user='$nik_user' order by rowindex ";
+            $nama="";
+            if ($format=="Mutasi")
+            {
+                $sql3 = "select '$kode_lokasi' as kode_lokasi,kode_neraca1,kode_neraca2,nama1,tipe1,nilai3 as nilai1,level_spasi1,nama2,tipe2,nilai4 as nilai2,level_spasi2 
+                    from neraca_skontro 
+                    where nik_user='$nik_user' order by rowindex ";
+                $nama="(MUTASI)";
+            }
+         
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+            
+            $success["nama_periode"] = $nama_periode;
+            $success["nama"] = $nama;
+            if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res3;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']=[];
+                $success['status'] = true;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getLabaRugi(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+            
+            $nik_user=$nik."_".uniqid();
+            $periode=$request->input('periode');
+            $kode_fs=$request->input('kode_fs');
+
+            $sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
+            $res = DB::connection($this->sql)->update($sql);
+            $success['sql'] = $sql;
+            $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi,
+                        case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4
+                from neraca_tmp 
+                where modul='L' and nik_user='$nik_user' 
+                order by rowindex ";
+            $success['sql2'] = $sql;
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                // $success['sql'] = $sql;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+
     
 
 }

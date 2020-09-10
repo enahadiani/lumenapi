@@ -34,6 +34,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-bukti-retur','Toko\FilterController@getFilterNoBuktiRetur');
     $router->get('filter-akun','Toko\FilterController@getFilterAkun');
     $router->get('filter-periode-keu','Toko\FilterController@getFilterPeriodeKeuangan');
+    $router->get('filter-fs','Toko\FilterController@getFilterFS');
+    $router->get('filter-level','Toko\FilterController@getFilterLevel');
+    $router->get('filter-format','Toko\FilterController@getFilterFormat');
 
     //Laporan
     $router->get('lap-barang','Toko\LaporanController@getReportBarang');
@@ -49,6 +52,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-jurnal','Toko\LaporanController@getJurnal');
     $router->get('lap-buktijurnal','Toko\LaporanController@getBuktiJurnal');
     $router->get('lap-bukubesar','Toko\LaporanController@getBukuBesar');
+    $router->get('lap-neraca','Toko\LaporanController@getNeraca');
 
     
     $router->post('send-laporan','Toko\LaporanController@sendMail');
