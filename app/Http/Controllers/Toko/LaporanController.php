@@ -888,7 +888,7 @@ class LaporanController extends Controller
                 }
             }
             
-            $nik_user=$nik."_".uniqid();
+            $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
 
             $sqlex="exec sp_glma_tmp '$kode_lokasi','$periode','$nik_user' ";
@@ -982,7 +982,7 @@ class LaporanController extends Controller
             }
 
             
-            $nik_user=$nik."_".uniqid();
+            $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
 
             $sql="exec sp_glma_tmp '$kode_lokasi','$periode','$nik_user' ";
@@ -1091,18 +1091,17 @@ class LaporanController extends Controller
                     }
                 }
             }
-            $nik_user=$nik."_".uniqid();
+            $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
             $level = $request->input('level')[1];
             $format = $request->input('format')[1];
 
-            $sql="exec sp_neraca_dw '$kode_fs','A','K','$level','$periode','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->sql)->update($sql);
+            $sql= "exec sp_neraca_dw '$kode_fs','A','K','$level','$periode','$kode_lokasi','$nik_user' ";
+            $res = DB::connection($this->sql)->getPdo()->exec($sql);
 
             $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
-            $rs = DB::connection($this->sql)->select($sql2);
-            $row = $rs->FetchNextObject($toupper=false);
+            $row = DB::connection($this->sql)->select($sql2);
             $periode_aktif = $row[0]->periode;
             $nama_periode="";
             if ($periode > $periode_aktif)
@@ -1137,6 +1136,9 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data']=[];
+                $success['res']=$res;
+                $success['sql3'] = $sql3;
+                $success['sql'] = $sql;
                 $success['status'] = true;
                 
                 return response()->json($success, $this->successStatus);
@@ -1165,7 +1167,7 @@ class LaporanController extends Controller
                 }
             }
             
-            $nik_user=$nik."_".uniqid();
+            $nik_user=$request->nik_user;
             $periode=$request->input('periode');
             $kode_fs=$request->input('kode_fs');
 
