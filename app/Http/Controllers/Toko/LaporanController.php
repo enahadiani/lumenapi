@@ -925,9 +925,6 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
-                $success['sqlex'] = $sqlex;
-                $success['sql'] = $sql;
-                $success['sql2'] = $sql2;
                 $success['message'] = "Success!"; 
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -935,9 +932,6 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['status'] = true;
-                $success['sqlex'] = $sqlex;
-                $success['sql'] = $sql;
-                $success['sql2'] = $sql2;
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 return response()->json($success, $this->successStatus);
