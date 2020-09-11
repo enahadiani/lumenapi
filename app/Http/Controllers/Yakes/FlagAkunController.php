@@ -42,7 +42,7 @@ class FlagAkunController extends Controller
                 $sql= "select kode_flag, nama from flag_akun ".$filter;
             } 
             else {
-                $sql = "select kode_flag, nama, flag_status from flag_akun ";
+                $sql = "select kode_flag, nama from flag_akun ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
