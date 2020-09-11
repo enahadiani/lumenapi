@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Toko;
+namespace App\Http\Controllers\Yakes;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
