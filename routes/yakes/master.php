@@ -29,6 +29,12 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('fs','Yakes\FSController@update');
     $router->delete('fs','Yakes\FSController@destroy'); 
 
+    //flagakun
+    $router->get('flagakun','Yakes\FlagAkunController@index');
+    $router->post('flagakun','Yakes\FlagAkunController@store');
+    $router->put('flagakun','Yakes\FlagAkunController@update');
+    $router->delete('flagakun','Yakes\FlagAkunController@destroy'); 
+
 });
 
 
