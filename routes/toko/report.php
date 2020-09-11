@@ -37,6 +37,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-fs','Toko\FilterController@getFilterFS');
     $router->get('filter-level','Toko\FilterController@getFilterLevel');
     $router->get('filter-format','Toko\FilterController@getFilterFormat');
+    $router->get('filter-sumju','Toko\FilterController@getFilterSumju');
+    $router->get('filter-modul','Toko\FilterController@getFilterModul');
+    $router->get('filter-bukti-jurnal','Toko\FilterController@getFilterBuktiJurnal');
 
     //Laporan
     $router->get('lap-barang','Toko\LaporanController@getReportBarang');
