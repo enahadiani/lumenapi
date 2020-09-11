@@ -17,7 +17,12 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
-   
+    //masakun
+    $router->get('masakun','Yakes\MasakunController@index');
+    $router->post('masakun','Yakes\MasakunController@store');
+    $router->put('masakun','Yakes\MasakunController@update');
+    $router->delete('masakun','Yakes\MasakunController@destroy'); 
+
 });
 
 
