@@ -18,7 +18,7 @@ class LaporanController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'yakes';
-    public $sql = 'dbyakes';
+    public $sql = 'dbsapkug';
 
     public function sendMail(Request $request){
         $this->validate($request,[
