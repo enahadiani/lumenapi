@@ -84,8 +84,8 @@ class FSController extends Controller
             }
             if($this->isUnik($request->kode_fs,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status) values 
-                                                         ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."')");
+                $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status,tgl_input) values 
+                                                         ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -127,8 +127,8 @@ class FSController extends Controller
             ->where('kode_fs', $request->kode_fs)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status) values 
-                                                      ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."')");
+            $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status,tgl_input) values 
+                                                      ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."',getdate())");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
