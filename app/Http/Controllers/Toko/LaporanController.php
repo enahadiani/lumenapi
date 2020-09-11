@@ -997,44 +997,45 @@ class LaporanController extends Controller
                 }
             }
 
-            if($request->input('trail')[1] != ""){
-
-                if ($request->input('trail')[1] == "1")
-                {
-                    $sql = "select a.kode_akun,c.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
-                    case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
-                    case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
-                    case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
-                    case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
-                    from glma_tmp a
-                    inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                    inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
-                    $where and a.nik_user='$nik_user' $mutasi
-                    order by a.kode_akun";
+            $sql="select a.kode_akun,b.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+            case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
+            case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
+            case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
+            case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
+            from glma_tmp a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            $where and a.nik_user='$nik_user'  $mutasi
+            order by a.kode_akun ";
+            if(isset($request->trail[1])){
+                if($request->input('trail')[1] != ""){
+    
+                    if ($request->input('trail')[1] == "1")
+                    {
+                        $sql = "select a.kode_akun,c.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+                        case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
+                        case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
+                        case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
+                        case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
+                        from glma_tmp a
+                        inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                        inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+                        $where and a.nik_user='$nik_user' $mutasi
+                        order by a.kode_akun";
+                    }
+                    if ($request->input('trail')[1] == "2")
+                    {
+                        $sql = "select a.kode_akun,c.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
+                        case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
+                        case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
+                        case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
+                        case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
+                        from glma_tmp a
+                        inner join konsol_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                        inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+                        $where and a.nik_user='$nik_user' $mutasi
+                        order by a.kode_akun";
+                    }
                 }
-                if ($request->input('trail')[1] == "2")
-                {
-                    $sql = "select a.kode_akun,c.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
-                    case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
-                    case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
-                    case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
-                    case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
-                    from glma_tmp a
-                    inner join konsol_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                    inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
-                    $where and a.nik_user='$nik_user' $mutasi
-                    order by a.kode_akun";
-                }
-            }else{
-                $sql="select a.kode_akun,b.nama,a.kode_lokasi,a.debet,a.kredit,a.so_awal,so_akhir, 
-                case when a.so_awal>0 then so_awal else 0 end as so_awal_debet,
-                case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
-                case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
-                case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
-                from glma_tmp a 
-                inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                $where and a.nik_user='$nik_user'  $mutasi
-                order by a.kode_akun ";
             }
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
