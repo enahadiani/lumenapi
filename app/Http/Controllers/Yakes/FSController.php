@@ -71,7 +71,8 @@ class FSController extends Controller
     {
         $this->validate($request, [
             'kode_fs' => 'required|max:10',
-            'nama' => 'required|max:100'            
+            'nama' => 'required|max:100',
+            'flag_status' => 'required'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -109,7 +110,8 @@ class FSController extends Controller
     {
         $this->validate($request, [
             'kode_fs' => 'required|max:10',
-            'nama' => 'required|max:100'            
+            'nama' => 'required|max:100',
+            'flag_status' => 'required'                       
         ]);
 
         DB::connection($this->sql)->beginTransaction();

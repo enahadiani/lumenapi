@@ -71,7 +71,13 @@ class MasakunController extends Controller
     {
         $this->validate($request, [
             'kode_akun' => 'required|max:20',
-            'nama' => 'required|max:100'            
+            'nama' => 'required|max:100',
+            'modul' => 'required',
+            'jenis' => 'required',
+            'kode_curr' => 'required',
+            'block' => 'required',
+            'status_gar' => 'required',
+            'normal' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -109,7 +115,13 @@ class MasakunController extends Controller
     {
         $this->validate($request, [
             'kode_akun' => 'required|max:20',
-            'nama' => 'required|max:100'            
+            'nama' => 'required|max:100',
+            'modul' => 'required',
+            'jenis' => 'required',
+            'kode_curr' => 'required',
+            'block' => 'required',
+            'status_gar' => 'required',
+            'normal' => 'required'        
         ]);
 
         DB::connection($this->sql)->beginTransaction();
