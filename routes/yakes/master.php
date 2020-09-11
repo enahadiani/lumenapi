@@ -23,6 +23,12 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('masakun','Yakes\MasakunController@update');
     $router->delete('masakun','Yakes\MasakunController@destroy'); 
 
+    //fs
+    $router->get('fs','Yakes\FSController@index');
+    $router->post('fs','Yakes\FSController@store');
+    $router->put('fs','Yakes\FSController@update');
+    $router->delete('fs','Yakes\FSController@destroy'); 
+
 });
 
 
