@@ -732,7 +732,7 @@ class FilterController extends Controller
         
     }
 
-    function getFilterSumju(){
+    function getFilterYaTidak(){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){

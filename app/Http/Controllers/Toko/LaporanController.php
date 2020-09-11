@@ -895,7 +895,7 @@ class LaporanController extends Controller
             $res = DB::connection($this->sql)->update($sqlex);
 
             $tmp = "";
-            if (isset($request->jenis) && $request->jenis == "Tidak")
+            if (isset($request->mutasi[1]) && $request->mutasi[1] == "Tidak")
             {
                 $tmp =" and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0) ";
             }
