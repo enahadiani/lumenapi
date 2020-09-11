@@ -1162,16 +1162,32 @@ class LaporanController extends Controller
             
             $col_array = array('periode','kode_fs');
             $db_col_name = array('a.periode','a.kode_fs');
-            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
             for($i = 0; $i<count($col_array); $i++){
-                if($request->input($col_array[$i]) !=""){
-                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
                 }
             }
-            
             $nik_user=$request->nik_user;
-            $periode=$request->input('periode');
-            $kode_fs=$request->input('kode_fs');
+            $periode=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
 
             $sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
             $res = DB::connection($this->sql)->update($sql);

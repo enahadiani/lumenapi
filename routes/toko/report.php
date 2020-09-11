@@ -57,6 +57,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-buktijurnal','Toko\LaporanController@getBuktiJurnal');
     $router->get('lap-bukubesar','Toko\LaporanController@getBukuBesar');
     $router->get('lap-neraca','Toko\LaporanController@getNeraca');
+    $router->get('lap-labarugi','Toko\LaporanController@getLabaRugi');
 
     
     $router->post('send-laporan','Toko\LaporanController@sendMail');
