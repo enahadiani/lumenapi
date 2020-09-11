@@ -39,10 +39,10 @@ class MasakunController extends Controller
                 }else{
                     $filter = " and kode_akun='".$request->kode_akun."' ";
                 }
-                $sql= "select kode_akun,nama from masakun where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_lokasi='".$kode_lokasi."' $filter ";
             }
             else {
-                $sql = "select kode_akun,nama from masakun where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
