@@ -328,16 +328,22 @@ class AsetController extends Controller
             ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama'";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->id_nama'";
+            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['daftar'] = $res;
+                $success['data_gambar'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['daftar'] = [];
+                $success['data_gambar'] = [];
                 $success['status'] = true;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
@@ -468,15 +474,21 @@ class AsetController extends Controller
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->qrcode'";
+            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['daftar'] = $res;
+                $success['data_gambar'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['daftar'] = [];
+                $success['data_gambar'] = [];
                 $success['status'] = true;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
