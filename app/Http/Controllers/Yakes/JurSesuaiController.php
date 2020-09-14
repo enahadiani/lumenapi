@@ -132,7 +132,7 @@ class JurSesuaiController extends Controller
                 if($request->no_bukti == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.no_ju='".$request->no_bukti."' ";
+                    $filter = " and no_ju='".$request->no_bukti."' ";
                 }
                 $sql= "select no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ".$filter;
             }
