@@ -1272,15 +1272,15 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
-                    from karyawan a
-                    where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            $get = json_decode(json_encode($get),true);
-            if(count($get) > 0){
-                $kode_pp = $get[0]['kode_pp'];
-            }else{
-                $kode_pp = "";
-            }
+            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //         from karyawan a
+            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_pp = $get[0]['kode_pp'];
+            // }else{
+            //     $kode_pp = "-";
+            // }
             $no_bukti = $request->no_bukti;
 
             $arr_foto = array();
@@ -1306,7 +1306,7 @@ class AsetController extends Controller
                 $cek = DB::connection('sqlsrv2')->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_lahan_dok 
-                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
+                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
                 group by no_bukti");
                 $cek = json_decode(json_encode($cek),true);
                 if(count($cek) > 0){
@@ -1315,7 +1315,7 @@ class AsetController extends Controller
                     $no = 0;
                 }
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp]); 
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],NULL]); 
                     $no++;
                 }
                 $success['status'] = true;
@@ -1349,15 +1349,15 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
-                    from karyawan a
-                    where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            $get = json_decode(json_encode($get),true);
-            if(count($get) > 0){
-                $kode_pp = $get[0]['kode_pp'];
-            }else{
-                $kode_pp = "";
-            }
+            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //         from karyawan a
+            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_pp = $get[0]['kode_pp'];
+            // }else{
+            //     $kode_pp = "-";
+            // }
 
             $cek = DB::connection('sqlsrv2')->select("select a.file_dok
                     from amu_lahan_dok a
@@ -1371,10 +1371,10 @@ class AsetController extends Controller
 
             $del = DB::connection('sqlsrv2')->table('amu_lahan_dok')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_pp', $kode_pp)
             ->where('no_bukti', $no_bukti) 
             ->where('no_urut', $no_urut)
             ->delete();
+            // ->where('kode_pp', $kode_pp)
 
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
