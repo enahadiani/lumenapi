@@ -137,6 +137,18 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('reftrans','Toko\ReferensiTransController@update');
     $router->delete('reftrans','Toko\ReferensiTransController@destroy');
 
+    
+    //Format Laporan
+    $router->get('format-laporan','Toko\FormatLaporanController@show');
+    $router->post('format-laporan','Toko\FormatLaporanController@store');
+    $router->put('format-laporan','Toko\FormatLaporanController@update');
+    $router->delete('format-laporan','Toko\FormatLaporanController@destroy');
+    $router->get('format-laporan-versi','Toko\FormatLaporanController@getVersi');
+    $router->get('format-laporan-tipe','Toko\FormatLaporanController@getTipe');
+    $router->get('format-laporan-relakun','Toko\FormatLaporanController@getRelakun');
+    $router->post('format-laporan-relasi','Toko\FormatLaporanController@simpanRelasi');
+    $router->post('format-laporan-move','Toko\FormatLaporanController@simpanMove');
+
 });
 
 
