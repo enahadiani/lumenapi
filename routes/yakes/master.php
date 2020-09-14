@@ -35,12 +35,22 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('flagakun','Yakes\FlagAkunController@update');
     $router->delete('flagakun','Yakes\FlagAkunController@destroy'); 
 
-    //FlagRelasi
+    //flagrelasi
     $router->get('getFlag','Yakes\FlagRelasiController@getFlag');
     $router->get('getAkunFlag/{kode_flag}','Yakes\FlagRelasiController@getAkunFlag');
     $router->get('getAkun','Yakes\FlagRelasiController@getAkun');    
     $router->put('flagrelasi','Yakes\FlagRelasiController@update');
 
+    //jurnal
+    $router->post('jurnal','Yakes\JurSesuaiController@store');
+    $router->put('jurnal','Yakes\JurSesuaiController@update');    
+    $router->delete('jurnal','Yakes\JurSesuaiController@destroy');     
+    $router->get('getAkun','Yakes\JurSesuaiController@getAkun');         
+    $router->get('getTglServer','Yakes\JurSesuaiController@getTglServer');     
+    $router->get('index','Yakes\JurSesuaiController@index');     
+    $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail');     
+    
+    
 });
 
 
