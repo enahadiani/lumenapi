@@ -134,10 +134,10 @@ class JurSesuaiController extends Controller
                 }else{
                     $filter = " and no_ju='".$request->no_bukti."' ";
                 }
-                $sql= "select no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ".$filter;
+                $sql= "select no_ju as no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ".$filter;
             }
             else {
-                $sql= "select no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ";
+                $sql= "select no_ju as no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
