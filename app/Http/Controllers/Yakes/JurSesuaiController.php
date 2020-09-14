@@ -48,11 +48,12 @@ class JurSesuaiController extends Controller
     }
 
     public function getBuktiDetail(Request $request) {
+        $this->validate($request, [
+            'no_bukti' => 'required'
+        ]);
+        
         try {
-            $this->validate($request, [
-                'no_bukti' => 'required'
-            ]);
-
+           
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
