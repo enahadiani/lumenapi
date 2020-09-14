@@ -35,6 +35,12 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('flagakun','Yakes\FlagAkunController@update');
     $router->delete('flagakun','Yakes\FlagAkunController@destroy'); 
 
+    //FlagRelasi
+    $router->get('getFlag','Yakes\FlagRelasiController@getFlag');
+    $router->get('getAkunFlag/{kode_flag}','Yakes\FlagRelasiController@getAkunFlag');
+    $router->get('getAkun','Yakes\FlagRelasiController@getAkun');    
+    $router->put('flagrelasi','Yakes\FlagRelasiController@update');
+
 });
 
 
