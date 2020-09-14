@@ -230,7 +230,7 @@ class VerifikasiController extends Controller
                 from apv_role a
                 inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
                 inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota'
+                where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota' and c.kode_divisi ='$request->kode_divisi'
                 order by b.no_urut";
             }else{
 
@@ -346,7 +346,7 @@ class VerifikasiController extends Controller
                 $no_juspo = "-";
             }
 
-            $sql="select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
+            $sql="select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota,b.kode_divisi
             from apv_juskeb_m b 
             where b.kode_lokasi='$kode_lokasi' and b.no_bukti='$no_aju' and b.progress in ('A','R') ";
             

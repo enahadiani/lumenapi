@@ -210,7 +210,7 @@ class FormatLaporanController extends Controller
             ->where('modul', $request->modul)
             ->delete();
 
-            $ins = DB::connection($this->db)->insert('insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->kode_neraca,$request->kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->rowindex,$request->modul,$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->kode_neraca,$request->kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->nu,$request->modul,$kode_lokasi]);
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
