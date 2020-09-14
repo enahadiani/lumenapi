@@ -324,7 +324,7 @@ class JuskebController extends Controller
                     from apv_role a
                     inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
                     inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota'
+                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota' and c.kode_divisi = '$kode_divisi'
                     order by b.no_urut";
                 }else{
 
@@ -667,7 +667,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                     from apv_role a
                     inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
                     inner join apv_karyawan c on b.kode_jab=c.kode_jab and b.kode_lokasi=c.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota'
+                    where a.kode_lokasi='$kode_lokasi' and ".$request->input('total_barang')." between a.bawah and a.atas and a.modul='JK' and a.kode_pp='$request->kode_pp' and c.id_kota = '$request->kode_kota' and c.kode_divisi='$kode_divisi'
                     order by b.no_urut";
                 }else{
 
@@ -1236,9 +1236,15 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 }
             }
 
+            if(isset($request->kode_divisi)){
+                if($request->kode_divisi != ""){
+                    $filter .= " and a.kode_divisi='$request->kode_divisi' ";
+                }
+            }
+
             $sql = "select a.nik,a.nama
 			from apv_karyawan a
-			where a.kode_jab='JV07' $filter";
+			where a.kode_jab like 'JV%' $filter";
             $cek = DB::connection($this->db)->select($sql);
             if(count($cek) > 0){
                 $nik_ver = $cek[0]->nik;
@@ -1250,6 +1256,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['status'] = true;
                 $success['data'] = $cek;
                 $success['nik_ver'] = $nik_ver;
+                $success['sql'] = $sql;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
