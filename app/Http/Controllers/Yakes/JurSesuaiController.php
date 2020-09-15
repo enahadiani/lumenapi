@@ -47,6 +47,35 @@ class JurSesuaiController extends Controller
         }        
     }
 
+    public function getPP() {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_pp,nama from pp where flag_aktif = '1' and kode_lokasi='".$kode_lokasi."'");						
+            $res= json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function getBuktiDetail(Request $request) {
         $this->validate($request, [
             'no_bukti' => 'required'
@@ -135,10 +164,10 @@ class JurSesuaiController extends Controller
                 }else{
                     $filter = " and no_ju='".$request->no_bukti."' ";
                 }
-                $sql= "select no_ju as no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ".$filter;
+                $sql= "select no_ju as no_bukti, tanggal, no_dokumen, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ".$filter;
             }
             else {
-                $sql= "select no_ju as no_bukti, tanggal, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ";
+                $sql= "select no_ju as no_bukti, tanggal, no_dokumen, keterangan, nilai from ju_m where modul = 'SESUAI' and kode_lokasi='".$kode_lokasi."' ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -162,13 +191,50 @@ class JurSesuaiController extends Controller
         }        
     }
 
-    function genBukti($tabel, $kolom_acuan, $prefix, $str_format){
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
         return $id;
     }
+
+    public function getNoBukti(Request $request) {
+        $this->validate($request, [    
+            'tanggal' => 'required'            
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
+            $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
+
+            $res = $no_bukti;
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
 
     public function store(Request $request)
     {
@@ -202,7 +268,7 @@ class JurSesuaiController extends Controller
             $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
-                                                      ('".$no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'JS', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
+                                                      ('".$no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
 
             $arrjurnal = $request->arrjurnal;
             if (count($arrjurnal) > 0){
@@ -266,7 +332,7 @@ class JurSesuaiController extends Controller
             ->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
-                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'JS', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
+                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
 
             $arrjurnal = $request->arrjurnal;
             if (count($arrjurnal) > 0){
