@@ -171,6 +171,11 @@ class AsetController extends Controller
                 }
             }
 
+            if(isset($request->id_gedung)){
+                $filter = " and a.id_gedung='$request->id_gedung' ";
+            }else{
+                $filter = "";
+            }
             $id_ruangan = $request->id_ruangan;
             
           
@@ -178,7 +183,7 @@ class AsetController extends Controller
             from amu_klp_brg a
             left join (select a.kode_klp,a.kode_lokasi,count(a.no_bukti) as jumlah,sum(nilai_perolehan) as nilai_perolehan
                     from amu_asset_bergerak a
-                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' AND no_ruang='$id_ruangan'
+                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' AND no_ruang='$id_ruangan' $filter
                     group by a.kode_klp,a.kode_lokasi
                     )b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0
@@ -451,25 +456,16 @@ class AsetController extends Controller
             //     }
             // }            
           
-            $sql="SELECT no_bukti
-            ,barcode
-            ,no_seri
-            ,merk
-            ,tipe
-            ,warna
-            ,satuan
-            ,spesifikasi
-            ,id_gedung
-            ,no_ruang
-            ,kode_klp
-            ,tanggal_perolehan
-            ,kode_lokasi
-            ,kode_pp
-            ,nilai_perolehan
-            ,kd_asset
-            ,sumber_dana
-            ,nama_inv as nama
-            ,foto FROM amu_asset_bergerak a WHERE a.no_bukti='$request->qrcode'";
+            $sql="select a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama,b.maxid as mon_id,c.status,c.catatan,c.tgl_input as tgl_inventaris_last,'-' as tindakan, d.jum as jum_inventaris
+            from amu_asset_bergerak a
+            left join (SELECT kd_asset,kode_lokasi,MAX(mon_id) as maxid
+                       FROM amu_mon_asset_bergerak
+                       GROUP BY kd_asset,kode_lokasi) b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi
+            left join amu_mon_asset_bergerak c on b.maxid=c.mon_id and b.kode_lokasi=c.kode_lokasi
+            left join (SELECT kd_asset,kode_lokasi,count(mon_id) as jum
+                       FROM amu_mon_asset_bergerak
+                       GROUP BY kd_asset,kode_lokasi) d on a.no_bukti=d.kd_asset and a.kode_lokasi=d.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$request->qrcode'";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
             

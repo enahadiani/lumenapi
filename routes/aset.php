@@ -45,7 +45,9 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('users/{id}', 'AdminController@singleUser');
     $router->get('users', 'AdminController@allUsers');
     $router->get('cek-payload', 'AdminController@cekPayload');
-
+    $router->post('profile-ubah', 'AdminController@updateProfile');
+    $router->post('ubah-foto', 'AdminController@updatePhoto');
+    
     $router->get('gedung','Aset\AsetController@getGedung');
     $router->get('ruangan','Aset\AsetController@getRuangan');
     $router->get('barang','Aset\AsetController@getBarang');
