@@ -25,9 +25,8 @@ class FlagRelasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag='".$request->kode_flag."' and b.kode_lokasi='".$kode_lokasi."'";
-
-            $success['sql'] = $sql;
+            //$sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag='".$request->kode_flag."' and b.kode_lokasi='".$kode_lokasi."'";
+            //$success['sql'] = $sql;
 
             $res = DB::connection($this->sql)->select("select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag='".$request->kode_flag."' and b.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
