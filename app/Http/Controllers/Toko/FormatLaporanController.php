@@ -18,6 +18,17 @@ class FormatLaporanController extends Controller
     public $db = "tokoaws";
     public $guard = "toko";
 
+    public function isUnik($isi,$kode_lokasi,$kode_fs){
+        
+        $auth = DB::connection($this->db)->select("select kode_neraca from neraca where kode_neraca ='".$isi."' and kode_lokasi='".$kode_lokasi."' and kode_fs='".$kode_fs."' ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -60,48 +71,55 @@ class FormatLaporanController extends Controller
             $modul = $request->modul;
             $kode_fs = $request->kode_fs;
             $kode_neraca = $request->kode_neraca;
+
+            if($this->isUnik($kode_neraca,$kode_lokasi,$kode_fs)){
+                //delete neraca tmp
+                $del_tmp = DB::connection($this->db)->table('neraca_tmp')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('kode_fs', $kode_fs)
+                ->where('nik_user', $nik)
+                ->delete();
+    
+                //insert neraca tmp
+                $nrc_tmp = DB::connection($this->db)->update("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi)
+                select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate(),kode_lokasi
+                from neraca 
+                where modul = '$modul' and kode_fs='".$kode_fs."' and kode_lokasi='$kode_lokasi'
+                order by rowindex");
+    
+                //insert 1 row to nrc tmp
+                $sql = DB::connection($this->db)->insert("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($kode_neraca,$kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->nu,$request->modul,$nik,date('Y-m-d H:i:s'),$kode_lokasi));
+    
+                //del nrc
+                $del = DB::connection($this->db)->table('neraca')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('kode_fs', $kode_fs)
+                ->where('modul', $modul)
+                ->delete();
                
-            //delete neraca tmp
-            $del_tmp = DB::connection($this->db)->table('neraca_tmp')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_fs', $kode_fs)
-            ->where('nik_user', $nik)
-            ->delete();
-
-            //insert neraca tmp
-            $nrc_tmp = DB::connection($this->db)->update("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi)
-            select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate(),kode_lokasi
-            from neraca 
-            where modul = '$modul' and kode_fs='".$kode_fs."' and kode_lokasi='$kode_lokasi'
-            order by rowindex");
-
-            //insert 1 row to nrc tmp
-            $sql = DB::connection($this->db)->insert("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($kode_neraca,$kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->nu,$request->modul,$nik,date('Y-m-d H:i:s'),$kode_lokasi));
-
-            //del nrc
-            $del = DB::connection($this->db)->table('neraca')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_fs', $kode_fs)
-            ->where('modul', $modul)
-            ->delete();
-           
-            //get nrc dari tmp
-            $getnrc = DB::connection($this->db)->select("select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate() as tgl_input,kode_lokasi
-            from neraca_tmp 
-            where modul = '$modul' and kode_fs='$kode_fs' and kode_lokasi='$kode_lokasi'
-            order by rowindex");
-            $getnrc = json_decode(json_encode($getnrc),true);
-            
-            //insert nrc
-            $i=1;
-            for($x=0;$x < count($getnrc);$x++){
-                $ins[$x] =  DB::connection($this->db)->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($getnrc[$x]['kode_neraca'],$getnrc[$x]['kode_fs'],$getnrc[$x]['nama'],$getnrc[$x]['level_spasi'],$getnrc[$x]['level_lap'],$getnrc[$x]['tipe'],$getnrc[$x]['sum_header'],$getnrc[$x]['jenis_akun'],$getnrc[$x]['kode_induk'],$i,$getnrc[$x]['modul'],$kode_lokasi));
-                $i++;
+                //get nrc dari tmp
+                $getnrc = DB::connection($this->db)->select("select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate() as tgl_input,kode_lokasi
+                from neraca_tmp 
+                where modul = '$modul' and kode_fs='$kode_fs' and kode_lokasi='$kode_lokasi'
+                order by rowindex");
+                $getnrc = json_decode(json_encode($getnrc),true);
+                
+                //insert nrc
+                $i=1;
+                for($x=0;$x < count($getnrc);$x++){
+                    $ins[$x] =  DB::connection($this->db)->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($getnrc[$x]['kode_neraca'],$getnrc[$x]['kode_fs'],$getnrc[$x]['nama'],$getnrc[$x]['level_spasi'],$getnrc[$x]['level_lap'],$getnrc[$x]['tipe'],$getnrc[$x]['sum_header'],$getnrc[$x]['jenis_akun'],$getnrc[$x]['kode_induk'],$i,$getnrc[$x]['modul'],$kode_lokasi));
+                    $i++;
+                }
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['kode_neraca'] = $request->kode_neraca;
+                $success['message'] = "Data Format Laporan berhasil disimpan";
+            }else{
+                $success['status'] = false;
+                $success['kode_neraca'] = "-";
+                $success['jenis'] = "duplicate";
+                $success['message'] = "Error : Kode Neraca sudah ada di database!";
             }
-        
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Format Laporan berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
