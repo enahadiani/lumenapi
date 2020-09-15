@@ -47,6 +47,35 @@ class JurSesuaiController extends Controller
         }        
     }
 
+    public function getPP() {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_pp,nama from pp where flag_aktif = '1' and kode_lokasi='".$kode_lokasi."'");						
+            $res= json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function getBuktiDetail(Request $request) {
         $this->validate($request, [
             'no_bukti' => 'required'
@@ -239,7 +268,7 @@ class JurSesuaiController extends Controller
             $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
-                                                      ('".$no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'JS', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
+                                                      ('".$no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
 
             $arrjurnal = $request->arrjurnal;
             if (count($arrjurnal) > 0){
@@ -303,7 +332,7 @@ class JurSesuaiController extends Controller
             ->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
-                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'JS', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
+                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
 
             $arrjurnal = $request->arrjurnal;
             if (count($arrjurnal) > 0){

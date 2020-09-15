@@ -49,6 +49,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->delete('jurnal','Yakes\JurSesuaiController@destroy');     
     $router->get('getNoBukti','Yakes\JurSesuaiController@getNoBukti');         
     $router->get('getAkun','Yakes\JurSesuaiController@getAkun');         
+    $router->get('getPP','Yakes\JurSesuaiController@getPP');         
     $router->get('getTglServer','Yakes\JurSesuaiController@getTglServer');     
     $router->get('index','Yakes\JurSesuaiController@index');     
     $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail');             
