@@ -39,7 +39,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('getFlag','Yakes\FlagRelasiController@getFlag');
     $router->get('getAkunFlag/{kode_flag}','Yakes\FlagRelasiController@getAkunFlag');
     $router->get('getAkun','Yakes\FlagRelasiController@getAkun');    
-    $router->get('viwAkun','Yakes\FlagRelasiController@viewAkun');    
+    $router->get('viewAkun','Yakes\FlagRelasiController@viewAkun');    
     $router->put('flagrelasi','Yakes\FlagRelasiController@update');
 
     //jurnal
