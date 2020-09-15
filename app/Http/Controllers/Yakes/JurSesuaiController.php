@@ -51,7 +51,7 @@ class JurSesuaiController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required'
         ]);
-        
+
         try {
            
             if($data =  Auth::guard($this->guard)->user()){
@@ -80,7 +80,7 @@ class JurSesuaiController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
-                $success['arrjurnal'] = $res2;  
+                $success['arrjurnal'] = [];  
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
