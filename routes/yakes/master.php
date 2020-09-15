@@ -50,7 +50,18 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('getAkun','Yakes\JurSesuaiController@getAkun');         
     $router->get('getTglServer','Yakes\JurSesuaiController@getTglServer');     
     $router->get('index','Yakes\JurSesuaiController@index');     
-    $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail');             
+    $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail'); 
+    
+    //Format Laporan
+    $router->get('format-laporan','Yakes\FormatLaporanController@show');
+    $router->post('format-laporan','Yakes\FormatLaporanController@store');
+    $router->put('format-laporan','Yakes\FormatLaporanController@update');
+    $router->delete('format-laporan','Yakes\FormatLaporanController@destroy');
+    $router->get('format-laporan-versi','Yakes\FormatLaporanController@getVersi');
+    $router->get('format-laporan-tipe','Yakes\FormatLaporanController@getTipe');
+    $router->get('format-laporan-relakun','Yakes\FormatLaporanController@getRelakun');
+    $router->post('format-laporan-relasi','Yakes\FormatLaporanController@simpanRelasi');
+    $router->post('format-laporan-move','Yakes\FormatLaporanController@simpanMove');
     
 });
 
