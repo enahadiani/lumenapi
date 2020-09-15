@@ -41,6 +41,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('getAkun','Yakes\FlagRelasiController@getAkun');    
     $router->get('viewAkun','Yakes\FlagRelasiController@viewAkun');    
     $router->put('flagrelasi','Yakes\FlagRelasiController@update');
+    $router->delete('flagrelasi','Yakes\FlagRelasiController@destroy'); 
 
     //jurnal
     $router->post('jurnal','Yakes\JurSesuaiController@store');
@@ -49,8 +50,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('getAkun','Yakes\JurSesuaiController@getAkun');         
     $router->get('getTglServer','Yakes\JurSesuaiController@getTglServer');     
     $router->get('index','Yakes\JurSesuaiController@index');     
-    $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail');     
-    
+    $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail');             
     
 });
 

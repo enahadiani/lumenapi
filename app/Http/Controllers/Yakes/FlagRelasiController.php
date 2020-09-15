@@ -181,5 +181,37 @@ class FlagRelasiController extends Controller
         }	
     }
 
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'kode_flag' => 'required'
+        ]);
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $del = DB::connection($this->sql)->table('flag_relasi')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_flag', $request->kode_flag)
+            ->delete();
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Flag Relasi berhasil dihapus";
+            
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Flag Relasi gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
 
 }
