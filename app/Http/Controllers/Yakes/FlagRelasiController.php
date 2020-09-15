@@ -82,7 +82,7 @@ class FlagRelasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun where b.kode_flag='".$kode_flag."' and b.kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->sql)->select("select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag='".$kode_flag."' and b.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -129,7 +129,7 @@ class FlagRelasiController extends Controller
             if (count($arrakun) > 0){
                 for ($i=0;$i <count($arrakun);$i++){                
                     $ins2[$i] = DB::connection($this->sql)->insert("insert into flag_relasi(kode_flag,kode_akun,kode_lokasi) values 
-                                                                 ('".$request->kode_flag."','".$arrakun[$i]['kode_akun']."','".$kode_lokasi."')");                    
+                                                                  ('".$request->kode_flag."','".$arrakun[$i]['kode_akun']."','".$kode_lokasi."')");                    
                 }						
             }                                         
                 
