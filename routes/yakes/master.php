@@ -24,6 +24,9 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('masakun','Yakes\MasakunController@update');
     $router->delete('masakun','Yakes\MasakunController@destroy'); 
 
+    //pp
+    $router->get('cariPP','Yakes\MasakunController@cariPP');
+    
     //fs
     $router->get('cariFS','Yakes\FSController@cariFS');
     $router->get('fs','Yakes\FSController@index');
