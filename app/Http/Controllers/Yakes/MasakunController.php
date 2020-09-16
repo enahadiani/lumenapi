@@ -13,6 +13,34 @@ class MasakunController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+
+    public function viewAkun(Request $request) {
+        $this->validate($request, [    
+            'kode_akun' => 'required'            
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_akun='".$request->kode_akun."' and kode_lokasi='".$kode_lokasi."'");
+            $res = json_decode(json_encode($res),true);
+            
+            $success['status'] = true;
+            $success['data'] = $res;
+            $success['message'] = "Success!";
+            return response()->json(['success'=>$success], $this->successStatus);     
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function isUnik($isi,$kode_lokasi)
     {        
         $auth = DB::connection($this->sql)->select("select kode_akun from masakun where kode_akun ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");

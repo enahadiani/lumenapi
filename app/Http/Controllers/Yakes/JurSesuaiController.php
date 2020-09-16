@@ -228,7 +228,6 @@ class JurSesuaiController extends Controller
         }        
     }
 
-
     public function store(Request $request)
     {
         $this->validate($request, [            

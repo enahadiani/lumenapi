@@ -13,6 +13,34 @@ class FlagAkunController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+
+    public function viewFlag(Request $request) {
+        $this->validate($request, [    
+            'kode_flag' => 'required'            
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_flag, nama from flag_akun where kode_flag='".$request->kode_flag."'");
+            $res = json_decode(json_encode($res),true);
+            
+            $success['status'] = true;
+            $success['data'] = $res;
+            $success['message'] = "Success!";
+            return response()->json(['success'=>$success], $this->successStatus);     
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function isUnik($isi)
     {        
         $auth = DB::connection($this->sql)->select("select kode_flag from flag_akun where kode_flag ='".$isi."'");

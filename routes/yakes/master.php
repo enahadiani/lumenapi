@@ -18,23 +18,26 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //masakun
+    $router->get('viewAkun','Yakes\MasakunController@viewAkun');
     $router->get('masakun','Yakes\MasakunController@index');
     $router->post('masakun','Yakes\MasakunController@store');
     $router->put('masakun','Yakes\MasakunController@update');
     $router->delete('masakun','Yakes\MasakunController@destroy'); 
 
     //fs
+    $router->get('viewFS','Yakes\FSController@viewFS');
     $router->get('fs','Yakes\FSController@index');
     $router->post('fs','Yakes\FSController@store');
     $router->put('fs','Yakes\FSController@update');
     $router->delete('fs','Yakes\FSController@destroy'); 
 
     //flagakun
+    $router->get('viewFlag','Yakes\FlagAkunController@viewFlag');
     $router->get('flagakun','Yakes\FlagAkunController@index');
     $router->post('flagakun','Yakes\FlagAkunController@store');
     $router->put('flagakun','Yakes\FlagAkunController@update');
     $router->delete('flagakun','Yakes\FlagAkunController@destroy'); 
-
+    
     //flagrelasi
     $router->get('getFlag','Yakes\FlagRelasiController@getFlag');
     $router->get('getAkunFlag/{kode_flag}','Yakes\FlagRelasiController@getAkunFlag');

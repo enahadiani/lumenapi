@@ -13,6 +13,33 @@ class FSController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+    public function viewFS(Request $request) {
+        $this->validate($request, [    
+            'kode_fs' => 'required'            
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where kode_fs='".$request->kode_fs."'");
+            $res = json_decode(json_encode($res),true);
+            
+            $success['status'] = true;
+            $success['data'] = $res;
+            $success['message'] = "Success!";
+            return response()->json(['success'=>$success], $this->successStatus);     
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function isUnik($isi,$kode_lokasi)
     {        
         $auth = DB::connection($this->sql)->select("select kode_fs from fs where kode_fs ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
