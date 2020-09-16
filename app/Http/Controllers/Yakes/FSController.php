@@ -21,7 +21,7 @@ class FSController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1'");						
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -55,7 +55,7 @@ class FSController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1' and kode_fs='".$request->kode_fs."'");
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1' and kode_fs='".$request->kode_fs."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;
