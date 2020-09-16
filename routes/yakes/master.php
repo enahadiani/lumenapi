@@ -28,7 +28,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('cariPPAktif','Yakes\PPController@cariPPAktif');
     
     //fs
-    $router->get('cariFS','Yakes\FSController@cariFS');
+    $router->get('cariFSAktif','Yakes\FSController@cariFSAktif');
     $router->get('fs','Yakes\FSController@index');
     $router->post('fs','Yakes\FSController@store');
     $router->put('fs','Yakes\FSController@update');

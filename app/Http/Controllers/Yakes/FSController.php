@@ -13,7 +13,7 @@ class FSController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function cariFS(Request $request) {
+    public function cariFSAktif(Request $request) {
         $this->validate($request, [    
             'kode_fs' => 'required'            
         ]);
@@ -25,7 +25,7 @@ class FSController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where kode_fs='".$request->kode_fs."'");
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1' and kode_fs='".$request->kode_fs."'");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;
