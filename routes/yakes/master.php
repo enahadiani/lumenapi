@@ -18,21 +18,21 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //masakun
-    $router->get('viewAkun','Yakes\MasakunController@viewAkun');
+    $router->get('cariAkun','Yakes\MasakunController@cariAkun');
     $router->get('masakun','Yakes\MasakunController@index');
     $router->post('masakun','Yakes\MasakunController@store');
     $router->put('masakun','Yakes\MasakunController@update');
     $router->delete('masakun','Yakes\MasakunController@destroy'); 
 
     //fs
-    $router->get('viewFS','Yakes\FSController@viewFS');
+    $router->get('cariFS','Yakes\FSController@cariFS');
     $router->get('fs','Yakes\FSController@index');
     $router->post('fs','Yakes\FSController@store');
     $router->put('fs','Yakes\FSController@update');
     $router->delete('fs','Yakes\FSController@destroy'); 
 
     //flagakun
-    $router->get('viewFlag','Yakes\FlagAkunController@viewFlag');
+    $router->get('cariFlag','Yakes\FlagAkunController@cariFlag');
     $router->get('flagakun','Yakes\FlagAkunController@index');
     $router->post('flagakun','Yakes\FlagAkunController@store');
     $router->put('flagakun','Yakes\FlagAkunController@update');
@@ -42,7 +42,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('getFlag','Yakes\FlagRelasiController@getFlag');
     $router->get('getAkunFlag/{kode_flag}','Yakes\FlagRelasiController@getAkunFlag');
     $router->get('getAkun','Yakes\FlagRelasiController@getAkun');    
-    $router->get('viewAkun','Yakes\FlagRelasiController@viewAkun');    
+    $router->get('cariAkunFlag','Yakes\FlagRelasiController@cariAkunFlag');    
     $router->put('flagrelasi','Yakes\FlagRelasiController@update');
     $router->delete('flagrelasi','Yakes\FlagRelasiController@destroy'); 
 

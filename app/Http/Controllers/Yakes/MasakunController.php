@@ -14,7 +14,7 @@ class MasakunController extends Controller
     public $guard = 'yakes';
 
 
-    public function viewAkun(Request $request) {
+    public function cariAkun(Request $request) {
         $this->validate($request, [    
             'kode_akun' => 'required'            
         ]);

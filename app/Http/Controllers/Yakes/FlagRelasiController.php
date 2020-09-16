@@ -14,7 +14,7 @@ class FlagRelasiController extends Controller
     public $guard = 'yakes';
 
 
-    public function viewAkun(Request $request) {
+    public function cariAkunFlag(Request $request) {
         $this->validate($request, [
             'kode_flag' => 'required|max:10'
         ]);

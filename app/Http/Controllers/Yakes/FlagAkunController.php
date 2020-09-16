@@ -14,7 +14,7 @@ class FlagAkunController extends Controller
     public $guard = 'yakes';
 
 
-    public function viewFlag(Request $request) {
+    public function cariFlag(Request $request) {
         $this->validate($request, [    
             'kode_flag' => 'required'            
         ]);

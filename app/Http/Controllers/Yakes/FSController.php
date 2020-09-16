@@ -13,7 +13,7 @@ class FSController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function viewFS(Request $request) {
+    public function cariFS(Request $request) {
         $this->validate($request, [    
             'kode_fs' => 'required'            
         ]);
