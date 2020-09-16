@@ -26,7 +26,7 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select getdate() as tglnow ");						
+            $res = DB::connection($this->db)->select("select getdate() as tglnow ");						
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -47,7 +47,7 @@ class FilterController extends Controller
             return response()->json($success, $this->successStatus);
         }        
     }
-    
+
     function getFilterPeriode(){
         try {
             
