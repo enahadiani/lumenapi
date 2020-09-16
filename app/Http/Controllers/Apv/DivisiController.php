@@ -79,13 +79,23 @@ class DivisiController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_divisi,a.nama 
-            from apv_divisi a 
-            inner join apv_karyawan b on a.kode_divisi=b.kode_divisi and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='".$kode_lokasi."' and b.nik='$nik_user'
-            ");
+            if($status_admin == "A"){
+                $res = DB::connection($this->db)->select("select a.kode_divisi,a.nama 
+                from apv_divisi a 
+                inner join apv_karyawan b on a.kode_divisi=b.kode_divisi and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' 
+                ");
+            }else{
+
+                $res = DB::connection($this->db)->select("select a.kode_divisi,a.nama 
+                from apv_divisi a 
+                inner join apv_karyawan b on a.kode_divisi=b.kode_divisi and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' and b.nik='$nik_user'
+                ");
+            }
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
