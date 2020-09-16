@@ -25,13 +25,17 @@ class AdminController extends Controller
      *
      * @return Response
      */
+    public $successStatus = 200;
+    public $db = 'sqlsrv2';
+    public $guard = 'admin';
+
     public function profile()
     {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrv2')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::connection($this->db)->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
 			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,c.email
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
@@ -43,11 +47,11 @@ class AdminController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrv2')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection($this->db)->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrv2')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection($this->db)->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
@@ -63,11 +67,11 @@ class AdminController extends Controller
 
     public function profile2()
     {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrv2')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::connection($this->db)->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
             c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,c.email
                   from hakakses a 
                   inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
@@ -79,11 +83,11 @@ class AdminController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrv2')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection($this->db)->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrv2')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection($this->db)->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
@@ -99,13 +103,13 @@ class AdminController extends Controller
 
     public function profileMobileApv()
     {
-        if($data =  Auth::guard('admin')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
             
             $url = url('api/apv/storage');
-            $user = DB::connection('sqlsrv2')->select("select a.nik, c.nama,
+            $user = DB::connection($this->db)->select("select a.nik, c.nama,
             case when foto != '-' then '".$url."/'+foto else '-' end as foto,b.logo,c.no_telp,c.kode_jab,c.email,f.nama as jabatan
                   from hakakses a 
                   inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
@@ -118,11 +122,11 @@ class AdminController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrv2')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection($this->db)->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrv2')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection($this->db)->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
@@ -143,33 +147,33 @@ class AdminController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            DB::connection('sqlsrv2')->beginTransaction();
+            DB::connection($this->db)->beginTransaction();
 
-            $upd =  DB::connection('sqlsrv2')->table('hakakses')
+            $upd =  DB::connection($this->db)->table('hakakses')
             ->where('nik', $nik)
             ->where('pass', $request->password_lama)
             ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
             
             if($upd){ //mengecek apakah data kosong atau tidak
-                DB::connection('sqlsrv2')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Password berhasil diubah";
                 return response()->json($success, 200);     
             }
             else{
-                DB::connection('sqlsrv2')->rollback();
+                DB::connection($this->db)->rollback();
                 $success['status'] = false;
                 $success['message'] = "Password gagal diubah";
                 return response()->json($success, 200);
             }
         } catch (\Throwable $e) {
             
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
@@ -206,7 +210,7 @@ class AdminController extends Controller
     }
 
     public function cekPayload(){
-        $payload = Auth::guard('admin')->payload();
+        $payload = Auth::guard($this->guard)->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }
