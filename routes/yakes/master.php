@@ -33,6 +33,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('listPPAktif','Yakes\PPController@listPPAktif');         
     
     //fs
+    $router->get('listFSAktif','Yakes\PPController@listFSAktif');         
     $router->get('cariFSAktif','Yakes\FSController@cariFSAktif');
     $router->get('fs','Yakes\FSController@index');
     $router->post('fs','Yakes\FSController@store');

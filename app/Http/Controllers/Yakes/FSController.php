@@ -13,6 +13,36 @@ class FSController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+
+    public function listFSAktif() {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1'");						
+            $res= json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function cariFSAktif(Request $request) {
         $this->validate($request, [    
             'kode_fs' => 'required'            
