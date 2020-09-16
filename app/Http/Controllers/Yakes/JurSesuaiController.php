@@ -216,18 +216,11 @@ class JurSesuaiController extends Controller
 
             $res = $no_bukti;
             
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
-                $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
+            $success['status'] = true;
+            $success['data'] = $res;
+            $success['message'] = "Success!";
+            return response()->json(['success'=>$success], $this->successStatus);     
+            
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
