@@ -47,7 +47,7 @@ class VendorController extends Controller
                 $sql= "select a.kode_vendor,a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_hutang,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pictel,b.nama as nama_akun 
                 from vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select kode_vendor,nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_hutang,bank,cabang,no_rek,nama_rek,no_pictel from vendor where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_vendor,nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_hutang,bank,cabang,no_rek,nama_rek,no_pictel,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from vendor where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -121,7 +121,7 @@ class VendorController extends Controller
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,$request->bank,$request->cabang,$request->no_rek,$request->nama_rek,$request->no_fax,$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
+                $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values ('$request->kode_vendor','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->no_fax','$request->no_pictel','$request->spek','$request->kode_klpvendor','$request->penilaian','$request->bank_trans','$request->akun_hutang',getdate()) ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -201,7 +201,7 @@ class VendorController extends Controller
             ->where('kode_vendor', $request->kode_vendor)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,$request->bank,$request->cabang,$request->no_rek,$request->nama_rek,$request->no_fax,$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
+            $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values ('$request->kode_vendor','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->no_fax','$request->no_pictel','$request->spek','$request->kode_klpvendor','$request->penilaian','$request->bank_trans','$request->akun_hutang',getdate()) ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
