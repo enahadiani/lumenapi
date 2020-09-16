@@ -14,7 +14,7 @@ class MasakunController extends Controller
     public $guard = 'yakes';
 
 
-    public function cariAkun(Request $request) {
+    public function cariAkunAktif(Request $request) {
         $this->validate($request, [    
             'kode_akun' => 'required'            
         ]);
@@ -26,7 +26,7 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_akun='".$request->kode_akun."' and kode_lokasi='".$kode_lokasi."'");
+            $res = DB::connection($this->sql)->select("select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where block='0' and kode_akun='".$request->kode_akun."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;

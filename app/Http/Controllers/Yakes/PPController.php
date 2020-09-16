@@ -13,7 +13,7 @@ class PPController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function cariPP(Request $request) {
+    public function cariPPAktif(Request $request) {
         $this->validate($request, [    
             'kode_pp' => 'required'            
         ]);
@@ -25,7 +25,7 @@ class PPController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_pp, nama, flag_aktif from pp where kode_pp='".$request->kode_pp."' and kode_lokasi='".$kode_lokasi."'");
+            $res = DB::connection($this->sql)->select("select kode_pp, nama from pp where flag_aktif='1' and kode_pp='".$request->kode_pp."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;
