@@ -18,64 +18,7 @@ class JurSesuaiController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function getAkun() {
-        try {            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $res = DB::connection($this->sql)->select("select kode_akun,nama from masakun where block = '0' and kode_lokasi='".$kode_lokasi."'");						
-            $res= json_decode(json_encode($res),true);
-           
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
-                $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }        
-    }
-
-    public function getPP() {
-        try {            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $res = DB::connection($this->sql)->select("select kode_pp,nama from pp where flag_aktif = '1' and kode_lokasi='".$kode_lokasi."'");						
-            $res= json_decode(json_encode($res),true);
-           
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
-                $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }        
-    }
-
+    
     public function getBuktiDetail(Request $request) {
         $this->validate($request, [
             'no_bukti' => 'required'
@@ -110,36 +53,6 @@ class JurSesuaiController extends Controller
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
                 $success['arrjurnal'] = [];  
-                $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }        
-    }
-   
-    public function getTglServer() {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $res = DB::connection($this->sql)->select("select getdate() as tglnow ");						
-            $res= json_decode(json_encode($res),true);
-           
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }

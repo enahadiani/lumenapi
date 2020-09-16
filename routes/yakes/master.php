@@ -17,15 +17,20 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
-    //masakun
+    //tanggal server
+    $router->get('getTglServer','Yakes\FilterController@getTglServer');     
+
+    //masakun    
+    $router->get('listAkunAktif','Yakes\MasakunController@listAkunAktif');         
     $router->get('cariAkunAktif','Yakes\MasakunController@cariAkunAktif');
-    $router->get('masakun','Yakes\MasakunController@index');
+    $router->get('masakun','Yakes\MasakunController@index');    
     $router->post('masakun','Yakes\MasakunController@store');
     $router->put('masakun','Yakes\MasakunController@update');
     $router->delete('masakun','Yakes\MasakunController@destroy'); 
-
+    
     //pp
     $router->get('cariPPAktif','Yakes\PPController@cariPPAktif');
+    $router->get('listPPAktif','Yakes\PPController@listPPAktif');         
     
     //fs
     $router->get('cariFSAktif','Yakes\FSController@cariFSAktif');

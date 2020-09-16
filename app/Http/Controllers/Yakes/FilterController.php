@@ -18,6 +18,36 @@ class FilterController extends Controller
     public $guard = 'yakes';
     public $db = 'dbsapkug';
 
+    public function getTglServer() {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->sql)->select("select getdate() as tglnow ");						
+            $res= json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+    
     function getFilterPeriode(){
         try {
             
