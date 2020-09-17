@@ -47,7 +47,7 @@ class VendorController extends Controller
                 $sql= "select a.kode_vendor,a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_hutang,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pictel,b.nama as nama_akun 
                 from vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select kode_vendor,nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_hutang,bank,cabang,no_rek,nama_rek,no_pictel,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from vendor where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_vendor,nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_hutang,bank,cabang,no_rek,nama_rek,no_pictel,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from vendor where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);

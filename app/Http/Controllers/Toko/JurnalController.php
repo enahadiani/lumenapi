@@ -94,7 +94,7 @@ class JurnalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  from trans_m where modul='MI' and kode_lokasi='$kode_lokasi'	 
+            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul='MI' and kode_lokasi='$kode_lokasi'	 
             ");
             $res = json_decode(json_encode($res),true);
             
