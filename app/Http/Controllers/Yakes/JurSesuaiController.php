@@ -199,7 +199,8 @@ class JurSesuaiController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [    
-            'no_bukti' => 'required',        
+            'no_bukti' => 'required',
+            'periode' => 'required',        
             'tanggal' => 'required',
             'no_dokumen' => 'required|max:50',
             'keterangan' => 'required|max:200',
