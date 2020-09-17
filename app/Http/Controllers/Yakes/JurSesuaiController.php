@@ -135,7 +135,7 @@ class JurSesuaiController extends Controller
             //     $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
             // }
 
-            $periode = app('App\Http\Controllers\FilterController')->getPerInput($request->tanggal);
+            $periode = app('App\Http\Controllers\Yakes\FilterController')->getPerInput($request->tanggal);
             $periode = substr($periode,2,2).substr($periode,5,2);
 
             $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
