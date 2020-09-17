@@ -34,7 +34,7 @@ class JurSesuaiController extends Controller
             $res = DB::connection($this->sql)->select("select * from ju_m where no_ju='".$request->no_bukti."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select("select b.kode_akun,b.nama as nama_akun, a.dc, a.keterangan, c.kode_pp,c.nama as nama_pp, d.kode_fs, d.nama as nama_fs
+            $res2 = DB::connection($this->sql)->select("select b.kode_akun,b.nama as nama_akun, a.dc, a.keterangan, a.nilai,  c.kode_pp,c.nama as nama_pp, d.kode_fs, d.nama as nama_fs
                                                        from gldt a 
                                                        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                                                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 
