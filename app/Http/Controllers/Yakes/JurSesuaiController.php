@@ -201,7 +201,6 @@ class JurSesuaiController extends Controller
         $this->validate($request, [    
             'no_bukti' => 'required',        
             'tanggal' => 'required',
-            'periode' => 'required',
             'no_dokumen' => 'required|max:50',
             'keterangan' => 'required|max:200',
             'kode_pp' => 'required',
