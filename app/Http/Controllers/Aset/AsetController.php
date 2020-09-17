@@ -311,25 +311,36 @@ class AsetController extends Controller
             //     }
             // }
 
-            $sql="SELECT no_bukti
-            ,barcode
-            ,no_seri
-            ,merk
-            ,tipe
-            ,warna
-            ,satuan
-            ,spesifikasi
-            ,id_gedung
-            ,no_ruang
-            ,kode_klp
-            ,tanggal_perolehan
-            ,kode_lokasi
-            ,kode_pp
-            ,nilai_perolehan
-            ,kd_asset
-            ,sumber_dana
-            ,nama_inv as nama
-            ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama'";
+            // $sql="SELECT no_bukti
+            // ,barcode
+            // ,no_seri
+            // ,merk
+            // ,tipe
+            // ,warna
+            // ,satuan
+            // ,spesifikasi
+            // ,id_gedung
+            // ,no_ruang
+            // ,kode_klp
+            // ,tanggal_perolehan
+            // ,kode_lokasi
+            // ,kode_pp
+            // ,nilai_perolehan
+            // ,kd_asset
+            // ,sumber_dana
+            // ,nama_inv as nama
+            // ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama'";
+
+            $sql="select a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama,b.maxid as mon_id,c.status,c.catatan,convert(varchar(10),c.tgl_input,103) as tgl_inventaris_last,'-' as tindakan, d.jum as jum_inventaris
+            from amu_asset_bergerak a
+            left join (SELECT kd_asset,kode_lokasi,MAX(mon_id) as maxid
+                    FROM amu_mon_asset_bergerak
+                    GROUP BY kd_asset,kode_lokasi) b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi
+            left join amu_mon_asset_bergerak c on b.maxid=c.mon_id and b.kode_lokasi=c.kode_lokasi
+            left join (SELECT kd_asset,kode_lokasi,count(mon_id) as jum
+                    FROM amu_mon_asset_bergerak
+                    GROUP BY kd_asset,kode_lokasi) d on a.no_bukti=d.kd_asset and a.kode_lokasi=d.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama' ";
             $res = DB::connection('sqlsrv2')->select($sql);
             $res = json_decode(json_encode($res),true);
 
