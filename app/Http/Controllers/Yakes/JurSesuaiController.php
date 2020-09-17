@@ -244,7 +244,7 @@ class JurSesuaiController extends Controller
             if (count($arrjurnal) > 0){
                 for ($i=0;$i <count($arrjurnal);$i++){                
                     $ins2[$i] = DB::connection($this->sql)->insert("insert into gldt(no_bukti, no_urut, kode_lokasi, no_dokumen, tanggal, kode_akun, dc, nilai, keterangan, kode_pp, kode_drk, kode_cust, kode_proyek, kode_task, kode_vendor, kode_lokarea, nik, modul, jenis, periode, kode_curr, kurs, nilai_curr, tgl_input, nik_user, kode_fs) values  
-                                                                   ('".$request->no_bukti."', ".floatval($arrjurnal[$i]['no_urut']).", '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$arrjurnal[$i]['kode_akun']."', '".$arrjurnal[$i]['dc']."', '".floatval($arrjurnal[$i]['nilai'])."', '".$arrjurnal[$i]['keterangan']."', '".$arrjurnal[$i]['kode_pp']."', '-', '-', '-', '-', '-', '-', '-', 'JS', 'JS', '".$periode."', 'IDR', 1, ".floatval($arrjurnal[$i]['nilai']).", getdate(), '".$nik."', '".$arrjurnal[$i]['kode_fs']."')");                    
+                                                                   ('".$request->no_bukti."', ".floatval($arrjurnal[$i]['no_urut']).", '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$arrjurnal[$i]['kode_akun']."', '".$arrjurnal[$i]['dc']."', '".floatval($arrjurnal[$i]['nilai'])."', '".$arrjurnal[$i]['keterangan']."', '".$arrjurnal[$i]['kode_pp']."', '-', '-', '-', '-', '-', '-', '-', 'JS', 'JS', '".$request->periode."', 'IDR', 1, ".floatval($arrjurnal[$i]['nilai']).", getdate(), '".$nik."', '".$arrjurnal[$i]['kode_fs']."')");                    
                 }						
             }		
 
