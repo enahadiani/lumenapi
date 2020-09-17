@@ -202,6 +202,7 @@ class JurSesuaiController extends Controller
         $this->validate($request, [    
             'no_bukti' => 'required',        
             'tanggal' => 'required',
+            'periode' => 'required',
             'no_dokumen' => 'required|max:50',
             'keterangan' => 'required|max:200',                               
             'tanggal' => 'required',
@@ -237,7 +238,7 @@ class JurSesuaiController extends Controller
             ->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
-                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
+                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$request->periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
 
             $arrjurnal = $request->arrjurnal;
             if (count($arrjurnal) > 0){
