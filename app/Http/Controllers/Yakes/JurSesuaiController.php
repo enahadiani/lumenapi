@@ -34,7 +34,7 @@ class JurSesuaiController extends Controller
             $res = DB::connection($this->sql)->select("select * from ju_m where no_ju='".$request->no_bukti."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select("select b.kode_akun,b.nama as nama_akun, a.dc, a.keterangan, c.kode_pp,c.nama as nama_pp, d.kode_fs, d.nama as nama_fs
+            $res2 = DB::connection($this->sql)->select("select b.kode_akun,b.nama as nama_akun, a.dc, a.keterangan, a.nilai,  c.kode_pp,c.nama as nama_pp, d.kode_fs, d.nama as nama_fs
                                                        from gldt a 
                                                        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                                                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 
@@ -169,7 +169,7 @@ class JurSesuaiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
                                   
-            $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
@@ -202,6 +202,7 @@ class JurSesuaiController extends Controller
         $this->validate($request, [    
             'no_bukti' => 'required',        
             'tanggal' => 'required',
+            'periode' => 'required',
             'no_dokumen' => 'required|max:50',
             'keterangan' => 'required|max:200',                               
             'tanggal' => 'required',
@@ -237,13 +238,13 @@ class JurSesuaiController extends Controller
             ->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
-                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
+                                                      ('".$request->no_bukti."', '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$request->keterangan."', '".$request->kode_pp."', 'SESUAI', 'JS', '".$request->periode."', 'IDR', 1, ".floatval($request->nilai).", '".$nik."', '".$nik."', getdate(), '".$nik."', 'T', '-', '-', '-')");
 
             $arrjurnal = $request->arrjurnal;
             if (count($arrjurnal) > 0){
                 for ($i=0;$i <count($arrjurnal);$i++){                
                     $ins2[$i] = DB::connection($this->sql)->insert("insert into gldt(no_bukti, no_urut, kode_lokasi, no_dokumen, tanggal, kode_akun, dc, nilai, keterangan, kode_pp, kode_drk, kode_cust, kode_proyek, kode_task, kode_vendor, kode_lokarea, nik, modul, jenis, periode, kode_curr, kurs, nilai_curr, tgl_input, nik_user, kode_fs) values  
-                                                                   ('".$request->no_bukti."', ".floatval($arrjurnal[$i]['no_urut']).", '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$arrjurnal[$i]['kode_akun']."', '".$arrjurnal[$i]['dc']."', '".floatval($arrjurnal[$i]['nilai'])."', '".$arrjurnal[$i]['keterangan']."', '".$arrjurnal[$i]['kode_pp']."', '-', '-', '-', '-', '-', '-', '-', 'JS', 'JS', '".$periode."', 'IDR', 1, ".floatval($arrjurnal[$i]['nilai']).", getdate(), '".$nik."', '".$arrjurnal[$i]['kode_fs']."')");                    
+                                                                   ('".$request->no_bukti."', ".floatval($arrjurnal[$i]['no_urut']).", '".$kode_lokasi."', '".$request->no_dokumen."', '".$request->tanggal."', '".$arrjurnal[$i]['kode_akun']."', '".$arrjurnal[$i]['dc']."', '".floatval($arrjurnal[$i]['nilai'])."', '".$arrjurnal[$i]['keterangan']."', '".$arrjurnal[$i]['kode_pp']."', '-', '-', '-', '-', '-', '-', '-', 'JS', 'JS', '".$request->periode."', 'IDR', 1, ".floatval($arrjurnal[$i]['nilai']).", getdate(), '".$nik."', '".$arrjurnal[$i]['kode_fs']."')");                    
                 }						
             }		
 
