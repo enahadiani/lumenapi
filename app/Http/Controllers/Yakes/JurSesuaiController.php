@@ -203,8 +203,7 @@ class JurSesuaiController extends Controller
             'tanggal' => 'required',
             'periode' => 'required',
             'no_dokumen' => 'required|max:50',
-            'keterangan' => 'required|max:200',                               
-            'periode' => 'required',
+            'keterangan' => 'required|max:200',
             'kode_pp' => 'required',
             'nilai' => 'required|numeric',
 
