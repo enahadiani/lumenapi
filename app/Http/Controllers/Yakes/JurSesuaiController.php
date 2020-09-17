@@ -169,7 +169,7 @@ class JurSesuaiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
                                   
-            $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
 
             $ins = DB::connection($this->sql)->insert("insert into ju_m(no_ju, kode_lokasi, no_dokumen, tanggal, keterangan, kode_pp, modul, jenis, periode, kode_curr, kurs, nilai, nik_buat, nik_setuju, tgl_input, nik_user, posted, no_del, no_link, ref1) values 
