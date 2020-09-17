@@ -124,16 +124,19 @@ class JurSesuaiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $query = DB::connection($this->sql)->select("select max(periode) as periode_aktif from periode where kode_lokasi='".$kode_lokasi."' ");
-            $query = json_decode(json_encode($query),true);
-            $periodeAktif = $query[0]['periode_aktif'];
+            // $query = DB::connection($this->sql)->select("select max(periode) as periode_aktif from periode where kode_lokasi='".$kode_lokasi."' ");
+            // $query = json_decode(json_encode($query),true);
+            // $periodeAktif = $query[0]['periode_aktif'];
                     
-            if (intval(substr($periodeAktif,4,2)) > 12 ) {
-                $periode = substr($periodeAktif,2,2).substr($periodeAktif,5,2);
-            }
-            else {
-                $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
-            }
+            // if (intval(substr($periodeAktif,4,2)) > 12 ) {
+            //     $periode = substr($periodeAktif,2,2).substr($periodeAktif,5,2);
+            // }
+            // else {
+            //     $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
+            // }
+
+            $periode = app('App\Http\Controllers\FilterController')->getPerInput($request->tanggal);
+            $periode = substr($periode,2,2).substr($periode,5,2);
 
             $no_bukti = $this->generateKode("ju_m", "no_ju", $kode_lokasi."-JS".$periode.".", "0001");
             $res = $no_bukti;
