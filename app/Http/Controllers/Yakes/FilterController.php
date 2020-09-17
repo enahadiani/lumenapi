@@ -60,7 +60,7 @@ class FilterController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
 
-        $query = DB::connection($this->sql)->select("select max(periode) as periode_aktif from periode where kode_lokasi='".$kode_lokasi."' ");
+        $query = DB::connection($this->db)->select("select max(periode) as periode_aktif from periode where kode_lokasi='".$kode_lokasi."' ");
         $query = json_decode(json_encode($query),true);
         $periodeAktif = $query[0]['periode_aktif'];
                 
