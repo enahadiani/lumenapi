@@ -18,6 +18,7 @@ class FilterController extends Controller
     public $guard = 'yakes';
     public $db = 'dbsapkug';
 
+    
     public function getTglServer() {
         try {
             
@@ -46,6 +47,31 @@ class FilterController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }        
+    }
+
+    function getPerInput(Request $request)     
+    {
+        $this->validate($request, [
+            'tanggal' => 'required'
+        ]);
+
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+
+        $query = DB::connection($this->sql)->select("select max(periode) as periode_aktif from periode where kode_lokasi='".$kode_lokasi."' ");
+        $query = json_decode(json_encode($query),true);
+        $periodeAktif = $query[0]['periode_aktif'];
+                
+        if (intval(substr($periodeAktif,4,2)) > 12 ) {
+            $periode = $periodeAktif;
+        }
+        else {
+            $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
+        }
+
+        return $periode;
     }
 
     function getFilterPeriode(){

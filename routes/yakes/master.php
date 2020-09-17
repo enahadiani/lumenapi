@@ -19,6 +19,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //tanggal server
     $router->get('getTglServer','Yakes\FilterController@getTglServer');     
+    //periode input
+    $router->get('getPerInput','Yakes\FilterController@getPerInput');     
 
     //masakun    
     $router->get('listAkunAktif','Yakes\MasakunController@listAkunAktif');         
