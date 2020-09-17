@@ -147,7 +147,6 @@ class JurSesuaiController extends Controller
             'tanggal' => 'required',
             'no_dokumen' => 'required|max:50',
             'keterangan' => 'required|max:200',                               
-            'tanggal' => 'required',
             'kode_pp' => 'required',
             'nilai' => 'required|numeric',
 
@@ -205,7 +204,7 @@ class JurSesuaiController extends Controller
             'periode' => 'required',
             'no_dokumen' => 'required|max:50',
             'keterangan' => 'required|max:200',                               
-            'tanggal' => 'required',
+            'periode' => 'required',
             'kode_pp' => 'required',
             'nilai' => 'required|numeric',
 
