@@ -68,7 +68,7 @@ class FilterController extends Controller
             $periode = $periodeAktif;
         }
         else {
-            $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
         }
 
         return $periode;

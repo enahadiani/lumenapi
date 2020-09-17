@@ -129,7 +129,7 @@ class JurSesuaiController extends Controller
             $periodeAktif = $query[0]['periode_aktif'];
                     
             if (intval(substr($periodeAktif,4,2)) > 12 ) {
-                $periode = $periodeAktif;
+                $periode = substr($periodeAktif,2,2).substr($periodeAktif,5,2);
             }
             else {
                 $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
