@@ -185,6 +185,7 @@ class JurSesuaiController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Jurnal berhasil disimpan";
+            $success['no_bukti'] = $no_bukti;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
