@@ -401,4 +401,36 @@ class AdminTarbakController extends Controller
         }
     }
 
+    public function getDaftarPP(Request $request)
+    {
+        $this->validate($request,[
+            'nik' => 'required'
+        ]);
+        try {
+            
+            $res = DB::connection('sqlsrvtarbak')->select("SELECT a.kode_pp,a.nama from pp a left join sis_hakakses b on a.kode_pp = b.kode_pp where a.kode_lokasi = '01' and b.nik='$request->nik' order by a.kode_pp
+            ");
+            $res = json_decode(json_encode($res),true);
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['pp'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['pp'] = [];
+                $success['status'] = true;
+            }    
+            
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+        
+    }
+
+
 }

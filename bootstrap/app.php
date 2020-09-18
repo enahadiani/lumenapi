@@ -252,7 +252,7 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/mobile_sekolah'
+    'prefix' => 'api/mobile-sekolah'
 ], function ($router) {
     require __DIR__.'/../routes/mobilesekolah.php';
 });
