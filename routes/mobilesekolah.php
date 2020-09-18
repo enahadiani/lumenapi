@@ -19,6 +19,9 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login-siswa', 'AuthController@loginSiswa');
     $router->get('hash-pass-siswa', 'AuthController@hashPasswordSiswa');
     $router->get('daftar-pp', 'AdminTarbakController@getDaftarPP');
+    $router->get('hash-pass-bynik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');
+    $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}','AuthController@hashPasswordCostum');
+    
 });
 
 $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
