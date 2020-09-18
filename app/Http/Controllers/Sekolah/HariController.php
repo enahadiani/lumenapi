@@ -35,11 +35,15 @@ class HariController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
             if(isset($request->kode_pp)){
                 $filter = "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_hari, a.nama,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_hari a
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_hari, a.nama,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp from sis_hari a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);
             
