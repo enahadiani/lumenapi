@@ -51,7 +51,8 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select * from sis_nilai_m a where a.kode_lokasi='".$kode_lokasi."' $filter");
+            $res = DB::connection('sqlsrvtarbak')->select("select 
+            a.no_bukti.a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  from sis_nilai_m a where a.kode_lokasi='".$kode_lokasi."' $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

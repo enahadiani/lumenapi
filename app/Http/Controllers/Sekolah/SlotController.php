@@ -41,7 +41,7 @@ class SlotController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot, a.nama,a.kode_pp+'-'+b.nama as pp 
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  
             from sis_slot a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."'  $filter ");
             $res = json_decode(json_encode($res),true);
             

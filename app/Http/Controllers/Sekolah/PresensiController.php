@@ -37,7 +37,7 @@ class PresensiController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kelas, a.kode_ta, b.nama,a.tanggal from sis_presensi a inner join sis_kelas b on a.kode_kelas=b.kode_kelas where a.jenis_absen='HARIAN' and a.kode_lokasi='".$kode_lokasi."' $filter group by a.kode_kelas,b.nama,a.kode_ta,a.tanggal");
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kelas, a.kode_ta, b.nama,a.tanggal,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_presensi a inner join sis_kelas b on a.kode_kelas=b.kode_kelas where a.jenis_absen='HARIAN' and a.kode_lokasi='".$kode_lokasi."' $filter group by a.kode_kelas,b.nama,a.kode_ta,a.tanggal");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

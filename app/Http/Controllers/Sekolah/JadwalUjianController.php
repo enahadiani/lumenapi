@@ -30,7 +30,7 @@ class JadwalUjianController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.tanggal,a.jam,a.kode_matpel,b.nama,a.kode_tingkat,a.kode_jenis,a.kode_ta,a.kode_sem from sis_jadwal_ujian a 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.tanggal,a.jam,a.kode_matpel,b.nama,a.kode_tingkat,a.kode_jenis,a.kode_ta,a.kode_sem,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  from sis_jadwal_ujian a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel  
             where a.kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);

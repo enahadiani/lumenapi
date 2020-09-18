@@ -41,7 +41,7 @@ class StatusGuruController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_status, a.nama, a.flag_aktif,a.kode_pp+'-'+b.nama as pp 
+            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_status, a.nama, a.flag_aktif,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  
             from sis_guru_status a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi  
             where a.kode_lokasi='".$kode_lokasi."' $filter ");

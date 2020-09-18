@@ -37,7 +37,7 @@ class SiswaController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
                                                             from sis_siswa a 
                                                             where a.kode_lokasi='$kode_lokasi' $filter
                                                             order by a.nis ");

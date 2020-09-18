@@ -30,7 +30,7 @@ class GuruMatpelController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp from sis_guru_matpel b inner join karyawan a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp  
+            $res = DB::connection('sqlsrvtarbak')->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_guru_matpel b inner join karyawan a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp  
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             

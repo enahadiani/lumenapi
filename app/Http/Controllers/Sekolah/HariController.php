@@ -36,11 +36,11 @@ class HariController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if(isset($request->kode_pp)){
-                $filter = "and kode_pp='$request->kode_pp' ";
+                $filter = "and a.kode_pp='$request->kode_pp' ";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_hari, nama,kode_pp from sis_hari
-            where kode_lokasi='$kode_lokasi' $filter");
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_hari, a.nama,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_hari a
+            where a.kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
