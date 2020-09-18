@@ -28,6 +28,17 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('cek_payload', 'AdminTarbakController@cekPayload');
 
     $router->get('menu/{kode_klp}', 'Sekolah\MenuController@show');
+    
+    $router->post('update-password', 'AdminTarbakController@updatePassword');
+    $router->post('update-foto', 'AdminTarbakController@updatePhoto');
+    $router->post('update-background', 'AdminTarbakController@updateBackground');
+    
+    $router->post('notif-pusher', 'Sekolah\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Sekolah\NotifController@getNotifPusher');
+    $router->put('notif-update-status', 'Sekolah\NotifController@updateStatusRead');
+
+    $router->post('search-form', 'AdminTarbakController@searchForm');
+    $router->get('search-form-list', 'AdminTarbakController@searchFormList');
 
     //Tahun Ajaran
     $router->get('pp','Sekolah\TahunAjaranController@getPP');
