@@ -34,7 +34,7 @@ class JadwalHarianController extends Controller
             from sis_jadwal a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter
-            group by a.kode_ta,a.kode_matpel,a.nik,a.kode_kelas,a.kode_pp+'-'+b.nama 
+            group by a.kode_ta,a.kode_matpel,a.nik,a.kode_kelas,a.kode_pp+'-'+b.nama,a.tgl_input 
             ");
             $res = json_decode(json_encode($res),true);
             
