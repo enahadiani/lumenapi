@@ -269,7 +269,7 @@ class TahunAjaranController extends Controller
         }	
     }
 
-    public function getPP()
+    public function getPP(Request $request)
     {
         try {
             
@@ -279,7 +279,19 @@ class TahunAjaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_pp,nama from pp where kode_lokasi='".$kode_lokasi."' 	 
+            if(isset($request->kode_pp)){
+                if($request->kode_pp != "" ){
+
+                    $filter = " and kode_pp='$request->kode_pp' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_pp,nama from pp where kode_lokasi='".$kode_lokasi."' $filter	 
             ");
             $res = json_decode(json_encode($res),true);
             
