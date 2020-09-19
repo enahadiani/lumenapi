@@ -1398,4 +1398,138 @@ class AsetController extends Controller
         }				 
     }
 
+    public function uploadDokGedung(Request $request){
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'nama_file.*'=>'required',
+            'file_gambar.*' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
+        ]);
+
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //         from karyawan a
+            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_pp = $get[0]['kode_pp'];
+            // }else{
+            //     $kode_pp = "-";
+            // }
+            $no_bukti = $request->no_bukti;
+
+            $arr_foto = array();
+            $arr_nama = array();
+            $i=0;
+            if($request->hasfile('file_gambar'))
+            {
+                foreach($request->file('file_gambar') as $file)
+                {                
+                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('aset/'.$foto)){
+                        Storage::disk('s3')->delete('aset/'.$foto);
+                    }
+                    Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
+                    $arr_foto[] = $foto;
+                    $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                    $i++;
+                }
+            }
+    
+            if(count($arr_nama) > 0){
+                $cek = DB::connection('sqlsrv2')->select("
+                select no_bukti,count(file_dok) as nomor
+                from amu_gedung_dok 
+                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
+                group by no_bukti");
+                $cek = json_decode(json_encode($cek),true);
+                if(count($cek) > 0){
+                    $no = $cek[0]['nomor'];
+                }else{
+                    $no = 0;
+                }
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_gedung_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],NULL]); 
+                    $no++;
+                }
+                $success['status'] = true;
+                $success['message'] = "Upload Gambar berhasil disimpan";
+            }else{
+                
+                $success['status'] = false;
+                $success['message'] = "Upload Gambar gagal disimpan";
+            }
+
+            $success['arr_nama'] = $arr_nama;
+            $success['count file'] = count($arr_foto);
+            DB::connection('sqlsrv2')->commit();
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Upload Gambar gagal disimpan. ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function hapusDokGedung($no_bukti,$no_urut){
+        DB::connection('sqlsrv2')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('admin')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //         from karyawan a
+            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_pp = $get[0]['kode_pp'];
+            // }else{
+            //     $kode_pp = "-";
+            // }
+
+            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+                    from amu_gedung_dok a
+                    where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $file = $cek[0]['file_dok'];
+            }else{
+                $file = "";
+            }
+
+            $del = DB::connection('sqlsrv2')->table('amu_gedung_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti) 
+            ->where('no_urut', $no_urut)
+            ->delete();
+            // ->where('kode_pp', $kode_pp)
+
+            if($file != ""){
+                Storage::disk('s3')->delete('aset/'.$file);
+            }
+            DB::connection('sqlsrv2')->commit();
+            $success['status'] = true;
+            $success['message'] = "Delete dokumen berhasil disimpan";
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Delete dokumen gagal disimpan. ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				 
+    }
+
 }

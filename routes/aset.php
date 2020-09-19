@@ -66,9 +66,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('upload-dok','Aset\AsetController@uploadDok');
     $router->delete('delete-dok/{no_bukti}/{no_urut}','Aset\AsetController@hapusDok');
     $router->delete('delete-dok-lahan/{no_bukti}/{no_urut}','Aset\AsetController@hapusDokLahan');
+    $router->delete('delete-dok-gedung/{no_bukti}/{no_urut}','Aset\AsetController@hapusDokGedung');
     $router->post('upload-dok-single','Aset\AsetController@uploadDokSingle');
     $router->get('aset-detail-upload','Aset\AsetController@getDetailUpload');
     $router->post('upload-dok-lahan','Aset\AsetController@uploadDokLahan');
+    $router->post('upload-dok-gedung','Aset\AsetController@uploadDokGedung');
 
     $router->get('user_device','UserDeviceController@index');
     $router->get('user_device/{nik}','UserDeviceController@show');
