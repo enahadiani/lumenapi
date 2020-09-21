@@ -950,7 +950,7 @@ class MobileController extends Controller
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='UAS'
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='ASS'
            ");
             $res = json_decode(json_encode($res),true);
 
@@ -958,13 +958,22 @@ class MobileController extends Controller
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='UTS'
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='KUI'
             ");
             $res2 = json_decode(json_encode($res2),true);
+
+            $res3 = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
+            from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and b.nis='$nik' and a.kode_jenis='NIA'
+            ");
+            $res3 = json_decode(json_encode($res3),true);
             
             $success['status'] = true;
-            $success['UAS'] = $res;
-            $success['UTS'] = $res2;
+            $success['ASS'] = $res;
+            $success['KUI'] = $res2;
+            $success['NIA'] = $res3;
             $success['message'] = "Success!";     
             
             return response()->json($success, $this->successStatus);
