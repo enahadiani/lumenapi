@@ -89,10 +89,10 @@ class SiswaController extends Controller
             'kode_akt' => 'required',
             'id_bank' => 'required',
             'tgl_lulus' => 'required',
-            'kode_param.*' => 'required',
-            'per_awal.*' => 'required',
-            'per_akhir.*' => 'required',
-            'tarif.*' => 'required'
+            'kode_param' => 'required|array',
+            'per_awal' => 'required|array',
+            'per_akhir' => 'required|array',
+            'tarif' => 'required|array'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -149,10 +149,10 @@ class SiswaController extends Controller
             'kode_akt' => 'required',
             'id_bank' => 'required',
             'tgl_lulus' => 'required',
-            'kode_param.*' => 'required',
-            'per_awal.*' => 'required',
-            'per_akhir.*' => 'required',
-            'tarif.*' => 'required'
+            'kode_param' => 'required|array',
+            'per_awal' => 'required|array',
+            'per_akhir' => 'required|array',
+            'tarif' => 'required|array'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -219,10 +219,7 @@ class SiswaController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'kode_ta' => 'required',
-            'kode_matpel' => 'required',
-            'nik_guru' => 'required',
-            'kode_kelas' => 'required'
+            'nis' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
