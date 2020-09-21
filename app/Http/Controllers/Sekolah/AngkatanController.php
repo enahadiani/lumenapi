@@ -263,7 +263,7 @@ class AngkatanController extends Controller
         }	
     }
 
-    public function getTingkat()
+    public function getTingkat(Request $request)
     {
         try {
             
@@ -273,7 +273,19 @@ class AngkatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_tingkat,nama from sis_tingkat where kode_lokasi='".$kode_lokasi."' 	 
+            // if(isset($request->kode_pp) && $request->kode_pp != ""){
+            //     $filter = " and kode_pp='$request->kode_pp' ";
+            // }else{
+            //     $filter = "";
+            // }
+            
+            if(isset($request->kode_tingkat) && $request->kode_tingkat != ""){
+                $filter = " and kode_tingkat='$request->kode_tingkat' ";
+            }else{
+                $filter = "";
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_tingkat,nama from sis_tingkat where kode_lokasi='".$kode_lokasi."' $filter	 
             ");
             $res = json_decode(json_encode($res),true);
             

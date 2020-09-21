@@ -345,11 +345,10 @@ class SiswaController extends Controller
         
     }
 
-    public function getJurusanTingkat(Request $request)
+    public function getPeriodeParam(Request $request)
     {
         $this->validate($request, [
-            'kode_pp' => 'required',
-            'kode_kelas' => 'required'
+            'kode_pp' => 'required'
         ]);
         try {
             
@@ -358,19 +357,19 @@ class SiswaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_tingkat,kode_jur from sis_kelas where kode_kelas='".$kode_kelas."' and kode_lokasi='".$kode_lokasi."'");
-            $res = json_decode(json_encode($res),true);
-
+            $res = DB::connection('sqlsrvtarbak')->select("select substring(convert(varchar,tgl_mulai,112),1,6) as bulanawal, substring(convert(varchar,tgl_akhir,112),1,6) as bulanakhir from sis_ta 
+            where flag_aktif ='1' and kode_pp='".$request->kode_pp."' and kode_lokasi='".$kode_lokasi."' ");
             if (count($res) > 0){
-                $success['message'] = "Success!";
-                $success['data'] = $res;
-                $success['status'] = true;
-            } 
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = true;
+                $success['periodeAwal']= $res[0]->bulanawal;
+                $success['periodeAkhir'] = $res[0]->bulanakhir;
+            }else{
+                $success['periodeAwal']= "";
+                $success['periodeAkhir'] = "";
             }
+
+            $success['message'] = "Success!";
+            $success['status'] = true;
+
             return response()->json(['success'=>$success], $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -379,5 +378,4 @@ class SiswaController extends Controller
         }
         
     }
-
 }

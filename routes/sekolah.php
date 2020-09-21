@@ -152,7 +152,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('siswa_all','Sekolah\SiswaController@index');
     $router->get('siswa','Sekolah\SiswaController@show');
     $router->get('siswa_param','Sekolah\SiswaController@getParam');
-    $router->get('siswa_jurusan','Sekolah\SiswaController@getJurusanTingkat');
+    $router->get('siswa_periode','Sekolah\SiswaController@getPeriodeParam');
     $router->post('siswa','Sekolah\SiswaController@store');
     $router->put('siswa','Sekolah\SiswaController@update');
     $router->delete('siswa','Sekolah\SiswaController@destroy');
