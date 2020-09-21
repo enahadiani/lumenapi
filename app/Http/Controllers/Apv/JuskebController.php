@@ -245,6 +245,7 @@ class JuskebController extends Controller
             'waktu' => 'required',
             'kegiatan' => 'required|max:300',
             'dasar' => 'required|max:500',
+            'pemakai' => 'required',
             'total_barang' => 'required',
             'barang'=> 'required|array|max:150',
             'barang_klp'=> 'required|array|max:30',
@@ -299,7 +300,7 @@ class JuskebController extends Controller
                     $kode_divisi = '-';
                 }
 
-                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota,$kode_divisi,$request->nik_ver]);
+                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver,pemakai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tanggal'),'A',$request->kode_kota,$kode_divisi,$request->nik_ver,$request->pemakai]);
     
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
