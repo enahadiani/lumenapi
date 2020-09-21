@@ -37,7 +37,7 @@ class SiswaController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
                                                             from sis_siswa a 
                                                             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                                                             where a.kode_lokasi='$kode_lokasi' $filter
@@ -89,10 +89,10 @@ class SiswaController extends Controller
             'kode_akt' => 'required',
             'id_bank' => 'required',
             'tgl_lulus' => 'required',
-            'kode_param' => 'required|array',
-            'per_awal' => 'required|array',
-            'per_akhir' => 'required|array',
-            'tarif' => 'required|array'
+            'kode_param' => 'array',
+            'per_awal' => 'array',
+            'per_akhir' => 'array',
+            'tarif' => 'array'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -112,12 +112,12 @@ class SiswaController extends Controller
             }
             else {
                 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($request->nis,$kode_lokasi,$request->nama,$request->flag_aktif,$request->kode_kelas,$request->kode_pp,$request->kode_akt,$request->id_bank,$request->tgl_lulus));
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus,tgl_input) values ('$request->nis','$kode_lokasi','$request->nama','$request->flag_aktif','$request->kode_kelas','$request->kode_pp','$request->kode_akt','$request->id_bank','$request->tgl_lulus',getdate())");
                 
                 if (count($request->kode_param) > 0){
                     for ($i=0;$i < count($request->kode_param);$i++){		
                         if ($request->tarif[$i] > 0) {	
-                            $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($request->nis,$request->kode_kelas,$request->kode_param[$i],$request->per_awal[$i],$request->per_akhir[$i],$request->tarif[$i],$kode_lokasi,$request->kode_pp,$request->kode_akt));		
+                            $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values ('".$request->nis."','".$request->kode_kelas."','".$request->kode_param[$i]."','".$request->per_awal[$i]."','".$request->per_akhir[$i]."','".$request->tarif[$i]."','".$kode_lokasi."','".$request->kode_pp."','".$request->kode_akt."')");		
                         }
                     }				
                 }
@@ -127,7 +127,7 @@ class SiswaController extends Controller
                 $sts = true;	
                 
             }			
-
+            $success['nis'] = $request->nis;
             $success['status'] = $sts;
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus);     
@@ -149,10 +149,10 @@ class SiswaController extends Controller
             'kode_akt' => 'required',
             'id_bank' => 'required',
             'tgl_lulus' => 'required',
-            'kode_param' => 'required|array',
-            'per_awal' => 'required|array',
-            'per_akhir' => 'required|array',
-            'tarif' => 'required|array'
+            'kode_param' => 'array',
+            'per_awal' => 'array',
+            'per_akhir' => 'array',
+            'tarif' => 'array'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -183,12 +183,12 @@ class SiswaController extends Controller
                 ->where('nis', $request->nis)
                 ->delete();
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($request->nis,$kode_lokasi,$request->nama,$request->flag_aktif,$request->kode_kelas,$request->kode_pp,$request->kode_akt,$request->id_bank,$request->tgl_lulus));
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus,tgl_input) values ('$request->nis','$kode_lokasi','$request->nama','$request->flag_aktif','$request->kode_kelas','$request->kode_pp','$request->kode_akt','$request->id_bank','$request->tgl_lulus',getdate())");
                 
                 if (count($request->kode_param) > 0){
                     for ($i=0;$i < count($request->kode_param);$i++){		
                         if ($request->tarif[$i] > 0) {	
-                            $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($request->nis,$request->kode_kelas,$request->kode_param[$i],$request->per_awal[$i],$request->per_akhir[$i],$request->tarif[$i],$kode_lokasi,$request->kode_pp,$request->kode_akt));		
+                            $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values ('".$request->nis."','".$request->kode_kelas."','".$request->kode_param[$i]."','".$request->per_awal[$i]."','".$request->per_akhir[$i]."','".$request->tarif[$i]."','".$kode_lokasi."','".$request->kode_pp."','".$request->kode_akt."')");		
                         }
                     }				
                 }
@@ -198,7 +198,8 @@ class SiswaController extends Controller
                 $sts = true;	
                 
             }			
-
+            
+            $success['nis'] = $request->nis;
             $success['status'] = $sts;
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus);     
@@ -317,12 +318,18 @@ class SiswaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if(isset($request->kode_param) && $request->kode_param != ""){
+                $filter = " and a.kode_param = '$request->kode_param' ";
+            }else{
+                $filter = "";
+            }
+
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_param,a.nama,isnull(b.tarif ,0) as tarif,isnull(b.bulan1 ,'-') as per_awal, isnull(b.bulan2 ,'-') as per_akhir 
             from sis_param a 
             left join sis_param_tarif b on a.kode_param=b.kode_param and a.kode_lokasi=b.kode_lokasi 
                     and b.kode_akt='".$request->kode_akt."' and b.kode_jur='".$request->kode_jur."' 		
                     and b.kode_tingkat='".$request->kode_tingkat."' and b.kode_pp='".$request->kode_pp."' 
-            where a.kode_lokasi = '".$kode_lokasi."' and b.tarif <> 0  
+            where a.kode_lokasi = '".$kode_lokasi."' and b.tarif <> 0  $filter
             order by a.idx ");
             $res = json_decode(json_encode($res),true);
 
