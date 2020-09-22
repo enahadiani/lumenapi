@@ -15,7 +15,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginTarbak');
     $router->get('hash-pass', 'AuthController@hashPasswordTarbak');
-    $router->get('hash-pass-costum/{db}/{table}/{top}/{kode-pp}', 'AuthController@hashPasswordCostum');
+    $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     
 });
@@ -27,7 +27,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('users', 'AdminTarbakController@allUsers');
     $router->get('cek-payload', 'AdminTarbakController@cekPayload');
 
-    $router->get('menu/{kode-klp}', 'Sekolah\MenuController@show');
+    $router->get('menu/{kode_klp}', 'Sekolah\MenuController@show');
     
     $router->post('update-password', 'AdminTarbakController@updatePassword');
     $router->post('update-foto', 'AdminTarbakController@updatePhoto');
