@@ -473,7 +473,7 @@ class PenilaianController extends Controller
             'no_bukti' => 'required',
             'kode_pp' => 'required'
         ]);
-        
+
         $nik_user = $request->nik_user;
         $no_bukti = $request->no_bukti;
         $kode_pp = $request->kode_pp;
@@ -507,6 +507,43 @@ class PenilaianController extends Controller
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function getPenilaianKe(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required',
+            'kode_ta' => 'required',
+            'kode_sem' => 'required',
+            'kode_kelas' => 'required',
+            'kode_matpel' => 'required',
+            'kode_jenis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$kode_pp."' ");
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['jumlah'] = $res[0]->jumlah;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Success!";
+                $success['jumlah'] = 0;
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
 }

@@ -24,7 +24,7 @@ class NilaiExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return JurnalTmp::select('nis','nilai','status','keterangan','nu')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->where('kode_pp', $this->kode_pp)->where('no_bukti', $this->no_bukti)->orderBy('nu')->get();
+        return NilaiTmp::select('nis','nilai','status','keterangan','nu')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->where('kode_pp', $this->kode_pp)->where('no_bukti', $this->no_bukti)->orderBy('nu')->get();
     }
 
     public function headings(): array
