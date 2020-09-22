@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\NilaiExport;
+use App\Imports\NilaiImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage; 
+use App\NilaiTmp;
 
 class PenilaianController extends Controller
 {
@@ -113,7 +118,9 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if(count($request->nis) > 0){
-                $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-BNSIS.", "0001");
+                
+                $per = date('ym');
+                $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
                 $strSQL = "select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_pp='$request->kode_pp'";	
                 $res = DB::connection('sqlsrvtarbak')->select($strSQL);
                 $res = json_decode(json_encode($res),true);
@@ -363,6 +370,143 @@ class PenilaianController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
+    }
+
+    public function importExcel(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xls,xlsx',
+            'nik_user' => 'required',
+            'kode_pp' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $del1 = DB::connection($this->db)->table('sis_nilai_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->where('kode_pp', $request->kode_pp)->delete();
+
+            $per = date('ym');
+
+            $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
+
+            // menangkap file excel
+            $file = $request->file('file');
+    
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
+
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $dt = Excel::toArray(new NilaiImport($request->nik_user,$kode_lokasi,$request->kode_pp,$no_bukti),$nama_file);
+            $excel = $dt[0];
+            $x = array();
+            $status_validate = true;
+            $no=1;
+            foreach($excel as $row){
+                if($row[0] != ""){
+                    $ket = $this->validateNIS($row[0],$kode_lokasi,$request->kode_pp);
+                    if($ket != ""){
+                        $sts = 0;
+                        $status_validate = false;
+                    }else{
+                        $sts = 1;
+                    }
+                    $x[] = NilaiTmp::create([
+                        'no_bukti' => $request->no_bukti,
+                        'nis' => strval($row[0]),
+                        'nilai' => floatval($row[1]),
+                        'kode_pp' => $request->kode_pp,
+                        'kode_lokasi' => $kode_lokasi,
+                        'nik_user' => $request->nik_user,
+                        'status' => $sts,
+                        'keterangan' => $ket,
+                        'nu' => $no
+                    ]);
+                    $no++;
+                }
+            }
+            
+            DB::connection($this->db)->commit();
+            Storage::disk('local')->delete($nama_file);
+            if($status_validate){
+                $msg = "File berhasil diupload!";
+            }else{
+                $msg = "Ada error!";
+            }
+            
+            $success['status'] = true;
+            $success['validate'] = $status_validate;
+            $success['message'] = $msg;
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function export(Request $request) 
+    {
+        $this->validate($request, [
+            'nik_user' => 'required',
+            'kode_lokasi' => 'required'
+        ]);
+
+        $nik_user = $request->nik_user;
+        $kode_lokasi = $request->kode_lokasi;
+        $nik = $request->nik;
+        date_default_timezone_set("Asia/Bangkok");
+        return Excel::download(new NilaiExport($nik_user,$kode_lokasi), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+    }
+
+    public function getNilaiTmp(Request $request)
+    {
+        
+        $this->validate($request, [
+            'nik_user' => 'required',
+            'no_bukti' => 'required',
+            'kode_pp' => 'required'
+        ]);
+        
+        $nik_user = $request->nik_user;
+        $no_bukti = $request->no_bukti;
+        $kode_pp = $request->kode_pp;
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.nis,b.nama,a.nilai
+            from jurnal_tmp a
+            inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.no_bukti='".$no_bukti."' order by a.nu");
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['detail'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['detail'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 
 }

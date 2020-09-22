@@ -61,6 +61,15 @@ $router->get('pusher/{title}/{message}/{id}', function ($title,$message,$id) {
     return "Event has been sent!";
 });
 
+
+$router->post('validasi-file', function (Request $request) {
+    $this->validate($request,[
+        'word' => 'required|mimetypes:application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'excel' => 'required|mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'pdf' => 'required|mimetypes:application/pdf',
+        'file' => 'required|mimes:docx,doc,xls,xlsx,pdf'
+    ]);
+});
 $router->post('import-csv', function (Request $request) {
    
     if($request->hasfile('file')){
