@@ -40,6 +40,12 @@ class TahunAjaranController extends Controller
             }else{
                 $filter = "";
             }
+
+            if(isset($request->flag_aktif)){
+                $filter .= "and a.flag_aktif='$request->flag_aktif' ";
+            }else{
+                $filter .= "";
+            }
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_pp+'-'+b.nama as pp,a.nama,convert (varchar, a.tgl_mulai,103) as tgl_mulai,convert (varchar, a.tgl_akhir,103) as tgl_akhir, case when a.flag_aktif='1' then 'AKTIF' else 'NONAKTIF' end as sts,tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
             from sis_ta a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
