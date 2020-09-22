@@ -372,6 +372,21 @@ class PenilaianController extends Controller
         }
     }
 
+    public function validateNIS($nis,$kode_lokasi,$kode_pp){
+        $keterangan = "";
+        $auth = DB::connection('sqlsrvtarbak')->select("select nis from sis_siswa where nis='$nis' and kode_lokasi='$kode_lokasi' and kode_pp = '$kode_pp'
+        ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "NIS $nis tidak valid. ";
+        }
+
+        return $keterangan;
+
+    }
+
     public function importExcel(Request $request)
     {
         $this->validate($request, [
@@ -380,15 +395,15 @@ class PenilaianController extends Controller
             'kode_pp' => 'required'
         ]);
 
-        DB::connection($this->db)->beginTransaction();
+        DB::connection('sqlsrvtarbak')->beginTransaction();
         try {
             
-            if($data =  Auth::guard($this->guard)->user()){
+            if($data =  Auth::guard('tarbak')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->db)->table('sis_nilai_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->where('kode_pp', $request->kode_pp)->delete();
+            $del1 = DB::connection('sqlsrvtarbak')->table('sis_nilai_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->where('kode_pp', $request->kode_pp)->delete();
 
             $per = date('ym');
 
@@ -401,7 +416,7 @@ class PenilaianController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $dt = Excel::toArray(new NilaiImport($request->nik_user,$kode_lokasi,$request->kode_pp,$no_bukti),$nama_file);
+            $dt = Excel::toArray(new NilaiImport(),$nama_file);
             $excel = $dt[0];
             $x = array();
             $status_validate = true;
@@ -416,9 +431,9 @@ class PenilaianController extends Controller
                         $sts = 1;
                     }
                     $x[] = NilaiTmp::create([
-                        'no_bukti' => $request->no_bukti,
+                        'no_bukti' => '-',
                         'nis' => strval($row[0]),
-                        'nilai' => floatval($row[1]),
+                        'nilai' => floatval($row[2]),
                         'kode_pp' => $request->kode_pp,
                         'kode_lokasi' => $kode_lokasi,
                         'nik_user' => $request->nik_user,
@@ -430,7 +445,7 @@ class PenilaianController extends Controller
                 }
             }
             
-            DB::connection($this->db)->commit();
+            DB::connection('sqlsrvtarbak')->commit();
             Storage::disk('local')->delete($nama_file);
             if($status_validate){
                 $msg = "File berhasil diupload!";
@@ -443,7 +458,7 @@ class PenilaianController extends Controller
             $success['message'] = $msg;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
+            DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
@@ -455,14 +470,22 @@ class PenilaianController extends Controller
     {
         $this->validate($request, [
             'nik_user' => 'required',
-            'kode_lokasi' => 'required'
+            'kode_lokasi' => 'required',
+            'kode_pp' => 'required',
+            'nik' => 'required',
+            'type' => 'required'
         ]);
 
-        $nik_user = $request->nik_user;
-        $kode_lokasi = $request->kode_lokasi;
-        $nik = $request->nik;
         date_default_timezone_set("Asia/Bangkok");
-        return Excel::download(new NilaiExport($nik_user,$kode_lokasi), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+        $nik_user = $request->nik_user;
+        $nik = $request->nik;
+        $kode_lokasi = $request->kode_lokasi;
+        $kode_pp = $request->kode_pp;
+        if(isset($request->type) && $request->type == "template"){
+            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+        }else{
+            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+        }
     }
 
     public function getNilaiTmp(Request $request)
@@ -470,23 +493,21 @@ class PenilaianController extends Controller
         
         $this->validate($request, [
             'nik_user' => 'required',
-            'no_bukti' => 'required',
             'kode_pp' => 'required'
         ]);
 
         $nik_user = $request->nik_user;
-        $no_bukti = $request->no_bukti;
         $kode_pp = $request->kode_pp;
         try {
             
-            if($data =  Auth::guard($this->guard)->user()){
+            if($data =  Auth::guard('tarbak')->user()){
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.nis,b.nama,a.nilai
-            from jurnal_tmp a
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,b.nama,a.nilai
+            from sis_nilai_tmp a
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.no_bukti='".$no_bukti."' order by a.nu");
+            where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'  order by a.nu");
             $res= json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
