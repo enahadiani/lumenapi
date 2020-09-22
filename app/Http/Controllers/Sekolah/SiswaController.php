@@ -272,7 +272,17 @@ class SiswaController extends Controller
             $kode_pp= $request->kode_pp;
             $nis= $request->nis;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select * from sis_siswa where nis='".$nis."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$kode_pp."'");
+            $res = DB::connection('sqlsrvtarbak')->select(" select a.nis,a.id_bank,a.nama,a.kode_pp,b.nama as nama_pp,a.kode_akt,c.nama as nama_akt,a.kode_kelas,d.nama as nama_kelas
+            ,d.kode_jur,e.nama as nama_jur,d.kode_tingkat, f.nama as nama_tingkat
+            ,a.flag_aktif,g.nama as nama_status,a.tgl_lulus
+            from sis_siswa a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_angkat c on a.kode_akt=c.kode_akt and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            inner join sis_jur e on d.kode_jur=e.kode_jur and d.kode_lokasi=e.kode_lokasi and d.kode_pp=e.kode_pp
+            inner join sis_tingkat f on d.kode_tingkat=f.kode_tingkat and d.kode_lokasi=f.kode_lokasi 
+            inner join sis_siswa_status g on a.flag_aktif=g.kode_ss and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+            where a.nis='".$nis."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'");
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_param,a.nama,isnull(b.tarif ,0) as tarif,isnull(b.per_awal ,'-') as per_awal, isnull(b.per_akhir ,'-') as per_akhir 
