@@ -192,5 +192,6 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('nilai-tmp','Sekolah\PenilaianController@getNilaiTmp');
     $router->get('penilaian-dok','Sekolah\PenilaianController@showDokUpload');
     $router->post('penilaian-dok','Sekolah\PenilaianController@storeDokumen');
+    $router->delete('penilaian-dok','Sekolah\PenilaianController@deleteDokumen');
     
 });
