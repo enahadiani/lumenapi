@@ -141,6 +141,7 @@ class LaporanController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['sql'] = $sql;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
