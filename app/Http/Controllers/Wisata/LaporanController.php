@@ -17,8 +17,8 @@ class LaporanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'tokoaws';
-    public $sql = 'toko';
+    public $guard = 'toko';
+    public $sql = 'tokoaws';
 
     function getReportBidang(Request $request){
         try {
