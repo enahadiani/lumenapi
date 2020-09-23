@@ -721,7 +721,7 @@ class PenilaianController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.nis,c.nama,c.file_dok,case isnull(c.file_dok,'-') when '-' then isnull(c.file_dok,'-') else  '".config('api.url')."sekolah/storage/'+isnull(c.file_dok,'-') end as fileaddres,b.nama as nama_siswa
+            $sql2="select a.no_bukti,a.nis,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
             from sis_nilai a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -749,5 +749,89 @@ class PenilaianController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function storeDokumen(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required|max:10',
+            'no_bukti' => 'required|max:20'
+        ]);
+
+        DB::connection('sqlsrvtarbak')->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bukti = $request->no_bukti;
+            $kode_pp = $request->kode_pp;
+            $arr_foto = array();
+            $arr_nama = array();
+            $arr_nis = array();
+            $i=0;
+            $cek = $request->file;
+            //cek upload file tidak kosong
+            if(!empty($cek)){
+                
+                if(count($request->nama_file_seb) > 0){
+                    //looping berdasarkan nama dok
+                    for($i=0;$i<count($request->nama_file_seb);$i++){
+                        //cek row i ada file atau tidak
+                        if(isset($request->file('file')[$i])){
+                            $file = $request->file('file')[$i];
+                            //kalo ada cek nama sebelumnya ada atau -
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('sekolah/'.$request->nama_file_seb[$i]);
+                            }
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            if(Storage::disk('s3')->exists('sekolah/'.$foto)){
+                                Storage::disk('s3')->delete('sekolah/'.$foto);
+                            }
+                            Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                            $arr_nama[] = $request->input('nama_file')[$i];
+                            $arr_nis[] = $request->nis[$i];
+                        }else if($request->nama_file_seb[$i] != "-"){
+                            $arr_foto[] = $request->nama_file_seb[$i];
+                            $arr_nama[] = $request->input('nama_file')[$i];
+                            $arr_nis[] = $request->nis[$i];
+                        }     
+                    }
+                    
+                    $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                }
+
+                if(count($arr_nama) > 0){
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$kode_pp','".$arr_nis[$i]."') "); 
+                    }
+                    DB::connection('sqlsrvtarbak')->commit();
+                    $success['status'] = true;
+                    $success['message'] = "Data Dokumen berhasil diupload.";
+                    $success['no_bukti'] = $no_bukti;
+                    $success['nis'] = $request->nis;
+                }
+                else{
+                    $success['status'] = true;
+                    $success['message'] = "Data Dokumen berhasil gagal diupload. Dokumen file tidak valid. (2)";
+                    $success['no_bukti'] = $no_bukti;
+                }
+            }else{
+                $success['status'] = true;
+                $success['message'] = "Data Dokumen berhasil gagal diupload. Dokumen file tidak valid. (3)";
+                $success['no_bukti'] = $no_bukti;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvtarbak')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Dokumenn gagal diupload ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    }
+
 
 }

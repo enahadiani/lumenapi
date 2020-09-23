@@ -2,6 +2,8 @@
 namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; 
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
@@ -18,6 +20,16 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     
+});
+
+
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('sekolah/'.$filename)) {
+        $success['message'] = 'Dokumen tidak tersedia!';
+        $success['status'] = false;
+    }
+    return Storage::disk('s3')->response('sekolah/'.$filename); 
 });
 
 $router->get('penilaian-export','Sekolah\PenilaianController@export');
@@ -179,5 +191,6 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('import-excel','Sekolah\PenilaianController@importExcel');
     $router->get('nilai-tmp','Sekolah\PenilaianController@getNilaiTmp');
     $router->get('penilaian-dok','Sekolah\PenilaianController@showDokUpload');
+    $router->post('penilaian-dok','Sekolah\PenilaianController@storeDokumen');
     
 });
