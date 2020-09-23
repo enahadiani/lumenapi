@@ -57,8 +57,9 @@ class VerifikasiController extends Controller
 
             $kode_pp = $request->kode_pp;
 
-            $res = DB::connection($this->db)->select("select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota
+            $res = DB::connection($this->db)->select("select b.no_bukti,b.no_dokumen,b.kode_pp,b.waktu,b.kegiatan,b.dasar,b.nilai,b.kode_kota,p.nama as nama_pp
             from apv_juskeb_m b 
+            inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
             where b.kode_lokasi='$kode_lokasi' and b.progress in ('A','R') and b.nik_ver='$nik_user'
             ");
             $res = json_decode(json_encode($res),true);

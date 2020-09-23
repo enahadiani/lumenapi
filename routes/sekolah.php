@@ -20,6 +20,8 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     
 });
 
+$router->get('penilaian-export','Sekolah\PenilaianController@export');
+
 $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
 
     $router->get('profile', 'AdminTarbakController@profile');
@@ -174,5 +176,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->delete('penilaian','Sekolah\PenilaianController@destroy');
     $router->get('penilaian-ke','Sekolah\PenilaianController@getPenilaianKe');
     
-
+    $router->post('import-excel','Sekolah\PenilaianController@importExcel');
+    $router->get('nilai-tmp','Sekolah\PenilaianController@getNilaiTmp');
+    
 });
