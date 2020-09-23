@@ -692,4 +692,62 @@ class PenilaianController extends Controller
         }
     }
 
+    public function showDokUpload(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bukti = $request->no_bukti;
+            $kode_pp = $request->kode_pp;
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah
+            from sis_nilai_m a
+                inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+                left join sis_jenisnilai f on a.kode_jenis=f.kode_jenis and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+                left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+                left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m 
+                    where no_bukti <> '$no_bukti'
+                    group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi
+                    ) j on a.kode_ta=j.kode_ta and a.kode_lokasi=j.kode_lokasi and a.kode_pp=j.kode_pp and a.kode_jenis=j.kode_jenis and a.kode_sem=j.kode_sem and a.kode_matpel=j.kode_matpel and a.kode_kelas=j.kode_kelas
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
+            $res = json_decode(json_encode($res),true);
+
+            $sql2="select a.no_bukti,a.nis,c.nama,c.file_dok,case isnull(c.file_dok,'-') when '-' then isnull(c.file_dok,'-') else  '".config('api.url')."sekolah/storage/'+isnull(c.file_dok,'-') end as fileaddres,b.nama as nama_siswa
+            from sis_nilai a 
+            inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp' ";
+            $res2 = DB::connection('sqlsrvtarbak')->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = "SUCCESS";
+                $success['data'] = $res;
+                $success['data_dokumen'] = $res2;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['data_dokumen'] = [];
+                $success['status'] = "FAILED";
+                return response()->json($success, $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = "FAILED";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
