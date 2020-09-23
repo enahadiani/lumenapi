@@ -22,6 +22,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     
     $router->get('lap-bidang','Wisata\LaporanController@getReportBidang');
     $router->get('lap-mitra','Wisata\LaporanController@getReportMitra');
+    $router->get('lap-kunjungan','Wisata\LaporanController@getReportKunjungan');
 });
 
 
