@@ -496,9 +496,9 @@ class PenilaianController extends Controller
         }
     }
 
-    public function validateNIS($nis,$kode_lokasi,$kode_pp){
+    public function validateNIS($nis,$kode_lokasi,$kode_pp,$kode_kelas){
         $keterangan = "";
-        $auth = DB::connection('sqlsrvtarbak')->select("select nis from sis_siswa where nis='$nis' and kode_lokasi='$kode_lokasi' and kode_pp = '$kode_pp'
+        $auth = DB::connection('sqlsrvtarbak')->select("select nis from sis_siswa where nis='$nis' and kode_lokasi='$kode_lokasi' and kode_pp = '$kode_pp' and kode_kelas ='$kode_kelas'
         ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
@@ -516,7 +516,8 @@ class PenilaianController extends Controller
         $this->validate($request, [
             'file' => 'required|mimes:csv,xls,xlsx',
             'nik_user' => 'required',
-            'kode_pp' => 'required'
+            'kode_pp' => 'required',
+            'kode_kelas' => 'required'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -547,7 +548,7 @@ class PenilaianController extends Controller
             $no=1;
             foreach($excel as $row){
                 if($row[0] != ""){
-                    $ket = $this->validateNIS($row[0],$kode_lokasi,$request->kode_pp);
+                    $ket = $this->validateNIS($row[0],$kode_lokasi,$request->kode_pp,$request->kode_kelas);
                     if($ket != ""){
                         $sts = 0;
                         $status_validate = false;

@@ -58,7 +58,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting
             }
         }else{
             $res = DB::connection('sqlsrvtarbak')->table('sis_nilai_tmp')
-                        ->select('sis_nilai_tmp.nis','sis_siswa.nama','sis_nilai_tmp.nilai. sis_nilai_tmp.status','sis_nilai_tmp.keterangan','sis_nilai_tmp.nu')
+                        ->select('sis_nilai_tmp.nis','sis_siswa.nama','sis_nilai_tmp.nilai','sis_nilai_tmp.status','sis_nilai_tmp.keterangan','sis_nilai_tmp.nu')
                         ->leftJoin('sis_siswa', function($join)
                          {
                              $join->on('sis_nilai_tmp.nis', '=', 'sis_siswa.nis');
@@ -69,7 +69,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting
                         ->where('sis_nilai_tmp.nik_user',$this->nik_user)
                         ->where('sis_nilai_tmp.kode_pp',$this->kode_pp)
                         ->get();
-
+                        
         }
         return $res;
     }
