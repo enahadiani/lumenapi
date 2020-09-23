@@ -20,6 +20,82 @@ class LaporanController extends Controller
     public $guard = 'toko';
     public $sql = 'tokoaws';
 
+    function getNamaBulan($bulan) {
+        $arrayBulan = array('Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 
+        'September', 'Oktober', 'November', 'Desember');
+        return $arrayBulan[$bulan-1];
+    }
+
+    function getBulanList() {
+        try {
+
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            //."$kode_lokasi".//
+            $res = DB::connection($this->sql)->select("select distinct bulan from par_kunj_m where kode_lokasi='77'");						
+            $res= json_decode(json_encode($res),true);
+            
+            $dataBulan = array();
+            for($i=0;$i<count($res);$i++) {
+                $dataBulan[] = array(
+                    'kode'=>$res[$i]['bulan'],
+                    'nama'=> $this->getNamaBulan(intval($res[$i]['bulan']))
+                );
+            }
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $dataBulan;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getTahunList() {
+        try {
+
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            //."$kode_lokasi".//
+            $res = DB::connection($this->sql)->select("select distinct tahun from par_kunj_m where kode_lokasi='77'");						
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getReportBidang(Request $request){
         try {
             

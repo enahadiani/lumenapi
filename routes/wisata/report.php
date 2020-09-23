@@ -17,6 +17,9 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
+    $router->get('list-bulan','Wisata\LaporanController@getBulanList');
+    $router->get('list-tahun','Wisata\LaporanController@getTahunList');
+    
     $router->get('lap-bidang','Wisata\LaporanController@getReportBidang');
     $router->get('lap-mitra','Wisata\LaporanController@getReportMitra');
 });
