@@ -102,7 +102,7 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,p.nama as nama_pp,
             a.nilai,
             case when a.progress = 'A' then 'Verifikasi' 
             when a.progress='F' then 'Return Verifikasi' 
@@ -114,6 +114,7 @@ class JuskebController extends Controller
             when a.progress = 'S' and c.progress not in ('R','S') then isnull(y.nama_jab,'-')
             end as posisi,a.progress,isnull(z.nilai,0) as nilai_finish
             from apv_juskeb_m a
+            inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
             left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
                         FROM apv_ver_m
                         GROUP BY no_juskeb,kode_lokasi,tanggal
@@ -165,7 +166,7 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,p.nama as nama_pp,
             a.nilai,
             case when a.progress = 'A' then 'Verifikasi' 
             when a.progress='F' then 'Return Verifikasi' 
@@ -177,6 +178,7 @@ class JuskebController extends Controller
             when a.progress = 'S' and c.progress not in ('R','S') then isnull(y.nama_jab,'-')
             end as posisi,a.progress,isnull(z.nilai,0) as nilai_finish
             from apv_juskeb_m a
+            inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
             left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
                         FROM apv_ver_m
                         GROUP BY no_juskeb,kode_lokasi,tanggal
