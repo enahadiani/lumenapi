@@ -104,8 +104,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('kode_bidang, kode_mitra, bulan, tahun');
-            $db_col_name = array('a.kode_bidang, a.kode_mitra, a.bulan, a.tahun');
+            $col_array = array('kode_bidang', 'kode_mitra', 'bulan', 'tahun');
+            $db_col_name = array('a.kode_bidang', 'a.kode_mitra', 'a.bulan', 'a.tahun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
 
             $this_in = "";
@@ -151,6 +151,7 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['sql'] = $sql;
+                $success['test'] = $dataTest;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
