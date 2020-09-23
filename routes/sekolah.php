@@ -178,5 +178,6 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     
     $router->post('import-excel','Sekolah\PenilaianController@importExcel');
     $router->get('nilai-tmp','Sekolah\PenilaianController@getNilaiTmp');
+    $router->get('penilaian-dok','Sekolah\PenilaianController@showDokUpload');
     
 });
