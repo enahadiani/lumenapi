@@ -1322,7 +1322,7 @@ class AsetController extends Controller
                     $no = 0;
                 }
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],NULL]); 
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i]]); 
                     $no++;
                 }
                 $success['status'] = true;
