@@ -721,7 +721,7 @@ class PenilaianController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.nis,c.nama,c.file_dok,case isnull(c.file_dok,'-') when '-' then isnull(c.file_dok,'-') else  '".url('api/sekolah/storage')."/'+isnull(c.file_dok,'-') end as fileaddres,b.nama as nama_siswa
+            $sql2="select a.no_bukti,a.nis,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
             from sis_nilai a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -774,7 +774,7 @@ class PenilaianController extends Controller
             //cek upload file tidak kosong
             if(!empty($cek)){
                 
-                if(count($request->nama_file) > 0){
+                if(count($request->nama_file_seb) > 0){
                     //looping berdasarkan nama dok
                     for($i=0;$i<count($request->nama_file_seb);$i++){
                         //cek row i ada file atau tidak
@@ -796,6 +796,7 @@ class PenilaianController extends Controller
                             $arr_nis[] = $request->nis[$i];
                         }else if($request->nama_file_seb[$i] != "-"){
                             $arr_foto[] = $request->nama_file_seb[$i];
+                            $arr_nama[] = $request->input('nama_file')[$i];
                             $arr_nis[] = $request->nis[$i];
                         }     
                     }
