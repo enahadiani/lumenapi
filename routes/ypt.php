@@ -116,6 +116,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('tuition','Dashboard\DashboardController@getBCTuition');
     $router->get('growth-tuition','Dashboard\DashboardController@getBCGrowthTuition');
     $router->get('rka-persen','Dashboard\DashboardController@getBCRKAPersen');
+    $router->get('tuition-persen','Dashboard\DashboardController@getBCTuitionPersen');
     
     $router->post('notif-pusher', 'Dashboard\NotifController@sendPusher');
     $router->get('notif-pusher', 'Dashboard\NotifController@getNotifPusher');
