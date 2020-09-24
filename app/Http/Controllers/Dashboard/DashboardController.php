@@ -196,17 +196,23 @@ class DashboardController extends Controller
             $sumcase = "";
             $kolom ="";
             $ctg = array();
+            $ctg2 = array();
             if(count($rs)> 0){
                 $i=1;
+                
                 for($x=0;$x<count($rs);$x++){
                     $sumcase .= " , sum(case when a.periode='".$rs[$x]['tahun']."".$bulan."' then (case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) else 0 end) as thn$i ";
                     $kolom .=",isnull(c.thn$i,0) as thn$i";
 
                     array_push($ctg,substr($rs[$x]['tahun'],2,2));
+                    if($x != 0){
+                        array_push($ctg2,$rs[$x-1]['tahun']."-".$rs[$x]['tahun']);
+                    }
                     $i++;
                 }
             }
-            $success['ctg']=$ctg;
+            // $success['ctg']=$ctg;
+            $success['ctg']=$ctg2;
             
             $rs2 = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,b.nama $kolom
             from db_grafik_d a
@@ -231,18 +237,29 @@ class DashboardController extends Controller
                     }
                 }
 
+                $dtp = array();
+                for($i=0;$i< count($dt);$i++){
+                    $x = array();
+                    for($j=0;$j < count($dt[$i]);$j++){
+                        if($j != 0){
+                            $x[] = round((($dt[$i][$j]-$dt[$i][$j-1])/ $dt[$i][$j-1])*100);
+                        }
+                    }
+                    $dtp[] = $x;
+                }
+
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
                 for($i=0;$i<count($row);$i++){
 
                     if($row[$i]['kode_neraca'] == '47'){
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>false)
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dtp[$i],"type"=>"spline", "marker"=>array("enabled"=>false)
                             
                         );
                     }else{
                         
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dtp[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
                             
                         );
                     }
@@ -299,6 +316,7 @@ class DashboardController extends Controller
             $sumcase = "";
             $kolom ="";
             $ctg = array();
+            $ctg2 = array();
             if(count($rs)> 0){
                 $i=1;
                 for($x=0;$x<count($rs);$x++){
@@ -306,10 +324,13 @@ class DashboardController extends Controller
                     $kolom .=",isnull(c.thn$i,0) as thn$i";
 
                     array_push($ctg,substr($rs[$x]['tahun'],2,2));
+                    if($x != 0){
+                        array_push($ctg2,$rs[$x-1]['tahun']."-".$rs[$x]['tahun']);
+                    }
                     $i++;
                 }
             }
-            $success['ctg']=$ctg;
+            $success['ctg']=$ctg2;
             
             $rs2 = DB::connection('sqlsrvyptkug')->select("select a.kode_neraca,b.nama $kolom
             from db_grafik_d a
@@ -334,18 +355,29 @@ class DashboardController extends Controller
                     }
                 }
 
+                $dtp = array();
+                for($i=0;$i< count($dt);$i++){
+                    $x = array();
+                    for($j=0;$j < count($dt[$i]);$j++){
+                        if($j != 0){
+                            $x[] = round((($dt[$i][$j]-$dt[$i][$j-1])/ $dt[$i][$j-1])*100);
+                        }
+                    }
+                    $dtp[] = $x;
+                }
+
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
                 for($i=0;$i<count($row);$i++){
 
                     if($row[$i]['kode_neraca'] == '47'){
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>false)
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dtp[$i],"type"=>"spline", "marker"=>array("enabled"=>false)
                             
                         );
                     }else{
                         
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dtp[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
                             
                         );
                     }
