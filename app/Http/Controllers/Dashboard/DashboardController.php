@@ -69,7 +69,7 @@ class DashboardController extends Controller
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n2,
             case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n3,
-            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            case when a.n1<>0 then (a.n5/a.n1)*100 else 0 end as capai
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D01'
