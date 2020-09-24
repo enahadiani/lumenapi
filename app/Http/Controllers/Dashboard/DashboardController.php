@@ -1540,17 +1540,17 @@ class DashboardController extends Controller
             }
 
             $rs = DB::connection('sqlsrvyptkug')->select("
-            select '2015' as tahun 
+            select '2014-2015' as tahun 
             union all
-            select '2016' as tahun 
+            select '2015-2016' as tahun 
             union all
-            select '2017' as tahun 
+            select '2016-2017' as tahun 
             union all
-            select '2018' as tahun 
+            select '2017-2018' as tahun 
             union all
-            select '2019' as tahun 
+            select '2018-2019' as tahun 
             union all
-            select '2020' as tahun 
+            select '2019-2020' as tahun 
             ");
             $rs = json_decode(json_encode($rs),true);
             $ctg = array();
@@ -1562,31 +1562,44 @@ class DashboardController extends Controller
                 }
             }
             $success['ctg']=$ctg;
+
+            $ctg2 = array('2014','2015','2016','2017','2018','2019','2020');
             
-            $row =  DB::connection('sqlsrvyptkug')->select("select 'Pendapatan' as nama,'411' as kode_neraca,44.08 as n2015,63.03 as n2016,60.37 as n2017,58.38 as n2018,48.46 as n2019,20.92 as n2020
+            $row =  DB::connection('sqlsrvyptkug')->select("select 'Pendapatan' as nama,'411' as kode_neraca,248.04	as n2014,292.13 as n2015,355.15 as n2016,415.52 as n2017,473.90 as n2018,522.37 as n2019,	543.28 as n2020
             union all
-            select 'Beban' as nama,'511' as kode_neraca,18.36 as n15,52.40,29.51,57.42,39.66,18.25
+            select 'Beban' as nama,'511' as kode_neraca,220.04,238.40,290.79,320.30,377.72,417.38,435.63
             union all
-            select 'SDM' as nama,'412' as kode_neraca,19.11,24.20,17.93,34.56,19.08,18.16
+            select 'SDM' as nama,'412' as kode_neraca,107.65,126.76,150.95,168.89,203.44,222.52,240.68
             union all
-            select 'SHU' as nama,'611' as kode_neraca,25.72,10.63,30.86,0.97,8.80,2.67 ");
+            select 'SHU' as nama,'611' as kode_neraca,28.01,53.73,64.36,95.22,96.18,104.98,107.65 ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
                     $dt[$i] = array();
                     $c=0;
-                    for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
+                    for($x=1;$x<=count($ctg2);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg2[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg2[$c]);
                         $c++;          
                     }
+                }
+
+                $dtp = array();
+                for($i=0;$i< count($dt);$i++){
+                    $x = array();
+                    for($j=0;$j < count($dt[$i]);$j++){
+                        if($j != 0){
+                            $x[] = round((($dt[$i][$j]["y"]-$dt[$i][$j-1]["y"])/ $dt[$i][$j-1]["y"])*100);
+                        }
+                    }
+                    $dtp[] = $x;
                 }
 
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                        "name"=> $row[$i]['nama'], "data"=>$dtp[$i]
                     );
                 }
 
