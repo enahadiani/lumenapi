@@ -74,6 +74,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('upload-dok','Dago\UploadDokController@index');
     $router->get('upload-dok-detail','Dago\UploadDokController@show');
     $router->post('upload-dok','Dago\UploadDokController@store');
+    $router->delete('upload-dok','Dago\UploadDokController@destroy');
 
     //Pembayaran Group
     

@@ -208,4 +208,63 @@ class UploadDokController extends Controller
         }
     }
 
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_reg' => 'required',
+            'no_dokumen'=>'required'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }		
+
+            $sql="select no_gambar from dgw_scan where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_reg' and modul='$request->no_dokumen' ";
+            $res = DB::connection($this->sql)->select($sql);
+            
+            if(count($res) > 0){
+                
+                if(Storage::disk('s3')->exists('dago/'.$res[0]->no_gambar)){
+                    Storage::disk('s3')->delete('dago/'.$res[0]->no_gambar);
+                }
+
+                $del = DB::connection($this->sql)->table('dgw_scan')
+                ->where('no_bukti', $request->no_reg)    
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('modul', $request->no_dokumen)
+                ->delete();
+
+                $sql2="select count(*) as jum from dgw_scan where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_reg' and modul='$request->no_dokumen' ";
+                $res2 = DB::connection($this->sql)->select($sql2);
+                if(count($res2) == 0){
+
+                    $upd = DB::connection($this->sql)->table('dgw_reg_dok')
+                    ->where('no_reg', $request->no_reg)    
+                    ->where('no_dok', $request->no_dokumen) 
+                    ->update(['tgl_terima' => NULL]);
+                }
+                
+                DB::connection($this->sql)->commit();
+
+                $success['status'] = true;
+                $success['message'] = "Dokumen ".$request->no_dokumen." berhasil dihapus";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Dokumen ".$request->no_dokumen." gagal dihapus.";
+            }
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Dokumen ".$request->no_dokumen." dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
 }
