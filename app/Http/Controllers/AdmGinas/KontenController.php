@@ -150,13 +150,8 @@ class KontenController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $del = DB::connection($this->sql)->table('lab_konten')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('id', $request->id)
-            ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into lab_konten(id,kode_lokasi,tanggal,judul,keterangan,nik_user,tgl_input,flag_aktif,header_url,kode_klp,tag) values ('$id','$kode_lokasi','$request->tanggal','$request->judul','$request->keterangan','$nik',getdate(),'$request->flag_aktif','$request->header_url','$request->kode_klp','$request->tag') ");
+            $ins = DB::connection($this->sql)->update("update lab_konten set tanggal='$request->tanggal',judul='$request->judul',keterangan='$request->keterangan',header_url='$request->header_url',kode_klp='$request->kode_klp',tag='$request->tag' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
