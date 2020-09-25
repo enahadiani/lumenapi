@@ -1539,7 +1539,7 @@ class AsetController extends Controller
             'no_bukti' => 'required',
             'nama_file.*'=>'required',
             'kode_jenis.*'=>'required',
-            'file_gambar.*' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
+            'file_gambar.*' => 'required|file|max:3072'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
