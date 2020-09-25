@@ -1330,6 +1330,7 @@ class AsetController extends Controller
                     $no++;
                 }
                 $success['status'] = true;
+                $success['kode_jenis'] = $request->kode_jenis;
                 $success['message'] = "Upload Gambar berhasil disimpan";
             }else{
                 
