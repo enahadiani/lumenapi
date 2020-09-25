@@ -498,4 +498,40 @@ $app->router->group([
 });
 
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admginas-auth'
+], function ($router) {
+    require __DIR__.'/../routes/admginas/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admginas-master'
+], function ($router) {
+    require __DIR__.'/../routes/admginas/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admginas-trans'
+], function ($router) {
+    require __DIR__.'/../routes/admginas/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admginas-report'
+], function ($router) {
+    require __DIR__.'/../routes/admginas/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admginas-dash'
+], function ($router) {
+    require __DIR__.'/../routes/admginas/dash.php';
+});
+
+
 return $app;

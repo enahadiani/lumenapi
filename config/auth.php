@@ -70,6 +70,10 @@ return [
         'yakes' => [
             'driver' => 'jwt',
             'provider' => 'yakes',
+        ],
+        'admginas' => [
+            'driver' => 'jwt',
+            'provider' => 'admginas',
         ]
     ],
 
@@ -133,6 +137,10 @@ return [
         'yakes' => [
             'driver' => 'eloquent',
             'model' => \App\AdminYakes::class
+        ],
+        'admginas' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminLabGinas::class
         ]
     ]
 ];
