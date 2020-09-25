@@ -31,11 +31,20 @@ class KontenController extends Controller
                 if($request->id == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and id='$request->id' ";
+                    $filter = " and a.id='$request->id' ";
                 }
-                $sql= "select id,kode_lokasi,convert(varchar,tanggal,103) as tanggal,judul,keterangan,nik_user,tgl_input,flag_aktif,header_url,kode_klp,tag from lab_konten where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.id,a.kode_lokasi,convert(varchar,a.tanggal,103) as tanggal,a.judul,a.keterangan,a.nik_user,a.tgl_input,a.flag_aktif,a.header_url,a.kode_klp,a.tag,b.nama as nama_header,c.nama as nama_klp 
+                from lab_konten a
+                left join lab_konten_galeri b on a.header_url=b.id and a.kode_lokasi=b.kode_lokasi
+                left join lab_konten_klp c on a.kode_klp=c.kode_klp
+                where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select id,kode_lokasi,convert(varchar,tanggal,103) as tanggal,judul,keterangan,nik_user,flag_aktif,header_url,kode_klp,tag,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from lab_konten  where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select a.id,a.kode_lokasi,convert(varchar,a.tanggal,103) as tanggal,a.judul,a.keterangan,a.nik_user,a.flag_aktif,a.header_url,a.kode_klp,a.tag,b.nama as nama_header,c.nama as nama_klp ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input 
+                from lab_konten a
+                left join lab_konten_galeri b on a.header_url=b.id and a.kode_lokasi=b.kode_lokasi
+                left join lab_konten_klp c on a.kode_klp=c.kode_klp
+                where a.kode_lokasi='".$kode_lokasi."'
+                ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
