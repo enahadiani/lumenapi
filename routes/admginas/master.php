@@ -27,6 +27,12 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('konten-klp','AdmGinas\KontenController@getKlp');
     $router->get('konten-kategori','AdmGinas\KontenController@getKategori');
 
+    //Konten Galeri
+    $router->get('kategori-galeri','AdmGinas\KategoriGaleriController@index');
+    $router->post('kategori-galeri','AdmGinas\KategoriGaleriController@store');
+    $router->put('kategori-galeri','AdmGinas\KategoriGaleriController@update');
+    $router->delete('kategori-galeri','AdmGinas\KategoriGaleriController@destroy');
+
 });
 
 
