@@ -1294,6 +1294,7 @@ class AsetController extends Controller
 
             $arr_foto = array();
             $arr_nama = array();
+            $arr_jenis = array();
             $i=0;
             if($request->hasfile('file_gambar'))
             {
@@ -1307,6 +1308,7 @@ class AsetController extends Controller
                     Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
                     $arr_foto[] = $foto;
                     $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                    $arr_jenis[] = $request->kode_jenis[$i];
                     $i++;
                 }
             }
@@ -1324,13 +1326,12 @@ class AsetController extends Controller
                     $no = 0;
                 }
                 for($i=0; $i<count($arr_nama);$i++){
-                    $tmp = explode("-",$request->kode_jenis[$i]);
+                    $tmp = explode("-",$arr_jenis[$i]);
                     $kode_jenis = $tmp[0];
                     $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
-                $success['kode_jenis'] = $request->kode_jenis;
                 $success['message'] = "Upload Gambar berhasil disimpan";
             }else{
                 
@@ -1407,7 +1408,8 @@ class AsetController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'nama_file.*'=>'required',
-            'file_gambar.*' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
+            'kode_jenis.*'=>'required',
+            'file_gambar.*' => 'required|file|max:3072'
         ]);
 
         DB::connection('sqlsrv2')->beginTransaction();
@@ -1418,19 +1420,11 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
             $no_bukti = $request->no_bukti;
 
             $arr_foto = array();
             $arr_nama = array();
+            $arr_jenis = array();
             $i=0;
             if($request->hasfile('file_gambar'))
             {
@@ -1444,6 +1438,7 @@ class AsetController extends Controller
                     Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
                     $arr_foto[] = $foto;
                     $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                    $arr_jenis[] = $request->input('kode_jenis')[$i];
                     $i++;
                 }
             }
@@ -1461,7 +1456,9 @@ class AsetController extends Controller
                     $no = 0;
                 }
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_gedung_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],NULL]); 
+                    $tmp = explode("-",$arr_jenis[$i]);
+                    $kode_jenis = $tmp[0];
+                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_gedung_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
