@@ -183,17 +183,17 @@ class KunjController extends Controller
                 }else{
                     $filter = " and a.no_bukti='".$request->no_bukti."' ";
                 }
-                $sql= "select a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat, c.nama as nama_bidang 
+                $sql= "select a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat, c.nama as nama_subjenis 
                       from par_kunj_m a 
                       inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi 
-                      inner join par_bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi 
+                      inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi 
                       where a.kode_lokasi='".$kode_lokasi."' ".$filter;
             }
             else {
-                $sql= "select a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat,  c.nama as nama_bidang 
+                $sql= "select a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat,  c.nama as nama_subjenis 
                       from par_kunj_m a 
                       inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi 
-                      inner join par_bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi 
+                      inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi 
                       where a.kode_lokasi='".$kode_lokasi."' ";
             }
 
@@ -276,8 +276,8 @@ class KunjController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function getBukti($kode_mitra,$kode_bidang,$tahun,$bulan,$kode_lokasi){            
-        $auth = DB::connection($this->db)->select("select no_bukti from par_kunj_m where kode_mitra ='".$kode_mitra."' and kode_bidang ='".$kode_bidang."' and tahun ='".$tahun."' and bulan ='".$bulan."' and kode_lokasi='".$kode_lokasi."' ");
+    public function getBukti($kode_mitra,$kode_subjenis,$tahun,$bulan,$kode_lokasi){            
+        $auth = DB::connection($this->db)->select("select no_bukti from par_kunj_m where kode_mitra ='".$kode_mitra."' and kode_subjenis ='".$kode_subjenis."' and tahun ='".$tahun."' and bulan ='".$bulan."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -300,7 +300,7 @@ class KunjController extends Controller
         $this->validate($request, [            
             'tanggal' => 'required',
             'kode_mitra' => 'required|max:10',
-            'kode_bidang' => 'required|max:10',            
+            'kode_subjenis' => 'required|max:10',            
             'tahun' => 'required|max:4',            
             'bulan' => 'required|max:2',
             'arrtgl'=>'required|array',
@@ -316,19 +316,19 @@ class KunjController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
                        
-            if($this->getBukti($request->kode_mitra,$request->kode_bidang,$request->tahun,$request->bulan,$kode_lokasi)){
+            if($this->getBukti($request->kode_mitra,$request->kode_subjenis,$request->tahun,$request->bulan,$kode_lokasi)){
 
                 $periode = substr($request->tanggal,2,2).substr($request->tanggal,5,2);
                 $no_bukti = $this->generateKode("par_kunj_m", "no_bukti", $kode_lokasi."-KJ".$periode.".", "0001");
 
-                $ins = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,tanggal,kode_lokasi,tgl_input,nik_user,kode_mitra,kode_bidang,tahun,bulan) values 
-                                                        ('".$no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_bidang."','".$request->tahun."','".$request->bulan."')");
+                $ins = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,tanggal,kode_lokasi,tgl_input,nik_user,kode_mitra,kode_subjenis,tahun,bulan) values 
+                                                        ('".$no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_subjenis."','".$request->tahun."','".$request->bulan."')");
 
                 $arrtgl = $request->arrtgl;
                 if (count($arrtgl) > 0){
                     for ($i=0;$i <count($arrtgl);$i++){                
-                        $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_d(no_bukti,kode_mitra,kode_bidang,tanggal,jumlah,kode_lokasi) values  
-                                                                      ('".$no_bukti."','".$request->kode_mitra."','".$request->kode_bidang."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_d(no_bukti,kode_mitra,kode_subjenis,tanggal,jumlah,kode_lokasi) values  
+                                                                      ('".$no_bukti."','".$request->kode_mitra."','".$request->kode_subjenis."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
                     }						
                 }	
                                                                       
@@ -365,7 +365,7 @@ class KunjController extends Controller
             'no_bukti' => 'required',
             'tanggal' => 'required',
             'kode_mitra' => 'required|max:10',
-            'kode_bidang' => 'required|max:10',            
+            'kode_subjenis' => 'required|max:10',            
             'tahun' => 'required|max:4',            
             'bulan' => 'required|max:2',
             'arrtgl'=>'required|array',
@@ -391,14 +391,14 @@ class KunjController extends Controller
             ->where('no_bukti', $request->no_bukti)
             ->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,tanggal,kode_lokasi,tgl_input,nik_user,kode_mitra,kode_bidang,tahun,bulan) values 
-                                                    ('".$request->no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_bidang."','".$request->tahun."','".$request->bulan."')");
+            $ins = DB::connection($this->db)->insert("insert into par_kunj_m(no_bukti,tanggal,kode_lokasi,tgl_input,nik_user,kode_mitra,kode_subjenis,tahun,bulan) values 
+                                                    ('".$request->no_bukti."','".$request->tanggal."','".$kode_lokasi."',getdate(),'".$nik."','".$request->kode_mitra."','".$request->kode_subjenis."','".$request->tahun."','".$request->bulan."')");
 
             $arrtgl = $request->arrtgl;
             if (count($arrtgl) > 0){
                 for ($i=0;$i <count($arrtgl);$i++){                
-                    $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_d(no_bukti,kode_mitra,kode_bidang,tanggal,jumlah,kode_lokasi) values  
-                                                                  ('".$request->no_bukti."','".$request->kode_mitra."','".$request->kode_bidang."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into par_kunj_d(no_bukti,kode_mitra,kode_subjenis,tanggal,jumlah,kode_lokasi) values  
+                                                                  ('".$request->no_bukti."','".$request->kode_mitra."','".$request->kode_subjenis."','".$arrtgl[$i]['tanggal']."','".floatval($arrtgl[$i]['jumlah'])."','".$kode_lokasi."')");                    
                 }						
             }	
 
