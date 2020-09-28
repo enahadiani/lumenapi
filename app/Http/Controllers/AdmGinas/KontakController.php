@@ -33,11 +33,11 @@ class KontakController extends Controller
                 }else{
                     $filter = " and id='$request->id' ";
                 }
-                $sql= "select id,kode_lokasi,tanggal,judul,keterangan,nik_user,case flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as status, latitude,longitude,tgl_input
+                $sql= "select id,kode_lokasi,tanggal,judul,keterangan,nik_user,case flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as sts, latitude,longitude,tgl_input
                 from lab_konten_kontak
                 where kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select id,kode_lokasi,tanggal,judul,keterangan,nik_user,case flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as status, latitude,longitude,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input 
+                $sql = "select id,kode_lokasi,tanggal,judul,keterangan,nik_user,case flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as sts, latitude,longitude,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input 
                 from lab_konten_kontak
                 where kode_lokasi='".$kode_lokasi."'
                 ";
@@ -153,7 +153,7 @@ class KontakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $ins = DB::connection($this->sql)->update("update lab_konten_kontak set judul='$request->judul',keterangan='$request->keterangan',latitide='$request->latitide',longitude='$request->longitude' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
+            $ins = DB::connection($this->sql)->update("update lab_konten_kontak set judul='$request->judul',keterangan='$request->keterangan',latitude='$request->latitude',longitude='$request->longitude' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
