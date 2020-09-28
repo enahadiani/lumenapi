@@ -103,7 +103,7 @@ class SubjenisController extends Controller
         $this->validate($request, [
             'kode_subjenis' => 'required|max:10',
             'nama' => 'required|max:100',
-            'kode_jenis' => 'require'
+            'kode_jenis' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -141,7 +141,7 @@ class SubjenisController extends Controller
         $this->validate($request, [
             'kode_subjenis' => 'required|max:10',
             'nama' => 'required|max:100' ,
-            'kode_jenis' => 'require'          
+            'kode_jenis' => 'required'          
         ]);
 
         DB::connection($this->sql)->beginTransaction();
