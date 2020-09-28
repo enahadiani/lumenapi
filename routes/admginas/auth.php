@@ -24,10 +24,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('s3')->exists('ginas/'.$filename)) {
+    if (!Storage::disk('s3')->exists('webginas/'.$filename)) {
         abort(404);
     }
-    return Storage::disk('s3')->response('ginas/'.$filename); 
+    return Storage::disk('s3')->response('webginas/'.$filename); 
 });
 
 

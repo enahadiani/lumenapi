@@ -39,6 +39,12 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->put('kontak','AdmGinas\KontakController@update');
     $router->delete('kontak','AdmGinas\KontakController@destroy');
 
+    //Galeri
+    $router->get('galeri','AdmGinas\GaleriController@index');
+    $router->post('galeri','AdmGinas\GaleriController@store');
+    $router->post('galeri-ubah','AdmGinas\GaleriController@update');
+    $router->delete('galeri','AdmGinas\GaleriController@destroy');
+
 });
 
 

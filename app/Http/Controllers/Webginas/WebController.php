@@ -157,7 +157,7 @@ class WebController extends Controller
             $res = DB::connection($this->sql)->select("SELECT kode_ktg, nama FROM lab_konten_ktg where jenis='Gambar' and nama <> '-' and nama <> '_' and kode_lokasi='".$this->lokasi."' ");
             $success["daftar_kategori"] = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select("SELECT a.nama, keterangan, file_gambar, tgl_input, b.kode_ktg as nama_ktg FROM lab_konten_galeri a inner join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi where a.jenis='Galeri' and b.nama <> '-' and b.nama <> '_' and flag_aktif = '1' and a.kode_lokasi='".$this->lokasi."' ");
+            $res2 = DB::connection($this->sql)->select("SELECT a.nama, a.keterangan, a.file_gambar, a.tgl_input, b.kode_ktg as nama_ktg FROM lab_konten_galeri a inner join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi where a.jenis='Galeri' and b.nama <> '-' and b.nama <> '_' and flag_aktif = '1' and a.kode_lokasi='".$this->lokasi."' ");
             $success["daftar_gambar"] =  json_decode(json_encode($res2),true);
 
             return response()->json($success, $this->successStatus);
