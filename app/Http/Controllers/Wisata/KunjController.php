@@ -49,7 +49,7 @@ class KunjController extends Controller
         }        
     }
 
-    public function getMitraBid($kode_mitra) {
+    public function getMitraSub($kode_mitra) {
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -57,7 +57,7 @@ class KunjController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_bidang,a.nama from par_bidang a inner join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi where b.kode_mitra='".$kode_mitra."' and b.kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select a.kode_subjenis,a.nama from par_subjenis a inner join par_mitra_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi where b.kode_mitra='".$kode_mitra."' and b.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
