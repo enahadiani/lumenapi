@@ -915,15 +915,16 @@ class PembayaranController extends Controller
             }else{
                 $no_kb = "-";
             }
+            $success['no_kb'] = $no_kb;
 
             $del = DB::connection($this->sql)->table('trans_m')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_kb)
+                ->where('no_bukti', $no_kb)
                 ->delete();
 
             $del2 = DB::connection($this->sql)->table('trans_j')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_kb)
+                ->where('no_bukti', $no_kb)
                 ->delete();
             
             $del3 = DB::connection($this->sql)->table('dgw_pembayaran')
