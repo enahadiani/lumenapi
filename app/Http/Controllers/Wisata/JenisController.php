@@ -103,7 +103,7 @@ class JenisController extends Controller
         $this->validate($request, [
             'kode_jenis' => 'required|max:10',
             'nama' => 'required|max:100',
-            'kode_bidang' => 'require'
+            'kode_bidang' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -141,7 +141,7 @@ class JenisController extends Controller
         $this->validate($request, [
             'kode_jenis' => 'required|max:10',
             'nama' => 'required|max:100' ,
-            'kode_bidang' => 'require'          
+            'kode_bidang' => 'required'          
         ]);
 
         DB::connection($this->sql)->beginTransaction();
