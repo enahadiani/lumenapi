@@ -45,6 +45,15 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->post('galeri-ubah','AdmGinas\GaleriController@update');
     $router->delete('galeri','AdmGinas\GaleriController@destroy');
 
+    
+    //Menu
+    $router->get('menu-web','AdmGinas\MenuWebController@index');
+    $router->post('menu-web','AdmGinas\MenuWebController@store');
+    $router->put('menu-web','AdmGinas\MenuWebController@update');
+    $router->delete('menu-web','AdmGinas\MenuWebController@destroy');
+    $router->get('menu-web-form','AdmGinas\MenuWebController@getForm');
+    $router->post('menu-web-move','AdmGinas\MenuWebController@simpanMove');
+
 });
 
 

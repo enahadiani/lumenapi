@@ -15,7 +15,7 @@ class KontenController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'dbsaife';
+    public $db = 'dbsaife';
     public $guard = 'admginas';
 
     public function index(Request $request)
@@ -47,7 +47,7 @@ class KontenController extends Controller
                 ";
             }
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -96,7 +96,7 @@ class KontenController extends Controller
             'kode_klp' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -104,15 +104,15 @@ class KontenController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $ins = DB::connection($this->sql)->insert("insert into lab_konten(kode_lokasi,tanggal,judul,keterangan,nik_user,tgl_input,flag_aktif,header_url,kode_klp,tag) values ('$kode_lokasi','$request->tanggal','$request->judul','$request->keterangan','$nik',getdate(),'$request->flag_aktif','$request->header_url','$request->kode_klp','$request->tag') ");
+            $ins = DB::connection($this->db)->insert("insert into lab_konten(kode_lokasi,tanggal,judul,keterangan,nik_user,tgl_input,flag_aktif,header_url,kode_klp,tag) values ('$kode_lokasi','$request->tanggal','$request->judul','$request->keterangan','$nik',getdate(),'$request->flag_aktif','$request->header_url','$request->kode_klp','$request->tag') ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->id;
             $success['message'] = "Data Konten berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Konten gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -152,7 +152,7 @@ class KontenController extends Controller
             'kode_klp' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -160,15 +160,15 @@ class KontenController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $ins = DB::connection($this->sql)->update("update lab_konten set tanggal='$request->tanggal',judul='$request->judul',keterangan='$request->keterangan',header_url='$request->header_url',kode_klp='$request->kode_klp',tag='$request->tag' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
+            $ins = DB::connection($this->db)->update("update lab_konten set tanggal='$request->tanggal',judul='$request->judul',keterangan='$request->keterangan',header_url='$request->header_url',kode_klp='$request->kode_klp',tag='$request->tag' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->id;
             $success['message'] = "Data Konten berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['kode'] = "-";
             $success['message'] = "Data Konten gagal diubah ".$e;
@@ -187,7 +187,7 @@ class KontenController extends Controller
         $this->validate($request, [
             'id' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -195,18 +195,18 @@ class KontenController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('lab_konten')
+            $del = DB::connection($this->db)->table('lab_konten')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('id', $request->id)
             ->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Konten berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Konten gagal dihapus ".$e;
             
@@ -236,7 +236,7 @@ class KontenController extends Controller
 
             $sql = "SELECT id, nama FROM lab_konten_galeri where kode_lokasi='$kode_lokasi' and (jenis = 'Konten' or kode_klp = 'KLP02') $filter ";
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -280,7 +280,7 @@ class KontenController extends Controller
 
             $sql = "SELECT kode_klp, nama FROM lab_konten_klp $filter ";
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -324,7 +324,7 @@ class KontenController extends Controller
 
             $sql = "SELECT kode_kategori, nama FROM lab_konten_kategori where kode_lokasi='$kode_lokasi' $filter ";
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

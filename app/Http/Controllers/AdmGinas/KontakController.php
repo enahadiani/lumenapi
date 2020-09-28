@@ -15,7 +15,7 @@ class KontakController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'dbsaife';
+    public $db = 'dbsaife';
     public $guard = 'admginas';
 
     public function index(Request $request)
@@ -43,7 +43,7 @@ class KontakController extends Controller
                 ";
             }
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -90,7 +90,7 @@ class KontakController extends Controller
             'longitude' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -98,16 +98,16 @@ class KontakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $ins = DB::connection($this->sql)->insert("insert into lab_konten_kontak(
+            $ins = DB::connection($this->db)->insert("insert into lab_konten_kontak(
                 kode_lokasi,tanggal,judul,keterangan,nik_user,tgl_input,flag_aktif,latitude,longitude) values ('$kode_lokasi',getdate(),'$request->judul','$request->keterangan','$nik',getdate(),'1','$request->latitude','$request->longitude') ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->id;
             $success['message'] = "Data Kontak berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kontak gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -145,7 +145,7 @@ class KontakController extends Controller
             'longitude' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -153,15 +153,15 @@ class KontakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $ins = DB::connection($this->sql)->update("update lab_konten_kontak set judul='$request->judul',keterangan='$request->keterangan',latitude='$request->latitude',longitude='$request->longitude' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
+            $ins = DB::connection($this->db)->update("update lab_konten_kontak set judul='$request->judul',keterangan='$request->keterangan',latitude='$request->latitude',longitude='$request->longitude' where id='$request->id' and kode_lokasi='$kode_lokasi' ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->id;
             $success['message'] = "Data Kontak berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['kode'] = "-";
             $success['message'] = "Data Kontak gagal diubah ".$e;
@@ -180,7 +180,7 @@ class KontakController extends Controller
         $this->validate($request, [
             'id' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -188,18 +188,18 @@ class KontakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('lab_konten_kontak')
+            $del = DB::connection($this->db)->table('lab_konten_kontak')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('id', $request->id)
             ->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kontak berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kontak gagal dihapus ".$e;
             

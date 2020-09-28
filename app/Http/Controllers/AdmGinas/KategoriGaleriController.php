@@ -15,12 +15,12 @@ class KategoriGaleriController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'dbsaife';
+    public $db = 'dbsaife';
     public $guard = 'admginas';
 
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -50,7 +50,7 @@ class KategoriGaleriController extends Controller
                 ";
             }
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -95,7 +95,7 @@ class KategoriGaleriController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -105,15 +105,15 @@ class KategoriGaleriController extends Controller
 
             $kode = $this->generateKode("lab_konten_ktg", "kode_ktg", "KTGR", "01");
 
-            $ins = DB::connection($this->sql)->insert("insert into lab_konten_ktg(kode_ktg,nama,jenis,kode_lokasi,tgl_input) values ('$kode','$request->nama','Gambar','$kode_lokasi',getdate()) ");
+            $ins = DB::connection($this->db)->insert("insert into lab_konten_ktg(kode_ktg,nama,jenis,kode_lokasi,tgl_input) values ('$kode','$request->nama','Gambar','$kode_lokasi',getdate()) ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $kode;
             $success['message'] = "Data Konten berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Konten gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -148,7 +148,7 @@ class KategoriGaleriController extends Controller
             'nama' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -156,20 +156,20 @@ class KategoriGaleriController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del = DB::connection($this->sql)->table('lab_konten_ktg')
+            $del = DB::connection($this->db)->table('lab_konten_ktg')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_ktg', $request->kode_ktg)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into lab_konten_ktg(kode_ktg,nama,jenis,kode_lokasi,tgl_input) values ('$request->kode_ktg','$request->nama','Gambar','$kode_lokasi',getdate()) ");
+            $ins = DB::connection($this->db)->insert("insert into lab_konten_ktg(kode_ktg,nama,jenis,kode_lokasi,tgl_input) values ('$request->kode_ktg','$request->nama','Gambar','$kode_lokasi',getdate()) ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->kode_ktg;
             $success['message'] = "Data Konten berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['kode'] = "-";
             $success['message'] = "Data Konten gagal diubah ".$e;
@@ -188,7 +188,7 @@ class KategoriGaleriController extends Controller
         $this->validate($request, [
             'kode_ktg' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -196,18 +196,18 @@ class KategoriGaleriController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('lab_konten_ktg')
+            $del = DB::connection($this->db)->table('lab_konten_ktg')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_ktg', $request->kode_ktg)
             ->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Konten berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Konten gagal dihapus ".$e;
             
