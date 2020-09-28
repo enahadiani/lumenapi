@@ -30,6 +30,20 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('bidang','Wisata\BidangController@update');
     $router->delete('bidang','Wisata\BidangController@destroy');    
 
+    //Jenis
+    $router->get('jenis','Wisata\JenisController@index');
+    $router->get('getBidang','Wisata\JenisController@getBidang');
+    $router->post('jenis','Wisata\JenisController@store');
+    $router->put('jenis','Wisata\JenisController@update');
+    $router->delete('jenis','Wisata\JenisController@destroy');    
+
+    //SubJenis
+    $router->get('subjenis','Wisata\SubjenisController@index');
+    $router->get('getJenis','Wisata\SubjenisController@getJenis');
+    $router->post('subjenis','Wisata\SubjenisController@store');
+    $router->put('subjenis','Wisata\SubjenisController@update');
+    $router->delete('subjenis','Wisata\SubjenisController@destroy');    
+
     //Mitra
     $router->get('mitra','Wisata\MitraController@index');
     $router->get('mitrabid','Wisata\MitraController@edit');
