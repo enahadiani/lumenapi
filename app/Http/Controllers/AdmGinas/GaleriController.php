@@ -34,10 +34,12 @@ class GaleriController extends Controller
                 }else{
                     $filter = " and a.id='$request->id' ";
                 }
-                $sql= "select a.id,a.kode_lokasi,a.nama,a.keterangan,a.file_gambar,a.flag_aktif,a.jenis,a.nik_user,a.tgl_input,a.file_type,a.kode_ktg from lab_konten_galeri a
+                $sql= "select a.id,a.kode_lokasi,a.nama,a.keterangan,a.file_gambar,a.flag_aktif,a.jenis,a.nik_user,a.tgl_input,a.file_type,a.kode_ktg,b.nama as nama_ktg from lab_konten_galeri a
+                left join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "SELECT a.id,a.kode_lokasi,a.nama,a.keterangan,a.file_gambar,a.flag_aktif,a.jenis,a.nik_user,a.file_type,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input,a.kode_ktg FROM lab_konten_galeri a
+                $sql = "SELECT a.id,a.kode_lokasi,a.nama,a.keterangan,a.file_gambar,a.flag_aktif,a.jenis,a.nik_user,a.file_type,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input,a.kode_ktg,b.nama as nama_ktg FROM lab_konten_galeri a
+                left join lab_konten_ktg b on a.kode_ktg=b.kode_ktg and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."'
                 ";
             }
@@ -122,6 +124,7 @@ class GaleriController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = '';
             $success['message'] = "Data Galeri berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -213,6 +216,7 @@ class GaleriController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->id;
             $success['message'] = "Data Galeri berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
