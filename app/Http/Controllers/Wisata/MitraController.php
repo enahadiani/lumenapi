@@ -8,12 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class MitraController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+{   
     public $successStatus = 200;
     public $sql = 'tokoaws';
     public $guard = 'toko';
@@ -116,20 +111,20 @@ class MitraController extends Controller
             $res = DB::connection($this->sql)->select("select * from par_mitra where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select( "select a.kode_bidang,a.nama, case when b.kode_bidang is null then 'NON' else 'CEK' end as status from par_bidang a left join par_mitra_bid b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
+            $res2 = DB::connection($this->sql)->select( "select a.kode_subjenis,a.nama, case when b.kode_subjenis is null then 'NON' else 'CEK' end as status from par_subjenis a left join par_mitra_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
             $res2 = json_decode(json_encode($res2),true);
 
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
-                $success['arrbid'] = $res2;                                
+                $success['arrsub'] = $res2;                                
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['arrbid'] = [];                
+                $success['arrsub'] = [];                
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
@@ -141,23 +136,6 @@ class MitraController extends Controller
 
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -171,8 +149,8 @@ class MitraController extends Controller
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',             
-            'arrbidang'=>'required|array',
-            'arrbidang.*.kode_bidang' => 'required'            
+            'arrsub'=>'required|array',
+            'arrsub.*.kode_subjenis' => 'required'            
 
         ]);
 
@@ -188,11 +166,11 @@ class MitraController extends Controller
                 $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                            ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
 
-                $arrbidang = $request->arrbidang;
-                if (count($arrbidang) > 0){
-                    for ($i=0;$i <count($arrbidang);$i++){                
-                        $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
-                                                                        ('".$request->kode_mitra."','".$arrbidang[$i]['kode_bidang']."','".$kode_lokasi."')");                    
+                $arrsub = $request->arrsub;
+                if (count($arrsub) > 0){
+                    for ($i=0;$i <count($arrsub);$i++){                
+                        $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_subjenis(kode_mitra,kode_subjenis,kode_lokasi) values  
+                                                                        ('".$request->kode_mitra."','".$arrsub[$i]['kode_subjenis']."','".$kode_lokasi."')");                    
                     }						
                 }	                                          
                 DB::connection($this->sql)->commit();
@@ -213,14 +191,6 @@ class MitraController extends Controller
         
     }
 
-    
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request)
     {
         $this->validate($request, [
@@ -234,8 +204,8 @@ class MitraController extends Controller
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',
-            'arrbidang'=>'required|array',
-            'arrbidang.*.kode_bidang' => 'required'                        
+            'arrsub'=>'required|array',
+            'arrsub.*.kode_subjenis' => 'required'                        
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -251,7 +221,7 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $del2 = DB::connection($this->sql)->table('par_mitra_bid')
+            $del2 = DB::connection($this->sql)->table('par_mitra_subjenis')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
@@ -259,11 +229,11 @@ class MitraController extends Controller
             $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                       ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
                                           
-            $arrbidang = $request->arrbidang;
-            if (count($arrbidang) > 0){
-                for ($i=0;$i <count($arrbidang);$i++){                
-                    $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_bid(kode_mitra,kode_bidang,kode_lokasi) values  
-                                                                    ('".$request->kode_mitra."','".$arrbidang[$i]['kode_bidang']."','".$kode_lokasi."')");                    
+            $arrsub = $request->arrsub;
+            if (count($arrsub) > 0){
+                for ($i=0;$i <count($arrsub);$i++){                
+                    $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_subjenis(kode_mitra,kode_subjenis,kode_lokasi) values  
+                                                                    ('".$request->kode_mitra."','".$arrsub[$i]['kode_subjenis']."','".$kode_lokasi."')");                    
                 }						
             }
 
@@ -279,12 +249,6 @@ class MitraController extends Controller
         }	
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request)
     {
         $this->validate($request, [
@@ -303,7 +267,7 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $del2 = DB::connection($this->sql)->table('par_mitra_bid')
+            $del2 = DB::connection($this->sql)->table('par_mitra_subjenis')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
