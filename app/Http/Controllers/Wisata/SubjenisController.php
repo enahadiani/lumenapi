@@ -64,11 +64,11 @@ class SubjenisController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_jenis)){
-                if($request->kode_jenis == "all"){
+            if(isset($request->kode_subjenis)){
+                if($request->kode_subjenis == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.kode_jenis='".$request->kode_jenis."' ";
+                    $filter = " and a.kode_subjenis='".$request->kode_subjenis."' ";
                 }
                 $sql= "select a.kode_subjenis,a.nama,a.kode_jenis,b.nama as nama_jenis from par_subjenis a inner join par_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }
