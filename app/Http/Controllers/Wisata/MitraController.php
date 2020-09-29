@@ -180,10 +180,10 @@ class MitraController extends Controller
                     {                
                         $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                         $foto = $nama_foto;
-                        if(Storage::disk('s3')->exists('apv/'.$foto)){
-                            Storage::disk('s3')->delete('apv/'.$foto);
+                        if(Storage::disk('s3')->exists('wisata/'.$foto)){
+                            Storage::disk('s3')->delete('wisata/'.$foto);
                         }
-                        Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                        Storage::disk('s3')->put('wisata/'.$foto,file_get_contents($file));
                         $arr_foto[] = $foto;
                         $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
                         $i++;
@@ -273,14 +273,14 @@ class MitraController extends Controller
                             //kalo ada cek nama sebelumnya ada atau -
                             if($request->nama_file_seb[$i] != "-"){
                                 //kalo ada hapus yang lama
-                                Storage::disk('s3')->delete('apv/'.$request->nama_file_seb[$i]);
+                                Storage::disk('s3')->delete('wisata/'.$request->nama_file_seb[$i]);
                             }
                             $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                             $foto = $nama_foto;
-                            if(Storage::disk('s3')->exists('apv/'.$foto)){
-                                Storage::disk('s3')->delete('apv/'.$foto);
+                            if(Storage::disk('s3')->exists('wisata/'.$foto)){
+                                Storage::disk('s3')->delete('wisata/'.$foto);
                             }
-                            Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                            Storage::disk('s3')->put('wisata/'.$foto,file_get_contents($file));
                             $arr_foto[] = $foto;
                         }else{
                             $arr_foto[] = $request->nama_file_seb[$i];
@@ -362,7 +362,7 @@ class MitraController extends Controller
 
             if(count($res3) > 0){
                 for($i=0;$i<count($res3);$i++){
-                    Storage::disk('s3')->delete('apv/'.$res3[$i]['file_dok']);
+                    Storage::disk('s3')->delete('wisata/'.$res3[$i]['file_dok']);
                 }
             }
 
