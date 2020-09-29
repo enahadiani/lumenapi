@@ -195,6 +195,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('penilaian','Sekolah\PenilaianController@update');
     $router->delete('penilaian','Sekolah\PenilaianController@destroy');
     $router->get('penilaian-ke','Sekolah\PenilaianController@getPenilaianKe');
+    $router->get('penilaian-kd','Sekolah\PenilaianController@getKD');
     
     $router->post('import-excel','Sekolah\PenilaianController@importExcel');
     $router->get('nilai-tmp','Sekolah\PenilaianController@getNilaiTmp');

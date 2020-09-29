@@ -106,6 +106,7 @@ class PenilaianController extends Controller
             'kode_kelas' => 'required',
             'kode_matpel' => 'required',
             'kode_jenis'=>'required',
+            'kode_kd'=>'required',
             'nis'=>'required|array',
             'nilai'=>'required|array',
             'nama_dok'=>'array|max:100',
@@ -152,7 +153,7 @@ class PenilaianController extends Controller
                 //     }
                 // }
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp));
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd));
                 for($i=0;$i<count($request->nis);$i++){
                     
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
@@ -208,13 +209,14 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah
+            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd
             from sis_nilai_m a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
                 left join sis_jenisnilai f on a.kode_jenis=f.kode_jenis and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
                 left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp
                 left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m 
                     where no_bukti <> '$request->no_bukti'
                     group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi
@@ -280,6 +282,7 @@ class PenilaianController extends Controller
             'kode_kelas' => 'required',
             'kode_matpel' => 'required',
             'kode_jenis'=>'required',
+            'kode_kd'=>'required',
             'nis'=>'required|array',
             'nilai'=>'required|array',
             'nama_dok'=>'array|max:100',
@@ -357,7 +360,7 @@ class PenilaianController extends Controller
                 ->delete();
 
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp));
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd));
                 for($i=0;$i<count($request->nis);$i++){
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
                     
@@ -644,6 +647,54 @@ class PenilaianController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['detail'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    
+    public function getKD(Request $request)
+    {
+
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->kode_pp) && $request->kode_pp != ""){
+                $filter .= " and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_matpel) && $request->kode_matpel != ""){
+                $filter .= " and a.kode_mapel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama
+            from sis_kd a
+            where a.kode_lokasi='".$kode_lokasi."' $filter");
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
