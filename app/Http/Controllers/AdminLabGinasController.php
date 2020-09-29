@@ -37,7 +37,7 @@ class AdminLabGinasController extends Controller
             $user = DB::connection($this->db)->select("	select  a.nik,a.kode_lokasi,a.kode_menu,a.nama,a.pass,a.status_admin,a.klp_akses,a.foto,a.password,a.background,a.path_view,e.id_form, b.nama as nmlok,b.logo
             from lab_hakakses a
             inner join lokasi b on a.kode_lokasi=b.kode_lokasi 
-            left join lab_form e on a.path_view=e.id_form 
+            left join lab_form e on a.path_view=e.kode_form 
             where a.nik= '$nik' 
             ");
             $user = json_decode(json_encode($user),true);

@@ -322,7 +322,7 @@ class AuthController extends Controller
 
         DB::connection($db)->beginTransaction();
         try {
-            $ins = DB::connection($db)->insert("insert into lab_log ( nik,tanggal,ip,agen,kota,loc,region,negara,page) values ('$request->nik','$request->tanggal','$request->ip','$request->agen','$request->kota','$request->loc','$request->region','$request->negara','$request->page') ");
+            $ins = DB::connection($db)->insert("insert into lab_log ( nik,tanggal,ip,agen,kota,loc,region,negara,page,kode_lokasi,kode_pp) values ('$request->nik','$request->tanggal','$request->ip','$request->agen','$request->kota','$request->loc','$request->region','$request->negara','$request->page','$request->kode_lokasi','$request->kode_pp') ");
             
             DB::connection($db)->commit();
             $success['status'] = true;
