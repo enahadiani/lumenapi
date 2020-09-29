@@ -311,6 +311,32 @@ class AuthController extends Controller
         return $this->respondWithToken($token,'admginas');
     }
 
+    public function simpanLog(Request $request,$id)
+    {
+          //validate incoming request 
+        if($id == 'webginas'){
+            $db = 'dbsaife';
+        }else if($id == 'webjava'){
+            $db = 'dbsaife';
+        }
+
+        DB::connection($db)->beginTransaction();
+        try {
+            $ins = DB::connection($db)->insert("insert into lab_log ( nik,tanggal,ip,agen,kota,loc,region,negara,page) values ('$request->nik','$request->tanggal','$request->ip','$request->agen','$request->kota','$request->loc','$request->region','$request->negara','$request->page') ");
+            
+            DB::connection($db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Log berhasil disimpan";
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Log gagal disimpan ".$e;
+            return response()->json($success, 200); 
+        }	
+
+    }
+
     public function loginAdminSilo(Request $request)
     {
           //validate incoming request 

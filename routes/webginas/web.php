@@ -31,6 +31,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
     $router->post('login', 'AuthController@loginWebginas');
     $router->get('hash-pass', 'AuthController@hassPassWebginas');
+    $router->post('lab-log/{id}', 'AuthController@simpanLog');
 });
 
 $router->get('storage/{filename}', function ($filename)

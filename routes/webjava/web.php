@@ -28,6 +28,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
     $router->post('login', 'AuthController@loginWebjava');
     $router->get('hash-pass', 'AuthController@hassPassWebjava');
+    $router->post('lab-log/{id}', 'AuthController@simpanLog');
 });
 
 $router->get('storage/{filename}', function ($filename)
