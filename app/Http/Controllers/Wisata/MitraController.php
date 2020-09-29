@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class MitraController extends Controller
 {   
@@ -153,12 +154,12 @@ class MitraController extends Controller
             'email' => 'required|max:100',            
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
-            'status' => 'required|max:50',             
+            'status' => 'required|max:50',   
+            'coor_x' => 'required',             
+            'coor_y' => 'required',             
             'arrsub'=>'required|array',
-            'arrsub.*.kode_subjenis' => 'required',
-            'arrdok'=>'required|array',            
-            'arrdok.*.nama' => 'required',            
-            'arrdok.*.file_dok' => 'required'            
+            'arrsub.*.kode_subjenis' => 'required',                                 
+            'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -170,8 +171,27 @@ class MitraController extends Controller
             }
             if($this->isUnik($request->kode_mitra,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
-                                                           ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
+                $arr_foto = array();
+                $arr_nama = array();
+                $i=0;
+                if($request->hasfile('file'))
+                {
+                    foreach($request->file('file') as $file)
+                    {                
+                        $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                        $foto = $nama_foto;
+                        if(Storage::disk('s3')->exists('apv/'.$foto)){
+                            Storage::disk('s3')->delete('apv/'.$foto);
+                        }
+                        Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                        $arr_foto[] = $foto;
+                        $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
+                        $i++;
+                    }
+                }
+
+                $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input, coor_x,coor_y) values 
+                                                           ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate(),'".$request->coor_x."','".$request->coor_y."')");
 
                 $arrsub = $request->arrsub;
                 if (count($arrsub) > 0){
@@ -180,13 +200,13 @@ class MitraController extends Controller
                                                                       ('".$request->kode_mitra."','".$arrsub[$i]['kode_subjenis']."','".$kode_lokasi."')");                    
                     }						
                 }	    
-                $arrdok = $request->arrdok;
-                if (count($arrdok) > 0){
-                    for ($i=0;$i <count($arrdok);$i++){                
-                        $ins3[$i] = DB::connection($this->sql)->insert("insert into par_mitra_sok(no_urut,kode_mitra,kode_lokasi,nama,file_dok) values  
-                                                                        (".$i.",'".$request->kode_mitra."','".$kode_lokasi."','".$arrdok[$i]['nama']."','".$arrdok[$i]['file_dok']."')");                    
-                    }						
-                }	 
+
+                if(count($arr_nama) > 0){
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into par_mitra_dok (kode_lokasi,kode_mitra,nama,no_urut,file_dok) values 
+                                                                      (".$kode_lokasi.",'".$request->kode_mitra."','".$arr_nama[$i]."',".$i.",'".$arr_foto[$i]."')"); 
+                    }
+                }
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -219,11 +239,11 @@ class MitraController extends Controller
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',
+            'coor_x' => 'required',             
+            'coor_y' => 'required',             
             'arrsub'=>'required|array',
-            'arrsub.*.kode_subjenis' => 'required',
-            'arrdok'=>'required|array',            
-            'arrdok.*.nama' => 'required',            
-            'arrdok.*.file_dok' => 'required'                                   
+            'arrsub.*.kode_subjenis' => 'required',            
+            'file.*'=>'file|max:10240'                                  
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -234,6 +254,45 @@ class MitraController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            $arr_foto = array();
+            $arr_nama = array();
+            $arr_foto2 = array();
+            $arr_nama2 = array();
+            $i=0;
+            $cek = $request->file;
+
+            //cek upload file tidak kosong
+            if(!empty($cek)){
+                if(count($request->nama_file) > 0){
+                    //looping berdasarkan nama dok
+                    for($i=0;$i<count($request->nama_file);$i++){
+                        //cek row i ada file atau tidak
+                        if(isset($request->file('file')[$i])){
+                            $file = $request->file('file')[$i];
+
+                            //kalo ada cek nama sebelumnya ada atau -
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('apv/'.$request->nama_file_seb[$i]);
+                            }
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            if(Storage::disk('s3')->exists('apv/'.$foto)){
+                                Storage::disk('s3')->delete('apv/'.$foto);
+                            }
+                            Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                        }else{
+                            $arr_foto[] = $request->nama_file_seb[$i];
+                        }     
+                        $arr_nama[] = $request->input('nama_file')[$i];
+                        $arr_nama2[] = count($request->nama_file).'|'.$i.'|'.isset($request->file('file')[$i]);
+                    }
+
+                    $del3 = DB::connection($this->sql)->table('par_mitra_dok')->where('kode_lokasi', $kode_lokasi)->where('kode_mitra', $request->kode_mitra)->delete();
+                }
+            }
+
             $del = DB::connection($this->sql)->table('par_mitra')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
@@ -244,13 +303,8 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $del3 = DB::connection($this->sql)->table('par_mitra_dok')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_mitra', $request->kode_mitra)
-            ->delete();
-
-            $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
-                                                      ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
+            $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input,coor_x,coor_y) values 
+                                                      ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate(),'".$request->coor_x."','".$request->coor_y."')");
                                           
             $arrsub = $request->arrsub;
             if (count($arrsub) > 0){
@@ -260,12 +314,11 @@ class MitraController extends Controller
                 }						
             }
 
-            $arrdok = $request->arrdok;
-            if (count($arrdok) > 0){
-                for ($i=0;$i <count($arrdok);$i++){                
-                    $ins3[$i] = DB::connection($this->sql)->insert("insert into par_mitra_sok(no_urut,kode_mitra,kode_lokasi,nama,file_dok) values  
-                                                                    (".$i.",'".$request->kode_mitra."','".$kode_lokasi."','".$arrdok[$i]['nama']."','".$arrdok[$i]['file_dok']."')");                    
-                }						
+            if(count($arr_nama) > 0){
+                for($i=0; $i<count($arr_nama);$i++){
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into par_mitra_dok (kode_lokasi,kode_mitra,nama,no_urut,file_dok) values 
+                                                                  (".$kode_lokasi.",'".$request->kode_mitra."','".$arr_nama[$i]."',".$i.",'".$arr_foto[$i]."')"); 
+                }
             }
 
             DB::connection($this->sql)->commit();
@@ -303,11 +356,21 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
+            $sql3="select kode_mitra,nama,file_dok from par_mitra_dok where kode_lokasi='".$kode_lokasi."' and kode_mitra='".$request->kode_mitra."'  order by no_urut";
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+
+            if(count($res3) > 0){
+                for($i=0;$i<count($res3);$i++){
+                    Storage::disk('s3')->delete('apv/'.$res3[$i]['file_dok']);
+                }
+            }
+
             $del3 = DB::connection($this->sql)->table('par_mitra_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
-
+           
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Mitra berhasil dihapus";
