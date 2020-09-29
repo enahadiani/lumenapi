@@ -154,7 +154,9 @@ class MitraController extends Controller
             'email' => 'required|max:100',            
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
-            'status' => 'required|max:50',             
+            'status' => 'required|max:50',   
+            'coor_x' => 'required',             
+            'coor_y' => 'required',             
             'arrsub'=>'required|array',
             'arrsub.*.kode_subjenis' => 'required',                                 
             'file.*'=>'file|max:10240'
@@ -188,8 +190,8 @@ class MitraController extends Controller
                     }
                 }
 
-                $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
-                                                           ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
+                $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input, coor_x,coor_y) values 
+                                                           ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate(),'".$request->coor_x."','".$request->coor_y."')");
 
                 $arrsub = $request->arrsub;
                 if (count($arrsub) > 0){
@@ -237,8 +239,10 @@ class MitraController extends Controller
             'pic' => 'required|max:50', 
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',
+            'coor_x' => 'required',             
+            'coor_y' => 'required',             
             'arrsub'=>'required|array',
-            'arrsub.*.kode_subjenis' => 'required',
+            'arrsub.*.kode_subjenis' => 'required',            
             'file.*'=>'file|max:10240'                                  
         ]);
 
@@ -299,8 +303,8 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
-                                                      ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
+            $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input,coor_x,coor_y) values 
+                                                      ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate(),'".$request->coor_x."','".$request->coor_y."')");
                                           
             $arrsub = $request->arrsub;
             if (count($arrsub) > 0){
