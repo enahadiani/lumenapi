@@ -758,13 +758,14 @@ class PenilaianController extends Controller
             $no_bukti = $request->no_bukti;
             $kode_pp = $request->kode_pp;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah
+            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd
             from sis_nilai_m a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
                 left join sis_jenisnilai f on a.kode_jenis=f.kode_jenis and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
                 left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp
                 left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m 
                     where no_bukti <> '$no_bukti'
                     group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi
