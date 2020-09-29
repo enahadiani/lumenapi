@@ -114,17 +114,22 @@ class MitraController extends Controller
             $res2 = DB::connection($this->sql)->select( "select a.kode_subjenis,a.nama, case when b.kode_subjenis is null then 'NON' else 'CEK' end as status from par_subjenis a left join par_mitra_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
             $res2 = json_decode(json_encode($res2),true);
 
+            $res3 = DB::connection($this->sql)->select( "select * from par_mitra_dok where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."' ");
+            $res3 = json_decode(json_encode($res2),true);
+
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
-                $success['arrsub'] = $res2;                                
+                $success['arrsub'] = $res2; 
+                $success['arrdok'] = $res3;                                
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['arrsub'] = [];                
+                $success['arrsub'] = [];   
+                $success['arrdok'] = [];                                             
                 $success['status'] = "FAILED";
             }
             return response()->json($success, $this->successStatus);
@@ -150,8 +155,10 @@ class MitraController extends Controller
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',             
             'arrsub'=>'required|array',
-            'arrsub.*.kode_subjenis' => 'required'            
-
+            'arrsub.*.kode_subjenis' => 'required',
+            'arrdok'=>'required|array',            
+            'arrdok.*.nama' => 'required',            
+            'arrdok.*.file_dok' => 'required'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -170,9 +177,17 @@ class MitraController extends Controller
                 if (count($arrsub) > 0){
                     for ($i=0;$i <count($arrsub);$i++){                
                         $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_subjenis(kode_mitra,kode_subjenis,kode_lokasi) values  
-                                                                        ('".$request->kode_mitra."','".$arrsub[$i]['kode_subjenis']."','".$kode_lokasi."')");                    
+                                                                      ('".$request->kode_mitra."','".$arrsub[$i]['kode_subjenis']."','".$kode_lokasi."')");                    
                     }						
-                }	                                          
+                }	    
+                $arrdok = $request->arrdok;
+                if (count($arrdok) > 0){
+                    for ($i=0;$i <count($arrdok);$i++){                
+                        $ins3[$i] = DB::connection($this->sql)->insert("insert into par_mitra_sok(no_urut,kode_mitra,kode_lokasi,nama,file_dok) values  
+                                                                        (".$i.",'".$request->kode_mitra."','".$kode_lokasi."','".$arrdok[$i]['nama']."','".$arrdok[$i]['file_dok']."')");                    
+                    }						
+                }	 
+
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Mitra berhasil disimpan";
@@ -205,7 +220,10 @@ class MitraController extends Controller
             'no_hp' => 'required|max:50', 
             'status' => 'required|max:50',
             'arrsub'=>'required|array',
-            'arrsub.*.kode_subjenis' => 'required'                        
+            'arrsub.*.kode_subjenis' => 'required',
+            'arrdok'=>'required|array',            
+            'arrdok.*.nama' => 'required',            
+            'arrdok.*.file_dok' => 'required'                                   
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -226,6 +244,11 @@ class MitraController extends Controller
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
 
+            $del3 = DB::connection($this->sql)->table('par_mitra_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_mitra', $request->kode_mitra)
+            ->delete();
+
             $ins = DB::connection($this->sql)->insert("insert into par_mitra(kode_mitra,kode_lokasi,nama,alamat,no_tel,kecamatan,website,email,pic,no_hp,status,nik_user,tgl_input) values 
                                                       ('".$request->kode_mitra."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->no_tel."','".$request->kecamatan."','".$request->website."','".$request->email."','".$request->pic."','".$request->no_hp."','".$request->status."','".$nik."',getdate())");
                                           
@@ -234,6 +257,14 @@ class MitraController extends Controller
                 for ($i=0;$i <count($arrsub);$i++){                
                     $ins2[$i] = DB::connection($this->sql)->insert("insert into par_mitra_subjenis(kode_mitra,kode_subjenis,kode_lokasi) values  
                                                                     ('".$request->kode_mitra."','".$arrsub[$i]['kode_subjenis']."','".$kode_lokasi."')");                    
+                }						
+            }
+
+            $arrdok = $request->arrdok;
+            if (count($arrdok) > 0){
+                for ($i=0;$i <count($arrdok);$i++){                
+                    $ins3[$i] = DB::connection($this->sql)->insert("insert into par_mitra_sok(no_urut,kode_mitra,kode_lokasi,nama,file_dok) values  
+                                                                    (".$i.",'".$request->kode_mitra."','".$kode_lokasi."','".$arrdok[$i]['nama']."','".$arrdok[$i]['file_dok']."')");                    
                 }						
             }
 
@@ -268,6 +299,11 @@ class MitraController extends Controller
             ->delete();
 
             $del2 = DB::connection($this->sql)->table('par_mitra_subjenis')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_mitra', $request->kode_mitra)
+            ->delete();
+
+            $del3 = DB::connection($this->sql)->table('par_mitra_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_mitra', $request->kode_mitra)
             ->delete();
