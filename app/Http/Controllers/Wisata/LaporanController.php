@@ -159,6 +159,7 @@ class LaporanController extends Controller
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
+                if($i == 4 || $i == 5) continue;
                 if(ISSET($request->input($col_array[$i])[0])){
                     if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
@@ -180,19 +181,19 @@ class LaporanController extends Controller
                 }
             }
 
-            if($request->input($col_array[0][0]) == '=') {
+            if($request->input($col_array[0])[0] == '=') {
                 $success['bidang'] = $this->getBidang($request->input($col_array[0])[1]);   
             }
 
-            if($request->input($col_array[1][0]) == '=') {
+            if($request->input($col_array[1])[0] == '=') {
                 $success['mitra'] = $this->getMitra($request->input($col_array[1])[1]);   
             }
 
-            if($request->input($col_array[2][0]) == '=') {
+            if($request->input($col_array[2])[0] == '=') {
                 $success['jenis'] = $this->getJenis($request->input($col_array[2])[1]);   
             }
 
-            if($request->input($col_array[3][0]) == '=') {
+            if($request->input($col_array[3])[0] == '=') {
                 $success['subjenis'] = $this->getSubJenis($request->input($col_array[3])[1]);   
             }
             
@@ -211,6 +212,7 @@ class LaporanController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['sql'] = $sql;
                 $success['bulan'] = $this->getNamaBulan(intval($request->input($col_array[4])));
                 $success['tahun'] = $request->input($col_array[5])[1];
                 $success['message'] = "Success!";
