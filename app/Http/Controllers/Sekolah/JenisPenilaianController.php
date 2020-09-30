@@ -47,7 +47,10 @@ class JenisPenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_jenisnilai a where a.kode_lokasi='".$kode_lokasi."'  $filter ");
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp 
+            from sis_jenisnilai a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."'  $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -103,7 +106,7 @@ class JenisPenilaianController extends Controller
             }
             if($this->isUnik($request->kode_jenis,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_jenis,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif,tgl_input) values ('$request->kode_jenis','$request->nama','$kode_lokasi','$request->kode_pp','$request->flag_aktif',getdate()) ");
                 
                 DB::connection('sqlsrvtarbak')->commit();
                 $success['status'] = true;
@@ -213,8 +216,8 @@ class JenisPenilaianController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_jenis,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);          
-                        
+            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif,tgl_input) values ('$request->kode_jenis','$request->nama','$kode_lokasi','$request->kode_pp','$request->flag_aktif',getdate()) ");   
+            
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
             $success['kode'] = $request->kode_jenis;
