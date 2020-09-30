@@ -107,9 +107,12 @@ class JenisPenilaianController extends Controller
                 
                 DB::connection('sqlsrvtarbak')->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_jenis;
                 $success['message'] = "Data Jenis Penilaian berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['kode'] = $request->kode_jenis;
+                $success['jenis'] = 'duplicate';
                 $success['message'] = "Error : Duplicate entry. Kode Jenis Penilaian sudah ada di database!";
             }
             return response()->json(['success'=>$success], $this->successStatus);     
@@ -145,8 +148,10 @@ class JenisPenilaianController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_jenis= $request->kode_jenis;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_jenis, nama,kode_pp,flag_aktif from sis_jenisnilai where kode_jenis ='".$kode_jenis."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+            $sql = "select kode_jenis, nama,kode_pp,flag_aktif from sis_jenisnilai where kode_jenis ='".$kode_jenis."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'";
+            $res = DB::connection('sqlsrvtarbak')->select($sql);
             $res = json_decode(json_encode($res),true);
+            $success['sql'] = $sql;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -212,6 +217,7 @@ class JenisPenilaianController extends Controller
                         
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_jenis;
             $success['message'] = "Data Jenis Penilaian berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
