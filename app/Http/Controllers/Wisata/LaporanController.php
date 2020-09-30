@@ -104,8 +104,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('kode_bidang', 'kode_mitra', 'bulan', 'tahun');
-            $db_col_name = array('a.kode_bidang', 'a.kode_mitra', 'a.bulan', 'a.tahun');
+            $col_array = array('kode_bidang', 'kode_mitra', 'kode_jenis', 'kode_subjenis','bulan', 'tahun');
+            $db_col_name = array('e.kode_bidang', 'b.kode_mitra', 'd.kode_jenis', 'c.kode_subjenis', 'z.bulan', 'z.tahun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
 
             $this_in = "";
@@ -114,7 +114,7 @@ class LaporanController extends Controller
                     if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
-                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                        $where .= " and ".$db_col_name[$i]." like '%".$request->input($col_array[$i])[1]."' ";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -130,17 +130,22 @@ class LaporanController extends Controller
                 }
             }
             
-            $sql="select distinct c.nama as nama_mitra, d.nama as nama_bidang, SUM(b.jumlah) as jumlah from par_kunj_m a 
-            inner join par_kunj_d b on a.no_bukti=b.no_bukti and b.kode_lokasi='".$kode_lokasi."'
-            inner join par_mitra c on a.kode_mitra=c.kode_mitra and c.kode_lokasi='".$kode_lokasi."'
-            inner join par_bidang d on a.kode_bidang=d.kode_bidang and d.kode_lokasi='".$kode_lokasi."' $where 
-            group by a.kode_mitra, a.kode_bidang,c.nama, d.nama, a.bulan, a.tahun";
+            $sql="select b.kode_mitra,b.nama,sum(a.jumlah) as kunjungan
+                from par_kunj_d a
+                inner join par_kunj_m z on a.no_bukti=z.no_bukti and a.kode_lokasi=z.kode_lokasi
+                inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi
+                inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi
+                inner join par_jenis d on c.kode_jenis=d.kode_jenis and c.kode_lokasi=d.kode_lokasi
+                inner join par_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                $where 
+                group by b.kode_mitra,b.nama";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['sql'] = $sql;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
