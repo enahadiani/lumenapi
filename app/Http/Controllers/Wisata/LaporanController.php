@@ -155,6 +155,7 @@ class LaporanController extends Controller
             $col_array = array('kode_bidang', 'kode_mitra', 'kode_jenis', 'kode_subjenis','bulan', 'tahun');
             $db_col_name = array('e.kode_bidang', 'b.kode_mitra', 'd.kode_jenis', 'c.kode_subjenis', 'z.bulan', 'z.tahun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
+            $group = "group by b.kode_mitra,b.nama";
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -163,6 +164,7 @@ class LaporanController extends Controller
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." like '%".$request->input($col_array[$i])[1]."' ";
+                        $group .= ",".$db_col_name[$i];
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -202,7 +204,7 @@ class LaporanController extends Controller
                 inner join par_jenis d on c.kode_jenis=d.kode_jenis and c.kode_lokasi=d.kode_lokasi
                 inner join par_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
                 $where 
-                group by b.kode_mitra,b.nama";
+                $group";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
