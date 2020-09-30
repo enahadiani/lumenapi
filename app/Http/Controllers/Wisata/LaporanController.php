@@ -178,20 +178,20 @@ class LaporanController extends Controller
                 }
             }
 
-            if($request->input($col_array['kode_bidang'][0]) == '=') {
-                $success['bidang'] = $this->getBidang($request->input($col_array['kode_bidang'])[1]);   
+            if($request->input($col_array[0][0]) == '=') {
+                $success['bidang'] = $this->getBidang($request->input($col_array[0])[1]);   
             }
 
-            if($request->input($col_array['kode_mitra'][0]) == '=') {
-                $success['mitra'] = $this->getMitra($request->input($col_array['kode_mitra'])[1]);   
+            if($request->input($col_array[1][0]) == '=') {
+                $success['mitra'] = $this->getMitra($request->input($col_array[1])[1]);   
             }
 
-            if($request->input($col_array['kode_jenis'][0]) == '=') {
-                $success['jenis'] = $this->getJenis($request->input($col_array['kode_jenis'])[1]);   
+            if($request->input($col_array[2][0]) == '=') {
+                $success['jenis'] = $this->getJenis($request->input($col_array[2])[1]);   
             }
 
-            if($request->input($col_array['kode_subjenis'][0]) == '=') {
-                $success['subjenis'] = $this->getSubJenis($request->input($col_array['kode_subjenis'])[1]);   
+            if($request->input($col_array[3][0]) == '=') {
+                $success['subjenis'] = $this->getSubJenis($request->input($col_array[3])[1]);   
             }
             
             $sql="select b.kode_mitra,b.nama,sum(a.jumlah) as kunjungan
