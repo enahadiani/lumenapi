@@ -12,6 +12,15 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
+$router->get('storage/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('sekolah/'.$filename)) {
+        $success['message'] = 'Dokumen tidak tersedia!';
+        $success['status'] = false;
+    }
+    return Storage::disk('s3')->response('sekolah/'.$filename); 
+});
+
 $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login-guru', 'AuthController@loginTarbak');
     $router->get('hash-pass-guru', 'AuthController@hashPasswordTarbak');
