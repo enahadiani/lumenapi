@@ -112,7 +112,12 @@ class MitraController extends Controller
             $res = DB::connection($this->sql)->select("select * from par_mitra where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->sql)->select( "select a.kode_subjenis,a.nama, case when b.kode_subjenis is null then 'NON' else 'CEK' end as status from par_subjenis a left join par_mitra_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' where a.kode_lokasi='".$kode_lokasi."' ");
+            $res2 = DB::connection($this->sql)->select( "select a.kode_subjenis,a.nama, case when b.kode_subjenis is null then 'NON' else 'CEK' end as status 
+            from par_subjenis a 
+            inner join par_jenis c on a.kode_jenis=c.kode_jenis and a.kode_lokasi=c.kode_lokasi 
+            inner join par_bidang d on a.kode_bidang=d.kode_bidang and a.kode_lokasi=d.kode_lokasi
+            left join par_mitra_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi and b.kode_mitra='".$request->kode_mitra."' 
+            where a.kode_lokasi='".$kode_lokasi."' order by d.kode_bidang");
             $res2 = json_decode(json_encode($res2),true);
 
             $res3 = DB::connection($this->sql)->select( "select * from par_mitra_dok where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."' ");
