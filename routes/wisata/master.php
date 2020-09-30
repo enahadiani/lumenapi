@@ -49,7 +49,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('mitrabid','Wisata\MitraController@edit');
     $router->get('getCamat','Wisata\MitraController@getCamat');
     $router->post('mitra','Wisata\MitraController@store');
-    $router->put('mitra','Wisata\MitraController@update');
+    $router->post('mitraupdate','Wisata\MitraController@update');
     $router->delete('mitra','Wisata\MitraController@destroy');    
 
     //Kunjungan

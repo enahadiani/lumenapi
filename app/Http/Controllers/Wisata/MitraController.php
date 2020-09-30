@@ -116,7 +116,7 @@ class MitraController extends Controller
             $res2 = json_decode(json_encode($res2),true);
 
             $res3 = DB::connection($this->sql)->select( "select * from par_mitra_dok where kode_mitra='".$request->kode_mitra."' and kode_lokasi='".$kode_lokasi."' ");
-            $res3 = json_decode(json_encode($res2),true);
+            $res3 = json_decode(json_encode($res3),true);
 
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
