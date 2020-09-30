@@ -155,14 +155,17 @@ class LaporanController extends Controller
             $col_array = array('kode_bidang', 'kode_mitra', 'kode_jenis', 'kode_subjenis','bulan', 'tahun');
             $db_col_name = array('e.kode_bidang', 'b.kode_mitra', 'd.kode_jenis', 'c.kode_subjenis', 'z.bulan', 'z.tahun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
+            $group = "group by b.kode_mitra,b.nama";
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
+                if($i == 4 || $i == 5) continue;
                 if(ISSET($request->input($col_array[$i])[0])){
                     if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." like '%".$request->input($col_array[$i])[1]."' ";
+                        $group .= ",".$db_col_name[$i];
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -178,20 +181,20 @@ class LaporanController extends Controller
                 }
             }
 
-            if($request->input($col_array['kode_bidang'][0]) == '=') {
-                $success['bidang'] = $this->getBidang($request->input($col_array['kode_bidang'])[1]);   
+            if($request->input($col_array[0])[0] == '=') {
+                $success['bidang'] = $this->getBidang($request->input($col_array[0])[1]);   
             }
 
-            if($request->input($col_array['kode_mitra'][0]) == '=') {
-                $success['mitra'] = $this->getMitra($request->input($col_array['kode_mitra'])[1]);   
+            if($request->input($col_array[1])[0] == '=') {
+                $success['mitra'] = $this->getMitra($request->input($col_array[1])[1]);   
             }
 
-            if($request->input($col_array['kode_jenis'][0]) == '=') {
-                $success['jenis'] = $this->getJenis($request->input($col_array['kode_jenis'])[1]);   
+            if($request->input($col_array[2])[0] == '=') {
+                $success['jenis'] = $this->getJenis($request->input($col_array[2])[1]);   
             }
 
-            if($request->input($col_array['kode_subjenis'][0]) == '=') {
-                $success['subjenis'] = $this->getSubJenis($request->input($col_array['kode_subjenis'])[1]);   
+            if($request->input($col_array[3])[0] == '=') {
+                $success['subjenis'] = $this->getSubJenis($request->input($col_array[3])[1]);   
             }
             
             $sql="select b.kode_mitra,b.nama,sum(a.jumlah) as kunjungan
@@ -202,15 +205,16 @@ class LaporanController extends Controller
                 inner join par_jenis d on c.kode_jenis=d.kode_jenis and c.kode_lokasi=d.kode_lokasi
                 inner join par_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
                 $where 
-                group by b.kode_mitra,b.nama";
+                $group";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['sql'] = $sql;
                 $success['bulan'] = $this->getNamaBulan(intval($request->input($col_array[4])));
-                $success['tahun'] = $request->input($col_array[5])[0];
+                $success['tahun'] = $request->input($col_array[5])[1];
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
