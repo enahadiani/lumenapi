@@ -305,7 +305,7 @@ class PenilaianController extends Controller
                 $strSQL = "select nu as jumlah from sis_nilai_m where no_bukti='$no_bukti' ";	
                 $cek = DB::connection('sqlsrvtarbak')->select($strSQL);
                 if(count($cek) > 0){
-                    $no_urut = $res[0]->jumlah;
+                    $no_urut = $cek[0]->jumlah;
                 }else{
                     $no_urut = 1;
                 }

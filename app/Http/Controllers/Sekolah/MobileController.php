@@ -1057,4 +1057,114 @@ class MobileController extends Controller
         
     }
 
+    public function getMatpel(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard('siswa')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+            
+            $filter = "";
+            if(isset($request->kode_matpel)){
+                $filter .= "and a.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama
+            from sis_matpel a 
+            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$kode_pp' $filter ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getDetMatpel(Request $request)
+    {
+        $this->validate($request,[
+            'kode_matpel' => 'required',
+            'kode_sem' => 'required|in:1,2,All'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('siswa')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+
+            if(isset($request->kode_sem)){
+                if($request->kode_sem != "All"){
+                    $filter = " and b.kode_sem ='$request->kode_sem' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $res3 = DB::connection('sqlsrvtarbak')->select("
+            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+            $res3 = json_decode(json_encode($res3),true);
+            
+            $res2 = DB::connection('sqlsrvtarbak')->select("select a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel 
+            from sis_guru_matpel a
+            inner join karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' ");
+            $res2 = json_decode(json_encode($res2),true);
+
+            $sql = "select a.kode_kd,a.nama as nama_kd,a.tgl_input,b.no_bukti,c.nilai,'-' as pelaksanaan,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok
+            from sis_kd a
+            inner join sis_nilai_m b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_mapel=b.kode_matpel
+            inner join sis_nilai c on b.no_bukti=c.no_bukti and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
+            left join sis_nilai_dok d on b.no_bukti=d.no_bukti and b.kode_lokasi=d.kode_lokasi and b.kode_pp=d.kode_pp and c.nis=d.nis
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_mapel='$request->kode_matpel'  ";
+            // $success['sql'] = $sql;
+            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data_ta'] = $res3;
+                $success['data_guru'] = $res2;
+                $success['data_kompetensi'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data_ta'] = [];
+                $success['data_guru'] = [];
+                $success['data_kompetensi'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+
 }

@@ -59,6 +59,11 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('nilai', 'Sekolah\MobileController@getNilai');
     $router->get('prestasi', 'Sekolah\MobileController@getPrestasi');
     $router->get('raport', 'Sekolah\MobileController@getRaport');
+    $router->get('mata-pelajaran', 'Sekolah\MobileController@getMatpel');
+    $router->get('mata-pelajaran-detail', 'Sekolah\MobileController@getDetMatpel');
+
+    $router->post('update-password', 'AdminSiswaController@updatePassword');
+    $router->post('update-foto', 'AdminSiswaController@updatePhoto');
 
 
 });
