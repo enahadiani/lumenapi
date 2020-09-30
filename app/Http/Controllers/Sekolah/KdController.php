@@ -39,6 +39,12 @@ class KdController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_kd)){
+                $filter .= " and a.kode_kd='$request->kode_kd' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection($this->db)->select("
             select a.kode_mapel,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status   
             from sis_kd a

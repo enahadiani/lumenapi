@@ -40,6 +40,12 @@ class MataPelajaranController extends Controller
             }else{
                 $filter = "";
             }
+            if(isset($request->kode_matpel)){
+                $filter .= "and a.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
             from sis_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
