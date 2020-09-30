@@ -145,10 +145,18 @@ class KkmController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_kkm= $request->kode_kkm;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kkm, a.kode_tingkat,a.kode_ta,a.kode_jur,a.flag_aktif,a.kode_pp from sis_kkm a where a.kode_kkm='$kode_kkm' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' group by a.kode_kkm,kode_ta,a.kode_tingkat,a.kode_jur,a.flag_aktif,a.kode_pp");
+            $res = DB::connection('sqlsrvtarbak')->select("
+            select a.kode_kkm, a.kode_tingkat,a.kode_ta,a.kode_jur,a.flag_aktif,a.kode_pp,b.nama as nama_pp,c.nama as nama_tingkat,d.nama as nama_jur,e.nama as nama_ta, case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as nama_status 
+            from sis_kkm a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_tingkat c on a.kode_tingkat=c.kode_tingkat and a.kode_lokasi=c.kode_lokasi
+            inner join sis_jur d on a.kode_jur=d.kode_jur and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            inner join sis_ta e on a.kode_ta=e.kode_ta and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
+            where a.kode_kkm='$kode_kkm' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'
+            group by a.kode_kkm,a.kode_ta,a.kode_tingkat,a.kode_jur,a.flag_aktif,a.kode_pp,b.nama,c.nama,d.nama,e.nama");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kkm, a.kode_tingkat, a.kode_matpel,b.nama, a.kkm from sis_kkm a inner join sis_matpel b on a.kode_matpel=b.kode_matpel where a.kode_kkm='$kode_kkm' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'");
+            $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kkm, a.kode_tingkat, a.kode_matpel,b.nama as nama_matpel, a.kkm from sis_kkm a inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp where a.kode_kkm='$kode_kkm' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'");
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
