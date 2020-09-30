@@ -96,6 +96,54 @@ class LaporanController extends Controller
         }
     }
 
+    function getMitra($kode) {
+        try {
+            $res = DB::connection($this->sql)->select("select distinct nama from par_mitra where kode_mitra='".$kode."'");						
+            $res= json_decode(json_encode($res),true);
+            return $res[0]['nama'];
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getBidang($kode) {
+        try {
+            $res = DB::connection($this->sql)->select("select distinct nama from par_bidang where kode_bidang='".$kode."'");						
+            $res= json_decode(json_encode($res),true);
+            return $res[0]['nama'];
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getJenis($kode) {
+        try {
+            $res = DB::connection($this->sql)->select("select distinct nama from par_jenis where kode_jenis='".$kode."'");						
+            $res= json_decode(json_encode($res),true);
+            return $res[0]['nama'];
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getSubJenis($kode) {
+        try {
+            $res = DB::connection($this->sql)->select("select distinct nama from par_subjenis where kode_subjenis='".$kode."'");						
+            $res= json_decode(json_encode($res),true);
+            return $res[0]['nama'];
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getReportKunjungan(Request $request){
         try {
             
@@ -128,6 +176,22 @@ class LaporanController extends Controller
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
                     }
                 }
+            }
+
+            if($request->input($col_array['kode_bidang'][0]) == '=') {
+                $success['bidang'] = $this->getBidang($request->input($col_array['kode_bidang'])[1]);   
+            }
+
+            if($request->input($col_array['kode_mitra'][0]) == '=') {
+                $success['mitra'] = $this->getMitra($request->input($col_array['kode_mitra'])[1]);   
+            }
+
+            if($request->input($col_array['kode_jenis'][0]) == '=') {
+                $success['jenis'] = $this->getJenis($request->input($col_array['kode_jenis'])[1]);   
+            }
+
+            if($request->input($col_array['kode_subjenis'][0]) == '=') {
+                $success['subjenis'] = $this->getSubJenis($request->input($col_array['kode_subjenis'])[1]);   
             }
             
             $sql="select b.kode_mitra,b.nama,sum(a.jumlah) as kunjungan
