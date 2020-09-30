@@ -107,8 +107,8 @@ class MataPelajaranController extends Controller
             }
             if($this->isUnik($request->kode_matpel,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif) values (?, ?, ?, ?, ?, ?, ?)', [$request->kode_matpel,$request->nama,$kode_lokasi,$request->keterangan,$request->kode_pp,$request->sifat,$request->flag_aktif]);
-                
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif,tgl_input) values ('$request->kode_matpel','$request->nama','$kode_lokasi','$request->keterangan','$request->kode_pp','$request->sifat','$request->flag_aktif',getdate())");     
+
                 DB::connection('sqlsrvtarbak')->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Mata Pelajaran berhasil disimpan";
@@ -116,6 +116,8 @@ class MataPelajaranController extends Controller
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode Mata Pelajaran sudah ada di database!";
             }
+            
+            $success['kode_matpel'] = $request->kode_matpel;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
@@ -214,11 +216,12 @@ class MataPelajaranController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif) values (?, ?, ?, ?, ?, ?, ?)', [$request->kode_matpel,$request->nama,$kode_lokasi,$request->keterangan,$request->kode_pp,$request->sifat,$request->flag_aktif]);          
+            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif,tgl_input) values ('$request->kode_matpel','$request->nama','$kode_lokasi','$request->keterangan','$request->kode_pp','$request->sifat','$request->flag_aktif',getdate())");          
                         
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
             $success['message'] = "Data Mata Pelajaran berhasil diubah";
+            $success['kode_matpel'] = $request->kode_matpel;
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();

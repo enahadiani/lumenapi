@@ -84,8 +84,8 @@ class KkmController extends Controller
             'kode_pp' => 'required',
             'kode_jur' => 'required',
             'flag_aktif' => 'required',
-            'kode_matpel.*' => 'required',
-            'kkm.*'=>'required'
+            'kode_matpel' => 'required|array',
+            'kkm'=>'required|array'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -101,7 +101,7 @@ class KkmController extends Controller
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$kode,$request->kode_ta,$request->kode_tingkat,$request->kode_matpel[$i],$kode_lokasi,$request->kode_pp,$request->kkm[$i],$request->flag_aktif,$request->kode_jur]);
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur,tgl_input) values ('$kode','$request->kode_ta','$request->kode_tingkat','".$request->kode_matpel[$i]."','$kode_lokasi','$request->kode_pp','".$request->kkm[$i]."','$request->flag_aktif','$request->kode_jur',getdate())");
                     
                 }
                 
@@ -109,6 +109,7 @@ class KkmController extends Controller
             
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
+            $success['kode_kkm'] = $kode;
             $success['message'] = "Data Kkm berhasil disimpan. Kode KKM:".$kode;
             
             return response()->json(['success'=>$success], $this->successStatus);     
@@ -198,8 +199,8 @@ class KkmController extends Controller
             'kode_pp' => 'required',
             'kode_jur' => 'required',
             'flag_aktif' => 'required',
-            'kode_matpel.*' => 'required',
-            'kkm.*'=>'required'
+            'kode_matpel' => 'required|array',
+            'kkm'=>'required|array'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -220,14 +221,14 @@ class KkmController extends Controller
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->kode_kkm,$request->kode_ta,$request->kode_tingkat,$request->kode_matpel[$i],$kode_lokasi,$request->kode_pp,$request->kkm[$i],$request->flag_aktif,$request->kode_jur]);
-                    
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur,tgl_input) values ('$request->kode_kkm','$request->kode_ta','$request->kode_tingkat','".$request->kode_matpel[$i]."','$kode_lokasi','$request->kode_pp','".$request->kkm[$i]."','$request->flag_aktif','$request->kode_jur',getdate())");                    
                 }
                 
             }          
                         
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
+            $success['kode_kkm'] = $request->kode_kkm;
             $success['message'] = "Data Kkm berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
