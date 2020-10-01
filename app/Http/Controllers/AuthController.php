@@ -15,6 +15,7 @@ use  App\AdminSatpam;
 use  App\AdminRtrw;
 use  App\AdminWarga;
 use  App\AdminSilo;
+use  App\AdminAset;
 
 class AuthController extends Controller
 {
@@ -115,6 +116,23 @@ class AuthController extends Controller
         }
 
         return $this->respondWithToken($token,'admin');
+    }
+
+    public function loginAdminAset(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('aset')->setTTL(60)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token,'aset');
     }
 
     public function loginYpt(Request $request)
@@ -515,6 +533,30 @@ class AuthController extends Controller
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrv2')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+    }
+
+    public function hashPasswordAset(){
+        $users = AdminAset::all();
+        DB::connection('dbaset')->beginTransaction();
+        
+        try {
+            DB::connection('dbaset')->table('hakakses')->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('dbaset')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('dbaset')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('dbaset')->rollback();
             $success['status'] = false;
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);

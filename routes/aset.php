@@ -26,7 +26,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
-    $router->post('login', 'AuthController@loginAdmin');
+    $router->post('login', 'AuthController@loginAdminAset');
     $router->get('hash_pass', 'AuthController@hashPasswordAdmin');
 });
 
