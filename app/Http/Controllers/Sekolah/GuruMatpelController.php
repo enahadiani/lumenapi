@@ -89,11 +89,15 @@ class GuruMatpelController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            
+            date_default_timezone_set('Asia/Jakarta');
+            $tgl_input = date('Y-m-d H:i:s');
+
             if(count($request->kode_matpel) > 0){
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,getdate())");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,'$tgl_input')");
                     
                 }
                 
@@ -215,10 +219,13 @@ class GuruMatpelController extends Controller
                 ->where('nik', $request->nik_guru)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
+                
+                date_default_timezone_set('Asia/Jakarta');
+                $tgl_input = date('Y-m-d H:i:s');
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,getdate())");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,'$tgl_input')");
                     
                 }
                 
