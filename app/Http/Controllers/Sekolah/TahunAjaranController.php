@@ -35,19 +35,20 @@ class TahunAjaranController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->kode_pp)){
-                $filter = "and a.kode_pp='$request->kode_pp' ";
+            $filter = "";
+            if(isset($request->kode_pp) && $request->kode_pp != ""){
+                $filter .= "and a.kode_pp='$request->kode_pp' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
-            if(isset($request->flag_aktif)){
+            if(isset($request->flag_aktif) && $request->flag_aktif != ""){
                 $filter .= "and a.flag_aktif='$request->flag_aktif' ";
             }else{
                 $filter .= "";
             }
 
-            if(isset($request->kode_ta)){
+            if(isset($request->kode_ta) && $request->kode_ta != ""){
                 $filter .= "and a.kode_ta='$request->kode_ta' ";
             }else{
                 $filter .= "";
