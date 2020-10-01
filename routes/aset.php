@@ -40,13 +40,13 @@ $router->get('storage/{filename}', function ($filename)
     // return $url . $this->avatar;
 });
 
-$router->group(['middleware' => 'auth:admin'], function () use ($router) {
-    $router->get('profile', 'AdminController@profile');
-    $router->get('users/{id}', 'AdminController@singleUser');
-    $router->get('users', 'AdminController@allUsers');
-    $router->get('cek-payload', 'AdminController@cekPayload');
-    $router->post('profile-ubah', 'AdminController@updateProfile');
-    $router->post('ubah-foto', 'AdminController@updatePhoto');
+$router->group(['middleware' => 'auth:aset'], function () use ($router) {
+    $router->get('profile', 'AdminAsetController@profile');
+    $router->get('users/{id}', 'AdminAsetController@singleUser');
+    $router->get('users', 'AdminAsetController@allUsers');
+    $router->get('cek-payload', 'AdminAsetController@cekPayload');
+    $router->post('profile-ubah', 'AdminAsetController@updateProfile');
+    $router->post('ubah-foto', 'AdminAsetController@updatePhoto');
     
     $router->get('gedung','Aset\AsetController@getGedung');
     $router->get('ruangan','Aset\AsetController@getRuangan');

@@ -74,6 +74,10 @@ return [
         'admginas' => [
             'driver' => 'jwt',
             'provider' => 'admginas',
+        ],
+        'aset' => [
+            'driver' => 'jwt',
+            'provider' => 'aset',
         ]
     ],
 
@@ -141,6 +145,10 @@ return [
         'admginas' => [
             'driver' => 'eloquent',
             'model' => \App\AdminLabGinas::class
+        ],
+        'aset' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminAset::class
         ]
     ]
 ];

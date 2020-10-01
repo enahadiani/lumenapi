@@ -16,9 +16,11 @@ class AsetController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $db = 'dbaset';
+    public $guard = 'aset';
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrv2')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -28,7 +30,7 @@ class AsetController extends Controller
     function getGedung(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -37,7 +39,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+                $get = DB::connection($this->db)->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
                 ");
@@ -60,7 +62,7 @@ class AsetController extends Controller
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and isnull(b.jumlah,0)>0 
             order by a.id_gedung";
 
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -88,7 +90,7 @@ class AsetController extends Controller
 
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -97,7 +99,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+                $get = DB::connection($this->db)->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
                 ");
@@ -121,7 +123,7 @@ class AsetController extends Controller
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung'
             order by a.no_ruangan
             ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -150,7 +152,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -159,7 +161,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+                $get = DB::connection($this->db)->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik."' 
                 ");
@@ -188,7 +190,7 @@ class AsetController extends Controller
                     )b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0
             order by a.kode_klp ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -218,7 +220,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -227,7 +229,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -258,7 +260,7 @@ class AsetController extends Controller
             ,sumber_dana
             ,nama_inv as nama
             ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -290,7 +292,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -299,7 +301,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -341,11 +343,11 @@ class AsetController extends Controller
                     FROM amu_mon_asset_bergerak
                     GROUP BY kd_asset,kode_lokasi) d on a.no_bukti=d.kd_asset and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama' ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->id_nama'";
-            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -377,7 +379,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -386,7 +388,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -417,7 +419,7 @@ class AsetController extends Controller
             ,sumber_dana
             ,nama_inv as nama
             ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -446,7 +448,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -455,7 +457,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -477,11 +479,11 @@ class AsetController extends Controller
                        FROM amu_mon_asset_bergerak
                        GROUP BY kd_asset,kode_lokasi) d on a.no_bukti=d.kd_asset and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$request->qrcode'";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->qrcode'";
-            $res2 = DB::connection('sqlsrv2')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -508,7 +510,7 @@ class AsetController extends Controller
     function getPerbaikan(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -517,7 +519,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -530,7 +532,7 @@ class AsetController extends Controller
             // }            
           
             $sql="select a.mon_id,a.kd_asset,a.id_gedung,a.no_ruangan, case a.status when 'Berfungsi' then 'Baik' else 'Rusak' end as kondisi,a.tgl_input from amu_mon_asset_bergerak a where a.status='Tidak Berfungsi' and a.kode_lokasi='$kode_lokasi'";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -558,7 +560,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -567,7 +569,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -582,7 +584,7 @@ class AsetController extends Controller
             $sql="select b.mon_id,a.nama_inv as nama,a.kd_asset as kode, a.merk, a.warna, a.no_ruang, case status when 'Berfungsi' then 'Baik' when 'Tidak Berfungsi' then 'Rusak' end as kondisi,a.foto 
             from amu_asset_bergerak a
             left join amu_mon_asset_bergerak b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi where b.mon_id= '$request->mon_id' and a.kode_lokasi='$kode_lokasi' ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -607,7 +609,7 @@ class AsetController extends Controller
     function getInventarisBerjalan(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -616,7 +618,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -642,7 +644,7 @@ class AsetController extends Controller
                         group by a.no_ruangan,a.kode_lokasi
                     ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST((isnull(c.jum_mon,0) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 <> 100 ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -667,7 +669,7 @@ class AsetController extends Controller
     function getInventarisLengkap(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -676,7 +678,7 @@ class AsetController extends Controller
             //     $kode_pp = $request->kode_pp;
             // }else{
 
-            //     $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            //     $get = DB::connection($this->db)->select("select a.kode_pp
             //     from karyawan a
             //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             //     ");
@@ -724,7 +726,7 @@ class AsetController extends Controller
                         group by a.no_ruangan,a.kode_lokasi 
                       ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST((isnull(c.jum_mon,0) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 = 100 ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -749,7 +751,7 @@ class AsetController extends Controller
     function getLokasi(Request $request){
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -758,7 +760,7 @@ class AsetController extends Controller
                 $kode_pp = $request->kode_pp;
             }else{
 
-                $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+                $get = DB::connection($this->db)->select("select a.kode_pp
                 from karyawan a
                 where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik."' 
                 ");
@@ -771,7 +773,7 @@ class AsetController extends Controller
             }            
           
             $sql="SELECT a.no_ruangan, a.nama_ruangan, a.kode_pp FROM amu_ruangan a WHERE kode_pp='$kode_pp' ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -800,7 +802,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -821,7 +823,7 @@ class AsetController extends Controller
             left join amu_mon_asset_bergerak b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi
             left join amu_asset_bergerak_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and c.no_urut = 0
             where a.no_ruang='$no_ruangan' $filter ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -853,10 +855,10 @@ class AsetController extends Controller
             'file_gambar.*' => 'file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -874,7 +876,7 @@ class AsetController extends Controller
 
             $sql = "select id_gedung from amu_ruangan where no_ruangan ='$no_ruangan' and kode_lokasi='$kode_lokasi' ";
 
-            $ged = DB::connection('sqlsrv2')->select($sql);
+            $ged = DB::connection($this->db)->select($sql);
             $ged = json_decode(json_encode($ged),true);
             if(count($ged) > 0){
                 $id_gedung = $ged[0]['id_gedung'];
@@ -898,7 +900,7 @@ class AsetController extends Controller
             //     $foto="-";
             // }
 
-            $ins = DB::connection('sqlsrv2')->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto,catatan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),'-',$request->catatan]);
+            $ins = DB::connection($this->db)->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto,catatan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),'-',$request->catatan]);
 
             $arr_foto = array();
             $arr_nama = array();
@@ -920,7 +922,7 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
-                $cek = DB::connection('sqlsrv2')->select("
+                $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_asset_bergerak_dok 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
@@ -932,7 +934,7 @@ class AsetController extends Controller
                     $no = 0;
                 }
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp]); 
                     $no++;
                 }
                 $sts = true;
@@ -942,14 +944,14 @@ class AsetController extends Controller
                 $message = "Tidak ada dokumen yang disimpan";
             }
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Inventaris berhasil disimpan. Id =".$id;
             $success['status_upload'] = $sts;
             $success['message_upload'] = $message;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Inventaris gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -965,10 +967,10 @@ class AsetController extends Controller
             'file_gambar' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -988,7 +990,7 @@ class AsetController extends Controller
                 Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
 
                 $sql3="select file_dok as foto from amu_asset_bergerak_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and no_urut ='$request->no_urut' ";
-                $res3 = DB::connection('sqlsrv2')->select($sql3);
+                $res3 = DB::connection($this->db)->select($sql3);
                 $res3 = json_decode(json_encode($res3),true);
 
                 if(count($res3) > 0 ){
@@ -1001,19 +1003,19 @@ class AsetController extends Controller
                 $foto="-";
             }
 
-            $upd3 =  DB::connection('sqlsrv2')->table('amu_asset_bergerak_dok')
+            $upd3 =  DB::connection($this->db)->table('amu_asset_bergerak_dok')
                     ->where('no_bukti', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('no_urut', $request->no_urut)
                     ->update(['file_dok' => $foto]);
             
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Aset berhasil disimpan ";
           
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Aset gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1030,15 +1032,15 @@ class AsetController extends Controller
             'file_gambar.*' => 'required|file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            $get = DB::connection($this->db)->select("select a.kode_pp
                     from karyawan a
                     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             $get = json_decode(json_encode($get),true);
@@ -1071,7 +1073,7 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
-                $cek = DB::connection('sqlsrv2')->select("
+                $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_asset_bergerak_dok 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
@@ -1085,7 +1087,7 @@ class AsetController extends Controller
                 for($i=0; $i<count($arr_nama);$i++){
                     $tmp = explode("-",$arr_jenis[$i]);
                     $kode_jenis = $tmp[0];
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp,kode_jenis) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp,$kode_jenis]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp,kode_jenis) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_pp,$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
@@ -1098,10 +1100,10 @@ class AsetController extends Controller
 
             $success['arr_nama'] = $arr_nama;
             $success['count file'] = count($arr_foto);
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1111,15 +1113,15 @@ class AsetController extends Controller
     }
 
     public function hapusDok($no_bukti,$no_urut){
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            $get = DB::connection($this->db)->select("select a.kode_pp
                     from karyawan a
                     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             $get = json_decode(json_encode($get),true);
@@ -1129,7 +1131,7 @@ class AsetController extends Controller
                 $kode_pp = "";
             }
 
-            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+            $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_asset_bergerak_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
             $cek = json_decode(json_encode($cek),true);
@@ -1139,7 +1141,7 @@ class AsetController extends Controller
                 $file = "";
             }
 
-            $del = DB::connection('sqlsrv2')->table('amu_asset_bergerak_dok')
+            $del = DB::connection($this->db)->table('amu_asset_bergerak_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_pp', $kode_pp)
             ->where('no_bukti', $no_bukti) 
@@ -1149,12 +1151,12 @@ class AsetController extends Controller
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
             }
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Delete dokumen berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Delete dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1168,15 +1170,15 @@ class AsetController extends Controller
             'file_gambar' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            $get = DB::connection($this->db)->select("select a.kode_pp
                     from karyawan a
                     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             $get = json_decode(json_encode($get),true);
@@ -1201,7 +1203,7 @@ class AsetController extends Controller
                 Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));                
             }
 
-            $cek = DB::connection('sqlsrv2')->select("
+            $cek = DB::connection($this->db)->select("
             select no_bukti,count(file_dok) as nomor
             from amu_asset_bergerak_dok 
             where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
@@ -1213,15 +1215,15 @@ class AsetController extends Controller
                 $no = 0;
             }
             
-            $ins = DB::connection('sqlsrv2')->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$request->nama_file,$no,$foto,$kode_pp]); 
+            $ins = DB::connection($this->db)->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$request->nama_file,$no,$foto,$kode_pp]); 
             
             $success['status'] = true;
             $success['message'] = "Upload Dokumen berhasil disimpan";
 
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1236,7 +1238,7 @@ class AsetController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -1247,7 +1249,7 @@ class AsetController extends Controller
             from amu_asset_bergerak_dok 
             where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi'
             order by no_bukti,no_urut ";
-            $res = DB::connection('sqlsrv2')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1278,15 +1280,15 @@ class AsetController extends Controller
             'file_gambar.*' => 'required|file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1319,7 +1321,7 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
-                $cek = DB::connection('sqlsrv2')->select("
+                $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_lahan_dok 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
@@ -1333,7 +1335,7 @@ class AsetController extends Controller
                 for($i=0; $i<count($arr_nama);$i++){
                     $tmp = explode("-",$arr_jenis[$i]);
                     $kode_jenis = $tmp[0];
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into amu_lahan_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
@@ -1346,10 +1348,10 @@ class AsetController extends Controller
 
             $success['arr_nama'] = $arr_nama;
             $success['count file'] = count($arr_foto);
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Gambar gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1359,15 +1361,15 @@ class AsetController extends Controller
     }
 
     public function hapusDokLahan($no_bukti,$no_urut){
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1377,7 +1379,7 @@ class AsetController extends Controller
             //     $kode_pp = "-";
             // }
 
-            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+            $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_lahan_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
             $cek = json_decode(json_encode($cek),true);
@@ -1387,7 +1389,7 @@ class AsetController extends Controller
                 $file = "";
             }
 
-            $del = DB::connection('sqlsrv2')->table('amu_lahan_dok')
+            $del = DB::connection($this->db)->table('amu_lahan_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti) 
             ->where('no_urut', $no_urut)
@@ -1397,12 +1399,12 @@ class AsetController extends Controller
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
             }
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Delete dokumen berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Delete dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1417,10 +1419,10 @@ class AsetController extends Controller
             'file_gambar.*' => 'required|file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -1449,7 +1451,7 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
-                $cek = DB::connection('sqlsrv2')->select("
+                $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_gedung_dok 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
@@ -1463,7 +1465,7 @@ class AsetController extends Controller
                 for($i=0; $i<count($arr_nama);$i++){
                     $tmp = explode("-",$arr_jenis[$i]);
                     $kode_jenis = $tmp[0];
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_gedung_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into amu_gedung_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
@@ -1476,10 +1478,10 @@ class AsetController extends Controller
 
             $success['arr_nama'] = $arr_nama;
             $success['count file'] = count($arr_foto);
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Gambar gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1489,15 +1491,15 @@ class AsetController extends Controller
     }
 
     public function hapusDokGedung($no_bukti,$no_urut){
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1507,7 +1509,7 @@ class AsetController extends Controller
             //     $kode_pp = "-";
             // }
 
-            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+            $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_gedung_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
             $cek = json_decode(json_encode($cek),true);
@@ -1517,7 +1519,7 @@ class AsetController extends Controller
                 $file = "";
             }
 
-            $del = DB::connection('sqlsrv2')->table('amu_gedung_dok')
+            $del = DB::connection($this->db)->table('amu_gedung_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti) 
             ->where('no_urut', $no_urut)
@@ -1527,12 +1529,12 @@ class AsetController extends Controller
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
             }
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Delete dokumen berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Delete dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1547,15 +1549,15 @@ class AsetController extends Controller
             'file_gambar.*' => 'required|file|max:3072'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1588,7 +1590,7 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
-                $cek = DB::connection('sqlsrv2')->select("
+                $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_pbb_dok 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
@@ -1602,7 +1604,7 @@ class AsetController extends Controller
                 for($i=0; $i<count($arr_nama);$i++){
                     $tmp = explode("-",$arr_jenis[$i]);
                     $kode_jenis = $tmp[0];
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_pbb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into amu_pbb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
@@ -1615,10 +1617,10 @@ class AsetController extends Controller
 
             $success['arr_nama'] = $arr_nama;
             $success['count file'] = count($arr_foto);
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Gambar gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1628,15 +1630,15 @@ class AsetController extends Controller
     }
 
     public function hapusDokPbb($no_bukti,$no_urut){
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1646,7 +1648,7 @@ class AsetController extends Controller
             //     $kode_pp = "-";
             // }
 
-            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+            $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_pbb_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
             $cek = json_decode(json_encode($cek),true);
@@ -1656,7 +1658,7 @@ class AsetController extends Controller
                 $file = "";
             }
 
-            $del = DB::connection('sqlsrv2')->table('amu_pbb_dok')
+            $del = DB::connection($this->db)->table('amu_pbb_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti) 
             ->where('no_urut', $no_urut)
@@ -1666,12 +1668,12 @@ class AsetController extends Controller
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
             }
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Delete dokumen berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Delete dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1686,15 +1688,15 @@ class AsetController extends Controller
             'file_gambar.*' => 'required|file|max:3072|image'
         ]);
 
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1727,7 +1729,7 @@ class AsetController extends Controller
             }
     
             if(count($arr_nama) > 0){
-                $cek = DB::connection('sqlsrv2')->select("
+                $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_imb_dok 
                 where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
@@ -1741,7 +1743,7 @@ class AsetController extends Controller
                 for($i=0; $i<count($arr_nama);$i++){
                     $tmp = explode("-", $arr_jenis[$i]);
                     $kode_jenis = $tmp[0];
-                    $ins3[$i] = DB::connection('sqlsrv2')->insert("insert into amu_imb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into amu_imb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$no,$arr_foto[$i],$kode_jenis]); 
                     $no++;
                 }
                 $success['status'] = true;
@@ -1754,10 +1756,10 @@ class AsetController extends Controller
 
             $success['arr_nama'] = $arr_nama;
             $success['count file'] = count($arr_foto);
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload Gambar gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -1767,15 +1769,15 @@ class AsetController extends Controller
     }
 
     public function hapusDokImb($no_bukti,$no_urut){
-        DB::connection('sqlsrv2')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('admin')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection('sqlsrv2')->select("select a.kode_pp
+            // $get = DB::connection($this->db)->select("select a.kode_pp
             //         from karyawan a
             //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
             // $get = json_decode(json_encode($get),true);
@@ -1785,7 +1787,7 @@ class AsetController extends Controller
             //     $kode_pp = "-";
             // }
 
-            $cek = DB::connection('sqlsrv2')->select("select a.file_dok
+            $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_imb_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
             $cek = json_decode(json_encode($cek),true);
@@ -1795,7 +1797,7 @@ class AsetController extends Controller
                 $file = "";
             }
 
-            $del = DB::connection('sqlsrv2')->table('amu_imb_dok')
+            $del = DB::connection($this->db)->table('amu_imb_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti) 
             ->where('no_urut', $no_urut)
@@ -1805,12 +1807,12 @@ class AsetController extends Controller
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
             }
-            DB::connection('sqlsrv2')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Delete dokumen berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrv2')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Delete dokumen gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 

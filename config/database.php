@@ -49,7 +49,6 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
-
         'sqlsrv2' => [
             'driver' => env('DB_CONNECTION2','sqlsrv'),
             'host' => env('DB_HOST2', 'localhost'),
@@ -170,6 +169,16 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'dbaset' => [
+            'driver' => env('DB_CONNECTION14','sqlsrv'),
+            'host' => env('DB_HOST14', 'localhost'),
+            'port' => env('DB_PORT14', '1433'),
+            'database' => env('DB_DATABASE14', 'forge'),
+            'username' => env('DB_USERNAME14', 'forge'),
+            'password' => env('DB_PASSWORD14', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ]
     
     ],
     'migrations' => 'migrations',
