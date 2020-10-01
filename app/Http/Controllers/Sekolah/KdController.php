@@ -46,11 +46,11 @@ class KdController extends Controller
             }
 
             $res = DB::connection($this->db)->select("
-            select a.kode_mapel,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+a.nama as pp   
+            select a.kode_mapel,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp   
             from sis_kd a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter
-            group by a.kode_mapel,a.kode_pp,a.tgl_input");
+            group by a.kode_mapel,a.kode_pp,a.tgl_input,b.nama");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
