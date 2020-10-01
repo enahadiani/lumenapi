@@ -78,8 +78,8 @@ class GuruMatpelController extends Controller
             'kode_pp' => 'required',
             'nik_guru' => 'required',
             'flag_aktif' => 'required',
-            'kode_matpel' => 'required|array',
-            'kode_status'=>'required|array'
+            'kode_matpel' => 'required|array'
+            // 'kode_status'=>'required|array'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -93,7 +93,7 @@ class GuruMatpelController extends Controller
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif','".$request->kode_status[$i]."',getdate())");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,getdate())");
                     
                 }
                 
@@ -196,8 +196,8 @@ class GuruMatpelController extends Controller
             'kode_pp' => 'required',
             'nik_guru' => 'required',
             'flag_aktif' => 'required',
-            'kode_matpel.*' => 'required',
-            'kode_status.*'=>'required'
+            'kode_matpel.*' => 'required'
+            // 'kode_status.*'=>'required'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -218,7 +218,7 @@ class GuruMatpelController extends Controller
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif','".$request->kode_status[$i]."',getdate())");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,getdate())");
                     
                 }
                 

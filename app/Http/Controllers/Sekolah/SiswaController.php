@@ -43,11 +43,12 @@ class SiswaController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
-                                                            from sis_siswa a 
-                                                            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-                                                            where a.kode_lokasi='$kode_lokasi' $filter
-                                                            order by a.nis ");
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.flag_aktif,c.nama as nama_status
+            from sis_siswa a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_siswa_status c on a.flag_aktif=c.kode_ss and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' $filter
+            order by a.nis ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
