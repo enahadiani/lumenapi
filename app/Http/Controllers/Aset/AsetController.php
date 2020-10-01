@@ -59,7 +59,7 @@ class AsetController extends Controller
                     where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
                     group by b.id_gedung,a.kode_lokasi,a.kode_pp
                     )b on a.id_gedung=b.id_gedung and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and isnull(b.jumlah,0)>0 
+            where a.kode_lokasi='$kode_lokasi'  and isnull(b.jumlah,0)>0 
             order by a.id_gedung";
 
             $res = DB::connection($this->db)->select($sql);
@@ -117,10 +117,10 @@ class AsetController extends Controller
             from amu_ruangan a
             left join (select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jumlah,sum(nilai_perolehan) as nilai_perolehan
                     from amu_asset_bergerak a
-                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+                    where a.kode_lokasi='$kode_lokasi' 
                     group by a.no_ruang,a.kode_lokasi
                     )b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung'
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung'
             order by a.no_ruangan
             ";
             $res = DB::connection($this->db)->select($sql);
@@ -185,7 +185,7 @@ class AsetController extends Controller
             from amu_klp_brg a
             left join (select a.kode_klp,a.kode_lokasi,count(a.no_bukti) as jumlah,sum(nilai_perolehan) as nilai_perolehan
                     from amu_asset_bergerak a
-                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' AND no_ruang='$id_ruangan' $filter
+                    where a.kode_lokasi='$kode_lokasi'  AND no_ruang='$id_ruangan' $filter
                     group by a.kode_klp,a.kode_lokasi
                     )b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0
@@ -772,7 +772,7 @@ class AsetController extends Controller
                 }
             }            
           
-            $sql="SELECT a.no_ruangan, a.nama_ruangan, a.kode_pp FROM amu_ruangan a WHERE kode_pp='$kode_pp' ";
+            $sql="SELECT a.no_ruangan, a.nama_ruangan, a.kode_pp FROM amu_ruangan a WHERE kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -1076,7 +1076,7 @@ class AsetController extends Controller
                 $cek = DB::connection($this->db)->select("
                 select no_bukti,count(file_dok) as nomor
                 from amu_asset_bergerak_dok 
-                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
+                where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
                 group by no_bukti");
                 $cek = json_decode(json_encode($cek),true);
                 if(count($cek) > 0){
@@ -1206,7 +1206,7 @@ class AsetController extends Controller
             $cek = DB::connection($this->db)->select("
             select no_bukti,count(file_dok) as nomor
             from amu_asset_bergerak_dok 
-            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'
+            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
             group by no_bukti");
             $cek = json_decode(json_encode($cek),true);
             if(count($cek) > 0){
