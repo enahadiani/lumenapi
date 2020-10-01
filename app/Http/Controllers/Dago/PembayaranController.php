@@ -74,7 +74,8 @@ class PembayaranController extends Controller
     public function getKurs(Request $request)
     {
         $this->validate($request,[
-            'kode_curr' => 'required'
+            'kode_curr' => 'required',
+            'tgl_bayar' => 'required'
         ]);
         try {
             
@@ -83,7 +84,7 @@ class PembayaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select top 1 kurs from dgw_kurs where kd_curr = '".$request->kode_curr."' and kode_lokasi='".$kode_lokasi."' order by id DESC ");
+            $res = DB::connection($this->sql)->select("select kurs from dgw_kurs where kd_curr = '".$request->kode_curr."' and tgl = '".$request->tgl_bayar."' and kode_lokasi='".$kode_lokasi."' order by id DESC ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
