@@ -1102,7 +1102,8 @@ class MobileController extends Controller
     {
         $this->validate($request,[
             'kode_matpel' => 'required',
-            'kode_sem' => 'required|in:1,2,All'
+            'kode_sem' => 'required|in:1,2,All',
+            'kode_kelas' => 'required'
         ]);
         try {
             
@@ -1130,7 +1131,7 @@ class MobileController extends Controller
             from sis_guru_matpel a
             inner join karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' ");
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' ");
             $res2 = json_decode(json_encode($res2),true);
 
             $sql = "select a.kode_kd,a.nama as nama_kd,a.tgl_input,b.no_bukti,c.nilai,'-' as pelaksanaan,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok
@@ -1138,7 +1139,7 @@ class MobileController extends Controller
             inner join sis_nilai_m b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_mapel=b.kode_matpel
             inner join sis_nilai c on b.no_bukti=c.no_bukti and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
             left join sis_nilai_dok d on b.no_bukti=d.no_bukti and b.kode_lokasi=d.kode_lokasi and b.kode_pp=d.kode_pp and c.nis=d.nis
-            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_mapel='$request->kode_matpel'  ";
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_mapel='$request->kode_matpel' $filter ";
             // $success['sql'] = $sql;
             $res = DB::connection('sqlsrvtarbak')->select($sql);
             $res = json_decode(json_encode($res),true);
