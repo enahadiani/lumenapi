@@ -478,11 +478,14 @@ class AsetController extends Controller
             left join (SELECT kd_asset,kode_lokasi,count(mon_id) as jum
                        FROM amu_mon_asset_bergerak
                        GROUP BY kd_asset,kode_lokasi) d on a.no_bukti=d.kd_asset and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$request->qrcode'";
+            where a.kode_lokasi='$kode_lokasi' and a.barcode='$request->qrcode'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
-            $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->qrcode'";
+            $sql2="select a.*
+            from amu_asset_bergerak_dok a 
+            inner join amu_asset_bergerak b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.barcode='$request->qrcode'";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
