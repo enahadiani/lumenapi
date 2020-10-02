@@ -134,6 +134,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('guru-matpel','Sekolah\GuruMatpelController@update');
     $router->delete('guru-matpel','Sekolah\GuruMatpelController@destroy');
 
+    //Guru Matpel
+    $router->get('guru-multi-kelas-all','Sekolah\GuruMultiKelasController@index');
+    $router->get('guru-multi-kelas','Sekolah\GuruMultiKelasController@show');
+    $router->post('guru-multi-kelas','Sekolah\GuruMultiKelasController@store');
+    $router->put('guru-multi-kelas','Sekolah\GuruMultiKelasController@update');
+    $router->delete('guru-multi-kelas','Sekolah\GuruMultiKelasController@destroy');
+
     //Kalender Akademik
     $router->get('kalender-akad-all','Sekolah\KalenderAkadController@index');
     $router->get('kalender-akad','Sekolah\KalenderAkadController@show');
