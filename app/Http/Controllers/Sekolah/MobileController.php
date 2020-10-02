@@ -1128,7 +1128,7 @@ class MobileController extends Controller
             $res3 = json_decode(json_encode($res3),true);
             
             $res2 = DB::connection('sqlsrvtarbak')->select("select a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel 
-            from sis_guru_matpel a
+            from sis_guru_matpel_kelas a
             inner join karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' ");
