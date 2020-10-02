@@ -2,6 +2,7 @@
 namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\Storage; 
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
