@@ -29,7 +29,7 @@ class LaporanController extends Controller
         try {
             $rs = $this->getNrcLajur($request);
             $res = json_decode(json_encode($rs),true);
-            $data_array = $res["original"]["success"]["data"];
+            $data_array = $res["original"]["data"];
             Mail::to($email)->send(new LaporanNrcLajur($data_array));
             
             return response()->json(array('status' => true, 'message' => 'Sent successfully'), $this->successStatus); 
