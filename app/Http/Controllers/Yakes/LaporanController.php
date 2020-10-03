@@ -891,7 +891,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
 
-            $sqlex="exec sp_glma_tmp '$kode_lokasi','$periode','$nik_user' ";
+            $sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
             $res = DB::connection($this->sql)->update($sqlex);
 
             $tmp = "";
@@ -985,7 +985,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
 
-            $sqlex="exec sp_glma_tmp '$kode_lokasi','$periode','$nik_user' ";
+            $sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
             $res = DB::connection($this->sql)->update($sqlex);
 
             $mutasi="";
