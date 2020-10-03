@@ -73,7 +73,7 @@ class JuskebController extends Controller
     }
 
     public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun,$kode_lokasi){
-        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
+        $query = DB::connection($this->db)->select("select max(right($kolom_acuan, ".strlen($str_format)."))+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
