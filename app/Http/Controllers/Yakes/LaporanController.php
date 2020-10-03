@@ -1045,6 +1045,8 @@ class LaporanController extends Controller
                 $success['data']=$res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
+                $success['sql']=$sqlex;
+                $success['sql2']=$sql;
                 return response()->json($success, $this->successStatus);     
             }
             else{
