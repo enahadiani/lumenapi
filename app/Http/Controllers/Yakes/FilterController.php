@@ -664,7 +664,7 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from trans_m a where a.periode <> '' and a.kode_lokasi='$kode_lokasi' ";
+            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from trans_m a where a.kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -835,7 +835,7 @@ class FilterController extends Controller
                 $filter = "";
             }
           
-            $sql="select distinct modul as kode from trans_m where kode_lokasi='$kode_lokasi' $filter";
+            $sql="select distinct modul as kode from gldt where kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
