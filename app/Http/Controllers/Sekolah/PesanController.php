@@ -23,7 +23,135 @@ class PesanController extends Controller
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
         return $id;
-    }    
+    }  
+    
+    function gcm($token,$payload){
+		$data = $payload;//array
+		
+		$ids = $token;//array
+		//------------------------------
+	    // Replace with real GCM API 
+	    // key from Google APIs Console
+	    // 
+	    // https://code.google.com/apis/console/
+	    //------------------------------
+		global $apiKey;
+		// $apiKey = "AIzaSyARBIGBtlVHp2JlhS3HRaP4IPysLBYwXg8";
+		$apiKey = "AAAAC_jHm34:APA91bFF0NUTQZty4hqcR-BtEilaLbGiny584xFIkWBbEz38mPL5iyIMCS2UqI-JCX1SUpBA6v98ETTq0HdtEI1h6e9lUB-LeIO20TvUfYSjvu6QlMRu_C_vDmDZJk3S2VTWogRN51F2";
+	    //------------------------------
+	    // Define URL to GCM endpoint
+	    //------------------------------
+	
+		$url = 'https://fcm.googleapis.com/fcm/send';
+	
+	    //------------------------------
+	    // Set GCM post variables
+	    // (Device IDs and push payload)
+		//------------------------------
+		if(isset($data['click_action'])){
+
+			$post = array(
+                'registration_ids'  => $ids,
+                'notification'              => array (
+                    "body" => $data["message"],
+                    "title" => $data["title"]
+                ),
+                'data'              => $data,
+                "android" => array (
+                    "ttl" => "86400s",
+                    "notification" => array (
+                        "click_action" => $data["click_action"]
+                        )
+                    ),
+                    
+                );
+		}else{
+
+			$post = array(
+				'registration_ids'  => $ids,
+				'notification'              => array (
+					"body" => $data["message"],
+					"title" => $data["title"]
+				),
+				'data'              => $data
+			);
+		}
+	
+	    //------------------------------
+	    // Set CURL request headers
+	    // (Authentication and type)
+	    //------------------------------
+	
+	    $headers = array( 
+            'Authorization: key=' . $apiKey,
+            'Content-Type: application/json'
+        );
+	
+	    //------------------------------
+	    // Initialize curl handle
+	    //------------------------------
+	
+	    $ch = curl_init();
+	
+	    //------------------------------
+	    // Set URL to GCM endpoint
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_URL, $url );
+	
+	    //------------------------------
+	    // Set request method to POST
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_POST, true );
+	
+	    //------------------------------
+	    // Set our custom headers
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
+	
+	    //------------------------------
+	    // Get the response back as 
+	    // string instead of printing it
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+	
+	    //------------------------------
+	    // Set post data as JSON
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode( $post ) );
+	
+	    //------------------------------
+	    // Actually send the push!
+	    //------------------------------
+	
+	    $result = curl_exec( $ch );
+	
+	    //------------------------------
+	    // Error? Display it!
+	    //------------------------------
+	
+	    if ( curl_errno( $ch ) )
+	    {
+	        echo('GCM error: ' . curl_error( $ch ));
+	        $status = false;
+	    }else $status = true;
+	
+	    //------------------------------
+	    // Close curl handle
+	    //------------------------------
+	
+	    curl_close( $ch );
+	
+	    //------------------------------
+	    // Debug GCM response
+	    //------------------------------
+		// $rs = error_log($token .":".$status);
+	    return $result;
+    }
 
     public function index(Request $request)
     {
@@ -485,6 +613,57 @@ class PesanController extends Controller
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
+    }
+
+    public function historyPesan(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pp' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
+                select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
+                from sis_pesan_m a
+                inner join (select jenis,nis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                            from sis_pesan_m
+                            group by jenis,nis,kode_kelas,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.nis=b.nis and a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+                where a.tipe='info'
+                ) a
+                inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(a.foto,'-') as foto 
+                            from sis_siswa a
+                            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi'
+                            union all
+                            select a.kode_kelas as kode,a.nama,a.kode_pp,a.kode_lokasi,'-' as foto 
+                            from sis_kelas a
+                            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi'
+                            )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
+                order by a.tgl_input desc                
+            ");
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
 
