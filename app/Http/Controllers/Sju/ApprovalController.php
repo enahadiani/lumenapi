@@ -311,7 +311,7 @@ class ApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,a.nilai - isnull(d.nilai,0) as potongan, isnull(d.nilai,0) as nilai,c.jabatan
+            $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_app2,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,abs(a.nilai - isnull(d.nilai,0)) as potongan, isnull(d.nilai,0) as nilai,c.jabatan
             from sju_pb_m a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -368,7 +368,7 @@ class ApprovalController extends Controller
                     // inner join sju_ver_d e on d.no_ver=e.no_ver and d.kode_lokasi=e.kode_lokasi
                     // where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' and a.modul in ('PBPROSES') and d.nik_user='$nik'
                     // order by tgl";
-                    $sql="select a.due_date,a.no_pb as no_bukti,case when d.status in ('A','P','K','U') then 'REJECT' when d.status in ('1','3','4','5') then 'APPROVE' else 'INPROG' end as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_atasan,a.no_app1,a.no_app2,a.no_app3,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,e.catatan,a.nilai - isnull(f.nilai,0) as potongan, isnull(f.nilai,0) as nilai,c.jabatan 
+                    $sql="select a.due_date,a.no_pb as no_bukti,case when d.status in ('A','P','K','U') then 'REJECT' when d.status in ('1','3','4','5') then 'APPROVE' else 'INPROG' end as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai as nilai_seb,c.nik+' - '+c.nama as pembuat,a.no_atasan,a.no_app1,a.no_app2,a.no_app3,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp,e.catatan,abs(a.nilai - isnull(f.nilai,0)) as potongan, isnull(f.nilai,0) as nilai,c.jabatan 
                     from sju_pb_m a 
                     inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
