@@ -46,7 +46,7 @@ class MataPelajaranController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.sifat 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case a.sifat when '0' then 'NASIONAL' when '1' then 'MUATAN LOKAL' else '-' end as sifat
             from sis_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
@@ -151,7 +151,7 @@ class MataPelajaranController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_matpel= $request->kode_matpel;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_matpel, nama,keterangan,sifat,kode_pp,flag_aktif from sis_matpel where kode_matpel ='".$kode_matpel."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+            $res = DB::connection('sqlsrvtarbak')->select("select kode_matpel, nama,keterangan,sifat,kode_pp,flag_aktif,case sifat when '0' then 'NASIONAL' when '1' then 'MUATAN LOKAL' else '-' end as sifat from sis_matpel where kode_matpel='".$kode_matpel."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

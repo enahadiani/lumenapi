@@ -119,20 +119,35 @@ class PesanController extends Controller
                         $i++;
                     }
                 }
+                
+                if($request->jenis == "Siswa"){
+                    $nis = $request->kontak;
+                    $kode_kelas = '-';
+                }else{
+                    $nis = "-";
+                    $kode_kelas = $request->kontak;
+                }
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,sts_read_mob,id_device,tipe,tgl_input,nik_user,sts_read) values () ");
+                $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');
+                $ref2 = (isset($request->ref2) && $request->ref2 != "" ? $request->ref2 : '-');
+                $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
+                $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
+
+                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
+
+
                 for($i=0;$i<count($request->nis);$i++){
                     
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
                     
                 }  
 
-                // if(count($arr_nama) > 0){
-                //     for($i=0; $i<count($arr_nama);$i++){
-                //         $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (
-                //         no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$request->kode_pp','".$request->nis_dok[$i]."') "); 
-                //     }
-                // }
+                if(count($arr_nama) > 0){
+                    for($i=0; $i<count($arr_nama);$i++){
+                        $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (
+                        no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$request->kode_pp','".$request->nis_dok[$i]."') "); 
+                    }
+                }
 
                 DB::connection('sqlsrvtarbak')->commit();
                 $sts = true;
