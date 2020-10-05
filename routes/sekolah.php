@@ -214,5 +214,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('pesan','Sekolah\PesanController@show');
     $router->post('pesan','Sekolah\PesanController@store');
     $router->delete('pesan','Sekolah\PesanController@destroy');
+
+    // GURU
+    $router->get('guru-all','Sekolah\GuruController@index');
+    $router->get('guru','Sekolah\GuruController@show');
+    $router->post('guru','Sekolah\GuruController@store');
+    $router->put('guru','Sekolah\GuruController@update');
+    $router->delete('guru','Sekolah\GuruController@destroy');
     
 });
