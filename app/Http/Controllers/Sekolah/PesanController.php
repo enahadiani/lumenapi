@@ -86,6 +86,8 @@ class PesanController extends Controller
         $this->validate($request, [
             'jenis' => 'required',
             'judul' => 'required',
+            'kode_pp' => 'required',
+            'kontak' => 'required',
             'pesan' => 'required',
             'tipe' => 'required',
         ]);
@@ -130,7 +132,7 @@ class PesanController extends Controller
                         }     
                     }
                     
-                    $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                    $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $request->kode_pp)->delete();
                 }
                 
             }
@@ -178,12 +180,12 @@ class PesanController extends Controller
             $success['status'] = $sts;
             $success['no_bukti'] = $no_bukti;
             $success['message'] = $msg;
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pesan gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
