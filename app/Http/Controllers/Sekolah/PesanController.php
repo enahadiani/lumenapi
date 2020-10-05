@@ -381,61 +381,61 @@ class PesanController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    // public function destroy(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'no_bukti' => 'required',
-    //         'kode_pp' => 'required'
-    //     ]);
-    //     DB::connection('sqlsrvtarbak')->beginTransaction();
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'kode_pp' => 'required'
+        ]);
+        DB::connection('sqlsrvtarbak')->beginTransaction();
         
-    //     try {
-    //         if($data =  Auth::guard('tarbak')->user()){
-    //             $nik= $data->nik;
-    //             $kode_lokasi= $data->kode_lokasi;
-    //         }		
+        try {
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }		
             
-    //         $del = DB::connection('sqlsrvtarbak')->table('sis_nilai_m')
-    //         ->where('kode_lokasi', $kode_lokasi)
-    //         ->where('no_bukti', $request->no_bukti)
-    //         ->where('kode_pp', $request->kode_pp)
-    //         ->delete();
+            $del = DB::connection('sqlsrvtarbak')->table('sis_pesan_m')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $request->no_bukti)
+            ->where('kode_pp', $request->kode_pp)
+            ->delete();
 
-    //         $del2 = DB::connection('sqlsrvtarbak')->table('sis_nilai')
-    //         ->where('kode_lokasi', $kode_lokasi)
-    //         ->where('no_bukti', $request->no_bukti)
-    //         ->where('kode_pp', $request->kode_pp)
-    //         ->delete();
+            $del2 = DB::connection('sqlsrvtarbak')->table('sis_pesan_d')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $request->no_bukti)
+            ->where('kode_pp', $request->kode_pp)
+            ->delete();
 
-    //         // $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and kode_pp='$kode_pp'  order by no_urut";
-    //         // $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
-    //         // $res3 = json_decode(json_encode($res3),true);
+            $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and kode_pp='$kode_pp'  order by no_urut";
+            $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
 
-    //         // if(count($res3) > 0){
-    //         //     for($i=0;$i<count($res3);$i++){
-    //         //         Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
-    //         //     }
-    //         // }
+            if(count($res3) > 0){
+                for($i=0;$i<count($res3);$i++){
+                    Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
+                }
+            }
 
-    //         // $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')
-    //         // ->where('kode_lokasi', $kode_lokasi)
-    //         // ->where('no_bukti', $no_bukti)
-    //         // ->where('kode_pp', $request->kode_pp)
-    //         // ->delete();
+            $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti)
+            ->where('kode_pp', $request->kode_pp)
+            ->delete();
 
-    //         DB::connection('sqlsrvtarbak')->commit();
-    //         $success['status'] = true;
-    //         $success['message'] = "Data Penilaian berhasil dihapus";
+            DB::connection('sqlsrvtarbak')->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Pesan berhasil dihapus";
             
-    //         return response()->json(['success'=>$success], $this->successStatus); 
-    //     } catch (\Throwable $e) {
-    //         DB::connection('sqlsrvtarbak')->rollback();
-    //         $success['status'] = false;
-    //         $success['message'] = "Data Penilaian gagal dihapus ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvtarbak')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Pesan gagal dihapus ".$e;
             
-    //         return response()->json(['success'=>$success], $this->successStatus); 
-    //     }	
-    // }
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    }
 
     public function deleteDokumen(Request $request)
     {
