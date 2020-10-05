@@ -303,7 +303,7 @@ class FormatLaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_fs,nama from fs  
+            $res = DB::connection($this->db)->select("select kode_fs,nama from fs where kode_lokasi='$kode_lokasi' 
             ");
             $res = json_decode(json_encode($res),true);
             

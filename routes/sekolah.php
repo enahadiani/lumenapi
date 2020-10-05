@@ -209,5 +209,9 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('penilaian-dok','Sekolah\PenilaianController@showDokUpload');
     $router->post('penilaian-dok','Sekolah\PenilaianController@storeDokumen');
     $router->delete('penilaian-dok','Sekolah\PenilaianController@deleteDokumen');
+
+    $router->get('pesan-all','Sekolah\PesanController@index');
+    $router->get('pesan','Sekolah\PesanController@show');
+    $router->post('pesan','Sekolah\PesanController@store');
     
 });
