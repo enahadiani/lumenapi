@@ -30,10 +30,11 @@ class GuruMatpelController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif 
+            $res = DB::connection('sqlsrvtarbak')->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,
+            case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif
             from sis_guru_matpel b 
-            inner join karyawan a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
-            inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp  
+            inner join sis_guru a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
+            inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
@@ -299,7 +300,7 @@ class GuruMatpelController extends Controller
             $kode_pp = $request->kode_pp;
             $nik_guru= $request->nik_guru;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nik, nama from karyawan where kode_lokasi = '".$kode_lokasi."' and kode_pp='".$kode_pp."' ");
+            $res = DB::connection('sqlsrvtarbak')->select("select nik, nama from sis_guru where kode_lokasi = '".$kode_lokasi."' and kode_pp='".$kode_pp."' ");
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
