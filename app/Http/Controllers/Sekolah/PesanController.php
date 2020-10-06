@@ -679,8 +679,12 @@ class PesanController extends Controller
                 $kode_lokasi= '';
             }
 
-            $rs = DB::connection('sqlsrvtarbak')->select("select kode_kd,nama from sis_kd
-            where kode_kelas='6A' and kode_mapel='BIN' and kode_pp='04' and kode_lokasi='$kode_lokasi'
+            $rs = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama
+            from sis_kd a
+            inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
+            inner join sis_kelas c on b.kode_tingkat=c.kode_tingkat and b.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='04' and c.kode_kelas='3A' 
+            and a.kode_matpel='BIN'
             ");
             $rs = json_decode(json_encode($rs),true);
             $sumcase = "";
@@ -697,11 +701,80 @@ class PesanController extends Controller
             $rs2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
             from sis_kd a 
             left join (
-            select a.kode_kd,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
+            select a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_pp='04' and a.kode_kelas='6A' and kode_matpel='BIN'
-            group by a.kode_kd,a.kode_lokasi,a.kode_pp ) b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            group by a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp ) b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			where a.kode_pp='04' and a.kode_tingkat='SD03' 
+			and a.kode_matpel='BIN'
+			order by a.kode_kd
+            ") ;
+
+            $row = json_decode(json_encode($rs2),true);
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $dt[0] = array();
+                for($i=0;$i<count($row);$i++){
+                    $dt[0][]=array("y"=>floatval($row[$i]["nilai"]),"kode_kd"=>$row[$i]["kode_kd"]);
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                $success["series"][0]= array(
+                    "name"=> 'Rata-rata', "color"=>$color[0],"data"=>$dt[0],"type"=>"spline", "marker"=>array("enabled"=>false)
+                );                
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataBox(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvtarbak')->select("select count(*) as jum from sis_siswa where kode_kelas='3A' and kode_pp='04' and kode_lokasi='01'
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs)> 0){
+                $siswa = $rs[0]['jum'];
+            }else{
+                $siswa = 0;
+            }
+            $success['siswa']=$siswa;
+            
+            $rs2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
+            from sis_kd a 
+            left join (
+            select a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
+            from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            group by a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp ) b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			where a.kode_pp='04' and a.kode_tingkat='SD03' 
+			and a.kode_matpel='BIN'
+			order by a.kode_kd
             ") ;
 
             $row = json_decode(json_encode($rs2),true);

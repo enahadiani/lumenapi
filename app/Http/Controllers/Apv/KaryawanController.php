@@ -158,7 +158,7 @@ class KaryawanController extends Controller
 
             $url = url('api/apv/storage');
 
-            $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp,kota,kode_divisi from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
+            $sql = "select nik,nama,kode_pp,kode_jab,case when foto != '-' then '".$url."/'+foto else '-' end as file_gambar,email,no_telp,kota,id_kota,kode_divisi from apv_karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
