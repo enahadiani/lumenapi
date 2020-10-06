@@ -42,6 +42,12 @@ class SiswaController extends Controller
             }else{
                 $filter .= "";
             }
+            
+            if(isset($request->nis)){
+                $filter .= " and a.nis='$request->nis' ";
+            }else{
+                $filter .= "";
+            }
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.flag_aktif,c.nama as nama_status
             from sis_siswa a 
