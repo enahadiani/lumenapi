@@ -34,13 +34,13 @@ class KdController extends Controller
             }
 
             if(isset($request->kode_matpel)){
-                $filter .= " and a.kode_mapel='$request->kode_matpel' ";
+                $filter .= " and a.kode_matpel='$request->kode_matpel' ";
             }else{
                 $filter .= "";
             }
 
-            if(isset($request->kode_kelas)){
-                $filter .= " and a.kode_mapel='$request->kode_kelas' ";
+            if(isset($request->kode_tingkat)){
+                $filter .= " and a.kode_matpel='$request->kode_tingkat' ";
             }else{
                 $filter .= "";
             }
@@ -52,11 +52,11 @@ class KdController extends Controller
             }
 
             $res = DB::connection($this->db)->select("
-            select a.kode_mapel,a.kode_kelas,a.kode_pp,a.kode_sem,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp   
+            select a.kode_matpel,a.kode_tingkat,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp   
             from sis_kd a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter
-            group by a.kode_mapel,a.kode_kelas,a.kode_pp,a.kode_sem,a.tgl_input,b.nama");
+            group by a.kode_matpel,a.kode_tingkat,a.kode_pp,a.tgl_input,b.nama");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -97,9 +97,9 @@ class KdController extends Controller
     {
         $this->validate($request,[
             'kode_matpel' => 'required',
-            'kode_kelas' => 'required',
+            'kode_tingkat' => 'required',
             'kode_pp' => 'required',
-            'kode_sem' => 'required',
+            // 'kode_sem' => 'required',
             'kode_kd' => 'array',
             'nama' => 'array'
         ]);
@@ -111,12 +111,12 @@ class KdController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_mapel,kode_pp from sis_kd where kode_mapel ='$request->kode_matpel' and kode_kelas='$request->kode_kelas' and kode_pp = '$request->kode_pp' and kode_sem = '$request->kode_sem'  and kode_lokasi='$kode_lokasi'");
+            $res = DB::connection($this->db)->select("select kode_matpel,kode_pp from sis_kd where kode_matpel ='$request->kode_matpel' and kode_tingkat='$request->kode_tingkat' and kode_pp = '$request->kode_pp' and kode_lokasi='$kode_lokasi'");
             $res = json_decode(json_encode($res),true);
             
             if (count($res) > 0){					
                 $line = $res[0];				
-                $msg = "Transaksi tidak valid. Data KD untuk Kode Mata Pelajaran ".$request->kode_matpel." Kelas ".$request->kode_kelas." Kode PP ".$request->kode_pp." di semester ".$request->kode_sem." sudah ada di database";
+                $msg = "Transaksi tidak valid. Data KD untuk Kode Mata Pelajaran ".$request->kode_matpel." Tingkat ".$request->kode_tingkat." Kode PP ".$request->kode_pp." sudah ada di database";
                 $sts = false;						
             }
             else {
@@ -125,7 +125,7 @@ class KdController extends Controller
                 $tgl_input = date('Y-m-d H:i:s');
                 if (count($request->kode_kd) > 0){
                     for ($i=0;$i < count($request->kode_kd);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_mapel,kode_pp,nama,kode_kelas,kode_sem,tgl_input) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_kelas."','".$request->kode_sem."','".$tgl_input."')");	
+                        $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."')");	
                     }				
                 }
                 
@@ -150,8 +150,8 @@ class KdController extends Controller
     {
         $this->validate($request,[
             'kode_matpel' => 'required',
-            'kode_kelas' => 'required',
-            'kode_sem' => 'required',
+            'kode_tingkat' => 'required',
+            // 'kode_sem' => 'required',
             'kode_pp' => 'required',
             'kode_kd' => 'array',
             'nama' => 'array'
@@ -167,16 +167,16 @@ class KdController extends Controller
             $del = DB::connection($this->db)->table('sis_kd')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_pp', $request->kode_pp)
-            ->where('kode_kelas', $request->kode_kelas)
-            ->where('kode_sem', $request->kode_sem)
-            ->where('kode_mapel', $request->kode_matpel)
+            ->where('kode_tingkat', $request->kode_tingkat)
+            // ->where('kode_sem', $request->kode_sem)
+            ->where('kode_matpel', $request->kode_matpel)
             ->delete();
             
             date_default_timezone_set('Asia/Jakarta');
             $tgl_input = date('Y-m-d H:i:s');
             if (count($request->kode_kd) > 0){
                 for ($i=0;$i < count($request->kode_kd);$i++){
-                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_mapel,kode_pp,nama,kode_kelas,kode_sem,tgl_input) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_kelas."','".$request->kode_sem."','".$tgl_input."')");	
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."')");	
                 }				
             }
 
@@ -206,8 +206,8 @@ class KdController extends Controller
         $this->validate($request, [
             'kode_pp' => 'required',
             'kode_matpel' => 'required',
-            'kode_kelas' => 'required',
-            'kode_sem' => 'required'
+            'kode_tingkat' => 'required'
+            // 'kode_sem' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -220,9 +220,9 @@ class KdController extends Controller
             $del = DB::connection($this->db)->table('sis_kd')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
-                ->where('kode_mapel', $request->kode_matpel)
-                ->where('kode_kelas', $request->kode_kelas)
-                ->where('kode_sem', $request->kode_sem)
+                ->where('kode_matpel', $request->kode_matpel)
+                ->where('kode_tingkat', $request->kode_tingkat)
+                // ->where('kode_sem', $request->kode_sem)
                 ->delete();
 
             DB::connection($this->db)->commit();
@@ -244,8 +244,8 @@ class KdController extends Controller
         $this->validate($request, [
             'kode_pp' => 'required',
             'kode_matpel' => 'required',
-            'kode_kelas' => 'required',
-            'kode_sem' => 'required'
+            'kode_tingkat' => 'required'
+            // 'kode_sem' => 'required'
         ]);
         try {
             
@@ -255,23 +255,23 @@ class KdController extends Controller
             }
             $kode_pp= $request->kode_pp;
             $kode_matpel= $request->kode_matpel;
-            $kode_kelas= $request->kode_kelas;
-            $kode_sem= $request->kode_sem;
+            $kode_tingkat= $request->kode_tingkat;
+            // $kode_sem= $request->kode_sem;
 
-            $res = DB::connection($this->db)->select(" select a.kode_mapel,a.kode_pp,a.tgl_input,b.nama as nama_matpel,c.nama as nama_pp,a.kode_kelas,d.nama as nama_kelas,a.kode_sem   
+            $res = DB::connection($this->db)->select(" select a.kode_matpel,a.kode_pp,a.tgl_input,b.nama as nama_matpel,c.nama as nama_pp,a.kode_tingkat,d.nama as nama_tingkat   
             from sis_kd a
-            inner join sis_matpel b on a.kode_mapel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            inner join sis_kelas d on a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_kelas=d.kode_kelas
-            where a.kode_mapel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.kode_sem='".$kode_sem."'
-            group by a.kode_mapel,a.kode_pp,a.tgl_input,b.nama,c.nama,a.kode_kelas,d.nama,a.kode_sem
+            inner join sis_tingkat d on a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_tingkat=d.kode_tingkat
+            where a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' 
+            group by a.kode_matpel,a.kode_pp,a.tgl_input,b.nama,c.nama,a.kode_tingkat,d.nama
             ");
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection($this->db)->select("
             select a.kode_kd,a.nama 
             from sis_kd a
-            where a.kode_mapel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'
+            where a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'
             order by a.kode_kd
             ");
             $res2 = json_decode(json_encode($res2),true);
