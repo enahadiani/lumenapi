@@ -687,6 +687,12 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_kd) && $request->kode_kd != ""){
+                $filter .= " and a.kode_kd='$request->kode_kd' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama
             from sis_kd a
             inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
@@ -694,7 +700,6 @@ class PenilaianController extends Controller
             where a.kode_lokasi='$kode_lokasi' 
             $filter ");
             $res= json_decode(json_encode($res),true);
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
