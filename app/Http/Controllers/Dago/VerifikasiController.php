@@ -527,5 +527,51 @@ class VerifikasiController extends Controller
         
     }
 
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required'
+        ]);
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $nk = DB::connection($this->sql)->select("select a.no_kwitansi from dgw_pembayaran a inner join dgw_ver_m b on a.no_kb=b.no_kwitansi and a.kode_lokasi=b.kode_lokasi where b.no_ver='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' ");
+            if (count($nk) > 0){
+                $no_kwitansi = $nk[0]->no_kwitansi;
+            }else{
+                $no_kwitansi = "-";
+            }
+            $success['no_kwitansi'] = $no_kwitansi;
+           
+            $del1 = DB::connection($this->sql)->table('dgw_ver_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_ver', $request->no_bukti)
+                ->delete();	
+            
+            $del2 = DB::connection($this->sql)->table('dgw_ver_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_ver', $request->no_bukti)
+                ->delete();	
+
+            $upd = DB::connection($this->sql)->update("update dgw_pembayaran set flag_ver='0' where no_kwitansi='$no_kwitansi' and kode_lokasi='$kode_lokasi' ");	
+
+            $success['status'] = true;
+            $success['message'] = "Data Verifikasi berhasil dihapus ";
+            DB::connection($this->sql)->commit();
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = "FAILED";
+            $success['message'] = "Data Verifikasi gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
 
 }

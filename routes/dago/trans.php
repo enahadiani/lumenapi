@@ -69,6 +69,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('verifikasi-edit','Dago\VerifikasiController@edit');
     $router->put('verifikasi','Dago\VerifikasiController@update');
     $router->get('verifikasi-histori','Dago\VerifikasiController@histori');
+    $router->delete('verifikasi','Dago\VerifikasiController@destroy');
 
     //UploadDok
     $router->get('upload-dok','Dago\UploadDokController@index');
