@@ -666,5 +666,76 @@ class PesanController extends Controller
         }
     }
 
+    
+    public function rata2Nilai(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $rs = DB::connection('sqlsrvtarbak')->select("select kode_kd,nama from sis_kd
+            where kode_kelas='6A' and kode_mapel='BIN' and kode_pp='04' and kode_lokasi='$kode_lokasi'
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $sumcase = "";
+            $kolom ="";
+            $ctg = array();
+            if(count($rs)> 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['kode_kd']);
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $rs2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
+            from sis_kd a 
+            left join (
+            select a.kode_kd,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
+            from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_pp='04' and a.kode_kelas='6A' and kode_matpel='BIN'
+            group by a.kode_kd,a.kode_lokasi,a.kode_pp ) b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            ") ;
+
+            $row = json_decode(json_encode($rs2),true);
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $dt[0] = array();
+                for($i=0;$i<count($row);$i++){
+                    $dt[0][]=array("y"=>floatval($row[$i]["nilai"]),"kode_kd"=>$row[$i]["kode_kd"]);
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                $success["series"][0]= array(
+                    "name"=> 'Rata-rata', "color"=>$color[0],"data"=>$dt[0],"type"=>"spline", "marker"=>array("enabled"=>false)
+                );                
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+
 
 }
