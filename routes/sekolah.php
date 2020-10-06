@@ -223,5 +223,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('guru','Sekolah\GuruController@store');
     $router->put('guru','Sekolah\GuruController@update');
     $router->delete('guru','Sekolah\GuruController@destroy');
+
+    // EKSKUL
+    $router->get('ekskul-all','Sekolah\EkskulController@index');
+    $router->get('ekskul','Sekolah\EkskulController@show');
+    $router->post('ekskul','Sekolah\EkskulController@store');
+    $router->put('ekskul','Sekolah\EkskulController@update');
+    $router->delete('ekskul','Sekolah\EkskulController@destroy');
     
 });
