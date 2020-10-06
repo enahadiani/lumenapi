@@ -676,14 +676,23 @@ class PenilaianController extends Controller
             }
 
             if(isset($request->kode_matpel) && $request->kode_matpel != ""){
-                $filter .= " and a.kode_mapel='$request->kode_matpel' ";
+                $filter .= " and a.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_kelas) && $request->kode_kelas != ""){
+                $filter .= " and c.kode_kelas='$request->kode_kelas' ";
             }else{
                 $filter .= "";
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama
             from sis_kd a
-            where a.kode_lokasi='".$kode_lokasi."' $filter");
+            inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
+            inner join sis_kelas c on b.kode_tingkat=c.kode_tingkat and b.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' 
+            $filter ");
             $res= json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
