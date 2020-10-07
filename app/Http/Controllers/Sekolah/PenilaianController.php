@@ -695,6 +695,12 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_sem) && $request->kode_sem != ""){
+                $filter .= " and a.kode_sem='$request->kode_sem' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama
             from sis_kd a
             inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
