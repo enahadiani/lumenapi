@@ -124,6 +124,7 @@ class PenilaianController extends Controller
             }
             if(count($request->nis) > 0){
                 
+                date_default_timezone_set("Asia/Bangkok");
                 $per = date('ym');
                 $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
                 $strSQL = "select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_pp='$request->kode_pp'";	
@@ -301,7 +302,7 @@ class PenilaianController extends Controller
             
             
             if(count($request->nis) > 0){
-                
+                date_default_timezone_set("Asia/Bangkok");
                 $no_bukti = $request->no_bukti;
                 $strSQL = "select nu as jumlah from sis_nilai_m where no_bukti='$no_bukti' ";	
                 $cek = DB::connection('sqlsrvtarbak')->select($strSQL);
