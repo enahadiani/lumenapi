@@ -151,7 +151,10 @@ class MataPelajaranController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_matpel= $request->kode_matpel;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_matpel, nama,keterangan,sifat,kode_pp,flag_aktif,case sifat when '0' then 'NASIONAL' when '1' then 'MUATAN LOKAL' else '-' end as sifat from sis_matpel where kode_matpel='".$kode_matpel."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.keterangan,a.sifat,a.kode_pp,a.flag_aktif,case a.sifat when '0' then 'NASIONAL' when '1' then 'MUATAN LOKAL' else '-' end as nama_sifat,b.nama as nama_pp 
+            from sis_matpel a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

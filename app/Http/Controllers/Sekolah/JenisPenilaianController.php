@@ -151,7 +151,9 @@ class JenisPenilaianController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_jenis= $request->kode_jenis;
 
-            $sql = "select kode_jenis, nama,kode_pp,flag_aktif from sis_jenisnilai where kode_jenis ='".$kode_jenis."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'";
+            $sql = "select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,a.flag_aktif,b.nama as nama_pp 
+            from sis_jenisnilai a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_jenis ='".$kode_jenis."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'";
             $res = DB::connection('sqlsrvtarbak')->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['sql'] = $sql;
