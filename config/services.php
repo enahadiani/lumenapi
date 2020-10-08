@@ -19,6 +19,10 @@ return [
         'client_secret' => env('FB_CLIENT_SECRET'),
         'redirect'      => env('FB_URL'),
     ],
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_KEY'),
+    ],
 
 
 ];

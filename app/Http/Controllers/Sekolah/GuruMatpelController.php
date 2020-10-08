@@ -31,7 +31,7 @@ class GuruMatpelController extends Controller
             }
 
             $res = DB::connection('sqlsrvtarbak')->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,
-            case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif
+            case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,b.kode_ta
             from sis_guru_matpel b 
             inner join sis_guru a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
             inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -78,9 +78,9 @@ class GuruMatpelController extends Controller
         $this->validate($request, [
             'kode_pp' => 'required',
             'nik_guru' => 'required',
+            'kode_ta'=>'required',
             'flag_aktif' => 'required',
             'kode_matpel' => 'required|array'
-            // 'kode_status'=>'required|array'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -98,7 +98,7 @@ class GuruMatpelController extends Controller
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,'$tgl_input')");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input,kode_ta) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,'$tgl_input','$request->kode_ta')");
                     
                 }
                 
@@ -130,7 +130,8 @@ class GuruMatpelController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
-            'nik_guru' => 'required'
+            'nik_guru' => 'required',
+            'kode_ta' => 'required'
         ]);
         try {
             
@@ -142,11 +143,12 @@ class GuruMatpelController extends Controller
             $kode_pp = $request->kode_pp;
             $nik_guru= $request->nik_guru;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_pp, a.nik as nik_guru,a.flag_aktif,b.nama as nama_pp,c.nama as nama_guru, case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as nama_status 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_pp, a.nik as nik_guru,a.flag_aktif,b.nama as nama_pp,c.nama as nama_guru, case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as nama_status,a.kode_ta,d.nama as nama_ta 
             from sis_guru_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join karyawan c on a.nik=c.nik and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-            where a.nik='$nik_guru' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' group by a.kode_pp,a.nik,a.flag_aktif,b.nama,c.nama");
+            inner join sis_ta d on a.kode_ta=d.kode_ta and a.kode_lokasi=d.kode_lokasi
+            where a.nik='$nik_guru' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' group by a.kode_pp,a.nik,a.flag_aktif,b.nama,c.nama,a.kode_ta,d.nama");
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel,a.kode_status,b.nama as nama_matpel,c.nama as nama_status
@@ -201,8 +203,8 @@ class GuruMatpelController extends Controller
             'kode_pp' => 'required',
             'nik_guru' => 'required',
             'flag_aktif' => 'required',
-            'kode_matpel.*' => 'required'
-            // 'kode_status.*'=>'required'
+            'kode_matpel' => 'required|array',
+            'kode_ta'=>'required'
         ]);
 
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -219,6 +221,7 @@ class GuruMatpelController extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('nik', $request->nik_guru)
                 ->where('kode_pp', $request->kode_pp)
+                ->where('kode_ta', $request->kode_ta)
                 ->delete();
                 
                 date_default_timezone_set('Asia/Jakarta');
@@ -226,7 +229,7 @@ class GuruMatpelController extends Controller
 
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,'$tgl_input')");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru_matpel(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_status,tgl_input,kode_ta) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel[$i]."','$request->nik_guru','$request->flag_aktif',NULL,'$tgl_input','$request->kode_ta')");
                     
                 }
                 
@@ -255,6 +258,7 @@ class GuruMatpelController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required',
+            'kode_ta' => 'required',
             'nik_guru' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
@@ -268,6 +272,7 @@ class GuruMatpelController extends Controller
             $del = DB::connection('sqlsrvtarbak')->table('sis_guru_matpel')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('nik', $request->nik_guru)
+                ->where('kode_ta', $request->kode_ta)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
