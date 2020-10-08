@@ -30,9 +30,9 @@ class LaporanController extends Controller
             $rs = $this->getNrcLajur($request);
             $res = json_decode(json_encode($rs),true);
             $data_array = $res["original"]["data"];
-            Mail::to($email)->send(new LaporanNrcLajur($data_array));
+            $res = Mail::to($email)->send(new LaporanNrcLajur($data_array));
             
-            return response()->json(array('status' => true, 'message' => 'Sent successfully'), $this->successStatus); 
+            return response()->json(array('status' => true, 'message' => 'Sent successfully','res'=>$res), $this->successStatus); 
         } catch (Exception $ex) {
             return response()->json(array('status' => false, 'message' => 'Something went wrong, please try later.'), $this->successStatus); 
         } 
