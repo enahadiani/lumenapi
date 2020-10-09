@@ -233,12 +233,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     
     $router->post('data-import','Sekolah\EkskulController@importExcel');
 
-    //Guru Matpel Khusus
-    $router->get('guru-matpel-khusus-all','Sekolah\GuruMatpelKhususController@index');
-    $router->get('guru-matpel-khusus','Sekolah\GuruMatpelKhususController@show');
-    $router->post('guru-matpel-khusus','Sekolah\GuruMatpelKhususController@store');
-    $router->put('guru-matpel-khusus','Sekolah\GuruMatpelKhususController@update');
-    $router->delete('guru-matpel-khusus','Sekolah\GuruMatpelKhususController@destroy');
+    //Siswa Matpel Khusus
+    $router->get('sis-matpel-khusus-all','Sekolah\SisMatpelKhususController@index');
+    $router->get('sis-matpel-khusus','Sekolah\SisMatpelKhususController@show');
+    $router->post('sis-matpel-khusus','Sekolah\SisMatpelKhususController@store');
+    $router->put('sis-matpel-khusus','Sekolah\SisMatpelKhususController@update');
+    $router->delete('sis-matpel-khusus','Sekolah\SisMatpelKhususController@destroy');
     
     
 });
