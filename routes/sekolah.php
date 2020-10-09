@@ -213,7 +213,9 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('pesan-all','Sekolah\PesanController@index');
     $router->get('pesan','Sekolah\PesanController@show');
     $router->post('pesan','Sekolah\PesanController@store');
+    $router->post('pesan-ubah','Sekolah\PesanController@update');
     $router->delete('pesan','Sekolah\PesanController@destroy');
+    $router->delete('pesan-dok','Sekolah\PesanController@deleteDokumen');
     $router->get('pesan-history','Sekolah\PesanController@historyPesan');
     $router->get('rata2-nilai','Sekolah\PesanController@rata2Nilai');
 

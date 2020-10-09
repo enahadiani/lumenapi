@@ -338,14 +338,16 @@ class PesanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas end as kontak,a.judul,a.pesan,a.kode_pp,a.ref1,a.ref2,a.ref3,a.link,a.tgl_input
+            $sql = "select a.jenis,a.no_bukti,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas end as kontak,a.judul,a.pesan,a.kode_pp,a.ref1,a.ref2,a.ref3,a.link,a.tgl_input
             from sis_pesan_m a
             where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' and a.tipe='info'
-            ");
+            ";
+            $res = DB::connection('sqlsrvtarbak')->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $res3 = DB::connection('sqlsrvtarbak')->select("select 
-            a.no_bukti,a.kode_lokasi,a.file_dok,a.no_urut,a.kode_pp from sis_pesan_dok a where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' ");
+            $sql2= "select 
+            a.no_bukti,a.kode_lokasi,a.file_dok,a.no_urut,a.kode_pp from sis_pesan_dok a where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' ";
+            $res3 = DB::connection('sqlsrvtarbak')->select($sql2);
             $res3 = json_decode(json_encode($res3),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -359,6 +361,8 @@ class PesanController extends Controller
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
                 $success['data_dok'] = [];
+                $success['sql'] = $sql;
+                $success['sql2'] = $sql2;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
@@ -387,121 +391,116 @@ class PesanController extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    // public function update(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'no_bukti' => 'required',
-    //         'jenis' => 'required',
-    //         'judul' => 'required',
-    //         'pesan' => 'required',
-    //         'tipe' => 'required',
-    //     ]);
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'jenis' => 'required',
+            'judul' => 'required',
+            'kode_pp' => 'required',
+            'kontak' => 'required',
+            'pesan' => 'required',
+            'tipe' => 'required',
+        ]);
+
+        DB::connection('sqlsrvtarbak')->beginTransaction();
         
-    //     DB::connection('sqlsrvtarbak')->beginTransaction();
-        
-    //     try {
-    //         if($data =  Auth::guard('tarbak')->user()){
-    //             $nik= $data->nik;
-    //             $kode_lokasi= $data->kode_lokasi;
-    //         }
+        try {
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
             
+            $per = date('ym');
+            $no_bukti = $request->no_bukti;
             
-    //         if(count($request->nis) > 0){
+            $arr_foto = array();
+            $i=0;
+            $cek = $request->file;
+            //cek upload file tidak kosong
+            if(!empty($cek)){
                 
-    //             $no_bukti = $request->no_bukti;
-    //             $strSQL = "select nu as jumlah from sis_nilai_m where no_bukti='$no_bukti' ";	
-    //             $cek = DB::connection('sqlsrvtarbak')->select($strSQL);
-    //             if(count($cek) > 0){
-    //                 $no_urut = $cek[0]->jumlah;
-    //             }else{
-    //                 $no_urut = 1;
-    //             }
-
-    //             // $arr_foto = array();
-    //             // $arr_nama = array();
-    //             // $arr_foto2 = array();
-    //             // $arr_nama2 = array();
-    //             // $i=0;
-    //             // $cek = $request->file;
-    //             // //cek upload file tidak kosong
-    //             // if(!empty($cek)){
-
-    //             //     if(count($request->nama_file) > 0){
-    //             //         //looping berdasarkan nama dok
-    //             //         for($i=0;$i<count($request->nama_file);$i++){
-    //             //             //cek row i ada file atau tidak
-    //             //             if(isset($request->file('file')[$i])){
-    //             //                 $file = $request->file('file')[$i];
-
-    //             //                 //kalo ada cek nama sebelumnya ada atau -
-    //             //                 if($request->nama_file_seb[$i] != "-"){
-    //             //                     //kalo ada hapus yang lama
-    //             //                     Storage::disk('s3')->delete('sekolah/'.$request->nama_file_seb[$i]);
-    //             //                 }
-    //             //                 $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-    //             //                 $foto = $nama_foto;
-    //             //                 if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-    //             //                     Storage::disk('s3')->delete('sekolah/'.$foto);
-    //             //                 }
-    //             //                 Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
-    //             //                 $arr_foto[] = $foto;
-    //             //             }else{
-    //             //                 $arr_foto[] = $request->nama_file_seb[$i];
-    //             //             }     
-    //             //             $arr_nama[] = $request->input('nama_file')[$i];
-    //             //             $arr_nama2[] = count($request->nama_file).'|'.$i.'|'.isset($request->file('file')[$i]);
-    //             //         }
-    
-    //             //         $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
-    //             //     }
-    //             // }
-
-    //             $del = DB::connection('sqlsrvtarbak')->table('sis_nilai_m')
-    //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_bukti', $request->no_bukti)
-    //             ->delete();
-    
-    //             $del2 = DB::connection('sqlsrvtarbak')->table('sis_nilai')
-    //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_bukti', $request->no_bukti)
-    //             ->delete();
-
-
-    //             $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd));
-    //             for($i=0;$i<count($request->nis);$i++){
-    //                 $ins2[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
+                if(count($request->nama_file_seb) > 0){
+                    //looping berdasarkan nama dok
+                    for($i=0;$i<count($request->nama_file_seb);$i++){
+                        //cek row i ada file atau tidak
+                        if(isset($request->file('file')[$i])){
+                            $file = $request->file('file')[$i];
+                            //kalo ada cek nama sebelumnya ada atau -
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('sekolah/'.$request->nama_file_seb[$i]);
+                            }
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            if(Storage::disk('s3')->exists('sekolah/'.$foto)){
+                                Storage::disk('s3')->delete('sekolah/'.$foto);
+                            }
+                            Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                        }else if($request->nama_file_seb[$i] != "-"){
+                            $arr_foto[] = $request->nama_file_seb[$i];
+                        }     
+                    }
                     
-    //             }  
-
-    //             // if(count($arr_nama) > 0){
-    //             //     for($i=0; $i<count($arr_nama);$i++){
-    //             //         $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (
-    //             //         no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$request->kode_pp','".$request->nis_dok[$i]."') "); 
-    //             //     }
-    //             // }
-
-    //             DB::connection('sqlsrvtarbak')->commit();
-    //             $sts = true;
-    //             $msg = "Data Penilaian berhasil diubah.";
+                    $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $request->kode_pp)->delete();
+                }
                 
-    //         }else{
-    //             $sts = true;
-    //             $no_bukti = "-";
-    //             $msg = "Data Penilaian gagal diubah. Detail Penilaian tidak valid";
-    //         }
+            }
             
-    //         $success['no_bukti'] = $no_bukti;
-    //         $success['status'] = $sts;
-    //         $success['message'] = $msg;
-     
-    //         return response()->json(['success'=>$success], $this->successStatus); 
-    //     } catch (\Throwable $e) {
-    //         DB::connection('sqlsrvtarbak')->rollback();
-    //         $success['status'] = false;
-    //         $success['message'] = "Data Penilaian gagal diubah ".$e;
-    //         return response()->json(['success'=>$success], $this->successStatus); 
-    //     }	
-    // }
+            if($request->jenis == "Siswa"){
+                $nis = $request->kontak;
+                $kode_kelas = '-';
+                $sql = "select id_device from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+            }else{
+                $nis = "-";
+                $kode_kelas = $request->kontak;
+                $sql = "select id_device from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+            }
+            
+            $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');
+            $ref2 = (isset($request->ref2) && $request->ref2 != "" ? $request->ref2 : '-');
+            $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
+            $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
+            
+            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
+            
+            $cek = DB::connection('sqlsrvtarbak')->select($sql);
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                for($i=0;$i<count($cek);$i++){
+                    
+                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."') ");
+                    
+                }  
+            }
+            
+            if(count($arr_foto) > 0){
+                for($i=0; $i<count($arr_foto);$i++){
+                    $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_dok (
+                        no_bukti,kode_lokasi,file_dok,no_urut,kode_pp) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','$request->kode_pp') "); 
+                }
+            }
+            
+            DB::connection('sqlsrvtarbak')->commit();
+            $sts = true;
+            $msg = "Data Pesan berhasil disimpan.";
+
+            // sendNotif();
+        
+            $success['status'] = $sts;
+            $success['no_bukti'] = $no_bukti;
+            $success['message'] = $msg;
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvtarbak')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Pesan gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -570,7 +569,7 @@ class PesanController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'kode_pp' => 'required',
-            'nu' => 'required'
+            'no_urut' => 'required'
         ]);
         DB::connection('sqlsrvtarbak')->beginTransaction();
         
@@ -580,7 +579,7 @@ class PesanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }		
 
-            $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and no_urut='$request->nu' ";
+            $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and no_urut='$request->no_urut' ";
             $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -594,7 +593,7 @@ class PesanController extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
                 ->where('kode_pp', $request->kode_pp)
-                ->where('no_urut', $request->nu)
+                ->where('no_urut', $request->no_urut)
                 ->delete();
 
                 DB::connection('sqlsrvtarbak')->commit();
