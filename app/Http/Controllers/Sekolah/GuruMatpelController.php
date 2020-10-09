@@ -142,20 +142,23 @@ class GuruMatpelController extends Controller
 
             $kode_pp = $request->kode_pp;
             $nik_guru= $request->nik_guru;
+            $kode_ta = $request->kode_ta;
 
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_pp, a.nik as nik_guru,a.flag_aktif,b.nama as nama_pp,c.nama as nama_guru, case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as nama_status,a.kode_ta,d.nama as nama_ta 
             from sis_guru_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            inner join karyawan c on a.nik=c.nik and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            inner join sis_guru c on a.nik=c.nik and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             inner join sis_ta d on a.kode_ta=d.kode_ta and a.kode_lokasi=d.kode_lokasi
-            where a.nik='$nik_guru' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' group by a.kode_pp,a.nik,a.flag_aktif,b.nama,c.nama,a.kode_ta,d.nama");
+            where a.nik='$nik_guru' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.kode_ta='$kode_ta' group by a.kode_pp,a.nik,a.flag_aktif,b.nama,c.nama,a.kode_ta,d.nama");
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel,a.kode_status,b.nama as nama_matpel,c.nama as nama_status
             from sis_guru_matpel a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             left join sis_guru_status c on a.kode_status=c.kode_status and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-            where a.nik='$nik_guru' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'");
+            where a.nik='$nik_guru' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'
+            and a.kode_ta='$kode_ta' 
+            ");
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
