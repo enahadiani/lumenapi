@@ -844,7 +844,6 @@ class PenilaianController extends Controller
             $no_bukti = $request->no_bukti;
             $kode_pp = $request->kode_pp;
             $arr_foto = array();
-            $arr_nama = array();
             $arr_nis = array();
             $i=0;
             $cek = $request->file;
@@ -869,11 +868,9 @@ class PenilaianController extends Controller
                             }
                             Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
                             $arr_foto[] = $foto;
-                            $arr_nama[] = $request->input('nama_file')[$i];
                             $arr_nis[] = $request->nis[$i];
                         }else if($request->nama_file_seb[$i] != "-"){
                             $arr_foto[] = $request->nama_file_seb[$i];
-                            $arr_nama[] = $request->input('nama_file')[$i];
                             $arr_nis[] = $request->nis[$i];
                         }     
                     }
@@ -881,9 +878,9 @@ class PenilaianController extends Controller
                     $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
                 }
 
-                if(count($arr_nama) > 0){
-                    for($i=0; $i<count($arr_nama);$i++){
-                        $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$kode_pp','".$arr_nis[$i]."') "); 
+                if(count($arr_nis) > 0){
+                    for($i=0; $i<count($arr_nis);$i++){
+                        $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','-','$kode_pp','".$arr_nis[$i]."') "); 
                     }
                     DB::connection('sqlsrvtarbak')->commit();
                     $success['status'] = true;
