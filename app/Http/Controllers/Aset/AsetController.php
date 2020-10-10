@@ -469,8 +469,12 @@ class AsetController extends Controller
             //     }
             // }            
           
-            $sql="select a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama,b.maxid as mon_id,c.status,c.catatan,convert(varchar(10),c.tgl_input,103) as tgl_inventaris_last,'-' as tindakan, d.jum as jum_inventaris
+            $sql="select a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,
+                a.kd_asset,a.sumber_dana,a.nama_inv as nama,b.maxid as mon_id,c.status,c.catatan,convert(varchar(10),c.tgl_input,103) as tgl_inventaris_last,'-' as tindakan, d.jum as jum_inventaris,
+                e.nama_gedung,f.nama_ruangan as nama_ruang
             from amu_asset_bergerak a
+            inner join amu_gedung e on a.id_gedung=e.id_gedung and a.kode_lokasi=e.kode_lokasi
+            inner join amu_ruangan f on a.no_ruang=f.no_ruangan and a.kode_lokasi=f.kode_lokasi
             left join (SELECT kd_asset,kode_lokasi,MAX(mon_id) as maxid
                        FROM amu_mon_asset_bergerak
                        GROUP BY kd_asset,kode_lokasi) b on a.no_bukti=b.kd_asset and a.kode_lokasi=b.kode_lokasi
