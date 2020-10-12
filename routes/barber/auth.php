@@ -18,42 +18,41 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     //approval dev
-    $router->post('login', 'AuthController@loginYakes');
-    $router->get('hash-pass', 'AuthController@hashPasswordYakes');
-    $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
+    $router->post('login', 'AuthController@loginToko');
+    $router->get('hash-pass', 'AuthController@hashPasswordToko');
 });
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('s3')->exists('yakes/'.$filename)) {
+    if (!Storage::disk('s3')->exists('toko/'.$filename)) {
         abort(404);
     }
-    return Storage::disk('s3')->response('yakes/'.$filename); 
+    return Storage::disk('s3')->response('toko/'.$filename); 
 });
 
 
-$router->group(['middleware' => 'auth:yakes'], function () use ($router) {
+$router->group(['middleware' => 'auth:toko'], function () use ($router) {
     
-    $router->get('profile', 'AdminYakesController@profile');
-    $router->get('users/{id}', 'AdminYakesController@singleUser');
-    $router->get('users', 'AdminYakesController@allUsers');
-    $router->get('cek-payload', 'AdminYakesController@cekPayload');
+    $router->get('profile', 'AdminTokoController@profile');
+    $router->get('users/{id}', 'AdminTokoController@singleUser');
+    $router->get('users', 'AdminTokoController@allUsers');
+    $router->get('cek-payload', 'AdminTokoController@cekPayload');
 
     
-    $router->post('update-password', 'AdminYakesController@updatePassword');
-    $router->post('update-foto', 'AdminYakesController@updatePhoto');
-    $router->post('update-background', 'AdminYakesController@updateBackground');
+    $router->post('update-password', 'AdminTokoController@updatePassword');
+    $router->post('update-foto', 'AdminTokoController@updatePhoto');
+    $router->post('update-background', 'AdminTokoController@updateBackground');
 
     //Menu
-    $router->get('menu/{kode_klp}', 'Yakes\MenuController@show');
+    $router->get('menu/{kode_klp}', 'Toko\MenuController@show');
 
     
-    $router->post('notif-pusher', 'Yakes\NotifController@sendPusher');
-    $router->get('notif-pusher', 'Yakes\NotifController@getNotifPusher');
-    $router->put('notif-update-status', 'Yakes\NotifController@updateStatusRead');
+    $router->post('notif-pusher', 'Toko\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Toko\NotifController@getNotifPusher');
+    $router->put('notif-update-status', 'Toko\NotifController@updateStatusRead');
 
-    $router->post('search-form', 'AdminYakesController@searchForm');
-    $router->get('search-form-list', 'AdminYakesController@searchFormList');
+    $router->post('search-form', 'AdminTokoController@searchForm');
+    $router->get('search-form-list', 'AdminTokoController@searchFormList');
 
 });
 

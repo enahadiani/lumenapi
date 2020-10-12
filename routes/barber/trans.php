@@ -16,15 +16,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 
-$router->group(['middleware' => 'auth:yakes'], function () use ($router) {
-    //jurnal
-    $router->post('jurnal','Yakes\JurSesuaiController@store');
-    $router->put('jurnal','Yakes\JurSesuaiController@update');    
-    $router->delete('jurnal','Yakes\JurSesuaiController@destroy');     
-    $router->get('getNoBukti','Yakes\JurSesuaiController@getNoBukti');                 
-    $router->get('index','Yakes\JurSesuaiController@index');     
-    $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail'); 
-
+$router->group(['middleware' => 'auth:toko'], function () use ($router) {
+   
 });
 
 
