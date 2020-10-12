@@ -44,7 +44,7 @@ class CustController extends Controller
 
     public function cariCustAktif(Request $request) {
         $this->validate($request, [    
-            'kode_barber' => 'required'            
+            'kode_cust' => 'required'            
         ]);
         
         try {
@@ -221,13 +221,13 @@ class CustController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Barber berhasil dihapus";
+            $success['message'] = "Data Customer berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Barber gagal dihapus ".$e;
+            $success['message'] = "Data Customer gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
