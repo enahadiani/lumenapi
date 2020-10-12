@@ -21,7 +21,8 @@ class LapInternal2Controller extends Controller
     function getMkuOperasional(Request $request){
         try {
             
-            if($data =  Auth::guard($this->guard)->user()){
+            if($data =  Auth::guard($this->guard)->user())
+            {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
