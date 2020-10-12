@@ -497,7 +497,6 @@ $app->router->group([
     require __DIR__.'/../routes/yakes/dash.php';
 });
 
-
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-auth'
@@ -532,6 +531,42 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/admginas/dash.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/barber-auth'
+], function ($router) {
+    require __DIR__.'/../routes/barber/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/barber-master'
+], function ($router) {
+    require __DIR__.'/../routes/barber/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/barber-trans'
+], function ($router) {
+    require __DIR__.'/../routes/barber/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/barber-report'
+], function ($router) {
+    require __DIR__.'/../routes/barber/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/barber-dash'
+], function ($router) {
+    require __DIR__.'/../routes/barber/dash.php';
+});
+
 
 
 return $app;
