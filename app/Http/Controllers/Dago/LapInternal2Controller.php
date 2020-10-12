@@ -624,7 +624,8 @@ class LapInternal2Controller extends Controller
 			left join (select no_reg,kode_lokasi,count(no_kwitansi) as cicil_ke
                         from dgw_pembayaran 
                         group by no_reg,kode_lokasi ) n on b.no_reg=n.no_reg and b.kode_lokasi=n.kode_lokasi
-            $where ";
+            $where 
+            order by a.periode desc, a.no_kwitansi desc";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
