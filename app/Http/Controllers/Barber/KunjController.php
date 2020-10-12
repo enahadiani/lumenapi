@@ -79,7 +79,7 @@ class KunjController extends Controller
             $no_bukti = $this->generateKode("bar_kunj", "no_bukti", $kode_lokasi."-KJ".$periode.".", "0001");
             $total = floatval($request->nilai) - floatval($request->diskon);
 
-            $ins = DB::connection($this->sql)->insert("insert into bar_kunj(no_bukti,tanggal,nik_user,periode,kode_lokasi,no_closing,kode_cust,nama,alamat,no_hp,kode_paket,kode_barber,nilai,diskon,total,no_del,tgl_del,nik_del) values 
+            $ins = DB::connection($this->sql)->insert("insert into bar_kunj(no_bukti,tanggal,nik_user,periode,kode_lokasi,no_close,kode_cust,nama,alamat,no_hp,kode_paket,kode_barber,nilai,diskon,total,no_del,tgl_del,nik_del) values 
                                                       ('".$no_bukti."','".$request->tanggal."','".$request->nik_user."','".$periode."','".$kode_lokasi."','-','".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->no_hp."','".$request->kode_paket."','".$request->kode_barber."',".floatval($request->nilai).",".floatval($request->diskon).",".$total.",'-',null,'-')");
 
                                                                     
