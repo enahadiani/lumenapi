@@ -35,16 +35,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('barber','Barber\BarberController@store');
     $router->put('barber','Barber\BarberController@update');
     $router->delete('barber','Barber\BarberController@destroy');    
-    $router->get('listBarberAktif','Barber\PaketController@listBarberAktif');         
-    $router->get('cariBarberAktif','Barber\PaketController@cariBarberAktif');
+    $router->get('listBarberAktif','Barber\BarberController@listBarberAktif');         
+    $router->get('cariBarberAktif','Barber\BarberController@cariBarberAktif');
 
     //cust
     $router->get('cust','Barber\CustController@index');
     $router->post('cust','Barber\CustController@store');
     $router->put('cust','Barber\CustController@update');
     $router->delete('cust','Barber\CustController@destroy');  
-    $router->get('listCustAktif','Barber\PaketController@listCustAktif');         
-    $router->get('cariCustAktif','Barber\PaketController@cariCustAktif');  
+    $router->get('listCustAktif','Barber\CustController@listCustAktif');         
+    $router->get('cariCustAktif','Barber\CustController@cariCustAktif');  
 
 
 });

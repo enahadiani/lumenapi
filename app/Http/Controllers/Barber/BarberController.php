@@ -169,7 +169,7 @@ class BarberController extends Controller
             'kode_barber' => 'required|max:10',
             'nama' => 'required|max:100',
             'alamat' => 'required',
-            'no_hp' => 'reqiured',
+            'no_hp' => 'required',
             'flag_aktif' => 'required',
             'nik_user' => 'required'    
         ]);

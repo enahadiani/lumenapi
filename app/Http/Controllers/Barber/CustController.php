@@ -44,7 +44,7 @@ class CustController extends Controller
 
     public function cariCustAktif(Request $request) {
         $this->validate($request, [    
-            'kode_barber' => 'required'            
+            'kode_cust' => 'required'            
         ]);
         
         try {
@@ -142,7 +142,7 @@ class CustController extends Controller
             }
             if($this->isUnik($request->kode_cust,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into bar_cust(kode_cust,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_cust."','".$request->nama."','".$kode_lokasi."',".$request->alamat.",'".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
+                $ins = DB::connection($this->sql)->insert("insert into bar_cust(kode_cust,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_cust."','".$request->nama."','".$kode_lokasi."','".$request->alamat."','".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -169,7 +169,7 @@ class CustController extends Controller
             'kode_cust' => 'required|max:10',
             'nama' => 'required|max:100',
             'alamat' => 'required',
-            'no_hp' => 'reqiured',
+            'no_hp' => 'required',
             'flag_aktif' => 'required',
             'nik_user' => 'required'    
         ]);
@@ -187,7 +187,7 @@ class CustController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into bar_cust(kode_cust,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_cust."','".$request->nama."','".$kode_lokasi."',".$request->alamat.",'".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
+            $ins = DB::connection($this->sql)->insert("insert into bar_cust(kode_cust,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_cust."','".$request->nama."','".$kode_lokasi."','".$request->alamat."','".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -221,13 +221,13 @@ class CustController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Barber berhasil dihapus";
+            $success['message'] = "Data Customer berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Barber gagal dihapus ".$e;
+            $success['message'] = "Data Customer gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
