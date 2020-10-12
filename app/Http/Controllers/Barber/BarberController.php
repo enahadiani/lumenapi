@@ -142,7 +142,7 @@ class BarberController extends Controller
             }
             if($this->isUnik($request->kode_barber,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into bar_barber(kode_barber,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_barber."','".$request->nama."','".$kode_lokasi."',".$request->alamat.",'".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
+                $ins = DB::connection($this->sql)->insert("insert into bar_barber(kode_barber,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_barber."','".$request->nama."','".$kode_lokasi."','".$request->alamat."','".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -187,7 +187,7 @@ class BarberController extends Controller
             ->where('kode_barber', $request->kode_barber)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into bar_barber(kode_barber,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_barber."','".$request->nama."','".$kode_lokasi."',".$request->alamat.",'".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
+            $ins = DB::connection($this->sql)->insert("insert into bar_barber(kode_barber,nama,kode_lokasi,alamat,no_hp,flag_aktif,nik_user,tgl_input) values ('".$request->kode_barber."','".$request->nama."','".$kode_lokasi."','".$request->alamat."','".$request->no_hp."','".$request->flag_aktif."','".$request->nik_user."',getdate())");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
