@@ -53,7 +53,8 @@ class CloseController extends Controller
 
     public function getKunj(Request $request) {
         $this->validate($request, [
-            'tanggal' => 'required'
+            'tanggal' => 'required',
+            'kode_barber' => 'required'
         ]);
 
         try {
@@ -64,7 +65,7 @@ class CloseController extends Controller
             }
 
             $res2 = DB::connection($this->sql)->select("select no_bukti,kode_paket,kode_barber,total from bar_kunj 
-                                                       where no_close='-' and tanggal = '".$request->tanggal."' and kode_lokasi='".$kode_lokasi."'");						
+                                                       where no_close='-' and kode_barber='".$request->kode_barber."' and tanggal = '".$request->tanggal."' and kode_lokasi='".$kode_lokasi."'");						
             $res2= json_decode(json_encode($res2),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -90,8 +91,11 @@ class CloseController extends Controller
     {
         $this->validate($request, [            
             'tanggal' => 'required',
-            'tgl_close' => 'required',
-            'nik_user' => 'required'         
+            'kode_barber' => 'required',
+            'nik_user' => 'required',
+            
+            'arrkunj'=>'required|array',
+            'arrkunj.*.no_bukti' => 'required'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -109,8 +113,14 @@ class CloseController extends Controller
 
             $ins = DB::connection($this->sql)->insert("insert into bar_close(no_close,tanggal,nik_user,tgl_close,kode_lokasi) values 
                                                       ('".$no_bukti."','".$request->tanggal."','".$request->nik_user."','".$request->tgl_close."','".$kode_lokasi."')");
+                                 
+            $arrkunj = $request->arrkunj;
+            if (count($arrkunj) > 0){
+                for ($i=0;$i <count($arrkunj);$i++){                
+                    $ins2[$i] = DB::connection($this->sql)->insert("update bar_kunj set no_close='".$no_bukti."' where no_close='-' and no_bukti='".$arrkunj[$i]['no_bukti']."' and kode_lokasi='".$kode_lokasi."'");                    
+                }						
+            }                                          
 
-                                                                    
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Closing berhasil disimpan";

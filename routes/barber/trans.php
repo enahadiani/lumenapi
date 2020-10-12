@@ -20,6 +20,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
    //kunjungan
    $router->post('kunj','Barber\KunjController@store');
    $router->get('getNoBukti','Barber\KunjController@getNoBukti');                    
+
+   //closing
+   $router->post('closing','Barber\CloseController@store');
+   $router->get('getNoClose','Barber\CloseController@getNoClose');                    
+   $router->get('getKunj','Barber\CloseController@getKunj');                    
+
 });
 
 
