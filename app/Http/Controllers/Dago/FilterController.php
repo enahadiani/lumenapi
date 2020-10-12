@@ -57,7 +57,7 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
           
-            $sql="select distinct periode from dgw_reg where kode_lokasi='$kode_lokasi' ";
+            $sql="select distinct periode,dbo.fnNamaBulan(periode) as nama from dgw_reg where kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -185,7 +185,7 @@ class FilterController extends Controller
                 }
             }
           
-            $sql="select a.no_paket,b.nama 
+            $sql="select distinct a.no_paket,b.nama 
                 from dgw_reg a 
                 inner join dgw_paket b on a.no_paket=b.no_paket and a.kode_lokasi = b.kode_lokasi 
                 $where ";
@@ -291,7 +291,7 @@ class FilterController extends Controller
                 }
             }
 
-            $sql="select a.no_jadwal,b.tgl_berangkat 
+            $sql="select distinct a.no_jadwal,b.tgl_berangkat 
             from dgw_reg a 
             inner join dgw_jadwal b on a.no_jadwal=b.no_jadwal and a.kode_lokasi=b.kode_lokasi and a.no_paket=b.no_paket 
             $where ";
