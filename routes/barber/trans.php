@@ -18,11 +18,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
    //kunjungan
-//    $router->post('kunj','Yakes\JurSesuaiController@store');
-//    $router->put('kunj','Yakes\JurSesuaiController@update');    
-//    $router->delete('kunj','Yakes\JurSesuaiController@destroy');     
-//    $router->get('getNoBukti','Yakes\JurSesuaiController@getNoBukti');                 
-//    $router->get('index','Yakes\JurSesuaiController@index');        
+   $router->post('kunj','Barber\KunjController@store');
+   $router->get('getNoBukti','Barber\KunjController@getNoBukti');                    
 });
 
 
