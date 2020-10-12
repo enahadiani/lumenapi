@@ -1937,7 +1937,7 @@ class RtrwController extends Controller
             'file_gambar' => 'required|file|max:3072'
         ]);
 
-        DB::connection($this->db)->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -1969,14 +1969,14 @@ class RtrwController extends Controller
                 Storage::disk('s3')->put('rtrw/'.$foto,file_get_contents($file));
             }
     
-            $ins = DB::connection($this->db)->insert("insert into rt_trans_dok (no_bukti,kode_akun,kode_rumah,kode_lokasi,tgl_input,nama_file,keterangan,no_app) values ('$no_bukti','$request->kode_akun','$kode_lokasi',getdate(),'$foto','$request->keterangan','-')");
+            $ins = DB::connection($this->sql)->insert("insert into rt_trans_dok (no_bukti,kode_akun,kode_rumah,kode_lokasi,tgl_input,nama_file,keterangan,no_app) values ('$no_bukti','$request->kode_akun','$kode_lokasi',getdate(),'$foto','$request->keterangan','-')");
 
-            DB::connection($this->db)->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Upload bukti berhasil disimpan. No Bukti:".$no_bukti;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Upload bukti gagal disimpan. ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
