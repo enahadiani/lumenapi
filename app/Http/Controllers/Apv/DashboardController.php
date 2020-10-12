@@ -24,7 +24,7 @@ class DashboardController extends Controller
     {
         try {
             
-            if($data =  Auth::guard(guard($this->guard))->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -73,7 +73,7 @@ class DashboardController extends Controller
     {
         try {
             
-            if($data =  Auth::guard(guard($this->guard))->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
