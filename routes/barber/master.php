@@ -31,10 +31,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('cariPaketAktif','Barber\PaketController@cariPaketAktif');
 
     //barber
-    $router->get('paket','Barber\BarberController@index');
-    $router->post('paket','Barber\BarberController@store');
-    $router->put('paket','Barber\BarberController@update');
-    $router->delete('paket','Barber\BarberController@destroy');    
+    $router->get('barber','Barber\BarberController@index');
+    $router->post('barber','Barber\BarberController@store');
+    $router->put('barber','Barber\BarberController@update');
+    $router->delete('barber','Barber\BarberController@destroy');    
     $router->get('listBarberAktif','Barber\PaketController@listBarberAktif');         
     $router->get('cariBarberAktif','Barber\PaketController@cariBarberAktif');
 
