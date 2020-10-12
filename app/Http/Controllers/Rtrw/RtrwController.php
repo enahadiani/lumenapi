@@ -1970,7 +1970,7 @@ class RtrwController extends Controller
                 Storage::disk('s3')->put('rtrw/'.$foto,file_get_contents($file));
             }
     
-            $ins = DB::connection($this->sql)->insert("insert into rt_trans_dok (no_bukti,kode_akun,kode_rumah,kode_lokasi,tgl_input,nama_file,keterangan,no_app) values ('$no_bukti','$request->kode_akun','$row->no_rumah','$kode_lokasi',getdate(),'$foto','$request->keterangan','-')");
+            $ins = DB::connection($this->sql)->insert("insert into rt_trans_dok (no_bukti,kode_akun,kode_rumah,kode_lokasi,tgl_input,nama_file,keterangan,no_app) values ('$no_bukti','$request->kode_akun','$request->no_rumah','$kode_lokasi',getdate(),'$foto','$request->keterangan','-')");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
