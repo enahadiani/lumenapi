@@ -47,6 +47,13 @@ class JenisPenilaianController extends Controller
                 $filter .= "";
             }
 
+            
+            if(isset($request->flag_aktif)){
+                $filter .= "and a.flag_aktif='$request->flag_aktif' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection('sqlsrvtarbak')->select("select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp 
             from sis_jenisnilai a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
