@@ -68,7 +68,7 @@ class CloseController extends Controller
                                                        where no_close='-' and kode_barber='".$request->kode_barber."' and tanggal = '".$request->tanggal."' and kode_lokasi='".$kode_lokasi."'");						
             $res2= json_decode(json_encode($res2),true);
            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res2) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;                
                 $success['arrkunj'] = $res2;  
                 $success['message'] = "Success!";
