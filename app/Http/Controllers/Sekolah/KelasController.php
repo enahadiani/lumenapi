@@ -47,6 +47,12 @@ class KelasController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->flag_aktif)){
+                $filter .= "and a.flag_aktif='$request->flag_aktif' ";
+            }else{
+                $filter .= "";
+            }
+            
             $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_jur,a.kode_jur+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
             from sis_kelas a 
 			left join sis_jur b on a.kode_jur=b.kode_jur and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
