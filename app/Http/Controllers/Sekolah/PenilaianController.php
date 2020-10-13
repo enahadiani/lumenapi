@@ -81,6 +81,66 @@ class PenilaianController extends Controller
         
     }
 
+    public function listUpload(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard('tarbak')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $filter = "";
+            if(isset($request->kode_pp)){
+                $filter .= " and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_ta)){
+                $filter .= " and a.kode_ta='$request->kode_ta' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_sem)){
+                $filter .= " and a.kode_sem='$request->kode_sem' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
+            ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) as persen
+            from sis_nilai_m a
+			inner join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
+				from sis_nilai 
+				group by no_bukti,kode_lokasi,kode_pp
+			) b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			left join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
+				from sis_nilai_dok 
+				group by no_bukti,kode_lokasi,kode_pp
+			) c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_lokasi='".$kode_lokasi."' $filter");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -433,21 +493,21 @@ class PenilaianController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            // $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and kode_pp='$kode_pp'  order by no_urut";
-            // $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
-            // $res3 = json_decode(json_encode($res3),true);
+            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and kode_pp='$kode_pp'  order by no_urut";
+            $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
 
-            // if(count($res3) > 0){
-            //     for($i=0;$i<count($res3);$i++){
-            //         Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
-            //     }
-            // }
+            if(count($res3) > 0){
+                for($i=0;$i<count($res3);$i++){
+                    Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
+                }
+            }
 
-            // $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')
-            // ->where('kode_lokasi', $kode_lokasi)
-            // ->where('no_bukti', $no_bukti)
-            // ->where('kode_pp', $request->kode_pp)
-            // ->delete();
+            $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti)
+            ->where('kode_pp', $request->kode_pp)
+            ->delete();
 
             DB::connection('sqlsrvtarbak')->commit();
             $success['status'] = true;
