@@ -1182,14 +1182,14 @@ class MobileController extends Controller
 		}
 
 		$this->validate($request,[
-            'id' => 'required|max:300',
+            'no_pesan' => 'required|max:300',
             'id_device' => 'required'
 		]);
 
 		DB::connection('sqlsrvtarbak')->beginTransaction();
         try{
             
-			$upd = DB::connection('sqlsrvtarbak')->insert("update sis_pesan_d set sts_read_mob = '1' where no_bukti='$request->id' and id_device='$request->id_device' and kode_lokasi='$kode_lokasi' ");
+			$upd = DB::connection('sqlsrvtarbak')->insert("update sis_pesan_d set sts_read_mob = '1' where no_bukti='$request->no_pesan' and id_device='$request->id_device' and kode_lokasi='$kode_lokasi' ");
 
 			DB::connection('sqlsrvtarbak')->commit();
 			$success['status'] = true;
@@ -1220,13 +1220,15 @@ class MobileController extends Controller
                 $kode_kelas = "-";
             }
             
-			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok
+			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob
             from sis_pesan_m a
             inner join (select nik_user,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
-                        from sis_pesan_m
+                        from sis_pesan_m 
+						where tipe='info'
                         group by  nik_user,kode_lokasi,kode_pp) b on a.nik_user=b.nik_user and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
             inner join sis_guru c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            inner join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
+            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nis='$nik'
+            left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
             where a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
 			";
 			$res = DB::connection('sqlsrvtarbak')->select($sql);
@@ -1293,7 +1295,56 @@ class MobileController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
         }
-	}
+    }
+    
+    public function getNotif(Request $request){
+
+		if($auth =  Auth::guard('siswa')->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            $get = DB::connection('sqlsrvtarbak')->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok
+            from sis_pesan_m a
+            inner join (select nik_user,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                        from sis_pesan_m
+                        group by  nik_user,kode_lokasi,kode_pp) b on a.nik_user=b.nik_user and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+            inner join sis_guru c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
+            where a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
+			";
+			$res = DB::connection('sqlsrvtarbak')->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
 
 
 }
