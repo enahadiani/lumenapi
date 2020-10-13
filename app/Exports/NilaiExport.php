@@ -17,11 +17,12 @@ use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\BeforeExport;
+use Maatwebsite\Excel\Events\AfterSheet;
 
 
-class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting, WithStyles
+class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
 {
     public function __construct($nik_user,$kode_lokasi,$kode_pp,$type,$kode_kelas= null,$kode_sem= null,$kode_jenis= null,$kode_matpel= null,$kode_kd = null)
     {
@@ -119,30 +120,30 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
 
     }
 
-    public function styles(Worksheet $sheet)
+    public function registerEvents(): array
     {
-        // return [
-        //     'A1' => ['font' => ['bold' => true]],
-        //     'A2' => ['font' => ['bold' => true]],
-        //     'B1' => ['font' => ['bold' => true]],
-        //     'B2' => ['font' => ['bold' => true]],
-        //     'C1' => ['font' => ['bold' => true]],
-        //     'C2' => ['font' => ['bold' => true]],
-        //     'D1' => ['font' => ['bold' => true]],
-        //     'D2' => ['font' => ['bold' => true]],
-        //     'E1' => ['font' => ['bold' => true]],
-        //     'E2' => ['font' => ['bold' => true]],
-        // ];
-        $sheet->getStyle('A1')->getFont()->setBold(true);
-        $sheet->getStyle('A2')->getFont()->setBold(true);
-        $sheet->getStyle('B1')->getFont()->setBold(true);
-        $sheet->getStyle('B2')->getFont()->setBold(true);
-        $sheet->getStyle('C1')->getFont()->setBold(true);
-        $sheet->getStyle('C2')->getFont()->setBold(true);
-        $sheet->getStyle('D1')->getFont()->setBold(true);
-        $sheet->getStyle('D2')->getFont()->setBold(true);
-        $sheet->getStyle('E1')->getFont()->setBold(true);
-        $sheet->getStyle('E2')->getFont()->setBold(true);
+        
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $styleArray = [
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'rotation' => 0,
+                        'startColor' => [
+                            'argb' => 'FFFF00',
+                        ],
+                        'endColor' => [
+                            'argb' => 'FFFF00',
+                        ],
+                    ],
+                ];
+                $event->sheet->getStyle('A1:E2')->applyFromArray($styleArray);
+            },
+        ];
+        
     }
 
     public function columnFormats(): array
