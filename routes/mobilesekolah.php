@@ -78,7 +78,8 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     
     $router->get('info', 'Sekolah\MobileController@getInfo');
     $router->get('info-detail', 'Sekolah\MobileController@getDetailInfo');
-    $router->get('update-status-read', 'Sekolah\MobileController@updateStatusReadMobile');
+    $router->put('update-status-read', 'Sekolah\MobileController@updateStatusReadMobile');
+    $router->get('notif', 'Sekolah\MobileController@getNotif');
 
 
 });

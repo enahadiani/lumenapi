@@ -1269,9 +1269,9 @@ class MobileController extends Controller
             
 			$sql = "select a.judul,a.pesan,a.ref1,a.ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal
             from sis_pesan_m a
-            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nis='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
-            where b.nis='$nik' and a.nik_user='$request->nik_guru'
+            where b.nis='$nik' and a.nik_user='$request->nik_guru' and a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             order by a.tgl_input desc
 			";
 			$res = DB::connection('sqlsrvtarbak')->select($sql);
@@ -1306,22 +1306,13 @@ class MobileController extends Controller
 		}
 		
         try{
-
-            $get = DB::connection('sqlsrvtarbak')->select("select kode_kelas from sis_siswa where nis='$nik' ");
-            if(count($get) > 0){
-                $kode_kelas = $get[0]->kode_kelas;
-            }else{
-                $kode_kelas = "-";
-            }
             
-			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok
+			$sql = "select a.jenis,dbo.fnNamaTanggal2(a.tgl_input,2) as tanggal,a.pesan,isnull(c.file_dok,'-') as file_dok
             from sis_pesan_m a
-            inner join (select nik_user,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
-                        from sis_pesan_m
-                        group by  nik_user,kode_lokasi,kode_pp) b on a.nik_user=b.nik_user and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
-            inner join sis_guru c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            inner join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
-            where a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nis='$nik'
+            left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
+            where b.nis='$nik' and a.tipe='notif' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            order by a.tgl_input desc
 			";
 			$res = DB::connection('sqlsrvtarbak')->select($sql);
 			$res = json_decode(json_encode($res),true);
