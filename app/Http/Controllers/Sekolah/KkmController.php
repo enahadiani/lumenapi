@@ -98,10 +98,11 @@ class KkmController extends Controller
 
             $kode = $this->generateKode("sis_kkm", "kode_kkm", $kode_lokasi."-KKM.", "0001");
             if(count($request->kode_matpel) > 0){
-
+                date_default_timezone_set('Asia/Jakarta');
+                $tgl_input = date('Y-m-d H:i:s');
                 for($i=0;$i<count($request->kode_matpel);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur,tgl_input) values ('$kode','$request->kode_ta','$request->kode_tingkat','".$request->kode_matpel[$i]."','$kode_lokasi','$request->kode_pp','".$request->kkm[$i]."','$request->flag_aktif','$request->kode_jur',getdate())");
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur,tgl_input) values ('$kode','$request->kode_ta','$request->kode_tingkat','".$request->kode_matpel[$i]."','$kode_lokasi','$request->kode_pp','".$request->kkm[$i]."','$request->flag_aktif','$request->kode_jur','$tgl_input')");
                     
                 }
                 
@@ -227,9 +228,11 @@ class KkmController extends Controller
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
+                date_default_timezone_set('Asia/Jakarta');
+                $tgl_input = date('Y-m-d H:i:s');
                 for($i=0;$i<count($request->kode_matpel);$i++){
-    
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur,tgl_input) values ('$request->kode_kkm','$request->kode_ta','$request->kode_tingkat','".$request->kode_matpel[$i]."','$kode_lokasi','$request->kode_pp','".$request->kkm[$i]."','$request->flag_aktif','$request->kode_jur',getdate())");                    
+                    
+                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kkm(kode_kkm,kode_ta,kode_tingkat, kode_matpel,kode_lokasi,kode_pp,kkm,flag_aktif,kode_jur,tgl_input) values ('$request->kode_kkm','$request->kode_ta','$request->kode_tingkat','".$request->kode_matpel[$i]."','$kode_lokasi','$request->kode_pp','".$request->kkm[$i]."','$request->flag_aktif','$request->kode_jur','$tgl_input' ");                    
                 }
                 
             }          
