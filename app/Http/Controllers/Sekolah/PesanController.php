@@ -285,11 +285,14 @@ class PesanController extends Controller
             
             $cek = DB::connection('sqlsrvtarbak')->select($sql);
             $cek = json_decode(json_encode($cek),true);
+            $arr_id = array();
             if(count($cek) > 0){
                 for($i=0;$i<count($cek);$i++){
                     
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
-                    
+                    if($cek[$i]['id_device'] != ""){
+                        array_push($arr_id,$cek[$i]['id_device']);
+                    }
                 }  
             }
             
@@ -301,8 +304,32 @@ class PesanController extends Controller
             }
             
             DB::connection('sqlsrvtarbak')->commit();
+
+            $msg_n = "Notif tidak dikirim";
+            if(count($arr_id) > 0){
+                $payload = array(
+                    'title' => $request->judul,
+                    'message' => $request->pesan
+                );
+                $res = $this->gcm($arr_id,$payload);
+                $hasil= json_decode($res,true);
+                $success['hasil'] = $hasil;
+                if(isset($hasil['success'])){
+                    if($hasil['failure'] > 0){
+                        $sts = 0;
+                        $msg_n = "Notif gagal dikirim";
+                    }else{
+                        $msg_n = "Notif berhasil dikirim";
+                        $sts = 1;
+                    }
+                }else{
+                    
+                    $msg_n = "Notif gagal dikirim";
+                }
+            }
+
             $sts = true;
-            $msg = "Data Pesan berhasil disimpan.";
+            $msg = "Data Pesan berhasil disimpan. ".$msg_n;
 
             // sendNotif();
         
@@ -484,6 +511,9 @@ class PesanController extends Controller
                 for($i=0;$i<count($cek);$i++){
                     
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
+                    if($cek[$i]['id_device'] != ""){
+                        array_push($arr_id,$cek[$i]['id_device']);
+                    }
                     
                 }  
             }
@@ -496,8 +526,30 @@ class PesanController extends Controller
             }
             
             DB::connection('sqlsrvtarbak')->commit();
+            $msg_n = "Notif tidak dikirim";
+            if(count($arr_id) > 0){
+                $payload = array(
+                    'title' => $request->judul,
+                    'message' => $request->pesan
+                );
+                $res = $this->gcm($arr_id,$payload);
+                $hasil= json_decode($res,true);
+                $success['hasil'] = $hasil;
+                if(isset($hasil['success'])){
+                    if($hasil['failure'] > 0){
+                        $sts = 0;
+                        $msg_n = "Notif gagal dikirim";
+                    }else{
+                        $msg_n = "Notif berhasil dikirim";
+                        $sts = 1;
+                    }
+                }else{
+                    
+                    $msg_n = "Notif gagal dikirim";
+                }
+            }
             $sts = true;
-            $msg = "Data Pesan berhasil disimpan.";
+            $msg = "Data Pesan berhasil diubah. ".$msg_n;
 
             // sendNotif();
         
