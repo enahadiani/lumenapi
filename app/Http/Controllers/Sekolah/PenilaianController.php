@@ -615,9 +615,9 @@ class PenilaianController extends Controller
         $kode_lokasi = $request->kode_lokasi;
         $kode_pp = $request->kode_pp;
         if(isset($request->type) && $request->type == "template"){
-            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_jenis,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
         }else{
-            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_jenis,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
         }
     }
 

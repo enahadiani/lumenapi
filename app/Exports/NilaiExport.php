@@ -17,14 +17,19 @@ use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+
 class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting
 {
-    public function __construct($nik_user,$kode_lokasi,$kode_pp,$type,$kode_kelas= null)
+    public function __construct($nik_user,$kode_lokasi,$kode_pp,$type,$kode_kelas= null,$kode_sem= null,$kode_jenis= null,$kode_matpel= null,$kode_kd = null)
     {
         $this->nik_user = $nik_user;
         $this->kode_lokasi = $kode_lokasi;
         $this->kode_pp = $kode_pp;
         $this->kode_kelas = $kode_kelas;
+        $this->kode_matpel = $kode_matpel;
+        $this->kode_sem = $kode_sem;
+        $this->kode_jenis = $kode_jenis;
+        $this->kode_kd = $kode_kd;
         $this->type = $type;
     }
 
@@ -77,19 +82,34 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting
     public function headings(): array
     {
         if($this->type == 'template'){
+            // return [
+            //     'nis',
+            //     'nama',
+            //     'nilai'
+            // ];
             return [
-                'nis',
-                'nama',
-                'nilai'
+                ['Mata Pelajaran', 'Kelas','Jenis Penilaian','Semester','KD'],
+                [$this->kode_matpel, $this->kode_kelas,$this->kode_jenis,$this->kode_sem,$this->kode_kd],
+                ['','','','',''],
+                [
+                    'nis',
+                    'nama',
+                    'nilai'
+                ]
             ];
         }else{
             return [
-                'nis',
-                'nama',
-                'nilai',
-                'status',
-                'keterangan',
-                'nu'
+                ['Mata Pelajaran', 'Kelas','Jenis Penilaian','Semester','KD'],
+                [$this->kode_matpel, $this->kode_kelas,$this->kode_jenis,$this->kode_sem,$this->kode_kd],
+                ['','','','',''],
+                [
+                    'nis',
+                    'nama',
+                    'nilai',
+                    'status',
+                    'keterangan',
+                    'nu'
+                ]
             ];
         }
 
