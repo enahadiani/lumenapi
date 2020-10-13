@@ -269,11 +269,11 @@ class PesanController extends Controller
             if($request->jenis == "Siswa"){
                 $nis = $request->kontak;
                 $kode_kelas = '-';
-                $sql = "select id_device from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+                $sql = "select id_device,nis from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
             }else{
                 $nis = "-";
                 $kode_kelas = $request->kontak;
-                $sql = "select id_device from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+                $sql = "select id_device,nis from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
             }
             
             $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');
@@ -288,7 +288,7 @@ class PesanController extends Controller
             if(count($cek) > 0){
                 for($i=0;$i<count($cek);$i++){
                     
-                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."') ");
+                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
                     
                 }  
             }
@@ -448,15 +448,27 @@ class PesanController extends Controller
                 }
                 
             }
+
+            $del = DB::connection('sqlsrvtarbak')->table('sis_pesan_m')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti)
+            ->where('kode_pp', $request->kode_pp)
+            ->delete();
+
+            $del2 = DB::connection('sqlsrvtarbak')->table('sis_pesan_d')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti)
+            ->where('kode_pp', $request->kode_pp)
+            ->delete();
             
             if($request->jenis == "Siswa"){
                 $nis = $request->kontak;
                 $kode_kelas = '-';
-                $sql = "select id_device from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+                $sql = "select id_device,nis from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
             }else{
                 $nis = "-";
                 $kode_kelas = $request->kontak;
-                $sql = "select id_device from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+                $sql = "select id_device,nis from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
             }
             
             $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');
@@ -471,7 +483,7 @@ class PesanController extends Controller
             if(count($cek) > 0){
                 for($i=0;$i<count($cek);$i++){
                     
-                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."') ");
+                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
                     
                 }  
             }
@@ -535,7 +547,7 @@ class PesanController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and kode_pp='$kode_pp'  order by no_urut";
+            $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
             $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -547,7 +559,7 @@ class PesanController extends Controller
 
             $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
+            ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 

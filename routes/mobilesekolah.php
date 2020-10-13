@@ -75,5 +75,9 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->post('update-password', 'AdminSiswaController@updatePassword');
     $router->post('update-foto', 'AdminSiswaController@updatePhoto');
 
+    
+    $router->get('info', 'Sekolah\MobileController@getInfo');
+    $router->get('info-detail', 'Sekolah\MobileController@getDetailInfo');
+
 
 });
