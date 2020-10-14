@@ -52,7 +52,7 @@ class MataPelajaranController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,a.sifat,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' else '-' end as nama_sifat
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,a.sifat,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat
             from sis_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
@@ -157,7 +157,7 @@ class MataPelajaranController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_matpel= $request->kode_matpel;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.keterangan,a.sifat,a.kode_pp,a.flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' else '-' end as nama_sifat,b.nama as nama_pp 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel, a.nama,a.keterangan,a.sifat,a.kode_pp,a.flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat,b.nama as nama_pp 
             from sis_matpel a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."'");
