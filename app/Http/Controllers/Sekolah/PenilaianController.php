@@ -1229,7 +1229,7 @@ class PenilaianController extends Controller
 			"data" => 'required'
 		]);
 
-		if($auth =  Auth::guard($this->guard)->user()){
+		if($auth =  Auth::guard('tarbak')->user()){
 			$nik= $auth->nik;
 			$kode_lokasi= $auth->kode_lokasi;
 		}
