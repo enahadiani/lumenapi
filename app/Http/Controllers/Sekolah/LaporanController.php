@@ -104,9 +104,9 @@ class LaporanController extends Controller
             $sql2 = "select a.nis,a.nama,a.kode_kelas,b.kode_matpel,a.kode_pp,isnull(b.n1,0) as n1,isnull(b.n2,0) as n2,isnull(b.n3,0) as n3
             from sis_siswa a 
             left join (select b.nis,b.kode_lokasi,b.kode_pp,a.kode_matpel,
-                   sum(case when a.kode_jenis='PH1' then b.nilai else 0 end) as n1,
-                   sum(case when a.kode_jenis='PH2' then b.nilai else 0 end) as n2,
-                   sum(case when a.kode_jenis='PH3' then b.nilai else 0 end) as n3
+                   avg(case when a.kode_jenis='PH1' then b.nilai else 0 end) as n1,
+                   avg(case when a.kode_jenis='PH2' then b.nilai else 0 end) as n2,
+                   avg(case when a.kode_jenis='PH3' then b.nilai else 0 end) as n3
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='".$request->kode_pp[1]."' 
