@@ -493,7 +493,7 @@ class PenilaianController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and kode_pp='$kode_pp'  order by no_urut";
+            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$kode_pp'  order by no_urut";
             $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -505,7 +505,7 @@ class PenilaianController extends Controller
 
             $del3 = DB::connection('sqlsrvtarbak')->table('sis_nilai_dok')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
+            ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
