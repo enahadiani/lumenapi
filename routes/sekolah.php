@@ -259,6 +259,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
 
     
     $router->get('lap-nilai','Sekolah\LaporanController@getNilai');
+    $router->post('notif','Sekolah\LaporanController@sendNotif');
     
     
 });

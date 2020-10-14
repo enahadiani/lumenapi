@@ -29,6 +29,134 @@ class PenilaianController extends Controller
         return $id;
     }    
 
+    function gcm($token,$payload){
+		$data = $payload;//array
+		
+		$ids = $token;//array
+		//------------------------------
+	    // Replace with real GCM API 
+	    // key from Google APIs Console
+	    // 
+	    // https://code.google.com/apis/console/
+	    //------------------------------
+		global $apiKey;
+		// $apiKey = "AIzaSyARBIGBtlVHp2JlhS3HRaP4IPysLBYwXg8";
+		$apiKey = "AAAAC_jHm34:APA91bFF0NUTQZty4hqcR-BtEilaLbGiny584xFIkWBbEz38mPL5iyIMCS2UqI-JCX1SUpBA6v98ETTq0HdtEI1h6e9lUB-LeIO20TvUfYSjvu6QlMRu_C_vDmDZJk3S2VTWogRN51F2";
+	    //------------------------------
+	    // Define URL to GCM endpoint
+	    //------------------------------
+	
+		$url = 'https://fcm.googleapis.com/fcm/send';
+	
+	    //------------------------------
+	    // Set GCM post variables
+	    // (Device IDs and push payload)
+		//------------------------------
+		if(isset($data['click_action'])){
+
+			$post = array(
+                'registration_ids'  => $ids,
+                'notification'              => array (
+                    "body" => $data["message"],
+                    "title" => $data["title"]
+                ),
+                'data'              => $data,
+                "android" => array (
+                    "ttl" => "86400s",
+                    "notification" => array (
+                        "click_action" => $data["click_action"]
+                        )
+                    ),
+                    
+                );
+		}else{
+
+			$post = array(
+				'registration_ids'  => $ids,
+				'notification'              => array (
+					"body" => $data["message"],
+					"title" => $data["title"]
+				),
+				'data'              => $data
+			);
+		}
+	
+	    //------------------------------
+	    // Set CURL request headers
+	    // (Authentication and type)
+	    //------------------------------
+	
+	    $headers = array( 
+            'Authorization: key=' . $apiKey,
+            'Content-Type: application/json'
+        );
+	
+	    //------------------------------
+	    // Initialize curl handle
+	    //------------------------------
+	
+	    $ch = curl_init();
+	
+	    //------------------------------
+	    // Set URL to GCM endpoint
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_URL, $url );
+	
+	    //------------------------------
+	    // Set request method to POST
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_POST, true );
+	
+	    //------------------------------
+	    // Set our custom headers
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
+	
+	    //------------------------------
+	    // Get the response back as 
+	    // string instead of printing it
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+	
+	    //------------------------------
+	    // Set post data as JSON
+	    //------------------------------
+	
+	    curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode( $post ) );
+	
+	    //------------------------------
+	    // Actually send the push!
+	    //------------------------------
+	
+	    $result = curl_exec( $ch );
+	
+	    //------------------------------
+	    // Error? Display it!
+	    //------------------------------
+	
+	    if ( curl_errno( $ch ) )
+	    {
+	        echo('GCM error: ' . curl_error( $ch ));
+	        $status = false;
+	    }else $status = true;
+	
+	    //------------------------------
+	    // Close curl handle
+	    //------------------------------
+	
+	    curl_close( $ch );
+	
+	    //------------------------------
+	    // Debug GCM response
+	    //------------------------------
+		// $rs = error_log($token .":".$status);
+	    return $result;
+    }
+
     public function index(Request $request)
     {
         try {
@@ -197,6 +325,14 @@ class PenilaianController extends Controller
                     $no_urut = 1;
                 }
 
+                $cek = DB::connection('sqlsrvtarbak')->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
+                $cek = json_decode(json_encode($cek),true);
+            	if(count($cek) > 0){
+                    $nama_matpel = $cek[0]['nama'];
+                }else{
+                    $nama_matpel = 1;
+                }
+
                 // $arr_foto = array();
                 // $arr_nama = array();
                 // $i=0;
@@ -217,9 +353,18 @@ class PenilaianController extends Controller
                 // }
 
                 $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan));
+                $arr_id = array();
                 for($i=0;$i<count($request->nis);$i++){
                     
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
+
+                    $sql = "select id_device from sis_siswa where nis='".$request->nis[$i]."' ";
+                    $gt = DB::connection('sqlsrvtarbak')->select($sql);
+                    if(count($gt) > 0){
+                        if($gt[0]->id_device != ""){
+                            array_push($arr_id,$gt[0]->id_device);
+                        }
+                    }
                     
                 }  
 
@@ -231,8 +376,31 @@ class PenilaianController extends Controller
                 // }
 
                 DB::connection('sqlsrvtarbak')->commit();
+
+                $msg_n = "Notif tidak dikirim";
+                if(count($arr_id) > 0){
+                    $payload = array(
+                        'title' => 'Penilaian',
+                        'message' => 'Nilai '.$nama_matpel.' dan Keterampilan Penilaian Harian sudah bisa dilihat'
+                    );
+                    $res = $this->gcm($arr_id,$payload);
+                    $hasil= json_decode($res,true);
+                    $success['hasil'] = $hasil;
+                    if(isset($hasil['success'])){
+                        if($hasil['failure'] > 0){
+                            $sts = 0;
+                            $msg_n = "Notif gagal dikirim";
+                        }else{
+                            $msg_n = "Notif berhasil dikirim";
+                            $sts = 1;
+                        }
+                    }else{
+                        
+                        $msg_n = "Notif gagal dikirim";
+                    }
+                }
                 $sts = true;
-                $msg = "Data Penilaian berhasil disimpan.";
+                $msg = "Data Penilaian berhasil disimpan.".$msg_n;
             }else{
                 $sts = true;
                 $no_bukti = "-";
@@ -424,11 +592,26 @@ class PenilaianController extends Controller
                 ->where('no_bukti', $request->no_bukti)
                 ->delete();
 
+                $cek = DB::connection('sqlsrvtarbak')->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
+                $cek = json_decode(json_encode($cek),true);
+            	if(count($cek) > 0){
+                    $nama_matpel = $cek[0]['nama'];
+                }else{
+                    $nama_matpel = 1;
+                }
+
 
                 $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$request->pelaksanaan));
+                $arr_id = array();
                 for($i=0;$i<count($request->nis);$i++){
                     $ins2[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
-                    
+                    $sql = "select id_device from sis_siswa where nis='".$request->nis[$i]."' ";
+                    $gt = DB::connection('sqlsrvtarbak')->select($sql);
+                    if(count($gt) > 0){
+                        if($gt[0]->id_device != ""){
+                            array_push($arr_id,$gt[0]->id_device);
+                        }
+                    }
                 }  
 
                 // if(count($arr_nama) > 0){
@@ -439,8 +622,31 @@ class PenilaianController extends Controller
                 // }
 
                 DB::connection('sqlsrvtarbak')->commit();
+
+                $msg_n = "Notif tidak dikirim";
+                if(count($arr_id) > 0){
+                    $payload = array(
+                        'title' => 'Penilaian',
+                        'message' => 'Nilai '.$nama_matpel.' dan Keterampilan Penilaian Harian sudah bisa dilihat'
+                    );
+                    $res = $this->gcm($arr_id,$payload);
+                    $hasil= json_decode($res,true);
+                    $success['hasil'] = $hasil;
+                    if(isset($hasil['success'])){
+                        if($hasil['failure'] > 0){
+                            $sts = 0;
+                            $msg_n = "Notif gagal dikirim";
+                        }else{
+                            $msg_n = "Notif berhasil dikirim";
+                            $sts = 1;
+                        }
+                    }else{
+                        
+                        $msg_n = "Notif gagal dikirim";
+                    }
+                }
                 $sts = true;
-                $msg = "Data Penilaian berhasil diubah.";
+                $msg = "Data Penilaian berhasil diubah.".$msg_n;
                 
             }else{
                 $sts = true;
@@ -1015,6 +1221,52 @@ class PenilaianController extends Controller
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
+
+    public function sendNotif(Request $request)
+	{
+		$this->validate($request,[
+			"token" => 'required|max:300',
+			"data" => 'required'
+		]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+
+        try{
+            $token = $request->token;
+            if($token != "-"){
+                
+				$payload = $request->data;
+                $res = $this->gcm($token,$payload);
+                $hasil= json_decode($res,true);
+                $success['hasil'] = $hasil;
+                if(isset($hasil['success'])){
+                    if($hasil['failure'] > 0){
+                        $sts = 0;
+                    }else{
+                        $sts = 1;
+                    }
+                    
+                    $success['status'] = true;
+                    $success['message'] = "Sukses";
+                }else{
+                    $success['status'] = false;
+                    $success['message'] = "Gagal";
+                }
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Gagal";
+            }
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+	}
+	
 
 
 }
