@@ -1079,7 +1079,7 @@ class MobileController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_matpel,b.nama 
+            $res = DB::connection($this->db)->select("select a.kode_matpel,b.nama,b.skode as singkatan 
             from sis_guru_matpel_kelas a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' $filter ");
@@ -1135,7 +1135,7 @@ class MobileController extends Controller
 
             $kode_ta = $res3[0]['kode_ta'];
             
-            $res2 = DB::connection($this->db)->select("select a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel 
+            $res2 = DB::connection($this->db)->select("select a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel,c.skode as singkatan 
             from sis_guru_matpel_kelas a
             inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp

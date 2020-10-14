@@ -53,7 +53,7 @@ class MataPelajaranController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,a.sifat,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat
+            $res = DB::connection($this->db)->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,a.sifat,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat,a.skode as singkatan
             from sis_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
@@ -101,6 +101,7 @@ class MataPelajaranController extends Controller
             'nama' => 'required',
             'kode_pp' => 'required',
             'keterangan' => 'required',
+            'singkatan' => 'required',
             'sifat' => 'required',
             'flag_aktif' => 'required'
         ]);
@@ -114,7 +115,7 @@ class MataPelajaranController extends Controller
             }
             if($this->isUnik($request->kode_matpel,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection($this->db)->insert("insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif,tgl_input) values ('$request->kode_matpel','$request->nama','$kode_lokasi','$request->keterangan','$request->kode_pp','$request->sifat','$request->flag_aktif',getdate())");     
+                $ins = DB::connection($this->db)->insert("insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif,tgl_input,skode) values ('$request->kode_matpel','$request->nama','$kode_lokasi','$request->keterangan','$request->kode_pp','$request->sifat','$request->flag_aktif',getdate(),'$request->singkatan')");     
 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
@@ -158,7 +159,7 @@ class MataPelajaranController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_matpel= $request->kode_matpel;
 
-            $res = DB::connection($this->db)->select("select a.kode_matpel, a.nama,a.keterangan,a.sifat,a.kode_pp,a.flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat,b.nama as nama_pp 
+            $res = DB::connection($this->db)->select("select a.kode_matpel, a.nama,a.keterangan,a.sifat,a.kode_pp,a.flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat,b.nama as nama_pp,a.skode as singkatan 
             from sis_matpel a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."'");
@@ -208,6 +209,7 @@ class MataPelajaranController extends Controller
             'nama' => 'required',
             'kode_pp' => 'required',
             'keterangan' => 'required',
+            'singkatan' =>'required',
             'sifat' => 'required',
             'flag_aktif' => 'required'
         ]);
@@ -226,7 +228,7 @@ class MataPelajaranController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif,tgl_input) values ('$request->kode_matpel','$request->nama','$kode_lokasi','$request->keterangan','$request->kode_pp','$request->sifat','$request->flag_aktif',getdate())");          
+            $ins = DB::connection($this->db)->insert("insert into sis_matpel(kode_matpel,nama,kode_lokasi,keterangan,kode_pp,sifat,flag_aktif,tgl_input,skode) values ('$request->kode_matpel','$request->nama','$kode_lokasi','$request->keterangan','$request->kode_pp','$request->sifat','$request->flag_aktif',getdate(),'$request->singkatan')");     
                         
             DB::connection($this->db)->commit();
             $success['status'] = true;
