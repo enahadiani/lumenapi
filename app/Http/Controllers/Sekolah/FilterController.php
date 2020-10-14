@@ -15,8 +15,8 @@ class FilterController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'tarbak';
-    public $db = 'sqlsrvtarbak';
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     function getFilterPP(Request $request){
         try {

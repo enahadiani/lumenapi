@@ -15,10 +15,12 @@ class StatusSiswaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_ss from sis_siswa_status where kode_ss ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select kode_ss from sis_siswa_status where kode_ss ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class StatusSiswaController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -41,7 +43,7 @@ class StatusSiswaController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_ss, a.nama, a.flag_aktif,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
+            $res = DB::connection($this->db)->select( "select a.kode_ss, a.nama, a.flag_aktif,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
             from sis_siswa_status a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi  
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
@@ -91,18 +93,18 @@ class StatusSiswaController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_ss,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_siswa_status(kode_ss,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_ss,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
+                $ins = DB::connection($this->db)->insert('insert into sis_siswa_status(kode_ss,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_ss,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Status Siswa berhasil disimpan";
             }else{
@@ -111,7 +113,7 @@ class StatusSiswaController extends Controller
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Status Siswa gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -134,7 +136,7 @@ class StatusSiswaController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -142,7 +144,7 @@ class StatusSiswaController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_ss= $request->kode_ss;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nama, kode_ss,kode_pp,flag_aktif from sis_siswa_status where kode_ss ='".$kode_ss."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
+            $res = DB::connection($this->db)->select("select nama, kode_ss,kode_pp,flag_aktif from sis_siswa_status where kode_ss ='".$kode_ss."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -191,29 +193,29 @@ class StatusSiswaController extends Controller
             'flag_aktif'=> 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_siswa_status')
+            $del = DB::connection($this->db)->table('sis_siswa_status')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_ss', $request->kode_ss)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_siswa_status(kode_ss,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_ss,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
+            $ins = DB::connection($this->db)->insert('insert into sis_siswa_status(kode_ss,nama,kode_lokasi,kode_pp,flag_aktif) values (?, ?, ?, ?, ?)', [$request->kode_ss,$request->nama,$kode_lokasi,$request->kode_pp,$request->flag_aktif]);
                 
                         
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Status Siswa berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Status Siswa gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -232,27 +234,27 @@ class StatusSiswaController extends Controller
             'kode_pp' => 'required',
             'kode_ss' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_siswa_status')
+            $del = DB::connection($this->db)->table('sis_siswa_status')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_ss', $request->kode_ss)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Status Siswa berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Status Siswa gagal dihapus ".$e;
             

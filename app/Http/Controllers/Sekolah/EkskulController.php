@@ -18,9 +18,11 @@ class EkskulController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrvtarbak')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -31,7 +33,7 @@ class EkskulController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -54,7 +56,7 @@ class EkskulController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("a.no_bukti,a.kode_pp,a.nis,a.keterangan,a.kode_jenis,a.tgl_mulai,a.tgl_selesai,a.predikat,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp 
+            $res = DB::connection($this->db)->select("a.no_bukti,a.kode_pp,a.nis,a.keterangan,a.kode_jenis,a.tgl_mulai,a.tgl_selesai,a.predikat,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp 
             from sis_ekskul a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."'  $filter ");
@@ -107,26 +109,26 @@ class EkskulController extends Controller
             'predikat' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             $no_bukti = $this->generateKode("sis_ekskul", "no_bukti", $kode_lokasi."-EKS.", "0001");
                 
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_ekskul(
+            $ins = DB::connection($this->db)->insert("insert into sis_ekskul(
                 no_bukti,nik_user,tgl_input,kode_lokasi,kode_pp,nis,tgl_mulai,tgl_selesai,keterangan,kode_jenis,predikat) values ('$no_bukti','$nik',getdate(),'$kode_lokasi','$request->kode_pp','$request->nis','$request->tgl_mulai','$request->tgl_selesai','$request->keterangan','$request->kode_jenis','$request->predikat' ");
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->kode_jenis;
             $success['message'] = "Data Ekstrakulikuler berhasil disimpan";
 
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Ekstrakulikuler gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -149,7 +151,7 @@ class EkskulController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -158,7 +160,7 @@ class EkskulController extends Controller
             $no_bukti= $request->no_bukti;
 
             $sql = "select no_bukti,nik_user,tgl_input,kode_lokasi,kode_pp,nis,tgl_mulai,tgl_selesai,keterangan,kode_jenis,predikat from sis_ekskul where no_bukti ='".$no_bukti."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'";
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['sql'] = $sql;
             
@@ -212,30 +214,30 @@ class EkskulController extends Controller
             'predikat' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_ekskul')
+            $del = DB::connection($this->db)->table('sis_ekskul')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_ekskul(
+            $ins = DB::connection($this->db)->insert("insert into sis_ekskul(
             no_bukti,nik_user,tgl_input,kode_lokasi,kode_pp,nis,tgl_mulai,tgl_selesai,keterangan,kode_jenis,predikat) values ('$request->no_bukti','$nik',getdate(),'$kode_lokasi','$request->kode_pp','$request->nis','$request->tgl_mulai','$request->tgl_selesai','$request->keterangan','$request->kode_jenis','$request->predikat' ");  
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->no_bukti;
             $success['message'] = "Data Ekstrakulikuler berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Ekstrakulikuler gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -254,27 +256,27 @@ class EkskulController extends Controller
             'kode_pp' => 'required',
             'no_bukti' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_ekskul')
+            $del = DB::connection($this->db)->table('sis_ekskul')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Ekstrakulikuler berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Ekstrakulikuler gagal dihapus ".$e;
             
@@ -290,15 +292,15 @@ class EkskulController extends Controller
             'kode_tingkat' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection('sqlsrvtarbak')->table('sis_kd')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $request->kode_pp)->where('kode_tingkat', $request->kode_tingkat)->delete();
+            $del1 = DB::connection($this->db)->table('sis_kd')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $request->kode_pp)->where('kode_tingkat', $request->kode_tingkat)->delete();
 
             // menangkap file excel
             $file = $request->file('file');
@@ -315,10 +317,10 @@ class EkskulController extends Controller
             $i=0;
             foreach($excel as $row){
 
-                $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_kd (kode_kd,kode_lokasi,kode_matpel,kode_pp,kode_tingkat,nama,tgl_input,kode_sem) values ('".$row[1]."','$kode_lokasi','".$row[0]."','$request->kode_pp','$request->kode_tingkat','".$row[2]."',getdate(),'".$row[3]."') ");
+                $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd (kode_kd,kode_lokasi,kode_matpel,kode_pp,kode_tingkat,nama,tgl_input,kode_sem) values ('".$row[1]."','$kode_lokasi','".$row[0]."','$request->kode_pp','$request->kode_tingkat','".$row[2]."',getdate(),'".$row[3]."') ");
             }
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             Storage::disk('local')->delete($nama_file);
             if($status_validate){
                 $msg = "File berhasil diupload!";
@@ -331,7 +333,7 @@ class EkskulController extends Controller
             $success['message'] = $msg;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);

@@ -15,12 +15,14 @@ class SisMatpelKhususController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function index(Request $request)
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -30,7 +32,7 @@ class SisMatpelKhususController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select distinct a.kode_kelas,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,b.kode_matpel+'-'+d.nama as kode_matpel,b.kode_ta,e.nama as nama_ta
+            $res = DB::connection($this->db)->select("select distinct a.kode_kelas,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,b.kode_matpel+'-'+d.nama as kode_matpel,b.kode_ta,e.nama as nama_ta
             from sis_siswa_matpel_khusus b 
             inner join sis_kelas_khusus a on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
             inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp  
@@ -85,10 +87,10 @@ class SisMatpelKhususController extends Controller
             'nis'=>'required|array'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -100,19 +102,19 @@ class SisMatpelKhususController extends Controller
 
                 for($i=0;$i<count($request->nis);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_matpel_khusus(kode_pp,kode_lokasi,kode_matpel,kode_ta,kode_kelas,nis,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->kode_ta','$request->kode_kelas','".$request->nis[$i]."','$tgl_input')");
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_siswa_matpel_khusus(kode_pp,kode_lokasi,kode_matpel,kode_ta,kode_kelas,nis,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->kode_ta','$request->kode_kelas','".$request->nis[$i]."','$tgl_input')");
                 }
                 
             }
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode_matpel'] = $request->kode_matpel;
             $success['message'] = "Data Siswa Matpel Khusus berhasil disimpan";
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Siswa Matpel Khusus gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -137,7 +139,7 @@ class SisMatpelKhususController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -147,7 +149,7 @@ class SisMatpelKhususController extends Controller
             $kode_matpel= $request->kode_matpel;
             $kode_ta= $request->kode_ta;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_pp, a.kode_matpel,b.nama as nama_pp,a.kode_ta,d.nama as nama_ta,a.kode_kelas,c.nama as nama_kelas,e.nama as nama_matpel 
+            $res = DB::connection($this->db)->select("select a.kode_pp, a.kode_matpel,b.nama as nama_pp,a.kode_ta,d.nama as nama_ta,a.kode_kelas,c.nama as nama_kelas,e.nama as nama_matpel 
             from sis_siswa_matpel_khusus a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_kelas_khusus c on a.kode_kelas=c.kode_kelas and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
@@ -156,7 +158,7 @@ class SisMatpelKhususController extends Controller
             where a.kode_kelas='$kode_kelas' and a.kode_lokasi='".$kode_lokasi."' and a.kode_matpel='".$kode_matpel."' and a.kode_pp='".$kode_pp."' and a.kode_ta='".$kode_ta."' group by a.kode_pp,a.kode_kelas,b.nama,c.nama,a.kode_matpel,a.kode_ta,d.nama,e.nama");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.nis,b.nama as nama_siswa
+            $res2 = DB::connection($this->db)->select("select a.nis,b.nama as nama_siswa
             from sis_siswa_matpel_khusus a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_kelas='$kode_kelas' and a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.kode_ta='".$kode_ta."' ");
@@ -211,17 +213,17 @@ class SisMatpelKhususController extends Controller
             'nis'=>'required|array'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
             
             if(count($request->nis) > 0){
-                $del = DB::connection('sqlsrvtarbak')->table('sis_siswa_matpel_khusus')
+                $del = DB::connection($this->db)->table('sis_siswa_matpel_khusus')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_kelas', $request->kode_kelas)
                 ->where('kode_matpel', $request->kode_matpel)
@@ -234,19 +236,19 @@ class SisMatpelKhususController extends Controller
 
                 for($i=0;$i<count($request->nis);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_matpel_khusus(kode_pp,kode_lokasi,kode_matpel,kode_ta,kode_kelas,nis,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->kode_ta','$request->kode_kelas','".$request->nis[$i]."','$tgl_input')");
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_siswa_matpel_khusus(kode_pp,kode_lokasi,kode_matpel,kode_ta,kode_kelas,nis,tgl_input) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->kode_ta','$request->kode_kelas','".$request->nis[$i]."','$tgl_input')");
                     
                 }
                 
             }          
                         
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode_matpel'] = $request->kode_matpel;
             $success['message'] = "Data Siswa Matpel Khusus berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Siswa Matpel Khusus gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -267,15 +269,15 @@ class SisMatpelKhususController extends Controller
             'kode_matpel' => 'required',
             'kode_ta' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_siswa_matpel_khusus')
+            $del = DB::connection($this->db)->table('sis_siswa_matpel_khusus')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_kelas', $request->kode_kelas)
                 ->where('kode_matpel', $request->kode_matpel)
@@ -283,13 +285,13 @@ class SisMatpelKhususController extends Controller
                 ->where('kode_ta', $request->kode_ta)
                 ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Siswa Matpel Khusus berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Siswa Matpel Khusus gagal dihapus ".$e;
             
@@ -304,7 +306,7 @@ class SisMatpelKhususController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -312,7 +314,7 @@ class SisMatpelKhususController extends Controller
             $kode_pp = $request->kode_pp;
             $nik_guru= $request->nik_guru;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nik, nama from sis_guru where kode_lokasi = '".$kode_lokasi."' and kode_pp='".$kode_pp."' ");
+            $res = DB::connection($this->db)->select("select nik, nama from sis_guru where kode_lokasi = '".$kode_lokasi."' and kode_pp='".$kode_pp."' ");
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

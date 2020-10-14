@@ -16,7 +16,7 @@ class KdController extends Controller
      */
     public $successStatus = 200;
     public $db = 'sqlsrvtarbak';
-    public $guard = 'tarbak';
+    public $guard = 'siswa';
 
     public function index(Request $request)
     {

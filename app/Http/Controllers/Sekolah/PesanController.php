@@ -16,9 +16,11 @@ class PesanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection('sqlsrvtarbak')->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -157,7 +159,7 @@ class PesanController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -169,7 +171,7 @@ class PesanController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp 
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp 
             from sis_pesan_m a
             where a.tipe='info' and a.kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);
@@ -221,10 +223,10 @@ class PesanController extends Controller
             'tipe' => 'required',
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -261,7 +263,7 @@ class PesanController extends Controller
                         }     
                     }
                     
-                    $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $request->kode_pp)->delete();
+                    $del3 = DB::connection($this->db)->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $request->kode_pp)->delete();
                 }
                 
             }
@@ -281,15 +283,15 @@ class PesanController extends Controller
             $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
             $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
             
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
+            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
             
-            $cek = DB::connection('sqlsrvtarbak')->select($sql);
+            $cek = DB::connection($this->db)->select($sql);
             $cek = json_decode(json_encode($cek),true);
             $arr_id = array();
             if(count($cek) > 0){
                 for($i=0;$i<count($cek);$i++){
                     
-                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
                     if($cek[$i]['id_device'] != ""){
                         array_push($arr_id,$cek[$i]['id_device']);
                     }
@@ -298,12 +300,12 @@ class PesanController extends Controller
             
             if(count($arr_foto) > 0){
                 for($i=0; $i<count($arr_foto);$i++){
-                    $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_dok (
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into sis_pesan_dok (
                         no_bukti,kode_lokasi,file_dok,no_urut,kode_pp) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','$request->kode_pp') "); 
                 }
             }
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
 
             $msg_n = "Notif tidak dikirim";
             if(count($arr_id) > 0){
@@ -338,7 +340,7 @@ class PesanController extends Controller
             $success['message'] = $msg;
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pesan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -361,7 +363,7 @@ class PesanController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -370,12 +372,12 @@ class PesanController extends Controller
             from sis_pesan_m a
             where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' and a.tipe='info'
             ";
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2= "select 
             a.no_bukti,a.kode_lokasi,a.file_dok,a.no_urut,a.kode_pp from sis_pesan_dok a where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' ";
-            $res3 = DB::connection('sqlsrvtarbak')->select($sql2);
+            $res3 = DB::connection($this->db)->select($sql2);
             $res3 = json_decode(json_encode($res3),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -431,10 +433,10 @@ class PesanController extends Controller
             'tipe' => 'required',
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -471,18 +473,18 @@ class PesanController extends Controller
                         }     
                     }
                     
-                    $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $request->kode_pp)->delete();
+                    $del3 = DB::connection($this->db)->table('sis_pesan_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $request->kode_pp)->delete();
                 }
                 
             }
 
-            $del = DB::connection('sqlsrvtarbak')->table('sis_pesan_m')
+            $del = DB::connection($this->db)->table('sis_pesan_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $del2 = DB::connection('sqlsrvtarbak')->table('sis_pesan_d')
+            $del2 = DB::connection($this->db)->table('sis_pesan_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->where('kode_pp', $request->kode_pp)
@@ -503,14 +505,14 @@ class PesanController extends Controller
             $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
             $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
             
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
+            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
             
-            $cek = DB::connection('sqlsrvtarbak')->select($sql);
+            $cek = DB::connection($this->db)->select($sql);
             $cek = json_decode(json_encode($cek),true);
             if(count($cek) > 0){
                 for($i=0;$i<count($cek);$i++){
                     
-                    $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
                     if($cek[$i]['id_device'] != ""){
                         array_push($arr_id,$cek[$i]['id_device']);
                     }
@@ -520,12 +522,12 @@ class PesanController extends Controller
             
             if(count($arr_foto) > 0){
                 for($i=0; $i<count($arr_foto);$i++){
-                    $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_dok (
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into sis_pesan_dok (
                         no_bukti,kode_lokasi,file_dok,no_urut,kode_pp) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','$request->kode_pp') "); 
                 }
             }
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $msg_n = "Notif tidak dikirim";
             if(count($arr_id) > 0){
                 $payload = array(
@@ -558,7 +560,7 @@ class PesanController extends Controller
             $success['message'] = $msg;
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pesan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -579,28 +581,28 @@ class PesanController extends Controller
             'no_bukti' => 'required',
             'kode_pp' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }		
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_pesan_m')
+            $del = DB::connection($this->db)->table('sis_pesan_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $del2 = DB::connection('sqlsrvtarbak')->table('sis_pesan_d')
+            $del2 = DB::connection($this->db)->table('sis_pesan_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
             $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
-            $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             if(count($res3) > 0){
@@ -609,19 +611,19 @@ class PesanController extends Controller
                 }
             }
 
-            $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')
+            $del3 = DB::connection($this->db)->table('sis_pesan_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Pesan berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pesan gagal dihapus ".$e;
             
@@ -636,16 +638,16 @@ class PesanController extends Controller
             'kode_pp' => 'required',
             'no_urut' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }		
 
             $sql3="select no_bukti,file_dok from sis_pesan_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and no_urut='$request->no_urut' ";
-            $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             if(count($res3) > 0){
@@ -654,14 +656,14 @@ class PesanController extends Controller
                     Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
                 }
 
-                $del3 = DB::connection('sqlsrvtarbak')->table('sis_pesan_dok')
+                $del3 = DB::connection($this->db)->table('sis_pesan_dok')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('no_urut', $request->no_urut)
                 ->delete();
 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Dokumen berhasil dihapus";
             }else{
@@ -671,7 +673,7 @@ class PesanController extends Controller
 
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Dokumen gagal dihapus ".$e;
             
@@ -686,12 +688,12 @@ class PesanController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
+            $res = DB::connection($this->db)->select("select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
                 select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
                 from sis_pesan_m a
                 inner join (select jenis,nis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
@@ -736,7 +738,7 @@ class PesanController extends Controller
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -744,7 +746,7 @@ class PesanController extends Controller
                 $kode_lokasi= '';
             }
 
-            $rs = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama
+            $rs = DB::connection($this->db)->select("select a.kode_kd,a.nama
             from sis_kd a
             inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
             inner join sis_kelas c on b.kode_tingkat=c.kode_tingkat and b.kode_lokasi=c.kode_lokasi
@@ -763,7 +765,7 @@ class PesanController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $rs2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
+            $rs2 = DB::connection($this->db)->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
             from sis_kd a 
             left join (
             select a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
@@ -811,7 +813,7 @@ class PesanController extends Controller
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -819,7 +821,7 @@ class PesanController extends Controller
                 $kode_lokasi= '';
             }
 
-            $rs = DB::connection('sqlsrvtarbak')->select("select count(*) as jum from sis_siswa where kode_kelas='3A' and kode_pp='04' and kode_lokasi='01'
+            $rs = DB::connection($this->db)->select("select count(*) as jum from sis_siswa where kode_kelas='3A' and kode_pp='04' and kode_lokasi='01'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -830,7 +832,7 @@ class PesanController extends Controller
             }
             $success['siswa']=$siswa;
             
-            $rs2 = DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
+            $rs2 = DB::connection($this->db)->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
             from sis_kd a 
             left join (
             select a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 

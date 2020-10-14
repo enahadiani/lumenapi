@@ -15,8 +15,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
-    $router->post('login', 'AuthController@loginTarbak');
-    $router->get('hash-pass', 'AuthController@hashPasswordTarbak');
+    $router->post('login', 'AuthController@loginSiswa');
+    $router->get('hash-pass', 'AuthController@hashPasswordSiswa');
     $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     
@@ -34,25 +34,25 @@ $router->get('storage/{filename}', function ($filename)
 
 $router->get('penilaian-export','Sekolah\PenilaianController@export');
 
-$router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
+$router->group(['middleware' => 'auth:siswa'], function () use ($router) {
 
-    $router->get('profile', 'AdminTarbakController@profile');
-    $router->get('users/{id}', 'AdminTarbakController@singleUser');
-    $router->get('users', 'AdminTarbakController@allUsers');
-    $router->get('cek-payload', 'AdminTarbakController@cekPayload');
+    $router->get('profile', 'AdminSiswaController@profile');
+    $router->get('users/{id}', 'AdminSiswaController@singleUser');
+    $router->get('users', 'AdminSiswaController@allUsers');
+    $router->get('cek-payload', 'AdminSiswaController@cekPayload');
 
     $router->get('menu/{kode_klp}', 'Sekolah\MenuController@show');
     
-    $router->post('update-password', 'AdminTarbakController@updatePassword');
-    $router->post('update-foto', 'AdminTarbakController@updatePhoto');
-    $router->post('update-background', 'AdminTarbakController@updateBackground');
+    $router->post('update-password', 'AdminSiswaController@updatePassword');
+    $router->post('update-foto', 'AdminSiswaController@updatePhoto');
+    $router->post('update-background', 'AdminSiswaController@updateBackground');
     
     $router->post('notif-pusher', 'Sekolah\NotifController@sendPusher');
     $router->get('notif-pusher', 'Sekolah\NotifController@getNotifPusher');
     $router->put('notif-update-status', 'Sekolah\NotifController@updateStatusRead');
 
-    $router->post('search-form', 'AdminTarbakController@searchForm');
-    $router->get('search-form-list', 'AdminTarbakController@searchFormList');
+    $router->post('search-form', 'AdminSiswaController@searchForm');
+    $router->get('search-form-list', 'AdminSiswaController@searchFormList');
 
     //Tahun Ajaran
     $router->get('pp','Sekolah\TahunAjaranController@getPP');

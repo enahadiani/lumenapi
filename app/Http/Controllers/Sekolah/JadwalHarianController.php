@@ -15,12 +15,14 @@ class JadwalHarianController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function index(Request $request)
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -30,7 +32,7 @@ class JadwalHarianController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_matpel,a.nik,a.kode_kelas,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
+            $res = DB::connection($this->db)->select("select a.kode_ta,a.kode_matpel,a.nik,a.kode_kelas,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
             from sis_jadwal a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter
@@ -83,15 +85,15 @@ class JadwalHarianController extends Controller
             'kode_kelas' => 'required',
             'kode_slot' => 'required|array'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_jadwal')
+            $del = DB::connection($this->db)->table('sis_jadwal')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_ta', $request->kode_ta)
             ->where('kode_kelas', $request->kode_kelas)
@@ -108,20 +110,20 @@ class JadwalHarianController extends Controller
                 for ($i=0;$i < count($req['kode_slot']);$i++){
                     for ($j = 0; $j < count($hari);$j++){
                         if($req[$hari[$j]][$i] == "ISI"){
-                            $ins[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_jadwal(kode_slot,kode_lokasi,kode_pp,kode_kelas,kode_hari,kode_ta,nik,kode_matpel) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$req['kode_slot'][$i],$kode_lokasi,$req['kode_pp'],$req['kode_kelas'],$kodeHari[$j],$req['kode_ta'],$req['nik_guru'],$req['kode_matpel']]);
+                            $ins[$i] = DB::connection($this->db)->insert("insert into sis_jadwal(kode_slot,kode_lokasi,kode_pp,kode_kelas,kode_hari,kode_ta,nik,kode_matpel) values (?, ?, ?, ?, ?, ?, ?, ?) ",[$req['kode_slot'][$i],$kode_lokasi,$req['kode_pp'],$req['kode_kelas'],$kodeHari[$j],$req['kode_ta'],$req['nik_guru'],$req['kode_matpel']]);
                             
                         }
                     }
                 }						
             }
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Jadwal Harian berhasil disimpan";
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Jadwal Harian gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -142,15 +144,15 @@ class JadwalHarianController extends Controller
             'nik_guru' => 'required',
             'kode_kelas' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_jadwal')
+            $del = DB::connection($this->db)->table('sis_jadwal')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_ta', $request->kode_ta)
                 ->where('kode_kelas', $request->kode_kelas)
@@ -159,13 +161,13 @@ class JadwalHarianController extends Controller
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Jadwal Harian berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Jadwal Harian gagal dihapus ".$e;
             
@@ -184,7 +186,7 @@ class JadwalHarianController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -194,7 +196,7 @@ class JadwalHarianController extends Controller
             $kode_matpel= $request->kode_matpel;
             $nik_guru= $request->nik_guru;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_slot,a.nama
+            $res = DB::connection($this->db)->select("select a.kode_slot,a.nama
             from  sis_slot a 
             where a.kode_pp='".$kode_pp."' and a.kode_lokasi='".$kode_lokasi."' order by a.kode_slot
             ");
@@ -205,7 +207,7 @@ class JadwalHarianController extends Controller
                 foreach ($res as $row){
                     $senin=$selasa=$rabu=$kamis=$jumat=$sabtu=$minggu="KOSONG";
                     $strSQL2 = "select kode_hari,kode_matpel,nik from sis_jadwal where kode_slot='".$row['kode_slot']."' and kode_ta='".$kode_ta."' and kode_kelas='".$kode_kelas."' and kode_pp='".$kode_pp."' ";
-                    $res2 = DB::connection('sqlsrvtarbak')->select($strSQL2); 
+                    $res2 = DB::connection($this->db)->select($strSQL2); 
                     $res2 = json_decode(json_encode($res2),true);			
                     if (count($res2) > 0){		
                         foreach ($res2 as $row2){

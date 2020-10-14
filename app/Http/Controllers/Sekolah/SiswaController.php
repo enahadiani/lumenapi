@@ -15,12 +15,14 @@ class SiswaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function index(Request $request)
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -49,7 +51,7 @@ class SiswaController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.flag_aktif,c.nama as nama_status
+            $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.flag_aktif,c.nama as nama_status
             from sis_siswa a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_siswa_status c on a.flag_aktif=c.kode_ss and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
@@ -107,15 +109,15 @@ class SiswaController extends Controller
             'per_akhir' => 'array',
             'tarif' => 'array'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nis from sis_siswa where id_bank ='$request->id_bank' and nis <> '$request->nis' and kode_lokasi='$kode_lokasi'");
+            $res = DB::connection($this->db)->select("select nis from sis_siswa where id_bank ='$request->id_bank' and nis <> '$request->nis' and kode_lokasi='$kode_lokasi'");
             $res = json_decode(json_encode($res),true);
             
             if (count($res) > 0){					
@@ -125,17 +127,17 @@ class SiswaController extends Controller
             }
             else {
                 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus,tgl_input) values ('$request->nis','$kode_lokasi','$request->nama','$request->flag_aktif','$request->kode_kelas','$request->kode_pp','$request->kode_akt','$request->id_bank','$request->tgl_lulus',getdate())");
+                $ins = DB::connection($this->db)->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus,tgl_input) values ('$request->nis','$kode_lokasi','$request->nama','$request->flag_aktif','$request->kode_kelas','$request->kode_pp','$request->kode_akt','$request->id_bank','$request->tgl_lulus',getdate())");
                 
                 if (count($request->kode_param) > 0){
                     for ($i=0;$i < count($request->kode_param);$i++){		
                         if ($request->tarif[$i] > 0) {	
-                            $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values ('".$request->nis."','".$request->kode_kelas."','".$request->kode_param[$i]."','".$request->per_awal[$i]."','".$request->per_akhir[$i]."','".$request->tarif[$i]."','".$kode_lokasi."','".$request->kode_pp."','".$request->kode_akt."')");		
+                            $ins2[$i] = DB::connection($this->db)->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values ('".$request->nis."','".$request->kode_kelas."','".$request->kode_param[$i]."','".$request->per_awal[$i]."','".$request->per_akhir[$i]."','".$request->tarif[$i]."','".$kode_lokasi."','".$request->kode_pp."','".$request->kode_akt."')");		
                         }
                     }				
                 }
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $msg = "Data Siswa berhasil disimpan";
                 $sts = true;	
                 
@@ -145,7 +147,7 @@ class SiswaController extends Controller
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Siswa gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -167,15 +169,15 @@ class SiswaController extends Controller
             'per_akhir' => 'array',
             'tarif' => 'array'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nis from sis_siswa where id_bank ='$request->id_bank' and nis <> '$request->nis' and kode_lokasi='$kode_lokasi'");
+            $res = DB::connection($this->db)->select("select nis from sis_siswa where id_bank ='$request->id_bank' and nis <> '$request->nis' and kode_lokasi='$kode_lokasi'");
             $res = json_decode(json_encode($res),true);
             
             if (count($res) > 0){					
@@ -184,29 +186,29 @@ class SiswaController extends Controller
                 $sts = false;						
             }
             else {
-                $del = DB::connection('sqlsrvtarbak')->table('sis_siswa')
+                $del = DB::connection($this->db)->table('sis_siswa')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('nis', $request->nis)
                 ->delete();
 
-                $del2 = DB::connection('sqlsrvtarbak')->table('sis_siswa_tarif')
+                $del2 = DB::connection($this->db)->table('sis_siswa_tarif')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('nis', $request->nis)
                 ->delete();
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus,tgl_input) values ('$request->nis','$kode_lokasi','$request->nama','$request->flag_aktif','$request->kode_kelas','$request->kode_pp','$request->kode_akt','$request->id_bank','$request->tgl_lulus',getdate())");
+                $ins = DB::connection($this->db)->insert("insert into sis_siswa(nis,kode_lokasi,nama,flag_aktif,kode_kelas,kode_pp,kode_akt,id_bank,tgl_lulus,tgl_input) values ('$request->nis','$kode_lokasi','$request->nama','$request->flag_aktif','$request->kode_kelas','$request->kode_pp','$request->kode_akt','$request->id_bank','$request->tgl_lulus',getdate())");
                 
                 if (count($request->kode_param) > 0){
                     for ($i=0;$i < count($request->kode_param);$i++){		
                         if ($request->tarif[$i] > 0) {	
-                            $ins2[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values ('".$request->nis."','".$request->kode_kelas."','".$request->kode_param[$i]."','".$request->per_awal[$i]."','".$request->per_akhir[$i]."','".$request->tarif[$i]."','".$kode_lokasi."','".$request->kode_pp."','".$request->kode_akt."')");		
+                            $ins2[$i] = DB::connection($this->db)->insert("insert into sis_siswa_tarif(nis,kode_kelas,kode_param,per_awal,per_akhir,tarif,kode_lokasi,kode_pp,kode_akt) values ('".$request->nis."','".$request->kode_kelas."','".$request->kode_param[$i]."','".$request->per_awal[$i]."','".$request->per_akhir[$i]."','".$request->tarif[$i]."','".$kode_lokasi."','".$request->kode_pp."','".$request->kode_akt."')");		
                         }
                     }				
                 }
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $msg = "Data Siswa berhasil diubah";
                 $sts = true;	
                 
@@ -217,7 +219,7 @@ class SiswaController extends Controller
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Siswa gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -235,34 +237,34 @@ class SiswaController extends Controller
             'kode_pp' => 'required',
             'nis' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_siswa')
+            $del = DB::connection($this->db)->table('sis_siswa')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('nis', $request->nis)
                 ->delete();
                 
-            $del2 = DB::connection('sqlsrvtarbak')->table('sis_siswa_tarif')
+            $del2 = DB::connection($this->db)->table('sis_siswa_tarif')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('nis', $request->nis)
                 ->delete();
 
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Siswa berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Siswa gagal dihapus ".$e;
             
@@ -278,14 +280,14 @@ class SiswaController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             $kode_pp= $request->kode_pp;
             $nis= $request->nis;
 
-            $res = DB::connection('sqlsrvtarbak')->select(" select a.nis,a.id_bank,a.nama,a.kode_pp,b.nama as nama_pp,a.kode_akt,c.nama as nama_akt,a.kode_kelas,d.nama as nama_kelas
+            $res = DB::connection($this->db)->select(" select a.nis,a.id_bank,a.nama,a.kode_pp,b.nama as nama_pp,a.kode_akt,c.nama as nama_akt,a.kode_kelas,d.nama as nama_kelas
             ,d.kode_jur,e.nama as nama_jur,d.kode_tingkat, f.nama as nama_tingkat
             ,a.flag_aktif,g.nama as nama_status,a.tgl_lulus
             from sis_siswa a
@@ -298,7 +300,7 @@ class SiswaController extends Controller
             where a.nis='".$nis."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_param,a.nama,isnull(b.tarif ,0) as tarif,isnull(b.per_awal ,'-') as per_awal, isnull(b.per_akhir ,'-') as per_akhir 
+            $res2 = DB::connection($this->db)->select("select a.kode_param,a.nama,isnull(b.tarif ,0) as tarif,isnull(b.per_awal ,'-') as per_awal, isnull(b.per_akhir ,'-') as per_akhir 
             from sis_param a 
             inner join sis_siswa_tarif b on a.kode_param=b.kode_param and a.kode_lokasi=b.kode_lokasi and b.nis='".$nis."' and b.kode_pp='".$kode_pp."' 
             where a.kode_lokasi = '".$kode_lokasi."'
@@ -336,7 +338,7 @@ class SiswaController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -347,7 +349,7 @@ class SiswaController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_param,a.nama,isnull(b.tarif ,0) as tarif,isnull(b.bulan1 ,'-') as per_awal, isnull(b.bulan2 ,'-') as per_akhir 
+            $res = DB::connection($this->db)->select("select a.kode_param,a.nama,isnull(b.tarif ,0) as tarif,isnull(b.bulan1 ,'-') as per_awal, isnull(b.bulan2 ,'-') as per_akhir 
             from sis_param a 
             left join sis_param_tarif b on a.kode_param=b.kode_param and a.kode_lokasi=b.kode_lokasi 
                     and b.kode_akt='".$request->kode_akt."' and b.kode_jur='".$request->kode_jur."' 		
@@ -382,12 +384,12 @@ class SiswaController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select substring(convert(varchar,tgl_mulai,112),1,6) as bulanawal, substring(convert(varchar,tgl_akhir,112),1,6) as bulanakhir from sis_ta 
+            $res = DB::connection($this->db)->select("select substring(convert(varchar,tgl_mulai,112),1,6) as bulanawal, substring(convert(varchar,tgl_akhir,112),1,6) as bulanakhir from sis_ta 
             where flag_aktif ='1' and kode_pp='".$request->kode_pp."' and kode_lokasi='".$kode_lokasi."' ");
             if (count($res) > 0){
                 $success['periodeAwal']= $res[0]->bulanawal;

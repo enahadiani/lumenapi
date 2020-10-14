@@ -31,14 +31,35 @@ class AdminSiswaController extends Controller
         if($data =  Auth::guard('siswa')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
+            $status_login = $data->status_login;
 
-            $user = DB::connection('sqlsrvtarbak')->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir
-            from sis_hakakses a 
-            left join sis_siswa b on a.nik=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            left join m_form e on a.path_view=e.kode_form  
-            left join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
-            where a.nik='$nik' 
-            ");
+            if($status_login == "S"){
+                $user = DB::connection('sqlsrvtarbak')->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir
+                from sis_hakakses a 
+                left join sis_siswa b on a.nik=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                left join m_form e on a.path_view=e.kode_form  
+                left join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
+                where a.nik='$nik' 
+                ");
+            }else if($status_login == "G"){
+                $user = DB::connection('sqlsrvtarbak')->select("select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan
+                from sis_hakakses a 
+                inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
+                inner join sis_guru c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
+                inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
+                inner join m_form e on a.path_view=e.kode_form 
+                where a.nik='$nik' 
+                ");
+            }else{
+                $user = DB::connection('sqlsrvtarbak')->select("select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan
+                from sis_hakakses a 
+                inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
+                inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
+                inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
+                inner join m_form e on a.path_view=e.kode_form 
+                where a.nik='$nik' 
+                ");
+            }
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
@@ -50,13 +71,17 @@ class AdminSiswaController extends Controller
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
-                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs], 200);
+                $ta = DB::connection('sqlsrvtarbak')->select("select kode_ta from sis_ta where kode_lokasi='$kode_lokasi' and kode_pp = '".$user[0]['kode_pp']."' and flag_aktif=1
+                ");
+                $ta = json_decode(json_encode($ta),true);
+
+                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs,'kode_ta'=>$ta], 200);
             }
             else{
-                return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+                return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[], 'kode_ta'=>[]], 200);
             }
         }else{
-            return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+            return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[], 'kode_ta'=>[]], 200);
         }
     }
 
@@ -67,7 +92,7 @@ class AdminSiswaController extends Controller
      */
     public function allUsers()
     {
-         return response()->json(['users' =>  AdminTarbak::all()], 200);
+         return response()->json(['users' =>  AdminSiswa::all()], 200);
     }
 
     /**
@@ -78,7 +103,7 @@ class AdminSiswaController extends Controller
     public function singleUser($id)
     {
         try {
-            $user = AdminTarbak::findOrFail($id);
+            $user = AdminSiswa::findOrFail($id);
 
             return response()->json(['user' => $user], 200);
 
@@ -187,7 +212,7 @@ class AdminSiswaController extends Controller
                 $foto="-";
             }
 
-            $upd =  DB::connection($this->db)->table('karyawan')
+            $upd =  DB::connection($this->db)->table('sis_hakakses')
             ->where('nik', $nik)
             ->update(['foto' => $foto]);
             

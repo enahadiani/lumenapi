@@ -352,7 +352,18 @@ class PenilaianController extends Controller
                 //     }
                 // }
 
+                $payload = array(
+                    'title' => 'Penilaian',
+                    'message' => 'Nilai '.$nama_matpel.' dan Keterampilan Penilaian Harian sudah bisa dilihat'
+                );
+
                 $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan));
+
+                // $per = date('ym');
+                // $no_pesan =  $this->generateKode("sis_pesan_m", "no_bukti", $kode_lokasi."-PSN".$per.".", "000001");
+
+                // $insp = DB::connection('sqlsrvtarbak')->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_pesan','Kelas','-','-','$request->kode_kelas','".$payload["title"]."','-','".$payload["message"]."','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','info',getdate(),'$nik') ");
+
                 $arr_id = array();
                 for($i=0;$i<count($request->nis);$i++){
                     
@@ -368,21 +379,10 @@ class PenilaianController extends Controller
                     
                 }  
 
-                // if(count($arr_nama) > 0){
-                //     for($i=0; $i<count($arr_nama);$i++){
-                //         $ins3[$i] = DB::connection('sqlsrvtarbak')->insert("insert into sis_nilai_dok (
-                //         no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$request->kode_pp','".$request->nis_dok[$i]."') "); 
-                //     }
-                // }
-
                 DB::connection('sqlsrvtarbak')->commit();
 
                 $msg_n = "Notif tidak dikirim";
                 if(count($arr_id) > 0){
-                    $payload = array(
-                        'title' => 'Penilaian',
-                        'message' => 'Nilai '.$nama_matpel.' dan Keterampilan Penilaian Harian sudah bisa dilihat'
-                    );
                     $res = $this->gcm($arr_id,$payload);
                     $hasil= json_decode($res,true);
                     $success['hasil'] = $hasil;

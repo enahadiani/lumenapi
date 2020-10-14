@@ -241,10 +241,16 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }else{
             if(isset($request->id_device)){
+                if(Auth::guard('siswa')->user()->status_login == "S"){
+                    DB::connection('sqlsrvtarbak')->table('sis_siswa')
+                    ->where('nis', $request->nik)
+                    ->update(['id_device' => $request->id_device]);
+                }else if(Auth::guard('siswa')->user()->status_login == "G"){
+                    DB::connection('sqlsrvtarbak')->table('sis_guru')
+                    ->where('nik', $request->nik)
+                    ->update(['id_device' => $request->id_device]);
+                }
 
-                DB::connection('sqlsrvtarbak')->table('sis_siswa')
-                ->where('nis', $request->nik)
-                ->update(['id_device' => $request->id_device]);
             }
         }
 
@@ -879,7 +885,7 @@ class AuthController extends Controller
             }else{
                 $filter = "";
             }
-            $users = DB::connection($db)->select("select top $top nik,pass from $table where isnull(password,'-')= '-' order by nik ");
+            $users = DB::connection($db)->select("select top $top nik,pass from $table where isnull(password,'-')= '-' $filter order by nik ");
 
             foreach ($users as $user) {
                 DB::connection($db)->table($table)

@@ -15,10 +15,12 @@ class KelasKhususController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_kelas from sis_kelas_khusus where kode_kelas ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select kode_kelas from sis_kelas_khusus where kode_kelas ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class KelasKhususController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -53,7 +55,7 @@ class KelasKhususController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_jur,a.kode_jur+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
+            $res = DB::connection($this->db)->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_jur,a.kode_jur+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
             from sis_kelas_khusus a 
 			left join sis_jur b on a.kode_jur=b.kode_jur and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join pp c on a.kode_pp=c.kode_pp and a.kode_pp=c.kode_pp  and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ");
@@ -105,18 +107,18 @@ class KelasKhususController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_kelas,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_kelas_khusus(kode_kelas,nama,kode_tingkat,kode_jur,flag_aktif,kode_lokasi,kode_pp,tgl_input) values ('$request->kode_kelas','$request->nama','$request->kode_tingkat','$request->kode_jur','$request->flag_aktif','$kode_lokasi','$request->kode_pp',getdate())");
+                $ins = DB::connection($this->db)->insert("insert into sis_kelas_khusus(kode_kelas,nama,kode_tingkat,kode_jur,flag_aktif,kode_lokasi,kode_pp,tgl_input) values ('$request->kode_kelas','$request->nama','$request->kode_tingkat','$request->kode_jur','$request->flag_aktif','$kode_lokasi','$request->kode_pp',getdate())");
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['kode'] = $request->kode_kelas;
                 $success['message'] = "Data Kelas Khusus berhasil disimpan";
@@ -128,7 +130,7 @@ class KelasKhususController extends Controller
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kelas Khusus gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -151,7 +153,7 @@ class KelasKhususController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -159,7 +161,7 @@ class KelasKhususController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_kelas = $request->kode_kelas;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nama, a.kode_kelas,a.kode_jur,a.kode_tingkat,a.kode_kelas,a.flag_aktif,a.kode_pp,b.nama as nama_pp,c.nama as nama_jur,d.nama as nama_tingkat 
+            $res = DB::connection($this->db)->select("select a.nama, a.kode_kelas,a.kode_jur,a.kode_tingkat,a.kode_kelas,a.flag_aktif,a.kode_pp,b.nama as nama_pp,c.nama as nama_jur,d.nama as nama_tingkat 
             from sis_kelas_khusus a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_jur c on a.kode_jur=c.kode_jur and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -214,29 +216,29 @@ class KelasKhususController extends Controller
             'flag_aktif'=> 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_kelas_khusus')
+            $del = DB::connection($this->db)->table('sis_kelas_khusus')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_kelas', $request->kode_kelas)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_kelas_khusus(kode_kelas,nama,kode_tingkat,kode_jur,flag_aktif,kode_lokasi,kode_pp,tgl_input) values ('$request->kode_kelas','$request->nama','$request->kode_tingkat','$request->kode_jur','$request->flag_aktif','$kode_lokasi','$request->kode_pp',getdate())");
+            $ins = DB::connection($this->db)->insert("insert into sis_kelas_khusus(kode_kelas,nama,kode_tingkat,kode_jur,flag_aktif,kode_lokasi,kode_pp,tgl_input) values ('$request->kode_kelas','$request->nama','$request->kode_tingkat','$request->kode_jur','$request->flag_aktif','$kode_lokasi','$request->kode_pp',getdate())");
                         
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->kode_kelas;
             $success['message'] = "Data Kelas Khusus berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kelas Khusus gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -255,27 +257,27 @@ class KelasKhususController extends Controller
             'kode_pp' => 'required',
             'kode_kelas' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_kelas_khusus')
+            $del = DB::connection($this->db)->table('sis_kelas_khusus')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_kelas', $request->kode_kelas)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kelas Khusus berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kelas Khusus gagal dihapus ".$e;
             

@@ -17,7 +17,7 @@ class LaporanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'tarbak';
+    public $guard = 'siswa';
     public $sql = 'sqlsrvtarbak';
 
     public function sendMail(Request $request){
