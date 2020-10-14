@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
+
 class KdController extends Controller
 {
     /**
@@ -17,6 +18,13 @@ class KdController extends Controller
     public $successStatus = 200;
     public $db = 'sqlsrvtarbak';
     public $guard = 'siswa';
+
+    public function joinNum($num){
+        // menggabungkan angka yang di-separate(10.000,75) menjadi 10000.00
+        $num = str_replace(".", "", $num);
+        $num = str_replace(",", ".", $num);
+        return floatval($num);
+    }
 
     public function index(Request $request)
     {
@@ -108,7 +116,8 @@ class KdController extends Controller
             'kode_sem' => 'required',
             'kode_ta' => 'required',
             'kode_kd' => 'array',
-            'nama' => 'array'
+            'nama' => 'array',
+            'kkm' => 'array'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -132,7 +141,9 @@ class KdController extends Controller
                 $tgl_input = date('Y-m-d H:i:s');
                 if (count($request->kode_kd) > 0){
                     for ($i=0;$i < count($request->kode_kd);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."')");	
+                        
+                        $kkm = ($request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
+                        $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
                     }				
                 }
                 
@@ -162,7 +173,8 @@ class KdController extends Controller
             'kode_ta' => 'required',
             'kode_pp' => 'required',
             'kode_kd' => 'array',
-            'nama' => 'array'
+            'nama' => 'array',
+            'kkm' => 'array'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -185,7 +197,8 @@ class KdController extends Controller
             $tgl_input = date('Y-m-d H:i:s');
             if (count($request->kode_kd) > 0){
                 for ($i=0;$i < count($request->kode_kd);$i++){
-                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."')");	
+                    $kkm = ($request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
                 }				
             }
 
@@ -283,7 +296,7 @@ class KdController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $res2 = DB::connection($this->db)->select("
-            select a.kode_kd,a.nama 
+            select a.kode_kd,a.nama,a.kkm 
             from sis_kd a
             where a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.kode_sem='".$kode_sem."' and a.kode_ta='".$request->kode_ta."' and a.kode_tingkat='".$kode_tingkat."'
             order by a.kode_kd
