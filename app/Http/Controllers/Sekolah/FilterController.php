@@ -204,7 +204,7 @@ class FilterController extends Controller
             }
 
             
-            $sql="select a.kode_matpel,b.nama 
+            $sql="select distinct a.kode_matpel,b.nama 
             from sis_guru_matpel_kelas a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             $where
