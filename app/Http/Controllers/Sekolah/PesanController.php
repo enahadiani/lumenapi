@@ -696,6 +696,7 @@ class PesanController extends Controller
                 from sis_pesan_m a
                 inner join (select jenis,nis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                             from sis_pesan_m
+                            where tipe='info'
                             group by jenis,nis,kode_kelas,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.nis=b.nis and a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
                 where a.tipe='info'
                 ) a
