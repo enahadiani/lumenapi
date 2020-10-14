@@ -252,4 +252,10 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->delete('sis-matpel-khusus','Sekolah\SisMatpelKhususController@destroy');
     
     
+    $router->get('filter-pp','Sekolah\FilterController@getFilterPP');
+    $router->get('filter-ta','Sekolah\FilterController@getFilterTA');
+    $router->get('filter-kelas','Sekolah\FilterController@getFilterKelas');
+    $router->get('filter-matpel','Sekolah\FilterController@getFilterMatpel');
+    
+    
 });
