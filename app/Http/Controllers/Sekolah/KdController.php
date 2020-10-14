@@ -142,7 +142,7 @@ class KdController extends Controller
                 if (count($request->kode_kd) > 0){
                     for ($i=0;$i < count($request->kode_kd);$i++){
                         
-                        $kkm = ($request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
+                        $kkm = (isset($request->kkm[$i]) && $request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
                         $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
                     }				
                 }
@@ -197,7 +197,7 @@ class KdController extends Controller
             $tgl_input = date('Y-m-d H:i:s');
             if (count($request->kode_kd) > 0){
                 for ($i=0;$i < count($request->kode_kd);$i++){
-                    $kkm = ($request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
+                    $kkm = (isset($request->kkm[$i]) && $request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
                     $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
                 }				
             }
@@ -284,7 +284,7 @@ class KdController extends Controller
             $kode_sem= $request->kode_sem;
             $kode_ta= $request->kode_ta;
 
-            $res = DB::connection($this->db)->select(" select a.kode_matpel,a.kode_pp,a.tgl_input,b.nama as nama_matpel,c.nama as nama_pp,a.kode_tingkat,d.nama as nama_tingkat,a.kode_sem,a.kode_ta   
+            $res = DB::connection($this->db)->select(" select a.kode_matpel,a.kode_pp,a.tgl_input,b.nama as nama_matpel,c.nama as nama_pp,a.kode_tingkat,d.nama as nama_tingkat,a.kode_sem,a.kode_ta,e.nama as nama_ta   
             from sis_kd a
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
