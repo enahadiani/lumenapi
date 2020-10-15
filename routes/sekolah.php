@@ -225,6 +225,7 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->delete('pesan-dok','Sekolah\PesanController@deleteDokumen');
     $router->get('pesan-history','Sekolah\PesanController@historyPesan');
     $router->get('rata2-nilai','Sekolah\PesanController@rata2Nilai');
+    $router->get('data-box','Sekolah\PesanController@getDataBox');
 
     // GURU
     $router->get('guru-all','Sekolah\GuruController@index');

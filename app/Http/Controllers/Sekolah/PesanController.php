@@ -728,7 +728,7 @@ class PesanController extends Controller
 
     public function historyPesan(Request $request)
     {
-        $this->validate($request, [
+        $this->validate($request,[
             'kode_pp' => 'required'
         ]);
         try {
@@ -738,14 +738,14 @@ class PesanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
+            $sql = "select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
                 select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
                 from sis_pesan_m a
                 inner join (select jenis,nis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                             from sis_pesan_m
                             where tipe in ('info','nilai')
                             group by jenis,nis,kode_kelas,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.nis=b.nis and a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
-                where a.tipe in ('info','nilai')
+                where a.tipe in ('info','nilai')  and a.nik_user = '$nik'
                 ) a
                 inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(a.foto,'-') as foto 
                             from sis_siswa a
@@ -755,8 +755,8 @@ class PesanController extends Controller
                             from sis_kelas a
                             where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi'
                             )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
-                order by a.tgl_input desc                
-            ");
+                order by a.tgl_input desc";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -780,7 +780,11 @@ class PesanController extends Controller
 
     
     public function rata2Nilai(Request $request){
-        // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'kode_kelas' => 'required',
+            'kode_matpel' => 'required',
+            'kode_pp' => 'required'
+        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -795,8 +799,9 @@ class PesanController extends Controller
             from sis_kd a
             inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
             inner join sis_kelas c on b.kode_tingkat=c.kode_tingkat and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='04' and c.kode_kelas='3A' 
-            and a.kode_matpel='BIN'
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$request->kode_pp' and c.kode_kelas='$request->kode_kelas' 
+            and a.kode_matpel='$request->kode_matpel'
+            order by a.kode_kd
             ");
             $rs = json_decode(json_encode($rs),true);
             $sumcase = "";
@@ -810,17 +815,20 @@ class PesanController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $rs2 = DB::connection($this->db)->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
+            $sql2 = "select a.kode_kd,a.nama,b.kode_kelas,a.kode_matpel,isnull(c.rata2,0) as nilai 
             from sis_kd a 
+            inner join sis_kelas b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_tingkat=b.kode_tingkat
             left join (
-            select a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
-            from sis_nilai_m a
-            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            group by a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp ) b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-			where a.kode_pp='04' and a.kode_tingkat='SD03' 
-			and a.kode_matpel='BIN'
-			order by a.kode_kd
-            ") ;
+                        select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2
+                        from sis_nilai_m a
+                        inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                        where a.kode_pp='$request->kode_pp'
+                        group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
+            ) c on a.kode_kd=c.kode_kd and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_matpel=c.kode_matpel and b.kode_kelas=c.kode_kelas and a.kode_sem=c.kode_sem
+            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas'
+            order by a.kode_kd";
+            $success['sql2'] = $sql2;
+            $rs2 = DB::connection($this->db)->select($sql2) ;
 
             $row = json_decode(json_encode($rs2),true);
 
@@ -856,17 +864,24 @@ class PesanController extends Controller
 
     public function getDataBox(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'kode_kelas' => 'required',
+            'kode_matpel' => 'required',
+            'kode_pp' => 'required'
+        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
             }else{
                 $nik= '';
                 $kode_lokasi= '';
+                $kode_pp='';
             }
 
-            $rs = DB::connection($this->db)->select("select count(*) as jum from sis_siswa where kode_kelas='3A' and kode_pp='04' and kode_lokasi='01'
+            $rs = DB::connection($this->db)->select("select count(*) as jum from sis_siswa where kode_kelas='$request->kode_kelas' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -875,45 +890,42 @@ class PesanController extends Controller
             }else{
                 $siswa = 0;
             }
-            $success['siswa']=$siswa;
             
-            $rs2 = DB::connection($this->db)->select("select a.kode_kd,a.nama, isnull(b.rata2,0) as nilai 
-            from sis_kd a 
-            left join (
-            select a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2 
+            $success['siswa']=$siswa;
+
+            $rs2 = DB::connection($this->db)->select("select count(distinct b.nis) as jum from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            where a.kode_kelas='$request->kode_kelas' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.nilai = 0
+            ");
+            $rs2 = json_decode(json_encode($rs2),true);
+            
+            if(count($rs2)> 0){
+                $siswa_tdk = $rs2[0]['jum'];
+            }else{
+                $siswa_tdk = 0;
+            }
+
+            $success['siswa_tdk']=$siswa_tdk;
+            
+            $rs3 = DB::connection($this->db)->select("
+            select count(a.pelaksanaan) as jum
             from sis_nilai_m a
-            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            group by a.kode_kd,a.kode_matpel,a.kode_lokasi,a.kode_pp ) b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-			where a.kode_pp='04' and a.kode_tingkat='SD03' 
-			and a.kode_matpel='BIN'
-			order by a.kode_kd
+            where a.kode_kelas='$request->kode_kelas' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and isnull(a.pelaksanaan,'-') = '-'            
             ") ;
 
-            $row = json_decode(json_encode($rs2),true);
-
-            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
-
-                $dt[0] = array();
-                for($i=0;$i<count($row);$i++){
-                    $dt[0][]=array("y"=>floatval($row[$i]["nilai"]),"kode_kd"=>$row[$i]["kode_kd"]);
-                }
-
-                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
-                $success["series"][0]= array(
-                    "name"=> 'Rata-rata', "color"=>$color[0],"data"=>$dt[0],"type"=>"spline", "marker"=>array("enabled"=>false)
-                );                
-                $success['status'] = true;
-                $success['message'] = "Success!";
-                
-                return response()->json(['success'=>$success], $this->successStatus);     
+            $rs3 = json_decode(json_encode($rs3),true);
+            
+            if(count($rs3)> 0){
+                $pelaksanaan = $rs3[0]['jum'];
+            }else{
+                $pelaksanaan = 0;
             }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['series'] = [];
-                $success['status'] = true;
-                
-                return response()->json(['success'=>$success], $this->successStatus);
-            }
+
+            $success['pelaksanaan'] = $pelaksanaan;
+            $success['status'] = true;
+            $success['message'] = "Sukses!";
+            return response()->json(['success'=>$success], $this->successStatus);
+
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
