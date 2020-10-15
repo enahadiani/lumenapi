@@ -23,6 +23,22 @@ class PenilaianController extends Controller
     public $guard = "siswa";
     public $db = "sqlsrvtarbak";
 
+    public function isUnik($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas,$kode_matpel,$kode_jenis,$kode_sem,$kode_kd){
+        
+        $auth = DB::connection($this->db)->select("select no_bukti from sis_nilai_m where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_matpel='$kode_matpel' and kode_jenis='$kode_jenis' and kode_sem='$kode_sem' and kode_kd='$kode_kd' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $data['status']=false;
+            $data['res'] = $auth;
+        }else{
+            $data['status']=true;
+            $data['res'] = [];
+        }
+
+        return $data;
+    }
+
+
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
@@ -310,69 +326,77 @@ class PenilaianController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(count($request->nis) > 0){
-                
-                date_default_timezone_set("Asia/Bangkok");
-                $per = date('ym');
-                $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
-                $strSQL = "select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_pp='$request->kode_pp'";	
-                $res = DB::connection($this->db)->select($strSQL);
-                $res = json_decode(json_encode($res),true);
-            	if(count($res) > 0){
-                    $no_urut = $res[0]['jumlah'];
-                }else{
-                    $no_urut = 1;
-                }                
+            $unik = $this->isUnik($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,$request->kode_kd);
+            if($unik['status']){
+                if(count($request->nis) > 0){
+                    
+                    date_default_timezone_set("Asia/Bangkok");
+                    $per = date('ym');
+                    $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
+                    $strSQL = "select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_pp='$request->kode_pp'";	
+                    $res = DB::connection($this->db)->select($strSQL);
+                    $res = json_decode(json_encode($res),true);
+                    if(count($res) > 0){
+                        $no_urut = $res[0]['jumlah'];
+                    }else{
+                        $no_urut = 1;
+                    }                
 
-                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan,$nik));
+                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan,$nik));
 
-                $arr_id = array();
-                for($i=0;$i<count($request->nis);$i++){
-                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));                    
-                }  
-                
-                $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
-                $cek = json_decode(json_encode($cek),true);
-            	if(count($cek) > 0){
-                    $nama_matpel = $cek[0]['nama'];
+                    $arr_id = array();
+                    for($i=0;$i<count($request->nis);$i++){
+                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));                    
+                    }  
+                    
+                    $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
+                    $cek = json_decode(json_encode($cek),true);
+                    if(count($cek) > 0){
+                        $nama_matpel = $cek[0]['nama'];
+                    }else{
+                        $nama_matpel = '-';
+                    }
+
+                    $cek2 = DB::connection($this->db)->select("select nama from sis_jenisnilai where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_jenis='$request->kode_jenis' ");
+                    $cek2 = json_decode(json_encode($cek2),true);
+                    if(count($cek2) > 0){
+                        $nama_jenis = $cek2[0]['nama'];
+                    }else{
+                        $nama_jenis = '-';
+                    }
+
+                    $request->request->add([
+                        'jenis' => 'Kelas',
+                        'judul' => 'Penilaian Siswa',
+                        'kontak' => $request->kode_kelas,
+                        'kode_matpel' => $request->kode_matpel,
+                        'tipe' => 'nilai',
+                        'pesan' => 'Nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
+                        'tipe' => 'nilai',
+                        'ref1' => $no_bukti
+                    ]);
+
+                    $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
+                    $notif = json_decode(json_encode($notif),true);
+                    
+                    $success['notif'] = $notif['original'];
+                    DB::connection($this->db)->commit();
+                    $sts = true;
+                    $msg = "Data Penilaian berhasil disimpan.";
                 }else{
-                    $nama_matpel = '-';
+                    $sts = true;
+                    $no_bukti = "-";
+                    $msg = "Data Penilaian gagal disimpan. Detail Penilaian tidak valid";
                 }
-
-                $cek2 = DB::connection($this->db)->select("select nama from sis_jenisnilai where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_jenis='$request->kode_jenis' ");
-                $cek2 = json_decode(json_encode($cek2),true);
-            	if(count($cek2) > 0){
-                    $nama_jenis = $cek2[0]['nama'];
-                }else{
-                    $nama_jenis = '-';
-                }
-
-                $request->request->add([
-                    'jenis' => 'Kelas',
-                    'judul' => 'Penilaian Siswa',
-                    'kontak' => $request->kode_kelas,
-                    'kode_matpel' => $request->kode_matpel,
-                    'tipe' => 'nilai',
-                    'pesan' => 'Nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
-                    'tipe' => 'nilai',
-                    'ref1' => $no_bukti
-                ]);
-
-                $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
-                $notif = json_decode(json_encode($notif),true);
-                
-                $success['notif'] = $notif['original'];
-                DB::connection($this->db)->commit();
-                $sts = true;
-                $msg = "Data Penilaian berhasil disimpan.";
+                $success['no_bukti'] = $no_bukti;
             }else{
-                $sts = true;
-                $no_bukti = "-";
-                $msg = "Data Penilaian gagal disimpan. Detail Penilaian tidak valid";
+                $sts = false;
+                $success['no_bukti'] = $unik['res'][0]['no_bukti'];
+                $success['jenis'] = 'duplicate';
+                $msg = "Error : Duplicate entry. Penilaian sudah ada di database dengan no bukti = ".$unik['res'][0]['no_bukti'];
             }
             
             $success['status'] = $sts;
-            $success['no_bukti'] = $no_bukti;
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
