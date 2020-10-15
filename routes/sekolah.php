@@ -216,6 +216,9 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('penilaian-dok','Sekolah\PenilaianController@showDokUpload');
     $router->post('penilaian-dok','Sekolah\PenilaianController@storeDokumen');
     $router->delete('penilaian-dok','Sekolah\PenilaianController@deleteDokumen');
+    $router->get('penilaian-matpel','Sekolah\PenilaianController@getMatpel');
+    $router->get('penilaian-kelas','Sekolah\PenilaianController@getKelas');
+
 
     $router->get('pesan-all','Sekolah\PesanController@index');
     $router->get('pesan','Sekolah\PesanController@show');

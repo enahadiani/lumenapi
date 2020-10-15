@@ -173,7 +173,7 @@ class PesanController extends Controller
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp,a.tipe 
             from sis_pesan_m a
-            where a.kode_lokasi='$kode_lokasi' $filter");
+            where a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik' $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
