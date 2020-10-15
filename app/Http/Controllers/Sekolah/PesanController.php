@@ -63,10 +63,10 @@ class PesanController extends Controller
                     "ttl" => "86400s",
                     "notification" => array (
                         "click_action" => $data["click_action"]
-                        )
-                    ),
+                    )
+                ),
                     
-                );
+            );
 		}else{
 
 			$post = array(
@@ -220,7 +220,7 @@ class PesanController extends Controller
             'kode_pp' => 'required',
             'kontak' => 'required',
             'pesan' => 'required',
-            'tipe' => 'required',
+            // 'tipe' => 'required',
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -302,8 +302,11 @@ class PesanController extends Controller
             $ref2 = (isset($request->ref2) && $request->ref2 != "" ? $request->ref2 : '-');
             $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
             $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
+            $kode_matpel = (isset($request->kode_matpel) && $request->kode_matpel != "" ? $request->kode_matpel : '-');
+
+            $tipe = ($request->jenis == "Semua" ? "notif" : "info");
             
-            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
+            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik') ");
             
             $ck = DB::connection($this->db)->select($sql);
             $ck = json_decode(json_encode($ck),true);
@@ -335,7 +338,8 @@ class PesanController extends Controller
             if(count($arr_id) > 0){
                 $payload = array(
                     'title' => $request->judul,
-                    'message' => $request->pesan
+                    'message' => $request->pesan,
+                    'click_action' => 'open_detail/'.$kode_matpel
                 );
                 $res = $this->gcm($arr_id,$payload);
                 $hasil= json_decode($res,true);
@@ -452,8 +456,8 @@ class PesanController extends Controller
             'judul' => 'required',
             'kode_pp' => 'required',
             'kontak' => 'required',
-            'pesan' => 'required',
-            'tipe' => 'required',
+            'pesan' => 'required'
+            // 'tipe' => 'required',
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -547,8 +551,9 @@ class PesanController extends Controller
             $ref2 = (isset($request->ref2) && $request->ref2 != "" ? $request->ref2 : '-');
             $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
             $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
+            $tipe = ($request->jenis == "Semua" ? "notif" : "info");
             
-            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
+            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik') ");
             
             $ck = DB::connection($this->db)->select($sql);
             $ck = json_decode(json_encode($ck),true);

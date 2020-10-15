@@ -351,6 +351,7 @@ class PenilaianController extends Controller
                     'jenis' => 'Kelas',
                     'judul' => 'Penilaian Siswa',
                     'kontak' => $request->kode_kelas,
+                    'kode_matpel' => $request->kode_matpel,
                     'pesan' => 'Nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                     'tipe' => 'nilai',
                     'ref1' => $no_bukti
@@ -540,6 +541,7 @@ class PenilaianController extends Controller
                     'jenis' => 'Kelas',
                     'judul' => 'Update Penilaian Siswa',
                     'kontak' => $request->kode_kelas,
+                    'kode_matpel' => $request->kode_matpel,
                     'pesan' => 'Koreksi untuk nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                     'tipe' => 'nilai',
                     'ref1' => $no_bukti
@@ -1180,11 +1182,19 @@ class PenilaianController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
             if(isset($request->kode_pp)){
-                $filter = "and a.kode_pp='$request->kode_pp' ";
+                $filter .= "and a.kode_pp='$request->kode_pp' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
+
+            if(isset($request->kode_kelas)){
+                $filter .= "and a.kode_kelas='$request->kode_kelas' ";
+            }else{
+                $filter .= "";
+            }
+
             if(isset($request->kode_matpel)){
                 $filter .= "and a.kode_matpel='$request->kode_matpel' ";
             }else{
@@ -1224,16 +1234,68 @@ class PenilaianController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
             if(isset($request->kode_pp)){
-                $filter = "and a.kode_pp='$request->kode_pp' ";
+                $filter .= "and a.kode_pp='$request->kode_pp' ";
             }else{
-                $filter = "";
+                $filter .= "";
+            }
+
+            if(isset($request->kode_kelas)){
+                $filter .= "and a.kode_kelas='$request->kode_kelas' ";
+            }else{
+                $filter .= "";
             }
 
             $res = DB::connection($this->db)->select("select distinct a.kode_kelas,b.nama 
             from sis_guru_matpel_kelas a
             inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp
             where a.nik='$nik' $filter ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getSiswa(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->kode_pp)){
+                $filter .= "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->nis)){
+                $filter .= "and a.nis='$request->nis' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection($this->db)->select("select a.nis,a.nama 
+            from sis_siswa a where a.kode_lokasi='$kode_lokasi' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
