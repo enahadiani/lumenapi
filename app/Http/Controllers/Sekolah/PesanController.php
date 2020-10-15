@@ -271,11 +271,31 @@ class PesanController extends Controller
             if($request->jenis == "Siswa"){
                 $nis = $request->kontak;
                 $kode_kelas = '-';
-                $sql = "select id_device,nis from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
-            }else{
+                $sql = "select a.nik,c.id_device from sis_hakakses a
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
+            }
+            else if($request->jenis == "Kelas"){
+                $nis = $request->kontak;
+                $kode_kelas = '-';
+                $sql = "select a.nik,c.id_device from sis_hakakses a
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
+            }
+            else{
                 $nis = "-";
                 $kode_kelas = $request->kontak;
-                $sql = "select id_device,nis from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+                $sql = "select a.nik,c.id_device from sis_hakakses a
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                where a.kode_pp='$request->kode_pp' 
+                union all
+                select a.nik,c.id_device from sis_hakakses a
+                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                where a.kode_pp='$request->kode_pp' ";
             }
             
             $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');
@@ -493,11 +513,31 @@ class PesanController extends Controller
             if($request->jenis == "Siswa"){
                 $nis = $request->kontak;
                 $kode_kelas = '-';
-                $sql = "select id_device,nis from sis_siswa where nis='$nis' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
-            }else{
+                $sql = "select a.nik,c.id_device from sis_hakakses a
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
+            }
+            else if($request->jenis == "Kelas"){
+                $nis = $request->kontak;
+                $kode_kelas = '-';
+                $sql = "select a.nik,c.id_device from sis_hakakses a
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
+            }
+            else{
                 $nis = "-";
                 $kode_kelas = $request->kontak;
-                $sql = "select id_device,nis from sis_siswa where kode_kelas='$kode_kelas' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' --and isnull(id_device,'-') <> '-' ";
+                $sql = "select a.nik,c.id_device from sis_hakakses a
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' 
+                union all
+                select a.nik,c.id_device from sis_hakakses a
+                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' ";
             }
             
             $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');
@@ -509,14 +549,18 @@ class PesanController extends Controller
             
             $cek = DB::connection($this->db)->select($sql);
             $cek = json_decode(json_encode($cek),true);
+            $nik = array();
             if(count($cek) > 0){
                 for($i=0;$i<count($cek);$i++){
+                    if(!isset($nik[$cek[$i]['nik']])){
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nik']."') ");
+                    }
                     
-                    $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
                     if($cek[$i]['id_device'] != ""){
                         array_push($arr_id,$cek[$i]['id_device']);
                     }
                     
+                    $nik[$cek[$i]['nik']] = $cek[$i]['nik'];
                 }  
             }
             

@@ -1184,14 +1184,13 @@ class MobileController extends Controller
 		}
 
 		$this->validate($request,[
-            'no_pesan' => 'required|max:300',
-            'id_device' => 'required'
+            'no_pesan' => 'required|max:300'
 		]);
 
 		DB::connection($this->db)->beginTransaction();
         try{
             
-			$upd = DB::connection($this->db)->insert("update sis_pesan_d set sts_read_mob = '1' where no_bukti='$request->no_pesan' and id_device='$request->id_device' and kode_lokasi='$kode_lokasi' ");
+			$upd = DB::connection($this->db)->insert("update sis_pesan_d set sts_read_mob = '1' where no_bukti='$request->no_pesan' and nik='$nik' and kode_lokasi='$kode_lokasi' ");
 
 			DB::connection($this->db)->commit();
 			$success['status'] = true;
@@ -1229,7 +1228,7 @@ class MobileController extends Controller
 						where tipe='info'
                         group by  nik_user,kode_lokasi,kode_pp) b on a.nik_user=b.nik_user and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
             inner join sis_guru c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nis='$nik'
+            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
             left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
             where a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
 			";
@@ -1271,9 +1270,9 @@ class MobileController extends Controller
             
 			$sql = "select a.judul,a.pesan,a.ref1,a.ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal
             from sis_pesan_m a
-            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nis='$nik'
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
-            where b.nis='$nik' and a.nik_user='$request->nik_guru' and a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            where b.nik='$nik' and a.nik_user='$request->nik_guru' and a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             order by a.tgl_input desc
 			";
 			$res = DB::connection($this->db)->select($sql);
@@ -1311,9 +1310,9 @@ class MobileController extends Controller
             
 			$sql = "select a.jenis,dbo.fnNamaTanggal2(a.tgl_input,2) as tanggal,a.pesan,isnull(c.file_dok,'-') as file_dok
             from sis_pesan_m a
-            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nis='$nik'
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
-            where b.nis='$nik' and a.tipe='notif' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            where b.nik='$nik' and a.tipe='notif' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             order by a.tgl_input desc
 			";
 			$res = DB::connection($this->db)->select($sql);
