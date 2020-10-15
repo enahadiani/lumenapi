@@ -171,9 +171,9 @@ class PesanController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp 
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp,a.tipe 
             from sis_pesan_m a
-            where a.tipe='info' and a.kode_lokasi='$kode_lokasi' $filter");
+            where a.kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -388,9 +388,9 @@ class PesanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.jenis,a.no_bukti,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas end as kontak,a.judul,a.pesan,a.kode_pp,a.ref1,a.ref2,a.ref3,a.link,a.tgl_input
+            $sql = "select a.jenis,a.no_bukti,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas when 'Semua' then a.kode_pp end as kontak,a.judul,a.pesan,a.kode_pp,a.ref1,a.ref2,a.ref3,a.link,a.tgl_input,a.tipe
             from sis_pesan_m a
-            where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' and a.tipe='info'
+            where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' 
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -528,7 +528,7 @@ class PesanController extends Controller
             }
             else{
                 $nis = "-";
-                $kode_kelas = $request->kontak;
+                $kode_kelas = "-";
                 $sql = "select a.nik,c.id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
