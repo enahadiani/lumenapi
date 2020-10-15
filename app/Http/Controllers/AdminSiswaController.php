@@ -149,7 +149,7 @@ class AdminSiswaController extends Controller
             $cek =  DB::connection($this->db)->select("select pass from sis_hakakses where nik='$nik' and pass='$request->password_lama' ");
             if(count($cek) > 0){
 
-                $upd =  DB::connection($this->db)->table('hakakses')
+                $upd =  DB::connection($this->db)->table('sis_hakakses')
                 ->where('nik', $nik)
                 ->where('pass', $request->password_lama)
                 ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
