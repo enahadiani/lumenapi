@@ -114,6 +114,7 @@ class FilterController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_login= $data->status_login;
             }
             
             $col_array = array('kode_pp','flag_aktif');
@@ -141,12 +142,20 @@ class FilterController extends Controller
                 }
             }
 
-            
-            $sql="select a.kode_kelas,a.nama
-            from sis_kelas a $where 
-            union all
-            select a.kode_kelas,a.nama
-            from sis_kelas_khusus a $where 
+            if($status_login == "G"){
+                $filter_nik = " and a.nik='$nik' ";
+            }else{
+                $filter_nik = "";
+            }         
+            $sql="select distinct a.kode_kelas,b.nama 
+            from sis_guru_matpel_kelas a
+            inner join (select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama 
+                        from sis_kelas a 
+                        union all
+                        select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama
+                        from sis_kelas_khusus a
+                        ) b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            $where  $filter_nik
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -176,6 +185,7 @@ class FilterController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_login= $data->status_login;
             }
             
             $col_array = array('kode_pp','flag_aktif','kode_kelas');
@@ -204,10 +214,16 @@ class FilterController extends Controller
             }
 
             
+            if($status_login == "G"){
+                $filter_nik = " and a.nik='$nik' ";
+            }else{
+                $filter_nik = "";
+            }     
+
             $sql="select distinct a.kode_matpel,b.nama 
             from sis_guru_matpel_kelas a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            $where
+            $where  $filter_nik
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
