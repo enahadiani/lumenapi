@@ -304,7 +304,15 @@ class PesanController extends Controller
             $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
             $kode_matpel = (isset($request->kode_matpel) && $request->kode_matpel != "" ? $request->kode_matpel : '-');
 
-            $tipe = ($request->jenis == "Semua" ? "notif" : "info");
+            $tipe = (isset($request->tipe) && $request->tipe != "" ? $request->tipe : ($request->jenis == "Semua" ? "notif" : "info"));
+
+            if($tipe == "notif"){
+                $click_action = "open_notification/";
+            }else if($tipe == "info"){
+                $click_action = "open_info/";
+            }else{
+                $click_action = "open_detail/".$kode_matpel;
+            }
             
             $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik') ");
             
@@ -336,10 +344,11 @@ class PesanController extends Controller
             
             $msg_n = "Notif tidak dikirim";
             if(count($arr_id) > 0){
+                
                 $payload = array(
                     'title' => $request->judul,
                     'message' => $request->pesan,
-                    'click_action' => 'open_detail/'.$kode_matpel
+                    'click_action' => $click_action
                 );
                 $res = $this->gcm($arr_id,$payload);
                 $hasil= json_decode($res,true);
@@ -551,7 +560,16 @@ class PesanController extends Controller
             $ref2 = (isset($request->ref2) && $request->ref2 != "" ? $request->ref2 : '-');
             $ref3 = (isset($request->ref3) && $request->ref3 != "" ? $request->ref3 : '-');
             $link = (isset($request->link) && $request->link != "" ? $request->link : '-');
-            $tipe = ($request->jenis == "Semua" ? "notif" : "info");
+            
+            $tipe = (isset($request->tipe) && $request->tipe != "" ? $request->tipe : ($request->jenis == "Semua" ? "notif" : "info"));
+
+            if($tipe == "notif"){
+                $click_action = "open_notification/";
+            }else if($tipe == "info"){
+                $click_action = "open_info/";
+            }else{
+                $click_action = "open_detail/".$kode_matpel;
+            }
             
             $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik') ");
             
@@ -584,7 +602,8 @@ class PesanController extends Controller
             if(count($arr_id) > 0){
                 $payload = array(
                     'title' => $request->judul,
-                    'message' => $request->pesan
+                    'message' => $request->pesan,
+                    'click_action' => $click_action
                 );
                 $res = $this->gcm($arr_id,$payload);
                 $hasil= json_decode($res,true);

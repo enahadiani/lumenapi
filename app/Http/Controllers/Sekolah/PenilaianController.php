@@ -352,6 +352,7 @@ class PenilaianController extends Controller
                     'judul' => 'Penilaian Siswa',
                     'kontak' => $request->kode_kelas,
                     'kode_matpel' => $request->kode_matpel,
+                    'tipe' => 'nilai',
                     'pesan' => 'Nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                     'tipe' => 'nilai',
                     'ref1' => $no_bukti
@@ -542,6 +543,7 @@ class PenilaianController extends Controller
                     'judul' => 'Update Penilaian Siswa',
                     'kontak' => $request->kode_kelas,
                     'kode_matpel' => $request->kode_matpel,
+                    'tipe' => 'nilai',
                     'pesan' => 'Koreksi untuk nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                     'tipe' => 'nilai',
                     'ref1' => $no_bukti
