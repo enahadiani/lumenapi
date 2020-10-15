@@ -277,22 +277,22 @@ class PesanController extends Controller
                 where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
             }
             else if($request->jenis == "Kelas"){
-                $nis = $request->kontak;
-                $kode_kelas = '-';
-                $sql = "select a.nik,c.id_device from sis_hakakses a
+                $nis = '-';
+                $kode_kelas = $request->kontak;
+                $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
             }
             else{
                 $nis = "-";
-                $kode_kelas = $request->kontak;
-                $sql = "select a.nik,c.id_device from sis_hakakses a
+                $kode_kelas = "-";
+                $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' 
                 union all
-                select a.nik,c.id_device from sis_hakakses a
+                select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
                 inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' ";
@@ -305,16 +305,21 @@ class PesanController extends Controller
             
             $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
             
-            $cek = DB::connection($this->db)->select($sql);
-            $cek = json_decode(json_encode($cek),true);
+            $ck = DB::connection($this->db)->select($sql);
+            $ck = json_decode(json_encode($ck),true);
             $arr_id = array();
-            if(count($cek) > 0){
-                for($i=0;$i<count($cek);$i++){
-                    
-                    $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nis) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nis']."') ");
-                    if($cek[$i]['id_device'] != ""){
-                        array_push($arr_id,$cek[$i]['id_device']);
+            $nik = array();
+            if(count($ck) > 0){
+                for($i=0;$i<count($ck);$i++){
+                    if(!isset($nik[$ck[$i]['nik']])){
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$ck[$i]['id_device']."','".$ck[$i]['nik']."') ");
                     }
+                    
+                    if($ck[$i]['id_device'] != "-"){
+                        array_push($arr_id,$ck[$i]['id_device']);
+                    }
+                    
+                    $nik[$ck[$i]['nik']] = $ck[$i]['nik'];
                 }  
             }
             
@@ -325,8 +330,7 @@ class PesanController extends Controller
                 }
             }
             
-            DB::connection($this->db)->commit();
-
+            
             $msg_n = "Notif tidak dikirim";
             if(count($arr_id) > 0){
                 $payload = array(
@@ -349,11 +353,10 @@ class PesanController extends Controller
                     $msg_n = "Notif gagal dikirim";
                 }
             }
-
+            
+            DB::connection($this->db)->commit();
             $sts = true;
-            $msg = "Data Pesan berhasil disimpan. ".$msg_n;
-
-            // sendNotif();
+            $msg = "Data Pesan berhasil disimpan. ";
         
             $success['status'] = $sts;
             $success['no_bukti'] = $no_bukti;
@@ -519,8 +522,8 @@ class PesanController extends Controller
                 where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
             }
             else if($request->jenis == "Kelas"){
-                $nis = $request->kontak;
-                $kode_kelas = '-';
+                $nis = '-';
+                $kode_kelas = $request->kontak;
                 $sql = "select a.nik,c.id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
@@ -547,20 +550,20 @@ class PesanController extends Controller
             
             $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$request->tipe',getdate(),'$nik') ");
             
-            $cek = DB::connection($this->db)->select($sql);
-            $cek = json_decode(json_encode($cek),true);
+            $ck = DB::connection($this->db)->select($sql);
+            $ck = json_decode(json_encode($ck),true);
             $nik = array();
-            if(count($cek) > 0){
-                for($i=0;$i<count($cek);$i++){
-                    if(!isset($nik[$cek[$i]['nik']])){
-                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$cek[$i]['id_device']."','".$cek[$i]['nik']."') ");
+            if(count($ck) > 0){
+                for($i=0;$i<count($ck);$i++){
+                    if(!isset($nik[$ck[$i]['nik']])){
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik) values ('$no_bukti','$kode_lokasi','$request->kode_pp','0','0','".$ck[$i]['id_device']."','".$ck[$i]['nik']."') ");
                     }
                     
-                    if($cek[$i]['id_device'] != ""){
-                        array_push($arr_id,$cek[$i]['id_device']);
+                    if($ck[$i]['id_device'] != "-"){
+                        array_push($arr_id,$ck[$i]['id_device']);
                     }
                     
-                    $nik[$cek[$i]['nik']] = $cek[$i]['nik'];
+                    $nik[$ck[$i]['nik']] = $ck[$i]['nik'];
                 }  
             }
             
@@ -596,8 +599,6 @@ class PesanController extends Controller
             }
             $sts = true;
             $msg = "Data Pesan berhasil diubah. ".$msg_n;
-
-            // sendNotif();
         
             $success['status'] = $sts;
             $success['no_bukti'] = $no_bukti;
@@ -742,9 +743,9 @@ class PesanController extends Controller
                 from sis_pesan_m a
                 inner join (select jenis,nis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                             from sis_pesan_m
-                            where tipe='info'
+                            where tipe in ('info','nilai')
                             group by jenis,nis,kode_kelas,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.nis=b.nis and a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
-                where a.tipe='info'
+                where a.tipe in ('info','nilai')
                 ) a
                 inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(a.foto,'-') as foto 
                             from sis_siswa a

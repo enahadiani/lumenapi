@@ -301,9 +301,6 @@ class PenilaianController extends Controller
             'pelaksanaan' => 'required',
             'nis'=>'required|array',
             'nilai'=>'required|array'
-            // 'nama_dok'=>'array|max:100',
-            // 'nis_dok'=>'array|max:20',
-            // 'file.*'=>'file|max:10240'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -325,84 +322,47 @@ class PenilaianController extends Controller
                     $no_urut = $res[0]['jumlah'];
                 }else{
                     $no_urut = 1;
-                }
+                }                
 
+                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan));
+
+                $arr_id = array();
+                for($i=0;$i<count($request->nis);$i++){
+                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));                    
+                }  
+                
                 $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
                 $cek = json_decode(json_encode($cek),true);
             	if(count($cek) > 0){
                     $nama_matpel = $cek[0]['nama'];
                 }else{
-                    $nama_matpel = 1;
+                    $nama_matpel = '-';
                 }
 
-                // $arr_foto = array();
-                // $arr_nama = array();
-                // $i=0;
-                // if($request->hasfile('file'))
-                // {
-                //     foreach($request->file('file') as $file)
-                //     {                
-                //         $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                //         $foto = $nama_foto;
-                //         if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                //             Storage::disk('s3')->delete('sekolah/'.$foto);
-                //         }
-                //         Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
-                //         $arr_foto[] = $foto;
-                //         $arr_nama[] = str_replace(' ', '_', $request->input('nama_file')[$i]);
-                //         $i++;
-                //     }
-                // }
+                $cek2 = DB::connection($this->db)->select("select nama from sis_jenisnilai where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_jenis='$request->kode_jenis' ");
+                $cek2 = json_decode(json_encode($cek2),true);
+            	if(count($cek2) > 0){
+                    $nama_jenis = $cek2[0]['nama'];
+                }else{
+                    $nama_jenis = '-';
+                }
 
-                $payload = array(
-                    'title' => 'Penilaian',
-                    'message' => 'Nilai '.$nama_matpel.' dan Keterampilan Penilaian Harian sudah bisa dilihat'
-                );
+                $request->request->add([
+                    'jenis' => 'Kelas',
+                    'judul' => 'Penilaian Siswa',
+                    'kontak' => $request->kode_kelas,
+                    'pesan' => 'Nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
+                    'tipe' => 'nilai',
+                    'ref1' => $no_bukti
+                ]);
 
-                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan));
-
-                // $per = date('ym');
-                // $no_pesan =  $this->generateKode("sis_pesan_m", "no_bukti", $kode_lokasi."-PSN".$per.".", "000001");
-
-                // $insp = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_pesan','Kelas','-','-','$request->kode_kelas','".$payload["title"]."','-','".$payload["message"]."','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','info',getdate(),'$nik') ");
-
-                $arr_id = array();
-                for($i=0;$i<count($request->nis);$i++){
-                    
-                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
-
-                    $sql = "select id_device from sis_siswa where nis='".$request->nis[$i]."' ";
-                    $gt = DB::connection($this->db)->select($sql);
-                    if(count($gt) > 0){
-                        if($gt[0]->id_device != ""){
-                            array_push($arr_id,$gt[0]->id_device);
-                        }
-                    }
-                    
-                }  
-
+                $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
+                $notif = json_decode(json_encode($notif),true);
+                
+                $success['notif'] = $notif['original'];
                 DB::connection($this->db)->commit();
-
-                $msg_n = "Notif tidak dikirim";
-                if(count($arr_id) > 0){
-                    $res = $this->gcm($arr_id,$payload);
-                    $hasil= json_decode($res,true);
-                    $success['hasil'] = $hasil;
-                    if(isset($hasil['success'])){
-                        if($hasil['failure'] > 0){
-                            $sts = 0;
-                            $msg_n = "Notif gagal dikirim";
-                        }else{
-                            $msg_n = "Notif berhasil dikirim";
-                            $sts = 1;
-                        }
-                    }else{
-                        
-                        $msg_n = "Notif gagal dikirim";
-                    }
-                }
                 $sts = true;
-                $msg = "Data Penilaian berhasil disimpan.".$msg_n;
+                $msg = "Data Penilaian berhasil disimpan.";
             }else{
                 $sts = true;
                 $no_bukti = "-";
@@ -521,8 +481,6 @@ class PenilaianController extends Controller
             'nis'=>'required|array',
             'nilai'=>'required|array',
             'nama_dok'=>'array|max:100'
-            // 'nis_dok'=>'array|max:20',
-            // 'file.*'=>'file|max:10240'
         ]);
         
         DB::connection($this->db)->beginTransaction();
@@ -545,45 +503,6 @@ class PenilaianController extends Controller
                     $no_urut = 1;
                 }
 
-                // $arr_foto = array();
-                // $arr_nama = array();
-                // $arr_foto2 = array();
-                // $arr_nama2 = array();
-                // $i=0;
-                // $cek = $request->file;
-                // //cek upload file tidak kosong
-                // if(!empty($cek)){
-
-                //     if(count($request->nama_file) > 0){
-                //         //looping berdasarkan nama dok
-                //         for($i=0;$i<count($request->nama_file);$i++){
-                //             //cek row i ada file atau tidak
-                //             if(isset($request->file('file')[$i])){
-                //                 $file = $request->file('file')[$i];
-
-                //                 //kalo ada cek nama sebelumnya ada atau -
-                //                 if($request->nama_file_seb[$i] != "-"){
-                //                     //kalo ada hapus yang lama
-                //                     Storage::disk('s3')->delete('sekolah/'.$request->nama_file_seb[$i]);
-                //                 }
-                //                 $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                //                 $foto = $nama_foto;
-                //                 if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                //                     Storage::disk('s3')->delete('sekolah/'.$foto);
-                //                 }
-                //                 Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
-                //                 $arr_foto[] = $foto;
-                //             }else{
-                //                 $arr_foto[] = $request->nama_file_seb[$i];
-                //             }     
-                //             $arr_nama[] = $request->input('nama_file')[$i];
-                //             $arr_nama2[] = count($request->nama_file).'|'.$i.'|'.isset($request->file('file')[$i]);
-                //         }
-    
-                //         $del3 = DB::connection($this->db)->table('sis_nilai_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
-                //     }
-                // }
-
                 $del = DB::connection($this->db)->table('sis_nilai_m')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
@@ -594,62 +513,45 @@ class PenilaianController extends Controller
                 ->where('no_bukti', $request->no_bukti)
                 ->delete();
 
+                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$request->pelaksanaan));
+
+                $arr_id = array();
+                for($i=0;$i<count($request->nis);$i++){
+                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
+                }  
+
                 $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
                 $cek = json_decode(json_encode($cek),true);
             	if(count($cek) > 0){
                     $nama_matpel = $cek[0]['nama'];
                 }else{
-                    $nama_matpel = 1;
+                    $nama_matpel = '-';
                 }
 
-
-                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$request->pelaksanaan));
-                $arr_id = array();
-                for($i=0;$i<count($request->nis);$i++){
-                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
-                    $sql = "select id_device from sis_siswa where nis='".$request->nis[$i]."' ";
-                    $gt = DB::connection($this->db)->select($sql);
-                    if(count($gt) > 0){
-                        if($gt[0]->id_device != ""){
-                            array_push($arr_id,$gt[0]->id_device);
-                        }
-                    }
-                }  
-
-                // if(count($arr_nama) > 0){
-                //     for($i=0; $i<count($arr_nama);$i++){
-                //         $ins3[$i] = DB::connection($this->db)->insert("insert into sis_nilai_dok (
-                //         no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','".$arr_nama[$i]."','$request->kode_pp','".$request->nis_dok[$i]."') "); 
-                //     }
-                // }
-
-                DB::connection($this->db)->commit();
-
-                $msg_n = "Notif tidak dikirim";
-                if(count($arr_id) > 0){
-                    $payload = array(
-                        'title' => 'Penilaian',
-                        'message' => 'Nilai '.$nama_matpel.' dan Keterampilan Penilaian Harian sudah bisa dilihat'
-                    );
-                    $res = $this->gcm($arr_id,$payload);
-                    $hasil= json_decode($res,true);
-                    $success['hasil'] = $hasil;
-                    if(isset($hasil['success'])){
-                        if($hasil['failure'] > 0){
-                            $sts = 0;
-                            $msg_n = "Notif gagal dikirim";
-                        }else{
-                            $msg_n = "Notif berhasil dikirim";
-                            $sts = 1;
-                        }
-                    }else{
-                        
-                        $msg_n = "Notif gagal dikirim";
-                    }
+                $cek2 = DB::connection($this->db)->select("select nama from sis_jenisnilai where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_jenis='$request->kode_jenis' ");
+                $cek2 = json_decode(json_encode($cek2),true);
+            	if(count($cek2) > 0){
+                    $nama_jenis = $cek2[0]['nama'];
+                }else{
+                    $nama_jenis = '-';
                 }
-                $sts = true;
-                $msg = "Data Penilaian berhasil diubah.".$msg_n;
+
+                $request->request->add([
+                    'jenis' => 'Kelas',
+                    'judul' => 'Update Penilaian Siswa',
+                    'kontak' => $request->kode_kelas,
+                    'pesan' => 'Koreksi untuk nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
+                    'tipe' => 'nilai',
+                    'ref1' => $no_bukti
+                ]);
+
+                $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
+                $notif = json_decode(json_encode($notif),true);
                 
+                $success['notif'] = $notif['original'];
+                DB::connection($this->db)->commit();
+                $sts = true;
+                $msg = "Data Penilaian berhasil diubah.";
             }else{
                 $sts = true;
                 $no_bukti = "-";
@@ -701,7 +603,7 @@ class PenilaianController extends Controller
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$kode_pp'  order by no_urut";
+            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 

@@ -1221,16 +1221,20 @@ class MobileController extends Controller
                 $kode_kelas = "-";
             }
             
-			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob
+			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe
             from sis_pesan_m a
             inner join (select nik_user,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                         from sis_pesan_m 
-						where tipe='info'
+						where tipe in ('info','nilai')
                         group by  nik_user,kode_lokasi,kode_pp) b on a.nik_user=b.nik_user and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
-            inner join sis_guru c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from sis_guru a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+						union all 
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from karyawan a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
             left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
-            where a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
+            where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
 			";
 			$res = DB::connection($this->db)->select($sql);
 			$res = json_decode(json_encode($res),true);
@@ -1268,12 +1272,19 @@ class MobileController extends Controller
 		
         try{
             
-			$sql = "select a.judul,a.pesan,a.ref1,a.ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal
+			$sql = "select * from (select a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
             from sis_pesan_m a
             inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
-            where b.nik='$nik' and a.nik_user='$request->nik_guru' and a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
-            order by a.tgl_input desc
+            where b.nik='$nik' and a.nik_user='$request->nik_guru' and a.tipe in ('info') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+			union all
+			select a.judul,a.pesan,a.ref1,d.nilai as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+			inner join sis_nilai d on a.ref1=d.no_bukti and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nis='$nik'
+            left join sis_nilai_dok c on a.ref1=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.nis='$nik'
+            where b.nik='$nik' and a.nik_user='$request->nik_guru' and a.tipe in ('nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            ) a order by a.tgl_input desc
 			";
 			$res = DB::connection($this->db)->select($sql);
 			$res = json_decode(json_encode($res),true);
