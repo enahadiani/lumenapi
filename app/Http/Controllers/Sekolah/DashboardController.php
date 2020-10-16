@@ -80,7 +80,7 @@ class DashboardController extends Controller
             ) e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and b.kode_kelas=e.kode_kelas and a.kode_sem=e.kode_sem
             where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas'
             order by a.kode_kd";
-            $success['sql2'] = $sql2;
+            // $success['sql2'] = $sql2;
             $rs2 = DB::connection($this->db)->select($sql2) ;
 
             $row = json_decode(json_encode($rs2),true);
