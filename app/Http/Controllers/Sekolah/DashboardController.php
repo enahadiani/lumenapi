@@ -90,7 +90,7 @@ class DashboardController extends Controller
                 // Data AVG
                 $dtAvg[0] = array();
                 for($i=0;$i<count($row);$i++){
-                    $dtAvg[0] =array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
+                    $dtAvg[0][] =array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
                 }
 
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
