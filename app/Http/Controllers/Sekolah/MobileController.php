@@ -1323,6 +1323,113 @@ class MobileController extends Controller
             return response()->json($success, 200);
         }
     }
+
+    public function getInfo2(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+			$sql = "select a.kode_matpel,'Guru '+c.nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru
+            from sis_pesan_m a
+            inner join (select kode_matpel,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                        from sis_pesan_m 
+						where tipe in ('info','nilai')
+                        group by  kode_matpel,kode_lokasi,kode_pp) b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
+            left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
+			  inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from sis_guru a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+						union all 
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from karyawan a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') f on a.nik_user=f.nik and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+            where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+    
+    public function getDetailInfo2(Request $request){
+        $this->validate($request,[
+            'nik_guru' => 'required',
+            'kode_matpel' => 'required'
+        ]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+			$sql = "select * from (select a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+            left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
+            where b.nik='$nik' and a.kode_matpel='$request->kode_matpel' and a.tipe in ('info') and a.kode_lokasi='01' and a.kode_pp='$kode_pp'
+			union all
+			select a.judul,a.pesan,a.ref1,d.nilai as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+			inner join sis_nilai d on a.ref1=d.no_bukti and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nis='$nik'
+            left join sis_nilai_dok c on a.ref1=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.nis='$nik'
+            where b.nik='$nik' and a.kode_matpel='$request->kode_matpel' and a.tipe in ('nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nik_user='$request->nik_guru'
+            ) a order by a.tgl_input desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
     
     public function getNotif(Request $request){
 
