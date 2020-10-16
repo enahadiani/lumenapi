@@ -1151,12 +1151,24 @@ class MobileController extends Controller
             // $success['sql'] = $sql;
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $sql4 = "select a.kode_kd,a.nama_kd,a.kode_jenis,b.nama as pelaksanaan
+            from sis_nilai_m a 
+            inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$request->kode_pp' and c.nis='$nik' 
+			and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
+            order by a.kode_kd,kode_jenis";
+            // $success['sql4'] = $sql4;
+            $res4 = DB::connection($this->db)->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
             
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data_ta'] = $res3;
                 $success['data_guru'] = $res2;
                 $success['data_kompetensi'] = $res;
+                $success['data_pelaksanaan'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
@@ -1164,6 +1176,7 @@ class MobileController extends Controller
                 $success['data_ta'] = [];
                 $success['data_guru'] = [];
                 $success['data_kompetensi'] = [];
+                $success['data_pelaksanaan'] = [];
                 $success['status'] = true;
             }
             return response()->json(['success'=>$success], $this->successStatus);
