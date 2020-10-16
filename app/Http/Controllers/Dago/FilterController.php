@@ -412,7 +412,7 @@ class FilterController extends Controller
                 }
             }
 
-            $sql="select a.no_reg from dgw_reg a $where";
+            $sql="select a.no_reg, b.nama from dgw_reg a inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi $where";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
