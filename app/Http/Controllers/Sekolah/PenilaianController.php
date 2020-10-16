@@ -1332,7 +1332,7 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.nis,a.nama
+            $res = DB::connection($this->db)->select("select distinct a.nis,a.nama,a.kode_kelas
             from sis_siswa a
             inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.nik='$nik' $filter ");
