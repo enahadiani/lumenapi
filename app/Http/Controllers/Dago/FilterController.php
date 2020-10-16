@@ -533,7 +533,7 @@ class FilterController extends Controller
                 }
             }
 
-            $sql="select a.no_peserta,b.nama 
+            $sql="select distinct a.no_peserta,b.nama 
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             $where";
