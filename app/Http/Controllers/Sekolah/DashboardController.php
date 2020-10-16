@@ -89,6 +89,7 @@ class DashboardController extends Controller
 
                 // Data AVG
                 $dtAvg[0] = array();
+                // Data Range Nilai
                 $dtRange[0] = array();
                 for($i=0;$i<count($row);$i++){
                     $dtAvg[0][] =array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
