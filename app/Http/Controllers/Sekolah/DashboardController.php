@@ -94,7 +94,7 @@ class DashboardController extends Controller
                 }
 
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
-                $success['avg'][0] = [$dtAvg];//array("data"=>$dtAvg[0]);
+                $success['avg'][0] = $dtAvg;//array("data"=>$dtAvg[0]);
                 // $success["series"][0]= array(
                 //     "name"=> 'Rata-rata', "color"=>$color[0],"data"=>$dt[0],"type"=>"spline", "marker"=>array("enabled"=>false)
                 // );                
