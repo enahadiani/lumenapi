@@ -1341,7 +1341,7 @@ class MobileController extends Controller
                 $kode_kelas = "-";
             }
             
-			$sql = "select a.kode_matpel,'Guru '+c.nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru
+			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru
             from sis_pesan_m a
             inner join (select kode_matpel,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                         from sis_pesan_m 
