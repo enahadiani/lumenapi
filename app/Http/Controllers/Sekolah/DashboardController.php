@@ -88,11 +88,11 @@ class DashboardController extends Controller
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
-                    $dtAvg = array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
+                    $dtAvg[] = array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
                 }
 
                 for($i=0;$i<count($row);$i++){
-                    $dtRange = array($row[$i]["kode_kd"],floatval($row[$i]["nilai_terendah"]),floatval($row[$i]["nilai_tertinggi"]));
+                    $dtRange[] = array($row[$i]["kode_kd"],floatval($row[$i]["nilai_terendah"]),floatval($row[$i]["nilai_tertinggi"]));
                 }
 
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
