@@ -148,8 +148,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('kode_pp','kode_ta','kode_kelas','kode_matpel','nik_guru');
-            $db_col_name = array('a.kode_pp','a.kode_ta','a.kode_kelas','a.kode_matpel','a.nik');
+            $col_array = array('kode_pp','nik_guru');
+            $db_col_name = array('a.kode_pp','a.nik');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -173,49 +173,16 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select distinct a.nik, b.nama, b.no_hp,'-' as tugas_mengajar 
-            from sis_guru_matpel_kelas a
-            inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            $sql="select a.nik,a.nama,a.tugas,a.no_hp,dbo.fnGetGuruKelas(a.nik,a.kode_lokasi,a.kode_pp) as kelas,
+                    dbo.fnGetGuruMatpel(a.nik,a.kode_lokasi,a.kode_pp) as matpel 
+            from sis_guru a
             $where ";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
-            // $nik_guru = "";
-            // $resdata = array();
-            // $i=0;
-            // foreach($rs as $row){
-
-            //     $resdata[]=(array)$row;
-            //     if($i == 0){
-            //         $nik_guru .= "'$row->nik'";
-            //     }else{
-
-            //         $nik_guru .= ","."'$row->nik'";
-            //     }
-            //     $i++;
-            // }
-
-            $sql2 = "select distinct a.nik, a.kode_matpel,b.nama
-            from sis_guru_matpel_kelas a
-            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            $where
-            order by a.nik,a.kode_matpel ";
-            $res2 = DB::connection($this->sql)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
-
-            $sql3 = "select distinct a.nik, a.kode_matpel,a.kode_kelas,b.nama
-            from sis_guru_matpel_kelas a
-            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            $where
-            order by a.nik,a.kode_kelas ";
-            $res3 = DB::connection($this->sql)->select($sql3);
-            $res3 = json_decode(json_encode($res3),true);
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['data_matpel'] = $res2;
-                $success['data_kelas'] = $res3;
                 $success['message'] = "Success!"; 
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -224,8 +191,6 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['status'] = true;
                 $success['data'] = [];
-                $success['data_matpel'] = [];
-                $success['data_kelas'] = [];
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -268,7 +233,7 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select distinct substring(a.kode_tingkat,4,1) as kode_tingkat,b.kode_kelas,c.kode_matpel,d.nama,d.skode,c.nik,e.nama as nama_guru
+            $sql="select distinct substring(a.kode_tingkat,4,1) as kode_tingkat,b.kode_kelas,c.kode_matpel,d.nama as nama_matpel,d.skode,c.nik,e.nama as nama_guru
             from sis_tingkat a
             inner join sis_kelas b on a.kode_tingkat=b.kode_tingkat and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_guru_matpel_kelas c on b.kode_kelas=c.kode_kelas and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
