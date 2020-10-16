@@ -568,9 +568,9 @@ class PesanController extends Controller
             $tipe = (isset($request->tipe) && $request->tipe != "" ? $request->tipe : ($request->jenis == "Semua" ? "notif" : "info"));
 
             if($tipe == "notif"){
-                $click_action = "open_notification/";
+                $click_action = "open_notifikasi/";
             }else if($tipe == "info"){
-                $click_action = "open_info/";
+                $click_action = "open_informasi/";
             }else{
                 $click_action = "open_detail/".$kode_matpel;
             }
