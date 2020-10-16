@@ -267,6 +267,7 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('lap-nilai','Sekolah\LaporanController@getNilai');
     $router->get('lap-guru-kelas','Sekolah\LaporanController@getGuruKelas');
     $router->get('lap-guru-matpel','Sekolah\LaporanController@getGuruMatpel');
+    $router->get('lap-siswa','Sekolah\LaporanController@getSiswa');
 
     $router->post('notif','Sekolah\PenilaianController@sendNotif');
     
