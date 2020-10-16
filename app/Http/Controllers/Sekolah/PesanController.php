@@ -274,7 +274,7 @@ class PesanController extends Controller
                 $nis = $request->kontak;
                 $kode_kelas = '-';
                 $sql = "select a.nik,c.id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
             }
@@ -282,7 +282,7 @@ class PesanController extends Controller
                 $nis = '-';
                 $kode_kelas = $request->kontak;
                 $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
             }
@@ -290,12 +290,12 @@ class PesanController extends Controller
                 $nis = "-";
                 $kode_kelas = "-";
                 $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' 
                 union all
                 select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
-                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' ";
             }
@@ -371,11 +371,12 @@ class PesanController extends Controller
             
             DB::connection($this->db)->commit();
             $sts = true;
-            $msg = "Data Pesan berhasil disimpan. ";
+            $msg = "Data Pesan berhasil disimpan. ".$msg_n;
         
             $success['status'] = $sts;
             $success['no_bukti'] = $no_bukti;
             $success['message'] = $msg;
+            $success['arr_id'] = $arr_id;
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
