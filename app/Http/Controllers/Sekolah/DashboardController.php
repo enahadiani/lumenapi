@@ -90,11 +90,11 @@ class DashboardController extends Controller
                 // Data AVG
                 $dtAvg[0] = array();
                 for($i=0;$i<count($row);$i++){
-                    $dtAvg[0][]=array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
+                    $dtAvg[0] =array($row[$i]["kode_kd"],floatval($row[$i]["nilai"]));
                 }
 
                 $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
-                $success['avg'][0] = $dtAvg;//array("data"=>$dtAvg[0]);
+                $success['avg'] = $dtAvg;//array("data"=>$dtAvg[0]);
                 // $success["series"][0]= array(
                 //     "name"=> 'Rata-rata', "color"=>$color[0],"data"=>$dt[0],"type"=>"spline", "marker"=>array("enabled"=>false)
                 // );                
