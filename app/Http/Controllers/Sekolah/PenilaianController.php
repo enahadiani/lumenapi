@@ -1273,6 +1273,12 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_matpel)){
+                $filter .= "and a.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection($this->db)->select("select distinct a.kode_kelas,b.nama 
             from sis_guru_matpel_kelas a
             inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
@@ -1314,14 +1320,22 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_matpel)){
+                $filter .= "and b.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
             if(isset($request->nis)){
                 $filter .= "and a.nis='$request->nis' ";
             }else{
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.nis,a.nama 
-            from sis_siswa a where a.kode_lokasi='$kode_lokasi' $filter ");
+            $res = DB::connection($this->db)->select("select distinct a.nis,a.nama
+            from sis_siswa a
+            inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.nik='$nik' $filter ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

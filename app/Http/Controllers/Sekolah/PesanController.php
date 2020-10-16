@@ -172,8 +172,9 @@ class PesanController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp,a.tipe 
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case jenis when 'Semua' then '-' when 'Kelas' then a.kode_kelas when 'Siswa' then a.nis end as kontak,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp,a.tipe,a.kode_matpel,isnull(b.nama,'-') as nama_matpel 
             from sis_pesan_m a
+            left join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik' $filter");
             $res = json_decode(json_encode($res),true);
             
@@ -221,7 +222,7 @@ class PesanController extends Controller
             'kode_pp' => 'required',
             'kontak' => 'required',
             'pesan' => 'required',
-            // 'tipe' => 'required',
+            'kode_matpel' => 'required',
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -315,7 +316,7 @@ class PesanController extends Controller
                 $click_action = "open_detail/".$kode_matpel;
             }
             
-            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik') ");
+            $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user,kode_matpel) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik','$request->kode_matpel') ");
             
             $ck = DB::connection($this->db)->select($sql);
             $ck = json_decode(json_encode($ck),true);
@@ -405,8 +406,9 @@ class PesanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.jenis,a.no_bukti,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas when 'Semua' then a.kode_pp end as kontak,a.judul,a.pesan,a.kode_pp,a.ref1,a.ref2,a.ref3,a.link,a.tgl_input,a.tipe
+            $sql = "select a.jenis,a.no_bukti,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas when 'Semua' then a.kode_pp end as kontak,a.judul,a.pesan,a.kode_pp,a.ref1,a.ref2,a.ref3,a.link,a.tgl_input,a.tipe,a.kode_matpel,isnull(b.nama,'-') as nama_matpel
             from sis_pesan_m a
+            left join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp' 
             ";
             $res = DB::connection($this->db)->select($sql);
@@ -466,7 +468,7 @@ class PesanController extends Controller
             'judul' => 'required',
             'kode_pp' => 'required',
             'kontak' => 'required',
-            'pesan' => 'required'
+            'pesan' => 'required',
             // 'tipe' => 'required',
         ]);
 
