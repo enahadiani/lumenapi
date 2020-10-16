@@ -54,7 +54,7 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
-            $sql2 = "select a.kode_kd,a.nama,b.kode_kelas,a.kode_matpel,isnull(c.rata2,0) as nilai,isnull(d.nilai_tertinggi,0) as nilai_tertiggi,isnull(e.nilai_terendah,0) as nilai_terendah 
+            $sql2 = "select a.kode_kd,a.nama,b.kode_kelas,a.kode_matpel,isnull(c.rata2,0) as nilai,isnull(d.nilai_tertinggi,0) as nilai_tertinggi,isnull(e.nilai_terendah,0) as nilai_terendah 
             from sis_kd a 
             inner join sis_kelas b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_tingkat=b.kode_tingkat
             left join (
