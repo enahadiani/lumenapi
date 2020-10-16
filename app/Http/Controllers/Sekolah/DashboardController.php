@@ -72,7 +72,7 @@ class DashboardController extends Controller
                         group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
             ) d on a.kode_kd=d.kode_kd and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_matpel=d.kode_matpel and b.kode_kelas=d.kode_kelas and a.kode_sem=d.kode_sem
             left join (
-                        select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,max(b.nilai) as nilai_tertinggi
+                        select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,min(b.nilai) as nilai_terendah
                         from sis_nilai_m a
                         inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
                         where a.kode_pp='$request->kode_pp'
