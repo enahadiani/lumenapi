@@ -257,17 +257,17 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->put('sis-matpel-khusus','Sekolah\SisMatpelKhususController@update');
     $router->delete('sis-matpel-khusus','Sekolah\SisMatpelKhususController@destroy');
     
-    
     $router->get('filter-pp','Sekolah\FilterController@getFilterPP');
     $router->get('filter-ta','Sekolah\FilterController@getFilterTA');
     $router->get('filter-kelas','Sekolah\FilterController@getFilterKelas');
     $router->get('filter-matpel','Sekolah\FilterController@getFilterMatpel');
-
+    $router->get('filter-guru','Sekolah\FilterController@getFilterGuru');
     
     $router->get('lap-nilai','Sekolah\LaporanController@getNilai');
     $router->get('lap-guru-kelas','Sekolah\LaporanController@getGuruKelas');
     $router->get('lap-guru-matpel','Sekolah\LaporanController@getGuruMatpel');
     $router->get('lap-siswa','Sekolah\LaporanController@getSiswa');
+    $router->get('lap-kd','Sekolah\LaporanController@getKD');
 
     $router->post('notif','Sekolah\PenilaianController@sendNotif');
     
