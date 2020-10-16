@@ -88,7 +88,7 @@ class DashboardController extends Controller
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
-                    $dtAvg[] = array($row[$i]["kode_kd"],round($row[$i]["nilai"]));
+                    $dtAvg[] = array($row[$i]["kode_kd"],round($row[$i]["nilai"],2));
                 }
 
                 for($i=0;$i<count($row);$i++){
