@@ -45,6 +45,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
                      ->where('sis_siswa.kode_kelas',$this->kode_kelas)
                      ->where('sis_siswa.kode_lokasi',$this->kode_lokasi)
                      ->where('sis_siswa.kode_pp',$this->kode_pp)
+                     ->orderBy('sis_siswa.nama')
                     ->get();
             
         }else{
@@ -59,6 +60,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
                         ->where('sis_nilai_tmp.kode_lokasi',$this->kode_lokasi)
                         ->where('sis_nilai_tmp.nik_user',$this->nik_user)
                         ->where('sis_nilai_tmp.kode_pp',$this->kode_pp)
+                        ->orderBy('sis_siswa.nama')
                         ->get();
                         
         }

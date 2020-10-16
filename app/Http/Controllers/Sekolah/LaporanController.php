@@ -235,6 +235,70 @@ class LaporanController extends Controller
         }
     }
 
+    function getGuruMatpel(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('kode_pp','kode_ta','kode_kelas','kode_matpel','nik_guru');
+            $db_col_name = array('c.kode_pp','c.kode_ta','c.kode_kelas','c.kode_matpel','c.nik');
+            $where = "where c.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select distinct substring(a.kode_tingkat,4,1) as kode_tingkat,b.kode_kelas,c.kode_matpel,d.nama,d.skode,c.nik,e.nama as nama_guru
+            from sis_tingkat a
+            inner join sis_kelas b on a.kode_tingkat=b.kode_tingkat and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_guru_matpel_kelas c on b.kode_kelas=c.kode_kelas and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            inner join sis_matpel d on c.kode_matpel=d.kode_matpel and c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
+            inner join sis_guru e on c.nik=e.nik and c.kode_pp=e.kode_pp and c.kode_lokasi=e.kode_lokasi
+            $where 
+            order by substring(a.kode_tingkat,4,1) ";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!"; 
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                $success['data'] = [];
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 
 }
