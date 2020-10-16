@@ -1142,15 +1142,16 @@ class MobileController extends Controller
             where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql = "select a.kode_kd,a.nama_kd,a.tgl_input,a.no_bukti,c.nilai,a.pelaksanaan,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok
+            $sql = "select a.kode_kd,a.nama_kd,a.tgl_input,a.no_bukti,c.nilai,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok,a.kode_jenis,e.nama as pelaksanaan
             from sis_nilai_m a 
             inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             left join sis_nilai_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and c.nis=d.nis
+            left join sis_jenisnilai e on a.kode_jenis=e.kode_jenis and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp 
             where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
             order by a.kode_kd";
             // $success['sql'] = $sql;
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
+            $rs = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($rs),true);
 
             $sql4 = "select a.kode_kd,a.nama_kd,a.kode_jenis,b.nama as pelaksanaan
             from sis_nilai_m a 
@@ -1160,8 +1161,8 @@ class MobileController extends Controller
 			and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
             order by a.kode_kd,kode_jenis";
             // $success['sql4'] = $sql4;
-            $res4 = DB::connection($this->db)->select($sql4);
-            $res4 = json_decode(json_encode($res4),true);
+            $rs4 = DB::connection($this->db)->select($sql4);
+            $res4 = json_decode(json_encode($rs4),true);
             
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
