@@ -1156,7 +1156,7 @@ class MobileController extends Controller
             from sis_nilai_m a 
             inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 			inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$request->kode_pp' and c.nis='$nik' 
+            where a.kode_pp='$kode_pp' and c.nis='$nik' 
 			and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
             order by a.kode_kd,kode_jenis";
             // $success['sql4'] = $sql4;
