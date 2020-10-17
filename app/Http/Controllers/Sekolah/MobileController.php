@@ -1142,34 +1142,29 @@ class MobileController extends Controller
             where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql = "select a.kode_kd,a.nama_kd,a.tgl_input,a.no_bukti,c.nilai,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok,a.kode_jenis,e.nama as pelaksanaan
+            $sql = "select a.kode_kd,a.nama_kd,a.tgl_input,a.no_bukti,c.nilai,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok,'-' as pelaksanaan 
             from sis_nilai_m a 
             inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             left join sis_nilai_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and c.nis=d.nis
-            left join sis_jenisnilai e on a.kode_jenis=e.kode_jenis and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp 
             where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
             order by a.kode_kd";
-            // $success['sql'] = $sql;
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
-            $sql4 = "select a.kode_kd,a.nama_kd,a.kode_jenis,b.nama as pelaksanaan
-            from sis_nilai_m a 
-            inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-			inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and c.nis='$nik' 
-			and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
-            order by a.kode_kd,kode_jenis";
-            // $success['sql4'] = $sql4;
-            $rs4 = DB::connection($this->db)->select($sql4);
-            $res4 = json_decode(json_encode($rs4),true);
-            
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.kode_jenis,b.nama as pelaksanaan,c.nilai
+                    from sis_nilai_m a 
+                    inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                    where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter and a.kode_kd='".$res[$i]['kode_kd']."'
+                    order by a.kode_jenis")),true);
+                }
                 $success['status'] = true;
                 $success['data_ta'] = $res3;
                 $success['data_guru'] = $res2;
                 $success['data_kompetensi'] = $res;
-                $success['data_pelaksanaan'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
@@ -1177,7 +1172,6 @@ class MobileController extends Controller
                 $success['data_ta'] = [];
                 $success['data_guru'] = [];
                 $success['data_kompetensi'] = [];
-                $success['data_pelaksanaan'] = [];
                 $success['status'] = true;
             }
             return response()->json(['success'=>$success], $this->successStatus);
@@ -1189,7 +1183,6 @@ class MobileController extends Controller
         
     }
 
-    
     public function updateStatusReadMobile(Request $request)
 	{
 		if($auth =  Auth::guard($this->guard)->user()){
@@ -1394,13 +1387,13 @@ class MobileController extends Controller
 		
         try{
             
-			$sql = "select * from (select a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+			$sql = "select * from (select a.no_bukti,a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
             from sis_pesan_m a
             inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
-            where b.nik='$nik' and a.kode_matpel='$request->kode_matpel' and a.tipe in ('info') and a.kode_lokasi='01' and a.kode_pp='$kode_pp'
+            where b.nik='$nik' and a.kode_matpel='$request->kode_matpel' and a.tipe in ('info') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
 			union all
-			select a.judul,a.pesan,a.ref1,d.nilai as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+			select a.no_bukti,a.judul,a.pesan,a.ref1,d.nilai as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
             from sis_pesan_m a
             inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
 			inner join sis_nilai d on a.ref1=d.no_bukti and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nis='$nik'
@@ -1410,7 +1403,11 @@ class MobileController extends Controller
 			";
 			$res = DB::connection($this->db)->select($sql);
 			$res = json_decode(json_encode($res),true);
-			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,LEN(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+file_dok as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
+                }
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
