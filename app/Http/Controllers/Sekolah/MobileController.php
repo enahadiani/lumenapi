@@ -1142,11 +1142,10 @@ class MobileController extends Controller
             where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql = "select a.kode_kd,a.nama_kd,a.tgl_input,a.no_bukti,c.nilai,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok,'-' as pelaksanaan 
+            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan 
             from sis_nilai_m a 
             inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            left join sis_nilai_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and c.nis=d.nis
-            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
             order by a.kode_kd";
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
@@ -1154,11 +1153,14 @@ class MobileController extends Controller
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.kode_jenis,b.nama as pelaksanaan,c.nilai
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd
                     from sis_nilai_m a 
                     inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                    where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter and a.kode_kd='".$res[$i]['kode_kd']."'
+                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+					inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+                    left join sis_nilai_dok d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp and c.nis=d.nis 
+					inner join sis_kd e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and a.kode_sem=e.kode_sem and a.kode_ta=e.kode_ta and f.kode_tingkat=e.kode_tingkat
+                    where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' and a.kode_kd='".$res[$i]['kode_kd']."' and c.nis='$nik' $filter
                     order by a.kode_jenis")),true);
                 }
                 $success['status'] = true;
