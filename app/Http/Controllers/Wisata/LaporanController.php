@@ -331,11 +331,11 @@ class LaporanController extends Controller
                 $success['bidang'] = $this->getBidang($request->input($col_array[0])[1]);   
             }
 
-            if($request->input($col_array[2])[0] == '=') {
+            if($request->input($col_array[1])[0] == '=') {
                 $success['jenis'] = $this->getJenis($request->input($col_array[1])[1]);   
             }
 
-            if($request->input($col_array[3])[0] == '=') {
+            if($request->input($col_array[2])[0] == '=') {
                 $success['subjenis'] = $this->getSubJenis($request->input($col_array[2])[1]);   
             }
             
