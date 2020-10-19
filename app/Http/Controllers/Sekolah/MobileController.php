@@ -1153,11 +1153,12 @@ class MobileController extends Controller
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.kode_jenis,b.nama as pelaksanaan,c.nilai
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok
                     from sis_nilai_m a 
                     inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                    where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter and a.kode_kd='".$res[$i]['kode_kd']."'
+                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                    left join sis_nilai_dok d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp and c.nis=d.nis 
+                    where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' and a.kode_kd='".$res[$i]['kode_kd']."' $filter and c.nis='$nik'
                     order by a.kode_jenis")),true);
                 }
                 $success['status'] = true;
