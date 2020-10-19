@@ -1153,7 +1153,7 @@ class MobileController extends Controller
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= kkm then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= kkm then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan
                     from sis_nilai_m a 
                     inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
                     inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
