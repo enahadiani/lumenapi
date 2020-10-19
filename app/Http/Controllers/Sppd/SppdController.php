@@ -394,6 +394,10 @@ class SppdController extends Controller
                         } 
                     }
                 }
+                
+            }else{
+                $msg = "Kode akun tidak valid. Status Anggaran kode akun ".$datam[0]['kode_akun']." tidak valid.";
+                $sts = false;	
             }
 
             DB::connection('sqlsrvypt')->commit();
