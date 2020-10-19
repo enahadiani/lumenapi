@@ -301,8 +301,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('kode_mitra');
-            $db_col_name = array('a.kode_mitra');
+            $col_array = array('kode_bidang','kode_jenis','kode_subjenis');
+            $db_col_name = array('e.kode_bidang','d.kode_jenis','c.kode_subjenis');
             $where = "where a.kode_lokasi='$kode_lokasi'";
 
             $this_in = "";
@@ -326,8 +326,25 @@ class LaporanController extends Controller
                     }
                 }
             }
+
+            if($request->input($col_array[0])[0] == '=') {
+                $success['bidang'] = $this->getBidang($request->input($col_array[0])[1]);   
+            }
+
+            if($request->input($col_array[1])[0] == '=') {
+                $success['jenis'] = $this->getJenis($request->input($col_array[1])[1]);   
+            }
+
+            if($request->input($col_array[2])[0] == '=') {
+                $success['subjenis'] = $this->getSubJenis($request->input($col_array[2])[1]);   
+            }
             
-            $sql="select a.kode_mitra, a.nama, a.alamat, a.no_tel, a.pic from par_mitra a $where";
+            $sql="select a.kode_mitra, a.nama, a.alamat, a.no_tel, a.pic from par_mitra a
+            inner join par_mitra_subjenis b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi
+            inner join par_subjenis c on b.kode_subjenis=c.kode_subjenis and b.kode_lokasi=c.kode_lokasi
+            inner join par_jenis d on c.kode_jenis=d.kode_jenis and d.kode_lokasi=c.kode_lokasi
+            inner join par_bidang e on d.kode_bidang=e.kode_bidang and e.kode_lokasi=d.kode_lokasi 
+            $where";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
