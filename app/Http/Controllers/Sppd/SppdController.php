@@ -251,6 +251,7 @@ class SppdController extends Controller
             $kode_akun=$request->kode_akun;
             $kode_drk=$request->kode_drk;
             $periode=$request->periode;
+            $success['req'] = $request->all();
 
             if(isset($request->no_agenda) && $request->no_agenda != ""){
                 $sql="select dbo.fn_cekagg3('$kode_pp','$kode_lokasi','$kode_akun','$kode_drk','$periode','$no_agenda') as gar ";
@@ -314,10 +315,21 @@ class SppdController extends Controller
                     $sts = false;						
                 }
                 else {
-                    if ($datam[0]['total'] > $datam[0]['saldo_budget']) {   
+
+                    $request->request->add([
+                        'kode_pp' => $datam[0]['kode_pp'],
+                        'kode_akun' =>$datam[0]['kode_akun'],
+                        'periode' => $datam[0]['periode'],
+                        'kode_drk' => $datam[0]['kode_drk']
+                    ]);
+
+                    $cekB = json_decode(json_encode($this->cekBudget($request)),true);
+                    $dtbugdet = $cekB['original'];
+
+                    if (floatval($datam[0]['total']) > floatval($dtbugdet['saldo_budget'])) {   
                         $msg = "Transaksi tidak valid. Nilai transaksi melebihi saldo.";
                         $sts =false;						
-                    }elseif($datam[0]['total'] <= 0) {
+                    }elseif(floatval($datam[0]['total']) <= 0) {
                         $msg = "Transaksi tidak valid. Total tidak boleh nol atau kurang.";
                         $sts =false;
                     }else{
@@ -391,14 +403,14 @@ class SppdController extends Controller
                                     $nu++;
                                 }	
                             }
+
+                            DB::connection('sqlsrvypt')->commit();
+                            $success['no_agenda']=$no_agenda;
+                            $success['no_bukti']=$no_bukti;
                         } 
                     }
                 }
-                
-                DB::connection('sqlsrvypt')->commit();
-                $success['no_agenda']=$no_agenda;
-                $success['no_bukti']=$no_bukti;
-                
+
             }else{
                 $msg = "Kode akun tidak valid. Status Anggaran kode akun ".$datam[0]['kode_akun']." tidak valid.";
                 $sts = false;	
@@ -580,5 +592,11 @@ class SppdController extends Controller
         }
     }
 
+
+    public function cek(Request $request){
+        $cekB = json_decode(json_encode($this->cekBudget($request)),true);
+        $dtbugdet = $cekB['original'];
+        dump($dtbugdet["saldo_budget"]);
+    }
 
 }
