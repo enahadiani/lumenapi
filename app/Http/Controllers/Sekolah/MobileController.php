@@ -1142,11 +1142,10 @@ class MobileController extends Controller
             where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql = "select a.kode_kd,a.nama_kd,a.tgl_input,a.no_bukti,c.nilai,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok,'-' as pelaksanaan 
+            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan 
             from sis_nilai_m a 
             inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            left join sis_nilai_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and c.nis=d.nis
-            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
             order by a.kode_kd";
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);

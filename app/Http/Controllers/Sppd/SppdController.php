@@ -395,17 +395,17 @@ class SppdController extends Controller
                     }
                 }
                 
+                DB::connection('sqlsrvypt')->commit();
+                $success['no_agenda']=$no_agenda;
+                $success['no_bukti']=$no_bukti;
+                
             }else{
                 $msg = "Kode akun tidak valid. Status Anggaran kode akun ".$datam[0]['kode_akun']." tidak valid.";
                 $sts = false;	
             }
 
-            DB::connection('sqlsrvypt')->commit();
-            $success['no_agenda']=$no_agenda;
-            $success['no_bukti']=$no_bukti;
             $success['status'] = $sts;
             $success['message'] = $msg;
-            //$success['error'] = $e;
             return response()->json($success, $this->successStatus);     
           
         } catch (\Throwable $e) {
