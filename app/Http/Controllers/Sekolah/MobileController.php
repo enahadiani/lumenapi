@@ -1153,7 +1153,7 @@ class MobileController extends Controller
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= kkm then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= kkm then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan
                     from sis_nilai_m a 
                     inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
                     inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
@@ -1174,6 +1174,78 @@ class MobileController extends Controller
                 $success['data_ta'] = [];
                 $success['data_guru'] = [];
                 $success['data_kompetensi'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPreviewMatpel(Request $request)
+    {
+        $this->validate($request,[
+            'kode_matpel' => 'required',
+            'kode_sem' => 'required|in:1,2,All',
+            'kode_kelas' => 'required',
+            'kode_kd' => 'required',
+            'kode_jenis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+
+            if(isset($request->kode_sem)){
+                if($request->kode_sem != "All"){
+                    $filter = " and a.kode_sem ='$request->kode_sem' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $res3 = DB::connection($this->db)->select("
+            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+            $res3 = json_decode(json_encode($res3),true);
+
+            $kode_ta = $res3[0]['kode_ta'];
+
+            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan 
+            from sis_nilai_m a 
+            inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' and a.kode_kd='$request->kode_kd' and a.kode_jenis='$request->kode_jenis' $filter 
+            order by a.kode_kd";
+            $rs = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan
+                    from sis_nilai_m a 
+                    inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+					inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+                    left join sis_nilai_dok d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp and c.nis=d.nis 
+					inner join sis_kd e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and a.kode_sem=e.kode_sem and a.kode_ta=e.kode_ta and f.kode_tingkat=e.kode_tingkat
+                    where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_jenis='".$request->kode_jenis."' and a.kode_ta='$kode_ta' and a.kode_kd='".$res[$i]['kode_kd']."' and c.nis='$nik' $filter
+                    order by a.kode_jenis")),true);
+                }
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = true;
             }
             return response()->json(['success'=>$success], $this->successStatus);
