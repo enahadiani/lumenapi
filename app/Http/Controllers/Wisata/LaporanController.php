@@ -351,16 +351,17 @@ class LaporanController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            // $dataBidangResult = array();
-            // if(count($res) > 0) {
-            //     foreach($res as $value){
-            //         $dataBidangResult[$value['nama_bidang']][] = $value;
-            //     }
-            // }   
+            $dataBidangResult = array();
+            if(count($res) > 0) {
+                foreach($res as $value){
+                    $dataBidangResult[$value['nama_bidang']][] = $value;
+                }
+            }   
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['dataMitra'] = $dataBidangResult;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
