@@ -303,7 +303,8 @@ class LaporanController extends Controller
 
             $col_array = array('kode_bidang','kode_jenis','kode_subjenis');
             $db_col_name = array('e.kode_bidang','d.kode_jenis','c.kode_subjenis');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            // $where = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='77'";
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -338,19 +339,28 @@ class LaporanController extends Controller
             if($request->input($col_array[2])[0] == '=') {
                 $success['subjenis'] = $this->getSubJenis($request->input($col_array[2])[1]);   
             }
-            
-            $sql="select a.kode_mitra, a.nama, a.alamat, a.no_tel, a.pic from par_mitra a
-            inner join par_mitra_subjenis b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi
-            inner join par_subjenis c on b.kode_subjenis=c.kode_subjenis and b.kode_lokasi=c.kode_lokasi
-            inner join par_jenis d on c.kode_jenis=d.kode_jenis and d.kode_lokasi=c.kode_lokasi
-            inner join par_bidang e on d.kode_bidang=e.kode_bidang and e.kode_lokasi=d.kode_lokasi 
-            $where";
+            $sql = "select distinct e.nama as nama_bidang,a.*, f.nama as camat
+            from par_mitra a 
+            inner join par_mitra_subjenis b on a.kode_mitra=b.kode_mitra
+            inner join par_subjenis c on b.kode_subjenis=c.kode_subjenis
+            inner join par_jenis d on c.kode_jenis=d.kode_jenis
+            inner join par_bidang e on d.kode_bidang=e.kode_bidang
+            inner join par_camat f on a.kecamatan=f.kode_camat
+            $where
+            order by e.nama";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $dataBidangResult = array();
+            if(count($res) > 0) {
+                foreach($res as $value){
+                    $dataBidangResult[$value['nama_bidang']][] = $value;
+                }
+            }   
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $dataBidangResult;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
