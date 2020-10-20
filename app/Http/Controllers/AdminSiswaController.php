@@ -37,10 +37,11 @@ class AdminSiswaController extends Controller
             $status_login = $data->status_login;
 
             if($status_login == "S"){
-                $user = DB::connection($this->db)->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir,a.pass as password
+                $user = DB::connection($this->db)->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir,a.pass as password,a.kode_menu as kode_klp_menu,a.status_login as status_admin,f.nama as nmlok,f.logo,'-' as jabatan
                 from sis_hakakses a 
                 left join sis_siswa b on a.nik=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join m_form e on a.path_view=e.kode_form  
+                inner join lokasi f on a.kode_lokasi = f.kode_lokasi 
                 left join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
                 where a.nik='$nik' 
                 ");

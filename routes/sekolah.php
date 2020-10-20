@@ -270,6 +270,10 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('lap-kd','Sekolah\LaporanController@getKD');
 
     $router->post('notif','Sekolah\PenilaianController@sendNotif');
+
+    
+    $router->get('kartu-piutang','Sekolah\PiutangController@getKartuPiutang');
+    $router->get('kartu-pdd','Sekolah\PiutangController@getKartuPDD');
     
     
 });
