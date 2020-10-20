@@ -251,7 +251,7 @@ class SppdController extends Controller
             $kode_akun=$request->kode_akun;
             $kode_drk=$request->kode_drk;
             $periode=$request->periode;
-            $success['req'] = $request->all();
+            // $success['req'] = $request->all();
 
             if(isset($request->no_agenda) && $request->no_agenda != ""){
                 $sql="select dbo.fn_cekagg3('$kode_pp','$kode_lokasi','$kode_akun','$kode_drk','$periode','$no_agenda') as gar ";
