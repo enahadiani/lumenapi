@@ -245,6 +245,13 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ts'
+], function ($router) {
+    require __DIR__.'/../routes/ts.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sju'
 ], function ($router) {
     require __DIR__.'/../routes/sju.php';

@@ -276,6 +276,48 @@ class AuthController extends Controller
         return $this->respondWithToken($token,'siswa');
     }
 
+    public function loginTs(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('ts')->setTTL(43800)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        // else{
+        //     if(isset($request->id_device)){
+                
+        //         $kode_lokasi = Auth::guard('ts')->user()->kode_lokasi;
+        //         $kode_pp = Auth::guard('ts')->user()->kode_pp;
+        //         $cek = DB::connection('sqlsrvyptkug')->select("select count(id_device) as jum from users_device where nik='$request->nik'  ");
+        //         if(count($cek) > 0){
+        //             $nu = intval($cek[0]->jum)+1;
+        //         }else{
+        //             $nu = 1;
+        //         }
+
+        //         $get = DB::connection('sqlsrvyptkug')->select("select count(id_device) as jum from users_device where id_device='$request->id_device' and nik='$request->nik'  ");
+        //         if(count($get) > 0){
+        //             if($get[0]->jum == 0){
+        //                 $ins = DB::connection('sqlsrvyptkug')->insert("insert into users_device (
+        //                     id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
+        //             }
+        //         }else{
+        //             $ins = DB::connection('sqlsrvyptkug')->insert("insert into users_device (
+        //                 id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
+        //         }
+
+        //     }
+        // }
+
+        return $this->respondWithToken($token,'ts');
+    }
+
     public function loginDago(Request $request)
     {
           //validate incoming request 
@@ -691,6 +733,31 @@ class AuthController extends Controller
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrvtarbak')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPasswordTs(){
+        DB::connection('sqlsrvyptkug')->beginTransaction();
+        
+        try {
+            DB::connection('sqlsrvyptkug')->table('sis_hakakses')->where('password', NULL)->orderBy('nik')->chunk(50, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('sqlsrvyptkug')->table('sis_hakakses')
+                        ->where('nik', $user->nik)
+                        ->where('password',NULL)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('sqlsrvyptkug')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvyptkug')->rollback();
             $success['status'] = false;
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);

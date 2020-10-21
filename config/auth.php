@@ -78,6 +78,10 @@ return [
         'aset' => [
             'driver' => 'jwt',
             'provider' => 'aset',
+        ],
+        'ts' => [
+            'driver' => 'jwt',
+            'provider' => 'ts',
         ]
     ],
 
@@ -149,6 +153,10 @@ return [
         'aset' => [
             'driver' => 'eloquent',
             'model' => \App\AdminAset::class
+        ],
+        'ts' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminTs::class
         ]
     ]
 ];
