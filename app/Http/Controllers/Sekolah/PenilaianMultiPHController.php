@@ -1055,11 +1055,11 @@ class PenilaianMultiPHController extends Controller
                             Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
                             $arr_foto[] = $foto;
                             $arr_nis[] = $request->nis[$i];
-                            $arr_jenis[] = $request->jenis[$i];
+                            $arr_jenis[] = $request->kode_jenis[$i];
                         }else if($request->nama_file_seb[$i] != "-"){
                             $arr_foto[] = $request->nama_file_seb[$i];
                             $arr_nis[] = $request->nis[$i];
-                            $arr_jenis[] = $request->jenis[$i];
+                            $arr_jenis[] = $request->kode_jenis[$i];
                         }     
                     }
                     
