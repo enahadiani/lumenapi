@@ -49,7 +49,7 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
 
             
         }else{
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,b.nama,a.nilai,a.kode_jenis,a.status,a.keterangan,a.nu
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,b.nama,a.nilai,a.kode_jenis,a.pelaksanaan,a.status,a.keterangan,a.nu
             from sis_nilai_tmp2 a 
             left join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.nik_user ='$this->nik_user' and a.kode_lokasi='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp'
@@ -71,6 +71,7 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
                     'nis',
                     'nama',
                     'kode_jenis',
+                    'pelaksanan',
                     'nilai'
                 ]
             ];
@@ -83,6 +84,7 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
                     'nis',
                     'nama', 
                     'kode_jenis',
+                    'pelaksanan',
                     'nilai',
                     'status',
                     'keterangan',

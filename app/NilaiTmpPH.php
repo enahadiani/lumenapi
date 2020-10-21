@@ -19,7 +19,7 @@ class NilaiTmpPH extends Model
      * @var array
      */
     protected $fillable = [
-        'nis','nilai','kode_lokasi','kode_pp','no_bukti','status','keterangan','nu','nik_user','kode_jenis'
+        'nis','nilai','kode_lokasi','kode_pp','no_bukti','status','keterangan','nu','nik_user','kode_jenis','pelaksanaan'
     ];
 
 }
