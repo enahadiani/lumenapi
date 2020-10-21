@@ -559,6 +559,7 @@ class LapInternal2Controller extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
