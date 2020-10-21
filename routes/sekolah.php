@@ -291,8 +291,9 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->post('notif','Sekolah\PenilaianController@sendNotif');
 
     
-    $router->get('kartu-piutang','Sekolah\PiutangController@getKartuPiutang');
-    $router->get('kartu-pdd','Sekolah\PiutangController@getKartuPDD');
+    $router->get('kartu-piutang','Sekolah\DashSiswaController@getKartuPiutang');
+    $router->get('kartu-pdd','Sekolah\DashSiswaController@getKartuPDD');
+    $router->get('dash-siswa-profile','Sekolah\DashSiswaController@getProfile');
     
     
 });
