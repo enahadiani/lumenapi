@@ -19,6 +19,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('hash-pass', 'AuthController@hashPasswordSiswa');
     $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
+
 });
 
 $router->get('storage/{filename}', function ($filename)
@@ -31,6 +32,7 @@ $router->get('storage/{filename}', function ($filename)
 });
 
 $router->get('penilaian-export','Sekolah\PenilaianController@export');
+$router->get('penilaian-multiph-export','Sekolah\PenilaianMultiPHController@export');
 
 $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
 
@@ -219,6 +221,23 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('penilaian-matpel','Sekolah\PenilaianController@getMatpel');
     $router->get('penilaian-kelas','Sekolah\PenilaianController@getKelas');
     $router->get('penilaian-siswa','Sekolah\PenilaianController@getSiswa');
+
+    // PENILAIAN PH
+    $router->get('penilaian-multiph-all','Sekolah\PenilaianMultiPHController@index');
+    $router->get('penilaian-multiph','Sekolah\PenilaianMultiPHController@show');
+    $router->get('penilaian-multiph-load','Sekolah\PenilaianMultiPHController@loadSiswa');
+    $router->post('penilaian-multiph','Sekolah\PenilaianMultiPHController@store');
+    $router->put('penilaian-multiph','Sekolah\PenilaianMultiPHController@update');
+    $router->delete('penilaian-multiph','Sekolah\PenilaianMultiPHController@destroy');
+    $router->get('penilaian-multiph-ke','Sekolah\PenilaianMultiPHController@getPenilaianKe');
+    $router->get('penilaian-multiph-kd','Sekolah\PenilaianMultiPHController@getKD');
+    
+    $router->get('penilaian-multiph-dok-all','Sekolah\PenilaianMultiPHController@listUpload');
+    $router->post('import-multiph-excel','Sekolah\PenilaianMultiPHController@importExcel');
+    $router->get('nilai-multiph-tmp','Sekolah\PenilaianMultiPHController@getNilaiTmp');
+    $router->get('penilaian-multiph-dok','Sekolah\PenilaianMultiPHController@showDokUpload');
+    $router->post('penilaian-multiph-dok','Sekolah\PenilaianMultiPHController@storeDokumen');
+    $router->delete('penilaian-multiph-dok','Sekolah\PenilaianMultiPHController@deleteDokumen');
 
 
     $router->get('pesan-all','Sekolah\PesanController@index');

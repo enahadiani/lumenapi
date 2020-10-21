@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Exports\NilaiExport;
-use App\Imports\NilaiImport;
+use App\Exports\NilaiExportPH;
+use App\Imports\NilaiImportPH;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
-use App\NilaiTmp;
+use App\NilaiTmpPH;
 
-class PenilaianController extends Controller
+class PenilaianMultiPHController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,9 +23,9 @@ class PenilaianController extends Controller
     public $guard = "siswa";
     public $db = "sqlsrvtarbak";
 
-    public function isUnik($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas,$kode_matpel,$kode_jenis,$kode_sem,$kode_kd){
+    public function isUnik($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas,$kode_matpel,$kode_sem,$kode_kd){
         
-        $auth = DB::connection($this->db)->select("select no_bukti from sis_nilai_m where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_matpel='$kode_matpel' and kode_jenis='$kode_jenis' and kode_sem='$kode_sem' and kode_kd='$kode_kd' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select no_bukti from sis_nilai_m2 where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_matpel='$kode_matpel' and  kode_sem='$kode_sem' and kode_kd='$kode_kd' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             $data['status']=false;
@@ -202,9 +202,9 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
             ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
-            from sis_nilai_m a
+            from sis_nilai_m2 a
             where a.kode_lokasi='".$kode_lokasi."' and a.nik_user='$nik' $filter");
             $res = json_decode(json_encode($res),true);
             
@@ -254,15 +254,15 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
             ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) as persen
-            from sis_nilai_m a
+            from sis_nilai_m2 a
 			inner join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
-				from sis_nilai 
+				from sis_nilai2 
 				group by no_bukti,kode_lokasi,kode_pp
 			) b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 			left join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
-				from sis_nilai_dok 
+				from sis_nilai_dok2 
 				group by no_bukti,kode_lokasi,kode_pp
 			) c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_lokasi='".$kode_lokasi."' and a.nik_user='$nik' $filter");
@@ -311,11 +311,11 @@ class PenilaianController extends Controller
             'kode_sem' => 'required',
             'kode_kelas' => 'required',
             'kode_matpel' => 'required',
-            'kode_jenis'=>'required',
             'kode_kd'=>'required',
             'nama_kd' => 'required',
             'pelaksanaan' => 'required',
             'nis'=>'required|array',
+            'kode_jenis'=>'required|array',
             'nilai'=>'required|array'
         ]);
 
@@ -326,14 +326,14 @@ class PenilaianController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $unik = $this->isUnik($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,$request->kode_kd);
+            $unik = $this->isUnik($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,$request->kode_kd);
             if($unik['status']){
                 if(count($request->nis) > 0){
                     
                     date_default_timezone_set("Asia/Bangkok");
                     $per = date('ym');
-                    $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
-                    $strSQL = "select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_pp='$request->kode_pp'";	
+                    $no_bukti = $this->generateKode("sis_nilai_m2", "no_bukti", $kode_lokasi."-NPH".$per.".", "00001");
+                    $strSQL = "select COUNT(*)+1 as jumlah from sis_nilai_m2 where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_pp='$request->kode_pp'";	
                     $res = DB::connection($this->db)->select($strSQL);
                     $res = json_decode(json_encode($res),true);
                     if(count($res) > 0){
@@ -342,11 +342,11 @@ class PenilaianController extends Controller
                         $no_urut = 1;
                     }                
 
-                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan,$nik));
+                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$request->pelaksanaan,$nik));
 
                     $arr_id = array();
                     for($i=0;$i<count($request->nis);$i++){
-                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));                    
+                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis) values (?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i]));                    
                     }  
                     
                     $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
@@ -357,21 +357,13 @@ class PenilaianController extends Controller
                         $nama_matpel = '-';
                     }
 
-                    $cek2 = DB::connection($this->db)->select("select nama from sis_jenisnilai where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_jenis='$request->kode_jenis' ");
-                    $cek2 = json_decode(json_encode($cek2),true);
-                    if(count($cek2) > 0){
-                        $nama_jenis = $cek2[0]['nama'];
-                    }else{
-                        $nama_jenis = '-';
-                    }
-
                     $request->request->add([
                         'jenis' => 'Kelas',
-                        'judul' => 'Penilaian Siswa',
+                        'judul' => 'Penilaian Siswa Multi PH',
                         'kontak' => $request->kode_kelas,
                         'kode_matpel' => $request->kode_matpel,
                         'tipe' => 'nilai',
-                        'pesan' => 'Nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
+                        'pesan' => 'Nilai mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                         'tipe' => 'nilai',
                         'ref1' => $no_bukti
                     ]);
@@ -382,11 +374,11 @@ class PenilaianController extends Controller
                     $success['notif'] = $notif['original'];
                     DB::connection($this->db)->commit();
                     $sts = true;
-                    $msg = "Data Penilaian berhasil disimpan.";
+                    $msg = "Data Penilaian Multi PH berhasil disimpan.";
                 }else{
                     $sts = true;
                     $no_bukti = "-";
-                    $msg = "Data Penilaian gagal disimpan. Detail Penilaian tidak valid";
+                    $msg = "Data Penilaian Multi PH gagal disimpan. Detail Penilaian tidak valid";
                 }
                 $success['no_bukti'] = $no_bukti;
             }else{
@@ -402,7 +394,7 @@ class PenilaianController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penilaian gagal disimpan ".$e;
+            $success['message'] = "Data Penilaian Multi PH gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -428,22 +420,26 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,a.nama_kd,a.kode_kd,a.pelaksanaan
-            from sis_nilai_m a
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,a.nama_kd,a.kode_kd,a.pelaksanaan
+            from sis_nilai_m2 a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
-                left join sis_jenisnilai f on a.kode_jenis=f.kode_jenis and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
                 left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
                 left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp
-                left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m 
+                left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m2 
                     where no_bukti <> '$request->no_bukti'
-                    group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi
-                    ) j on a.kode_ta=j.kode_ta and a.kode_lokasi=j.kode_lokasi and a.kode_pp=j.kode_pp and a.kode_jenis=j.kode_jenis and a.kode_sem=j.kode_sem and a.kode_matpel=j.kode_matpel and a.kode_kelas=j.kode_kelas
+                    group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi
+                    ) j on a.kode_ta=j.kode_ta and a.kode_lokasi=j.kode_lokasi and a.kode_pp=j.kode_pp and a.kode_sem=j.kode_sem and a.kode_matpel=j.kode_matpel and a.kode_kelas=j.kode_kelas
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.nis,a.nilai,b.nama from sis_nilai a inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  order by b.nama ");
+            $res2 = DB::connection($this->db)->select("select a.nis,a.nilai,b.nama,a.kode_jenis,c.nama as nama_jenis 
+            from sis_nilai2 a 
+            inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi 
+            inner join sis_jenisnilai c on a.kode_jenis=c.kode_jenis and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 
+            where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  
+            order by a.kode_jenis,b.nama ");
             $res2 = json_decode(json_encode($res2),true);
 
             // $res3 = DB::connection($this->db)->select("select 
@@ -500,13 +496,12 @@ class PenilaianController extends Controller
             'kode_sem' => 'required',
             'kode_kelas' => 'required',
             'kode_matpel' => 'required',
-            'kode_jenis'=>'required',
             'kode_kd'=>'required',
             'nama_kd'=>'required',
             'pelaksanaan'=>'required',
             'nis'=>'required|array',
-            'nilai'=>'required|array',
-            'nama_dok'=>'array|max:100'
+            'kode_jenis'=>'required|array',
+            'nilai'=>'required|array'
         ]);
         
         DB::connection($this->db)->beginTransaction();
@@ -521,7 +516,7 @@ class PenilaianController extends Controller
             if(count($request->nis) > 0){
                 date_default_timezone_set("Asia/Bangkok");
                 $no_bukti = $request->no_bukti;
-                $strSQL = "select nu as jumlah from sis_nilai_m where no_bukti='$no_bukti' ";	
+                $strSQL = "select nu as jumlah from sis_nilai_m2 where no_bukti='$no_bukti' ";	
                 $cek = DB::connection($this->db)->select($strSQL);
                 if(count($cek) > 0){
                     $no_urut = $cek[0]->jumlah;
@@ -529,21 +524,21 @@ class PenilaianController extends Controller
                     $no_urut = 1;
                 }
 
-                $del = DB::connection($this->db)->table('sis_nilai_m')
+                $del = DB::connection($this->db)->table('sis_nilai_m2')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
                 ->delete();
     
-                $del2 = DB::connection($this->db)->table('sis_nilai')
+                $del2 = DB::connection($this->db)->table('sis_nilai2')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
                 ->delete();
 
-                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_jenis,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_jenis,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$request->pelaksanaan,$nik));
+                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,pelaksanaan,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$request->pelaksanaan,$nik));
 
                 $arr_id = array();
                 for($i=0;$i<count($request->nis);$i++){
-                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai(no_bukti,nis,nilai,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp));
+                    $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis) values (?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i]));
                 }  
 
                 $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
@@ -554,21 +549,13 @@ class PenilaianController extends Controller
                     $nama_matpel = '-';
                 }
 
-                $cek2 = DB::connection($this->db)->select("select nama from sis_jenisnilai where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_jenis='$request->kode_jenis' ");
-                $cek2 = json_decode(json_encode($cek2),true);
-            	if(count($cek2) > 0){
-                    $nama_jenis = $cek2[0]['nama'];
-                }else{
-                    $nama_jenis = '-';
-                }
-
                 $request->request->add([
                     'jenis' => 'Kelas',
-                    'judul' => 'Update Penilaian Siswa',
+                    'judul' => 'Update Penilaian Multi PH',
                     'kontak' => $request->kode_kelas,
                     'kode_matpel' => $request->kode_matpel,
                     'tipe' => 'nilai',
-                    'pesan' => 'Koreksi untuk nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
+                    'pesan' => 'Koreksi untuk nilai mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                     'tipe' => 'nilai',
                     'ref1' => $no_bukti
                 ]);
@@ -579,11 +566,11 @@ class PenilaianController extends Controller
                 $success['notif'] = $notif['original'];
                 DB::connection($this->db)->commit();
                 $sts = true;
-                $msg = "Data Penilaian berhasil diubah.";
+                $msg = "Data Penilaian Multi PH berhasil diubah.";
             }else{
                 $sts = true;
                 $no_bukti = "-";
-                $msg = "Data Penilaian gagal diubah. Detail Penilaian tidak valid";
+                $msg = "Data Penilaian Multi PH gagal diubah. Detail Penilaian Multi PH tidak valid";
             }
             
             $success['no_bukti'] = $no_bukti;
@@ -594,7 +581,7 @@ class PenilaianController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penilaian gagal diubah ".$e;
+            $success['message'] = "Data Penilaian Multi PH gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -619,19 +606,19 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }		
             
-            $del = DB::connection($this->db)->table('sis_nilai_m')
+            $del = DB::connection($this->db)->table('sis_nilai_m2')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $del2 = DB::connection($this->db)->table('sis_nilai')
+            $del2 = DB::connection($this->db)->table('sis_nilai2')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
+            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok2 where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -641,7 +628,7 @@ class PenilaianController extends Controller
                 }
             }
 
-            $del3 = DB::connection($this->db)->table('sis_nilai_dok')
+            $del3 = DB::connection($this->db)->table('sis_nilai_dok2')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
@@ -649,13 +636,13 @@ class PenilaianController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Penilaian berhasil dihapus";
+            $success['message'] = "Data Penilaian Multi PH berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penilaian gagal dihapus ".$e;
+            $success['message'] = "Data Penilaian Multi PH gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
@@ -738,7 +725,7 @@ class PenilaianController extends Controller
 
             $per = date('ym');
 
-            $no_bukti = $this->generateKode("sis_nilai_m", "no_bukti", $kode_lokasi."-NIL".$per.".", "00001");
+            $no_bukti = $this->generateKode("sis_nilai_m2", "no_bukti", $kode_lokasi."-NPH".$per.".", "00001");
 
             // menangkap file excel
             $file = $request->file('file');
@@ -747,7 +734,7 @@ class PenilaianController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $dt = Excel::toArray(new NilaiImport(),$nama_file);
+            $dt = Excel::toArray(new NilaiImportPH(),$nama_file);
             $excel = $dt[0];
             $x = array();
             $status_validate = true;
@@ -761,11 +748,12 @@ class PenilaianController extends Controller
                     }else{
                         $sts = 1;
                     }
-                    $x[] = NilaiTmp::create([
+                    $x[] = NilaiTmpPH::create([
                         'no_bukti' => '-',
                         'nis' => strval($row[0]),
-                        'nilai' => floatval($row[2]),
+                        'nilai' => floatval($row[3]),
                         'kode_pp' => $request->kode_pp,
+                        'kode_jenis' => $row[2],
                         'kode_lokasi' => $kode_lokasi,
                         'nik_user' => $request->nik_user,
                         'status' => $sts,
@@ -813,9 +801,9 @@ class PenilaianController extends Controller
         $kode_lokasi = $request->kode_lokasi;
         $kode_pp = $request->kode_pp;
         if(isset($request->type) && $request->type == "template"){
-            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_jenis,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+            return Excel::download(new NilaiExportPH($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
         }else{
-            return Excel::download(new NilaiExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_jenis,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+            return Excel::download(new NilaiExportPH($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
         }
     }
 
@@ -835,9 +823,10 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.nis,b.nama,a.nilai
-            from sis_nilai_tmp a
+            $res = DB::connection($this->db)->select("select a.nis,b.nama,a.nilai,a.kode_jenis,c.nama as nama_jenis
+            from sis_nilai_tmp2 a
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_jenisnilai c on a.kode_jenis=c.kode_jenis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'  order by a.nu");
             $res= json_decode(json_encode($res),true);
 
@@ -936,8 +925,7 @@ class PenilaianController extends Controller
             'kode_ta' => 'required',
             'kode_sem' => 'required',
             'kode_kelas' => 'required',
-            'kode_matpel' => 'required',
-            'kode_jenis' => 'required'
+            'kode_matpel' => 'required'
         ]);
         try {
             
@@ -946,7 +934,7 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select COUNT(*)+1 as jumlah from sis_nilai_m where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_jenis= '".$request->kode_jenis."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$request->kode_pp."' ");
+            $res = DB::connection($this->db)->select("select COUNT(*)+1 as jumlah from sis_nilai_m2 where kode_ta= '".$request->kode_ta."' and kode_sem= '".$request->kode_sem."' and kode_kelas= '".$request->kode_kelas."' and kode_matpel= '".$request->kode_matpel."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$request->kode_pp."' ");
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['jumlah'] = $res[0]->jumlah;
@@ -981,25 +969,24 @@ class PenilaianController extends Controller
             $no_bukti = $request->no_bukti;
             $kode_pp = $request->kode_pp;
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd,a.pelaksanaan
-            from sis_nilai_m a
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd,a.pelaksanaan
+            from sis_nilai_m2 a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
-                left join sis_jenisnilai f on a.kode_jenis=f.kode_jenis and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
                 left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
                 left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp
-                left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m 
+                left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m2 
                     where no_bukti <> '$no_bukti'
-                    group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi
-                    ) j on a.kode_ta=j.kode_ta and a.kode_lokasi=j.kode_lokasi and a.kode_pp=j.kode_pp and a.kode_jenis=j.kode_jenis and a.kode_sem=j.kode_sem and a.kode_matpel=j.kode_matpel and a.kode_kelas=j.kode_kelas
+                    group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi
+                    ) j on a.kode_ta=j.kode_ta and a.kode_lokasi=j.kode_lokasi and a.kode_pp=j.kode_pp and a.kode_sem=j.kode_sem and a.kode_matpel=j.kode_matpel and a.kode_kelas=j.kode_kelas
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.nis,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
-            from sis_nilai a 
+            $sql2="select a.no_bukti,a.nis,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa,a.kode_jenis
+            from sis_nilai2 a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            left join sis_nilai_dok2 c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_jenis=c.kode_jenis
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp' ";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
@@ -1043,6 +1030,7 @@ class PenilaianController extends Controller
             $kode_pp = $request->kode_pp;
             $arr_foto = array();
             $arr_nis = array();
+            $arr_jenis = array();
             $i=0;
             $cek = $request->file;
             //cek upload file tidak kosong
@@ -1067,24 +1055,25 @@ class PenilaianController extends Controller
                             Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
                             $arr_foto[] = $foto;
                             $arr_nis[] = $request->nis[$i];
+                            $arr_jenis[] = $request->jenis[$i];
                         }else if($request->nama_file_seb[$i] != "-"){
                             $arr_foto[] = $request->nama_file_seb[$i];
                             $arr_nis[] = $request->nis[$i];
+                            $arr_jenis[] = $request->jenis[$i];
                         }     
                     }
                     
-                    $del3 = DB::connection($this->db)->table('sis_nilai_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                    $del3 = DB::connection($this->db)->table('sis_nilai_dok2')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
                 }
 
                 if(count($arr_nis) > 0){
                     for($i=0; $i<count($arr_nis);$i++){
-                        $ins3[$i] = DB::connection($this->db)->insert("insert into sis_nilai_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','-','$kode_pp','".$arr_nis[$i]."') "); 
+                        $ins3[$i] = DB::connection($this->db)->insert("insert into sis_nilai_dok2 (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis,kode_jenis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','-','$kode_pp','".$arr_nis[$i]."','".$arr_jenis[$i]."') "); 
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Data Dokumen berhasil diupload.";
                     $success['no_bukti'] = $no_bukti;
-                    $success['nis'] = $request->nis;
                 }
                 else{
                     $success['status'] = true;
@@ -1110,6 +1099,7 @@ class PenilaianController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'nis' => 'required',
+            'kode_jenis' => 'required',
             'kode_pp' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
@@ -1120,7 +1110,7 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }		
 
-            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and nis='$request->nis' ";
+            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok2 where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and nis='$request->nis' and kode_jenis='$request->kode_jenis' ";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -1130,25 +1120,26 @@ class PenilaianController extends Controller
                     Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
                 }
 
-                $del3 = DB::connection($this->db)->table('sis_nilai_dok')
+                $del3 = DB::connection($this->db)->table('sis_nilai_dok2')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('nis', $request->nis)
+                ->where('kode_jenis', $request->kode_jenis)
                 ->delete();
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Dokumen Penilaian berhasil dihapus";
+                $success['message'] = "Data Dokumen Penilaian Multi PH berhasil dihapus";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Data Dokumen Penilaian gagal dihapus.";
+                $success['message'] = "Data Dokumen Penilaian Multi PH gagal dihapus.";
             }
 
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Dokumen Penilaian gagal dihapus ".$e;
+            $success['message'] = "Data Dokumen Penilaian Multi PH gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
