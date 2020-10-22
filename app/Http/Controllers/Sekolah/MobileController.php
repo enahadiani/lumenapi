@@ -1259,10 +1259,10 @@ class MobileController extends Controller
 
     public function updateStatusReadMobile(Request $request)
 	{
-		if($auth =  Auth::guard($this->guard)->user()){
+		if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
-            $kode_pp = $request->kode_pp;
+            $kode_pp = $data->kode_pp;
 		}
 
 		$this->validate($request,[
