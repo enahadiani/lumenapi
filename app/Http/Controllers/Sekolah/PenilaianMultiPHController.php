@@ -721,7 +721,7 @@ class PenilaianMultiPHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->db)->table('sis_nilai_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->where('kode_pp', $request->kode_pp)->delete();
+            $del1 = DB::connection($this->db)->table('sis_nilai_tmp2')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->where('kode_pp', $request->kode_pp)->delete();
 
             $per = date('ym');
 

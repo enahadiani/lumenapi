@@ -268,6 +268,7 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->delete('ekskul','Sekolah\EkskulController@destroy');
     
     $router->post('data-import','Sekolah\EkskulController@importExcel');
+    $router->post('data-import-update','Sekolah\EkskulController@importExcelSiswa');
 
     //Siswa Matpel Khusus
     $router->get('sis-matpel-khusus-all','Sekolah\SisMatpelKhususController@index');

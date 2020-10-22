@@ -341,5 +341,60 @@ class EkskulController extends Controller
         
     }
 
+    public function importExcelSiswa(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xls,xlsx',
+            'kode_pp' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+        
+            // menangkap file excel
+            $file = $request->file('file');
+    
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
+
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $dt = Excel::toArray(new DataImport(),$nama_file);
+            $excel = $dt[0];
+            $x = array();
+            $status_validate = true;
+            $no=1;
+            $i=0;
+            $success['upd'] = array();
+            foreach($excel as $row){
+                $upd[$i] = DB::connection($this->db)->update("update sis_siswa set nis2= '".$row[0]."' where nis='".$row[1]."' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' ");
+                $success['upd'][] = "update sis_siswa set nis2= '".$row[0]."' where nis='".$row[1]."' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' ";
+            }
+            
+            DB::connection($this->db)->commit();
+            Storage::disk('local')->delete($nama_file);
+            if($status_validate){
+                $msg = "File berhasil diupload!";
+            }else{
+                $msg = "Ada error!";
+            }
+            
+            $success['status'] = true;
+            $success['validate'] = $status_validate;
+            $success['message'] = $msg;
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 
 }
