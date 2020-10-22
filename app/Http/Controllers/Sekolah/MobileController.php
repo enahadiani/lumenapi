@@ -1512,7 +1512,7 @@ class MobileController extends Controller
 		
         try{
             
-			$sql = "select a.jenis,dbo.fnNamaTanggal2(a.tgl_input,2) as tanggal,a.pesan,isnull(c.file_dok,'-') as file_dok,b.sts_read_mob
+			$sql = "select a.jenis,dbo.fnNamaTanggal2(a.tgl_input,2) as tanggal,a.pesan,isnull(c.file_dok,'-') as file_dok,b.sts_read_mob,a.no_bukti
             from sis_pesan_m a
             inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
