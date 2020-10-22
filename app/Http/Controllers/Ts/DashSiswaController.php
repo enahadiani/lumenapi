@@ -248,14 +248,48 @@ class DashSiswaController extends Controller
             order by a.kode_kelas,a.nis ");
             $res = json_decode(json_encode($res),true);
 
+            $res2 = DB::connection($this->db)->select("select a.nis,a.nama,
+            isnull(c.nilai,0)+isnull(d.nilai,0)-isnull(e.nilai,0) as so_akhir
+            from sis_siswa a 
+            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_jur f on b.kode_jur=f.kode_jur and b.kode_lokasi=f.kode_lokasi and b.kode_pp=f.kode_pp
+            inner join (select a.nis,a.kode_pp,a.kode_lokasi
+                        from sis_cd_d a
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+                        group by a.nis,a.kode_pp,a.kode_lokasi
+                        )g on a.nis=g.nis and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
+            left join (select a.nis,a.kode_lokasi,a.kode_pp,sum(case when a.dc='D' then nilai else -nilai end) as nilai
+                    from sis_cd_d a			
+                    inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    where a.kode_lokasi='$kode_lokasi' and a.periode<'$periode' and a.kode_pp='$kode_pp'
+                    group by a.nis,a.kode_lokasi,a.kode_pp
+                    )c on a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            left join (select a.nis,a.kode_lokasi,a.kode_pp,sum(a.nilai) as nilai
+                    from sis_cd_d a			
+                    inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    where a.kode_lokasi='$kode_lokasi' and a.dc='D' and a.periode='$periode' and a.kode_pp='$kode_pp'
+                    group by a.nis,a.kode_lokasi,a.kode_pp
+                    )d on a.nis=d.nis and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            left join (select a.nis,a.kode_lokasi,a.kode_pp,sum(a.nilai) as nilai
+                    from sis_cd_d a			
+                    inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.dc='C' and a.kode_pp='$kode_pp'
+                    group by a.nis,a.kode_lokasi,a.kode_pp
+                    )e on a.nis=e.nis and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
+            where a.nis='$nik' 
+            order by a.kode_kelas,a.nis");
+            $res2 = json_decode(json_encode($res2),true);
+
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['data2'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['data'] = [];
                 $success['status'] = true;
             }
