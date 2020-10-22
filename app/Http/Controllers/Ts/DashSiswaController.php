@@ -198,6 +198,9 @@ class DashSiswaController extends Controller
 
     public function getProfile(Request $request)
     {
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -206,17 +209,43 @@ class DashSiswaController extends Controller
                 $kode_pp= $data->kode_pp;
             }
 
-            if(isset($request->periode) && $request->periode != ""){
-                $periode_filter = " and a.periode='$request->periode' ";
-            }else{
-                $periode_filter = "";
-            }
-            $res = DB::connection($this->db)->select("select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,f.nama as nama_jur,a.id_bank,a.kode_akt
-            from sis_siswa a
-            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
-            inner join sis_jur f on b.kode_jur=f.kode_jur and b.kode_lokasi=f.kode_lokasi and b.kode_pp=f.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
-            order by a.nis ");
+            $periode = $request->periode;
+            $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_lokasi,a.kode_pp,a.kode_akt
+            ,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total,
+            a.kode_kelas,f.kode_jur,g.nama as nama_jur
+            from sis_siswa a 
+            inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+            inner join sis_jur g on f.kode_jur=g.kode_jur and f.kode_lokasi=g.kode_lokasi and f.kode_pp=g.kode_pp
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )c on a.nis=c.nis and a.kode_lokasi=c.kode_lokasi
+            left join (select y.nis,y.kode_lokasi,  
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                        from sis_rekon_d x 	
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periode')	and x.kode_pp='$kode_pp'		
+                        group by y.nis,y.kode_lokasi 			
+                        )d on a.nis=d.nis and a.kode_lokasi=d.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
+                        from sis_rekon_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )e on a.nis=e.nis and a.kode_lokasi=e.kode_lokasi
+            where a.nis='$nik'
+            order by a.kode_kelas,a.nis ");
             $res = json_decode(json_encode($res),true);
 
             
