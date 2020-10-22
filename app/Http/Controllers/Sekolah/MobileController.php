@@ -1079,10 +1079,16 @@ class MobileController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.kode_matpel,b.nama,b.skode as singkatan 
+            $sql = "select distinct a.kode_matpel,b.nama,b.skode as singkatan
             from sis_guru_matpel_kelas a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' $filter ");
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' and b.sifat='0' $filter
+			union all
+			select a.kode_matpel,b.nama,b.skode as singkatan 
+			from sis_siswa_matpel_khusus a 
+			inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			where a.kode_kelas='$request->kode_kelas' and a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' $filter";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
