@@ -297,7 +297,7 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.nis,a.nama
+            $sql="select a.nis,a.nama,a.kode_kelas
             from sis_siswa a
             $where and a.flag_aktif='1'
             order by a.nis ";
@@ -332,8 +332,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('kode_pp','kode_ta','kode_matpel');
-            $db_col_name = array('a.kode_pp','a.kode_ta','a.kode_matpel');
+            $col_array = array('kode_pp','kode_ta','kode_matpel','kode_kelas','kode_sem');
+            $db_col_name = array('a.kode_pp','a.kode_ta','a.kode_matpel','c.kode_kelas','a.kode_sem');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -357,11 +357,12 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.kode_matpel,a.kode_sem,a.kode_kd,a.nama as nama_kd,b.skode
+            $sql="select a.kode_matpel,a.kode_sem,a.kode_kd,a.nama as nama_kd,b.skode,c.kode_kelas
             from sis_kd a
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			inner join sis_kelas c on a.kode_tingkat=c.kode_tingkat and  a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             $where
-            order by a.kode_matpel,a.kode_sem,a.kode_kd";
+            order by a.kode_matpel,a.kode_sem,c.kode_kelas,a.kode_kd";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
