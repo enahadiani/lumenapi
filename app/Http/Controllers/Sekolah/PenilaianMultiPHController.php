@@ -346,7 +346,7 @@ class PenilaianMultiPHController extends Controller
 
                     $arr_id = array();
                     for($i=0;$i<count($request->nis);$i++){
-                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis,pelaksanaan) values (?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i],$request->pelaksanaan[$i]));                    
+                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i],$request->pelaksanaan[$i]));                    
                     }  
                     
                     $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
