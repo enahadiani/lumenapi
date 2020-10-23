@@ -351,7 +351,7 @@ class PenilaianMultiPHController extends Controller
                     $msg_duplicate = "";
                     for($i=0;$i<count($request->nis);$i++){
                         $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i],$request->pelaksanaan[$i]));   
-                        $ket2 = $this->validateJenis($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,$request->kode_kd,$row[3]);
+                        $ket2 = $this->validateJenis($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,$request->kode_kd,$request->kode_jenis[$i]);
                         if($ket2 != ""){
                             $sts_duplicate  = true;
                             $msg_duplicate .= $ket2;
@@ -390,7 +390,7 @@ class PenilaianMultiPHController extends Controller
                     else{
                         DB::connection($this->db)->rollback();
                         $no_bukti = "-";
-                        $sts = true;
+                        $sts = false;
                         $msg = "Data Penilaian Multi PH gagal disimpan. Kode Jenis Penilaian tidak valid.".$msg_duplicate;
                     }
                 }else{
@@ -746,7 +746,17 @@ class PenilaianMultiPHController extends Controller
         ");
         $auth2 = json_decode(json_encode($auth2),true);
         if(count($auth2) > 0){
-            $keterangan .= "Duplicate entry. Penilaian dengan kode jenis ".$kode_jenis." sudah ada didatabase dengan no bukti ".$auth2[0]['no_bukti'];
+            // $keterangan .= "Duplicate entry. Penilaian dengan kode jenis ".$kode_jenis." sudah ada didatabase dengan no bukti ".$auth2[0]['no_bukti'];
+            $keterangan = "select distinct a.no_bukti,b.kode_jenis 
+            from sis_nilai_m2 a
+            inner join sis_nilai2 b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and  a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and b.kode_jenis='$kode_jenis'
+            union all
+            select distinct a.no_bukti,a.kode_jenis 
+            from sis_nilai_m a
+            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and a.kode_jenis='$kode_jenis'
+            ";
         }else{
             $keterangan .= "";
         }

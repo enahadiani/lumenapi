@@ -296,22 +296,23 @@ class AuthController extends Controller
             if(isset($request->id_device)){
                 $kode_lokasi = Auth::guard('siswa')->user()->kode_lokasi;
                 $kode_pp = Auth::guard('siswa')->user()->kode_pp;
-                $cek = DB::connection('sqlsrvtarbak')->select("select count(id_device) as jum from users_device where nik='$request->nik'  ");
+                $nis = Auth::guard('siswa')->user()->nik;
+                $cek = DB::connection('sqlsrvtarbak')->select("select count(id_device) as jum from users_device where nik='$nis'  ");
                 if(count($cek) > 0){
                     $nu = intval($cek[0]->jum)+1;
                 }else{
                     $nu = 1;
                 }
 
-                $get = DB::connection('sqlsrvtarbak')->select("select count(id_device) as jum from users_device where id_device='$request->id_device' and nik='$request->nik'  ");
+                $get = DB::connection('sqlsrvtarbak')->select("select count(id_device) as jum from users_device where id_device='$request->id_device' and nik='$nis'  ");
                 if(count($get) > 0){
                     if($get[0]->jum == 0){
                         $ins = DB::connection('sqlsrvtarbak')->insert("insert into users_device (
-                            id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
+                            id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$nis',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
                     }
                 }else{
                     $ins = DB::connection('sqlsrvtarbak')->insert("insert into users_device (
-                        id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
+                        id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$nis',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
                 }
 
             }
