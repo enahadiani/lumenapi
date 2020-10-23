@@ -443,7 +443,7 @@ class PenilaianController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.nis,a.nilai,b.nama from sis_nilai a inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  order by b.nama ");
+            $res2 = DB::connection($this->db)->select("select a.nis,b.nis2,a.nilai,b.nama from sis_nilai a inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi and b.flag_aktif=1 where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  order by b.nama ");
             $res2 = json_decode(json_encode($res2),true);
 
             // $res3 = DB::connection($this->db)->select("select 
@@ -764,7 +764,7 @@ class PenilaianController extends Controller
                     $x[] = NilaiTmp::create([
                         'no_bukti' => '-',
                         'nis' => strval($row[0]),
-                        'nilai' => floatval($row[2]),
+                        'nilai' => floatval($row[3]),
                         'kode_pp' => $request->kode_pp,
                         'kode_lokasi' => $kode_lokasi,
                         'nik_user' => $request->nik_user,
@@ -835,7 +835,7 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.nis,b.nama,a.nilai
+            $res = DB::connection($this->db)->select("select a.nis,b.nis2,b.nama,a.nilai
             from sis_nilai_tmp a
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'  order by a.nu");
@@ -996,9 +996,9 @@ class PenilaianController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.nis,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
+            $sql2="select a.no_bukti,a.nis,b.nis2,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
             from sis_nilai a 
-            inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
             left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp' ";
             $res2 = DB::connection($this->db)->select($sql2);

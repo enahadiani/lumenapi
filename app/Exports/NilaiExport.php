@@ -41,16 +41,17 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
     {
         if($this->type == 'template'){
             $res = DB::connection('sqlsrvtarbak')->table('sis_siswa')
-                    ->select('sis_siswa.nis','sis_siswa.nama')
+                    ->select('sis_siswa.nis','sis_siswa.nis2','sis_siswa.nama')
                      ->where('sis_siswa.kode_kelas',$this->kode_kelas)
                      ->where('sis_siswa.kode_lokasi',$this->kode_lokasi)
                      ->where('sis_siswa.kode_pp',$this->kode_pp)
+                     ->where('sis_siswa.flag_aktif',1)
                      ->orderBy('sis_siswa.nama')
                     ->get();
             
         }else{
             $res = DB::connection('sqlsrvtarbak')->table('sis_nilai_tmp')
-                        ->select('sis_nilai_tmp.nis','sis_siswa.nama','sis_nilai_tmp.nilai','sis_nilai_tmp.status','sis_nilai_tmp.keterangan','sis_nilai_tmp.nu')
+                        ->select('sis_nilai_tmp.nis','sis_siswa.nis2','sis_siswa.nama','sis_nilai_tmp.nilai','sis_nilai_tmp.status','sis_nilai_tmp.keterangan','sis_nilai_tmp.nu')
                         ->leftJoin('sis_siswa', function($join)
                          {
                              $join->on('sis_nilai_tmp.nis', '=', 'sis_siswa.nis');
@@ -60,6 +61,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
                         ->where('sis_nilai_tmp.kode_lokasi',$this->kode_lokasi)
                         ->where('sis_nilai_tmp.nik_user',$this->nik_user)
                         ->where('sis_nilai_tmp.kode_pp',$this->kode_pp)
+                        ->where('sis_siswa.flag_aktif',1)
                         ->orderBy('sis_siswa.nama')
                         ->get();
                         
@@ -81,6 +83,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
                 ['','','','',''],
                 [
                     'nis',
+                    'nis2',
                     'nama',
                     'nilai'
                 ]
@@ -92,6 +95,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
                 ['','','','',''],
                 [
                     'nis',
+                    'nis2',
                     'nama',
                     'nilai',
                     'status',

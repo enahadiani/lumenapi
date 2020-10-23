@@ -158,7 +158,7 @@ class SisMatpelKhususController extends Controller
             where a.kode_kelas='$kode_kelas' and a.kode_lokasi='".$kode_lokasi."' and a.kode_matpel='".$kode_matpel."' and a.kode_pp='".$kode_pp."' and a.kode_ta='".$kode_ta."' group by a.kode_pp,a.kode_kelas,b.nama,c.nama,a.kode_matpel,a.kode_ta,d.nama,e.nama");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.nis,b.nama as nama_siswa
+            $res2 = DB::connection($this->db)->select("select a.nis,b.nis2,b.nama as nama_siswa
             from sis_siswa_matpel_khusus a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_kelas='$kode_kelas' and a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."' and a.kode_ta='".$kode_ta."' ");

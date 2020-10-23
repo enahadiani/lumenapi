@@ -113,7 +113,7 @@ class LaporanController extends Controller
             group by b.nis,b.kode_lokasi,b.kode_pp,a.kode_matpel
                     )b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='".$request->kode_pp[1]."' and a.kode_kelas in ($kelas) and b.kode_matpel in ($matpel) and a.flag_aktif=1
-            order by a.nis";
+            order by a.nama";
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
@@ -322,7 +322,7 @@ class LaporanController extends Controller
             $sql2="select a.nis,a.nis2,a.nama,a.kode_kelas
             from sis_siswa a
             $where and a.flag_aktif='1' and a.kode_kelas in ($kelas)
-            order by a.nis ";
+            order by a.nama ";
             $rs2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($rs2),true);
 
