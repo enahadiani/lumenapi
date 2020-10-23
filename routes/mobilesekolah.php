@@ -26,7 +26,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login-guru', 'AuthController@loginTarbak');
     $router->get('hash-pass-guru', 'AuthController@hashPasswordTarbak');
 
-    $router->post('login-siswa', 'AuthController@loginSiswa');
+    $router->post('login-siswa', 'AuthController@loginSiswa2');
     $router->get('hash-pass-siswa', 'AuthController@hashPasswordSiswa');
     $router->get('daftar-pp', 'AdminTarbakController@getDaftarPP');
     $router->get('hash-pass-bynik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');

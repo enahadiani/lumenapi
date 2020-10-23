@@ -15,11 +15,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
-    $router->post('login', 'AuthController@loginSiswa');
+    $router->post('login', 'AuthController@loginSiswa2');
     $router->get('hash-pass', 'AuthController@hashPasswordSiswa');
     $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
-
+    $router->get('hash-pass-costum2/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum2');
 });
 
 $router->get('storage/{filename}', function ($filename)
