@@ -55,9 +55,8 @@ class KelasKhususController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_jur,a.kode_jur+' | '+b.nama as jur,a.kode_pp+'-'+c.nama as pp,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
+            $res = DB::connection($this->db)->select( "select a.kode_kelas,a.nama,a.kode_tingkat,a.kode_jur,a.kode_pp+'-'+c.nama as pp,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(dbo.fnGetMatpelKhusus(a.kode_kelas,a.kode_lokasi,a.kode_pp),'-') as matpel 
             from sis_kelas_khusus a 
-			left join sis_jur b on a.kode_jur=b.kode_jur and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join pp c on a.kode_pp=c.kode_pp and a.kode_pp=c.kode_pp  and a.kode_lokasi=c.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ");
             $res = json_decode(json_encode($res),true);
             
