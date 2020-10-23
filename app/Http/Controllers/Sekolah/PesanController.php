@@ -58,7 +58,9 @@ class PesanController extends Controller
                     "body" => $data["message"],
                     "title" => $data["title"],
                     "click_action" => $data["click_action"],
-                    $data['key'] => $data['value']
+                    "key" => array(
+                        $data['key'] => $data['value']
+                    )
                 ),
                 'data'              => $data
                 // "android" => array (
