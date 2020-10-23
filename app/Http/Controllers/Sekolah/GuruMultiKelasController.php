@@ -32,7 +32,7 @@ class GuruMultiKelasController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,b.kode_matpel+'-'+d.nama as kode_matpel,b.kode_ta,e.nama as nama_ta
+            $res = DB::connection($this->db)->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,b.kode_matpel+'-'+d.nama as kode_matpel,b.kode_ta,e.nama as nama_ta,dbo.fnGetGuruKelas(a.nik,a.kode_lokasi,a.kode_pp) as kelas
             from sis_guru_matpel_kelas b 
             inner join sis_guru a on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
             inner join pp c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp  
