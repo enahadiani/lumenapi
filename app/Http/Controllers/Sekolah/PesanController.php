@@ -56,7 +56,8 @@ class PesanController extends Controller
                 'registration_ids'  => $ids,
                 'notification'              => array (
                     "body" => $data["message"],
-                    "title" => $data["title"]
+                    "title" => $data["title"],
+                    "click_action" => $data["click_action"]
                 ),
                 'data'              => $data
                 // "android" => array (
