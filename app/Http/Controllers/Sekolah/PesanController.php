@@ -56,11 +56,7 @@ class PesanController extends Controller
                 'registration_ids'  => $ids,
                 'notification'              => array (
                     "body" => $data["message"],
-                    "title" => $data["title"],
-                    "click_action" => $data["click_action"],
-                    "key" => array(
-                        $data['key'] => $data['value']
-                    )
+                    "title" => $data["title"]
                 ),
                 'data'              => $data
                 // "android" => array (
@@ -361,7 +357,9 @@ class PesanController extends Controller
                     'message' => $request->pesan,
                     'click_action' => $click_action,
                     'value' => $value,
-                    'key' => $key
+                    'key' => array(
+                        $key => $value
+                    )
                 );
                 $res = $this->gcm($arr_id,$payload);
                 $hasil= json_decode($res,true);
