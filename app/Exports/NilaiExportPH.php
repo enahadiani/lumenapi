@@ -40,19 +40,19 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
     {
         if($this->type == 'template'){
            
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama 
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama 
                     from sis_siswa a 
-                    where a.kode_kelas ='$this->kode_kelas' and a.kode_lokasi='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp'
+                    where a.kode_kelas ='$this->kode_kelas' and a.kode_lokasi='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and a.flag_aktif=1
                     order by a.nama
             ");
             $res = collect($res);
 
             
         }else{
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,b.nama,a.nilai,a.kode_jenis,a.pelaksanaan,a.status,a.keterangan,a.nu
+            $res = DB::connection('sqlsrvtarbak')->select("select a.nis as id,b.nis2 as nis,b.nama,a.nilai,a.kode_jenis,a.pelaksanaan,a.status,a.keterangan,a.nu
             from sis_nilai_tmp2 a 
             left join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.nik_user ='$this->nik_user' and a.kode_lokasi='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp'
+            where a.nik_user ='$this->nik_user' and a.kode_lokasi='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and b.flag_aktif=1
             order by a.nama
             ");
             $res = collect($res);
@@ -68,6 +68,7 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
                 [$this->kode_matpel, $this->kode_kelas,$this->kode_sem,$this->kode_kd],
                 ['','','','',''],
                 [
+                    'id',
                     'nis',
                     'nama',
                     'kode_jenis',
@@ -81,6 +82,7 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
                 [$this->kode_matpel, $this->kode_kelas,$this->kode_sem,$this->kode_kd],
                 ['','','','',''],
                 [
+                    'id',
                     'nis',
                     'nama', 
                     'kode_jenis',

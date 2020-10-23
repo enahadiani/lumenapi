@@ -434,7 +434,7 @@ class PenilaianMultiPHController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.nis,a.nilai,b.nama,a.kode_jenis,c.nama as nama_jenis,a.pelaksanaan 
+            $res2 = DB::connection($this->db)->select("select a.nis,a.nilai,b.nama,a.kode_jenis,c.nama as nama_jenis,a.pelaksanaan,b.nis2 
             from sis_nilai2 a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi 
             inner join sis_jenisnilai c on a.kode_jenis=c.kode_jenis and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 
@@ -751,14 +751,14 @@ class PenilaianMultiPHController extends Controller
                     $x[] = NilaiTmpPH::create([
                         'no_bukti' => '-',
                         'nis' => strval($row[0]),
-                        'nilai' => floatval($row[4]),
+                        'nilai' => floatval($row[5]),
                         'kode_pp' => $request->kode_pp,
-                        'kode_jenis' => $row[2],
+                        'kode_jenis' => $row[3],
                         'kode_lokasi' => $kode_lokasi,
                         'nik_user' => $request->nik_user,
                         'status' => $sts,
                         'keterangan' => $ket,
-                        'pelaksanaan' => $row[3],
+                        'pelaksanaan' => $row[4],
                         'nu' => $no
                     ]);
                     $no++;
@@ -824,7 +824,7 @@ class PenilaianMultiPHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.nis,b.nama,a.nilai,a.kode_jenis,c.nama as nama_jenis,a.pelaksanaan
+            $res = DB::connection($this->db)->select("select a.nis,b.nis2,b.nama,a.nilai,a.kode_jenis,c.nama as nama_jenis,a.pelaksanaan
             from sis_nilai_tmp2 a
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_jenisnilai c on a.kode_jenis=c.kode_jenis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -984,7 +984,7 @@ class PenilaianMultiPHController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_bukti,a.nis,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa,a.kode_jenis,a.pelaksanaan
+            $sql2="select a.no_bukti,a.nis,b.nis2,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa,a.kode_jenis,a.pelaksanaan
             from sis_nilai2 a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             left join sis_nilai_dok2 c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_jenis=c.kode_jenis
