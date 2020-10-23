@@ -343,9 +343,7 @@ class PenilaianMultiPHController extends Controller
                     }else{
                         $no_urut = 1;
                     }                
-
-                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$nik));
-
+                    
                     $arr_id = array();
                     $sts_duplicate = false;
                     $msg_duplicate = "";
@@ -357,6 +355,9 @@ class PenilaianMultiPHController extends Controller
                             $msg_duplicate .= $ket2;
                         }                 
                     }  
+
+                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$nik));
+
 
                     if(!$sts_duplicate){
 
@@ -391,7 +392,8 @@ class PenilaianMultiPHController extends Controller
                         DB::connection($this->db)->rollback();
                         $no_bukti = "-";
                         $sts = false;
-                        $msg = "Data Penilaian Multi PH gagal disimpan. Kode Jenis Penilaian tidak valid.".$msg_duplicate;
+                        $msg = "Data Penilaian Multi PH gagal disimpan. Kode Jenis Penilaian tidak valid.";
+                        $success['message2'] = $msg_duplicate;
                     }
                 }else{
                     $sts = true;
@@ -734,29 +736,19 @@ class PenilaianMultiPHController extends Controller
             $keterangan .= "Kode Jenis $kode_jenis tidak valid. ";
         }
 
-        $auth2 = DB::connection($this->db)->select("select distinct a.no_bukti,b.kode_jenis 
+        $auth2 = DB::connection($this->db)->select("select distinct a.no_bukti,b.kode_jenis,a.tgl_input 
         from sis_nilai_m2 a
         inner join sis_nilai2 b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
         where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and  a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and b.kode_jenis='$kode_jenis'
         union all
-        select distinct a.no_bukti,a.kode_jenis 
+        select distinct a.no_bukti,a.kode_jenis,a.tgl_input 
         from sis_nilai_m a
         inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
         where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and a.kode_jenis='$kode_jenis'
         ");
         $auth2 = json_decode(json_encode($auth2),true);
         if(count($auth2) > 0){
-            // $keterangan .= "Duplicate entry. Penilaian dengan kode jenis ".$kode_jenis." sudah ada didatabase dengan no bukti ".$auth2[0]['no_bukti'];
-            $keterangan = "select distinct a.no_bukti,b.kode_jenis 
-            from sis_nilai_m2 a
-            inner join sis_nilai2 b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and  a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and b.kode_jenis='$kode_jenis'
-            union all
-            select distinct a.no_bukti,a.kode_jenis 
-            from sis_nilai_m a
-            inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and a.kode_jenis='$kode_jenis'
-            ";
+            $keterangan .= "Duplicate entry. Penilaian dengan kode jenis ".$auth2[0]['kode_jenis']." sudah ada didatabase dengan no bukti ".$auth2[0]['no_bukti']." ".$auth2[0]['tgl_input'];
         }else{
             $keterangan .= "";
         }
