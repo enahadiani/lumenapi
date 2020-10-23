@@ -25,7 +25,9 @@ class PenilaianMultiPHController extends Controller
 
     public function isUnik($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas,$kode_matpel,$kode_sem,$kode_kd){
         
-        $auth = DB::connection($this->db)->select("select no_bukti from sis_nilai_m2 where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_matpel='$kode_matpel' and  kode_sem='$kode_sem' and kode_kd='$kode_kd' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select no_bukti from sis_nilai_m2 where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_matpel='$kode_matpel' and  kode_sem='$kode_sem' and kode_kd='$kode_kd' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'
+        union all
+        select no_bukti from sis_nilai_m where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_matpel='$kode_matpel' and  kode_sem='$kode_sem' and kode_kd='$kode_kd' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             $data['status']=false;
@@ -345,36 +347,52 @@ class PenilaianMultiPHController extends Controller
                     $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$nik));
 
                     $arr_id = array();
+                    $sts_duplicate = false;
+                    $msg_duplicate = "";
                     for($i=0;$i<count($request->nis);$i++){
-                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i],$request->pelaksanaan[$i]));                    
+                        $ins2[$i] = DB::connection($this->db)->insert('insert into sis_nilai2(no_bukti,nis,nilai,kode_lokasi,kode_pp,kode_jenis,pelaksanaan) values (?, ?, ?, ?, ?, ?, ?)', array($no_bukti,$request->nis[$i],$request->nilai[$i],$kode_lokasi,$request->kode_pp,$request->kode_jenis[$i],$request->pelaksanaan[$i]));   
+                        $ket2 = $this->validateJenis($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,$request->kode_kd,$row[3]);
+                        if($ket2 != ""){
+                            $sts_duplicate  = true;
+                            $msg_duplicate .= $ket2;
+                        }                 
                     }  
-                    
-                    $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
-                    $cek = json_decode(json_encode($cek),true);
-                    if(count($cek) > 0){
-                        $nama_matpel = $cek[0]['nama'];
-                    }else{
-                        $nama_matpel = '-';
+
+                    if(!$sts_duplicate){
+
+                        $cek = DB::connection($this->db)->select("select nama from sis_matpel where kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' and kode_matpel='$request->kode_matpel' ");
+                        $cek = json_decode(json_encode($cek),true);
+                        if(count($cek) > 0){
+                            $nama_matpel = $cek[0]['nama'];
+                        }else{
+                            $nama_matpel = '-';
+                        }
+    
+                        $request->request->add([
+                            'jenis' => 'Kelas',
+                            'judul' => 'Penilaian Siswa Multi PH',
+                            'kontak' => $request->kode_kelas,
+                            'kode_matpel' => $request->kode_matpel,
+                            'tipe' => 'nilai',
+                            'pesan' => 'Nilai mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
+                            'tipe' => 'nilai',
+                            'ref1' => $no_bukti
+                        ]);
+    
+                        $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
+                        $notif = json_decode(json_encode($notif),true);
+                        
+                        $success['notif'] = $notif['original'];
+                        DB::connection($this->db)->commit();
+                        $sts = true;
+                        $msg = "Data Penilaian Multi PH berhasil disimpan.";
                     }
-
-                    $request->request->add([
-                        'jenis' => 'Kelas',
-                        'judul' => 'Penilaian Siswa Multi PH',
-                        'kontak' => $request->kode_kelas,
-                        'kode_matpel' => $request->kode_matpel,
-                        'tipe' => 'nilai',
-                        'pesan' => 'Nilai mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
-                        'tipe' => 'nilai',
-                        'ref1' => $no_bukti
-                    ]);
-
-                    $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
-                    $notif = json_decode(json_encode($notif),true);
-                    
-                    $success['notif'] = $notif['original'];
-                    DB::connection($this->db)->commit();
-                    $sts = true;
-                    $msg = "Data Penilaian Multi PH berhasil disimpan.";
+                    else{
+                        DB::connection($this->db)->rollback();
+                        $no_bukti = "-";
+                        $sts = true;
+                        $msg = "Data Penilaian Multi PH gagal disimpan. Kode Jenis Penilaian tidak valid.".$msg_duplicate;
+                    }
                 }else{
                     $sts = true;
                     $no_bukti = "-";
@@ -704,12 +722,49 @@ class PenilaianMultiPHController extends Controller
 
     }
 
+    public function validateJenis($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas,$kode_matpel,$kode_sem,$kode_kd,$kode_jenis){
+
+        $keterangan = "";
+        $auth = DB::connection($this->db)->select("select kode_jenis from sis_jenisnilai where kode_jenis='$kode_jenis' and kode_lokasi='$kode_lokasi' and kode_pp = '$kode_pp' 
+        ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Kode Jenis $kode_jenis tidak valid. ";
+        }
+
+        $auth2 = DB::connection($this->db)->select("select distinct a.no_bukti,b.kode_jenis 
+        from sis_nilai_m2 a
+        inner join sis_nilai2 b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+        where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and  a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and b.kode_jenis='$kode_jenis'
+        union all
+        select distinct a.no_bukti,a.kode_jenis 
+        from sis_nilai_m a
+        inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+        where a.kode_ta='$kode_ta' and a.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel' and a.kode_sem='$kode_sem' and a.kode_kd='$kode_kd' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_pp='".$kode_pp."' and a.kode_jenis='$kode_jenis'
+        ");
+        $auth2 = json_decode(json_encode($auth2),true);
+        if(count($auth2) > 0){
+            $keterangan .= "Duplicate entry. Penilaian dengan kode jenis ".$kode_jenis." sudah ada didatabase dengan no bukti ".$auth2[0]['no_bukti'];
+        }else{
+            $keterangan .= "";
+        }
+
+        return $keterangan;
+
+    }
+
     public function importExcel(Request $request)
     {
         $this->validate($request, [
             'file' => 'required|mimes:csv,xls,xlsx',
             'nik_user' => 'required',
             'kode_pp' => 'required',
+            'kode_sem' => 'required',
+            'kode_kd' => 'required',
+            'kode_ta' => 'required',
+            'kode_matpel' => 'required',
             'kode_kelas' => 'required'
         ]);
 
@@ -742,11 +797,13 @@ class PenilaianMultiPHController extends Controller
             foreach($excel as $row){
                 if($row[0] != ""){
                     $ket = $this->validateNIS($row[0],$kode_lokasi,$request->kode_pp,$request->kode_kelas);
-                    if($ket != ""){
+                    $ket2 = $this->validateJenis($kode_lokasi,$request->kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,$request->kode_kd,$row[3]);
+
+                    if($ket == "" && $ket2 == ""){
+                        $sts = 1;
+                    }else{
                         $sts = 0;
                         $status_validate = false;
-                    }else{
-                        $sts = 1;
                     }
                     $x[] = NilaiTmpPH::create([
                         'no_bukti' => '-',
@@ -757,7 +814,7 @@ class PenilaianMultiPHController extends Controller
                         'kode_lokasi' => $kode_lokasi,
                         'nik_user' => $request->nik_user,
                         'status' => $sts,
-                        'keterangan' => $ket,
+                        'keterangan' => $ket."-".$ket2,
                         'pelaksanaan' => $row[4],
                         'nu' => $no
                     ]);
