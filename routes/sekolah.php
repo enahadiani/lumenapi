@@ -252,6 +252,7 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
 
     // DASHBOARD 
     $router->get('rata2-nilai-dashboard','Sekolah\DashboardController@rata2Nilai');
+    $router->get('chart-kkm','Sekolah\DashboardController@jumDibawahKKM');
 
     // GURU
     $router->get('guru-all','Sekolah\GuruController@index');

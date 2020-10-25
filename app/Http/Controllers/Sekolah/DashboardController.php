@@ -117,4 +117,71 @@ class DashboardController extends Controller
         }
     }
 
+    public function jumDibawahKKM(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        $this->validate($request,[
+            'kode_kelas' => 'required',
+            'kode_sem' => 'required',
+            'kode_ta' => 'required',
+            'kode_matpel' => 'required',
+        ]);
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+                $kode_pp = '';
+            }
+            
+            $res = DB::connection($this->db)->select("select a.kode_kd,a.kkm, isnull(round((CAST (d.jum as float) / c.jum)*100,1),0) as persen 
+            from sis_kd a
+            inner join sis_kelas b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join (select a.kode_lokasi,a.kode_pp,a.kode_kelas,count(a.nis) as jum
+                      from sis_siswa a
+                      where a.flag_aktif=1
+                      group by a.kode_lokasi,a.kode_pp,a.kode_kelas
+                       ) c on b.kode_kelas=c.kode_kelas and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
+            left join (select a.kode_kd,a.kode_pp,a.kode_lokasi,a.kode_matpel,a.kode_ta,a.kode_sem,a.kode_kelas,count(b.nis) as jum
+                        from sis_nilai_m a 
+                        inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                        inner join sis_siswa d on b.nis=d.nis and b.kode_lokasi=d.kode_lokasi and b.kode_pp=d.kode_pp
+                        inner join sis_kelas e on d.kode_kelas=e.kode_kelas and d.kode_lokasi=e.kode_lokasi and d.kode_pp=e.kode_pp
+                        inner join sis_kd c on a.kode_kd=c.kode_kd and a.kode_matpel=c.kode_matpel and a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_sem=c.kode_sem and e.kode_tingkat=c.kode_tingkat
+                        where (b.nilai < c.kkm)
+                        group by a.kode_kd,a.kode_pp,a.kode_lokasi,a.kode_matpel,a.kode_ta,a.kode_sem,a.kode_kelas
+                       ) d on a.kode_kd=d.kode_kd and b.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_sem=d.kode_sem and a.kode_matpel=d.kode_matpel and a.kode_ta=d.kode_ta 
+            where a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas' and a.kode_sem='$request->kode_sem' and a.kode_ta='$request->kode_ta' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' 
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar = array();
+                for($i=0;$i<count($res);$i++){
+                    $daftar[] = array("y"=>floatval($res[$i]['persen']),"name"=>$res[$i]['kode_kd'],"key"=>$res[$i]['kode_kd']); 
+                
+                }
+                $success['status'] = true;
+                $success['data'] = $daftar;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }
