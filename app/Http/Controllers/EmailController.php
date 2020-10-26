@@ -13,6 +13,7 @@ class EmailController extends Controller
             'from' => 'required',
             'to' => 'required',
             'subject' => 'required',
+            'html' => 'required',
             'text' => 'required'
         ]);
         try {
@@ -27,6 +28,7 @@ class EmailController extends Controller
                     'from' => $request->from,
                     'to' => $request->to,
                     'subject' => $request->subject,
+                    'html' => $request->html,
                     'text' => $request->text,
                 ]
             ]);

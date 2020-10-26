@@ -61,6 +61,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     
     $router->post('send-laporan','Toko\LaporanController@sendMail');
+    $router->post('send-email','EmailController@send');
 
 });
 
