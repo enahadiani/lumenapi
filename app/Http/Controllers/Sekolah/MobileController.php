@@ -1079,10 +1079,22 @@ class MobileController extends Controller
                 $filter .= "";
             }
 
+            
+            $sqlcek = "select a.kode_matpel,a.nis,b.nama 
+            from sis_siswa_matpel_khusus a
+            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.nis='$nik' and b.nama like 'Pendidikan Agama%' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' ";
+            $cek = DB::connection($this->db)->select($sqlcek);
+            if(count($cek) > 0){
+                $filter_agama = " and a.kode_matpel <> 'PAI' ";
+            }else{
+                $filter_agama = "";
+            }
+
             $sql = "select distinct a.kode_matpel,b.nama,b.skode as singkatan
             from sis_guru_matpel_kelas a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' and b.sifat='0' $filter
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' and b.sifat='0' $filter $filter_agama
 			union all
 			select a.kode_matpel,b.nama,b.skode as singkatan 
 			from sis_siswa_matpel_khusus a 
