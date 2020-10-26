@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class NilaiImport implements ToModel, WithStartRow
+class KdImport implements ToModel, WithStartRow
 {
     public $sql = 'sqlsrvtarbak';
     public $guard = 'siswa';

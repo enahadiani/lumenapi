@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 class NilaiImportPH implements ToModel, WithStartRow
 {
     public $sql = 'sqlsrvtarbak';
-    public $guard = 'tarbak';
+    public $guard = 'siswa';
     public $ket = '';
 
     public function startRow(): int

@@ -32,6 +32,7 @@ $router->get('storage/{filename}', function ($filename)
 });
 
 $router->get('penilaian-export','Sekolah\PenilaianController@export');
+$router->get('kd-export','Sekolah\KdController@export');
 $router->get('penilaian-multiph-export','Sekolah\PenilaianMultiPHController@export');
 
 $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
@@ -192,6 +193,8 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->post('kd','Sekolah\KdController@store');
     $router->put('kd','Sekolah\KdController@update');
     $router->delete('kd','Sekolah\KdController@destroy');
+    $router->post('import-kd','Sekolah\KdController@importExcel');
+    $router->get('kd-tmp','Sekolah\KdController@getKdTmp');
 
     //Presensi
     $router->get('presensi-all','Sekolah\PresensiController@index');

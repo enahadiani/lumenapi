@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Imports\KdImport;
+use App\Exports\KdExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage; 
 
 
 class KdController extends Controller
@@ -323,4 +327,139 @@ class KdController extends Controller
         
     }
 
+    public function importExcel(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xls,xlsx',
+            'nik_user' => 'required',
+            'kode_pp' => 'required',
+            'kode_ta' => 'required',
+            'kode_matpel' => 'required',
+            'kode_tingkat' => 'required',
+            'kode_sem' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $del1 = DB::connection($this->db)->table('sis_kd_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->where('kode_pp', $request->kode_pp)->delete();
+
+            $per = date('ym');
+
+            // menangkap file excel
+            $file = $request->file('file');
+    
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
+
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $dt = Excel::toArray(new KdImport(),$nama_file);
+            $excel = $dt[0];
+            $x = array();
+            $status_validate = true;
+            $no=1;
+            
+            date_default_timezone_set('Asia/Jakarta');
+            $tgl_input = date('Y-m-d H:i:s');
+            foreach($excel as $row){
+                if($row[0] != ""){
+                    $ket = '';
+                    $sts = 1;
+                    $x[] = DB::connection($this->db)->insert("insert into sis_kd_tmp(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm,nu,nik_user,keterangan,status) values ('".$row[0]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$row[1]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$row[2].",".$no.",'".$request->nik_user."','$ket','$sts')");	
+                    $no++;
+                }
+            }
+            
+            DB::connection($this->db)->commit();
+            Storage::disk('local')->delete($nama_file);
+            if($status_validate){
+                $msg = "File berhasil diupload!";
+            }else{
+                $msg = "Ada error!";
+            }
+            
+            $success['status'] = true;
+            $success['validate'] = $status_validate;
+            $success['message'] = $msg;
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function export(Request $request) 
+    {
+        $this->validate($request, [
+            'nik_user' => 'required',
+            'kode_lokasi' => 'required',
+            'kode_pp' => 'required',
+            'kode_ta' => 'required',
+            'kode_matpel' => 'required',
+            'kode_tingkat' => 'required',
+            'kode_sem' => 'required',
+            'nik' => 'required',
+            'type' => 'required'
+        ]);
+
+        date_default_timezone_set("Asia/Bangkok");
+        $nik_user = $request->nik_user;
+        $nik = $request->nik;
+        $kode_lokasi = $request->kode_lokasi;
+        $kode_pp = $request->kode_pp;
+        if(isset($request->type) && $request->type == "template"){
+            return Excel::download(new KdExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_tingkat,$request->kode_sem,$request->kode_ta,$request->kode_matpel,$request->kode_kd), 'KD_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+        }else{
+            return Excel::download(new KdExport($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_tingkat,$request->kode_sem,$request->kode_ta,$request->kode_matpel,$request->kode_kd), 'KD_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+        }
+    }
+
+    public function getKdTmp(Request $request)
+    {
+        
+        $this->validate($request, [
+            'nik_user' => 'required',
+            'kode_pp' => 'required'
+        ]);
+
+        $nik_user = $request->nik_user;
+        $kode_pp = $request->kode_pp;
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_kd,a.nama,a.kkm
+            from sis_kd_tmp a
+            where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'  order by a.nu");
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['detail'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['detail'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
 }
