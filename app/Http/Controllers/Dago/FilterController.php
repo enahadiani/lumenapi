@@ -680,7 +680,7 @@ class FilterController extends Controller
           
             $sql="select distinct a.no_kb,a.no_reg 
             from dgw_pembayaran a 
-            where kode_lokasi='$kode_lokasi' $filter";
+            where kode_lokasi='$kode_lokasi' $filter and flag_ver='1' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
