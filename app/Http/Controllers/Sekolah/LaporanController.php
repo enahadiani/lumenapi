@@ -99,6 +99,18 @@ class LaporanController extends Controller
                 $i++;
             }
 
+            if($kelas == ""){
+                $filter_kelas = "";
+            }else{
+                $filter_kelas = " and a.kode_kelas in ($kelas) ";
+            }
+
+            if($matpel == ""){
+                $filter_matpel = "";
+            }else{
+                $filter_matpel = " and b.kode_matpel in ($matpel) ";
+            }
+
             // $sql2=" select a.nis, a.nama, a.kode_kelas, a.kode_pp from sis_siswa a 
             // where a.kode_lokasi='$kode_lokasi' and a.kode_pp ='".$request->kode_pp[1]."' and a.kode_kelas in ($kelas) ";
             $sql2 = "select a.nis,a.nis2,a.nama,a.kode_kelas,b.kode_matpel,a.kode_pp,isnull(b.n1,0) as n1,isnull(b.n2,0) as n2,isnull(b.n3,0) as n3
@@ -112,7 +124,7 @@ class LaporanController extends Controller
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='".$request->kode_pp[1]."' 
             group by b.nis,b.kode_lokasi,b.kode_pp,a.kode_matpel
                     )b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='".$request->kode_pp[1]."' and a.kode_kelas in ($kelas) and b.kode_matpel in ($matpel) and a.flag_aktif=1
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='".$request->kode_pp[1]."' $filter_kelas $filter_matpel and a.flag_aktif=1
             order by a.nama";
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
@@ -121,7 +133,6 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
-                $success['sql2'] = $sql2;
                 $success['message'] = "Success!"; 
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -131,6 +142,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['sql2'] = $sql2;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
