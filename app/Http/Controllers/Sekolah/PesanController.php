@@ -919,7 +919,7 @@ class PesanController extends Controller
                 $kode_pp='';
             }
 
-            $rs = DB::connection($this->db)->select("select count(*) as jum from sis_siswa where kode_kelas='$request->kode_kelas' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi'
+            $rs = DB::connection($this->db)->select("select count(*) as jum from sis_siswa where kode_kelas='$request->kode_kelas' and kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif=1
             ");
             $rs = json_decode(json_encode($rs),true);
             
