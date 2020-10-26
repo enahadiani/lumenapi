@@ -40,11 +40,11 @@ class KdExport implements FromCollection, WithHeadings, WithColumnFormatting, Wi
     {
         if($this->type == 'template'){
            
-            $res = collect(DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama,a.kkm from sis_kd_tmp a where a.kode_lokasi='-' "));
+            $res = collect(DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama as deskripsi,a.kkm from sis_kd_tmp a where a.kode_lokasi='-' "));
             
         }else{
            
-            $res = collect(DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama,a.kkm,a.status,a.keterangan,a.nu 
+            $res = collect(DB::connection('sqlsrvtarbak')->select("select a.kode_kd,a.nama as deskripsi,a.kkm,a.status,a.keterangan,a.nu 
             from sis_kd_tmp a
             where a.nik_user ='$this->nik_user' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and a.kode_sem ='$this->kode_sem' and a.kode_ta ='$this->kode_ta' and a.kode_matpel ='$this->kode_matpel' and a.kode_tingkat ='$this->kode_tingkat' order by a.kode_kd"));
                         
@@ -61,7 +61,7 @@ class KdExport implements FromCollection, WithHeadings, WithColumnFormatting, Wi
                 ['','','',''],
                 [
                     'kode_kd',
-                    'nama',
+                    'deskripsi',
                     'kkm'
                 ]
             ];
@@ -72,7 +72,7 @@ class KdExport implements FromCollection, WithHeadings, WithColumnFormatting, Wi
                 ['','','',''],
                 [
                     'kode_kd',
-                    'nama',
+                    'deskripsi',
                     'kkm'
                 ]
             ];
