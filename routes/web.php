@@ -54,6 +54,8 @@ $router->get('auth/facebook/callback', 'LoginSocialiteController@handleProviderC
 
 $router->post('send_notif_fcm', 'NotifController@sendNotif');
 
+$router->post('send-email', 'EmailController@send');
+
 
 $router->get('pusher/{title}/{message}/{id}', function ($title,$message,$id) {
     event(new \App\Events\NotifApv($title,$message,$id));
