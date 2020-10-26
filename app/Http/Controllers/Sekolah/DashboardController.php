@@ -163,10 +163,11 @@ class DashboardController extends Controller
                 $daftar = array();
                 for($i=0;$i<count($res);$i++){
                     $daftar[] = array("y"=>floatval($res[$i]['persen']),"name"=>$res[$i]['kode_kd'],"key"=>$res[$i]['kode_kd']); 
-                
+                    $ctg[] = array($res[$i]['kode_kd']);
                 }
                 $success['status'] = true;
                 $success['data'] = $daftar;
+                $success['ctg'] = $ctg;
                 $success['message'] = "Success!";
                 
                 return response()->json(['success'=>$success], $this->successStatus);     
