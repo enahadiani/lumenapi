@@ -312,18 +312,21 @@ class PesanController extends Controller
                 $click_action = "notifikasi";
                 $key = array(
                     'no_bukti' => $no_bukti,
-                    'kode_matpel' => $kode_matpel
+                    'kode_matpel' => $kode_matpel,
+                    'nik' => $nik
                 );
             }else if($tipe == "info"){
                 $click_action = "informasi";
                 $key = array(
                     'no_bukti' => $no_bukti,
-                    'kode_matpel' => $kode_matpel
+                    'kode_matpel' => $kode_matpel,
+                    'nik' => $nik
                 );
             }else{
                 $click_action = "detail_matpel";
                 $key = array(
-                    'kode_matpel' => $kode_matpel
+                    'kode_matpel' => $kode_matpel,
+                    'nik' => $nik
                 );
             }
             
