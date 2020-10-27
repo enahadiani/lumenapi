@@ -307,19 +307,24 @@ class PesanController extends Controller
             $kode_matpel = (isset($request->kode_matpel) && $request->kode_matpel != "" ? $request->kode_matpel : '-');
 
             $tipe = (isset($request->tipe) && $request->tipe != "" ? $request->tipe : ($request->jenis == "Semua" ? "notif" : "info"));
-
+            $key = array();
             if($tipe == "notif"){
                 $click_action = "notifikasi";
-                $value = $no_bukti;
-                $key = "no_bukti";
+                $key = array(
+                    'no_bukti' => $no_bukti,
+                    'kode_matpel' => $kode_matpel
+                );
             }else if($tipe == "info"){
                 $click_action = "informasi";
-                $value = $no_bukti;
-                $key = "no_bukti";
+                $key = array(
+                    'no_bukti' => $no_bukti,
+                    'kode_matpel' => $kode_matpel
+                );
             }else{
                 $click_action = "detail_matpel";
-                $value = $kode_matpel;
-                $key = "kode_matpel";
+                $key = array(
+                    'kode_matpel' => $kode_matpel
+                );
             }
             
             $ins = DB::connection($this->db)->insert("insert into sis_pesan_m(no_bukti,jenis,nis,kode_akt,kode_kelas,judul,subjudul,pesan,kode_pp,kode_lokasi,ref1,ref2,ref3,link,tipe,tgl_input,nik_user,kode_matpel) values ('$no_bukti','$request->jenis','$nis','-','$kode_kelas','$request->judul','-','$request->pesan','$request->kode_pp','$kode_lokasi','$ref1','$ref2','$ref3','$link','$tipe',getdate(),'$nik','$request->kode_matpel') ");
@@ -358,9 +363,7 @@ class PesanController extends Controller
                     'message' => $request->pesan,
                     'click_action' => $click_action,
                     'value' => $value,
-                    'key' => array(
-                        $key => $value
-                    )
+                    'key' => $key
                 );
                 $res = $this->gcm($arr_id,$payload);
                 $hasil= json_decode($res,true);
