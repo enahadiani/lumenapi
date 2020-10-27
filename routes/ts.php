@@ -58,7 +58,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     
     $router->get('kartu-piutang','Ts\DashSiswaController@getKartuPiutang');
     $router->get('kartu-pdd','Ts\DashSiswaController@getKartuPDD');
-    $router->get('dash-siswa-profile','Ts\DashSiswaController@getProfile');
-    
+    $router->get('dash-siswa-profile','Ts\DashSiswaController@getProfile');    
+    $router->post('send-email','EmailController@send');
     
 });
