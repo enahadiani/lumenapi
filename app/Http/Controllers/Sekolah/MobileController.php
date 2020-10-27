@@ -1426,7 +1426,7 @@ class MobileController extends Controller
                 $kode_kelas = "-";
             }
             
-			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru
+			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru,f.foto
             from sis_pesan_m a
             inner join (select kode_matpel,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                         from sis_pesan_m 
@@ -1435,10 +1435,12 @@ class MobileController extends Controller
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
             left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
-			  inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from sis_guru a
+            inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from sis_guru a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
 						union all 
-						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from karyawan a
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from karyawan a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') f on a.nik_user=f.nik and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
             where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
 			";
