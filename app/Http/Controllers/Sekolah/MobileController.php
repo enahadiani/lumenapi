@@ -1497,7 +1497,13 @@ class MobileController extends Controller
             inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$kode_kelas' and a.nik='$request->nik_guru' ");
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$kode_kelas' and a.nik='$request->nik_guru' 
+            union all
+            select distinct a.nik,'-' as kode_matpel,a.nama as nama_guru,isnull(d.foto,'-') as foto,'-' as nama_matpel,'-' as singkatan 
+            from karyawan a
+            left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            where a.kode_pp='$kode_pp' and a.nik='$request->nik_guru' 
+            ");
             $res2 = json_decode(json_encode($res2),true);
             
 			$sql = "select * from (select a.no_bukti,a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
