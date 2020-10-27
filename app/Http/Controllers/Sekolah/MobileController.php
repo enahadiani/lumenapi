@@ -1478,6 +1478,27 @@ class MobileController extends Controller
 		}
 		
         try{
+
+            $res3 = DB::connection($this->db)->select("
+            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+            $res3 = json_decode(json_encode($res3),true);
+
+            $kode_ta = $res3[0]['kode_ta'];
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,isnull(d.foto,'-') as foto,c.nama as nama_matpel,c.skode as singkatan 
+            from sis_guru_matpel_kelas a
+            inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$kode_kelas' and a.nik='$request->nik_guru' ");
+            $res2 = json_decode(json_encode($res2),true);
             
 			$sql = "select * from (select a.no_bukti,a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
             from sis_pesan_m a
@@ -1501,11 +1522,13 @@ class MobileController extends Controller
                     $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,LEN(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+file_dok as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
                 }
                 $success['status'] = true;
+                $success['data_guru'] = $res2;
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['status'] = false;
+                $success['data_guru'] = $res2;
                 $success['data'] = [];
                 $success['message'] = "Data Kosong!";
             }
