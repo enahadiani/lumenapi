@@ -362,7 +362,6 @@ class PesanController extends Controller
                     'title' => $request->judul,
                     'message' => $request->pesan,
                     'click_action' => $click_action,
-                    'value' => $value,
                     'key' => $key
                 );
                 $res = $this->gcm($arr_id,$payload);
