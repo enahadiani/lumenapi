@@ -985,8 +985,8 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
 
-            $sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
-            $res = DB::connection($this->sql)->update($sqlex);
+            //$sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
+            //$res = DB::connection($this->sql)->update($sqlex);
 
             $mutasi="";
             if($request->input('jenis') != ""){
@@ -1002,7 +1002,7 @@ class LaporanController extends Controller
             case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
             case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
             case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
-            from glma_tmp a 
+            from exs_glma a 
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             $where and a.nik_user='$nik_user'  $mutasi
             order by a.kode_akun ";
@@ -1016,7 +1016,7 @@ class LaporanController extends Controller
                         case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
                         case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
                         case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
-                        from glma_tmp a
+                        from exs_glma a
                         inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                         inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                         $where and a.nik_user='$nik_user' $mutasi
@@ -1029,7 +1029,7 @@ class LaporanController extends Controller
                         case when a.so_awal<0 then -so_awal else 0 end as so_awal_kredit, 
                         case when a.so_akhir>0 then so_akhir else 0 end as so_akhir_debet,
                         case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
-                        from glma_tmp a
+                        from exs_glma a
                         inner join konsol_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
                         inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                         $where and a.nik_user='$nik_user' $mutasi
@@ -1045,8 +1045,6 @@ class LaporanController extends Controller
                 $success['data']=$res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
-                $success['sql']=$sqlex;
-                $success['sql2']=$sql;
                 return response()->json($success, $this->successStatus);     
             }
             else{
