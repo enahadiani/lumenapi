@@ -1004,7 +1004,7 @@ class LaporanController extends Controller
             case when a.so_akhir<0 then -so_akhir else 0 end as so_akhir_kredit
             from exs_glma a 
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            $where and a.nik_user='$nik_user'  $mutasi
+            $where   $mutasi
             order by a.kode_akun ";
             if(isset($request->trail[1])){
                 if($request->input('trail')[1] != ""){
@@ -1019,7 +1019,7 @@ class LaporanController extends Controller
                         from exs_glma a
                         inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                         inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
-                        $where and a.nik_user='$nik_user' $mutasi
+                        $where  $mutasi
                         order by a.kode_akun";
                     }
                     if ($request->input('trail')[1] == "2")
@@ -1032,7 +1032,7 @@ class LaporanController extends Controller
                         from exs_glma a
                         inner join konsol_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
                         inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
-                        $where and a.nik_user='$nik_user' $mutasi
+                        $where $mutasi
                         order by a.kode_akun";
                     }
                 }
