@@ -1099,8 +1099,8 @@ class LaporanController extends Controller
             $level = $request->input('level')[1];
             $format = $request->input('format')[1];
 
-            $sql= "exec sp_neraca_dw '$kode_fs','A','K','$level','$periode','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->sql)->getPdo()->exec($sql);
+            //$sql= "exec sp_neraca_dw '$kode_fs','A','K','$level','$periode','$kode_lokasi','$nik_user' ";
+            //$res = DB::connection($this->sql)->getPdo()->exec($sql);
 
             $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
             $row = DB::connection($this->sql)->select($sql2);
@@ -1111,15 +1111,22 @@ class LaporanController extends Controller
                 $nama_periode="<br>(UnClosing)";
             }
 
-            $sql3 = "select '$kode_lokasi' as kode_lokasi,kode_neraca1,kode_neraca2,nama1,tipe1,nilai1,level_spasi1,nama2,tipe2,nilai2,level_spasi2 
-				from neraca_skontro 
-				where nik_user='$nik_user' order by rowindex ";
+           
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4
+                from exs_neraca a
+                $where and a.modul='A' 
+                union all
+                select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4
+                from exs_neraca a
+                $where and a.modul='P'  ";
+
             $nama="";
             if ($format=="Mutasi")
             {
-                $sql3 = "select '$kode_lokasi' as kode_lokasi,kode_neraca1,kode_neraca2,nama1,tipe1,nilai3 as nilai1,level_spasi1,nama2,tipe2,nilai4 as nilai2,level_spasi2 
-                    from neraca_skontro 
-                    where nik_user='$nik_user' order by rowindex ";
+                $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                    from exs_neraca a
+                    $where and a.modul='A' 
+                    order by a.rowindex ";
                 $nama="(MUTASI)";
             }
          
