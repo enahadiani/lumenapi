@@ -1189,14 +1189,15 @@ class LaporanController extends Controller
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
 
-            $sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->sql)->update($sql);
-            $success['sql'] = $sql;
-            $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi,
-                        case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4
-                from neraca_tmp 
-                where modul='L' and nik_user='$nik_user' 
-                order by rowindex ";
+            //$sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
+            //$res = DB::connection($this->sql)->update($sql);
+            //$success['sql'] = $sql;
+            
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
+                        case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4
+                from exs_neraca a
+                $where and a.modul='L' 
+                order by a.rowindex ";
             $success['sql2'] = $sql;
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
