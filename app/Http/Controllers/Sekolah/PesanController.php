@@ -59,7 +59,17 @@ class PesanController extends Controller
                     "title" => $data["title"],
                     "click_action" => $data["click_action"]
                 ),
-                'data'              => $data
+                'data'              => $data,
+                'priority' => "high",
+                'android' => array(
+                    "priority" => "high",
+                    "ttl" => "86400s",
+                    "notification" => array (
+                      "click_action" =>  $data["click_action"]
+                    )
+                ),
+             
+
                 // "android" => array (
                 //     "ttl" => "86400s",
                 //     "notification" => array (
