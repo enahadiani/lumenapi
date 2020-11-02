@@ -226,7 +226,7 @@ class LaporanController extends Controller
                 $success['data'] = $res;
                 $success['sql'] = $sql;
                 // $success['bulan'] = $this->getNamaBulan(intval($request->input($col_array[4])[1]));
-                $success['tahun'] = $request->input($col_array[5])[1];
+                $success['tahun'] = $request->input($col_array[4])[1];
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
