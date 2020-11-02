@@ -183,14 +183,14 @@ class KunjController extends Controller
                 }else{
                     $filter = " and a.no_bukti='".$request->no_bukti."' ";
                 }
-                $sql= "select a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat, c.nama as nama_subjenis 
+                $sql= "select distinct a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat, c.nama as nama_subjenis 
                       from par_kunj_m a 
                       inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi 
                       inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi 
                       where a.kode_lokasi='".$kode_lokasi."' ".$filter;
             }
             else {
-                $sql= "select a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat,  c.nama as nama_subjenis 
+                $sql= "select distinct a.no_bukti,a.tahun,a.bulan,b.nama as nama_mitra, b.alamat,  c.nama as nama_subjenis 
                       from par_kunj_m a 
                       inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi 
                       inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi 
