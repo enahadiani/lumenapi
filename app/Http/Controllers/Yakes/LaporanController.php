@@ -1524,7 +1524,7 @@ class LaporanController extends Controller
                 $where and a.modul='A' 
                 union all
                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-                from exs_neraca a
+                from exs_neraca_pp a
                 $where and a.modul='P'  ";
 
             $nama="";
@@ -1544,9 +1544,7 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data']=[];
-                $success['res']=$res;
                 $success['sql3'] = $sql3;
-                $success['sql'] = $sql;
                 $success['status'] = true;
                 
                 return response()->json($success, $this->successStatus);
