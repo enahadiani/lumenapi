@@ -1426,7 +1426,7 @@ class MobileController extends Controller
                 $kode_kelas = "-";
             }
             
-			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru
+			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru,f.foto
             from sis_pesan_m a
             inner join (select kode_matpel,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                         from sis_pesan_m 
@@ -1435,10 +1435,12 @@ class MobileController extends Controller
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
             left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
-			  inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from sis_guru a
+            inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from sis_guru a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
 						union all 
-						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from karyawan a
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from karyawan a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') f on a.nik_user=f.nik and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
             where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
 			";
@@ -1478,6 +1480,33 @@ class MobileController extends Controller
 		}
 		
         try{
+
+            $res3 = DB::connection($this->db)->select("
+            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+            $res3 = json_decode(json_encode($res3),true);
+
+            $kode_ta = $res3[0]['kode_ta'];
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,isnull(d.foto,'-') as foto,c.nama as nama_matpel,c.skode as singkatan 
+            from sis_guru_matpel_kelas a
+            inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$kode_kelas' and a.nik='$request->nik_guru' 
+            union all
+            select distinct a.nik,'-' as kode_matpel,a.nama as nama_guru,isnull(d.foto,'-') as foto,'-' as nama_matpel,'-' as singkatan 
+            from karyawan a
+            left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            where a.kode_pp='$kode_pp' and a.nik='$request->nik_guru' 
+            ");
+            $res2 = json_decode(json_encode($res2),true);
             
 			$sql = "select * from (select a.no_bukti,a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
             from sis_pesan_m a
@@ -1501,11 +1530,13 @@ class MobileController extends Controller
                     $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,LEN(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+file_dok as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
                 }
                 $success['status'] = true;
+                $success['data_guru'] = $res2;
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['status'] = false;
+                $success['data_guru'] = $res2;
                 $success['data'] = [];
                 $success['message'] = "Data Kosong!";
             }

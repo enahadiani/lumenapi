@@ -534,7 +534,7 @@ class LapInternal2Controller extends Controller
             inner join trans_m m on a.no_kb=m.no_bukti and a.kode_lokasi=m.kode_lokasi
             inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.nu=0
 			inner join masakun p on o.kode_akun=p.kode_akun and o.kode_lokasi=p.kode_lokasi
-            left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
+            left join ( select no_reg,kode_lokasi,sum(nilai) as biaya_tambah 
                         from dgw_reg_biaya 
                         group by no_reg,kode_lokasi ) i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi
             left join (select no_reg,kode_lokasi,isnull(sum(nilai_p),0) as paket, 
@@ -616,7 +616,7 @@ class LapInternal2Controller extends Controller
             inner join trans_m m on a.no_kb=m.no_bukti and a.kode_lokasi=m.kode_lokasi
             inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.dc='D'
 			inner join masakun p on o.kode_akun=p.kode_akun and o.kode_lokasi=p.kode_lokasi
-            left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
+            left join ( select no_reg,kode_lokasi,sum(nilai) as biaya_tambah 
                         from dgw_reg_biaya 
                         group by no_reg,kode_lokasi ) i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi
             left join (select no_reg,kode_lokasi,isnull(sum(nilai_p),0) as paket, 

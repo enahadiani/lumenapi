@@ -124,4 +124,6 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
     // Midtrans Test
     $router->get('sai-midtrans','Midtrans\MidtransController@getSnapToken');
+
+    $router->post('send-email','EmailController@send');
 });
