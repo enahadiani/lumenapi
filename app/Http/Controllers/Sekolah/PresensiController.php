@@ -15,12 +15,14 @@ class PresensiController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function index(Request $request)
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -37,7 +39,7 @@ class PresensiController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_kelas, a.kode_ta, b.nama,a.tanggal,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_presensi a inner join sis_kelas b on a.kode_kelas=b.kode_kelas where a.jenis_absen='HARIAN' and a.kode_lokasi='".$kode_lokasi."' $filter group by a.kode_kelas,b.nama,a.kode_ta,a.tanggal");
+            $res = DB::connection($this->db)->select("select a.kode_kelas, a.kode_ta, b.nama,a.tanggal,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from sis_presensi a inner join sis_kelas b on a.kode_kelas=b.kode_kelas where a.jenis_absen='HARIAN' and a.kode_lokasi='".$kode_lokasi."' $filter group by a.kode_kelas,b.nama,a.kode_ta,a.tanggal");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -87,10 +89,10 @@ class PresensiController extends Controller
             'keterangan'=>'required|array'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -99,10 +101,10 @@ class PresensiController extends Controller
 
                 for($i=0;$i<count($request->nis);$i++){
                     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->nis[$i],$request->kode_kelas,$request->kode_ta,date('Y-m-d H:i:s'),$request->status[$i],$kode_lokasi,$request->kode_pp,$request->keterangan[$i],$request->tanggal,'HARIAN'));
+                    $ins[$i] = DB::connection($this->db)->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->nis[$i],$request->kode_kelas,$request->kode_ta,date('Y-m-d H:i:s'),$request->status[$i],$kode_lokasi,$request->kode_pp,$request->keterangan[$i],$request->tanggal,'HARIAN'));
                     
                 }  
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $sts = true;
                 $msg = "Data Presensi berhasil disimpan.";
             }else{
@@ -114,7 +116,7 @@ class PresensiController extends Controller
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Presensi gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -139,15 +141,15 @@ class PresensiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select '$request->kode_kelas' as kode_kelas, '$request->kode_pp' as kode_pp, '$request->kode_ta' as kode_ta, '$request->tanggal' as tanggal ");
+            $res = DB::connection($this->db)->select("select '$request->kode_kelas' as kode_kelas, '$request->kode_pp' as kode_pp, '$request->kode_ta' as kode_ta, '$request->tanggal' as tanggal ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.nis, a.status,a.keterangan from sis_presensi a  where a.kode_kelas = '".$request->kode_kelas."' and a.kode_ta = '".$request->kode_ta."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$request->kode_pp."' and a.jenis_absen='HARIAN' and a.tanggal='$request->tanggal' ");
+            $res2 = DB::connection($this->db)->select("select a.nis, a.status,a.keterangan from sis_presensi a  where a.kode_kelas = '".$request->kode_kelas."' and a.kode_ta = '".$request->kode_ta."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$request->kode_pp."' and a.jenis_absen='HARIAN' and a.tanggal='$request->tanggal' ");
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -201,10 +203,10 @@ class PresensiController extends Controller
             'keterangan'=>'required|array'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -212,7 +214,7 @@ class PresensiController extends Controller
             
             if(count($request->nis) > 0){
 
-                $del = DB::connection('sqlsrvtarbak')->table('sis_presensi')
+                $del = DB::connection($this->db)->table('sis_presensi')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('kode_ta', $request->kode_ta)
@@ -223,10 +225,10 @@ class PresensiController extends Controller
 
                 for($i=0;$i<count($request->nis);$i++){
                     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->nis[$i],$request->kode_kelas,$request->kode_ta,date('Y-m-d H:i:s'),$request->status[$i],$kode_lokasi,$request->kode_pp,$request->keterangan[$i],$request->tanggal,'HARIAN'));
+                    $ins[$i] = DB::connection($this->db)->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->nis[$i],$request->kode_kelas,$request->kode_ta,date('Y-m-d H:i:s'),$request->status[$i],$kode_lokasi,$request->kode_pp,$request->keterangan[$i],$request->tanggal,'HARIAN'));
                     
                 }  
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $sts = true;
                 $msg = "Data Presensi berhasil diubah.";
             }else{
@@ -239,7 +241,7 @@ class PresensiController extends Controller
      
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Presensi gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -260,15 +262,15 @@ class PresensiController extends Controller
             'kode_ta' => 'required',
             'kode_kelas' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }		
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_presensi')
+            $del = DB::connection($this->db)->table('sis_presensi')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_pp', $request->kode_pp)
                 ->where('kode_ta', $request->kode_ta)
@@ -277,13 +279,13 @@ class PresensiController extends Controller
                 ->where('jenis_absen', 'HARIAN')
                 ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Presensi berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Presensi gagal dihapus ".$e;
             
@@ -307,12 +309,12 @@ class PresensiController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select 'HADIR' as stsapp,'-' as ket, nis from sis_siswa where flag_aktif='1' and kode_kelas = '".$request->kode_kelas."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$request->kode_pp."'");
+            $res = DB::connection($this->db)->select("select 'HADIR' as stsapp,'-' as ket, nis from sis_siswa where flag_aktif='1' and kode_kelas = '".$request->kode_kelas."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$request->kode_pp."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

@@ -15,10 +15,12 @@ class JenisPenilaianController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_jenis from sis_jenisnilai where kode_jenis ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select kode_jenis from sis_jenisnilai where kode_jenis ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class JenisPenilaianController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -54,7 +56,7 @@ class JenisPenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp 
+            $res = DB::connection($this->db)->select("select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp 
             from sis_jenisnilai a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."'  $filter ");
@@ -104,18 +106,18 @@ class JenisPenilaianController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_jenis,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif,tgl_input) values ('$request->kode_jenis','$request->nama','$kode_lokasi','$request->kode_pp','$request->flag_aktif',getdate()) ");
+                $ins = DB::connection($this->db)->insert("insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif,tgl_input) values ('$request->kode_jenis','$request->nama','$kode_lokasi','$request->kode_pp','$request->flag_aktif',getdate()) ");
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['kode'] = $request->kode_jenis;
                 $success['message'] = "Data Jenis Penilaian berhasil disimpan";
@@ -127,7 +129,7 @@ class JenisPenilaianController extends Controller
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Jenis Penilaian gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -150,7 +152,7 @@ class JenisPenilaianController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -161,7 +163,7 @@ class JenisPenilaianController extends Controller
             $sql = "select a.kode_jenis, a.nama,a.kode_pp,a.tgl_input,a.flag_aktif,b.nama as nama_pp 
             from sis_jenisnilai a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_jenis ='".$kode_jenis."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'";
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['sql'] = $sql;
             
@@ -211,29 +213,29 @@ class JenisPenilaianController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_jenisnilai')
+            $del = DB::connection($this->db)->table('sis_jenisnilai')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_jenis', $request->kode_jenis)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif,tgl_input) values ('$request->kode_jenis','$request->nama','$kode_lokasi','$request->kode_pp','$request->flag_aktif',getdate()) ");   
+            $ins = DB::connection($this->db)->insert("insert into sis_jenisnilai(kode_jenis,nama,kode_lokasi,kode_pp,flag_aktif,tgl_input) values ('$request->kode_jenis','$request->nama','$kode_lokasi','$request->kode_pp','$request->flag_aktif',getdate()) ");   
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->kode_jenis;
             $success['message'] = "Data Jenis Penilaian berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Jenis Penilaian gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -252,27 +254,27 @@ class JenisPenilaianController extends Controller
             'kode_pp' => 'required',
             'kode_jenis' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_jenisnilai')
+            $del = DB::connection($this->db)->table('sis_jenisnilai')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_jenis', $request->kode_jenis)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Jenis Penilaian berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Jenis Penilaian gagal dihapus ".$e;
             

@@ -9,12 +9,12 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 class NilaiImport implements ToModel, WithStartRow
 {
     public $sql = 'sqlsrvtarbak';
-    public $guard = 'tarbak';
+    public $guard = 'siswa';
     public $ket = '';
 
     public function startRow(): int
     {
-        return 2;
+        return 5;
     }
 
     public function model(Array $row)

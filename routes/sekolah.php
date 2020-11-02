@@ -15,13 +15,12 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
-    $router->post('login', 'AuthController@loginTarbak');
-    $router->get('hash-pass', 'AuthController@hashPasswordTarbak');
+    $router->post('login', 'AuthController@loginSiswa2');
+    $router->get('hash-pass', 'AuthController@hashPasswordSiswa');
     $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
-    
+    $router->get('hash-pass-costum2/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum2');
 });
-
 
 $router->get('storage/{filename}', function ($filename)
 {
@@ -33,26 +32,28 @@ $router->get('storage/{filename}', function ($filename)
 });
 
 $router->get('penilaian-export','Sekolah\PenilaianController@export');
+$router->get('kd-export','Sekolah\KdController@export');
+$router->get('penilaian-multiph-export','Sekolah\PenilaianMultiPHController@export');
 
-$router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
+$router->group(['middleware' => 'auth:siswa'], function () use ($router) {
 
-    $router->get('profile', 'AdminTarbakController@profile');
-    $router->get('users/{id}', 'AdminTarbakController@singleUser');
-    $router->get('users', 'AdminTarbakController@allUsers');
-    $router->get('cek-payload', 'AdminTarbakController@cekPayload');
+    $router->get('profile', 'AdminSiswaController@profile');
+    $router->get('users/{id}', 'AdminSiswaController@singleUser');
+    $router->get('users', 'AdminSiswaController@allUsers');
+    $router->get('cek-payload', 'AdminSiswaController@cekPayload');
 
     $router->get('menu/{kode_klp}', 'Sekolah\MenuController@show');
     
-    $router->post('update-password', 'AdminTarbakController@updatePassword');
-    $router->post('update-foto', 'AdminTarbakController@updatePhoto');
-    $router->post('update-background', 'AdminTarbakController@updateBackground');
+    $router->post('update-password', 'AdminSiswaController@updatePassword');
+    $router->post('update-foto', 'AdminSiswaController@updatePhoto');
+    $router->post('update-background', 'AdminSiswaController@updateBackground');
     
     $router->post('notif-pusher', 'Sekolah\NotifController@sendPusher');
     $router->get('notif-pusher', 'Sekolah\NotifController@getNotifPusher');
     $router->put('notif-update-status', 'Sekolah\NotifController@updateStatusRead');
 
-    $router->post('search-form', 'AdminTarbakController@searchForm');
-    $router->get('search-form-list', 'AdminTarbakController@searchFormList');
+    $router->post('search-form', 'AdminSiswaController@searchForm');
+    $router->get('search-form-list', 'AdminSiswaController@searchFormList');
 
     //Tahun Ajaran
     $router->get('pp','Sekolah\TahunAjaranController@getPP');
@@ -83,6 +84,13 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('kelas','Sekolah\KelasController@store');
     $router->put('kelas','Sekolah\KelasController@update');
     $router->delete('kelas','Sekolah\KelasController@destroy');
+
+    // Kelas Khusus
+    $router->get('kelas-khusus-all','Sekolah\KelasKhususController@index');
+    $router->get('kelas-khusus','Sekolah\KelasKhususController@show');
+    $router->post('kelas-khusus','Sekolah\KelasKhususController@store');
+    $router->put('kelas-khusus','Sekolah\KelasKhususController@update');
+    $router->delete('kelas-khusus','Sekolah\KelasKhususController@destroy');
 
     //Status Siswa
     $router->get('status-siswa-all','Sekolah\StatusSiswaController@index');
@@ -185,6 +193,8 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('kd','Sekolah\KdController@store');
     $router->put('kd','Sekolah\KdController@update');
     $router->delete('kd','Sekolah\KdController@destroy');
+    $router->post('import-kd','Sekolah\KdController@importExcel');
+    $router->get('kd-tmp','Sekolah\KdController@getKdTmp');
 
     //Presensi
     $router->get('presensi-all','Sekolah\PresensiController@index');
@@ -204,11 +214,34 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('penilaian-ke','Sekolah\PenilaianController@getPenilaianKe');
     $router->get('penilaian-kd','Sekolah\PenilaianController@getKD');
     
+    
+    $router->get('penilaian-dok-all','Sekolah\PenilaianController@listUpload');
     $router->post('import-excel','Sekolah\PenilaianController@importExcel');
     $router->get('nilai-tmp','Sekolah\PenilaianController@getNilaiTmp');
     $router->get('penilaian-dok','Sekolah\PenilaianController@showDokUpload');
     $router->post('penilaian-dok','Sekolah\PenilaianController@storeDokumen');
     $router->delete('penilaian-dok','Sekolah\PenilaianController@deleteDokumen');
+    $router->get('penilaian-matpel','Sekolah\PenilaianController@getMatpel');
+    $router->get('penilaian-kelas','Sekolah\PenilaianController@getKelas');
+    $router->get('penilaian-siswa','Sekolah\PenilaianController@getSiswa');
+
+    // PENILAIAN PH
+    $router->get('penilaian-multiph-all','Sekolah\PenilaianMultiPHController@index');
+    $router->get('penilaian-multiph','Sekolah\PenilaianMultiPHController@show');
+    $router->get('penilaian-multiph-load','Sekolah\PenilaianMultiPHController@loadSiswa');
+    $router->post('penilaian-multiph','Sekolah\PenilaianMultiPHController@store');
+    $router->put('penilaian-multiph','Sekolah\PenilaianMultiPHController@update');
+    $router->delete('penilaian-multiph','Sekolah\PenilaianMultiPHController@destroy');
+    $router->get('penilaian-multiph-ke','Sekolah\PenilaianMultiPHController@getPenilaianKe');
+    $router->get('penilaian-multiph-kd','Sekolah\PenilaianMultiPHController@getKD');
+    
+    $router->get('penilaian-multiph-dok-all','Sekolah\PenilaianMultiPHController@listUpload');
+    $router->post('import-multiph-excel','Sekolah\PenilaianMultiPHController@importExcel');
+    $router->get('nilai-multiph-tmp','Sekolah\PenilaianMultiPHController@getNilaiTmp');
+    $router->get('penilaian-multiph-dok','Sekolah\PenilaianMultiPHController@showDokUpload');
+    $router->post('penilaian-multiph-dok','Sekolah\PenilaianMultiPHController@storeDokumen');
+    $router->delete('penilaian-multiph-dok','Sekolah\PenilaianMultiPHController@deleteDokumen');
+
 
     $router->get('pesan-all','Sekolah\PesanController@index');
     $router->get('pesan','Sekolah\PesanController@show');
@@ -218,6 +251,11 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->delete('pesan-dok','Sekolah\PesanController@deleteDokumen');
     $router->get('pesan-history','Sekolah\PesanController@historyPesan');
     $router->get('rata2-nilai','Sekolah\PesanController@rata2Nilai');
+    $router->get('data-box','Sekolah\PesanController@getDataBox');
+
+    // DASHBOARD 
+    $router->get('rata2-nilai-dashboard','Sekolah\DashboardController@rata2Nilai');
+    $router->get('chart-kkm','Sekolah\DashboardController@jumDibawahKKM');
 
     // GURU
     $router->get('guru-all','Sekolah\GuruController@index');
@@ -234,6 +272,7 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->delete('ekskul','Sekolah\EkskulController@destroy');
     
     $router->post('data-import','Sekolah\EkskulController@importExcel');
+    $router->post('data-import-update','Sekolah\EkskulController@importExcelSiswa');
 
     //Siswa Matpel Khusus
     $router->get('sis-matpel-khusus-all','Sekolah\SisMatpelKhususController@index');
@@ -241,6 +280,26 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('sis-matpel-khusus','Sekolah\SisMatpelKhususController@store');
     $router->put('sis-matpel-khusus','Sekolah\SisMatpelKhususController@update');
     $router->delete('sis-matpel-khusus','Sekolah\SisMatpelKhususController@destroy');
+    
+    $router->get('filter-pp','Sekolah\FilterController@getFilterPP');
+    $router->get('filter-ta','Sekolah\FilterController@getFilterTA');
+    $router->get('filter-kelas','Sekolah\FilterController@getFilterKelas');
+    $router->get('filter-matpel','Sekolah\FilterController@getFilterMatpel');
+    $router->get('filter-guru','Sekolah\FilterController@getFilterGuru');
+    $router->get('filter-semester','Sekolah\FilterController@getFilterSemester');
+    
+    $router->get('lap-nilai','Sekolah\LaporanController@getNilai');
+    $router->get('lap-guru-kelas','Sekolah\LaporanController@getGuruKelas');
+    $router->get('lap-guru-matpel','Sekolah\LaporanController@getGuruMatpel');
+    $router->get('lap-siswa','Sekolah\LaporanController@getSiswa');
+    $router->get('lap-kd','Sekolah\LaporanController@getKD');
+
+    $router->post('notif','Sekolah\PenilaianController@sendNotif');
+
+    
+    $router->get('kartu-piutang','Sekolah\DashSiswaController@getKartuPiutang');
+    $router->get('kartu-pdd','Sekolah\DashSiswaController@getKartuPDD');
+    $router->get('dash-siswa-profile','Sekolah\DashSiswaController@getProfile');
     
     
 });

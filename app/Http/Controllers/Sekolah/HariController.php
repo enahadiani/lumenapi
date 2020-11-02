@@ -15,10 +15,12 @@ class HariController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_hari from sis_hari where kode_hari ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select kode_hari from sis_hari where kode_hari ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class HariController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -42,7 +44,7 @@ class HariController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_hari, a.nama,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp from sis_hari a
+            $res = DB::connection($this->db)->select("select a.kode_hari, a.nama,a.kode_pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp from sis_hari a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter");
             $res = json_decode(json_encode($res),true);
@@ -89,10 +91,10 @@ class HariController extends Controller
             'kode_hari' => 'required',
             'nama' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -102,9 +104,9 @@ class HariController extends Controller
             $req = $request->all();
             if($this->isUnik($req['kode_hari'],$kode_lokasi,$req['kode_pp'])){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_hari(kode_hari,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?) ",[$req['kode_hari'],$req['nama'],$kode_lokasi,$req['kode_pp']]);
+                $ins = DB::connection($this->db)->insert("insert into sis_hari(kode_hari,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?) ",[$req['kode_hari'],$req['nama'],$kode_lokasi,$req['kode_pp']]);
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Hari berhasil disimpan";
             }else{
@@ -113,7 +115,7 @@ class HariController extends Controller
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Hari gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -127,15 +129,15 @@ class HariController extends Controller
             'kode_hari' => 'required',
             'nama' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del = DB::connection('sqlsrvtarbak')->table('sis_hari')
+            $del = DB::connection($this->db)->table('sis_hari')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_hari', $request->kode_hari)
             ->where('kode_pp', $request->kode_pp)
@@ -143,15 +145,15 @@ class HariController extends Controller
             
             
             $req = $request->all();
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_hari(kode_hari,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?) ",[$req['kode_hari'],$req['nama'],$kode_lokasi,$req['kode_pp']]);
+            $ins = DB::connection($this->db)->insert("insert into sis_hari(kode_hari,nama,kode_lokasi,kode_pp) values (?, ?, ?, ?) ",[$req['kode_hari'],$req['nama'],$kode_lokasi,$req['kode_pp']]);
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Hari berhasil disimpan";
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Hari gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -169,27 +171,27 @@ class HariController extends Controller
             'kode_pp' => 'required',
             'kode_hari' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_hari')
+            $del = DB::connection($this->db)->table('sis_hari')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_hari', $request->kode_hari)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Hari berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Hari gagal dihapus ".$e;
             
@@ -205,14 +207,14 @@ class HariController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             $kode_pp= $request->kode_pp;
             $kode_hari= $request->kode_hari;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_hari, nama,kode_pp from sis_hari where kode_hari ='".$kode_hari."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'
+            $res = DB::connection($this->db)->select("select kode_hari, nama,kode_pp from sis_hari where kode_hari ='".$kode_hari."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'
             ");
             $res = json_decode(json_encode($res),true);
             

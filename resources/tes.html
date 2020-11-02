@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <title>JavaScript Window Close Example </title>
+  <script type="text/javascript">
+    function popuponclick() {
+      my_window = window.open('', 'mywindow', 'status=1,width=350,height=150');
+      my_window.document.write('<html><head><title>Print Me</title></head>');
+      my_window.document.write('<body>');
+      my_window.document.write('<p>When you print this window, it will close afterward.</p>');
+      my_window.document.write('</body></html>');  
+      my_window.print();
+      my_window.close();
+  }
+  // $('#cetakBtn2').click(function(){
+  //       var no_jual = $('#modal-no_jual').text();
+  //       $.ajax({
+  //           type: 'GET',
+  //           url: '<?=$root_ser?>/POS.php?fx=getNota',
+  //           dataType: 'json',
+  //           data: {'no_bukti':no_jual,'kode_lokasi':'<?=$kode_lokasi?>','nik_user':'<?=$nik?>','kode_pp':'<?=$kode_pp?>'},
+  //           success:function(result){    
+  //               if(result.status){
+  //                   var html = '';
+
+  //                   for(var i =0; i<result.daftar.length;i++){
+  //                       var sub=(result.daftar[i].harga*result.daftar[i].jumlah)-result.daftar[i].diskon;
+  //                       html += `
+  //                           <tr>
+  //                           <td width='85%' class='size_isi'>`+result.daftar[i].nama+`  X `+sepNum(result.daftar[i].jumlah)+`</td>
+  //                           <td width='15%' align='right' class='size_isi'>`+sepNum(result.daftar[i].total)+`</td>
+  //                           </tr>
+  //                       `;
+  //                   }
+  //                   my_window = window.open('', 'mywindow', 'status=1,width=350,height=150');
+  //                   my_window.document.write(`<!DOCTYPE html>
+  //                   <html lang="en">
+  //                       <head>
+  //                           <meta charset="UTF-8">
+  //                           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  //                           <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  //                           <title>Nota Penjualan</title>
+  //                           <style>
+  //                               .size_judul
+  //                               {
+  //                               font-size:12px;
+  //                               }
+                                
+  //                               .size_isi
+  //                               {
+  //                               font-size:10px;
+  //                               }
+
+  //                           </style>
+  //                           <style media="print">
+  //                               #nonPrint
+  //                               {
+  //                               display:none;
+  //                               }
+  //                           </style>
+  //                       </head>
+  //                       <body>
+  //                       <table width='100%' border='0' cellspacing='0' cellpadding='0'>
+  //                           <tr>
+  //                           <td colspan='2' align='center' class='size_judul'>Toko Asrama Putra TJ</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td colspan='2' align='center' class='size_judul'>Jl.Telekomunikasi No. 1 Trs.Buahbatu </td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td colspan='2' align='center' class='size_judul'>Bandung</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td>&nbsp;</td>
+  //                           <td align='right'>&nbsp;</td>
+  //                           </tr>
+  //                       </table>
+  //                       <table width='100%' border='0' cellspacing='0' cellpadding='0' id='table-det' style='padding-bottom:20px'>
+  //                       `+html+`
+  //                       </table>
+  //                       <table width='100%' border='0' cellspacing='0' cellpadding='0'>
+  //                           <tr>
+  //                           <td class='size_isi'>Total Transaksi</td>
+  //                           <td align='right' class='size_isi' id='totrans'>`+result.total_trans+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>Total Diskon</td>
+  //                           <td align='right' class='size_isi' id='todisk'>`+result.total_disk+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>Total Set. Disc</td>
+  //                           <td align='right' class='size_isi' id='tostlh'>`+result.total_stlh+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>Total Bayar</td>
+  //                           <td align='right' class='size_isi' id='tobyr'>`+result.total_byr+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>Kembalian</td>
+  //                           <td align='right' class='size_isi' id='kembali'>`+result.kembalian+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>&nbsp;</td>
+  //                           <td align='right' class='size_isi'>&nbsp;</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <tr>
+  //                           <td class='size_isi' colspan='2' id='no_bukti'>`+result.no_jual+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi' colspan='2' id='tgl'>`+result.tgl+`</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>Kasir:<span id='nik'>`+result.nik+`</span></td>
+  //                           <td class='size_isi'></td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td class='size_isi'>&nbsp;</td>
+  //                           <td align='right' class='size_isi'>&nbsp;</td>
+  //                           </tr>
+  //                           <tr>
+  //                           <td colspan='2' align='center' class='size_judul'>Terima Kasih </td>
+  //                           </tr>
+  //                       </table>
+  //                       </body>
+  //                   </html>`);
+  //                   my_window.document.write('<body>');
+  //                   my_window.document.write('<p>When you print this window, it will close afterward.</p>');
+  //                   my_window.document.write('</body></html>');  
+  //                   my_window.print();
+  //                   my_window.close();
+  //               }
+  //           }
+  //       });
+  //   });
+  </script>
+</head>
+<body>
+  <p>To try out the <code>afterprint</code> event, click the link below to open
+  the window to print. You can also try changing the code to use <code>beforeprint</code>
+  to see the difference.</p>
+  <p><a href="javascript: popuponclick()">Open Popup Window</a></p>
+</body>
+</html>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class RtrwController extends Controller
 {
@@ -1928,6 +1929,63 @@ class RtrwController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function uploadBuktiBayar(Request $request){
+        $this->validate($request, [
+            'no_rumah' => 'required',
+            'kode_akun' => 'required',
+            'keterangan'=>'required',
+            'file_gambar' => 'required|file|max:3072'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $str_format="0000";
+            $periode=date('Y').date('m');
+            $per=date('y').date('m');
+            $prefix=$kode_lokasi."-DOK".$per.".";
+            $query = DB::connection($this->sql)->select("select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from rt_trans_dok where no_bukti like '$prefix%' ");
+            $query = json_decode(json_encode($query),true);
+            
+            $no_bukti = $prefix.str_pad($query[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+
+            $arr_foto = array();
+            $arr_nama = array();
+            $arr_jenis = array();
+            $i=0;
+            if($request->hasfile('file_gambar'))
+            {
+                $file = $request->file('file_gambar');
+                $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('rtrw/'.$foto)){
+                    Storage::disk('s3')->delete('rtrw/'.$foto);
+                }
+                Storage::disk('s3')->put('rtrw/'.$foto,file_get_contents($file));
+            }
+    
+            $ins = DB::connection($this->sql)->insert("insert into rt_trans_dok (no_bukti,kode_akun,kode_rumah,kode_lokasi,tgl_input,nama_file,keterangan,no_app) values ('$no_bukti','$request->kode_akun','$request->no_rumah','$kode_lokasi',getdate(),'$foto','$request->keterangan','-')");
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Upload bukti berhasil disimpan. No Bukti:".$no_bukti;
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Upload bukti gagal disimpan. ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
 
     
 }

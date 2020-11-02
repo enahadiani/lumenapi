@@ -152,14 +152,14 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('kode_bidang', 'kode_mitra', 'kode_jenis', 'kode_subjenis','bulan', 'tahun');
-            $db_col_name = array('e.kode_bidang', 'b.kode_mitra', 'd.kode_jenis', 'c.kode_subjenis', 'z.bulan', 'z.tahun');
+            $col_array = array('kode_bidang', 'kode_mitra', 'kode_jenis', 'kode_subjenis','tahun');
+            $db_col_name = array('e.kode_bidang', 'b.kode_mitra', 'd.kode_jenis', 'c.kode_subjenis', 'z.tahun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $group = "group by b.kode_mitra,b.nama";
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
-                if($i == 4 || $i == 5) continue;
+                // if($i == 4 || $i == 5) continue;
                 if(ISSET($request->input($col_array[$i])[0])){
                     if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
@@ -213,7 +213,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['sql'] = $sql;
-                $success['bulan'] = $this->getNamaBulan(intval($request->input($col_array[4])));
+                $success['bulan'] = $this->getNamaBulan(intval($request->input($col_array[4])[1]));
                 $success['tahun'] = $request->input($col_array[5])[1];
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
@@ -301,9 +301,10 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('kode_mitra');
-            $db_col_name = array('a.kode_mitra');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $col_array = array('kode_bidang','kode_jenis','kode_subjenis');
+            $db_col_name = array('e.kode_bidang','d.kode_jenis','c.kode_subjenis');
+            // $where = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='77'";
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -326,14 +327,41 @@ class LaporanController extends Controller
                     }
                 }
             }
-            
-            $sql="select a.kode_mitra, a.nama, a.alamat, a.no_tel, a.pic from par_mitra a $where";
+
+            if($request->input($col_array[0])[0] == '=') {
+                $success['bidang'] = $this->getBidang($request->input($col_array[0])[1]);   
+            }
+
+            if($request->input($col_array[1])[0] == '=') {
+                $success['jenis'] = $this->getJenis($request->input($col_array[1])[1]);   
+            }
+
+            if($request->input($col_array[2])[0] == '=') {
+                $success['subjenis'] = $this->getSubJenis($request->input($col_array[2])[1]);   
+            }
+            $sql = "select distinct e.nama as nama_bidang,a.*, f.nama as camat
+            from par_mitra a 
+            inner join par_mitra_subjenis b on a.kode_mitra=b.kode_mitra
+            inner join par_subjenis c on b.kode_subjenis=c.kode_subjenis
+            inner join par_jenis d on c.kode_jenis=d.kode_jenis
+            inner join par_bidang e on d.kode_bidang=e.kode_bidang
+            inner join par_camat f on a.kecamatan=f.kode_camat
+            $where
+            order by e.nama";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $dataBidangResult = array();
+            if(count($res) > 0) {
+                foreach($res as $value){
+                    $dataBidangResult[$value['nama_bidang']][] = $value;
+                }
+            }   
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['dataMitra'] = $dataBidangResult;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 

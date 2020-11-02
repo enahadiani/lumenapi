@@ -15,10 +15,12 @@ class GuruController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select nik from sis_guru where nik ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select nik from sis_guru where nik ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class GuruController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -47,7 +49,7 @@ class GuruController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nik,a.kode_pp,a.nama,a.no_hp,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp,a.tgl_input 
+            $res = DB::connection($this->db)->select("select a.nik,a.kode_pp,a.nama,a.no_hp,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp+'-'+b.nama as pp,a.tgl_input 
             from sis_guru a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."'  $filter ");
@@ -98,18 +100,18 @@ class GuruController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->nik,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru(nik,nama,kode_lokasi,kode_pp,no_hp,flag_aktif,tgl_input) values ('$request->nik','$request->nama','$kode_lokasi','$request->kode_pp','$request->no_hp','$request->flag_aktif',getdate()) ");
+                $ins = DB::connection($this->db)->insert("insert into sis_guru(nik,nama,kode_lokasi,kode_pp,no_hp,flag_aktif,tgl_input) values ('$request->nik','$request->nama','$kode_lokasi','$request->kode_pp','$request->no_hp','$request->flag_aktif',getdate()) ");
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['kode'] = $request->nik;
                 $success['message'] = "Data Guru berhasil disimpan";
@@ -121,7 +123,7 @@ class GuruController extends Controller
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Guru gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -144,7 +146,7 @@ class GuruController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -156,7 +158,7 @@ class GuruController extends Controller
             from sis_guru a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             where a.nik ='".$nik."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'";
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -206,29 +208,29 @@ class GuruController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_guru')
+            $del = DB::connection($this->db)->table('sis_guru')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('nik', $request->nik)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert("insert into sis_guru(nik,nama,kode_lokasi,kode_pp,no_hp,flag_aktif,tgl_input) values ('$request->nik','$request->nama','$kode_lokasi','$request->kode_pp','$request->no_hp','$request->flag_aktif',getdate()) ");
+            $ins = DB::connection($this->db)->insert("insert into sis_guru(nik,nama,kode_lokasi,kode_pp,no_hp,flag_aktif,tgl_input) values ('$request->nik','$request->nama','$kode_lokasi','$request->kode_pp','$request->no_hp','$request->flag_aktif',getdate()) ");
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->nik;
             $success['message'] = "Data Guru berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Guru gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -247,27 +249,27 @@ class GuruController extends Controller
             'kode_pp' => 'required',
             'nik' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_guru')
+            $del = DB::connection($this->db)->table('sis_guru')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('nik', $request->nik)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Guru berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Guru gagal dihapus ".$e;
             

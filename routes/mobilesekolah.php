@@ -26,7 +26,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login-guru', 'AuthController@loginTarbak');
     $router->get('hash-pass-guru', 'AuthController@hashPasswordTarbak');
 
-    $router->post('login-siswa', 'AuthController@loginSiswa');
+    $router->post('login-siswa', 'AuthController@loginSiswa2');
     $router->get('hash-pass-siswa', 'AuthController@hashPasswordSiswa');
     $router->get('daftar-pp', 'AdminTarbakController@getDaftarPP');
     $router->get('hash-pass-bynik/{db}/{table}/{nik}','AuthController@hashPasswordByNIK');
@@ -71,9 +71,21 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('raport', 'Sekolah\MobileController@getRaport');
     $router->get('mata-pelajaran', 'Sekolah\MobileController@getMatpel');
     $router->get('mata-pelajaran-detail', 'Sekolah\MobileController@getDetMatpel');
+    $router->get('mata-pelajaran-preview', 'Sekolah\MobileController@getPreviewMatpel');
+    
 
     $router->post('update-password', 'AdminSiswaController@updatePassword');
     $router->post('update-foto', 'AdminSiswaController@updatePhoto');
+
+    
+    $router->get('info', 'Sekolah\MobileController@getInfo');
+    $router->get('info-detail', 'Sekolah\MobileController@getDetailInfo');
+
+    $router->get('info2', 'Sekolah\MobileController@getInfo2');
+    $router->get('info2-detail', 'Sekolah\MobileController@getDetailInfo2');
+
+    $router->put('update-status-read', 'Sekolah\MobileController@updateStatusReadMobile');
+    $router->get('notif', 'Sekolah\MobileController@getNotif');
 
 
 });

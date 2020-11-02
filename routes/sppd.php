@@ -57,4 +57,7 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->get('agenda-dok/{no_agenda}', 'Sppd\SppdController@getAgendaDok');
     $router->get('agenda-bayar/{no_agenda}', 'Sppd\SppdController@getAgendaBayar');
 
+    
+    $router->post('cek', 'Sppd\SppdController@cek');
+
 });

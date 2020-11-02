@@ -412,7 +412,7 @@ class FilterController extends Controller
                 }
             }
 
-            $sql="select a.no_reg from dgw_reg a $where";
+            $sql="select a.no_reg, b.nama from dgw_reg a inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi $where";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -533,7 +533,7 @@ class FilterController extends Controller
                 }
             }
 
-            $sql="select a.no_peserta,b.nama 
+            $sql="select distinct a.no_peserta,b.nama 
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             $where";
@@ -680,7 +680,7 @@ class FilterController extends Controller
           
             $sql="select distinct a.no_kb,a.no_reg 
             from dgw_pembayaran a 
-            where kode_lokasi='$kode_lokasi' $filter";
+            where kode_lokasi='$kode_lokasi' $filter and flag_ver='1' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             

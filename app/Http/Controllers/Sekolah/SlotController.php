@@ -15,10 +15,12 @@ class SlotController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_slot from sis_slot where kode_slot ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select kode_slot from sis_slot where kode_slot ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class SlotController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -41,7 +43,7 @@ class SlotController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  
+            $res = DB::connection($this->db)->select( "select a.kode_slot, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  
             from sis_slot a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."'  $filter ");
             $res = json_decode(json_encode($res),true);
             
@@ -90,18 +92,18 @@ class SlotController extends Controller
             'jam2' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_slot,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_slot(kode_slot,nama,kode_lokasi,kode_pp,jam1,jam2) values (?, ?, ?, ?, ?, ?)', [$request->kode_slot,$request->nama,$kode_lokasi,$request->kode_pp,$request->jam1,$request->jam2]);
+                $ins = DB::connection($this->db)->insert('insert into sis_slot(kode_slot,nama,kode_lokasi,kode_pp,jam1,jam2) values (?, ?, ?, ?, ?, ?)', [$request->kode_slot,$request->nama,$kode_lokasi,$request->kode_pp,$request->jam1,$request->jam2]);
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Slot Jam Belajar berhasil disimpan";
             }else{
@@ -110,7 +112,7 @@ class SlotController extends Controller
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Slot Jam Belajar gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -133,7 +135,7 @@ class SlotController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -141,7 +143,7 @@ class SlotController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_slot= $request->kode_slot;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select nama, kode_slot,convert(varchar(5),jam1,121) as jam1,convert(varchar(5),jam2,121) as jam2,kode_pp from sis_slot where kode_slot ='".$kode_slot."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+            $res = DB::connection($this->db)->select("select nama, kode_slot,convert(varchar(5),jam1,121) as jam1,convert(varchar(5),jam2,121) as jam2,kode_pp from sis_slot where kode_slot ='".$kode_slot."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -191,28 +193,28 @@ class SlotController extends Controller
             'jam2' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_slot')
+            $del = DB::connection($this->db)->table('sis_slot')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_slot', $request->kode_slot)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_slot(kode_slot,nama,kode_lokasi,kode_pp,jam1,jam2) values (?, ?, ?, ?, ?, ?)', [$request->kode_slot,$request->nama,$kode_lokasi,$request->kode_pp,$request->jam1,$request->jam2]);            
+            $ins = DB::connection($this->db)->insert('insert into sis_slot(kode_slot,nama,kode_lokasi,kode_pp,jam1,jam2) values (?, ?, ?, ?, ?, ?)', [$request->kode_slot,$request->nama,$kode_lokasi,$request->kode_pp,$request->jam1,$request->jam2]);            
                         
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Slot Jam Belajar berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Slot Jam Belajar gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -231,27 +233,27 @@ class SlotController extends Controller
             'kode_pp' => 'required',
             'kode_slot' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_slot')
+            $del = DB::connection($this->db)->table('sis_slot')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_slot', $request->kode_slot)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Slot Jam Belajar berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Slot Jam Belajar gagal dihapus ".$e;
             

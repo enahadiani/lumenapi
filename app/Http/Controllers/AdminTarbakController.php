@@ -40,7 +40,11 @@ class AdminTarbakController extends Controller
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
-                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs], 200);
+                $ta = DB::connection($this->db)->select("select kode_ta from sis_ta where kode_lokasi='$kode_lokasi' and kode_pp='".$user[0]['kode_pp']."' and flag_aktif='1'
+                ");
+                $ta = json_decode(json_encode($ta),true);
+
+                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs,'kode_ta'=>$ta], 200);
             }
             else{
                 return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);

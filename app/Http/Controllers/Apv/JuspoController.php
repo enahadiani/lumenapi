@@ -121,7 +121,7 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             // $sql = "case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai";
-            $sql = "select a.no_bukti,a.no_dokumen,a.kode_pp,case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.progress,case isnull(b.progress,'-')  when 'R' then 'REVISI' when 'A' then 'Approval Pusat 1' else '-' end as status,isnull(b.no_bukti,'-') as id,p.nama as nama_pp
+            $sql = "select a.no_bukti,a.no_dokumen,a.kode_pp,case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.progress,case isnull(b.progress,'-')  when 'R' then 'REVISI' when 'A' then 'Approval Pusat 1' else '-' end as status,isnull(b.no_bukti,'-') as id,p.nama as nama_pp,a.pemakai as pic
             from apv_juskeb_m a
             inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi 
             left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
@@ -386,10 +386,11 @@ class JuspoController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tgl_input,121) as tgl_input, convert(varchar(10),a.tanggal,121) as tgl_juskeb,b.nama as nama_pp,c.nama as nama_klp
+            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tgl_input,121) as tgl_input, convert(varchar(10),a.tanggal,121) as tgl_juskeb,b.nama as nama_pp,c.nama as nama_klp,d.pemakai as pic
             from apv_juspo_m a 
             left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             left join apv_kota c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
+            inner join apv_juskeb_m d on a.no_juskeb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' ";
             
             $res = DB::connection($this->db)->select($sql);
@@ -483,7 +484,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tanggal,121) as tanggal
+            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kode_kota,a.waktu,a.kegiatan,a.dasar,a.nilai,convert(varchar(10),a.tanggal,121) as tanggal,a.pemakai as pic
             from apv_juskeb_m a 
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti'  ";
             
@@ -873,10 +874,11 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen, convert(varchar(10),a.tanggal,121) as tanggal,a.kegiatan,a.waktu,a.dasar,a.nilai,a.kode_pp,b.nama as nama_pp,a.kode_kota,c.nama as nama_kota 
+            $sql="select a.no_bukti,a.no_juskeb,a.no_dokumen, convert(varchar(10),a.tanggal,121) as tanggal,a.kegiatan,a.waktu,a.dasar,a.nilai,a.kode_pp,b.nama as nama_pp,a.kode_kota,c.nama as nama_kota,d.pemakai as pic 
             from apv_juspo_m a
             left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             left join apv_kota c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
+            inner join apv_juskeb_m d on a.no_juskeb=d.no_bukti and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
             
             $res = DB::connection($this->db)->select($sql);

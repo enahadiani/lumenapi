@@ -195,4 +195,122 @@ class LaporanController extends Controller
         }
     }
 
+    function getRekapAju(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('kode_pp','kode_kota');
+            $db_col_name = array('a.kode_pp','a.kode_kota');
+
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+
+            $sql="select a.kode_pp,b.nama as nama_pp,a.kode_kota,c.nama as nama_kota,count(a.no_bukti) as jum 
+            from apv_juskeb_m a
+            inner join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join apv_kota c on a.kode_kota=c.kode_kota and a.kode_lokasi=c.kode_lokasi
+            $filter 
+            group by a.kode_pp,b.nama,a.kode_kota,c.nama
+            order by a.kode_pp,a.kode_kota
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getRekapAjuDetail(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('kode_pp','kode_kota');
+            $db_col_name = array('a.kode_pp','a.kode_kota');
+
+            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            for($i = 0; $i<count($col_array); $i++){
+                if($request->input($col_array[$i]) !=""){
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                }
+            }
+
+            $sql="select a.no_bukti as no_juskeb,a.no_dokumen,a.kegiatan as juskeb,a.dasar as latar_belakang,a.kode_divisi,a.nilai,isnull(a.pemakai,'-') as pic,isnull(b.nama,'-') as nama_divisi,isnull(c.no_bukti,'-') as no_juspo,isnull(c.nilai,0) as nilai_juspo,
+            case when a.progress = 'A' then 'Verifikasi' 
+                       when a.progress='F' then 'Return Verifikasi' 
+                       when a.progress='R' then 'Return Approval' 
+                       when a.progress not in ('R','S','F') then isnull(x.nama_jab,'-')
+                       when a.progress = 'S' and isnull(c.progress,'-') ='-' then 'Finish Kebutuhan' 
+                       when a.progress = 'S' and c.progress ='S' then 'Finish Pengadaan' 
+                       when a.progress = 'S' and c.progress ='R' then 'Return Approval' 
+                       when a.progress = 'S' and c.progress not in ('R','S') then isnull(y.nama_jab,'-')
+                       end as posisi
+            from apv_juskeb_m a
+            left join apv_divisi b on a.kode_divisi=b.kode_divisi and a.kode_lokasi=b.kode_lokasi
+            left join apv_juspo_m c on a.no_bukti=c.no_juskeb and a.kode_lokasi=c.kode_lokasi
+            left join (select a.no_bukti,b.nama as nama_jab
+                                           from apv_flow a
+                                           inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                                           where a.kode_lokasi='$kode_lokasi' and a.status='1'
+                                           )x on a.no_bukti=x.no_bukti
+                       left join (select a.no_bukti,b.nama as nama_jab
+                                           from apv_flow a
+                                           inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                                           where a.kode_lokasi='$kode_lokasi' and a.status='1'
+                                           )y on c.no_bukti=y.no_bukti
+            $filter
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $success['sql'] = $sql;
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

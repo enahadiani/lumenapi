@@ -15,10 +15,12 @@ class AngkatanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
 
     public function isUnik($isi,$kode_lokasi,$kode_pp){
         
-        $auth = DB::connection('sqlsrvtarbak')->select("select kode_akt from sis_angkat where kode_akt ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
+        $auth = DB::connection($this->db)->select("select kode_akt from sis_angkat where kode_akt ='".$isi."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -31,7 +33,7 @@ class AngkatanController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -41,7 +43,7 @@ class AngkatanController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_akt,a.kode_pp+'-'+b.nama as pp, a.nama, a.kode_tingkat,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
+            $res = DB::connection($this->db)->select( "select a.kode_akt,a.kode_pp+'-'+b.nama as pp, a.nama, a.kode_tingkat,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
             from sis_angkat a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
@@ -92,18 +94,18 @@ class AngkatanController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_akt,$kode_lokasi,$request->kode_pp)){
 
-                $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_angkat (kode_lokasi,kode_akt,nama,kode_tingkat,kode_pp,flag_aktif) values (?, ?, ?, ?, ?, ?)', [$kode_lokasi,$request->kode_akt,$request->nama,$request->kode_tingkat,$request->kode_pp,$request->flag_aktif]);
+                $ins = DB::connection($this->db)->insert('insert into sis_angkat (kode_lokasi,kode_akt,nama,kode_tingkat,kode_pp,flag_aktif) values (?, ?, ?, ?, ?, ?)', [$kode_lokasi,$request->kode_akt,$request->nama,$request->kode_tingkat,$request->kode_pp,$request->flag_aktif]);
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Angkatan berhasil disimpan";
             }else{
@@ -113,7 +115,7 @@ class AngkatanController extends Controller
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Angkatan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -137,7 +139,7 @@ class AngkatanController extends Controller
         try {
             
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -145,7 +147,7 @@ class AngkatanController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_akt = $request->kode_akt;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_akt,nama, kode_tingkat,kode_pp,flag_aktif from sis_angkat where kode_akt ='".$kode_akt."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
+            $res = DB::connection($this->db)->select("select kode_akt,nama, kode_tingkat,kode_pp,flag_aktif from sis_angkat where kode_akt ='".$kode_akt."' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -195,28 +197,28 @@ class AngkatanController extends Controller
             'flag_aktif' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_angkat')
+            $del = DB::connection($this->db)->table('sis_angkat')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_akt', $request->kode_akt)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $ins = DB::connection('sqlsrvtarbak')->insert('insert into sis_angkat (kode_lokasi,kode_akt,nama,kode_tingkat,kode_pp,flag_aktif) values (?, ?, ?, ?, ?, ?)', [$kode_lokasi,$request->kode_akt,$request->nama,$request->kode_tingkat,$request->kode_pp,$request->flag_aktif]);
+            $ins = DB::connection($this->db)->insert('insert into sis_angkat (kode_lokasi,kode_akt,nama,kode_tingkat,kode_pp,flag_aktif) values (?, ?, ?, ?, ?, ?)', [$kode_lokasi,$request->kode_akt,$request->nama,$request->kode_tingkat,$request->kode_pp,$request->flag_aktif]);
             
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Angkatan berhasil diubah";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Angkatan gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -235,27 +237,27 @@ class AngkatanController extends Controller
             'kode_pp' => 'required',
             'kode_akt' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_angkat')
+            $del = DB::connection($this->db)->table('sis_angkat')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_akt', $request->kode_akt)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Angkatan berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Angkatan gagal dihapus ".$e;
             
@@ -268,7 +270,7 @@ class AngkatanController extends Controller
         try {
             
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -286,7 +288,7 @@ class AngkatanController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select kode_tingkat,nama from sis_tingkat where kode_lokasi='".$kode_lokasi."' $filter	 
+            $res = DB::connection($this->db)->select("select kode_tingkat,nama from sis_tingkat where kode_lokasi='".$kode_lokasi."' $filter	 
             ");
             $res = json_decode(json_encode($res),true);
             

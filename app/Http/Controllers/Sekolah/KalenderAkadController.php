@@ -15,12 +15,14 @@ class KalenderAkadController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
+    
     public function index(Request $request)
     {
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -30,7 +32,7 @@ class KalenderAkadController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_sem,a.kode_ta,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  
+            $res = DB::connection($this->db)->select("select a.kode_sem,a.kode_ta,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status  
             from sis_kalender_akad a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter
@@ -82,10 +84,10 @@ class KalenderAkadController extends Controller
             'agenda'=>'required|array'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -93,10 +95,10 @@ class KalenderAkadController extends Controller
 
                 for($i=0;$i<count($request->tanggal);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
+                    $ins[$i] = DB::connection($this->db)->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
                     
                 }
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $sts = true;
                 $msg = "Data Kalender Akademik berhasil disimpan";
             }else{
@@ -109,7 +111,7 @@ class KalenderAkadController extends Controller
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kalender Akademik gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -133,7 +135,7 @@ class KalenderAkadController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -142,10 +144,10 @@ class KalenderAkadController extends Controller
             $kode_sem= $request->kode_sem;
             $kode_ta= $request->kode_ta;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select '$kode_ta' as kode_ta, '$kode_sem' as kode_sem, '$kode_pp' as kode_pp ");
+            $res = DB::connection($this->db)->select("select '$kode_ta' as kode_ta, '$kode_sem' as kode_sem, '$kode_pp' as kode_pp ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select tanggal,agenda from sis_kalender_akad 
+            $res2 = DB::connection($this->db)->select("select tanggal,agenda from sis_kalender_akad 
             where kode_ta='$kode_ta' and kode_sem='$kode_sem' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'");
             $res2 = json_decode(json_encode($res2),true);
             
@@ -198,17 +200,17 @@ class KalenderAkadController extends Controller
             'agenda'=>'required|array'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
             
             if(count($request->tanggal) > 0){
-                $del = DB::connection('sqlsrvtarbak')->table('sis_kalender_akad')
+                $del = DB::connection($this->db)->table('sis_kalender_akad')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_ta', $request->kode_ta)
                 ->where('kode_sem', $request->kode_sem)
@@ -217,11 +219,11 @@ class KalenderAkadController extends Controller
 
                 for($i=0;$i<count($request->tanggal);$i++){
     
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
+                    $ins[$i] = DB::connection($this->db)->insert('insert into sis_kalender_akad(kode_pp,kode_lokasi,kode_ta,kode_sem,tanggal,agenda) values (?, ?, ?, ?, ?, ?)', [$request->kode_pp,$kode_lokasi,$request->kode_ta,$request->kode_sem,$request->tanggal[$i],$request->agenda[$i]]);
                     
                 }
                 
-                DB::connection('sqlsrvtarbak')->commit();
+                DB::connection($this->db)->commit();
                 $sts = true;
                 $msg = "Data Kalender Akademik berhasil diubah";
             }else{
@@ -233,7 +235,7 @@ class KalenderAkadController extends Controller
             $success['message'] = $msg;
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kalender Akademik gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -253,28 +255,28 @@ class KalenderAkadController extends Controller
             'kode_ta' => 'required',
             'kode_sem' => 'required'
         ]);
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
-            if($data =  Auth::guard('tarbak')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection('sqlsrvtarbak')->table('sis_kalender_akad')
+            $del = DB::connection($this->db)->table('sis_kalender_akad')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_ta', $request->kode_ta)
                 ->where('kode_sem', $request->kode_sem)
                 ->where('kode_pp', $request->kode_pp)
                 ->delete();
 
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kalender Akademik berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kalender Akademik gagal dihapus ".$e;
             

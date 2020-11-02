@@ -16,7 +16,7 @@ class AdminSiswa extends Model implements AuthenticatableContract, AuthorizableC
     protected $connection = 'sqlsrvtarbak';
     protected $table = 'sis_hakakses';
 
-    protected $primaryKey = 'nik';
+    protected $primaryKey = 'nik2';
     public $incrementing = false;
 
     /**
@@ -25,7 +25,7 @@ class AdminSiswa extends Model implements AuthenticatableContract, AuthorizableC
      * @var array
      */
     protected $fillable = [
-        'nik','status_login','no_hp','kode_lokasi','kode_pp','tgl_selesai','flag_aktif','menu_mobile','tgl_input','nik_user','kode_menu','foto','path_view'
+        'nik','status_login','no_hp','kode_lokasi','kode_pp','tgl_selesai','flag_aktif','menu_mobile','tgl_input','nik_user','kode_menu','foto','path_view','nik2'
     ];
 
     /**

@@ -27,8 +27,9 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('filter-modul','Yakes\FilterController@getFilterModul');
     $router->get('filter-bukti-jurnal','Yakes\FilterController@getFilterBuktiJurnal');
     $router->get('filter-mutasi','Yakes\FilterController@getFilterYaTidak');
+    $router->get('filter-pp','Yakes\FilterController@getFilterPp');
 
-    //Laporan
+    //Laporan lokasi
     $router->get('lap-nrclajur','Yakes\LaporanController@getNrcLajur');
     $router->get('lap-jurnal','Yakes\LaporanController@getJurnal');
     $router->get('lap-buktijurnal','Yakes\LaporanController@getBuktiJurnal');
@@ -36,6 +37,17 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('lap-neraca','Yakes\LaporanController@getNeraca');
     $router->get('lap-labarugi','Yakes\LaporanController@getLabaRugi');
 
+    //Laporan pp
+    $router->get('lap-nrclajur-pp','Yakes\LaporanController@getNrcLajurPp');
+    $router->get('lap-neraca-pp','Yakes\LaporanController@getNeracaPp');
+    $router->get('lap-labarugi-pp','Yakes\LaporanController@getLabaRugiPp');
+
+    //Laporan jejer
+    $router->get('lap-nrclajur-jejer','Yakes\LaporanController@getNrcLajurJejer');
+    $router->get('lap-neraca-jejer','Yakes\LaporanController@getNeracaJejer');
+    $router->get('lap-labarugi-jejer','Yakes\LaporanController@getLabaRugiJejer');
+
+    //email
     $router->post('send-laporan','Yakes\LaporanController@sendMail');
 
 });

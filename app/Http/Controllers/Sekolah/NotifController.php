@@ -25,7 +25,7 @@ class NotifController extends Controller
      * @return Response
      */
 	public $successStatus = 200;
-    public $guard = 'tarbak';
+    public $guard = 'siswa';
     public $db = 'sqlsrvtarbak';
 	
 	public function sendPusher(Request $request)

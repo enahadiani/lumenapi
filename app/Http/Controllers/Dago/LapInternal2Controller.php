@@ -523,7 +523,7 @@ class LapInternal2Controller extends Controller
                 }
             }
 
-            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room-b.diskon)) as biaya_paket,(b.harga+b.harga_room-b.diskon)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room-b.diskon)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp,a.no_kb
+            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room-b.diskon)) as biaya_paket,(b.harga+b.harga_room-b.diskon)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room-b.diskon)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp,a.no_kb, i.biaya_tambah - (j.tambahan)+ (a.nilai_t+nilai_m) as saldo_t, a.nilai_t+nilai_m as bayar_t, i.biaya_tambah - (j.tambahan) as sisa_t
             from dgw_pembayaran a
             inner join dgw_reg b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
             inner join dgw_typeroom c on b.no_type=c.no_type and b.kode_lokasi=c.kode_lokasi
@@ -532,9 +532,9 @@ class LapInternal2Controller extends Controller
             inner join dgw_peserta k on b.no_peserta=k.no_peserta and b.kode_lokasi=k.kode_lokasi 
             inner join dgw_paket l on b.no_paket=l.no_paket and b.kode_lokasi=l.kode_lokasi 
             inner join trans_m m on a.no_kb=m.no_bukti and a.kode_lokasi=m.kode_lokasi
-            inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.dc='D'
+            inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.nu=0
 			inner join masakun p on o.kode_akun=p.kode_akun and o.kode_lokasi=p.kode_lokasi
-            left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
+            left join ( select no_reg,kode_lokasi,sum(nilai) as biaya_tambah 
                         from dgw_reg_biaya 
                         group by no_reg,kode_lokasi ) i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi
             left join (select no_reg,kode_lokasi,isnull(sum(nilai_p),0) as paket, 
@@ -551,6 +551,7 @@ class LapInternal2Controller extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = "SUCCESS";
                 $success['data'] = $res;
+                $success['sql'] = $sql;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -558,6 +559,7 @@ class LapInternal2Controller extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = "FAILED";
                 return response()->json($success, $this->successStatus);
             }
@@ -603,7 +605,7 @@ class LapInternal2Controller extends Controller
                 }
             }
 
-            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room-b.diskon)) as biaya_paket,(b.harga+b.harga_room-b.diskon)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room-b.diskon)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp,a.no_kb
+            $sql="select a.no_kwitansi, a.kurs,a.paket,b.no_type,c.nama as room,b.harga+b.harga_room-b.diskon as harga_paket,a.jadwal,h.nama_marketing,e.nama_agen,isnull(b.referal,'-') as referal,a.no_reg,i.biaya_tambah,j.paket+j.tambahan+j.dokumen as bayar_lain,n.cicil_ke as cicil_ke, (a.kurs*(b.harga+b.harga_room-b.diskon)) as biaya_paket,(b.harga+b.harga_room-b.diskon)-(j.paket)+a.nilai_p as saldo, a.nilai_p as bayar,(b.harga+b.harga_room-b.diskon)-(j.paket) as sisa,CONVERT(varchar, a.tgl_bayar, 105) as tgl_bayar,k.nama as peserta,l.kode_curr,m.nik_user,o.kode_akun,p.nama as nama_akun,a.sistem_bayar,k.telp,a.no_kb, i.biaya_tambah - (j.tambahan)+ (a.nilai_t+nilai_m) as saldo_t, a.nilai_t+nilai_m as bayar_t, i.biaya_tambah - (j.tambahan) as sisa_t
             from dgw_pembayaran a
             inner join dgw_reg b on a.no_reg=b.no_reg and a.kode_lokasi=b.kode_lokasi
             inner join dgw_typeroom c on b.no_type=c.no_type and b.kode_lokasi=c.kode_lokasi
@@ -614,7 +616,7 @@ class LapInternal2Controller extends Controller
             inner join trans_m m on a.no_kb=m.no_bukti and a.kode_lokasi=m.kode_lokasi
             inner join trans_j o on m.no_bukti=o.no_bukti and m.kode_lokasi=o.kode_lokasi and o.dc='D'
 			inner join masakun p on o.kode_akun=p.kode_akun and o.kode_lokasi=p.kode_lokasi
-            left join ( select no_reg,kode_lokasi,sum(jml*nilai) as biaya_tambah 
+            left join ( select no_reg,kode_lokasi,sum(nilai) as biaya_tambah 
                         from dgw_reg_biaya 
                         group by no_reg,kode_lokasi ) i on b.no_reg=i.no_reg and b.kode_lokasi=i.kode_lokasi
             left join (select no_reg,kode_lokasi,isnull(sum(nilai_p),0) as paket, 
@@ -683,7 +685,7 @@ class LapInternal2Controller extends Controller
                 }
             }
 
-            $sql="select a.no_reg,b.id_peserta,a.no_peserta,b.nama as nama_peserta,a.no_paket,c.nama as nama_paket,d.nama as nama_room, convert(varchar,e.tgl_berangkat,103) tgl_berangkat,a.harga+a.harga_room-a.diskon as biaya_paket,isnull(f.nilai,0) as biaya_tambahan,isnull(g.nilai,0) as biaya_dok,isnull(h.bayar_paket,0) as bayar_paket,isnull(h.bayar_tambahan,0) as bayar_tambahan,isnull(h.bayar_dok,0) as bayar_dok, (a.harga+a.harga_room-a.diskon)-isnull(h.bayar_paket,0) as saldo_paket,isnull(f.nilai,0) - isnull(h.bayar_tambahan,0) as saldo_tambahan,isnull(g.nilai,0)-isnull(h.bayar_dok,0) as saldo_dok, (a.harga+a.harga_room-a.diskon)+isnull(f.nilai,0)+isnull(g.nilai,0) as tagihan,isnull(h.bayar_paket,0) + isnull(h.bayar_tambahan,0) + isnull(h.bayar_dok,0) as bayar,((a.harga+a.harga_room-a.diskon)-isnull(h.bayar_paket,0))+ (isnull(f.nilai,0) - isnull(h.bayar_tambahan,0)) + (isnull(g.nilai,0)-isnull(h.bayar_dok,0)) as saldo
+            $sql="select a.no_reg,b.id_peserta,a.no_peserta,b.nama as nama_peserta,a.no_paket,c.nama as nama_paket,c.kode_curr,d.nama as nama_room, convert(varchar,e.tgl_berangkat,103) tgl_berangkat,a.harga+a.harga_room-a.diskon as biaya_paket,isnull(f.nilai,0) as biaya_tambahan,isnull(g.nilai,0) as biaya_dok,isnull(h.bayar_paket,0) as bayar_paket,isnull(h.bayar_tambahan,0) as bayar_tambahan,isnull(h.bayar_dok,0) as bayar_dok, (a.harga+a.harga_room-a.diskon)-isnull(h.bayar_paket,0) as saldo_paket,isnull(f.nilai,0) - isnull(h.bayar_tambahan,0) as saldo_tambahan,isnull(g.nilai,0)-isnull(h.bayar_dok,0) as saldo_dok, (a.harga+a.harga_room-a.diskon)+isnull(f.nilai,0)+isnull(g.nilai,0) as tagihan,isnull(h.bayar_paket,0) + isnull(h.bayar_tambahan,0) + isnull(h.bayar_dok,0) as bayar,((a.harga+a.harga_room-a.diskon)-isnull(h.bayar_paket,0))+ (isnull(f.nilai,0) - isnull(h.bayar_tambahan,0)) + (isnull(g.nilai,0)-isnull(h.bayar_dok,0)) as saldo
             from dgw_reg a 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi
             inner join dgw_paket c on a.no_paket=c.no_paket and a.kode_lokasi=c.kode_lokasi
@@ -803,11 +805,11 @@ class LapInternal2Controller extends Controller
                     $i++;
                 }
 
-                $sql="select a.no_reg,a.no_kwitansi,a.kode_lokasi,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,a.nilai_p,a.nilai_t,a.nilai_m
+                $sql="select a.no_reg,a.no_kb as no_kwitansi,a.kode_lokasi,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,a.nilai_p,a.nilai_t,a.nilai_m
                 from dgw_pembayaran a
                 inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
                 inner join trans_m b on a.no_kb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and a.no_reg in ($no_reg)
+                where a.kode_lokasi='$kode_lokasi' and a.no_reg in ($no_reg) and a.flag_ver =1
                 order by b.tanggal ";
                 $rs2 = DB::connection($this->sql)->select($sql);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -1175,7 +1177,7 @@ class LapInternal2Controller extends Controller
                     case when a.dc='C' then a.nilai else 0 end as kredit 
                     from trans_j a 
                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                    $filter and a.no_bukti in ($no_bukti) order by a.no_bukti,a.nu ";
+                    $where and a.no_bukti in ($no_bukti) order by a.no_bukti,a.nu ";
                 $res2 = DB::connection($this->sql)->select($sql2);
                 $res2 = json_decode(json_encode($res2),true);
                 

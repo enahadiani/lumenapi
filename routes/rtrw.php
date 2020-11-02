@@ -182,6 +182,8 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->delete('lokasi','Rtrw\LokasiController@destroy');
     
     $router->post('upload-warga','Rtrw\WargaController@uploadWarga');
+    
+    $router->post('upload-bukti-bayar', 'Rtrw\RtrwController@uploadBuktiBayar');
 
 });
 
@@ -228,6 +230,5 @@ $router->group(['middleware' => 'auth:warga'], function () use ($router) {
     $router->get('rekap_setoran_detail_wr', 'Rtrw\RtrwController@getDetailRekapSetoran');
     $router->get('notif_wr', 'Rtrw\NotifController@getInfo');
     $router->get('notif_wr_all', 'Rtrw\NotifController@getNotif');
-
     
 });

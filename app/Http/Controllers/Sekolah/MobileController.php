@@ -15,6 +15,8 @@ class MobileController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
+    public $guard = "siswa";
+    public $db = "sqlsrvtarbak";
     //GURU
 
     public function getJadwalSekarang(Request $request)
@@ -34,7 +36,7 @@ class MobileController extends Controller
             $kode_hari = $request->kode_hari;
             $kode_ta = $request->kode_ta;
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,a.kode_matpel,b.jam1,b.jam2,c.nama as matpel,'-' as status 
+            $res = DB::connection($this->db)->select( "select a.kode_kelas,a.kode_matpel,b.jam1,b.jam2,c.nama as matpel,'-' as status 
             from sis_jadwal a 
             inner join sis_slot b on a.kode_slot=b.kode_slot and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
@@ -82,7 +84,7 @@ class MobileController extends Controller
             $jam = $request->jam;
             $tanggal = $request->tanggal;
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_kelas,isnull(b.jum,0) as jum_sis,isnull(c.jum_hadir,0) as jum_hadir,isnull(c.jum_sakit,0) as jum_sakit,isnull(c.jum_izin,0) as jum_izin,isnull(c.jum_alpa,0) as jum_alpa
+            $res = DB::connection($this->db)->select( "select a.kode_kelas,isnull(b.jum,0) as jum_sis,isnull(c.jum_hadir,0) as jum_hadir,isnull(c.jum_sakit,0) as jum_sakit,isnull(c.jum_izin,0) as jum_izin,isnull(c.jum_alpa,0) as jum_alpa
             from sis_jadwal a 
             inner join sis_slot x on a.kode_slot=x.kode_slot and a.kode_lokasi=x.kode_lokasi
             left join (select kode_kelas,kode_pp,kode_lokasi,count(nis) as jum
@@ -134,7 +136,7 @@ class MobileController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_kelas = $request->kode_kelas;
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis,a.nama,'HADIR' as sts
+            $res = DB::connection($this->db)->select( "select a.nis,a.nama,'HADIR' as sts
             from sis_siswa a
             where a.flag_aktif='1' and a.kode_kelas = '$kode_kelas' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'             
             ");
@@ -178,7 +180,7 @@ class MobileController extends Controller
             $kode_matpel = $request->kode_matpel;
             $tanggal = $request->tanggal;
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis,a.nama,isnull(b.status,'-') as sts
+            $res = DB::connection($this->db)->select( "select a.nis,a.nama,isnull(b.status,'-') as sts
             from sis_siswa a
             left join (select a.nis,kode_pp,kode_lokasi,a.status,a.kode_kelas
                         from sis_presensi a
@@ -220,7 +222,7 @@ class MobileController extends Controller
             'detail.*.nis' => 'required'
         ]);
 
-        DB::connection('sqlsrvtarbak')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($res =  Auth::guard('tarbak')->user()){
@@ -236,7 +238,7 @@ class MobileController extends Controller
             $status_simpan = $request->status_simpan;
 
             if ($status_simpan == 0) {
-                $del = DB::connection('sqlsrvtarbak')->table('sis_presensi')
+                $del = DB::connection($this->db)->table('sis_presensi')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_kelas', $request->kode_kelas)
                 ->where('kode_pp', $request->kode_pp)
@@ -252,17 +254,17 @@ class MobileController extends Controller
 
                 for ($i=0;$i < count($data);$i++){
                      
-                    $ins[$i] = DB::connection('sqlsrvtarbak')->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen,kode_matpel,nik) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['nis'],$kode_kelas,$kode_ta,date('Y-m-d H:i:s'),$data[$i]['status'],$kode_lokasi,$kode_pp,$tanggal,'HARIAN',$kode_matpel,$nik]);
+                    $ins[$i] = DB::connection($this->db)->insert('insert into sis_presensi(nis,kode_kelas,kode_ta,tgl_input,status,kode_lokasi,kode_pp,keterangan,tanggal,jenis_absen,kode_matpel,nik) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$data[$i]['nis'],$kode_kelas,$kode_ta,date('Y-m-d H:i:s'),$data[$i]['status'],$kode_lokasi,$kode_pp,$tanggal,'HARIAN',$kode_matpel,$nik]);
                 }	
             }
 
             $success['status'] = true;
             $success['message'] = "Data Presensi berhasil disimpan";
-            DB::connection('sqlsrvtarbak')->commit();
+            DB::connection($this->db)->commit();
             
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvtarbak')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Presensi gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -286,7 +288,7 @@ class MobileController extends Controller
             $kode_pp = $request->kode_pp;
             $kode_ta = $request->kode_ta;
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot,a.kode_kelas, a.kode_hari, a.kode_matpel,d.nama as nama_matpel, a.nik,e.nama as nama_guru,c.jam1,c.jam2 
+            $res = DB::connection($this->db)->select( "select a.kode_slot,a.kode_kelas, a.kode_hari, a.kode_matpel,d.nama as nama_matpel, a.nik,e.nama as nama_guru,c.jam1,c.jam2 
             from sis_jadwal a
                         inner join sis_slot c on a.kode_slot=c.kode_slot and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
                         inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
@@ -319,13 +321,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis, a.nama , isnull(b.hadir,0) as hadir,isnull(b.alpa,0) as alpha,isnull(b.izin,0) as izin,isnull(b.sakit,0) as sakit 
+            $res = DB::connection($this->db)->select( "select a.nis, a.nama , isnull(b.hadir,0) as hadir,isnull(b.alpa,0) as alpha,isnull(b.izin,0) as izin,isnull(b.sakit,0) as sakit 
             from sis_siswa a 
             left join (select a.nis,a.kode_lokasi,count(case when a.status ='hadir' then status end) hadir,
                        count(case when a.status ='alpa' then status end) alpa,
@@ -341,7 +343,7 @@ class MobileController extends Controller
            ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select( " select tanggal,convert(varchar(5),tgl_input,108) as jam, status from sis_presensi  where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' and nis='$nik'
+            $res2 = DB::connection($this->db)->select( " select tanggal,convert(varchar(5),tgl_input,108) as jam, status from sis_presensi  where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' and nis='$nik'
             ");
             $res2 = json_decode(json_encode($res2),true);
             
@@ -370,16 +372,16 @@ class MobileController extends Controller
     {
         try {
             
-            if($cek =  Auth::guard('siswa')->user()){
+            if($cek =  Auth::guard($this->guard)->user()){
                 $nik= $cek->nik;
                 $kode_lokasi= $cek->kode_lokasi;
                 $kode_pp = $cek->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select kode_hari,nama from sis_hari where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' ");
+            $res = DB::connection($this->db)->select( "select kode_hari,nama from sis_hari where kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp' ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select( "select a.kode_slot, c.nama as nama_slot,a.kode_kelas, a.kode_hari, a.kode_matpel,d.nama as nama_matpel, b.nis,a.nik,e.nama as nama_guru from sis_jadwal a
+            $res2 = DB::connection($this->db)->select( "select a.kode_slot, c.nama as nama_slot,a.kode_kelas, a.kode_hari, a.kode_matpel,d.nama as nama_matpel, b.nis,a.nik,e.nama as nama_guru from sis_jadwal a
             inner join sis_siswa b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_slot c on a.kode_slot=c.kode_slot and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
@@ -438,13 +440,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select * from sis_kalender_akad a where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            $res = DB::connection($this->db)->select( "select * from sis_kalender_akad a where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -471,13 +473,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select convert(varchar,a.tgl_mulai,103) as tgl_mulai,convert(varchar,a.tgl_selesai,103) as tgl_selesai,a.keterangan,a.predikat from sis_ekskul a
+            $res = DB::connection($this->db)->select( "select convert(varchar,a.tgl_mulai,103) as tgl_mulai,convert(varchar,a.tgl_selesai,103) as tgl_selesai,a.keterangan,a.predikat from sis_ekskul a
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik' ");
             $res = json_decode(json_encode($res),true);
             
@@ -504,13 +506,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,c.nama as nama_jur,a.kode_akt,a.id_bank,x.nama as nama_pp
+            $res = DB::connection($this->db)->select( "select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,c.nama as nama_jur,a.kode_akt,a.id_bank,x.nama as nama_pp
 			from sis_siswa a
 			inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
 			inner join sis_jur c on b.kode_jur=c.kode_jur and 
@@ -539,7 +541,7 @@ class MobileController extends Controller
 			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
 			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='C'
 			)a";
-            $get = DB::connection('sqlsrvtarbak')->select($sql2);
+            $get = DB::connection($this->db)->select($sql2);
             $get = json_decode(json_encode($get),true);
             $success['saldo'] = $get[0]['so_akhir'];
 
@@ -578,7 +580,7 @@ class MobileController extends Controller
                     )a
                     inner join (select tanggal,keterangan,no_kas,kode_lokasi from kas_m where kode_lokasi='$kode_lokasi' union select tanggal,keterangan,no_ju as no_kas,kode_lokasi from ju_m where kode_lokasi='$kode_lokasi') b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
             ";
-            $res2 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res2 = DB::connection($this->db)->select($sql3);
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -606,7 +608,7 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
@@ -620,7 +622,7 @@ class MobileController extends Controller
 			inner join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
 			where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
 			order by a.kode_kelas,a.nis";
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             $sql2 = "select case when sum(debet-kredit) < 0 then 0 else sum(debet-kredit) end as so_akhir
@@ -642,7 +644,7 @@ class MobileController extends Controller
 			inner join kas_m b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi
 			where a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.dc='C'
 			)a";
-            $get = DB::connection('sqlsrvtarbak')->select($sql2);
+            $get = DB::connection($this->db)->select($sql2);
             $get = json_decode(json_encode($get),true);
             $success['saldo'] = $get[0]['so_akhir'];
 
@@ -670,7 +672,7 @@ class MobileController extends Controller
                     )a
             inner join sis_rekon_m b on a.no_bukti=b.no_rekon and a.kode_lokasi=b.kode_lokasi
             order by tanggal,modul";
-            $res2 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res2 = DB::connection($this->db)->select($sql3);
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -701,14 +703,14 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
             $periode = $request->periode;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total,a.kode_kelas,isnull(e.total,0) as bayar
+            $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total,a.kode_kelas,isnull(e.total,0) as bayar
             from sis_siswa a 
             inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
             left join (select y.nis,y.kode_lokasi,  
@@ -763,14 +765,14 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
             $periode = $request->periode;
 
-            $res = DB::connection('sqlsrvtarbak')->select("select case when sum(debet-kredit) < 0 then 0 else sum(debet-kredit) end as so_akhir
+            $res = DB::connection($this->db)->select("select case when sum(debet-kredit) < 0 then 0 else sum(debet-kredit) end as so_akhir
 			from (select a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
 			a.nilai as debet,0 as kredit,a.dc
 			from sis_cd_d a
@@ -809,13 +811,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select( "select  top 10 a.* from (
+            $res = DB::connection($this->db)->select( "select  top 10 a.* from (
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
                 b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
                 from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,
@@ -872,14 +874,14 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
             $tahun = $request->tahun;
             $sql = "select distinct a.periode from sis_bill_d a where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and a.periode  LIKE '$tahun%' ";
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql2 = "select a.no_bill,a.periode,a.tanggal,isnull(b.jum,0) as jum_param
@@ -890,7 +892,7 @@ class MobileController extends Controller
                         group by a.no_bill,a.kode_lokasi,a.kode_pp,a.periode,a.nis
              ) b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
              where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.periode  LIKE '$tahun%'  and b.nis ='$nik'";
-            $res2 = DB::connection('sqlsrvtarbak')->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             $sql3 = "select a.nis, a.nama, b.kode_param,isnull(b.total,0) as bill, isnull(c.total,0) as bayar , isnull(b.total,0)-isnull(c.total,0) as saldo,b.periode,b.tanggal,b.no_bill   
@@ -910,7 +912,7 @@ class MobileController extends Controller
                         and b.periode=c.periode_bill and b.kode_param=c.kode_param            
             where(a.kode_lokasi = '$kode_lokasi')and a.kode_pp='$kode_pp' and a.nis='$nik' and b.periode  LIKE '$tahun%'            
             order by periode desc";
-            $res3 = DB::connection('sqlsrvtarbak')->select($sql3);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -940,13 +942,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
+            $res = DB::connection($this->db)->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -954,7 +956,7 @@ class MobileController extends Controller
            ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
+            $res2 = DB::connection($this->db)->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -962,7 +964,7 @@ class MobileController extends Controller
             ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $res3 = DB::connection('sqlsrvtarbak')->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
+            $res3 = DB::connection($this->db)->select("select a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel, b.nilai,c.nama as nama_matpel 
             from sis_nilai_m a
             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -989,13 +991,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select(" select a.no_bukti, convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.tempat,a.jenis from sis_prestasi a
+            $res = DB::connection($this->db)->select(" select a.no_bukti, convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.tempat,a.jenis from sis_prestasi a
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
             ");
             $res = json_decode(json_encode($res),true);
@@ -1024,13 +1026,13 @@ class MobileController extends Controller
     {
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $request->kode_pp;
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select b.kode_matpel,c.nama, isnull(b.nilai,0) as nilai,isnull(c.kkm,0) as kkm from sis_raport_m a
+            $res = DB::connection($this->db)->select("select b.kode_matpel,c.nama, isnull(b.nilai,0) as nilai,isnull(c.kkm,0) as kkm from sis_raport_m a
             inner join sis_raport_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on b.kode_matpel=c.kode_matpel and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nis='$nik'
@@ -1064,7 +1066,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
@@ -1077,10 +1079,28 @@ class MobileController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection('sqlsrvtarbak')->select("select a.kode_matpel,b.nama 
+            
+            $sqlcek = "select a.kode_matpel,a.nis,b.nama 
+            from sis_siswa_matpel_khusus a
+            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.nis='$nik' and b.nama like 'Pendidikan Agama%' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' ";
+            $cek = DB::connection($this->db)->select($sqlcek);
+            if(count($cek) > 0){
+                $filter_agama = " and a.kode_matpel <> 'PAI' ";
+            }else{
+                $filter_agama = "";
+            }
+
+            $sql = "select distinct a.kode_matpel,b.nama,b.skode as singkatan
             from sis_guru_matpel_kelas a 
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' $filter ");
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.kode_kelas='$request->kode_kelas' and b.sifat='0' $filter $filter_agama
+			union all
+			select a.kode_matpel,b.nama,b.skode as singkatan 
+			from sis_siswa_matpel_khusus a 
+			inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+			where a.kode_kelas='$request->kode_kelas' and a.nis='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' $filter";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1111,7 +1131,7 @@ class MobileController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('siswa')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
@@ -1119,7 +1139,7 @@ class MobileController extends Controller
 
             if(isset($request->kode_sem)){
                 if($request->kode_sem != "All"){
-                    $filter = " and b.kode_sem ='$request->kode_sem' ";
+                    $filter = " and a.kode_sem ='$request->kode_sem' ";
                 }else{
                     $filter = "";
                 }
@@ -1127,28 +1147,40 @@ class MobileController extends Controller
                 $filter = "";
             }
 
-            $res3 = DB::connection('sqlsrvtarbak')->select("
+            $res3 = DB::connection($this->db)->select("
             select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
             $res3 = json_decode(json_encode($res3),true);
+
+            $kode_ta = $res3[0]['kode_ta'];
             
-            $res2 = DB::connection('sqlsrvtarbak')->select("select a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel 
+            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel,c.skode as singkatan 
             from sis_guru_matpel_kelas a
-            inner join karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' ");
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql = "select a.kode_kd,a.nama as nama_kd,a.tgl_input,b.no_bukti,c.nilai,'-' as pelaksanaan,'-' as periode,'-' as minggu,isnull(d.file_dok,'-') as file_dok
-            from sis_kd a
-            inner join sis_nilai_m b on a.kode_kd=b.kode_kd and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_mapel=b.kode_matpel
-            inner join sis_nilai c on b.no_bukti=c.no_bukti and b.kode_lokasi=c.kode_lokasi and b.kode_pp=c.kode_pp
-            left join sis_nilai_dok d on b.no_bukti=d.no_bukti and b.kode_lokasi=d.kode_lokasi and b.kode_pp=d.kode_pp and c.nis=d.nis
-            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='".$kode_lokasi."'  and a.kode_mapel='$request->kode_matpel' $filter ";
-            // $success['sql'] = $sql;
-            $res = DB::connection('sqlsrvtarbak')->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
+            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan 
+            from sis_nilai_m a 
+            inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
+            order by a.kode_kd";
+            $rs = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan,a.pelaksanaan as deskripsi
+                    from sis_nilai_m a 
+                    inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+					inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+                    left join sis_nilai_dok d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp and c.nis=d.nis 
+					inner join sis_kd e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and a.kode_sem=e.kode_sem and a.kode_ta=e.kode_ta and f.kode_tingkat=e.kode_tingkat
+                    where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' and a.kode_kd='".$res[$i]['kode_kd']."' and c.nis='$nik' $filter
+                    order by a.kode_jenis")),true);
+                }
                 $success['status'] = true;
                 $success['data_ta'] = $res3;
                 $success['data_guru'] = $res2;
@@ -1169,6 +1201,394 @@ class MobileController extends Controller
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function getPreviewMatpel(Request $request)
+    {
+        $this->validate($request,[
+            'kode_matpel' => 'required',
+            'kode_sem' => 'required|in:1,2,All',
+            'kode_kelas' => 'required',
+            'kode_kd' => 'required',
+            'kode_jenis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+
+            if(isset($request->kode_sem)){
+                if($request->kode_sem != "All"){
+                    $filter = " and a.kode_sem ='$request->kode_sem' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $res3 = DB::connection($this->db)->select("
+            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+            $res3 = json_decode(json_encode($res3),true);
+
+            $kode_ta = $res3[0]['kode_ta'];
+
+            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan 
+            from sis_nilai_m a 
+            inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' and a.kode_kd='$request->kode_kd' and a.kode_jenis='$request->kode_jenis' $filter 
+            order by a.kode_kd";
+            $rs = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan,a.pelaksanaan as deskripsi
+                    from sis_nilai_m a 
+                    inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+					inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+                    left join sis_nilai_dok d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp and c.nis=d.nis 
+					inner join sis_kd e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and a.kode_sem=e.kode_sem and a.kode_ta=e.kode_ta and f.kode_tingkat=e.kode_tingkat
+                    where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_jenis='".$request->kode_jenis."' and a.kode_ta='$kode_ta' and a.kode_kd='".$res[$i]['kode_kd']."' and c.nis='$nik' $filter
+                    order by a.kode_jenis")),true);
+                }
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function updateStatusReadMobile(Request $request)
+	{
+		if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $kode_pp = $data->kode_pp;
+		}
+
+		$this->validate($request,[
+            'no_pesan' => 'required|max:300'
+		]);
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			$upd = DB::connection($this->db)->insert("update sis_pesan_d set sts_read_mob = '1' where no_bukti='$request->no_pesan' and nik='$nik' and kode_lokasi='$kode_lokasi' ");
+
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = "Sukses";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+    
+    public function getInfo(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+			$sql = "select a.nik_user as nik,c.nama,isnull(c.foto,'-') as foto,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe
+            from sis_pesan_m a
+            inner join (select nik_user,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                        from sis_pesan_m 
+						where tipe in ('info','nilai')
+                        group by  nik_user,kode_lokasi,kode_pp) b on a.nik_user=b.nik_user and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+            inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from sis_guru a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+						union all 
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,a.foto from karyawan a
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
+            left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
+            where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+    
+    public function getDetailInfo(Request $request){
+        $this->validate($request,[
+            'nik_guru' => 'required'
+        ]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+			$sql = "select * from (select a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+            left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
+            where b.nik='$nik' and a.nik_user='$request->nik_guru' and a.tipe in ('info') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+			union all
+			select a.judul,a.pesan,a.ref1,d.nilai as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+			inner join sis_nilai d on a.ref1=d.no_bukti and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nis='$nik'
+            left join sis_nilai_dok c on a.ref1=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.nis='$nik'
+            where b.nik='$nik' and a.nik_user='$request->nik_guru' and a.tipe in ('nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            ) a order by a.tgl_input desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function getInfo2(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru,f.foto
+            from sis_pesan_m a
+            inner join (select kode_matpel,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                        from sis_pesan_m 
+						where tipe in ('info','nilai')
+                        group by  kode_matpel,kode_lokasi,kode_pp) b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
+            left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
+            inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from sis_guru a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+						union all 
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from karyawan a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') f on a.nik_user=f.nik and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+            where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.nis='$nik' or a.kode_kelas='$kode_kelas')
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+    
+    public function getDetailInfo2(Request $request){
+        $this->validate($request,[
+            'nik_guru' => 'required',
+            'kode_matpel' => 'required'
+        ]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            $res3 = DB::connection($this->db)->select("
+            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+            $res3 = json_decode(json_encode($res3),true);
+
+            $kode_ta = $res3[0]['kode_ta'];
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,isnull(d.foto,'-') as foto,c.nama as nama_matpel,c.skode as singkatan 
+            from sis_guru_matpel_kelas a
+            inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$kode_kelas' and a.nik='$request->nik_guru' 
+            union all
+            select distinct a.nik,'-' as kode_matpel,a.nama as nama_guru,isnull(d.foto,'-') as foto,'-' as nama_matpel,'-' as singkatan 
+            from karyawan a
+            left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+            where a.kode_pp='$kode_pp' and a.nik='$request->nik_guru' 
+            ");
+            $res2 = json_decode(json_encode($res2),true);
+            
+			$sql = "select * from (select a.no_bukti,a.judul,a.pesan,a.ref1,convert(int,a.ref2) as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+            left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
+            where b.nik='$nik' and a.kode_matpel='$request->kode_matpel' and a.tipe in ('info') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+			union all
+			select a.no_bukti,a.judul,a.pesan,a.ref1,d.nilai as ref2,a.ref3,a.link,isnull(c.file_dok,'-') as file_dok,dbo.fnNamaTanggal(a.tgl_input) as tanggal,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+			inner join sis_nilai d on a.ref1=d.no_bukti and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nis='$nik'
+            left join sis_nilai_dok c on a.ref1=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.nis='$nik'
+            where b.nik='$nik' and a.kode_matpel='$request->kode_matpel' and a.tipe in ('nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.nik_user='$request->nik_guru'
+            ) a order by a.tgl_input desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,LEN(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+file_dok as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
+                }
+                $success['status'] = true;
+                $success['data_guru'] = $res2;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data_guru'] = $res2;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+    
+    public function getNotif(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+			$sql = "select a.jenis,dbo.fnNamaTanggal2(a.tgl_input,2) as tanggal,a.pesan,isnull(c.file_dok,'-') as file_dok,b.sts_read_mob,a.no_bukti
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+            left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
+            where b.nik='$nik' and a.tipe='notif' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            order by a.tgl_input desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
     }
 
 
