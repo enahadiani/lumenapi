@@ -197,7 +197,19 @@ class LaporanController extends Controller
                 $success['subjenis'] = $this->getSubJenis($request->input($col_array[3])[1]);   
             }
             
-            $sql="select b.kode_mitra,b.nama,sum(a.jumlah) as kunjungan
+            $sql="select b.kode_mitra,b.nama,
+                sum(case when month(z.tanggal)='01' then a.jumlah else 0 end) n1,
+                sum(case when month(z.tanggal)='02' then a.jumlah else 0 end) n2,
+                sum(case when month(z.tanggal)='03' then a.jumlah else 0 end) n3,
+                sum(case when month(z.tanggal)='04' then a.jumlah else 0 end) n4,
+                sum(case when month(z.tanggal)='05' then a.jumlah else 0 end) n5,
+                sum(case when month(z.tanggal)='06' then a.jumlah else 0 end) n6,
+                sum(case when month(z.tanggal)='07' then a.jumlah else 0 end) n7,
+                sum(case when month(z.tanggal)='08' then a.jumlah else 0 end) n8,
+                sum(case when month(z.tanggal)='09' then a.jumlah else 0 end) n9,
+                sum(case when month(z.tanggal)='10' then a.jumlah else 0 end) n10,
+                sum(case when month(z.tanggal)='11' then a.jumlah else 0 end) n11,
+                sum(case when month(z.tanggal)='12' then a.jumlah else 0 end) n12
                 from par_kunj_d a
                 inner join par_kunj_m z on a.no_bukti=z.no_bukti and a.kode_lokasi=z.kode_lokasi
                 inner join par_mitra b on a.kode_mitra=b.kode_mitra and a.kode_lokasi=b.kode_lokasi
