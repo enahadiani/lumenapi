@@ -177,5 +177,40 @@ class DashboardController extends Controller
         }
     }
 
+    public function getTopMitra() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $yearNow = date('Y');
+            $select = "select distinct top 5 sum(a.jumlah) as jumlah, b.kode_mitra, b.nama as mitra
+                from par_kunj_d a
+                inner join par_mitra b on a.kode_lokasi=b.kode_lokasi and a.kode_mitra=b.kode_mitra
+                where year(a.tanggal) = '$yearNow' and a.kode_lokasi = '$kode_lokasi'
+                group by b.nama, b.kode_mitra
+                order by jumlah desc";
+
+            $res = DB::connection($this->sql)->select($select);						
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0) {
+                $success['status'] = true;
+                $success['data'] = $res;
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+
+            return response()->json(['data'=>$success], $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->errorStatus);
+        }
+    }
+
 }
 ?>
