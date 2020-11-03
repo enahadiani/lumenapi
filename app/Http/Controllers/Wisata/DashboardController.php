@@ -137,5 +137,45 @@ class DashboardController extends Controller
         }
     }
 
+    public function getTopDaerah() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $yearNow = date('Y');
+            $select = "select top 5 sum(a.jumlah) as jumlah, b.nama as mitra, c.nama as camat, g.nama as bidang
+                from par_kunj_d a
+                inner join par_mitra b on a.kode_lokasi=b.kode_lokasi and a.kode_mitra=b.kode_mitra
+                inner join par_camat c on b.kode_lokasi=c.kode_lokasi and b.kecamatan=c.kode_camat
+                inner join par_mitra_subjenis d on b.kode_lokasi=d.kode_lokasi and b.kode_mitra=d.kode_mitra
+                inner join par_subjenis e on d.kode_lokasi=e.kode_lokasi and d.kode_subjenis=e.kode_subjenis
+                inner join par_jenis f on e.kode_lokasi=f.kode_lokasi and e.kode_jenis=f.kode_jenis
+                inner join par_bidang g on f.kode_lokasi=g.kode_lokasi and f.kode_bidang=g.kode_bidang
+                where year(a.tanggal) = '$yearNow' and a.kode_lokasi = '$kode_lokasi'
+                group by b.nama, c.nama, g.nama
+                order by jumlah desc";
+            
+            $res = DB::connection($this->sql)->select($select);						
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0) {
+                $success['status'] = true;
+                $success['data'] = $res;
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+
+            return response()->json(['data'=>$success], $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->errorStatus);
+        }
+    }
+
 }
 ?>
