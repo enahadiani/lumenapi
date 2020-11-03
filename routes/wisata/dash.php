@@ -18,6 +18,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('data-kunjungan','Wisata\DashboardController@getDataKunjungan');
     $router->get('data-bidang','Wisata\DashboardController@getDataBidang');
+    $router->get('data-mitra','Wisata\DashboardController@getDataMitra');
     
 });
 
