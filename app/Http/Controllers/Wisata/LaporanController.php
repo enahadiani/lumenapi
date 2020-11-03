@@ -197,7 +197,7 @@ class LaporanController extends Controller
                 $success['subjenis'] = $this->getSubJenis($request->input($col_array[3])[1]);   
             }
             
-            $sql="select b.kode_mitra,b.nama,b.alamat,f.nama
+            $sql="select b.kode_mitra,b.nama,b.alamat,f.nama as camat
                 sum(case when month(z.tanggal)='01' then a.jumlah else 0 end) n1,
                 sum(case when month(z.tanggal)='02' then a.jumlah else 0 end) n2,
                 sum(case when month(z.tanggal)='03' then a.jumlah else 0 end) n3,
