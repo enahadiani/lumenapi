@@ -212,5 +212,60 @@ class DashboardController extends Controller
         }
     }
 
+    public function getKunjunganBulanan() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $yearNow = date('Y');
+            $select = "select e.nama,
+                sum(case when month(a.tanggal)='01' then a.jumlah else 0 end) n1,
+                sum(case when month(a.tanggal)='02' then a.jumlah else 0 end) n2,
+                sum(case when month(a.tanggal)='03' then a.jumlah else 0 end) n3,
+                sum(case when month(a.tanggal)='04' then a.jumlah else 0 end) n4,
+                sum(case when month(a.tanggal)='05' then a.jumlah else 0 end) n5,
+                sum(case when month(a.tanggal)='06' then a.jumlah else 0 end) n6,
+                sum(case when month(a.tanggal)='07' then a.jumlah else 0 end) n7,
+                sum(case when month(a.tanggal)='08' then a.jumlah else 0 end) n8,
+                sum(case when month(a.tanggal)='09' then a.jumlah else 0 end) n9,
+                sum(case when month(a.tanggal)='10' then a.jumlah else 0 end) n10,
+                sum(case when month(a.tanggal)='11' then a.jumlah else 0 end) n11,
+                sum(case when month(a.tanggal)='12' then a.jumlah else 0 end) n12
+                from par_kunj_d a
+                inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi
+                inner join par_jenis d on c.kode_jenis=d.kode_jenis and c.kode_lokasi=d.kode_lokasi
+                inner join par_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                where year(a.tanggal) = '$yearNow' and a.kode_lokasi = '$kode_lokasi'
+                group by e.nama";
+            
+            $res = DB::connection($this->sql)->select($select);						
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0) {
+                
+                for($i=0;$i<count($res);$i++){
+                    $daftar[] = array('name'=>$res[$i]['nama'],
+                    'data'=> array($res[$i]['n1'],$res[$i]['n2'],$res[$i]['n3'],$res[$i]['n4'],$res[$i]['n5'],$res[$i]['n6'],$res[$i]['n7'],$res[$i]['n8'],$res[$i]['n9'],$res[$i]['n10'],$res[$i]['n11'],$res[$i]['n12'])
+                );
+                }
+
+                $success['status'] = true;
+                $success['data'] = $daftar;
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+
+            return response()->json(['data'=>$success], $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->errorStatus);
+        }
+    }
+
 }
 ?>

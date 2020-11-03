@@ -21,6 +21,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('data-mitra','Wisata\DashboardController@getDataMitra');
     $router->get('top-daerah','Wisata\DashboardController@getTopDaerah');
     $router->get('top-mitra','Wisata\DashboardController@getTopMitra');
+    $router->get('kunjungan-bulanan','Wisata\DashboardController@getKunjunganBulanan');
     
 });
 
