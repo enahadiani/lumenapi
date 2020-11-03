@@ -267,5 +267,49 @@ class DashboardController extends Controller
         }
     }
 
+    public function getKunjunganBulanan() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $yearNow = date('Y');
+            $monthNow = "08";
+            $select = "select e.nama, sum(a.jumlah) as jumlah
+                from par_kunj_d a
+                inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi
+                inner join par_jenis d on c.kode_jenis=d.kode_jenis and c.kode_lokasi=d.kode_lokasi
+                inner join par_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                where year(a.tanggal)='$yearNow' and month(a.tanggal)='$monthNow'
+                group by e.nama";
+
+            $res = DB::connection($this->sql)->select($select);						
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0) {
+                
+                for($i=0;$i<count($res);$i++){
+                    $daftar[] = $res[$i]['jumlah'];
+                    $ctg[] = $res[$i]['nama'];
+                }
+                
+                $success['status'] = true;
+                $success['data'] = $daftar;
+                $success['ctg'] = $ctg;
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+
+            return response()->json(['data'=>$success], $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->errorStatus);
+        }
+    }
+
 }
 ?>
