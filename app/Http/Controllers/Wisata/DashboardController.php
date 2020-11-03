@@ -58,7 +58,44 @@ class DashboardController extends Controller
             $success['banding'] = $pembanding;
             return response()->json(['data'=>$success], $this->successStatus);
 
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->errorStatus);
+        }
+    }
+
+    public function getDataBidang() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $yearNow = date('Y');
+            $select = "select top 1 isnull(sum(a.jumlah),0) as jumlah, d.nama 
+                from par_kunj_d a
+                inner join par_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi
+                inner join par_jenis c on b.kode_jenis=c.kode_jenis and b.kode_lokasi=c.kode_lokasi
+                inner join par_bidang d on c.kode_lokasi=d.kode_lokasi and c.kode_bidang=d.kode_bidang
+                where a.kode_lokasi = '$kode_lokasi' and year(a.tanggal)='$yearNow'
+                group by d.nama, d.kode_bidang
+                order by jumlah desc";
+
+            $res = DB::connection($this->sql)->select($select);						
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0) {
+                $success['status'] = true;
+                $success['data'] = $res[0];
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+
+            return response()->json(['data'=>$success], $this->successStatus);
+
+        } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->errorStatus);
