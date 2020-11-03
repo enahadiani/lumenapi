@@ -289,7 +289,7 @@ class DashboardController extends Controller
             if(count($res) > 0) {
                 
                 for($i=0;$i<count($res);$i++){
-                    $daftar[] = $res[$i]['jumlah'];
+                    $daftar[] = intval($res[$i]['jumlah']);
                     $ctg[] = $res[$i]['nama'];
                 }
                 
