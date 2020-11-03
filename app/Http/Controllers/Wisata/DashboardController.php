@@ -31,8 +31,8 @@ class DashboardController extends Controller
             $yearYesterday = $convertYearNow - 1;
             $convertYearYesterday = strval($yearYesterday);
 
-            $selectYoY = "select isnull(sum(a.jumlah),0) as jumlah from par_kunj_d a where year(a.tanggal)='$yearNow'";
-            $selectYearYesterday = "select isnull(sum(a.jumlah),0) as jumlah from par_kunj_d a where year(a.tanggal)='$convertYearYesterday'";
+            $selectYoY = "select isnull(sum(a.jumlah),0) as jumlah from par_kunj_d a where year(a.tanggal)='$yearNow' and a.kode_lokasi='$kode_lokasi'";
+            $selectYearYesterday = "select isnull(sum(a.jumlah),0) as jumlah from par_kunj_d a where year(a.tanggal)='$convertYearYesterday' and a.kode_lokasi='$kode_lokasi'";
             
             $resYoY = DB::connection($this->sql)->select($selectYoY);						
             $resYoY = json_decode(json_encode($resYoY),true);
