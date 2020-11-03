@@ -197,7 +197,7 @@ class LaporanController extends Controller
                 $success['subjenis'] = $this->getSubJenis($request->input($col_array[3])[1]);   
             }
             
-            $sql="select b.kode_mitra,b.nama,
+            $sql="select b.kode_mitra,b.nama,b.alamat,f.nama
                 sum(case when month(z.tanggal)='01' then a.jumlah else 0 end) n1,
                 sum(case when month(z.tanggal)='02' then a.jumlah else 0 end) n2,
                 sum(case when month(z.tanggal)='03' then a.jumlah else 0 end) n3,
@@ -216,6 +216,7 @@ class LaporanController extends Controller
                 inner join par_subjenis c on a.kode_subjenis=c.kode_subjenis and a.kode_lokasi=c.kode_lokasi
                 inner join par_jenis d on c.kode_jenis=d.kode_jenis and c.kode_lokasi=d.kode_lokasi
                 inner join par_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                inner join par_camat f on b.kecamatan=f.kode_camat and b.kode_lokasi=f.kode_lokasi
                 $where 
                 $group";
             $res = DB::connection($this->sql)->select($sql);
