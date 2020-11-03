@@ -155,7 +155,7 @@ class LaporanController extends Controller
             $col_array = array('kode_bidang', 'kode_mitra', 'kode_jenis', 'kode_subjenis','tahun');
             $db_col_name = array('e.kode_bidang', 'b.kode_mitra', 'd.kode_jenis', 'c.kode_subjenis', 'z.tahun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
-            $group = "group by b.kode_mitra,b.nama";
+            $group = "group by b.kode_mitra,b.nama,b.alamat,f.nama";
 
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
