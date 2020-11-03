@@ -212,7 +212,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function getKunjunganBulanan() {
+    public function getKunjunganTahunan() {
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
