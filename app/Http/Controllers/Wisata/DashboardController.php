@@ -246,7 +246,7 @@ class DashboardController extends Controller
                 
                 for($i=0;$i<count($res);$i++){
                     $daftar[] = array('name'=>$res[$i]['nama'],
-                    'data'=> array($res[$i]['n1'],$res[$i]['n2'],$res[$i]['n3'],$res[$i]['n4'],$res[$i]['n5'],$res[$i]['n6'],$res[$i]['n7'],$res[$i]['n8'],$res[$i]['n9'],$res[$i]['n10'],$res[$i]['n11'],$res[$i]['n12'])
+                    'data'=> array(intval($res[$i]['n1']),intval($res[$i]['n2']),intval($res[$i]['n3']),intval($res[$i]['n4']),intval($res[$i]['n5']),intval($res[$i]['n6']),intval($res[$i]['n7']),intval($res[$i]['n8']),intval($res[$i]['n9']),intval($res[$i]['n10']),intval($res[$i]['n11']),intval($res[$i]['n12']))
                 );
                 }
 
