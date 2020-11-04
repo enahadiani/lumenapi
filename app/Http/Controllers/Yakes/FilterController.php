@@ -149,7 +149,7 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from trans_m a where a.kode_lokasi='$kode_lokasi' ";
+            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from gldt a where a.kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -381,6 +381,7 @@ class FilterController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $success['sql'] = $sql;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
