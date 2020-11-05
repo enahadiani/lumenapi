@@ -54,11 +54,11 @@ class PesanController extends Controller
 
 			$post = array(
                 'registration_ids'  => $ids,
-                'notification'              => array (
-                    "body" => $data["message"],
-                    "title" => $data["title"],
-                    "click_action" => $data["click_action"]
-                ),
+                // 'notification'              => array (
+                //     "body" => $data["message"],
+                //     "title" => $data["title"],
+                //     "click_action" => $data["click_action"]
+                // ),
                 'data'              => $data,
                 'priority' => "high",
                 'android' => array(
@@ -82,10 +82,10 @@ class PesanController extends Controller
 
 			$post = array(
 				'registration_ids'  => $ids,
-				'notification'              => array (
-					"body" => $data["message"],
-					"title" => $data["title"]
-				),
+				// 'notification'              => array (
+				// 	"body" => $data["message"],
+				// 	"title" => $data["title"]
+				// ),
 				'data'              => $data
 			);
 		}
