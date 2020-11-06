@@ -16,6 +16,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 
+$router->get('anggaran-export','Yakes\AnggaranController@export');    
+
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //jurnal
     $router->post('jurnal','Yakes\JurSesuaiController@store');
@@ -27,6 +29,11 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
             
     $router->get('periode','Yakes\TransferDataController@getPeriode');     
     $router->post('transfer-data','Yakes\TransferDataController@store'); 
+
+    $router->get('tahun','Yakes\AnggaranController@getTahun');       
+    $router->post('anggaran-upload','Yakes\AnggaranController@importExcel'); 
+    $router->get('anggaran-load','Yakes\AnggaranController@loadAnggaran');    
+    $router->post('anggaran','Yakes\AnggaranController@store');    
 
 });
 
