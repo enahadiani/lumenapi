@@ -35,7 +35,7 @@ class AdminYakesController extends Controller
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection($this->db)->select("select a.kode_klp_menu, a.nik, a.nama, a.pass, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,isnull(c.background,'-') as background,a.flag_menu,isnull(c.email,'-') as email,c.no_telp,c.jabatan
+			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,isnull(c.background,'-') as background,a.flag_menu,isnull(c.email,'-') as email,c.no_telp,c.jabatan,a.password
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -172,7 +172,7 @@ class AdminYakesController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('toko/'.$foto);
+                        Storage::disk('s3')->delete('yakes/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -182,10 +182,10 @@ class AdminYakesController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('toko/'.$foto)){
-                    Storage::disk('s3')->delete('toko/'.$foto);
+                if(Storage::disk('s3')->exists('yakes/'.$foto)){
+                    Storage::disk('s3')->delete('yakes/'.$foto);
                 }
-                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('yakes/'.$foto,file_get_contents($file));
                 
             }else{
 
@@ -242,7 +242,7 @@ class AdminYakesController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('toko/'.$foto);
+                        Storage::disk('s3')->delete('yakes/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -252,10 +252,10 @@ class AdminYakesController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('toko/'.$foto)){
-                    Storage::disk('s3')->delete('toko/'.$foto);
+                if(Storage::disk('s3')->exists('yakes/'.$foto)){
+                    Storage::disk('s3')->delete('yakes/'.$foto);
                 }
-                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('yakes/'.$foto,file_get_contents($file));
                 
             }else{
 
