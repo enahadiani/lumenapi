@@ -24,6 +24,9 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('getNoBukti','Yakes\JurSesuaiController@getNoBukti');                 
     $router->get('index','Yakes\JurSesuaiController@index');     
     $router->get('getBuktiDetail','Yakes\JurSesuaiController@getBuktiDetail'); 
+            
+    $router->get('periode','Yakes\TransferDataController@getPeriode');     
+    $router->post('transfer-data','Yakes\TransferDataController@store'); 
 
 });
 
