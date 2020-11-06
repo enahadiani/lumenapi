@@ -99,23 +99,29 @@ class AnggaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            
             $ins = DB::connection($this->db)->insert("insert into anggaran_m(
                 no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis)  
                 select a.no_agg,a.kode_lokasi,'-',getdate(),'$request->keterangan' as keterangan,'$request->tahun' as tahun,'IDR' as kode_curr,a.n1+a.n2+a.n3+a.n4+a.n5+a.n6+a.n7+a.n8+a.n9+a.n10+a.n11+a.n12 as nilai,getdate(),'$nik','T' as posted,'-','$nik','-','-' 
                 from anggaran_load a 
-                where a.kode_lokasi='$request->kode_lokasi' and a.nik_user='$request->nik_user'
+                where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
                 ");
+                
+            $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
 
             for($i=1;$i <= 12;$i++){
-                $row = $res[0];
-                $det[$i] = DB::connection($this->db)->insert("insert into anggaran_d ('
-                no_agg,kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka') 
-                select no_agg,kode_lokasi,kode_pp,kode_akun,'-',1 as volume,'".( $i < 10 ? $request->tahun.'0'.$i : $request->tahun.$i )."' as periode,n".$i." as nilai,n".$i." as nilai,'D','-',getdate(),'$nik_user','RRA',0 as nilai_kas,'-'
-                from anggran_load 
-                where kode_lokasi='$request->kode_lokasi' and nik_user='$request->nik_user'
+                $periode = ( $i < 10 ? $request->tahun."0".$i : $request->tahun.$i );
+                $det[$i] = DB::connection($this->db)->insert("insert into anggaran_d (
+                no_agg,kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
+                select no_agg,kode_lokasi,$i,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$i." as nilai,n".$i." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
+                from anggaran_load 
+                where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
                 ");
             }
 
+            $del2 = DB::connection($this->db)->update("delete from anggaran_load where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' ");
+
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Anggaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
