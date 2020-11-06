@@ -64,7 +64,7 @@ class AdminSiswaController extends Controller
                 inner join m_form e on a.path_view=e.kode_form 
                 where a.nik='$nik' 
                 union all
-                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password,a.nik2
+                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password,a.nik2
                 from sis_hakakses a 
                 inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                 inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
