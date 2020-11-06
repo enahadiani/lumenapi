@@ -205,7 +205,7 @@ class AdminTsController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                        Storage::disk('s3')->delete('ts/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -215,10 +215,10 @@ class AdminTsController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                if(Storage::disk('s3')->exists('ts/'.$foto)){
+                    Storage::disk('s3')->delete('ts/'.$foto);
                 }
-                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('ts/'.$foto,file_get_contents($file));
                 
             }else{
 
@@ -275,7 +275,7 @@ class AdminTsController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                        Storage::disk('s3')->delete('ts/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -285,10 +285,10 @@ class AdminTsController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                if(Storage::disk('s3')->exists('ts/'.$foto)){
+                    Storage::disk('s3')->delete('ts/'.$foto);
                 }
-                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('ts/'.$foto,file_get_contents($file));
                 
             }else{
 
