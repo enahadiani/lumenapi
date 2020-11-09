@@ -141,11 +141,11 @@ class AnggaranController extends Controller
                     values ('".$no_buktiFix."','$kode_lokasi',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T' as posted,'-','$nik','-','-')
                 ");
 
-                for($i=1;$i <= 12;$i++){
-                    $periode = ( $i < 10 ? $request->tahun."0".$i : $request->tahun.$i );
-                    $det[$i] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
+                for($j=1;$j <= 12;$j++){
+                    $periode = ( $j < 10 ? $request->tahun."0".$j : $request->tahun.$j );
+                    $det[$j] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
                         kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
-                        select '$no_buktiFix',kode_lokasi,$i,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$i." as nilai,n".$i." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
+                        select '$no_buktiFix',kode_lokasi,$j,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$j." as nilai,n".$j." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
                         from anggaran_tmp 
                         where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
                     ");
