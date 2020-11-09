@@ -179,7 +179,7 @@ class AnggaranController extends Controller
 
             $per = date('ym');
 
-            $no_bukti = $this->generateKode("anggaran_m", "no_agg", $kode_lokasi."-RRU".$per.".", "0001");
+            // $no_bukti = $this->generateKode("anggaran_m", "no_agg", $kode_lokasi."-RRU".$per.".", "0001");
 
             // menangkap file excel
             $file = $request->file('file');
@@ -193,6 +193,17 @@ class AnggaranController extends Controller
             $x = array();
             $status_validate = true;
             $no=1;
+            $no_bukti = 0;
+            $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
+            $cek = DB::connection($this->db)->select($cekNoBukti);
+            if(count($cek) > 0){
+                $nobukti = ($cek[0]->no_agg != NULL ? substr($cek[0]->no_agg,-4) : "0000") ;
+            }else{
+                $nobukti = "0000";
+            }
+            $prefix = $kode_lokasi."-RRU".$per.".";
+            
+            $no_bukti = (int) $nobukti;
             foreach($excel as $row){
                 if($row[0] != ""){
                     $ket = $this->validateData($row[0],$row[1],$kode_lokasi);
@@ -202,7 +213,20 @@ class AnggaranController extends Controller
                     }else{
                         $sts = 1;
                     }
-                    $x[] = DB::connection($this->db)->insert("insert into anggaran_load(no_agg,kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi)  values ('$no_bukti','".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi') ");
+                    
+                    $no_bukti++;
+                    if(strlen($no_bukti) == 1) {
+                        $noFix = "000".$no_bukti."";
+                    } elseif (strlen($no_bukti) == 2) {
+                        $noFix = "00".$no_bukti."";
+                    } elseif (strlen($no_bukti) == 3) {
+                        $noFix = "0".$no_bukti."";
+                    } elseif (strlen($no_bukti) == 4) {
+                        $noFix = $no_bukti;
+                    }
+                    $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
+
+                    $x[] = DB::connection($this->db)->insert("insert into anggaran_load(no_agg,kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi)  values ('$no_buktiFix','".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi') ");
                     $no++;
                 }
             }
@@ -215,6 +239,7 @@ class AnggaranController extends Controller
                 $msg = "Ada error!";
             }
             
+            $success['no_bukti'] = $no_bukti;
             $success['status'] = true;
             $success['validate'] = $status_validate;
             $success['message'] = $msg;
