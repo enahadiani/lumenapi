@@ -101,55 +101,29 @@ class AnggaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $per = date('ym');
+            $no_bukti = $this->generateKode("anggaran_m", "no_agg", $kode_lokasi."-RRU".$per.".", "0001");
+
             $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
 
-            $cek = DB::connection($this->db)->select("
-            select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12  from anggaran_tmp a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
+            $get = DB::connection($this->db)->select("
+            select sum(a.n1+a.n2+a.n3+a.n4+a.n5+a.n6+a.n7+a.n8+a.n9+a.n10+a.n11+a.n12) as total from anggaran_tmp a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
             ");
-            $cek = json_decode(json_encode($cek),true);
+            $total = floatval($get[0]->total);
 
-            $no_bukti = 0;
-            $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
-            $get = DB::connection($this->db)->select($cekNoBukti);
-            if(count($get) > 0){
-                $nobukti = ($get[0]->no_agg != NULL ? substr($get[0]->no_agg,-4) : "0000") ;
-            }else{
-                $nobukti = "0000";
-            }
-            $per = date('ym');
-            $prefix = $kode_lokasi."-RRU".$per.".";
-            
-            $no_bukti = (int) $nobukti;
-            for($i=0;$i<count($cek);$i++){
+            $ins = DB::connection($this->db)->insert("insert into anggaran_m(
+                no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis)  
+                values ('".$no_bukti."','$kode_lokasi','-',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T','-','$nik','-','-')
+            ");
 
-                $total = floatval($cek[$i]['n1'])+floatval($cek[$i]['n2'])+floatval($cek[$i]['n3'])+floatval($cek[$i]['n4'])+floatval($cek[$i]['n5'])+floatval($cek[$i]['n6'])+floatval($cek[$i]['n7'])+floatval($cek[$i]['n8'])+floatval($cek[$i]['n9'])+floatval($cek[$i]['n10'])+floatval($cek[$i]['n11'])+floatval($cek[$i]['n12']);
-
-                $no_bukti++;
-                if(strlen($no_bukti) == 1) {
-                    $noFix = "000".$no_bukti."";
-                } elseif (strlen($no_bukti) == 2) {
-                    $noFix = "00".$no_bukti."";
-                } elseif (strlen($no_bukti) == 3) {
-                    $noFix = "0".$no_bukti."";
-                } elseif (strlen($no_bukti) == 4) {
-                    $noFix = $no_bukti;
-                }
-                $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
-
-                $ins = DB::connection($this->db)->insert("insert into anggaran_m(
-                    no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis)  
-                    values ('".$no_buktiFix."','$kode_lokasi','-',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T','-','$nik','-','-')
+            for($j=1;$j <= 12;$j++){
+                $periode = ( $j < 10 ? $request->tahun."0".$j : $request->tahun.$j );
+                $det[$j] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
+                    kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
+                    select '$no_bukti',kode_lokasi,$j,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$j." as nilai,n".$j." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
+                    from anggaran_tmp 
+                    where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
                 ");
-
-                for($j=1;$j <= 12;$j++){
-                    $periode = ( $j < 10 ? $request->tahun."0".$j : $request->tahun.$j );
-                    $det[$j] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
-                        kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
-                        select '$no_buktiFix',kode_lokasi,$j,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$j." as nilai,n".$j." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
-                        from anggaran_tmp 
-                        where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
-                    ");
-                }
             }
                 
             $del2 = DB::connection($this->db)->update("delete from anggaran_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' ");
