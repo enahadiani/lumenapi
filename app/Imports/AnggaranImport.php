@@ -14,7 +14,7 @@ class AnggaranImport implements ToModel, WithStartRow
 
     public function startRow(): int
     {
-        return 5;
+        return 2;
     }
 
     public function model(Array $row)
