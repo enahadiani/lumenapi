@@ -79,6 +79,38 @@ class AnggaranController extends Controller
         }        
     }
 
+    public function index(Request $request)
+    {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql= "select no_agg,tanggal,keterangan,tahun,nilai from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -131,6 +163,7 @@ class AnggaranController extends Controller
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Anggaran berhasil disimpan";
+            $success['no_bukti'] = $no_bukti;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
@@ -139,11 +172,9 @@ class AnggaranController extends Controller
             Log::error($e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
-        
-        
+       
     }
 
-   
     public function validateData($kode_akun,$kode_pp,$kode_lokasi){
         $keterangan = "";
         $auth = DB::connection($this->db)->select("select kode_akun from masakun where kode_akun='$kode_akun' and kode_lokasi='$kode_lokasi' 

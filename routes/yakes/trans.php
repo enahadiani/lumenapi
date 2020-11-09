@@ -30,7 +30,8 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('periode','Yakes\TransferDataController@getPeriode');     
     $router->post('transfer-data','Yakes\TransferDataController@store'); 
 
-    $router->get('tahun','Yakes\AnggaranController@getTahun');       
+    $router->get('tahun','Yakes\AnggaranController@getTahun'); 
+    $router->get('anggaran','Yakes\AnggaranController@index');          
     $router->post('anggaran-upload','Yakes\AnggaranController@importExcel'); 
     $router->get('anggaran-load','Yakes\AnggaranController@loadAnggaran');    
     $router->post('anggaran','Yakes\AnggaranController@store');    
