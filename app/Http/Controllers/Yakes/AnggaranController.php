@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Imports\AnggaranImport;
 use App\Exports\AnggaranExport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
+use Log; 
 
 class AnggaranController extends Controller
 {
@@ -72,7 +73,8 @@ class AnggaranController extends Controller
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }        
     }
@@ -128,7 +130,8 @@ class AnggaranController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Anggran gagal disimpan ".$e;
+            $success['message'] = "Data Anggran gagal disimpan. Internal Server Error.";
+            Log::error($e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -247,7 +250,9 @@ class AnggaranController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            // $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
         
@@ -308,7 +313,9 @@ class AnggaranController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            // $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
         
