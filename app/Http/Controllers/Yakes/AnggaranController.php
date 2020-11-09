@@ -138,7 +138,7 @@ class AnggaranController extends Controller
 
                 $ins = DB::connection($this->db)->insert("insert into anggaran_m(
                     no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis)  
-                    values ('".$no_buktiFix."','$kode_lokasi',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T','-','$nik','-','-')
+                    values ('".$no_buktiFix."','$kode_lokasi','-',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T','-','$nik','-','-')
                 ");
 
                 for($j=1;$j <= 12;$j++){
