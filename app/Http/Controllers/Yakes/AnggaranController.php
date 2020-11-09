@@ -101,27 +101,57 @@ class AnggaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            
-            $ins = DB::connection($this->db)->insert("insert into anggaran_m(
-                no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis)  
-                select a.no_agg,a.kode_lokasi,'-',getdate(),'$request->keterangan' as keterangan,'$request->tahun' as tahun,'IDR' as kode_curr,a.n1+a.n2+a.n3+a.n4+a.n5+a.n6+a.n7+a.n8+a.n9+a.n10+a.n11+a.n12 as nilai,getdate(),'$nik','T' as posted,'-','$nik','-','-' 
-                from anggaran_load a 
-                where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
-                ");
-                
             $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
 
-            for($i=1;$i <= 12;$i++){
-                $periode = ( $i < 10 ? $request->tahun."0".$i : $request->tahun.$i );
-                $det[$i] = DB::connection($this->db)->insert("insert into anggaran_d (
-                no_agg,kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
-                select no_agg,kode_lokasi,$i,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$i." as nilai,n".$i." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
-                from anggaran_load 
-                where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
-                ");
-            }
+            $cek = DB::connection($this->db)->select("
+            select a.kode_akun,a.kode_akun,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12  from anggaran_m a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
+            ");
+            $cek = json_decode(json_encode($cek),true);
 
-            $del2 = DB::connection($this->db)->update("delete from anggaran_load where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' ");
+             $no_bukti = 0;
+            $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
+            $cek = DB::connection($this->db)->select($cekNoBukti);
+            if(count($cek) > 0){
+                $nobukti = ($cek[0]->no_agg != NULL ? substr($cek[0]->no_agg,-4) : "0000") ;
+            }else{
+                $nobukti = "0000";
+            }
+            $prefix = $kode_lokasi."-RRU".$per.".";
+            
+            $no_bukti = (int) $nobukti;
+            for($i=0;$i<count($cek);$i++){
+
+                $total = floatval($cek[$i]['n1'])+floatval($cek[$i]['n2'])+floatval($cek[$i]['n3'])+floatval($cek[$i]['n4'])+floatval($cek[$i]['n5'])+floatval($cek[$i]['n6'])+floatval($cek[$i]['n7'])+floatval($cek[$i]['n8'])+floatval($cek[$i]['n9'])+floatval($cek[$i]['n10'])+floatval($cek[$i]['n11'])+floatval($cek[$i]['n12']);
+
+                $no_bukti++;
+                if(strlen($no_bukti) == 1) {
+                    $noFix = "000".$no_bukti."";
+                } elseif (strlen($no_bukti) == 2) {
+                    $noFix = "00".$no_bukti."";
+                } elseif (strlen($no_bukti) == 3) {
+                    $noFix = "0".$no_bukti."";
+                } elseif (strlen($no_bukti) == 4) {
+                    $noFix = $no_bukti;
+                }
+                $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
+
+                $ins = DB::connection($this->db)->insert("insert into anggaran_m(
+                    no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis)  
+                    values ('".$no_buktiFix."','$kode_lokasi',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T' as posted,'-','$nik','-','-')
+                ");
+
+                for($i=1;$i <= 12;$i++){
+                    $periode = ( $i < 10 ? $request->tahun."0".$i : $request->tahun.$i );
+                    $det[$i] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
+                        kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
+                        select '$no_buktiFix',kode_lokasi,$i,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$i." as nilai,n".$i." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
+                        from anggaran_tmp 
+                        where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
+                    ");
+                }
+            }
+                
+            $del2 = DB::connection($this->db)->update("delete from anggaran_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -178,7 +208,7 @@ class AnggaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->db)->table('anggaran_load')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->delete();
+            $del1 = DB::connection($this->db)->table('anggaran_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->delete();
 
             $per = date('ym');
 
@@ -196,17 +226,17 @@ class AnggaranController extends Controller
             $x = array();
             $status_validate = true;
             $no=1;
-            $no_bukti = 0;
-            $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
-            $cek = DB::connection($this->db)->select($cekNoBukti);
-            if(count($cek) > 0){
-                $nobukti = ($cek[0]->no_agg != NULL ? substr($cek[0]->no_agg,-4) : "0000") ;
-            }else{
-                $nobukti = "0000";
-            }
-            $prefix = $kode_lokasi."-RRU".$per.".";
+            // $no_bukti = 0;
+            // $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
+            // $cek = DB::connection($this->db)->select($cekNoBukti);
+            // if(count($cek) > 0){
+            //     $nobukti = ($cek[0]->no_agg != NULL ? substr($cek[0]->no_agg,-4) : "0000") ;
+            // }else{
+            //     $nobukti = "0000";
+            // }
+            // $prefix = $kode_lokasi."-RRU".$per.".";
             
-            $no_bukti = (int) $nobukti;
+            // $no_bukti = (int) $nobukti;
             foreach($excel as $row){
                 if($row[0] != ""){
                     $ket = $this->validateData($row[0],$row[1],$kode_lokasi);
@@ -217,19 +247,19 @@ class AnggaranController extends Controller
                         $sts = 1;
                     }
                     
-                    $no_bukti++;
-                    if(strlen($no_bukti) == 1) {
-                        $noFix = "000".$no_bukti."";
-                    } elseif (strlen($no_bukti) == 2) {
-                        $noFix = "00".$no_bukti."";
-                    } elseif (strlen($no_bukti) == 3) {
-                        $noFix = "0".$no_bukti."";
-                    } elseif (strlen($no_bukti) == 4) {
-                        $noFix = $no_bukti;
-                    }
-                    $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
+                    // $no_bukti++;
+                    // if(strlen($no_bukti) == 1) {
+                    //     $noFix = "000".$no_bukti."";
+                    // } elseif (strlen($no_bukti) == 2) {
+                    //     $noFix = "00".$no_bukti."";
+                    // } elseif (strlen($no_bukti) == 3) {
+                    //     $noFix = "0".$no_bukti."";
+                    // } elseif (strlen($no_bukti) == 4) {
+                    //     $noFix = $no_bukti;
+                    // }
+                    // $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
 
-                    $x[] = DB::connection($this->db)->insert("insert into anggaran_load(no_agg,kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi)  values ('$no_buktiFix','".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi') ");
+                    $x[] = DB::connection($this->db)->insert("insert into anggaran_tmp(kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi)  values ('$no_buktiFix','".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi') ");
                     $no++;
                 }
             }
@@ -242,7 +272,7 @@ class AnggaranController extends Controller
                 $msg = "Ada error!";
             }
             
-            $success['no_bukti'] = $no_bukti;
+            // $success['no_bukti'] = $no_bukti;
             $success['status'] = true;
             $success['validate'] = $status_validate;
             $success['message'] = $msg;
@@ -292,8 +322,8 @@ class AnggaranController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql = "select a.no_agg,a.kode_pp,a.kode_akun,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 
-            from anggaran_load a
+            $sql = "select a.kode_akun,a.kode_akun,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 
+            from anggaran_tmp a
             where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
             $res = DB::connection($this->db)->select($sql);
             $res= json_decode(json_encode($res),true);
