@@ -127,6 +127,6 @@ $router->group(['middleware' => 'auth:sju'], function () use ($router) {
     $router->get('notif', 'Sju\NotifController@getNotif');
     $router->get('update-notif-status', 'Sju\NotifController@updateStatusReadMobile');
 
-    $router->post('send-email','EmailController@send');
+    // $router->post('send-email','EmailController@send');
     
 });
