@@ -108,7 +108,7 @@ class AnggaranController extends Controller
             ");
             $cek = json_decode(json_encode($cek),true);
 
-             $no_bukti = 0;
+            $no_bukti = 0;
             $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
             $cek = DB::connection($this->db)->select($cekNoBukti);
             if(count($cek) > 0){
@@ -116,6 +116,7 @@ class AnggaranController extends Controller
             }else{
                 $nobukti = "0000";
             }
+            $per = date('ym');
             $prefix = $kode_lokasi."-RRU".$per.".";
             
             $no_bukti = (int) $nobukti;
