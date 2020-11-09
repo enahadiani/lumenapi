@@ -104,7 +104,7 @@ class AnggaranController extends Controller
             $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
 
             $cek = DB::connection($this->db)->select("
-            select a.kode_akun,a.kode_akun,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12  from anggaran_m a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
+            select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12  from anggaran_tmp a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
             ");
             $cek = json_decode(json_encode($cek),true);
 
