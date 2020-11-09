@@ -110,9 +110,9 @@ class AnggaranController extends Controller
 
             $no_bukti = 0;
             $cekNoBukti = "select max(no_agg) as no_agg from anggaran_m where kode_lokasi='".$kode_lokasi."' and no_agg like '%RRU%' ";
-            $cek = DB::connection($this->db)->select($cekNoBukti);
-            if(count($cek) > 0){
-                $nobukti = ($cek[0]->no_agg != NULL ? substr($cek[0]->no_agg,-4) : "0000") ;
+            $get = DB::connection($this->db)->select($cekNoBukti);
+            if(count($get) > 0){
+                $nobukti = ($get[0]->no_agg != NULL ? substr($get[0]->no_agg,-4) : "0000") ;
             }else{
                 $nobukti = "0000";
             }
