@@ -322,7 +322,7 @@ class AnggaranController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql = "select a.kode_akun,a.kode_akun,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 
+            $sql = "select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 
             from anggaran_tmp a
             where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
             $res = DB::connection($this->db)->select($sql);
