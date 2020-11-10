@@ -237,7 +237,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('siswa')->setTTL(43800)->attempt($credentials)) {
+        if (! $token = Auth::guard('siswa')->setTTL(10080)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }else{
             if(isset($request->id_device)){
