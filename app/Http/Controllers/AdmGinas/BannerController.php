@@ -77,7 +77,8 @@ class BannerController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            var_dump($request->file_gambar);
+            var_dump($request->file('file_gambar'));
             // if(count($request->file_gambar) >0) {
             //     foreach($request->file('file_gambar') as $file) {
             //         var_dump($file);
@@ -102,6 +103,7 @@ class BannerController extends Controller {
             $success['status'] = true;
             $success['kode'] = '';
             $success['data'] = $request->file_gambar;
+            $success['dat'] = $request->file('file_gambar');
             $success['message'] = "Data Banner berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
