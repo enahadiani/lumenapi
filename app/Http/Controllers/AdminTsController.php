@@ -37,7 +37,7 @@ class AdminTsController extends Controller
             $status_login = $data->status_login;
 
             if($status_login == "S"){
-                $user = DB::connection($this->db)->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir,a.pass as password,a.kode_menu as kode_klp_menu,a.status_login as status_admin,f.nama as nmlok,f.logo,'-' as jabatan
+                $user = DB::connection($this->db)->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir,a.pass as password,a.kode_menu as kode_klp_menu,a.status_login as status_admin,f.nama as nmlok,f.logo,'-' as jabatan
                 from sis_hakakses a 
                 left join sis_siswa b on a.nik=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join m_form e on a.path_view=e.kode_form  
@@ -46,7 +46,7 @@ class AdminTsController extends Controller
                 where a.nik='$nik' 
                 ");
             }else if($status_login == "G"){
-                $user = DB::connection($this->db)->select("select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
+                $user = DB::connection($this->db)->select("select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
                 from sis_hakakses a 
                 inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                 inner join sis_guru c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -56,7 +56,7 @@ class AdminTsController extends Controller
                 ");
             }else{
                 $user = DB::connection($this->db)->select("
-                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
+                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
                 from sis_hakakses a 
                 inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                 inner join sis_guru c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -64,7 +64,7 @@ class AdminTsController extends Controller
                 inner join m_form e on a.path_view=e.kode_form 
                 where a.nik='$nik' 
                 union all
-                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
+                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
                 from sis_hakakses a 
                 inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                 inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -205,7 +205,7 @@ class AdminTsController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                        Storage::disk('s3')->delete('ts/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -215,10 +215,10 @@ class AdminTsController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                if(Storage::disk('s3')->exists('ts/'.$foto)){
+                    Storage::disk('s3')->delete('ts/'.$foto);
                 }
-                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('ts/'.$foto,file_get_contents($file));
                 
             }else{
 
@@ -275,7 +275,7 @@ class AdminTsController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                        Storage::disk('s3')->delete('ts/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -285,10 +285,10 @@ class AdminTsController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                if(Storage::disk('s3')->exists('ts/'.$foto)){
+                    Storage::disk('s3')->delete('ts/'.$foto);
                 }
-                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('ts/'.$foto,file_get_contents($file));
                 
             }else{
 
