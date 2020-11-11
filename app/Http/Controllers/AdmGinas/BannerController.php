@@ -92,14 +92,12 @@ class BannerController extends Controller {
 
                     // DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
                 }
-                
+                DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
             }else{
                 $foto="-";
                 $file_type = "-";
             }
 
-            DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
-            
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = '';
