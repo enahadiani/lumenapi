@@ -80,7 +80,7 @@ class BannerController extends Controller {
             
             if($request->file('file_gambar')) {
                 foreach($request->file('file_gambar') as $file) {
-                    
+                    $dt[] = $file;
                     $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $file_type = $file->getmimeType();
                     $foto = $nama_foto;
@@ -89,10 +89,10 @@ class BannerController extends Controller {
                     }
                     Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                     $foto = "/assets/uploads/".$foto;
-
-                    DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
+                    
+                    // DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
                 }
-                DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
+                // DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
             }else{
                 $foto="-";
                 $file_type = "-";
@@ -101,6 +101,7 @@ class BannerController extends Controller {
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = '';
+            $success['data'] = $dt;
             $success['message'] = "Data Banner berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
