@@ -80,16 +80,17 @@ class BannerController extends Controller {
 
             if($request->hasfile('file_gambar')) {
                 foreach($request->file('file_gambar') as $file) {
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                    $file_type = $file->getmimeType();
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('webginas/'.$foto)){
-                        Storage::disk('s3')->delete('webginas/'.$foto);
-                    }
-                    Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
-                    $foto = "/assets/uploads/".$foto;
+                    var_dump($file);
+                    // $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    // $file_type = $file->getmimeType();
+                    // $foto = $nama_foto;
+                    // if(Storage::disk('s3')->exists('webginas/'.$foto)){
+                    //     Storage::disk('s3')->delete('webginas/'.$foto);
+                    // }
+                    // Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                    // $foto = "/assets/uploads/".$foto;
 
-                    DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
+                    // DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
                 }
                 
             }else{
