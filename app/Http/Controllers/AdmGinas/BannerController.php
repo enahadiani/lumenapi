@@ -18,7 +18,7 @@ class BannerController extends Controller {
     public $db = 'dbsaife';
     public $guard = 'admginas';
 
-    public function index(Request $reques)
+    public function index(Request $request)
     {
         try {
             
