@@ -64,6 +64,53 @@ class BannerController extends Controller {
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function store(Request $request) {
+        $this->validate($request, [
+            'file-gambar' => 'required|file|mimes:jpeg,png,jpg'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if($request->hasfile('file-gambar')) {
+                foreach($request->file('file-gambar') as $file) {
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $file_type = $file->getmimeType();
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('webginas/'.$foto)){
+                        Storage::disk('s3')->delete('webginas/'.$foto);
+                    }
+                    Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                    $foto = "/assets/uploads/".$foto;
+
+                    DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
+                }
+                
+            }else{
+                $foto="-";
+                $file_type = "-";
+            }
+
+            DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
+            
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['kode'] = '';
+            $success['message'] = "Data Banner berhasil disimpan";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Banner gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
 }
 
 ?>
