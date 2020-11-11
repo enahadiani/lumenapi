@@ -70,7 +70,7 @@ class BannerController extends Controller {
             'file_gambar' => 'file|mimes:jpeg,png,jpg'
         ]);
 
-        // DB::connection($this->db)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
 
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -78,27 +78,27 @@ class BannerController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            // if(count($request->file_gambar) >0) {
-            //     foreach($request->file('file_gambar') as $file) {
-            //         var_dump($file);
-            //         // $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                    // $file_type = $file->getmimeType();
-                    // $foto = $nama_foto;
-                    // if(Storage::disk('s3')->exists('webginas/'.$foto)){
-                    //     Storage::disk('s3')->delete('webginas/'.$foto);
-                    // }
-                    // Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
-                    // $foto = "/assets/uploads/".$foto;
+            if(count($request->file_gambar) >0) {
+                foreach($request->file('file_gambar') as $file) {
+                    // var_dump($file);
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    $file_type = $file->getmimeType();
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('webginas/'.$foto)){
+                        Storage::disk('s3')->delete('webginas/'.$foto);
+                    }
+                    Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                    $foto = "/assets/uploads/".$foto;
 
-                    // DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
-                // }
-                // DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
-            // }else{
-            //     $foto="-";
-            //     $file_type = "-";
-            // }
+                    DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
+                }
+                DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
+            }else{
+                $foto="-";
+                $file_type = "-";
+            }
 
-            // DB::connection($this->db)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = '';
             $success['data'] = $request->file_gambar;
