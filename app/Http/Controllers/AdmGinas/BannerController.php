@@ -78,8 +78,8 @@ class BannerController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             $dt = array();
-            if($request->file('file_gambar[]')) {
-                foreach($request->file('file_gambar[]') as $file) {
+            if($request->file('file_gambar')) {
+                foreach($request->file('file_gambar') as $file) {
                     $dt = array_push($dt,$file);
                     $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $file_type = $file->getmimeType();
