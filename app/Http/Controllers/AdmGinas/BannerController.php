@@ -78,7 +78,7 @@ class BannerController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('file_gambar')) {
+            if(count($request->file_gambar) >0) {
                 foreach($request->file('file_gambar') as $file) {
                     var_dump($file);
                     // $nama_foto = uniqid()."_".$file->getClientOriginalName();
