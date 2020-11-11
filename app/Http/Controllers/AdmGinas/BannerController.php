@@ -67,7 +67,7 @@ class BannerController extends Controller {
 
     public function store(Request $request) {
         $this->validate($request, [
-            'file-gambar' => 'required|file|mimes:jpeg,png,jpg'
+            'file_gambar' => 'required|file|mimes:jpeg,png,jpg'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -78,8 +78,8 @@ class BannerController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('file-gambar')) {
-                foreach($request->file('file-gambar') as $file) {
+            if($request->hasfile('file_gambar')) {
+                foreach($request->file('file_gambar') as $file) {
                     $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $file_type = $file->getmimeType();
                     $foto = $nama_foto;
