@@ -65,6 +65,14 @@ class BannerController extends Controller {
         }
     }
 
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
     public function store(Request $request) {
         $this->validate($request, [
             'gambarke' => 'required|array'
@@ -77,6 +85,7 @@ class BannerController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $kode = $this->generateKode("lab_gbr_banner", "id_banner", $kode_lokasi."-BN".date('Ym').".", "0001");
             $arr_foto = array();
             $arr_gambarke = array();
             $i=0;
@@ -104,9 +113,9 @@ class BannerController extends Controller {
 
                 if(count($arr_gambarke) > 0){
                     for($i=0; $i<count($arr_gambarke);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id,kode_lokasi,file_gambar,gambarke) values ('".$i."','$kode_lokasi','".$arr_foto[$i]."','".$arr_gambarke[$i]."') "); 
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id_banner,kode_lokasi,file_gambar,gambarke) values ('".$kode."','$kode_lokasi','".$arr_foto[$i]."','".$arr_gambarke[$i]."') "); 
                     }
-                    DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
+                    DB::connection($this->db)->insert("insert into lab_gbr_banner(id_banner,kode_lokasi) values (''$kode',".$kode_lokasi."') ");
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Data Banner berhasil diupload.";
