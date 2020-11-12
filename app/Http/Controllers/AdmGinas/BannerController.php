@@ -119,17 +119,17 @@ class BannerController extends Controller {
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Data Banner berhasil diupload.";
-                    $success['no_bukti'] = "Tes";
+                    $success['no_bukti'] = $kode;
                 }
                 else{
                     $success['status'] = false;
                     $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (2)";
-                    $success['no_bukti'] = "Tes";
+                    $success['no_bukti'] = "0";
                 }
             }else{
                 $success['status'] = false;
                 $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (3)";
-                $success['no_bukti'] = "Tes";
+                $success['no_bukti'] = "0";
             }
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
