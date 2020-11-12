@@ -113,9 +113,9 @@ class BannerController extends Controller {
 
                 if(count($arr_gambarke) > 0){
                     for($i=0; $i<count($arr_gambarke);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id_banner,kode_lokasi,file_gambar,gambarke) values ('".$kode."','$kode_lokasi','".$arr_foto[$i]."','".$arr_gambarke[$i]."') "); 
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id_banner,kode_lokasi,file_gambar,gambarke) values ('$kode','$kode_lokasi','$arr_foto[$i]','$arr_gambarke[$i]') "); 
                     }
-                    DB::connection($this->db)->insert("insert into lab_gbr_banner(id_banner,kode_lokasi) values (''$kode',".$kode_lokasi."') ");
+                    DB::connection($this->db)->insert("insert into lab_gbr_banner(id_banner,kode_lokasi) values ('$kode','$kode_lokasi') ");
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Data Banner berhasil diupload.";
