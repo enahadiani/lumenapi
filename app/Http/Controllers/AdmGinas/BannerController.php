@@ -109,6 +109,7 @@ class BannerController extends Controller {
                     }
                     
                     $del = DB::connection($this->db)->table('lab_gbr_banner_detail')->where('kode_lokasi', $kode_lokasi)->delete();
+                    $del = DB::connection($this->db)->table('lab_gbr_banner')->where('kode_lokasi', $kode_lokasi)->delete();
                 }
 
                 if(count($arr_gambarke) > 0){
