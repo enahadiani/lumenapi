@@ -76,6 +76,11 @@ class KlienController extends Controller {
             'file_gambar' => 'required|file|mimes:jpeg,png,jpg'
         ]);
 
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
         try {
             if($request->hasfile('file_gambar')){
                 
