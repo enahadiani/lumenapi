@@ -106,6 +106,7 @@ class BannerController extends Controller {
                     for($i=0; $i<count($arr_gambarke);$i++){
                         $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id,kode_lokasi,file_gambar,gambarke) values ('".$i."','$kode_lokasi','".$arr_foto[$i]."','".$arr_gambarke[$i]."') "); 
                     }
+                    DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Data Banner berhasil diupload.";
