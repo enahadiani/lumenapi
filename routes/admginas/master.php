@@ -57,9 +57,15 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('banner','AdmGinas\BannerController@index');
     $router->get('banner-show','AdmGinas\BannerController@show');
     $router->post('banner','AdmGinas\BannerController@store');
-    $router->post('banner-ubah','AdmGinas\BannerController@update');
-    $router->delete('banner','AdmGinas\BannerController@destroy');
+    // $router->post('banner-ubah','AdmGinas\BannerController@update');
+    // $router->delete('banner','AdmGinas\BannerController@destroy');
 
+    //Klien
+    $router->get('klien','AdmGinas\KlienController@index');
+    $router->get('klien-show','AdmGinas\KlienController@show');
+    $router->post('klien','AdmGinas\KlienController@store');
+    $router->post('klien-ubah','AdmGinas\KlienController@update');
+    // $router->delete('banner','AdmGinas\KlienController@destroy');
 });
 
 
