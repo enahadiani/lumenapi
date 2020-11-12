@@ -150,7 +150,7 @@ class KlienController extends Controller {
         $this->validate($request, [
             'id_klien' => 'required',
             'nama_klien' => 'required',
-            'file_gambar' => 'required|file|mimes:jpeg,png,jpg'
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg'
         ]);
         
         try {
