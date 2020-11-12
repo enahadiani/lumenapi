@@ -73,7 +73,7 @@ class KlienController extends Controller {
     {
         $this->validate($request, [
             'nama_klien' => 'required',
-            'file_gambar' => 'required|file|mimes:jpeg,png,jpg'
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
             if($data =  Auth::guard($this->guard)->user()){
@@ -105,7 +105,7 @@ class KlienController extends Controller {
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json($success, 500);
         }
     }
 
@@ -184,7 +184,7 @@ class KlienController extends Controller {
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
+            return response()->json($success, 500);
         }
     }
 
