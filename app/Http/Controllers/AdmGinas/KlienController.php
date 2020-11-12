@@ -96,7 +96,10 @@ class KlienController extends Controller {
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                 
                 DB::connection($this->db)->insert("insert into lab_daftar_klien(id_klien,nama_klien,kode_lokasi,file_gambar) values ('$kode','$nama','$kode_lokasi','$foto')");
-
+                $success['status'] = true;
+                $success['message'] = "Data Banner berhasil diupload.";
+                $success['no_bukti'] = $kode;
+                return response()->json($success, 200);
             }else{
                 $success['status'] = false;
                 $success['message'] = "File Gambar harus dilampirkan";
