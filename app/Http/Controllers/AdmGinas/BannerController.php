@@ -67,7 +67,7 @@ class BannerController extends Controller {
 
     public function store(Request $request) {
         $this->validate($request, [
-            'file_gambar' => 'file|mimes:jpeg,png,jpg'
+            'gambarke' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -77,32 +77,50 @@ class BannerController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $dt = array();
-            if($request->file('file_gambar')) {
-                foreach($request->file('file_gambar') as $file) {
-                    $dt = array_push($dt,$file);
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                    $file_type = $file->getmimeType();
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('webginas/'.$foto)){
-                        Storage::disk('s3')->delete('webginas/'.$foto);
-                    }
-                    Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
-                    $foto = "/assets/uploads/".$foto;
-                    
-                    // DB::connection($this->db)->insert("insert into lab_gbr_banner_detail(kode_lokasi,file_gambar) values ('".$kode_lokasi."','".$foto."') ");
-                }
-                // DB::connection($this->db)->insert("insert into lab_gbr_banner(kode_lokasi) values ('".$kode_lokasi."') ");
-            }else{
-                $foto="-";
-                $file_type = "-";
-            }
+            $arr_foto = array();
+            $arr_gambarke = array();
+            $i=0;
+            $cek = $request->file_gambar;
+            if(!empty($cek)){
+                if(count($request->gambarke) > 0){
+                    for($i=0;$i<count($request->gambarke);$i++){
+                        if(isset($request->file('file_gambar')[$i])){
 
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['kode'] = '';
-            $success['data'] = $dt;
-            $success['message'] = "Data Banner berhasil disimpan";
+                            $file = $request->file('file_gambar')[$i];
+                            $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            if(Storage::disk('s3')->exists('webginas/'.$foto)){
+                                Storage::disk('s3')->delete('webginas/'.$foto);
+                            }
+                            Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                        }else{
+                            $arr_foto[] = "-";
+                        }     
+                        $arr_gambarke[] = $request->gambarke[$i];
+                    }
+                    
+                    $del = DB::connection($this->db)->table('lab_gbr_banner_detail')->where('kode_lokasi', $kode_lokasi)->delete();
+                }
+
+                if(count($arr_gambarke) > 0){
+                    for($i=0; $i<count($arr_gambarke);$i++){
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id,kode_lokasi,file_gambar,gambarke) values ('".$i."','$kode_lokasi','".$arr_foto[$i]."','".$arr_gambarke[$i]."') "); 
+                    }
+                    DB::connection($this->db)->commit();
+                    $success['status'] = true;
+                    $success['message'] = "Data Banner berhasil diupload.";
+                    $success['no_bukti'] = "Tes";
+                }
+                else{
+                    $success['status'] = false;
+                    $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (2)";
+                    $success['no_bukti'] = "Tes";
+                }
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (3)";
+                $success['no_bukti'] = "Tes";
+            }
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
