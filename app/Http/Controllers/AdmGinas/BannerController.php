@@ -33,11 +33,11 @@ class BannerController extends Controller {
                 }else{
                     $filter = " and a.id='$request->id' ";
                 }
-                $sql= "select a.id_banner from lab_gbr_banner a
+                $sql= "select distinct a.id_banner from lab_gbr_banner a
                 inner join lab_gbr_banner_detail b on a.id_banner=b.id_banner and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select a.id_banner from lab_gbr_banner a
+                $sql = "select distinct a.id_banner from lab_gbr_banner a
                 inner join lab_gbr_banner_detail b on a.id_banner=b.id_banner and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."'";
             }
