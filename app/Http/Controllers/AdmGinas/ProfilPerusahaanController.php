@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers\AdmGinas;
 
@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class ReviewKlienController extends Controller {
+class ProfilPerusahaanController extends Controller {
     /**
      * Display a listing of the resource.
      *
@@ -30,12 +30,12 @@ class ReviewKlienController extends Controller {
                 if($request->id == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and id_review='$request->id' ";
+                    $filter = " and id_perusahaan='$request->id' ";
                 }
-                $sql= "select id_review, nama_perusahaan, jabatan from lab_review_klien
+                $sql= "select id_perusahaan, nama_perusahaan, alamat, no_telp, email from lab_profil_perusahaan
                 where kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select id_review, nama_perusahaan, jabatan from lab_review_klien
+                $sql = "select id_perusahaan, nama_perusahaan, alamat, no_telp, email from lab_profil_perusahaan
                 where kode_lokasi='".$kode_lokasi."'";
             }
 
@@ -74,8 +74,13 @@ class ReviewKlienController extends Controller {
     {
         $this->validate($request, [
             'nama_perusahaan' => 'required',
-            'jabatan' => 'required',
+            'koordinat' => 'required',
             'deskripsi' => 'required',
+            'visi' => 'required',
+            'misi' => 'required',
+            'alamat' => 'required',
+            'no_telp' => 'required',
+            'email' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -87,10 +92,15 @@ class ReviewKlienController extends Controller {
         try {
             if($request->hasfile('file_gambar')){
                 
-                $kode = $this->generateKode("lab_review_klien", "id_review", $kode_lokasi."-RV".date('Ym').".", "0001");
+                $kode = $this->generateKode("lab_profil_perusahaan", "id_perusahaan", $kode_lokasi."-PR".date('Ym').".", "0001");
                 $nama = $request->nama_perusahaan;
-                $jabatan = $request->jabatan;
+                $koordinat = $request->koordinat;
                 $deskripsi = $request->deskripsi;
+                $visi = $request->visi;
+                $misi = $request->misi;
+                $alamat = $request->alamat;
+                $telp = $request->no_telp;
+                $email = $request->email;
                 $file = $request->file('file_gambar');
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
@@ -100,7 +110,7 @@ class ReviewKlienController extends Controller {
                 }
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                 
-                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi')");
+                DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,misi,alamat,deskripsi,no_telp,email) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$misi','$alamat','$deskripsi','$telp','$email')");
                 $success['status'] = true;
                 $success['message'] = "Data Review berhasil disimpan.";
                 $success['no_bukti'] = $kode;
@@ -119,7 +129,7 @@ class ReviewKlienController extends Controller {
 
     public function show(Request $request) {
         $this->validate($request, [
-            'id_review' => 'required'
+            'id_perusahaan' => 'required'
         ]);
         
         try {
@@ -128,7 +138,7 @@ class ReviewKlienController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select id_review, nama_perusahaan, jabatan, deskripsi, file_gambar from lab_review_klien where kode_lokasi = '$kode_lokasi' and id_review = '$request->id_review'");
+            $res = DB::connection($this->db)->select("select id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, misi, alamat, no_telp, email, file_gambar from lab_review_klien where kode_lokasi = '$kode_lokasi' and id_perusahaan = '$request->id_perusahaan'");
             
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -154,8 +164,13 @@ class ReviewKlienController extends Controller {
     public function update(Request $request) {
         $this->validate($request, [
             'nama_perusahaan' => 'required',
-            'jabatan' => 'required',
+            'koordinat' => 'required',
             'deskripsi' => 'required',
+            'visi' => 'required',
+            'misi' => 'required',
+            'alamat' => 'required',
+            'no_telp' => 'required',
+            'email' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         
@@ -164,11 +179,16 @@ class ReviewKlienController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $kode = $request->id_review;
+            
+            $kode = $request->id_perusahaan;
             $nama = $request->nama_perusahaan;
-            $jabatan = $request->jabatan;
+            $koordinat = $request->koordinat;
             $deskripsi = $request->deskripsi;
+            $visi = $request->visi;
+            $misi = $request->misi;
+            $alamat = $request->alamat;
+            $telp = $request->no_telp;
+            $email = $request->email;
             if($request->hasfile('file_gambar')){ 
                 $file = $request->file_gambar;
                 $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
@@ -178,18 +198,18 @@ class ReviewKlienController extends Controller {
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
 
                 DB::connection($this->db)
-                    ->table('lab_review_klien')
+                    ->table('lab_profil_perusahaan')
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->where('id_review', $kode)
+                    ->where('id_perusahaan', $kode)
                     ->delete();
 
-                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi')");
+                DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,misi,alamat,deskripsi,no_telp,email) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$misi','$alamat','$deskripsi','$telp','$email')");
             } else {
-                DB::connection($this->db)->update("update lab_review_klien set nama_perusahaan = '$nama', jabatan = '$jabatan', deskripsi = '$deskripsi' where id_review = '$kode' and kode_lokasi = '$kode_lokasi'");
+                DB::connection($this->db)->update("update lab_profil_perusahaan set nama_perusahaan = '$nama', koordinat = '$koordinat', deskripsi = '$deskripsi', visi = '$visi', misi = '$misi', alamat = '$alamat', no_telp = '$telp', email = '$email' where id_perusahaan = '$kode' and kode_lokasi = '$kode_lokasi'");
             }
 
             $success['status'] = true;
-            $success['message'] = "Data Review berhasil diubah.";
+            $success['message'] = "Data Perusahaan berhasil diubah.";
             $success['no_bukti'] = $kode;
             return response()->json($success, $this->successStatus);            
         } catch (\Throwable $e) {
