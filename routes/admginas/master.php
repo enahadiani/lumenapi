@@ -66,6 +66,12 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->post('klien','AdmGinas\KlienController@store');
     $router->post('klien-ubah','AdmGinas\KlienController@update');
     // $router->delete('banner','AdmGinas\KlienController@destroy');
+
+    //Review Klien
+    $router->get('review','AdmGinas\ReviewKlienController@index');
+    $router->get('review-show','AdmGinas\ReviewKlienController@show');
+    $router->post('review','AdmGinas\ReviewKlienController@store');
+    $router->post('review-ubah','AdmGinas\ReviewKlienController@update');
 });
 
 

@@ -1,13 +1,14 @@
-<?php
+<?php 
+
 namespace App\Http\Controllers\AdmGinas;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
 
-class KlienController extends Controller {
+class ReviewKlienController extends Controller {
     /**
      * Display a listing of the resource.
      *
@@ -29,12 +30,12 @@ class KlienController extends Controller {
                 if($request->id == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and id_klien='$request->id' ";
+                    $filter = " and id_review='$request->id' ";
                 }
-                $sql= "select id_klien, nama_klien from lab_daftar_klien
+                $sql= "select id_review, nama_perusahaan, jabatan from lab_review_klien
                 where kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select id_klien, nama_klien from lab_daftar_klien
+                $sql = "select id_review, nama_perusahaan, jabatan from lab_review_klien
                 where kode_lokasi='".$kode_lokasi."'";
             }
 
@@ -72,7 +73,9 @@ class KlienController extends Controller {
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nama_klien' => 'required',
+            'nama_perusahaan' => 'required',
+            'jabatan' => 'required',
+            'deskripsi' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -84,8 +87,10 @@ class KlienController extends Controller {
         try {
             if($request->hasfile('file_gambar')){
                 
-                $kode = $this->generateKode("lab_daftar_klien", "id_klien", $kode_lokasi."-CL".date('Ym').".", "0001");
-                $nama = $request->nama_klien;
+                $kode = $this->generateKode("lab_review_klien", "id_review", $kode_lokasi."-RV".date('Ym').".", "0001");
+                $nama = $request->nama_perusahaan;
+                $jabatan = $request->jabatan;
+                $deskripsi = $request->deskripsi;
                 $file = $request->file('file_gambar');
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
@@ -95,9 +100,9 @@ class KlienController extends Controller {
                 }
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                 
-                DB::connection($this->db)->insert("insert into lab_daftar_klien(id_klien,nama_klien,kode_lokasi,file_gambar) values ('$kode','$nama','$kode_lokasi','$foto')");
+                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi')");
                 $success['status'] = true;
-                $success['message'] = "Data Klien berhasil disimpan.";
+                $success['message'] = "Data Review berhasil disimpan.";
                 $success['no_bukti'] = $kode;
                 return response()->json($success, 200);
             }else{
@@ -114,7 +119,7 @@ class KlienController extends Controller {
 
     public function show(Request $request) {
         $this->validate($request, [
-            'id_klien' => 'required'
+            'id_review' => 'required'
         ]);
         
         try {
@@ -123,7 +128,7 @@ class KlienController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select id_klien, nama_klien, file_gambar from lab_daftar_klien where kode_lokasi = '$kode_lokasi' and id_klien = '$request->id_klien'");
+            $res = DB::connection($this->db)->select("select id_review, nama_perusahaan, jabatan, deskripsi, file_gambar from lab_review_klien where kode_lokasi = '$kode_lokasi' and id_review = '$request->id_review'");
             
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -148,9 +153,10 @@ class KlienController extends Controller {
 
     public function update(Request $request) {
         $this->validate($request, [
-            'id_klien' => 'required',
-            'nama_klien' => 'required',
-            'file_gambar' => 'file|image|mimes:jpeg,png,jpg'
+            'nama_perusahaan' => 'required',
+            'jabatan' => 'required',
+            'deskripsi' => 'required',
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         
         try {
@@ -159,8 +165,9 @@ class KlienController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $kode = $request->id_klien;
-            $nama = $request->nama_klien;
+            $nama = $request->nama_perusahaan;
+            $jabatan = $request->jabatan;
+            $deskripsi = $request->deskripsi;
             if($request->hasfile('file_gambar')){ 
                 $file = $request->file_gambar;
                 $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
@@ -170,18 +177,18 @@ class KlienController extends Controller {
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
 
                 DB::connection($this->db)
-                    ->table('lab_daftar_klien')
+                    ->table('lab_review_klien')
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->where('id_klien', $kode)
+                    ->where('id_review', $kode)
                     ->delete();
 
-                DB::connection($this->db)->insert("insert into lab_daftar_klien (id_klien, nama_klien, kode_lokasi, file_gambar) values ('$kode', '$nama', '$kode_lokasi', '$foto')");
+                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi')");
             } else {
-                DB::connection($this->db)->update("update lab_daftar_klien set nama_klien = '$nama' where id_klien = '$kode' and kode_lokasi = '$kode_lokasi'");
+                DB::connection($this->db)->update("update lab_review_klien set nama_perusahaan = '$nama', jabatan = '$jabatan', deskripsi = '$deskripsi' where id_review = '$kode' and kode_lokasi = '$kode_lokasi'");
             }
 
             $success['status'] = true;
-            $success['message'] = "Data Klien berhasil diubah.";
+            $success['message'] = "Data Review berhasil diubah.";
             $success['no_bukti'] = $kode;
             return response()->json($success, $this->successStatus);            
         } catch (\Throwable $e) {
@@ -190,7 +197,6 @@ class KlienController extends Controller {
             return response()->json($success, 500);
         }
     }
-
 }
 
 ?>
