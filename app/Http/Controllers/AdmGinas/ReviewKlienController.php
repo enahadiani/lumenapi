@@ -32,10 +32,10 @@ class ReviewKlienController extends Controller {
                 }else{
                     $filter = " and id_review='$request->id' ";
                 }
-                $sql= "select id_review, nama_perusahaan, jabatan from lab_review_klien
+                $sql= "select id_review, nama_client, nama_perusahaan, jabatan from lab_review_klien
                 where kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select id_review, nama_perusahaan, jabatan from lab_review_klien
+                $sql = "select id_review, nama_client, nama_perusahaan, jabatan from lab_review_klien
                 where kode_lokasi='".$kode_lokasi."'";
             }
 
@@ -74,6 +74,7 @@ class ReviewKlienController extends Controller {
     {
         $this->validate($request, [
             'nama_perusahaan' => 'required',
+            'nama_klien' => 'required',
             'jabatan' => 'required',
             'deskripsi' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
@@ -91,6 +92,7 @@ class ReviewKlienController extends Controller {
                 $nama = $request->nama_perusahaan;
                 $jabatan = $request->jabatan;
                 $deskripsi = $request->deskripsi;
+                $client = $request->nama_klien;
                 $file = $request->file('file_gambar');
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
@@ -100,7 +102,7 @@ class ReviewKlienController extends Controller {
                 }
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                 
-                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi')");
+                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi,nama_client) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi','$client')");
                 $success['status'] = true;
                 $success['message'] = "Data Review berhasil disimpan.";
                 $success['no_bukti'] = $kode;
@@ -128,7 +130,7 @@ class ReviewKlienController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select id_review, nama_perusahaan, jabatan, deskripsi, file_gambar from lab_review_klien where kode_lokasi = '$kode_lokasi' and id_review = '$request->id_review'");
+            $res = DB::connection($this->db)->select("select id_review, nama_perusahaan, jabatan, deskripsi, file_gambar, nama_client from lab_review_klien where kode_lokasi = '$kode_lokasi' and id_review = '$request->id_review'");
             
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -154,6 +156,7 @@ class ReviewKlienController extends Controller {
     public function update(Request $request) {
         $this->validate($request, [
             'nama_perusahaan' => 'required',
+            'nama_klien' => 'required',
             'jabatan' => 'required',
             'deskripsi' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
@@ -169,6 +172,7 @@ class ReviewKlienController extends Controller {
             $nama = $request->nama_perusahaan;
             $jabatan = $request->jabatan;
             $deskripsi = $request->deskripsi;
+            $client = $request->nama_klien;
             if($request->hasfile('file_gambar')){ 
                 $file = $request->file_gambar;
                 $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
@@ -183,9 +187,9 @@ class ReviewKlienController extends Controller {
                     ->where('id_review', $kode)
                     ->delete();
 
-                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi')");
+                DB::connection($this->db)->insert("insert into lab_review_klien(id_review,nama_perusahaan,kode_lokasi,file_gambar,jabatan,deskripsi, nama_client) values ('$kode','$nama','$kode_lokasi','$foto','$jabatan','$deskripsi','$client')");
             } else {
-                DB::connection($this->db)->update("update lab_review_klien set nama_perusahaan = '$nama', jabatan = '$jabatan', deskripsi = '$deskripsi' where id_review = '$kode' and kode_lokasi = '$kode_lokasi'");
+                DB::connection($this->db)->update("update lab_review_klien set nama_client = '$client',nama_perusahaan = '$nama', jabatan = '$jabatan', deskripsi = '$deskripsi' where id_review = '$kode' and kode_lokasi = '$kode_lokasi'");
             }
 
             $success['status'] = true;
