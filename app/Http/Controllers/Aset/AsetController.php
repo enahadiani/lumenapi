@@ -446,9 +446,8 @@ class AsetController extends Controller
 
     function getDaftarBarang(Request $request){
         $this->validate($request, [
-            'id_ruangan' => 'required',
-            'id_gedung' => 'required',
-            'kode_klp' => 'required'
+            'no_ruangan' => 'required',
+            'id_gedung' => 'required'
         ]);
         try {
             
@@ -491,7 +490,7 @@ class AsetController extends Controller
             ,kd_asset
             ,sumber_dana
             ,nama_inv as nama
-            ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp'";
+            ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->no_ruangan' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
