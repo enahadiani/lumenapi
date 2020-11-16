@@ -146,9 +146,66 @@ class AsetController extends Controller
            
             $id_gedung = $request->id_gedung;
 
-            $sql="select a.id_lantai,a.nama 
+            $sql="select a.lantai,a.nama,a.id_gedung 
                 from amu_lantai a 
                 where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' ";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    function getKlpBarang(Request $request){
+        $this->validate($request, [
+            'id_gedung' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter="";
+
+            if ($request->input('lantai') != "") {
+                $lantai = $request->input('lantai');                
+                $filter .= " and b.lantai='$lantai' ";
+                
+            }else{
+                $filter .= "";
+            }
+
+            $id_gedung = $request->id_gedung;
+
+            $sql="select a.kode_klp,a.nama_klp,isnull(b.jumlah,0) as jumlah
+            from amu_klp_brg a
+            inner join (select a.kode_lokasi,a.kode_klp,count(no_bukti) as jumlah
+                        from amu_asset_bergerak a
+                        inner join amu_ruangan b on a.no_ruang=b.no_ruangan and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' $filter
+                        group by a.kode_lokasi,a.kode_klp
+                        )b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi'";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -393,7 +450,6 @@ class AsetController extends Controller
 
     function getDaftarBarang(Request $request){
         $this->validate($request, [
-            'no_ruangan' => 'required',
             'id_gedung' => 'required'
         ]);
         try {
@@ -403,41 +459,43 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
+            $id_gedung=$request->id_gedung;
 
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }            
+            $filter="";
+
+            if ($request->input('no_ruangan') != "") {
+                $no_ruangan = $request->input('no_ruangan');                
+                $filter .= " and a.no_ruang='$no_ruangan' ";
+                
+            }    
+            if ($request->input('lantai') != "") {
+                $lantai = $request->input('lantai');                
+                $filter .= " and b.lantai='$lantai' ";
+                
+            } 
           
-            $sql="SELECT no_bukti
-            ,barcode
-            ,no_seri
-            ,merk
-            ,tipe
-            ,warna
-            ,satuan
-            ,spesifikasi
-            ,id_gedung
-            ,no_ruang
-            ,kode_klp
-            ,tanggal_perolehan
-            ,kode_lokasi
-            ,kode_pp
-            ,nilai_perolehan
-            ,kd_asset
-            ,sumber_dana
-            ,nama_inv as nama
-            ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->no_ruangan' ";
+            $sql="SELECT a.no_bukti
+            ,a.barcode
+            ,a.no_seri
+            ,a.merk
+            ,a.tipe
+            ,a.warna
+            ,a.satuan
+            ,a.spesifikasi
+            ,a.id_gedung
+            ,a.no_ruang
+            ,a.kode_klp
+            ,a.tanggal_perolehan
+            ,a.kode_lokasi
+            ,a.kode_pp
+            ,a.nilai_perolehan
+            ,a.kd_asset
+            ,a.sumber_dana
+            ,a.nama_inv as nama
+            ,a.foto 
+            FROM amu_asset_bergerak a
+            inner join amu_ruangan b on a.kode_lokasi=b.kode_lokasi and a.no_ruang=b.no_ruangan 
+            WHERE a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' $filter ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -472,22 +530,6 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }            
-          
             $sql="select a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,
                 a.kd_asset,a.sumber_dana,a.nama_inv as nama,b.maxid as mon_id,c.status,c.catatan,convert(varchar(10),c.tgl_input,103) as tgl_inventaris_last,'-' as tindakan, d.jum as jum_inventaris,
                 e.nama_gedung,f.nama_ruangan as nama_ruang
@@ -541,22 +583,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }            
-          
+           
             $sql="select a.mon_id,a.kd_asset,a.id_gedung,a.no_ruangan, case a.status when 'Berfungsi' then 'Baik' else 'Rusak' end as kondisi,a.tgl_input from amu_mon_asset_bergerak a where a.status='Tidak Berfungsi' and a.kode_lokasi='$kode_lokasi'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -591,21 +618,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }            
+                
           
             $sql="select b.mon_id,a.nama_inv as nama,a.kd_asset as kode, a.merk, a.warna, a.no_ruang, case status when 'Berfungsi' then 'Baik' when 'Tidak Berfungsi' then 'Rusak' end as kondisi,a.foto 
             from amu_asset_bergerak a
@@ -640,21 +653,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }            
+               
           
             $sql="select a.no_ruangan, isnull(b.jum_asset,0) as jum_asset, isnull(c.jum_mon,0) as jum_mon,CAST((isnull(c.jum_mon,0) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 as persen, isnull(b.jum_asset,0) - isnull(c.jum_mon,0) as jum_belum,getdate() as tgl
             from amu_ruangan a
@@ -700,44 +699,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }            
-            // $sql="select a.no_ruangan, isnull(b.jum_asset,0) as jum_asset, isnull(d.jum_rusak,0) as jum_rusak,isnull(c.jum_baik,0) as jum_baik,
-            // case when isnull(b.jum_asset,0)<>0 then CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 else 0 end  as persen,
-            // isnull(b.jum_asset,0) - (isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) as jum_belum,getdate() as tgl 
-            // from amu_ruangan a 
-            // left join ( select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jum_asset 
-            //             from amu_asset_bergerak a 
-            //             where a.kode_lokasi='$kode_lokasi'
-            //             group by a.no_ruang,a.kode_lokasi 
-            //           ) b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi 
-            // left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_rusak  
-            //             from amu_mon_asset_bergerak a 
-            //             inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti 
-            //             where a.status='Tidak Berfungsi' and a.kode_lokasi='$kode_lokasi'
-            //             group by a.no_ruangan,a.kode_lokasi
-            //           ) d on a.no_ruangan=d.no_ruangan and a.kode_lokasi=d.kode_lokasi 
-            // left join ( select a.no_ruangan,a.kode_lokasi,count(a.kd_asset) as jum_baik 
-            //             from amu_mon_asset_bergerak a 
-            //             inner join amu_asset_bergerak b on a.kd_asset=b.no_bukti 
-            //             where a.status='Berfungsi' and a.kode_lokasi='$kode_lokasi'
-            //             group by a.no_ruangan,a.kode_lokasi 
-            //           ) c on a.no_ruangan=c.no_ruangan and a.kode_lokasi=c.kode_lokasi 
-            // where a.kode_lokasi='$kode_lokasi' and isnull(b.jum_asset,0) <> 0 and CAST(((isnull(d.jum_rusak,0)+isnull(c.jum_baik,0)) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 = 100 ";
-
+          
             $sql="select a.no_ruangan, isnull(b.jum_asset,0) as jum_asset, isnull(c.jum_mon,0) as jum_mon,CAST((isnull(c.jum_mon,0) * 1.0 / isnull(b.jum_asset,0)) AS DECIMAL(6,2))*100 as persen, isnull(b.jum_asset,0) - isnull(c.jum_mon,0) as jum_belum,getdate() as tgl 
             from amu_ruangan a 
             left join ( select a.no_ruang,a.kode_lokasi,count(a.no_bukti) as jum_asset 
@@ -910,21 +872,7 @@ class AsetController extends Controller
                 $id_gedung = "";
             }
 
-            // if($request->hasfile('file_gambar'))
-            // {
-            //     $file = $request->file('file_gambar');
-                
-            //     $nama_foto = uniqid()."_".$file->getClientOriginalName();
-            //     // $picName = uniqid() . '_' . $picName;
-            //     $foto = $nama_foto;
-            //     if(Storage::disk('s3')->exists('aset/'.$foto)){
-            //         Storage::disk('s3')->delete('aset/'.$foto);
-            //     }
-            //     Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
-            // }else{
-
-            //     $foto="-";
-            // }
+          
 
             $ins = DB::connection($this->db)->insert("insert into amu_mon_asset_bergerak (mon_id,kd_asset,id_gedung,no_ruangan,status,periode,kode_lokasi,tgl_input,foto,catatan) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",[$id,$kode_aset,$id_gedung,$no_ruangan,$status,$periode,$kode_lokasi,date('Y-m-d'),'-',$request->catatan]);
 
@@ -1314,15 +1262,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
+        
             $no_bukti = $request->no_bukti;
 
             $arr_foto = array();
@@ -1525,16 +1465,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
-
+        
             $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_gedung_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
@@ -1583,15 +1514,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
+          
             $no_bukti = $request->no_bukti;
 
             $arr_foto = array();
@@ -1664,16 +1587,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
-
+           
             $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_pbb_dok a
                     where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
@@ -1722,15 +1636,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
+          
             $no_bukti = $request->no_bukti;
 
             $arr_foto = array();
@@ -1803,15 +1709,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_pp
-            //         from karyawan a
-            //         where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_pp = $get[0]['kode_pp'];
-            // }else{
-            //     $kode_pp = "-";
-            // }
+       
 
             $cek = DB::connection($this->db)->select("select a.file_dok
                     from amu_imb_dok a
