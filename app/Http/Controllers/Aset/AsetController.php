@@ -174,9 +174,7 @@ class AsetController extends Controller
     }
 
     function getGedungPnj(Request $request){
-        $this->validate($request, [
-            'id_gedung' => 'required'
-        ]);
+        
 
         try {
             
@@ -191,7 +189,7 @@ class AsetController extends Controller
             $sql="select distinct a.id_gedung,b.nama_gedung 
             from amu_pnj_ruang a
             inner join amu_gedung b on a.id_gedung=b.id_gedung and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' and a.nik='$nik_user'";
+            where a.kode_lokasi='$kode_lokasi' and a.nik='$nik_user'";
                 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
