@@ -294,22 +294,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }
-
+          
             $sql="SELECT no_bukti
             ,barcode
             ,no_seri
@@ -353,10 +338,6 @@ class AsetController extends Controller
 
     function getDetailBarang(Request $request){
         $this->validate($request, [
-            'id_ruangan' => 'required',
-            'id_gedung' => 'required',
-            'id_nama' => 'required',
-            'kode_klp' => 'required',
             'qrcode' => 'required'
         ]);
         try {
@@ -366,41 +347,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // if(isset($request->kode_pp)){
-            //     $kode_pp = $request->kode_pp;
-            // }else{
-
-            //     $get = DB::connection($this->db)->select("select a.kode_pp
-            //     from karyawan a
-            //     where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            //     ");
-            //     $get = json_decode(json_encode($get),true);
-            //     if(count($get) > 0){
-            //         $kode_pp = $get[0]['kode_pp'];
-            //     }else{
-            //         $kode_pp = "";
-            //     }
-            // }
-
-            // $sql="SELECT no_bukti
-            // ,barcode
-            // ,no_seri
-            // ,merk
-            // ,tipe
-            // ,warna
-            // ,satuan
-            // ,spesifikasi
-            // ,id_gedung
-            // ,no_ruang
-            // ,kode_klp
-            // ,tanggal_perolehan
-            // ,kode_lokasi
-            // ,kode_pp
-            // ,nilai_perolehan
-            // ,kd_asset
-            // ,sumber_dana
-            // ,nama_inv as nama
-            // ,foto FROM amu_asset_bergerak a WHERE a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama'";
+            $qrcode=$request->input('qrcode');
 
             $sql="select a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,
                 a.kd_asset,a.sumber_dana,a.nama_inv as nama,b.maxid as mon_id,c.status,c.catatan,convert(varchar(10),c.tgl_input,103) as tgl_inventaris_last,'-' as tindakan, d.jum as jum_inventaris,
@@ -415,7 +362,7 @@ class AsetController extends Controller
             left join (SELECT kd_asset,kode_lokasi,count(mon_id) as jum
                     FROM amu_mon_asset_bergerak
                     GROUP BY kd_asset,kode_lokasi) d on a.no_bukti=d.kd_asset and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$request->id_gedung' AND a.no_ruang='$request->id_ruangan' AND a.kode_klp='$request->kode_klp' AND a.no_bukti='$request->id_nama' ";
+            where a.kode_lokasi='$kode_lokasi' and  a.barcode='$request->qrcode' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
