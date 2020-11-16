@@ -50,6 +50,9 @@ $router->group(['middleware' => 'auth:aset'], function () use ($router) {
     
     $router->get('gedung','Aset\AsetController@getGedung');
     $router->get('ruangan','Aset\AsetController@getRuangan');
+    $router->get('lantai','Aset\AsetController@getLantai');
+    $router->get('gedung-pnj','Aset\AsetController@getGedungPnj');
+    
     $router->get('barang','Aset\AsetController@getBarang');
     $router->get('aju_daftar','Aset\AsetController@getDaftarPengajuan');
     $router->get('barang-detail','Aset\AsetController@getDetailBarang');
@@ -81,4 +84,6 @@ $router->group(['middleware' => 'auth:aset'], function () use ($router) {
     $router->post('user_device','UserDeviceController@store');
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
+
+
 });

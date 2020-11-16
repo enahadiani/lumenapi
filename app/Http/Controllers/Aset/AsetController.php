@@ -95,22 +95,7 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_pp)){
-                $kode_pp = $request->kode_pp;
-            }else{
-
-                $get = DB::connection($this->db)->select("select a.kode_pp
-                from karyawan a
-                where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-                ");
-                $get = json_decode(json_encode($get),true);
-                if(count($get) > 0){
-                    $kode_pp = $get[0]['kode_pp'];
-                }else{
-                    $kode_pp = "";
-                }
-            }
-
+            
             $id_gedung = $request->id_gedung;
 
             $sql="SELECT a.no_ruangan,a.kode_lokasi,a.nama_ruangan,isnull(b.jumlah,0) as jumlah,isnull(b.nilai_perolehan,0) as nilai_perolehan
@@ -127,6 +112,92 @@ class AsetController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    function getLantai(Request $request){
+        $this->validate($request, [
+            'id_gedung' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+           
+            $id_gedung = $request->id_gedung;
+
+            $sql="select a.id_lantai,a.nama 
+                from amu_lantai a 
+                where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' ";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    function getGedungPnj(Request $request){
+        $this->validate($request, [
+            'id_gedung' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+           
+            $id_gedung = $request->id_gedung;
+
+            $sql="select distinct a.id_gedung,b.nama_gedung 
+            from amu_pnj_ruang a
+            inner join amu_gedung b on a.id_gedung=b.id_gedung and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' and a.nik='$nik_user'";
+                
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                //$success['sql'] = $sql;
                 $success['status'] = true;
                 $success['daftar'] = $res;
                 $success['message'] = "Success!";
