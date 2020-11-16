@@ -51,7 +51,7 @@ class ReportController extends Controller
         }
     }
 
-    public function getAkun(){
+    public function getAkun(Request $request){
         try {
             if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
@@ -61,10 +61,18 @@ class ReportController extends Controller
                 $kode_lokasi= '';
             }
             
-            $res = DB::connection('sqlsrvyptkug')->select("select a.kode_akun,a.nama
+            $filter="";
+            if ($request->input('kode_akun') != "") {
+                $kode_akun = $request->input('kode_akun');
+                $filter = " and a.kode_akun='$kode_akun' ";
+            }
+
+            $sql="select a.kode_akun,a.nama
             from masakun a
-            where a.kode_lokasi='$kode_lokasi' 
-            order by a.kode_akun            ");
+            where a.kode_lokasi='$kode_lokasi' $filter
+            order by a.kode_akun";
+
+            $res = DB::connection('sqlsrvyptkug')->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ 
@@ -100,17 +108,16 @@ class ReportController extends Controller
                 $kode_lokasi= '';
             }
             
+            $filter="";
             if ($request->input('kode_pp') != "") {
                 $kode_pp = $request->input('kode_pp');                
-                $filterkode_pp = " and a.kode_pp='$kode_pp' ";
+                $filter = " and a.kode_pp='$kode_pp' ";
             
-            }else{
-                $filterkode_pp = "";
             }
 
             $res = DB::connection('sqlsrvyptkug')->select("select a.kode_pp,a.nama
             from pp a
-            where a.kode_lokasi='$kode_lokasi' and a.flag_aktif='1' $filterkode_pp
+            where a.kode_lokasi='$kode_lokasi' and a.flag_aktif='1' $filter
             order by a.kode_pp            ");
             $res = json_decode(json_encode($res),true);
             
