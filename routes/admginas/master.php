@@ -78,7 +78,7 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->post('profil','AdmGinas\ProfilPerusahaanController@store');
     $router->post('profil-ubah','AdmGinas\ProfilPerusahaanController@update');
 });
-
+    $router->get('banner-web','AdmGinas\BannerController@show');
 
 
 ?>

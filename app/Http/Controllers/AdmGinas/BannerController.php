@@ -25,6 +25,7 @@ class BannerController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $kode_lokasi= '17';
 
             $res = DB::connection($this->db)->select("select file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi'");
             
