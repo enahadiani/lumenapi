@@ -54,8 +54,7 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->post('menu-web-move','AdmGinas\MenuWebController@simpanMove');
 
     // Banner 
-    $router->get('banner','AdmGinas\BannerController@index');
-    $router->get('banner-show','AdmGinas\BannerController@show');
+    $router->get('banner','AdmGinas\BannerController@show');
     $router->post('banner','AdmGinas\BannerController@store');
     // $router->post('banner-ubah','AdmGinas\BannerController@update');
     // $router->delete('banner','AdmGinas\BannerController@destroy');
