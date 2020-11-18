@@ -108,7 +108,7 @@ class ProfilPerusahaanController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res1 = DB::connection($this->db)->select("select a.id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, alamat, no_telp, email, file_gambar 
+            $res1 = DB::connection($this->db)->select("select id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, alamat, no_telp, email, file_gambar 
                 from lab_profil_perusahaan
                 where kode_lokasi = '$kode_lokasi'");
 
