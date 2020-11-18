@@ -574,6 +574,39 @@ $app->router->group([
     require __DIR__.'/../routes/barber/dash.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dev-auth'
+], function ($router) {
+    require __DIR__.'/../routes/dev/auth.php';
+});
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dev-master'
+], function ($router) {
+    require __DIR__.'/../routes/dev/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dev-trans'
+], function ($router) {
+    require __DIR__.'/../routes/dev/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dev-report'
+], function ($router) {
+    require __DIR__.'/../routes/dev/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dev-dash'
+], function ($router) {
+    require __DIR__.'/../routes/dev/dash.php';
+});
 
 return $app;
