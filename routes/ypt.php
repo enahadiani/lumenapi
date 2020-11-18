@@ -130,4 +130,10 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('komponen-investasi','Dashboard\DashboardController@komponenInvestasi');
     $router->get('rka-real-investasi','Dashboard\DashboardController@rkaVSRealInvestasi');
     $router->get('penyerapan-investasi','Dashboard\DashboardController@penyerapanInvestasi');
+
+    //route report
+    $router->get('lokasi','Dashboard\ReportController@getLokasi');
+    $router->get('akun','Dashboard\ReportController@getAkun');
+    $router->get('pp','Dashboard\ReportController@getPp');
+    $router->get('drk','Dashboard\ReportController@getDrk');
 });
