@@ -108,15 +108,20 @@ class ProfilPerusahaanController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, misi, alamat, no_telp, email, file_gambar 
-                from lab_profil_perusahaan a
+            $res1 = DB::connection($this->db)->select("select a.id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, alamat, no_telp, email, file_gambar 
+                from lab_profil_perusahaan
+                where kode_lokasi = '$kode_lokasi'");
+
+            $res2 = DB::connection($this->db)->select("select misi from lab_profil_perusahaan a
                 inner join lab_profil_perusahaan_detail b on a.kode_lokasi=b.kode_lokasi and a.id_perusahaan=b.id_perusahaan  
                 where a.kode_lokasi = '$kode_lokasi'");
             
-            $res = json_decode(json_encode($res),true);
+            $res1 = json_decode(json_encode($res1),true);
+            $res2 = json_decode(json_encode($res2),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $res1;
+                $success['detail'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
