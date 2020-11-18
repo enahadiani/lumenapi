@@ -104,18 +104,20 @@ class ProfilPerusahaanController extends Controller {
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('webginas/'.$foto)){
-                    Storage::disk('s3')->delete('webginas/'.$foto);
-                }
-                Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                var_dump($request->no_urut);
+                var_dump($request->misi);
+                // if(Storage::disk('s3')->exists('webginas/'.$foto)){
+                //     Storage::disk('s3')->delete('webginas/'.$foto);
+                // }
+                // Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                 
-                DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,alamat,deskripsi,no_telp,email) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$alamat','$deskripsi','$telp','$email')");
+                // DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,alamat,deskripsi,no_telp,email) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$alamat','$deskripsi','$telp','$email')");
                 
-                if(count($request->no_urut) > 0) {
-                    for($i=0;$i<count($request->no_urut);$i++) {
-                        DB::connection($this->db)->insert("insert into lab_profil_perusahaan_detail(kode_lokasi,id_perusahaan,misi,no_urut) values ('$kode_lokasi','$kode','$request->misi[$i]','$request->no_urut[$i]')");
-                    }
-                }
+                // if(count($request->no_urut) > 0) {
+                //     for($i=0;$i<count($request->no_urut);$i++) {
+                //         DB::connection($this->db)->insert("insert into lab_profil_perusahaan_detail(kode_lokasi,id_perusahaan,misi,no_urut) values ('$kode_lokasi','$kode','$request->misi[$i]','$request->no_urut[$i]')");
+                //     }
+                // }
 
                 $success['status'] = true;
                 $success['message'] = "Data Profil Perusahaan berhasil disimpan.";
