@@ -118,7 +118,7 @@ class ProfilPerusahaanController extends Controller {
             
             $res1 = json_decode(json_encode($res1),true);
             $res2 = json_decode(json_encode($res2),true);
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res1) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['detail'] = $res2;
