@@ -17,6 +17,34 @@ class KlienController extends Controller {
     public $db = 'dbsaife';
     public $guard = 'admginas';
 
+    public function showKlien() {
+        try {
+            $kode_lokasi= '17';
+
+            $sql= "select nama_klien, file_gambar from lab_daftar_klien
+                where kode_lokasi='".$kode_lokasi."'";
+                
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function index(Request $request) {
         try {
             
