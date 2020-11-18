@@ -75,7 +75,8 @@ class BannerController extends Controller {
 
     public function store(Request $request) {
         $this->validate($request, [
-            'gambarke' => 'required|array'
+            'gambarke' => 'required|array',
+            'id_banner' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -85,7 +86,6 @@ class BannerController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $kode = $this->generateKode("lab_gbr_banner", "id_banner", $kode_lokasi."-BN".date('Ym').".", "0001");
             $arr_foto = array();
             $arr_gambarke = array();
             $i=0;
@@ -104,23 +104,22 @@ class BannerController extends Controller {
                             $arr_foto[] = $foto;
                         }else{
                             $arr_foto[] = "-";
-                        }     
+                        }
+                        $arr_id_banner[] = $request->id_banner[$i];     
                         $arr_gambarke[] = $request->gambarke[$i];
                     }
                     
-                    $del = DB::connection($this->db)->table('lab_gbr_banner_detail')->where('kode_lokasi', $kode_lokasi)->delete();
                     $del = DB::connection($this->db)->table('lab_gbr_banner')->where('kode_lokasi', $kode_lokasi)->delete();
                 }
 
                 if(count($arr_gambarke) > 0){
                     for($i=0; $i<count($arr_gambarke);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner_detail (id_banner,kode_lokasi,file_gambar,gambarke) values ('$kode','$kode_lokasi','$arr_foto[$i]','$arr_gambarke[$i]') "); 
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_foto[$i]') "); 
                     }
-                    DB::connection($this->db)->insert("insert into lab_gbr_banner(id_banner,kode_lokasi) values ('$kode','$kode_lokasi') ");
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['message'] = "Data Banner berhasil diupload.";
-                    $success['no_bukti'] = $kode;
+                    $success['no_bukti'] = "0";
                 }
                 else{
                     $success['status'] = false;
