@@ -108,12 +108,10 @@ class ProfilPerusahaanController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("
-                select a.id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, misi, alamat, no_telp, email, file_gambar 
+            $res = DB::connection($this->db)->select("select a.id_perusahaan, nama_perusahaan, koordinat, deskripsi, visi, misi, alamat, no_telp, email, file_gambar 
                 from lab_profil_perusahaan a
                 inner join lab_profil_perusahaan_detail b on a.kode_lokasi=b.kode_lokasi and a.id_perusahaan=b.id_perusahaan  
-                where a.kode_lokasi = '$kode_lokasi''
-            ");
+                where a.kode_lokasi = '$kode_lokasi'");
             
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
