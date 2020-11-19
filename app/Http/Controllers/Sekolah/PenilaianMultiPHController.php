@@ -312,6 +312,7 @@ class PenilaianMultiPHController extends Controller
             'kode_pp' => 'required',
             'kode_sem' => 'required',
             'kode_kelas' => 'required',
+            'flag_kelas' => 'required',
             'kode_matpel' => 'required',
             'kode_kd'=>'required',
             'nama_kd' => 'required',
@@ -356,7 +357,7 @@ class PenilaianMultiPHController extends Controller
                         }                 
                     }  
 
-                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$nik));
+                    $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user,flag_kelas) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd, $request->nama_kd,$nik,$request->flag_kelas));
 
 
                     if(!$sts_duplicate){
@@ -440,13 +441,18 @@ class PenilaianMultiPHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,a.nama_kd,a.kode_kd
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,a.nama_kd,a.kode_kd,a.flag_kelas
             from sis_nilai_m2 a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+                inner join (select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'reguler' as flag_kelas,kode_tingkat
+                            from sis_kelas a 
+                            union all
+                            select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'khusus' as flag_kelas,kode_tingkat
+                            from sis_kelas_khusus a
+                ) d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.flag_kelas=d.flag_kelas
                 left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
-                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp
+                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp and a.kode_matpel=h.kode_matpel and a.kode_sem=h.kode_sem and d.kode_tingkat=h.kode_tingkat
                 left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m2 
                     where no_bukti <> '$request->no_bukti'
                     group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi
@@ -515,6 +521,7 @@ class PenilaianMultiPHController extends Controller
             'kode_pp' => 'required',
             'kode_sem' => 'required',
             'kode_kelas' => 'required',
+            'flag_kelas' => 'required',
             'kode_matpel' => 'required',
             'kode_kd'=>'required',
             'nama_kd'=>'required',
@@ -554,7 +561,7 @@ class PenilaianMultiPHController extends Controller
                 ->where('no_bukti', $request->no_bukti)
                 ->delete();
 
-                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$nik));
+                $ins = DB::connection($this->db)->insert("insert into sis_nilai_m2(no_bukti,kode_ta,kode_kelas,kode_matpel,kode_sem,tgl_input,nu,kode_lokasi,kode_pp,kode_kd,nama_kd,nik_user,flag_kelas) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->kode_ta,$request->kode_kelas,$request->kode_matpel,$request->kode_sem,date('Y-m-d H:i:s'),$no_urut,$kode_lokasi,$request->kode_pp,$request->kode_kd,$request->nama_kd,$nik,$request->flag_kelas));
 
                 $arr_id = array();
                 for($i=0;$i<count($request->nis);$i++){
@@ -852,7 +859,8 @@ class PenilaianMultiPHController extends Controller
             'kode_lokasi' => 'required',
             'kode_pp' => 'required',
             'nik' => 'required',
-            'type' => 'required'
+            'type' => 'required',
+            'flag_kelas' => 'required'
         ]);
 
         date_default_timezone_set("Asia/Bangkok");
@@ -861,9 +869,9 @@ class PenilaianMultiPHController extends Controller
         $kode_lokasi = $request->kode_lokasi;
         $kode_pp = $request->kode_pp;
         if(isset($request->type) && $request->type == "template"){
-            return Excel::download(new NilaiExportPH($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+            return Excel::download(new NilaiExportPH($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_matpel,$request->kode_kd,$request->flag_kelas,$request->kode_matpel2), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
         }else{
-            return Excel::download(new NilaiExportPH($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_matpel,$request->kode_kd), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+            return Excel::download(new NilaiExportPH($nik_user,$kode_lokasi,$kode_pp,$request->type,$request->kode_kelas,$request->kode_sem,$request->kode_matpel,$request->kode_kd,$request->flag_kelas,$request->kode_matpel2), 'Nilai_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
         }
     }
 
@@ -1029,13 +1037,18 @@ class PenilaianMultiPHController extends Controller
             $no_bukti = $request->no_bukti;
             $kode_pp = $request->kode_pp;
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd,a.flag_kelas
             from sis_nilai_m2 a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                left join sis_kelas d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
+                inner join (select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'reguler' as flag_kelas,a.kode_tingkat
+                            from sis_kelas a 
+                            union all
+                            select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'khusus' as flag_kelas,a.kode_tingkat
+                            from sis_kelas_khusus a
+                ) d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.flag_kelas=d.flag_kelas
                 left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
-                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp
+                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp and a.kode_matpel=h.kode_matpel and a.kode_sem=h.kode_sem and d.kode_tingkat=h.kode_tingkat
                 left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m2 
                     where no_bukti <> '$no_bukti'
                     group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_lokasi
@@ -1281,9 +1294,17 @@ class PenilaianMultiPHController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.kode_matpel,b.nama 
+            
+            if(isset($request->flag_kelas)){
+                $filter .= "and a.flag_kelas='$request->flag_kelas' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection($this->db)->select("select distinct a.kode_matpel,b.nama
             from sis_guru_matpel_kelas a
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+			left join sis_siswa_matpel_khusus c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             where a.nik='$nik' and a.kode_lokasi='$kode_lokasi' $filter ");
             $res = json_decode(json_encode($res),true);
             
@@ -1333,9 +1354,15 @@ class PenilaianMultiPHController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.kode_kelas,b.nama 
+            $res = DB::connection($this->db)->select("select distinct a.kode_kelas,b.nama,a.flag_kelas 
             from sis_guru_matpel_kelas a
-            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join (
+                select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama,'reguler' as flag_kelas 
+                from sis_kelas a 
+                union all
+                select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama,'khusus' as flag_kelas 
+                from sis_kelas_khusus a
+            ) b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.flag_kelas=b.flag_kelas
             where a.nik='$nik' and a.kode_lokasi='$kode_lokasi' $filter ");
             $res = json_decode(json_encode($res),true);
             

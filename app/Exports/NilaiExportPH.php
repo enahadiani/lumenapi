@@ -24,7 +24,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
 {
-    public function __construct($nik_user,$kode_lokasi,$kode_pp,$type,$kode_kelas= null,$kode_sem= null,$kode_matpel= null,$kode_kd = null)
+    public function __construct($nik_user,$kode_lokasi,$kode_pp,$type,$kode_kelas= null,$kode_sem= null,$kode_matpel= null,$kode_kd = null,$flag_kelas = null,$kode_matpel2= null)
     {
         $this->nik_user = $nik_user;
         $this->kode_lokasi = $kode_lokasi;
@@ -34,17 +34,26 @@ class NilaiExportPH implements FromCollection, WithHeadings, WithColumnFormattin
         $this->kode_sem = $kode_sem;
         $this->kode_kd = $kode_kd;
         $this->type = $type;
+        $this->flag_kelas = $flag_kelas;
+        $this->kode_matpel2 = $kode_matpel2;
     }
 
     public function collection()
     {
         if($this->type == 'template'){
            
-            $res = DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama 
+            if($this->flag_kelas == "khusus"){
+                $res = collect(DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama from sis_siswa a 
+                inner join sis_siswa_matpel_khusus b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                where b.kode_kelas ='$this->kode_kelas' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and b.kode_matpel='$this->kode_matpel2' and a.flag_aktif ='1' order by a.nama"));
+            }else{
+
+                $res = DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama 
                     from sis_siswa a 
                     where a.kode_kelas ='$this->kode_kelas' and a.kode_lokasi='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and a.flag_aktif=1
                     order by a.nama
-            ");
+                ");
+            }
             $res = collect($res);
 
             
