@@ -88,9 +88,9 @@ class BayarController extends Controller
            
             DB::connection($this->db)->beginTransaction();
 
-            $no_bukti = $this->generateKode("dev_bayar_m", "no_tagihan", $kode_lokasi."-PBR".substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("dev_bayar_m", "no_bayar", $kode_lokasi."-PBR".substr($request->periode,2,4).".", "001");
             
-            $ins = DB::connection($this->db)->insert("insert into dev_bayar_m (no_tagihan,kode_lokasi,tgl_input,tanggal,periode,keterangan,nim) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$request->tanggal."','".$request->periode."','".$request->keterangan."','".$request->nim."')");
+            $ins = DB::connection($this->db)->insert("insert into dev_bayar_m (no_bayar,kode_lokasi,tgl_input,tanggal,periode,keterangan,nim) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$request->tanggal."','".$request->periode."','".$request->keterangan."','".$request->nim."')");
 
             if (count($request->no_tagihan) > 0){
                 for ($j=0;$j < count($request->no_tagihan);$j++){
@@ -201,32 +201,32 @@ class BayarController extends Controller
         }	
     }
 
-    public function show($no_bayar)
+    public function show(Request $request)
     {
+        $this->validate($request,[
+            'no_bayar' => 'required'
+        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $no_bayar = $request->no_bayar;
 
-            $res = DB::connection($this->db)->select("select no_bayar,tanggal,periode,keterangan,periode from dev_bayar_m where no_bayar = '".$no_bayar."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select no_bayar,tanggal,periode,keterangan,periode,nim from dev_bayar_m where no_bayar = '".$no_bayar."' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
-            
-            $res2 = DB::connection($this->db)->select("
-            select a.nim,a.no_tagihan,a.keterangan,isnull(b.tagihan,0) as tagihan,isnull(c.bayar,0) as bayar,isnull(b.tagihan,0)-isnull(c.bayar,0) as sisa_tagihan 
-            from dev_tagihan_m a 
-            left join (select no_tagihan,kode_lokasi,sum(nilai) as tagihan 
-                        from  dev_tagihan_d 
-                        group by no_tagihan,kode_lokasi 
-                    ) b on a.no_tagihan=b.no_tagihan and a.kode_lokasi=b.kode_lokasi 
-            left join (select no_tagihan,kode_lokasi,sum(nilai) as bayar 
-                    from  dev_bayar_d 
-                    group by no_tagihan,kode_lokasi
-                    ) c on a.no_tagihan=c.no_tagihan and a.kode_lokasi=c.kode_lokasi ");
-            $res2= json_decode(json_encode($res2),true);
 
+            $res2 = DB::connection($this->db)->select("select c.no_tagihan,c.keterangan,a.nilai as nilai_t, b.nilai as nilai_b 
+            from dev_tagihan_m c inner join
+            (select no_tagihan,sum(nilai) as nilai from dev_tagihan_d group by no_tagihan) a on c.no_tagihan=a.no_tagihan
+            inner join (select no_bayar,no_tagihan,sum(nilai) as nilai from dev_bayar_d group by no_tagihan,no_bayar) b on a.no_tagihan=b.no_tagihan and c.no_tagihan=b.no_tagihan 
+            where b.no_bayar='$no_bayar' and c.kode_lokasi='$kode_lokasi'
+            ");
+            $res2 = json_decode(json_encode($res2),true);
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['detail'] = $res2;

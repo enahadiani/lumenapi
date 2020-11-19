@@ -22,8 +22,10 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('tagihan','Dev\TagihanController@store');
     $router->put('tagihan','Dev\TagihanController@update');
     $router->delete('tagihan','Dev\TagihanController@destroy');
+    $router->get('tagihan-load','Dev\TagihanController@load');
     
     $router->get('bayar','Dev\BayarController@index');
+    $router->get('bayar-detail','Dev\BayarController@show');
     $router->post('bayar','Dev\BayarController@store');
     $router->put('bayar','Dev\BayarController@update');
     $router->delete('bayar','Dev\BayarController@destroy');    
