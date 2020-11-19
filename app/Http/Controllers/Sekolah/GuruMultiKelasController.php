@@ -368,14 +368,41 @@ class GuruMultiKelasController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("
-            select a.kode_kelas,a.nama, 'reguler' as flag_kelas
-            from sis_kelas a
-            $filter
-            union all
-            select a.kode_kelas,a.nama, 'khusus' as flag_kelas 
-            from sis_kelas_khusus a
-            $filter ");
+            if(isset($request->kode_matpel)){
+                $cek = DB::connection($this->db)->select("select sifat from sis_matpel where kode_matpel='$request->kode_matpel' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' ");
+                if(count($cek) > 0){
+                    if($cek[0]->sifat == 2){
+                        $sql = "select distinct a.kode_kelas,a.nama, 'khusus' as flag_kelas 
+                        from sis_kelas_khusus a
+                        inner join sis_siswa_matpel_khusus b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                        $filter and b.kode_matpel='$request->kode_matpel' ";
+                    }else{
+                        $sql = "select a.kode_kelas,a.nama, 'reguler' as flag_kelas
+                        from sis_kelas a
+                        $filter";
+                    }
+                }else{
+                    $sql = "
+                    select a.kode_kelas,a.nama, 'reguler' as flag_kelas
+                    from sis_kelas a
+                    $filter
+                    union all
+                    select a.kode_kelas,a.nama, 'khusus' as flag_kelas 
+                    from sis_kelas_khusus a
+                    $filter ";
+                }
+            }else{
+                $sql = "
+                select a.kode_kelas,a.nama, 'reguler' as flag_kelas
+                from sis_kelas a
+                $filter
+                union all
+                select a.kode_kelas,a.nama, 'khusus' as flag_kelas 
+                from sis_kelas_khusus a
+                $filter ";
+            }
+
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
