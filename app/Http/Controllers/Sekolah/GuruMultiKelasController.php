@@ -84,7 +84,8 @@ class GuruMultiKelasController extends Controller
             'flag_aktif' => 'required',
             'kode_matpel' => 'required',
             'kode_ta' => 'required',
-            'kode_kelas'=>'required|array'
+            'kode_kelas'=>'required|array',
+            'flag_kelas' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -102,7 +103,7 @@ class GuruMultiKelasController extends Controller
 
                 for($i=0;$i<count($request->kode_kelas);$i++){
     
-                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_guru_matpel_kelas(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_kelas,tgl_input,kode_ta) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->nik_guru','$request->flag_aktif','".$request->kode_kelas[$i]."','$tgl_input','$request->kode_ta')");
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_guru_matpel_kelas(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_kelas,tgl_input,kode_ta,flag_kelas) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->nik_guru','$request->flag_aktif','".$request->kode_kelas[$i]."','$tgl_input','$request->kode_ta','".$request->flag_kelas[$i]."')");
                     
                 }
                 
@@ -160,9 +161,14 @@ class GuruMultiKelasController extends Controller
             group by a.kode_pp,a.nik,a.flag_aktif,b.nama,c.nama,a.kode_matpel,a.kode_ta,d.nama,e.nama");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.kode_kelas,b.nama as nama_kelas
+            $res2 = DB::connection($this->db)->select("select a.kode_kelas,b.nama as nama_kelas,a.flag_kelas
             from sis_guru_matpel_kelas a 
-            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join (select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'reguler' as flag_kelas 
+                        from sis_kelas a
+                        union all
+                        select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'khusus' as flag_kelas 
+                        from sis_kelas_khusus a
+            ) b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.flag_kelas=b.flag_kelas
             where a.nik='$nik_guru' and a.kode_matpel='".$kode_matpel."' and a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='".$kode_pp."'  and a.kode_ta='".$kode_ta."'");
             $res2 = json_decode(json_encode($res2),true);
             
@@ -213,7 +219,8 @@ class GuruMultiKelasController extends Controller
             'flag_aktif' => 'required',
             'kode_matpel' => 'required',
             'kode_ta' => 'required',
-            'kode_kelas'=>'required|array'
+            'kode_kelas'=>'required|array',
+            'flag_kelas'=> 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -239,7 +246,7 @@ class GuruMultiKelasController extends Controller
 
                 for($i=0;$i<count($request->kode_kelas);$i++){
     
-                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_guru_matpel_kelas(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_kelas,tgl_input,kode_ta) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->nik_guru','$request->flag_aktif','".$request->kode_kelas[$i]."','$tgl_input','$request->kode_ta')");
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_guru_matpel_kelas(kode_pp,kode_lokasi,kode_matpel,nik,flag_aktif,kode_kelas,tgl_input,kode_ta,flag_kelas) values ( '$request->kode_pp','$kode_lokasi','".$request->kode_matpel."','$request->nik_guru','$request->flag_aktif','".$request->kode_kelas[$i]."','$tgl_input','$request->kode_ta','".$request->flag_kelas[$i]."')");
                     
                 }
                 
@@ -337,6 +344,57 @@ class GuruMultiKelasController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
+    }
+
+    public function getMultiKelas(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "where a.kode_lokasi ='$kode_lokasi' ";
+            if(isset($request->kode_pp)){
+                $filter .= "and a.kode_pp='$request->kode_pp' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_kelas)){
+                $filter .= "and a.kode_kelas='$request->kode_kelas' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection($this->db)->select("
+            select a.kode_kelas,a.nama, 'reguler' as flag_kelas
+            from sis_kelas a
+            $filter
+            union all
+            select a.kode_kelas,a.nama, 'khusus' as flag_kelas 
+            from sis_kelas_khusus a
+            $filter ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 
 }

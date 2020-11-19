@@ -144,6 +144,7 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
 
     //Guru Matpel
     $router->get('guru-multi-kelas-all','Sekolah\GuruMultiKelasController@index');
+    $router->get('multi-kelas','Sekolah\GuruMultiKelasController@getMultiKelas');
     $router->get('guru-multi-kelas','Sekolah\GuruMultiKelasController@show');
     $router->post('guru-multi-kelas','Sekolah\GuruMultiKelasController@store');
     $router->put('guru-multi-kelas','Sekolah\GuruMultiKelasController@update');
