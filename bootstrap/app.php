@@ -576,37 +576,9 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/dev-auth'
+    'prefix' => 'api/dev'
 ], function ($router) {
-    require __DIR__.'/../routes/dev/auth.php';
-});
-
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/dev-master'
-], function ($router) {
-    require __DIR__.'/../routes/dev/master.php';
-});
-
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/dev-trans'
-], function ($router) {
-    require __DIR__.'/../routes/dev/trans.php';
-});
-
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/dev-report'
-], function ($router) {
-    require __DIR__.'/../routes/dev/report.php';
-});
-
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/dev-dash'
-], function ($router) {
-    require __DIR__.'/../routes/dev/dash.php';
+    require __DIR__.'/../routes/dev.php';
 });
 
 return $app;
