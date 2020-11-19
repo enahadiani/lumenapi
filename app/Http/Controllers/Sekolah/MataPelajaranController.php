@@ -53,6 +53,17 @@ class MataPelajaranController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->flag_kelas)){
+                if($request->flag_kelas == "khusus"){
+                    $sifat = "('2')";
+                }else{
+                    $sifat = "('0','1')";
+                }
+                $filter .= "and a.sifat in $sifat ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection($this->db)->select("select a.kode_matpel, a.nama,a.kode_pp+'-'+b.nama as pp,a.tgl_input,a.sifat,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,case a.sifat when '0' then 'Nasional' when '1' then 'Muatan Lokal' when '2' then 'Khusus' when '3' then 'Ekstrakulikuler' else '-' end as nama_sifat,a.skode as singkatan
             from sis_matpel a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
