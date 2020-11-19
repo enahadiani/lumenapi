@@ -112,7 +112,7 @@ class ProfilPerusahaanController extends Controller {
                 from lab_profil_perusahaan
                 where kode_lokasi = '$kode_lokasi'");
 
-            $res2 = DB::connection($this->db)->select("select misi from lab_profil_perusahaan a
+            $res2 = DB::connection($this->db)->select("select no_urut, misi from lab_profil_perusahaan a
                 inner join lab_profil_perusahaan_detail b on a.kode_lokasi=b.kode_lokasi and a.id_perusahaan=b.id_perusahaan  
                 where a.kode_lokasi = '$kode_lokasi'");
             
