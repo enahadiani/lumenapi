@@ -59,7 +59,7 @@ class ProfilPerusahaanController extends Controller {
                 }
                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
             }else{
-                $getFoto = DB::connection($this->db)->select("select top 1 file_gambar from lab_profil_perusahaan kode_lokasi = '$kode_lokasi''");
+                $getFoto = DB::connection($this->db)->select("select top 1 file_gambar from lab_profil_perusahaan where kode_lokasi = '$kode_lokasi''");
                 $res = json_decode(json_encode($res),true);
 
                 if($res[0]['file_gambar'] == null) {
