@@ -218,9 +218,13 @@ class BayarController extends Controller
             $res= json_decode(json_encode($res),true);
 
             $res2 = DB::connection($this->db)->select("select c.no_tagihan,c.keterangan,a.nilai as nilai_t, b.nilai as nilai_b 
-            from dev_tagihan_m c inner join
-            (select no_tagihan,sum(nilai) as nilai from dev_tagihan_d group by no_tagihan) a on c.no_tagihan=a.no_tagihan
-            inner join (select no_bayar,no_tagihan,sum(nilai) as nilai from dev_bayar_d group by no_tagihan,no_bayar) b on a.no_tagihan=b.no_tagihan and c.no_tagihan=b.no_tagihan 
+            from dev_tagihan_m c 
+            inner join(select no_tagihan,sum(nilai) as nilai 
+                        from dev_tagihan_d group by no_tagihan
+                        ) a on c.no_tagihan=a.no_tagihan
+            inner join (select no_bayar,no_tagihan,sum(nilai) as nilai 
+                        from dev_bayar_d group by no_tagihan,no_bayar
+                        ) b on a.no_tagihan=b.no_tagihan and c.no_tagihan=b.no_tagihan 
             where b.no_bayar='$no_bayar' and c.kode_lokasi='$kode_lokasi'
             ");
             $res2 = json_decode(json_encode($res2),true);
