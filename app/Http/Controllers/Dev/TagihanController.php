@@ -252,6 +252,51 @@ class TagihanController extends Controller
         
     }
 
+    public function load(Request $request){
+        $this->validate($request,[
+            'nim' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bayar = $request->no_bayar;
+
+            $res = DB::connection($this->db)->select("
+                select a.nim,a.no_tagihan,a.keterangan,isnull(b.tagihan,0) as tagihan,isnull(c.bayar,0) as bayar,isnull(b.tagihan,0)-isnull(c.bayar,0) as sisa_tagihan 
+                from dev_tagihan_m a 
+                left join (select no_tagihan,kode_lokasi,sum(nilai) as tagihan 
+                            from  dev_tagihan_d 
+                            group by no_tagihan,kode_lokasi 
+                        ) b on a.no_tagihan=b.no_tagihan and a.kode_lokasi=b.kode_lokasi 
+                left join (select no_tagihan,kode_lokasi,sum(nilai) as bayar 
+                        from  dev_bayar_d 
+                        group by no_tagihan,kode_lokasi
+                        ) c on a.no_tagihan=c.no_tagihan and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_lokasi='$kode_lokasi' and a.nim='".$request->nim."' ");
+            $res= json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 
 }
 
