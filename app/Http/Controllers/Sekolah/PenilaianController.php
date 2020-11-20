@@ -1240,24 +1240,35 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
-            if(isset($request->flag_kelas)){
-                $filter .= "and a.flag_kelas='$request->flag_kelas' ";
-            }else{
-                $filter .= "";
-            }
-
-            
             if($data->status_login == "G"){
                 $filter_nik = " and a.nik='$nik' ";
             }else{
                 $filter_nik = "";
             }
 
-            $sql = "select distinct a.kode_matpel,b.nama
-            from sis_guru_matpel_kelas a
-            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-			inner join sis_siswa_matpel_khusus c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
+            if(isset($request->flag_kelas)){
+                $filter .= "and a.flag_kelas='$request->flag_kelas' ";
+                if($request->flag_kelas == "khusus"){
+
+                    $sql = "select distinct a.kode_matpel,b.nama
+                    from sis_guru_matpel_kelas a
+                    inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                    inner join sis_siswa_matpel_khusus c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
+                }else{
+                    $sql = "select distinct a.kode_matpel,b.nama
+                    from sis_guru_matpel_kelas a
+                    inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
+                }
+
+            }else{
+                $filter .= "select distinct a.kode_matpel,b.nama
+                from sis_guru_matpel_kelas a
+                inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' $filter_nik $filter";
+            }
+            
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
