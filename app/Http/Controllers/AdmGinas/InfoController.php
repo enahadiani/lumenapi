@@ -52,7 +52,7 @@ class InfoController extends Controller {
         }
     }
 
-    public function index() {
+    public function index(Request $request) {
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
