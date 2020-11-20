@@ -1070,29 +1070,29 @@ class LaporanController extends Controller
             
             $col_array = array('periode','kode_akun','kode_neraca','kode_fs');
             $db_col_name = array('a.periode','a.kode_akun','b.kode_neraca','b.kode_fs');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='$kode_lokasi' ";
 
             $this_in = "";
-            // for($i = 0; $i<count($col_array); $i++){
-            //     if(ISSET($request->input($col_array[$i])[0])){
-            //         if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
-            //             $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
-            //         }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
-            //             $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
-            //         }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
-            //             $tmp = explode(",",$request->input($col_array[$i])[1]);
-            //             for($x=0;$x<count($tmp);$x++){
-            //                 if($x == 0){
-            //                     $this_in .= "'".$tmp[$x]."'";
-            //                 }else{
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
             
-            //                     $this_in .= ","."'".$tmp[$x]."'";
-            //                 }
-            //             }
-            //             $where .= " and ".$db_col_name[$i]." in ($this_in) ";
-            //         }
-            //     }
-            // }
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
 
             
             $nik_user=$request->nik_user;
@@ -1113,7 +1113,7 @@ class LaporanController extends Controller
             $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
             from exs_glma_lap a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='00'";
+            $where ";
             if(isset($request->trail[1])){
                 if($request->input('trail')[1] != ""){
     
@@ -1122,14 +1122,14 @@ class LaporanController extends Controller
                         $sql = "select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
                         from exs_glma_lap a
                         inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                        where a.kode_lokasi='00'";
+                        $where ";
                     }
                     if ($request->input('trail')[1] == "2")
                     {
                         $sql = "select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
                         from exs_glma_lap a
                         inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                        where a.kode_lokasi='00'";
+                        $where ";
                     }
                 }
             }
