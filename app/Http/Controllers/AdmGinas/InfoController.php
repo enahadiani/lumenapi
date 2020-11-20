@@ -18,6 +18,41 @@ class InfoController extends Controller {
     public $db = 'dbsaife';
     public $guard = 'admginas';
 
+    public function getInfoDetail(Request $request) {
+        try {
+            $kode_lokasi = '17';
+            $id_info = $request->id_info;
+            $res1 = DB::connection($this->db)->select("select tanggal, judul, file_gambar, content 
+                from lab_informasi
+                where kode_lokasi = '$kode_lokasi' and id_info = '$id_info'");
+            
+            $res1 = json_decode(json_encode($res1),true);
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $getDate = date('d',strtotime($res1[0]['tanggal']));
+                $getMonth = date('m',strtotime($res1[0]['tanggal']));
+                $getYear = date('Y',strtotime($res1[0]['tanggal']));
+                $convert = floatval($getMonth);
+                $bulan = $this->getNamaBulan($convert);
+                $res1[0]['tanggal'] = "$getDate $bulan $getYear";
+
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getTop3Info() {
         try {
             $kode_lokasi = '17';
@@ -27,7 +62,7 @@ class InfoController extends Controller {
                 where kode_lokasi = '$kode_lokasi' order by id_info desc");
             
             $res1 = json_decode(json_encode($res1),true);
-            if(count($res1) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 for($i=0;$i<count($res1);$i++) {
                     $getDate = date('d',strtotime($res1[$i]['tanggal']));
                     $getMonth = date('m',strtotime($res1[$i]['tanggal']));
