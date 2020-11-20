@@ -22,9 +22,9 @@ class InfoController extends Controller {
         try {
             $kode_lokasi = '17';
 
-            $res1 = DB::connection($this->db)->select("select id_info, tanggal, judul, file_gambar 
+            $res1 = DB::connection($this->db)->select("select top 3 id_info, tanggal, judul, file_gambar 
                 from lab_informasi
-                where kode_lokasi = '$kode_lokasi'");
+                where kode_lokasi = '$kode_lokasi' order by id_info desc");
             
             $res1 = json_decode(json_encode($res1),true);
             if(count($res1) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
