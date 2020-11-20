@@ -53,6 +53,43 @@ class InfoController extends Controller {
         }
     }
 
+    public function getAllInfo() {
+        try {
+            $kode_lokasi = '17';
+
+            $res1 = DB::connection($this->db)->select("select id_info, tanggal, judul, file_gambar 
+                from lab_informasi
+                where kode_lokasi = '$kode_lokasi' order by id_info desc");
+            
+            $res1 = json_decode(json_encode($res1),true);
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($res1);$i++) {
+                    $getDate = date('d',strtotime($res1[$i]['tanggal']));
+                    $getMonth = date('m',strtotime($res1[$i]['tanggal']));
+                    $getYear = date('Y',strtotime($res1[$i]['tanggal']));
+                    $convert = floatval($getMonth);
+                    $bulan = $this->getNamaBulan($convert);
+                    $res1[$i]['tanggal'] = "$getDate $bulan $getYear";
+                }
+
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getTop3Info() {
         try {
             $kode_lokasi = '17';
