@@ -57,6 +57,7 @@ class ProfilPerusahaanController extends Controller {
         $this->validate($request, [
             'id_perusahaan' => 'required',
             'nama_perusahaan' => 'required',
+            'wa' => 'required',
             'koordinat' => 'required',
             'deskripsi' => 'required',
             'visi' => 'required',
@@ -82,6 +83,7 @@ class ProfilPerusahaanController extends Controller {
             $alamat = $request->alamat;
             $telp = $request->no_telp;
             $email = $request->email;
+            $wa = $request->wa;
             
             if($request->hasfile('file_gambar')){
                 $file = $request->file('file_gambar');
@@ -113,7 +115,7 @@ class ProfilPerusahaanController extends Controller {
             DB::connection($this->db)->table('lab_profil_perusahaan')->where('kode_lokasi', $kode_lokasi)->delete();
             DB::connection($this->db)->table('lab_profil_perusahaan_detail')->where('kode_lokasi', $kode_lokasi)->delete();
 
-            DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,alamat,deskripsi,no_telp,email) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$alamat','$deskripsi','$telp','$email')");
+            DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,alamat,deskripsi,no_telp,email,link_wa) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$alamat','$deskripsi','$telp','$email','$wa')");
 
             if(count($arr_no_urut) > 0) {
                 for($i=0;$i<count($arr_no_urut);$i++) {
