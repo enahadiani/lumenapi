@@ -80,7 +80,7 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('info','AdmGinas\InfoController@index');
     $router->get('info-show','AdmGinas\InfoController@show');
     $router->post('info-simpan','AdmGinas\InfoController@store');
-    $router->post('info-ubah','AdmGinas\InfoController@ubah');
+    $router->post('info-ubah','AdmGinas\InfoController@update');
 });
     $router->get('banner-web','AdmGinas\BannerController@show');
     $router->get('review-web','AdmGinas\ReviewKlienController@showReview');
