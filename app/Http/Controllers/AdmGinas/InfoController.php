@@ -39,7 +39,6 @@ class InfoController extends Controller {
 
                 $success['status'] = true;
                 $success['data'] = $res1;
-                $success['detail'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
