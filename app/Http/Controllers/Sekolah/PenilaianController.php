@@ -1246,11 +1246,19 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.kode_matpel,b.nama
+            
+            if($data->status_login == "G"){
+                $filter_nik = " and a.nik='$nik' ";
+            }else{
+                $filter_nik = "";
+            }
+
+            $sql = "select distinct a.kode_matpel,b.nama
             from sis_guru_matpel_kelas a
             inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-			left join sis_siswa_matpel_khusus c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-            where a.nik='$nik' and a.kode_lokasi='$kode_lokasi' $filter ");
+			inner join sis_siswa_matpel_khusus c on a.kode_matpel=c.kode_matpel and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1357,18 +1365,52 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_kelas)){
+                $filter .= "and b.kode_kelas='$request->kode_kelas' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_matpel)){
+                $filter .= "and b.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
             if(isset($request->flag_aktif)){
                 $filter .= "and a.flag_aktif='$request->flag_aktif' ";
             }else{
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select distinct a.nis,a.nama,a.kode_kelas
-            from sis_siswa a
-            inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.nik='$nik' $filter ");
-            $res = json_decode(json_encode($res),true);
+            if($data->status_login == "G"){
+                $filter_nik = " and b.nik='$nik' ";
+            }else{
+                $filter_nik = "";
+            }
+
+            if(isset($request->flag_kelas)){
+               if($request->flag_kelas == "khusus"){
+                    $sql = "select a.nis,a.nama,a.nis2 from sis_siswa a 
+                    inner join sis_siswa_matpel_khusus b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    where a.kode_lokasi ='$kode_lokasi' $filter_nik  $filter order by a.nama ";
+               }else{
+                    $sql = "select distinct a.nis,a.nama,a.nis2
+                    from sis_siswa a
+                    inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
+               }
+            }else{
+                
+                $sql = "select distinct a.nis,a.nama,a.nis2
+                from sis_siswa a
+                inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
+            }
             
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $success['sql'] = $sql;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
