@@ -18,21 +18,24 @@ class InfoController extends Controller {
     public $db = 'dbsaife';
     public $guard = 'admginas';
 
-    public function getDataPerusahaanVMD() {
+    public function getTop3Info() {
         try {
             $kode_lokasi = '17';
 
-            $res1 = DB::connection($this->db)->select("select deskripsi, visi 
-                from lab_profil_perusahaan
+            $res1 = DB::connection($this->db)->select("select tanggal, judul, file_gambar 
+                from lab_informasi
                 where kode_lokasi = '$kode_lokasi'");
-
-            $res2 = DB::connection($this->db)->select("select no_urut, misi from lab_profil_perusahaan a
-                inner join lab_profil_perusahaan_detail b on a.kode_lokasi=b.kode_lokasi and a.id_perusahaan=b.id_perusahaan  
-                where a.kode_lokasi = '$kode_lokasi'");
             
             $res1 = json_decode(json_encode($res1),true);
-            $res2 = json_decode(json_encode($res2),true);
             if(count($res1) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($res1);$i++) {
+                    $getDate = date('d',strtotime($res1[$i]['tanggal']));
+                    $getMonth = date('m',strtotime($res1[$i]['tanggal']));
+                    $getYear = date('Y',strtotime($res1[$i]['tanggal']));
+                    $convert = floatval($getMonth);
+                    $res1[$i]['tanggal'] = "$getDate $this->getNamaBulan($convet) $getYear";
+                }
+
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['detail'] = $res2;
@@ -94,6 +97,12 @@ class InfoController extends Controller {
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
+    }
+
+    function getNamaBulan($bulan) {
+        $arrayBulan = array('Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 
+        'September', 'Oktober', 'November', 'Desember');
+        return $arrayBulan[$bulan-1];
     }
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){

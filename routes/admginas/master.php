@@ -86,6 +86,7 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('review-web','AdmGinas\ReviewKlienController@showReview');
     $router->get('klien-web','AdmGinas\KlienController@showKlien');
     $router->get('perusahaan-web','AdmGinas\ProfilPerusahaanController@getDataPerusahaanVMD');
+    $router->get('info-3-web','AdmGinas\InfoController@getTop3Info');
 
 
 ?>
