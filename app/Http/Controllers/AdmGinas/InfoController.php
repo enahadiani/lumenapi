@@ -22,7 +22,7 @@ class InfoController extends Controller {
         try {
             $kode_lokasi = '17';
 
-            $res1 = DB::connection($this->db)->select("select tanggal, judul, file_gambar 
+            $res1 = DB::connection($this->db)->select("select id_info, tanggal, judul, file_gambar 
                 from lab_informasi
                 where kode_lokasi = '$kode_lokasi'");
             
