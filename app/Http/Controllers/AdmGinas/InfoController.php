@@ -33,7 +33,7 @@ class InfoController extends Controller {
                     $getMonth = date('m',strtotime($res1[$i]['tanggal']));
                     $getYear = date('Y',strtotime($res1[$i]['tanggal']));
                     $convert = floatval($getMonth);
-                    $res1[$i]['tanggal'] = "$getDate $this->getNamaBulan($convet) $getYear";
+                    $res1[$i]['tanggal'] = "$getDate $this->getNamaBulan($convert) $getYear";
                 }
 
                 $success['status'] = true;
