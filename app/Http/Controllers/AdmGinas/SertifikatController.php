@@ -18,12 +18,12 @@ class SertifikatController extends Controller {
     public $db = 'dbsaife';
     public $guard = 'admginas';
 
-    public function showReview() {
+    public function showSertifikat() {
         try {
             $kode_lokasi= '17';
 
-            $sql= "select top 3 nama_perusahaan, jabatan, deskripsi, file_gambar, nama_client from lab_review_klien
-                where kode_lokasi='".$kode_lokasi."' order by id_review desc";
+            $sql= "select nama_sertifikat, file_gambar from lab_sertifikat
+                where kode_lokasi='".$kode_lokasi."'";
                 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
