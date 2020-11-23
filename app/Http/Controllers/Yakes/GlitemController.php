@@ -35,7 +35,7 @@ class GlitemController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $success['data'] = count($request->data);
+            // $success['data'] = count($request->data);
             $success['data_list'] = $request->data;
             // $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
 
