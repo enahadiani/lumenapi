@@ -18,6 +18,62 @@ class ProfilPerusahaanController extends Controller {
     public $db = 'dbsaife';
     public $guard = 'admginas';
 
+    public function getDataPerusahaanWA() {
+        try {
+            $kode_lokasi = '17';
+
+            $res1 = DB::connection($this->db)->select("select link_wa 
+                from lab_profil_perusahaan
+                where kode_lokasi = '$kode_lokasi'");
+            
+            $res1 = json_decode(json_encode($res1),true);
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataPerusahaanKontak() {
+        try {
+            $kode_lokasi = '17';
+
+            $res1 = DB::connection($this->db)->select("select no_telp, alamat, no_fax, email 
+                from lab_profil_perusahaan
+                where kode_lokasi = '$kode_lokasi'");
+            
+            $res1 = json_decode(json_encode($res1),true);
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getDataPerusahaanVMD() {
         try {
             $kode_lokasi = '17';
