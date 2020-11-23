@@ -72,6 +72,12 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->post('review','AdmGinas\ReviewKlienController@store');
     $router->post('review-ubah','AdmGinas\ReviewKlienController@update');
 
+    //Sertifikat
+    $router->get('sertifikat','AdmGinas\SertifikatController@index');
+    $router->get('sertifikat-show','AdmGinas\SertifikatController@show');
+    $router->post('sertifikat','AdmGinas\SertifikatController@store');
+    $router->post('sertifikat-ubah','AdmGinas\SertifikatController@update');
+
     //Profil Perusahaan
     $router->get('profil','AdmGinas\ProfilPerusahaanController@show');
     $router->post('profil','AdmGinas\ProfilPerusahaanController@store');
