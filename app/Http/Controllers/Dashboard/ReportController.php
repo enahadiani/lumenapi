@@ -197,7 +197,269 @@ class ReportController extends Controller
         }
     }
 
+    public function getPeriodeAktif(Request $request){
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+           
+            
+            $sql="select a.periode from periode a
+            where a.kode_lokasi='$kode_lokasi' 
+             order by a.periode ";
+            $res = DB::connection('sqlsrvyptkug')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ 
+                //$success['sql'] = $sql;
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getTb(Request $request){
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+            $this->validate($request,[
+                'kode_pp' => 'required',
+                'periode' => 'required'
+            ]);
+
+            $kode_pp=$request->input('kode_pp');
+            $periode=$request->input('periode');
+
+            $filter="";
+
+            if ($request->input('kode_akun') != "") {
+                $kode_akun = $request->input('kode_akun');                
+                $filter .= " and a.kode_akun='$kode_akun' ";
+                
+            }else{
+                $filter .= "";
+            }
+            
+            $sql="select a.kode_akun,b.nama as nama_akun,a.so_awal,a.debet,a.kredit,a.so_akhir
+            from exs_glma_pp a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and periode='$periode'
+            order by a.kode_akun ";
+            $res = DB::connection('sqlsrvyptkug')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ 
+                //$success['sql'] = $sql;
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getAnggaran(Request $request){
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+            $this->validate($request,[
+                'kode_pp' => 'required',
+                'tahun' => 'required'
+            ]);
+
+            $kode_pp=$request->input('kode_pp');
+            $tahun=$request->input('tahun');
+
+            $filter="";
+
+            if ($request->input('kode_akun') != "") {
+                $kode_akun = $request->input('kode_akun');                
+                $filter .= " and x.kode_akun='$kode_akun' ";
+                
+            }else{
+                $filter .= "";
+            }
+            
+            $sql="select a.kode_akun,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp,
+            isnull(e.agg_01,0) as n1,isnull(e.agg_02,0) as n2,isnull(e.agg_03,0) as n3,isnull(e.agg_04,0) as n4,
+            isnull(e.agg_05,0) as n5,isnull(e.agg_06,0) as n6,isnull(e.agg_07,0) as n7,isnull(e.agg_08,0) as n8,
+            isnull(e.agg_09,0) as n9,isnull(e.agg_10,0) as n10,isnull(e.agg_11,0) as n11,isnull(e.agg_12,0) as n12,isnull(e.total,0) as total
+     from (select x.kode_lokasi,x.kode_akun,x.kode_pp
+           from anggaran_d x
+           inner join masakun y on x.kode_akun=y.kode_akun and x.kode_lokasi=y.kode_lokasi
+           where x.kode_lokasi='$kode_lokasi' and x.kode_pp='$kode_pp' and substring(x.periode,1,4)='$tahun' $filter
+           group by x.kode_lokasi,x.kode_akun,x.kode_pp
+           ) a
+     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+     inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+     left join (select x.kode_lokasi,x.kode_akun,x.kode_pp
+                           , sum(case when substring(x.periode,5,2) between '01' and '01' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_01
+                       , sum(case when substring(x.periode,5,2) between '02' and '02' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_02
+                       , sum(case when substring(x.periode,5,2) between '03' and '03' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_03
+                       , sum(case when substring(x.periode,5,2) between '04' and '04' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_04
+                       , sum(case when substring(x.periode,5,2) between '05' and '05' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_05
+                       , sum(case when substring(x.periode,5,2) between '06' and '06' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_06
+                       , sum(case when substring(x.periode,5,2) between '07' and '07' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_07
+                       , sum(case when substring(x.periode,5,2) between '08' and '08' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_08
+                       , sum(case when substring(x.periode,5,2) between '09' and '09' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_09
+                       , sum(case when substring(x.periode,5,2) between '10' and '10' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_10
+                       , sum(case when substring(x.periode,5,2) between '11' and '11' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_11
+                       , sum(case when substring(x.periode,5,2) between '12' and '12' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_12
+                       , sum(case when substring(x.periode,5,2) between '01' and '12' then case when dc='D' then nilai else -nilai end else 0 end ) as total
+                from anggaran_d x
+                  inner join masakun y on x.kode_akun=y.kode_akun and x.kode_lokasi=y.kode_lokasi 
+                where x.kode_lokasi='$kode_lokasi' and x.kode_pp='$kode_pp' and substring(x.periode,1,4)='$tahun' $filter
+                group by x.kode_lokasi,x.kode_akun,x.kode_pp
+                ) e on a.kode_akun=e.kode_akun and a.kode_pp=e.kode_pp and a.kode_lokasi=e.kode_lokasi
+    order by a.kode_akun,a.kode_pp ";
+            $res = DB::connection('sqlsrvyptkug')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ 
+                //$success['sql'] = $sql;
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
-    
+    public function getAnggaranRealBulan(Request $request){
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+            
+            $this->validate($request,[
+                'kode_pp' => 'required',
+                'tahun' => 'required'
+            ]);
+
+            $kode_pp=$request->input('kode_pp');
+            $tahun=$request->input('tahun');
+
+            $filter="";
+
+            if ($request->input('kode_akun') != "") {
+                $kode_akun = $request->input('kode_akun');                
+                $filter .= " and a.kode_akun='$kode_akun' ";
+                
+            }else{
+                $filter .= "";
+            }
+            
+            $sql="select a.kode_akun,a.kode_pp,a.kode_drk,a.nama_akun,a.nama_pp,a.nama_drk,a.periode as tahun,
+                    a.n1 as gar1,a.n13 as real1,a.n1-a.n13 as sisa1,
+                    a.n2 as gar2,a.n14 as real2,a.n2-a.n14 as sisa2,
+                    a.n3 as gar3,a.n15 as real3,a.n3-a.n15 as sisa3,
+                    a.n4 as gar4,a.n16 as real4,a.n4-a.n16 as sisa4,
+                    a.n5 as gar5,a.n17 as real5,a.n5-a.n17 as sisa5,
+                    a.n6 as gar6,a.n18 as real6,a.n6-a.n18 as sisa6,
+                    a.n7 as gar7,a.n19 as real7,a.n7-a.n19 as sisa7,
+                    a.n8 as gar8,a.n20 as real8,a.n8-a.n20 as sisa8,
+                    a.n9 as gar9,a.n21 as real9,a.n9-a.n21 as sisa9,
+                    a.n10 as gar10,a.n22 as real10,a.n10-a.n22 as sisa10,
+                    a.n11 as gar11,a.n23 as real11,a.n11-a.n23 as sisa11,
+                    a.n12 as gar12,a.n24 as real12,a.n12-a.n24 as sisa12
+                    
+            from exs_glma_drk a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and substring(a.periode,1,4)='$tahun' $filter
+            order by a.kode_akun ";
+            $res = DB::connection('sqlsrvyptkug')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ 
+                //$success['sql'] = $sql;
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
