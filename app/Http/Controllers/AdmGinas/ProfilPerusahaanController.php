@@ -58,7 +58,7 @@ class ProfilPerusahaanController extends Controller {
             'id_perusahaan' => 'required',
             'nama_perusahaan' => 'required',
             'wa' => 'required',
-            'fax' => 'required',
+            'no_fax' => 'required',
             'koordinat' => 'required',
             'deskripsi' => 'required',
             'visi' => 'required',
@@ -85,7 +85,7 @@ class ProfilPerusahaanController extends Controller {
             $telp = $request->no_telp;
             $email = $request->email;
             $wa = $request->wa;
-            $fax = $request->fax;
+            $fax = $request->no_fax;
             
             if($request->hasfile('file_gambar')){
                 $file = $request->file('file_gambar');
