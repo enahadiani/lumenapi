@@ -581,4 +581,11 @@ $app->router->group([
     require __DIR__.'/../routes/dev.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yptkug'
+], function ($router) {
+    require __DIR__.'/../routes/yptkug.php';
+});
+
 return $app;
