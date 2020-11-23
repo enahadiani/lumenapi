@@ -24,7 +24,7 @@ class GlitemController extends Controller
     {
         $this->validate($request, [
             'periode' => 'required', 
-            'data' => 'array', 
+            'data' => 'required|array', 
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -35,26 +35,24 @@ class GlitemController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $success['data'] = count($request->data);
-            $success['data_list'] = $request->data;
-            // $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
+            if(count($request->data) > 0){
+                $del = DB::connection($this->db)->update("delete from exs_glitem where substring(pstng_date,1,6) = '$request->periode' ");
+    
+                for($j=1;$j < count($request->data); $j++){
+                    $dt = $request->data[$j];
+                    $ins[$j] = DB::connection($this->db)->insert("insert into exs_glitem (glacc,doc_no,fisc_year,assignment,pstng_date,doc_date,curr,doc_type,bus_area,amount,item_text,cost_ctr,profit_ctr,local_amount,kode_lokasi,tgl_update,tp,dc) 
+                    values ('".$dt["glacc"]."','".$dt["doc_no"]."','".$dt["fisc_year"]."','".$dt["assignment"]."','".$dt["pstng_date"]."','".$dt["doc_date"]."','".$dt["curr"]."','".$dt["doc_type"]."','".$dt["bus_area"]."','".floatval($dt["amount"])."','".$dt["item_text"]."','".$dt["cost_ctr"]."','".$dt["profit_ctr"]."','".floatval($dt["local_amount"])."','".$dt["kode_lokasi"]."','".$dt["tgl_update"]."','".$dt["tp"]."','".$dt["dc"]."')
+                    ");
+                }
+    
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data GL Item berhasil disimpan";
 
-            // for($j=1;$j <= 12;$j++){
-            //     $periode = ( $j < 10 ? $request->tahun."0".$j : $request->tahun.$j );
-            //     $det[$j] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
-            //         kode_lokasi,no_urut,kode_pp,kode_akun,kode_drk,volume,periode,nilai,nilai_sat,dc,satuan,tgl_input,nik_user,modul,nilai_kas,no_sukka) 
-            //         select '$no_bukti',kode_lokasi,$j,kode_pp,kode_akun,'-',1 as volume,'".$periode."' as periode,n".$j." as nilai,n".$j." as nilai,'D','-',getdate(),'$request->nik_user','RRA',0 as nilai_kas,'-'
-            //         from anggaran_tmp 
-            //         where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
-            //     ");
-            // }
-                
-            
-
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data GL Item berhasil disimpan";
-            $success['no_bukti'] = $no_bukti;
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data tidak valid. Data GL Item gagal disimpan";
+            }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
