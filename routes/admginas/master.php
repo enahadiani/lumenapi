@@ -90,7 +90,7 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
 });
     $router->get('banner-web','AdmGinas\BannerController@show');
     $router->get('review-web','AdmGinas\ReviewKlienController@showReview');
-    $router->get('sertifikat-web','AdmGinas\ReviewKlienController@showSertifikat');
+    $router->get('sertifikat-web','AdmGinas\SertifikatController@showSertifikat');
     $router->get('klien-web','AdmGinas\KlienController@showKlien');
     $router->get('perusahaan-web','AdmGinas\ProfilPerusahaanController@getDataPerusahaanVMD');
     $router->get('kontak-web','AdmGinas\ProfilPerusahaanController@getDataPerusahaanKontak');
