@@ -37,7 +37,8 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('anggaran','Yakes\AnggaranController@store');    
 
        
-    $router->post('sync-glitem','Yakes\GlitemController@store');    
+    $router->post('sync-glitem','Yakes\GlitemController@store');   
+    $router->post('upload-glitem','Yakes\GlitemController@importExcel');    
 
 });
 

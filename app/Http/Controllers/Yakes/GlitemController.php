@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+
+use App\Imports\GlitemImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage; 
+
 use Log; 
 
 class GlitemController extends Controller
@@ -62,6 +67,59 @@ class GlitemController extends Controller
             Log::error($e);
         }				
       
+    }
+
+    public function importExcel(Request $request)
+    {
+        $this->validate($request, [
+            'file_dok' => 'required|mimes:csv,xls,xlsx',
+            'periode' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+    
+            // menangkap file excel
+            $file = $request->file('file_dok');
+    
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
+
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $dt = Excel::toArray(new GlitemImport(),$nama_file);
+            $excel = $dt[0];
+            $x = array();
+            $status_validate = true;
+            $no=1;
+            $success['data'] = $excel;
+            // foreach($excel as $row){
+                
+            // }
+            
+            // DB::connection($this->db)->commit();
+            // Storage::disk('local')->delete($nama_file);
+            // if($status_validate){
+            //     $msg = "File berhasil diupload!";
+            // }else{
+            //     $msg = "Ada error!";
+            // }
+            
+            $success['status'] = true;
+            $success['validate'] = $status_validate;
+            // $success['message'] = $msg;
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 
 
