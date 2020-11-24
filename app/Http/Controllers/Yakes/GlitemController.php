@@ -97,21 +97,30 @@ class GlitemController extends Controller
             $status_validate = true;
             $no=1;
             $success['data'] = count($excel);
-            // foreach($excel as $row){
-                
-            // }
-            
-            // DB::connection($this->db)->commit();
-            // Storage::disk('local')->delete($nama_file);
-            // if($status_validate){
-            //     $msg = "File berhasil diupload!";
-            // }else{
-            //     $msg = "Ada error!";
-            // }
-            
+            if(count($excel) > 0){
+
+                $del = DB::connection($this->db)->update("delete from exs_glitem_tmp where substring(pstng_date,1,6) = '$request->periode' ");
+                $x=0;
+                foreach($excel as $row){
+                    $ins[$x] = DB::connection($this->db)->insert("insert into exs_glitem_tmp (glacc,doc_no,fisc_year,assignment,pstng_date,doc_date,curr,doc_type,bus_area,amount,item_text,cost_ctr,profit_ctr,local_amount,kode_lokasi,tgl_update,tp,dc) 
+                    values ('".$row[0]."','".$row[1]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".floatval(9)."','".$row[10]."','".$row[11]."','".$row[12]."','".floatval($row[13])."','".$row[14]."','".$row[15]."','".$row[16]."','".$row[17]."')
+                    ");
+                    $x++;
+                }
+
+                DB::connection($this->db)->commit();
+                Storage::disk('local')->delete($nama_file);
+                if($status_validate){
+                    $msg = "Data berhasil disyncronize!";
+                }else{
+                    $msg = "Ada error!";
+                }
+            }else{
+                $msg = "Data tidak valid. Ada error!";
+            }
             $success['status'] = true;
             $success['validate'] = $status_validate;
-            // $success['message'] = $msg;
+            $success['message'] = $msg;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
