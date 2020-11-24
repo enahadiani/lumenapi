@@ -148,6 +148,13 @@ class AnggaranController extends Controller
                 values ('".$no_bukti."','$kode_lokasi','-',getdate(),'$request->keterangan','$request->tahun','IDR',".$total.",getdate(),'$nik','T','-','$nik','-','-')
             ");
 
+            $ins2 = DB::connection($this->db)->insert("insert into anggaran_load(
+                no_bukti,kode_lokasi,kode_akun,kode_pp,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,status,keterangan,nu,nik_user)  
+                select '$no_bukti',kode_lokasi,kode_akun,kode_pp,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,status,keterangan,nu,nik_user
+                from anggaran_tmp 
+                where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'            
+            ");
+
             for($j=1;$j <= 12;$j++){
                 $periode = ( $j < 10 ? $request->tahun."0".$j : $request->tahun.$j );
                 $det[$j] = DB::connection($this->db)->insert("insert into anggaran_d (no_agg,
