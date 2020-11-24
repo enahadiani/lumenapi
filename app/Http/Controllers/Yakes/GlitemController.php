@@ -131,5 +131,32 @@ class GlitemController extends Controller
         
     }
 
+    public function executeSQL(Request $request)
+    {
+        $this->validate($request, [
+            'sql' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $query = DB::connection($this->db)->update($request->sql);
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Berhasil.";
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 
 }
