@@ -96,7 +96,7 @@ class GlitemController extends Controller
             $x = array();
             $status_validate = true;
             $no=1;
-            $success['data'] = $excel;
+            $success['data'] = count($excel);
             // foreach($excel as $row){
                 
             // }
