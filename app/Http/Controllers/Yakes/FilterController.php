@@ -377,7 +377,7 @@ class FilterController extends Controller
             }
 
             $sql="select a.no_bukti,a.keterangan 
-            from trans_m a $where";
+            from gldt a $where";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
