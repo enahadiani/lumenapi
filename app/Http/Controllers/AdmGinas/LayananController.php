@@ -15,7 +15,7 @@ class LayananController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200; 
-    public $db = 'dbsaife';
+    public $sql = 'dbsaife';
     public $guard = 'admginas';
 
     public function isUnik($isi,$kode_lokasi){
