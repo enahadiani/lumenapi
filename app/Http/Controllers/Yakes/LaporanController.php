@@ -845,6 +845,7 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
