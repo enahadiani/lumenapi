@@ -18,7 +18,7 @@ class SublayananController extends Controller {
     public $guard = 'admginas';
 
     public function isUnik($isi,$kode_lokasi){
-        $auth = DB::connection($this->sql)->select("select id_sublayanan from lab_sublayanan where id_sublayanan ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->db)->select("select id_sublayanan from lab_sublayanan where id_sublayanan ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -118,12 +118,12 @@ class SublayananController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
 
         try {
             if($request->hasfile('file_gambar')){
                 if($this->isUnik($request->id_layanan,$kode_lokasi)){    
-                    
+                    $file = $request->file('file_gambar');
                     $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $foto = $nama_foto;
                     if(Storage::disk('s3')->exists('webginas/'.$foto)){
@@ -131,9 +131,9 @@ class SublayananController extends Controller {
                     }
                     Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
 
-                    DB::connection($this->sql)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskrispi_singkat."','".$request->deskripsi."','$foto')");
-                    DB::connection($this->sql)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
-                    DB::connection($this->sql)->commit();
+                    DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','$foto')");
+                    DB::connection($this->db)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
+                    DB::connection($this->db)->commit();
                     
                     $success['status'] = true;
                     $success['message'] = "Data Sublayanan berhasil disimpan.";
@@ -143,17 +143,17 @@ class SublayananController extends Controller {
                     $success['status'] = false;
                     $success['message'] = "Error : Duplicate entry. Kode Sublayanan sudah ada di database!";
                 }
-                DB::connection($this->sql)->commit();
+                DB::connection($this->db)->commit();
                 return response()->json($success, 200);
         
             }else{
-                DB::connection($this->sql)->rollback();
+                DB::connection($this->db)->rollback();
                 $success['status'] = false;
                 $success['message'] = "File Gambar harus dilampirkan";
                 return response()->json($success, 500);
             }
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 500);
@@ -209,7 +209,7 @@ class SublayananController extends Controller {
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -217,7 +217,7 @@ class SublayananController extends Controller {
             }
 
             if($request->hasfile('file_gambar')){ 
-                $file = $request->file_gambar;
+                $file = $request->file('file_gambar');
                 $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                 if(Storage::disk('s3')->exists('webginas/'.$foto)){
                                 Storage::disk('s3')->delete('webginas/'.$foto);
@@ -237,8 +237,8 @@ class SublayananController extends Controller {
                     ->where('id_layanan', $request->id_layanan)
                     ->delete();
 
-                DB::connection($this->sql)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskrispi_singkat."','".$request->deskripsi."','$foto')");
-                DB::connection($this->sql)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
+                DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','$foto')");
+                DB::connection($this->db)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
             } else {
                 DB::connection($this->db)
                     ->table('lab_sublayanan')
@@ -253,17 +253,17 @@ class SublayananController extends Controller {
                     ->where('id_layanan', $request->id_layanan)
                     ->delete();
 
-                DB::connection($this->sql)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskrispi_singkat."','".$request->deskripsi."','$foto')");
-                DB::connection($this->sql)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
+                DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','$foto')");
+                DB::connection($this->db)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
             }
 
             $success['status'] = true;
             $success['message'] = "Data Sublayanan berhasil diubah.";
             $success['no_bukti'] = $request->id_sublayanan;
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             return response()->json($success, $this->successStatus);            
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 500);
