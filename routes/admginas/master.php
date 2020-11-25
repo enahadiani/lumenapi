@@ -88,6 +88,12 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->post('info-simpan','AdmGinas\InfoController@store');
     $router->post('info-ubah','AdmGinas\InfoController@update');
 
+    //Sublayanan
+    $router->get('sublayanan','AdmGinas\SublayananController@index');
+    $router->get('sublayanan-show','AdmGinas\SublayananController@show');
+    $router->post('sublayanan-simpan','AdmGinas\SublayananController@store');
+    $router->post('sublayanan-ubah','AdmGinas\SublayananController@update');
+
     //Layanan
     $router->get('layanan','AdmGinas\LayananController@index');
     $router->get('layanan/{id}','AdmGinas\LayananController@show');
