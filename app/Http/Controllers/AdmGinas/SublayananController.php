@@ -237,7 +237,7 @@ class SublayananController extends Controller {
                     ->where('id_layanan', $request->id_layanan)
                     ->delete();
 
-                DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskrispi_singkat."','".$request->deskripsi."','$foto')");
+                DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','$foto')");
                 DB::connection($this->db)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
             } else {
                 DB::connection($this->db)
