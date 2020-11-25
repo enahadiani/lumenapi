@@ -87,5 +87,11 @@ $router->group(['middleware' => 'auth:aset'], function () use ($router) {
     $router->put('user_device/{nik}','UserDeviceController@update');
     $router->delete('user_device/{nik}','UserDeviceController@destroy');
 
+    
+    $router->get('maps-lahan','Aset\AsetController@getMapsLahan');
+    $router->get('maps-lahan-detail','Aset\AsetController@getMapsLahanDetail');
+    $router->get('maps-gedung','Aset\AsetController@getMapsGedung');
+    $router->get('maps-gedung-detail','Aset\AsetController@getMapsGedungDetail');
+
 
 });
