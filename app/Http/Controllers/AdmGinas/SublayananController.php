@@ -123,7 +123,7 @@ class SublayananController extends Controller {
         try {
             if($request->hasfile('file_gambar')){
                 if($this->isUnik($request->id_layanan,$kode_lokasi)){    
-                    
+                    $file = $request->file('file_gambar');
                     $nama_foto = uniqid()."_".$file->getClientOriginalName();
                     $foto = $nama_foto;
                     if(Storage::disk('s3')->exists('webginas/'.$foto)){
@@ -217,7 +217,7 @@ class SublayananController extends Controller {
             }
 
             if($request->hasfile('file_gambar')){ 
-                $file = $request->file_gambar;
+                $file = $request->file('file_gambar');
                 $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                 if(Storage::disk('s3')->exists('webginas/'.$foto)){
                                 Storage::disk('s3')->delete('webginas/'.$foto);
