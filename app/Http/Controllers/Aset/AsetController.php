@@ -1764,7 +1764,7 @@ class AsetController extends Controller
                 $filter .= "";
             }
 
-            $sql="select id_gedung,nama_gedung,coor_x as latitude,coor_y as longitude 
+            $sql="select id_gedung,nama_gedung,coor_y as latitude,coor_x as longitude 
             from amu_gedung
             where kode_lokasi='$kode_lokasi' $filter ";
 
@@ -1811,7 +1811,7 @@ class AsetController extends Controller
                 $filter .= "";
             }
 
-            $sql="select id_lahan,nama_lahan,coor_x as latitude,coor_y as longitude 
+            $sql="select id_lahan,nama_lahan,coor_y as latitude,coor_x as longitude 
             from amu_lahan
             where kode_lokasi='$kode_lokasi' $filter ";
 
