@@ -171,7 +171,7 @@ class SublayananController extends Controller {
             }
 
             $res = DB::connection($this->db)->select("
-            select b.id_sublayanan, b.nama_sublayanan, a.id_layanan, a.nama_layanan, b.deskripsi_singkat, b.deskripsi, b.foto 
+            select b.id_sublayanan, b.nama_sublayanan, a.id_layanan, a.nama_layanan, b.deskripsi_singkat, b.deskripsi, b.file_gambar 
             from lab_layanan a
             inner join lab_detail_layanan c on a.kode_lokasi=c.kode_lokasi and a.id_layanan=c.id_layanan
             inner join lab_sublayanan b on c.kode_lokasi=b.kode_lokasi and c.id_sublayanan=b.id_sublayanan 
