@@ -1847,9 +1847,11 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select id_gedung,nama_gedung,alamat,isnull(luas_lantai,0) as luas_lantai,isnull(luas_lain,0) as luas_lain,isnull(jumlah_ruang,0) as jum_ruang,isnull(jumlah_lantai,0) as jum_lantai,status as status_milik 
-            from amu_gedung
-            where kode_lokasi='$kode_lokasi' and id_gedung = '$request->id_gedung' ";
+            $sql="select a.id_gedung,a.nama_gedung,a.alamat,isnull(a.luas_lantai,0) as luas_lantai,isnull(a.luas_lain,0) as luas_lain,isnull(a.jumlah_ruang,0) as jum_ruang,isnull(a.jumlah_lantai,0) as jum_lantai,a.status as status_milik,case a.flag_aktif when 1 then 'Aktif' else 'Non Aktif' end as status_aktif,b.nama as kawasan,isnull(c.file_dok,'-') as file_dok
+            from amu_gedung a
+			inner join amu_kawasan b on a.id_kawasan=b.id_kawasan and a.kode_lokasi = b.kode_lokasi
+			left join amu_gedung_dok c on a.id_gedung=c.no_bukti and a.kode_lokasi=c.kode_lokasi and c.no_urut=0
+            where a.kode_lokasi='$kode_lokasi' and a.id_gedung = '$request->id_gedung' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1883,9 +1885,11 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select id_lahan,nama_lahan,alamat,isnull(luas,0) as luas,status_dokumen as status_milik 
-            from amu_lahan
-            where kode_lokasi='$kode_lokasi' and id_lahan = '$request->id_lahan' ";
+            $sql="select a.id_lahan,a.nama_lahan,a.alamat,isnull(a.luas,0) as luas,a.status_dokumen as status_milik,case a.flag_aktif when 1 then 'Aktif' else 'Non Aktif' end as status_aktif,b.nama as kawasan,isnull(c.file_dok,'-') as file_dok
+            from amu_lahan a
+			inner join amu_kawasan b on a.id_kawasan=b.id_kawasan and a.kode_lokasi = b.kode_lokasi
+			left join amu_lahan_dok c on a.id_lahan=c.no_bukti and a.kode_lokasi=c.kode_lokasi and c.no_urut=0
+            where a.kode_lokasi='$kode_lokasi' and a.id_lahan = '$request->id_lahan' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
