@@ -118,6 +118,7 @@ class SublayananController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+        DB::connection($this->sql)->beginTransaction();
 
         try {
             if($request->hasfile('file_gambar')){
@@ -142,7 +143,7 @@ class SublayananController extends Controller {
                     $success['status'] = false;
                     $success['message'] = "Error : Duplicate entry. Kode Sublayanan sudah ada di database!";
                 }
-
+                DB::connection($this->sql)->commit();
                 return response()->json($success, 200);
         
             }else{
@@ -208,6 +209,7 @@ class SublayananController extends Controller {
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
         
+        DB::connection($this->sql)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -258,8 +260,10 @@ class SublayananController extends Controller {
             $success['status'] = true;
             $success['message'] = "Data Sublayanan berhasil diubah.";
             $success['no_bukti'] = $request->id_sublayanan;
+            DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus);            
         } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 500);
