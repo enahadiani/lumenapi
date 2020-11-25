@@ -87,6 +87,12 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('info-show','AdmGinas\InfoController@show');
     $router->post('info-simpan','AdmGinas\InfoController@store');
     $router->post('info-ubah','AdmGinas\InfoController@update');
+
+    //Layanan
+    $router->get('layanan','AdmGinas\LayananController@index');
+    $router->post('layanan','AdmGinas\LayananController@store');
+    $router->put('layanan','AdmGinas\LayananController@update');
+    // $router->delete('layanan','Wisata\CamatController@destroy');    
 });
     $router->get('banner-web','AdmGinas\BannerController@show');
     $router->get('review-web','AdmGinas\ReviewKlienController@showReview');
