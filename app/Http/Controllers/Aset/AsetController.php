@@ -1751,22 +1751,6 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_pp)){
-                $kode_pp = $request->kode_pp;
-            }else{
-
-                $get = DB::connection($this->db)->select("select a.kode_pp
-                from karyawan a
-                where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-                ");
-                $get = json_decode(json_encode($get),true);
-                if(count($get) > 0){
-                    $kode_pp = $get[0]['kode_pp'];
-                }else{
-                    $kode_pp = "";
-                }
-            }
-
             $filter = "";
             if(isset($request->id_gedung)){
                 $filter .= " and id_gedung = '$request->id_gedung' ";
@@ -1782,7 +1766,7 @@ class AsetController extends Controller
 
             $sql="select id_gedung,nama_gedung,coor_x as latitude,coor_y as longitude 
             from amu_gedung
-            where a.kode_lokasi='$kode_lokasi' $filter ";
+            where kode_lokasi='$kode_lokasi' $filter ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1829,7 +1813,7 @@ class AsetController extends Controller
 
             $sql="select id_lahan,nama_lahan,coor_x as latitude,coor_y as longitude 
             from amu_lahan
-            where a.kode_lokasi='$kode_lokasi' $filter ";
+            where kode_lokasi='$kode_lokasi' $filter ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1865,7 +1849,7 @@ class AsetController extends Controller
 
             $sql="select id_gedung,nama_gedung,alamat,isnull(luas_lantai,0) as luas_lantai,isnull(luas_lain,0) as luas_lain,isnull(jumlah_ruang,0) as jum_ruang,isnull(jumlah_lantai,0) as jum_lantai,status as status_milik 
             from amu_gedung
-            where a.kode_lokasi='$kode_lokasi' and id_gedung = '$request->id_gedung' ";
+            where kode_lokasi='$kode_lokasi' and id_gedung = '$request->id_gedung' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1901,7 +1885,7 @@ class AsetController extends Controller
 
             $sql="select id_lahan,nama_lahan,alamat,isnull(luas,0) as luas,status_dokumen as status_milik 
             from amu_lahan
-            where a.kode_lokasi='$kode_lokasi' and id_lahan = '$request->id_lahan' ";
+            where kode_lokasi='$kode_lokasi' and id_lahan = '$request->id_lahan' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
