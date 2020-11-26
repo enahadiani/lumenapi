@@ -175,7 +175,7 @@ class Sync2Controller extends Controller
     public function loadSyncMaster(Request $request)
     {
         try {
-            if($data =  Auth::guard($this->guard)->user()){
+            if($data =  Auth::guard($this->guard2)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -390,10 +390,8 @@ class Sync2Controller extends Controller
         
     }
 
-    public function syncPnj(Request $request)
+    public function loadSyncPnj(Request $request)
     {
-        DB::connection($this->sql2)->beginTransaction();
-        
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -417,9 +415,6 @@ class Sync2Controller extends Controller
                     ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->tgl_input."','".$row->nik_user."','".$row->periode."','".$row->modul."','".$row->form."','".$row->posted."','".$row->prog_seb."','".$row->progress."','".$row->kode_pp."','".$row->tanggal."','".$row->no_dokumen."','".$row->keterangan."','".$row->kode_curr."',".floatval($row->kurs).",".floatval($row->nilai1).",".floatval($row->nilai2).",".floatval($row->nilai3).",'".$row->nik1."','".$row->nik2."','".$row->nik3."','".$row->no_ref1."','".$row->no_ref2."','".$row->no_ref3."','".$row->param1."','".$row->param2."','".$row->param3."'); ";
                 }   
             }
-
-            $instransm = DB::connection($this->sql2)->insert($begin.$sql_transm.$commit);
-
             //TRANSJ
             $sql_transj = "";
 
@@ -434,8 +429,6 @@ class Sync2Controller extends Controller
                 }
             }
 
-            $instransj = DB::connection($this->sql2)->insert($begin.$sql_transj.$commit);
-
             //BRGJUAL
             $sql_brgjual = "";
 
@@ -447,7 +440,7 @@ class Sync2Controller extends Controller
                     $sql_brgjual .= "insert into brg_jualpiu_d (no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close) values ('".$row->no_jual."','".$row->kode_lokasi."','".$row->tanggal."','".$row->keterangan."','".$row->kode_cust."','".$row->kode_curr."',".floatval($row->kurs).",'".$row->kode_pp."',".floatval($row->nilai).",'".$row->periode."','".$row->nik_user."','".$row->tgl_input."','".$row->akun_piutang."',".floatval($row->nilai_ppn).",".floatval($row->nilai_pph).",'".$row->no_fp."',".floatval($row->diskon).",'".$row->kode_gudang."','".$row->no_ba."',".floatval($row->tobyr).",'".$row->no_open."','".$row->no_close."'); ";
                 }
             }
-            $insbrgjual = DB::connection($this->sql2)->insert($begin.$sql_brgjual.$commit);
+            
 
             //BRGTRANS
             $sql_brgtrans = "";
@@ -462,36 +455,29 @@ class Sync2Controller extends Controller
                 }
             }
 
-            $insbrgtrans = DB::connection($this->sql2)->insert($begin.$sql_brgtrans.$commit);
-            DB::connection($this->sql)->beginTransaction();
-            try{
-                $id =  $this->generateKode("sync_pnj", "id", $kode_lokasi.'SC'.date('Y'), "00001");
-                $sql_his = "insert into sync_pnj (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
-                    values ('$id','$kode_lokasi','DATA PENJUALAN DAN JURNAL',getdate(),'$nik',$total) ;
-                    insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
-                    values ('$kode_lokasi','TRANS M',$jum_transm,'$id');
-                    insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
-                    values ('$kode_lokasi','TRANS J',$jum_transj,'$id');
-                    insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
-                    values ('$kode_lokasi','BRG JUALPIU',$jum_brgjual,'$id');
-                    insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
-                    values ('$kode_lokasi','BRG TRANSD',$jum_brgtrans,'$id');
-                    update trans_m set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi'  and form='CLOSING';
-                    update trans_j set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi'  and modul='BRGJUAL';
-                    update brg_jualpiu_dloc set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi';
-                    update brg_trans_dloc set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi'; ";
+            $id =  $this->generateKode("sync_pnj", "id", $kode_lokasi.'SC'.date('Y'), "00001");
+            $sql_his = "insert into sync_pnj (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
+            values ('$id','$kode_lokasi','DATA PENJUALAN DAN JURNAL',getdate(),'$nik',$total) ;
+            insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
+            values ('$kode_lokasi','TRANS M',$jum_transm,'$id');
+            insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
+            values ('$kode_lokasi','TRANS J',$jum_transj,'$id');
+            insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
+            values ('$kode_lokasi','BRG JUALPIU',$jum_brgjual,'$id');
+            insert into sync_pnj_d (kode_lokasi,keterangan,total_rows,id) 
+            values ('$kode_lokasi','BRG TRANSD',$jum_brgtrans,'$id');
+            update trans_m set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi'  and form='CLOSING';
+            update trans_j set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi'  and modul='BRGJUAL';
+            update brg_jualpiu_dloc set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi';
+            update brg_trans_dloc set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi'; ";
 
-                $insbrgtrans = DB::connection($this->sql)->insert($begin.$sql_his.$commit);
-                DB::connection($this->sql)->commit();
-
-            }catch (\Throwable $e) {
-                DB::connection($this->sql)->rollback();
-                $success['status'] = false;
-                $success['message'] = "Synchronize Data Failed. ".$e;
-                return response()->json($success, $this->successStatus); 
-            }		
-            DB::connection($this->sql2)->commit();
+            $success['transm']= $begin.$sql_transm.$commit;
+            $success['transj'] = $begin.$sql_transj.$commit;
+            $success['brgjual'] = $begin.$sql_brgjual.$commit;
+            $success['brgtrans'] = $begin.$sql_brgtrans.$commit;
+            $success['histori'] = $begin.$sql_his.$commit;
             
+            $success['transm'] = 
             $success['status'] = true;
             $success['message'] = "Synchronize Data Successfully. ";
             return response()->json($success, $this->successStatus);     
@@ -502,7 +488,89 @@ class Sync2Controller extends Controller
             $success['message'] = "Synchronize Data Failed. ".$e;
             return response()->json($success, $this->successStatus); 
         }				
+    
+    }
+
+    public function syncPnj(Request $request)
+    {
+        DB::connection($this->sql2)->beginTransaction();
         
+        try {
+            if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if($request->transm != "" ){
+                $instransm = DB::connection($this->sql2)->insert($request->transm);
+            }
+            if($request->transj != "" ){
+                $instransj = DB::connection($this->sql2)->insert($request->transj);
+            }
+            if($request->brgjual != "" ){
+                $insbrgjual = DB::connection($this->sql2)->insert($request->brgjual);
+            }
+            if($request->brgtrans != ""){
+                $insbrgtrans = DB::connection($this->sql2)->insert($request->brgtrans);
+            }
+            if($request->histori != ""){
+                $inshistori = DB::connection($this->sql2)->insert($request->histori);
+            }
+            
+            DB::connection($this->sql2)->commit();
+            $success['status'] = true;
+            $success['message'] = "Synchronize Data Successfully. ";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql2)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Synchronize Data Failed. ".$e;
+            return response()->json($success, $this->successStatus); 
+        }		
+        
+    }
+
+    public function getSyncPnj(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->nik_user)){
+                if($request->nik_user == "all"){
+                    $filter = "";
+                }else{
+                    $filter = " and nik_user='$request->nik_user' ";
+                }
+                $sql= "select id,kode_lokasi,keterangan,tgl_sync as tgl_input,nik_user,total_rows,case when datediff(minute,tgl_sync,getdate()) <= 10 then 'baru' else 'lama' end as status from sync_pnj where kode_lokasi='$kode_lokasi'
+                $filter ";
+            }else{
+                $sql = "select id,kode_lokasi,keterangan,tgl_sync as tgl_input,nik_user,total_rows,case when datediff(minute,tgl_sync,getdate()) <= 10 then 'baru' else 'lama' end as status from sync_pnj where kode_lokasi='$kode_lokasi' ";
+            }
+            
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
         
     }
 
