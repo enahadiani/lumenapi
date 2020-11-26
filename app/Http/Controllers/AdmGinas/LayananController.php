@@ -28,7 +28,7 @@ class LayananController extends Controller
             inner join lab_sublayanan b on c.kode_lokasi=b.kode_lokasi and c.id_sublayanan=b.id_sublayanan
             where c.kode_lokasi = '$kode_lokasi'";
                 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
