@@ -28,7 +28,7 @@ class LayananController extends Controller
 
             $sql2 = "select a.id_sublayanan, a.nama_sublayanan, a.deskripsi_singkat
             from lab_sublayanan a
-            inner join lab_detail_layanan b
+            inner join lab_detail_layanan b on a.kode_lokasi=b.kode_lokasi and a.id_sublayanan=b.id_sublayanan
             where a.kode_lokasi = '$kode_lokasi' and b.id_layanan = '$request->id_layanan'";
                 
             $res1 = DB::connection($this->sql)->select($sql1);
