@@ -36,7 +36,7 @@ class LayananController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['data_detail'] = $res2;
