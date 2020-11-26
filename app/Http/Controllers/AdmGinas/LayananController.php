@@ -32,7 +32,7 @@ class LayananController extends Controller
             $res = json_decode(json_encode($res),true);
             $result = array();
             foreach($res as $key) {
-                $result[$key['id_layanan']][] = $value;
+                $result[$key['id_layanan']][] = $key;
             }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
