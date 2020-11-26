@@ -31,8 +31,8 @@ class LayananController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             $result = array();
-            foreach($res as $key => $value) {
-                $result[$value['id_layanan']][$key] = $value;
+            foreach($res as $key) {
+                $result[$key['id_layanan']][] = $value;
             }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
