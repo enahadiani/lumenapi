@@ -95,6 +95,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('jurnal-tmp','Toko\JurnalController@getJurnalTmp');
 
     $router->get('sync-master','Toko\Sync2Controller@getSyncMaster');
+    $router->get('load-sync-master','Toko\Sync2Controller@loadSyncMaster');
     $router->post('sync-master','Toko\Sync2Controller@syncMaster');
     $router->post('sync-pnj','Toko\Sync2Controller@syncPnj');
 
