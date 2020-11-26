@@ -240,6 +240,8 @@ class SublayananController extends Controller {
                 DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','$foto')");
                 DB::connection($this->db)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
             } else {
+                $foto = DB::connection($this->db)->select("select file_gambar from lab_sublayanan where kode_lokasi = '$kode_lokasi' and id_sublayanan = '$request->id_sublayanan'");
+
                 DB::connection($this->db)
                     ->table('lab_sublayanan')
                     ->where('kode_lokasi', $kode_lokasi)
@@ -253,7 +255,7 @@ class SublayananController extends Controller {
                     ->where('id_layanan', $request->id_layanan)
                     ->delete();
 
-                DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','$foto')");
+                DB::connection($this->db)->insert("insert into lab_sublayanan(id_sublayanan,nama_sublayanan,kode_lokasi,deskripsi_singkat,deskripsi,file_gambar) values ('".$request->id_sublayanan."','".$request->nama_sublayanan."','".$kode_lokasi."','".$request->deskripsi_singkat."','".$request->deskripsi."','".$foto[0]->file_gambar."')");
                 DB::connection($this->db)->insert("insert into lab_detail_layanan(id_sublayanan,id_layanan,kode_lokasi) values ('".$request->id_sublayanan."','".$request->id_layanan."','".$kode_lokasi."')");
             }
 

@@ -96,9 +96,9 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
 
     //Layanan
     $router->get('layanan','AdmGinas\LayananController@index');
-    $router->get('layanan/{id}','AdmGinas\LayananController@show');
+    $router->get('layanan-show','AdmGinas\LayananController@show');
     $router->post('layanan','AdmGinas\LayananController@store');
-    $router->put('layanan','AdmGinas\LayananController@update');
+    $router->post('layanan','AdmGinas\LayananController@update');
     // $router->delete('layanan','Wisata\CamatController@destroy');    
 });
     $router->get('banner-web','AdmGinas\BannerController@show');
@@ -112,6 +112,8 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('info-3-web','AdmGinas\InfoController@getTop3Info');
     $router->get('info-5-web','AdmGinas\InfoController@getTop5Info');
     $router->get('info-detail-web','AdmGinas\InfoController@getInfoDetail');
-
+    $router->get('daftar-layanan-web','AdmGinas\LayananController@showDaftarLayanan');
+    $router->get('detail-layanan-web','AdmGinas\LayananController@showDaftarLayananDetail');
+    $router->get('layanan-detail-web','AdmGinas\LayananController@showLayananDetail');
 
 ?>
