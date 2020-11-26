@@ -94,6 +94,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('import-excel','Toko\JurnalController@importExcel');
     $router->get('jurnal-tmp','Toko\JurnalController@getJurnalTmp');
 
+    $router->get('sync-master','Toko\Sync2Controller@getSyncMaster');
+    $router->post('sync-master','Toko\Sync2Controller@syncMaster');
+    $router->post('sync-pnj','Toko\Sync2Controller@syncPnj');
+
 });
 
 $router->get('export', 'Toko\JurnalController@export');
