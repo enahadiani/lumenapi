@@ -113,6 +113,6 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('info-5-web','AdmGinas\InfoController@getTop5Info');
     $router->get('info-detail-web','AdmGinas\InfoController@getInfoDetail');
     $router->get('daftar-layanan-web','AdmGinas\LayananController@showDaftarLayanan');
-
+    $router->get('detail-layanan-web','AdmGinas\LayananController@showDaftarLayananDetail');
 
 ?>
