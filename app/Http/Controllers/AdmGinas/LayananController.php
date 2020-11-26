@@ -30,9 +30,14 @@ class LayananController extends Controller
                 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+            $result = array();
+            foreach($res as $key => $value) {
+                $result[$value['id_layanan']][$key] = $value;
+            }
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $result;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
