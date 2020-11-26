@@ -18,6 +18,37 @@ class LayananController extends Controller
     public $sql = 'dbsaife';
     public $guard = 'admginas';
 
+    public function showDaftarLayanan() {
+        try {
+            $kode_lokasi= '17';
+
+            $sql= "select a.id_layanan, a.nama_layanan, b.id_sublayanan, b.nama_sublayanan
+            from lab_layanan a
+            inner join lab_detail_layanan c on a.kode_lokasi=c.kode_lokasi and a.id_layanan=c.id_layanan
+            inner join lab_sublayanan b on c.kode_lokasi=b.kode_lokasi and c.id_sublayanan=b.id_sublayanan
+            where c.kode_lokasi = '$kode_lokasi'";
+                
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function isUnik($isi,$kode_lokasi){
         $auth = DB::connection($this->sql)->select("select id_layanan from lab_layanan where id_layanan ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
