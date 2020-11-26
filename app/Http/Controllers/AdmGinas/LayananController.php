@@ -26,7 +26,7 @@ class LayananController extends Controller
             from lab_layanan
             where kode_lokasi = '$kode_lokasi' and id_layanan = '$request->id_layanan'";
 
-            $sql2 = "select a.id_sublayanan, a.nama_sublayanan, a.deskripsi_singkat
+            $sql2 = "select a.id_sublayanan, a.nama_sublayanan, a.deskripsi_singkat, b.id_layanan
             from lab_sublayanan a
             inner join lab_detail_layanan b on a.kode_lokasi=b.kode_lokasi and a.id_sublayanan=b.id_sublayanan
             where a.kode_lokasi = '$kode_lokasi' and b.id_layanan = '$request->id_layanan'";
