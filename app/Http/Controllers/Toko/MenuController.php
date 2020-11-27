@@ -230,7 +230,7 @@ class MenuController extends Controller
             ->where('kode_menu', $request->kode_menu)
             ->delete(); 
            
-            $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu,icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->index."','".$request->jenis_menu."','".$request->icon."')");
+            $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu,icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->rowindex."','".$request->jenis_menu."','".$request->icon."')");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
