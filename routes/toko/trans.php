@@ -105,6 +105,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sync-pmb-detail','Toko\Sync2Controller@getSyncPmbDetail');
     $router->get('load-sync-pmb','Toko\Sync2Controller@loadSyncPmb');
 
+    $router->get('sync-retur-beli','Toko\Sync2Controller@getSyncReturBeli');
+    $router->get('sync-retur-beli-detail','Toko\Sync2Controller@getSyncReturBeliDetail');
+    $router->get('load-sync-retur-beli','Toko\Sync2Controller@loadSyncReturBeli');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
@@ -112,6 +116,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('load-sync-master','Toko\Sync2Controller@loadSyncMaster');
     $router->post('sync-pnj','Toko\Sync2Controller@syncPnj');
     $router->post('sync-pmb','Toko\Sync2Controller@syncPmb');
+    $router->post('sync-retur-beli','Toko\Sync2Controller@syncReturBeli');
 });
 
 $router->get('export', 'Toko\JurnalController@export');

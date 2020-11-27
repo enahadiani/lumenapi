@@ -704,7 +704,7 @@ class Sync2Controller extends Controller
             $total = $jum_transm+$jum_transj+$jum_brgbeli+$jum_brgtrans;
             $id =  $this->generateKode("sync_pmb", "id", $kode_lokasi.'SC'.date('Y'), "00001");
             $sql_his = "insert into sync_pmb (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
-                    values ('$id','$kode_lokasi','DATA PENJUALAN DAN JURNAL',getdate(),'$nik',$total);
+                    values ('$id','$kode_lokasi','DATA PEMBELIAN DAN JURNAL',getdate(),'$nik',$total);
                     insert into sync_pmb_d (kode_lokasi,keterangan,total_rows,id) values ('$kode_lokasi','TRANS M',$jum_transm,'$id');
                     insert into sync_pmb_d (kode_lokasi,keterangan,total_rows,id) values ('$kode_lokasi','TRANS J',$jum_transj,'$id');
                     insert into sync_pmb_d (kode_lokasi,keterangan,total_rows,id) values ('$kode_lokasi','BRG HUT',$jum_brgbeli,'$id');
@@ -861,17 +861,8 @@ class Sync2Controller extends Controller
         
     }
 
-    public function syncReturBeli(Request $request)
+    public function loadSyncReturBeli(Request $request)
     {
-        $this->validate($request, [
-            'TRANSM' => 'required|array',
-            'TRANSJ' => 'required|array',
-            'BRGBAYAR' => 'required|array',
-            'BRGTRANS' => 'required|array'
-        ]);
-
-        DB::connection($this->sql)->beginTransaction();
-        
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -882,75 +873,233 @@ class Sync2Controller extends Controller
                 $nik= $request->nik;
             }
 
-             //TRANSM
-             $transm = $request->TRANSM;
-             if(count($transm) > 0){
-                 for($i=0;$i<count($transm);$i++){
- 
-                     $kurs=($transm[$i]['kurs'] != "" ? $transm[$i]['kurs'] : 0);
-                     $nilai1=($transm[$i]['nilai1'] != "" ? $transm[$i]['nilai1'] : 0);
-                     $nilai2=($transm[$i]['nilai2'] != "" ? $transm[$i]['nilai2'] : 0);
-                     $nilai3=($transm[$i]['nilai3'] != "" ? $transm[$i]['nilai3'] : 0);
-                     $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values 
-                     ('".$transm[$i]["no_bukti"]."','".$transm[$i]["kode_lokasi"]."','".$transm[$i]["tgl_input"]."','".$transm[$i]["nik_user"]."','".$transm[$i]["periode"]."','".$transm[$i]["modul"]."','".$transm[$i]["form"]."','".$transm[$i]["posted"]."','".$transm[$i]["prog_seb"]."','".$transm[$i]["progress"]."','".$transm[$i]["kode_pp"]."','".$transm[$i]["tanggal"]."','".$transm[$i]["no_dokumen"]."','".$transm[$i]["keterangan"]."','".$transm[$i]["kode_curr"]."',".$kurs.",".$nilai1.",".$nilai2.",".$nilai3.",'".$transm[$i]["nik1"]."','".$transm[$i]["nik2"]."','".$transm[$i]["nik3"]."','".$transm[$i]["no_ref1"]."','".$transm[$i]["no_ref2"]."','".$transm[$i]["no_ref3"]."','".$transm[$i]["param1"]."','".$transm[$i]["param2"]."','".$transm[$i]["param3"]."')");
+            $sql = "";
+            $begin = "SET NOCOUNT on;
+            BEGIN tran;
+            ";
+            $commit = "commit tran;";
+            //TRANSM
+            $sql_transm = "";
+
+            $transm = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3 from trans_m where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and form='BRGRETBELI' ");
+            $jum_transm = count($transm);
+            if($jum_transm > 0){
+                foreach($transm as $row){
+                     
+                     $sql_transm .= "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values 
+                     ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->tgl_input."','".$row->nik_user."','".$row->periode."','".$row->modul."','".$row->form."','".$row->posted."','".$row->prog_seb."','".$row->progress."','".$row->kode_pp."','".$row->tanggal."','".$row->no_dokumen."','".$row->keterangan."','".$row->kode_curr."',".floatval($row->kurs).",".floatval($row->nilai1).",".floatval($row->nilai2).",".floatval($row->nilai3).",'".$row->nik1."','".$row->nik2."','".$row->nik3."','".$row->no_ref1."','".$row->no_ref2."','".$row->no_ref3."','".$row->param1."','".$row->param2."','".$row->param3."');";
                  }
              }
  
              //TRANSJ
-             $transj = $request->TRANSJ;
-             if(count($transj) > 0){
-                 
-                 for($i=0;$i<count($transj);$i++){
+             
+             $sql_transj = "";
+             $transj = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3 from trans_j where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and modul='BRGBELI' and jenis ='BRGRETBELI'");
+             $jum_transj = count($transj);
+             if($jum_transj > 0){
+                 foreach($transj as $row){
                      
-                     $kurs=($transj[$i]['kurs'] != "" ? $transj[$i]['kurs'] : 0);
-                     $nu=($transm[$i]['nu'] != "" ? $transm[$i]['nu'] : 0);
-                     $nilai=($transj[$i]['nilai'] != "" ? $transj[$i]['nilai'] : 0);
-                     $nilai_curr=($transj[$i]['nilai_curr'] != "" ? $transj[$i]['nilai_curr'] : 0);
-                     $ins2=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values 
-                     ('".$transj[$i]["no_bukti"]."','".$transj[$i]["kode_lokasi"]."','".$transj[$i]["tgl_input"]."','".$transj[$i]["nik_user"]."','".$transj[$i]["periode"]."','".$transj[$i]["no_dokumen"]."','".$transj[$i]["tanggal"]."',".$nu.",'".$transj[$i]["kode_akun"]."','".$transj[$i]["dc"]."',".$nilai.",".$nilai_curr.",'".$transj[$i]["keterangan"]."','".$transj[$i]["keterangan"]."','".$transj[$i]["modul"]."','".$transj[$i]["jenis"]."',".$kurs.",'".$transj[$i]["kode_pp"]."','".$transj[$i]["kode_drk"]."','".$transj[$i]["kode_cust"]."','".$transj[$i]["kode_vendor"]."','".$transj[$i]["no_fa"]."','".$transj[$i]["no_selesai"]."','".$transj[$i]["no_ref1"]."','".$transj[$i]["no_ref2"]."','".$transj[$i]["no_ref3"]."')");
+                     $sql_transj .= "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values 
+                     ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->tgl_input."','".$row->nik_user."','".$row->periode."','".$row->no_dokumen."','".$row->tanggal."',".$row->nu.",'".$row->kode_akun."','".$row->dc."',".floatval($row->nilai).",".floatval($row->nilai_curr).",'".$row->keterangan."','".$row->modul."','".$row->jenis."','".$row->kode_curr."',".floatval($row->kurs).",'".$row->kode_pp."','".$row->kode_drk."','".$row->kode_cust."','".$row->kode_vendor."','".$row->no_fa."','".$row->no_selesai."','".$row->no_ref1."','".$row->no_ref2."','".$row->no_ref3."');";
                  }
              }
  
              //BRGBELI BAYAR
-             $brgBeli = $request->BRGBAYAR;
-             if(count($brgBeli) > 0){
-                 for($i=0;$i<count($brgBeli);$i++){
-                     $nilai=($brgBeli[$i]['nilai'] != "" ? $brgBeli[$i]['nilai'] : 0);
- 
-                     $ins3 = DB::connection($this->sql)->insert("insert into brg_belibayar_d(no_bukti,kode_lokasi,no_beli,kode_vendor,periode,dc,modul,nilai,nik_user,tgl_input) 
-                     values ('".$brgBeli[$i]["no_bukti"]."','".$brgBeli[$i]["kode_lokasi"]."','".$brgBeli[$i]['no_beli']."','".$brgBeli[$i]['kode_vendor']."', '".$brgBeli[$i]['periode']."','".$brgBeli[$i]["dc"]."','".$brgBeli[$i]["modul"]."',".$nilai.",'".$brgBeli[$i]['nik_user']."','".$brgBeli[$i]['tgl_input']."')");
+
+             $sql_brgbeli = "";
+             $brgbeli = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,no_beli,kode_vendor,periode,dc,modul,nilai,nik_user,tgl_input from brg_belibayar_d where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and modul='KBBELICCL' ");
+             $jum_brgbeli = count($brgbeli);
+             if($jum_brgbeli > 0){
+                 foreach($brgbeli as $row){
+                     
+                     $sql_brgbeli .= "insert into brg_belibayar_d(no_bukti,kode_lokasi,no_beli,kode_vendor,periode,dc,modul,nilai,nik_user,tgl_input) 
+                     values ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->no_beli."','".$row->kode_vendor."', '".$row->periode."','".$row->dc."','".$row->modul."',".floatval($row->nilai).",'".$row->nik_user."','".$row->tgl_input."');";
                  }
              }
  
              //BRGTRANS
-             $brgTrans = $request->BRGTRANS;
-             if(count($brgTrans) > 0){
-                 for($i=0;$i<count($brgTrans);$i++){
-                     $stok=($brgTrans[$i]['stok'] != "" ? $brgTrans[$i]['stok'] : 0);  
-                     $jumlah=($brgTrans[$i]['jumlah'] != "" ? $brgTrans[$i]['jumlah'] : 0);
-                     $bonus=($brgTrans[$i]['bonus'] != "" ? $brgTrans[$i]['bonus'] : 0);
-                     $harga=($brgTrans[$i]['harga'] != "" ? $brgTrans[$i]['harga'] : 0);
-                     $hpp_p=($brgTrans[$i]['hpp_p'] != "" ? $brgTrans[$i]['hpp_p'] : 0);  
-                     $p_disk=($brgTrans[$i]['p_disk'] != "" ? $brgTrans[$i]['p_disk'] : 0);
-                     $diskon=($brgTrans[$i]['diskon'] != "" ? $brgTrans[$i]['diskon'] : 0);
-                     $tot_diskon=($brgTrans[$i]['tot_diskon'] != "" ? $brgTrans[$i]['tot_diskon'] : 0);
-                     $total=($brgTrans[$i]['total'] != "" ? $brgTrans[$i]['total'] : 0);
-                     $ins4= DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values 
-                         ('".$brgTrans[$i]["no_bukti"]."','".$brgTrans[$i]["kode_lokasi"]."','".$brgTrans[$i]["periode"]."','".$brgTrans[$i]["modul"]."','".$brgTrans[$i]["form"]."',".$brgTrans[$i]["nu"].",'".$brgTrans[$i]["kode_gudang"]."','".$brgTrans[$i]["kode_barang"]."','".$brgTrans[$i]["no_batch"]."','".$brgTrans[$i]["tgl_ed"]."','".$brgTrans[$i]["satuan"]."','".$brgTrans[$i]["dc"]."',".$stok.",".$jumlah.",".$bonus.",".$harga.",".$hpp_p.",".$p_disk.",".$diskon.",".$tot_diskon.",".$total.") ");
-                 }
-             }
-            
-            DB::connection($this->sql)->commit();
+            //BRGTRANS
+            $sql_brgtrans = "";
+
+            $brgtrans = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total
+            from brg_trans_d where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-'  and modul='BRGRETBELI'");
+            $jum_brgtrans = count($brgtrans);
+            if($jum_brgtrans > 0){
+                foreach($brgtrans as $row){
+                   
+                    $sql_brgtrans .= "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values 
+                        ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->periode."','".$row->modul."','".$row->form."',".$row->nu.",'".$row->kode_gudang."','".$row->kode_barang."','".$row->no_batch."','".$row->tgl_ed."','".$row->satuan."','".$row->dc."',".floatval($row->stok).",".floatval($row->jumlah).",".floatval($row->bonus).",".floatval($row->harga).",".floatval($row->hpp).",".floatval($row->p_disk).",".floatval($row->diskon).",".floatval($row->tot_diskon).",".floatval($row->total)."); ";
+                }
+            }
+
+            $success['transm']= ($sql_transm != "" ? $begin.$sql_transm.$commit : "");
+            $success['transj'] = ($sql_transj != "" ? $begin.$sql_transj.$commit : "");
+            $success['brgbeli'] = ($sql_brgbeli != "" ? $begin.$sql_brgbeli.$commit : "");
+            $success['brgtrans'] = ($sql_brgtrans != "" ? $begin.$sql_brgtrans.$commit : "");
+
+            $total = $jum_transm+$jum_transj+$jum_brgbeli+$jum_brgtrans;
+            $id =  $this->generateKode("sync_retbeli", "id", $kode_lokasi.'SC'.date('Y'), "00001");
+            $sql_his = "insert into sync_retbeli (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
+                values ('$id','$kode_lokasi','DATA RETUR BELI DAN JURNAL',getdate(),'$nik',$total);insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                values ('$kode_lokasi','TRANS M',$jum_transm,'$id');
+                insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                values ('$kode_lokasi','TRANS J',$jum_transj,'$id');
+                insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                values ('$kode_lokasi','BRG BAYAR',$jum_brgbeli,'$id');
+                insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                values ('$kode_lokasi','BRG TRANSD',$jum_brgtrans,'$id');
+                update trans_m set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi' and form='BRGRETBELI';
+                update trans_j set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi' and modul='BRGBELI' and jenis='BRGRETBELI';
+                update brg_belibayar_d set id_sync='$id' where isnull(id_sync,'-') = '-' and kode_lokasi='$kode_lokasi' and modul='KBBELICCL';
+                update brg_trans_d set id_sync='$id' where isnull(id_sync,'-') = '-' and kode_lokasi='$kode_lokasi' and modul='BRGRETBELI'; ";
+
+            $success['histori'] = ($sql_his != "" ? $begin.$sql_his.$commit : "");
             $success['status'] = true;
-            $success['message'] = "Synchronize Data Successfully. ";
+            $success['message'] = "Sukses!";
+            
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Synchronize Data Failed. ".$e;
+            $success['message'] = "Error. ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
+        
+    }
+
+    public function syncReturBeli(Request $request)
+    {
+        DB::connection($this->sql2)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard2)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if($request->transm != "" ){
+                $instransm = DB::connection($this->sql2)->insert($request->transm);
+            }
+            if($request->transj != "" ){
+                $instransj = DB::connection($this->sql2)->insert($request->transj);
+            }
+            if($request->brgbeli != "" ){
+                $insbrgbeli = DB::connection($this->sql2)->insert($request->brgbeli);
+            }
+            if($request->brgtrans != ""){
+                $insbrgtrans = DB::connection($this->sql2)->insert($request->brgtrans);
+            }
+            if($request->histori != ""){
+                $inshistori = DB::connection($this->sql)->insert($request->histori);
+            }
+            
+            DB::connection($this->sql2)->commit();
+            $success['status'] = true;
+            $success['req'] = $request->all();
+            $success['message'] = "Synchronize Data Successfully. ";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql2)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Synchronize Data Failed. ".$e;
+            return response()->json($success, $this->successStatus); 
+        }		
+        
+    }
+
+    public function getSyncReturBeli(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->nik_user)){
+                if($request->nik_user == "all"){
+                    $filter = "";
+                }else{
+                    $filter = " and nik_user='$request->nik_user' ";
+                }
+                $sql= "select id,kode_lokasi,keterangan,tgl_sync as tgl_input,nik_user,total_rows,case when datediff(minute,tgl_sync,getdate()) <= 10 then 'baru' else 'lama' end as status from sync_retbeli where kode_lokasi='$kode_lokasi'
+                $filter ";
+            }else{
+                $sql = "select id,kode_lokasi,keterangan,tgl_sync as tgl_input,nik_user,total_rows,case when datediff(minute,tgl_sync,getdate()) <= 10 then 'baru' else 'lama' end as status from sync_retbeli where kode_lokasi='$kode_lokasi' ";
+            }
+            
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getSyncReturBeliDetail(Request $request)
+    {
+        $this->validate($request,[
+            'id' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->nik_user)){
+                if($request->nik_user == "all"){
+                    $filter = "";
+                }else{
+                    $filter = " and nik_user='$request->nik_user' ";
+                }
+                $sql= "select id,kode_lokasi,keterangan,tgl_sync as tgl_input,nik_user,total_rows,case when datediff(minute,tgl_sync,getdate()) <= 10 then 'baru' else 'lama' end as status from sync_retbeli where kode_lokasi='$kode_lokasi' and id='$request->id'
+                $filter ";
+            }else{
+                $sql = "select id,kode_lokasi,keterangan,tgl_sync as tgl_input,nik_user,total_rows,case when datediff(minute,tgl_sync,getdate()) <= 10 then 'baru' else 'lama' end as status from sync_retbeli where kode_lokasi='$kode_lokasi' and id='$request->id' ";
+            }
+            
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $res2 = DB::connection($this->sql)->select("select id,keterangan,total_rows from sync_retbeli_d where kode_lokasi='$kode_lokasi' and id='$request->id' ");
+                $res2 = json_decode(json_encode($res2),true);
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
         
     }
 }
