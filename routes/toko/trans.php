@@ -98,7 +98,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sync-master','Toko\Sync2Controller@syncMaster');
     
     $router->get('sync-pnj','Toko\Sync2Controller@getSyncPnj');
+    $router->get('sync-pnj-detail','Toko\Sync2Controller@getSyncPnjDetail');
     $router->get('load-sync-pnj','Toko\Sync2Controller@loadSyncPnj');
+    
+    $router->get('sync-pmb','Toko\Sync2Controller@getSyncPmb');
+    $router->get('sync-pmb-detail','Toko\Sync2Controller@getSyncPmbDetail');
+    $router->get('load-sync-pmb','Toko\Sync2Controller@loadSyncPmb');
 
 });
 
@@ -106,6 +111,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
     $router->get('load-sync-master','Toko\Sync2Controller@loadSyncMaster');
     $router->post('sync-pnj','Toko\Sync2Controller@syncPnj');
+    $router->post('sync-pmb','Toko\Sync2Controller@syncPmb');
 });
 
 $router->get('export', 'Toko\JurnalController@export');
