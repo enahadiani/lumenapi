@@ -196,21 +196,22 @@ class CloseKasirController extends Controller
 
             $cek = DB::connection($this->sql)->select($sqlcek);
             $cek = json_decode(json_encode($cek),true);
+            $str_format="0000";
+            $periode=date('Y').date('m');
+            $per=date('y').date('m');
+            $prefix=$kode_lokasi."-CLS".$per.".";
+            $sql="select right(isnull(max(no_close),'0000'),".strlen($str_format).")+1 as id from kasir_close where no_close like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
+            
+            $get = DB::connection($this->sql)->select($sql);
+            $get = json_decode(json_encode($get),true);
+            if(count($get) > 0){
+                $id = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+            }else{
+                $id = "-";
+            }
+            
             if(count($cek) > 0){
 
-                $str_format="0000";
-                $periode=date('Y').date('m');
-                $per=date('y').date('m');
-                $prefix=$kode_lokasi."-CLS".$per.".";
-                $sql="select right(isnull(max(no_close),'0000'),".strlen($str_format).")+1 as id from kasir_close where no_close like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
-                
-                $get = DB::connection($this->sql)->select($sql);
-                $get = json_decode(json_encode($get),true);
-                if(count($get) > 0){
-                    $id = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
-                }else{
-                    $id = "-";
-                }
     
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
@@ -298,6 +299,7 @@ class CloseKasirController extends Controller
             }
 
             $success['status'] = $sts;
+            $success['no_close'] = $id;
             $success['message'] = $tmp;
             
             return response()->json($success, $this->successStatus);     
