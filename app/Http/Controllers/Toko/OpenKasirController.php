@@ -52,7 +52,7 @@ class OpenKasirController extends Controller
                 $nik= $request->nik;
             }
 
-            $sql = "select no_open,nik,tgl_input,saldo_awal,no_close from kasir_open where kode_lokasi='".$kode_lokasi."' and nik='".$nik."' and no_close = '-' $filter ";
+            $sql = "select no_open,nik,tgl_input,saldo_awal,no_close,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from kasir_open where kode_lokasi='".$kode_lokasi."' and nik='".$nik."' and no_close = '-' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -137,11 +137,13 @@ class OpenKasirController extends Controller
             }
             $success['status'] = $sts;
             $success['message'] = $msg;
+            $success['no_open'] = $id;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
+            $success['no_open'] = '-';
             $success['message'] = "Data Open Kasir gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
@@ -214,11 +216,13 @@ class OpenKasirController extends Controller
             }
             $success['status'] = $sts;
             $success['message'] = $msg;
+            $success['no_open'] = $id;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
+            $success['no_open'] = '-';
             $success['message'] = "Data Open Kasir gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }				
