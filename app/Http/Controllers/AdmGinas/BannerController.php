@@ -86,6 +86,7 @@ class BannerController extends Controller {
                                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                             }
                         }
+                        $arr_gambarke[] = $request->gambarke[$i];
                     }
                 }
 
