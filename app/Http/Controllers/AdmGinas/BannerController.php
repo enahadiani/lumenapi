@@ -73,7 +73,7 @@ class BannerController extends Controller {
             if(!empty($cek)){
                 if(count($request->gambarke) > 0){
                     for($i=0;$i<count($request->gambarke);$i++){
-                        if($request->hasFile('file_gambar')[$i]){
+                        if(isset($request->file('file_gambar')[$i])){
                             $file = $request->file('file_gambar')[$i];
                             $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                             $data = DB::connection($this->db)->select("select id_banner, file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and id_banner = '$request->id_banner[$i]'");
