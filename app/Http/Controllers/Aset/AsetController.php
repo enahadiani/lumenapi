@@ -95,7 +95,16 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            
+            $filter="";
+
+            if ($request->input('lantai') != "") {
+                $lantai = $request->input('lantai');                
+                $filter .= " and a.lantai='$lantai' ";
+                
+            }else{
+                $filter .= "";
+            }
+
             $id_gedung = $request->id_gedung;
 
             $sql="SELECT a.no_ruangan,a.kode_lokasi,a.nama_ruangan,isnull(b.jumlah,0) as jumlah,isnull(b.nilai_perolehan,0) as nilai_perolehan
@@ -105,7 +114,7 @@ class AsetController extends Controller
                     where a.kode_lokasi='$kode_lokasi' 
                     group by a.no_ruang,a.kode_lokasi
                     )b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung'
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung' $filter
             order by a.no_ruangan
             ";
             $res = DB::connection($this->db)->select($sql);
