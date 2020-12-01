@@ -95,7 +95,16 @@ class AsetController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            
+            $filter="";
+
+            if ($request->input('lantai') != "") {
+                $lantai = $request->input('lantai');                
+                $filter .= " and a.lantai='$lantai' ";
+                
+            }else{
+                $filter .= "";
+            }
+
             $id_gedung = $request->id_gedung;
 
             $sql="SELECT a.no_ruangan,a.kode_lokasi,a.nama_ruangan,isnull(b.jumlah,0) as jumlah,isnull(b.nilai_perolehan,0) as nilai_perolehan
@@ -105,7 +114,7 @@ class AsetController extends Controller
                     where a.kode_lokasi='$kode_lokasi' 
                     group by a.no_ruang,a.kode_lokasi
                     )b on a.no_ruangan=b.no_ruang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung'
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.jumlah,0)>0 AND a.id_gedung='$id_gedung' $filter
             order by a.no_ruangan
             ";
             $res = DB::connection($this->db)->select($sql);
@@ -190,6 +199,14 @@ class AsetController extends Controller
             if ($request->input('lantai') != "") {
                 $lantai = $request->input('lantai');                
                 $filter .= " and b.lantai='$lantai' ";
+                
+            }else{
+                $filter .= "";
+            }
+
+            if ($request->input('kode_klp') != "") {
+                $kode_klp = $request->input('kode_klp');                
+                $filter .= " and a.kode_klp='$kode_klp' ";
                 
             }else{
                 $filter .= "";
@@ -466,9 +483,9 @@ class AsetController extends Controller
 
             $filter="";
 
-            if ($request->input('no_ruangan') != "") {
-                $no_ruangan = $request->input('no_ruangan');                
-                $filter .= " and a.no_ruang='$no_ruangan' ";
+            if ($request->input('no_ruang') != "") {
+                $no_ruang = $request->input('no_ruang');                
+                $filter .= " and a.no_ruang='$no_ruang' ";
                 
             }    
             if ($request->input('lantai') != "") {
@@ -477,32 +494,16 @@ class AsetController extends Controller
                 
             } 
           
-            $sql="SELECT a.no_bukti
-            ,a.barcode
-            ,a.no_seri
-            ,a.merk
-            ,a.tipe
-            ,a.warna
-            ,a.satuan
-            ,a.spesifikasi
-            ,a.id_gedung
-            ,a.no_ruang
-            ,a.kode_klp
-            ,a.tanggal_perolehan
-            ,a.kode_lokasi
-            ,a.kode_pp
-            ,a.nilai_perolehan
-            ,a.kd_asset
-            ,a.sumber_dana
-            ,a.nama_inv as nama
-            ,a.foto 
-            FROM amu_asset_bergerak a
-            inner join amu_ruangan b on a.kode_lokasi=b.kode_lokasi and a.no_ruang=b.no_ruangan 
-            WHERE a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' $filter ";
+            $sql="SELECT a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp
+                    ,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama,
+                    dbo.fnGetBuktiFoto(no_bukti) as foto 
+                FROM amu_asset_bergerak a
+                WHERE a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' $filter ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                
                 $success['status'] = true;
                 $success['daftar'] = $res;
                 $success['message'] = "Success!";
