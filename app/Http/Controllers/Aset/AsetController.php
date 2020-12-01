@@ -422,8 +422,11 @@ class AsetController extends Controller
             where a.kode_lokasi='$kode_lokasi' and  a.barcode='$request->qrcode' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-
-            $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->qrcode'";
+            
+            $sql2="select a.*
+            from amu_asset_bergerak_dok a
+            inner join amu_asset_bergerak b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            where b.kode_lokasi='$kode_lokasi' and  b.barcode='$request->qrcode' ";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
