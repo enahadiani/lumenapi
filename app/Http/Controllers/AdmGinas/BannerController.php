@@ -74,34 +74,34 @@ class BannerController extends Controller {
                     for($i=0;$i<count($request->gambarke);$i++){
                         if(isset($request->file('file_gambar')[$i])){
                             $file = $request->file('file_gambar')[$i];
+                            $id = $request->id_banner[$i];
                             $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                            $arr_bann[] = $request->id_banner[$i];
-                            // $data = DB::connection($this->db)->select("select id_banner, file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and id_banner = '$request->id_banner[$i]'");
-                            dd($arr_bann);
-                            // if(count($data) > 0) {
-                            //     Storage::disk('s3')->delete('webginas/'.$data[0]['file_gambar']);
-                            //     DB::connection($this->db)->update("update lab_gbr_banner set file_gambar = '$foto' where id_banner = '$data[0]['id_banner']'");
-                            //     Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
-                            // } else {
-                            //     DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_foto[$i]','$arr_mode[$i]') ");
-                            //     Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
-                            // }
+                            $data = DB::connection($this->db)->select("select id_banner, file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and id_banner = '$id'");
+                            if(count($data) > 0) {
+                                Storage::disk('s3')->delete('webginas/'.$data[0]['file_gambar']);
+                                DB::connection($this->db)->update("update lab_gbr_banner set file_gambar = '$foto' where id_banner = '$data[0]['id_banner']'");
+                                Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                            } else {
+                                DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_foto[$i]','$arr_mode[$i]') ");
+                                Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
+                            }
                         }
                         $arr_gambarke[] = $request->gambarke[$i];
                     }
                 }
 
-                if(count($arr_gambarke) > 0){
-                    DB::connection($this->db)->commit();
-                    $success['status'] = true;
-                    $success['message'] = "Data Banner berhasil diupload.";
-                    $success['no_bukti'] = "0";
-                }
-                else{
-                    $success['status'] = false;
-                    $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (2)";
-                    $success['no_bukti'] = "0";
-                }
+                // if(count($arr_gambarke) > 0){
+                //     DB::connection($this->db)->commit();
+                //     $success['status'] = true;
+                //     $success['message'] = "Data Banner berhasil diupload.";
+                //     $success['data'] = $arr_bann;
+                //     $success['no_bukti'] = "0";
+                // }
+                // else{
+                //     $success['status'] = false;
+                //     $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (2)";
+                //     $success['no_bukti'] = "0";
+                // }
             }else{
                 $success['status'] = false;
                 $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (3)";
