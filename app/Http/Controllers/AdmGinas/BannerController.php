@@ -27,12 +27,15 @@ class BannerController extends Controller {
             }
             $kode_lokasi= '17';
 
-            $res = DB::connection($this->db)->select("select file_gambar, mode from lab_gbr_banner where kode_lokasi = '$kode_lokasi'");
+            $res1 = DB::connection($this->db)->select("select file_gambar, mode from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and mode = 'WEB'");
+            $res2 = DB::connection($this->db)->select("select file_gambar, mode from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and mode = 'MOBILE'");
             
-            $res = json_decode(json_encode($res),true);
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            $res1 = json_decode(json_encode($res1),true);
+            $res2 = json_decode(json_encode($res2),true);
+            if(count($res1) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['data_mobile'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
