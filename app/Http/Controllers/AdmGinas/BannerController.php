@@ -56,7 +56,7 @@ class BannerController extends Controller {
         $this->validate($request, [
             'gambarke' => 'required|array',
             'id_banner' => 'required|array',
-            'mode' => 'reuired|array'
+            'mode' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -94,7 +94,7 @@ class BannerController extends Controller {
 
                 if(count($arr_gambarke) > 0){
                     for($i=0; $i<count($arr_gambarke);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_mode[$i]') "); 
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi',''$arr_foto[$i]'','$arr_mode[$i]') "); 
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
