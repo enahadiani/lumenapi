@@ -83,6 +83,7 @@ class BannerController extends Controller {
                                 DB::connection($this->db)->update("update lab_gbr_banner set file_gambar = '$foto' where id_banner = '$data[0]['id_banner']'");
                                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                             } else {
+                                $arr_insert[] = "insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$id','$kode_lokasi','$foto','$mode') ";
                                 DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$id','$kode_lokasi','$foto','$mode') ");
                                 Storage::disk('s3')->put('webginas/'.$foto,file_get_contents($file));
                             }
@@ -97,6 +98,7 @@ class BannerController extends Controller {
                     $success['status'] = true;
                     $success['data'] = $arr_gambarke;
                     $success['data2'] = $arr_mode;
+                    $success['data3'] = $arr_insert;
                     $success['message'] = "Data Banner berhasil diupload.";
                     $success['no_bukti'] = "0";
                 }
