@@ -90,18 +90,17 @@ class BannerController extends Controller {
                     }
                 }
 
-                // if(count($arr_gambarke) > 0){
-                //     DB::connection($this->db)->commit();
-                //     $success['status'] = true;
-                //     $success['message'] = "Data Banner berhasil diupload.";
-                //     $success['data'] = $arr_bann;
-                //     $success['no_bukti'] = "0";
-                // }
-                // else{
-                //     $success['status'] = false;
-                //     $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (2)";
-                //     $success['no_bukti'] = "0";
-                // }
+                if(count($arr_gambarke) > 0){
+                    DB::connection($this->db)->commit();
+                    $success['status'] = true;
+                    $success['message'] = "Data Banner berhasil diupload.";
+                    $success['no_bukti'] = "0";
+                }
+                else{
+                    $success['status'] = false;
+                    $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (2)";
+                    $success['no_bukti'] = "0";
+                }
             }else{
                 $success['status'] = false;
                 $success['message'] = "Data Banner gagal diupload. Banner file tidak valid. (3)";
