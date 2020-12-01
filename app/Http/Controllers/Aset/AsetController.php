@@ -482,7 +482,8 @@ class AsetController extends Controller
 
     function getDaftarBarang(Request $request){
         $this->validate($request, [
-            'id_gedung' => 'required'
+            'id_gedung' => 'required',
+            'kode_klp' => 'array'
         ]);
         try {
             
