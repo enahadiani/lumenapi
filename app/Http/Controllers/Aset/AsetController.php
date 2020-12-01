@@ -423,7 +423,7 @@ class AsetController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->id_nama'";
+            $sql2="SELECT * FROM amu_asset_bergerak_dok a WHERE a.no_bukti='$request->qrcode'";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
