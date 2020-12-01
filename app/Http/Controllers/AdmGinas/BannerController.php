@@ -88,12 +88,15 @@ class BannerController extends Controller {
                             }
                         }
                         $arr_gambarke[] = $request->gambarke[$i];
+                        $arr_mode[] = $request->mode[$i];
                     }
                 }
 
                 if(count($arr_gambarke) > 0){
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
+                    $success['data'] = $arr_gambarke;
+                    $success['data2'] = $arr_mode;
                     $success['message'] = "Data Banner berhasil diupload.";
                     $success['no_bukti'] = "0";
                 }
