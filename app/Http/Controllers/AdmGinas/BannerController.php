@@ -27,7 +27,7 @@ class BannerController extends Controller {
             }
             $kode_lokasi= '17';
 
-            $res = DB::connection($this->db)->select("select file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi'");
+            $res = DB::connection($this->db)->select("select file_gambar, mode from lab_gbr_banner where kode_lokasi = '$kode_lokasi'");
             
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -52,7 +52,8 @@ class BannerController extends Controller {
     public function store(Request $request) {
         $this->validate($request, [
             'gambarke' => 'required|array',
-            'id_banner' => 'required|array'
+            'id_banner' => 'required|array',
+            'mode' => 'reuired|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -82,7 +83,7 @@ class BannerController extends Controller {
                             $arr_foto[] = "-";
                         }
                         $arr_id_banner[] = $request->id_banner[$i];     
-                        $arr_gambarke[] = $request->gambarke[$i];
+                        $arr_mode[] = $request->mode[$i];
                     }
                     
                     $del = DB::connection($this->db)->table('lab_gbr_banner')->where('kode_lokasi', $kode_lokasi)->delete();
@@ -90,7 +91,7 @@ class BannerController extends Controller {
 
                 if(count($arr_gambarke) > 0){
                     for($i=0; $i<count($arr_gambarke);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_foto[$i]') "); 
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_mode[$i]') "); 
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
