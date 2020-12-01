@@ -53,11 +53,11 @@ class BannerController extends Controller {
     }
 
     public function store(Request $request) {
-        $this->validate($request, [
-            'gambarke' => 'required|array',
-            'id_banner' => 'required|array',
-            'mode' => 'required|array'
-        ]);
+        // $this->validate($request, [
+        //     'gambarke' => 'required|array',
+        //     'id_banner' => 'required|array',
+        //     'mode' => 'required|array'
+        // ]);
 
         DB::connection($this->db)->beginTransaction();
 
