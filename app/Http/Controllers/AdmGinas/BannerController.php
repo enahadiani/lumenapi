@@ -86,6 +86,7 @@ class BannerController extends Controller {
                             $arr_foto[] = "-";
                         }
                         $arr_id_banner[] = $request->id_banner[$i];     
+                        $arr_gambarke[] = $request->gambarke[$i];     
                         $arr_mode[] = $request->mode[$i];
                     }
                     
@@ -94,7 +95,7 @@ class BannerController extends Controller {
 
                 if(count($arr_gambarke) > 0){
                     for($i=0; $i<count($arr_gambarke);$i++){
-                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi',''$arr_foto[$i]'','$arr_mode[$i]') "); 
+                        $ins[$i] = DB::connection($this->db)->insert("insert into lab_gbr_banner (id_banner,kode_lokasi,file_gambar,mode) values ('$arr_id_banner[$i]','$kode_lokasi','$arr_foto[$i]','$arr_mode[$i]') "); 
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
