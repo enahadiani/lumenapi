@@ -85,7 +85,8 @@ class AsetController extends Controller
 
     function getRuangan(Request $request){
         $this->validate($request, [
-            'id_gedung' => 'required'
+            'id_gedung' => 'required',
+            'lantai' => 'array'
         ]);
 
         try {
@@ -98,8 +99,19 @@ class AsetController extends Controller
             $filter="";
 
             if ($request->input('lantai') != "") {
-                $lantai = $request->input('lantai');                
-                $filter .= " and a.lantai='$lantai' ";
+                $lantai = $request->input('lantai'); 
+                $this_in = "";
+                if(count($lantai) > 0){
+                    for($x=0;$x<count($lantai);$x++){
+                        if($x == 0){
+                            $this_in .= "'".$lantai[$x]."'";
+                        }else{
+                            
+                            $this_in .= ","."'".$lantai[$x]."'";
+                        }
+                    }
+                    $filter .= " and a.lantai in ($this_in) ";
+                }             
                 
             }else{
                 $filter .= "";
@@ -494,14 +506,25 @@ class AsetController extends Controller
                 
             } 
             if ($request->input('kode_klp') != "") {
-                $kode_klp = $request->input('kode_klp');                
-                $filter .= " and a.kode_klp='$kode_klp' ";
+                $kode_klp = $request->input('kode_klp');  
+                $this_in = "";
+                if(count($kode_klp) > 0){
+                    for($x=0;$x<count($kode_klp);$x++){
+                        if($x == 0){
+                            $this_in .= "'".$kode_klp[$x]."'";
+                        }else{
+                            
+                            $this_in .= ","."'".$kode_klp[$x]."'";
+                        }
+                    }
+                    $filter .= " and a.kode_klp in ($this_in) ";
+                }      
                 
             } 
           
             $sql="SELECT a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp
-                    ,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama,
-                    dbo.fnGetBuktiFoto(no_bukti) as foto 
+                    ,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama
+                    --dbo.fnGetBuktiFoto(no_bukti) as foto 
                 FROM amu_asset_bergerak a
                 inner join amu_ruangan b on a.kode_lokasi=b.kode_lokasi and a.no_ruang=b.no_ruangan 
                 WHERE a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' $filter ";
