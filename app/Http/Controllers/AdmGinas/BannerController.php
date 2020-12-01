@@ -66,8 +66,7 @@ class BannerController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $arr_foto = array();
-            $arr_gambarke = array();
+            $arr_bann = array();
             $i=0;
             $cek = $request->file_gambar;
             if(!empty($cek)){
@@ -76,8 +75,9 @@ class BannerController extends Controller {
                         if(isset($request->file('file_gambar')[$i])){
                             $file = $request->file('file_gambar')[$i];
                             $foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                            $data = DB::connection($this->db)->select("select id_banner, file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and id_banner = '$request->id_banner[$i]'");
-                            dd($data);
+                            $arr_bann[] = $request->id_banner[$i];
+                            // $data = DB::connection($this->db)->select("select id_banner, file_gambar from lab_gbr_banner where kode_lokasi = '$kode_lokasi' and id_banner = '$request->id_banner[$i]'");
+                            dd($arr_bann);
                             // if(count($data) > 0) {
                             //     Storage::disk('s3')->delete('webginas/'.$data[0]['file_gambar']);
                             //     DB::connection($this->db)->update("update lab_gbr_banner set file_gambar = '$foto' where id_banner = '$data[0]['id_banner']'");
