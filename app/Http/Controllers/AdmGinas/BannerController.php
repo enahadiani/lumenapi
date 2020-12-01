@@ -67,6 +67,7 @@ class BannerController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             $arr_bann = array();
+            $arr_insert = array();
             $i=0;
             $cek = $request->file_gambar;
             if(!empty($cek)){
