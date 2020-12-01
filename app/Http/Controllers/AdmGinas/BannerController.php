@@ -86,6 +86,7 @@ class BannerController extends Controller {
                             $arr_foto[] = "-";
                         }
                         $arr_id_banner[] = $request->id_banner[$i];     
+                        $arr_gambarke[] = $request->gambarke[$i];     
                         $arr_mode[] = $request->mode[$i];
                     }
                     
