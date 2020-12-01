@@ -34,7 +34,7 @@ class BannerController extends Controller {
             $res2 = json_decode(json_encode($res2),true);
             if(count($res1) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $res1;
                 $success['data_mobile'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
