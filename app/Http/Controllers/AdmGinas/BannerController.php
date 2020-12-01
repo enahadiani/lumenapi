@@ -56,7 +56,7 @@ class BannerController extends Controller {
         $this->validate($request, [
             'gambarke' => 'required|array',
             'id_banner' => 'required|array',
-            'mode' => 'reuired|array'
+            'mode' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
