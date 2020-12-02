@@ -194,13 +194,13 @@ class PembelianController extends Controller
             }
             $no_bukti = $request->no_bukti;
 
-            $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
+            $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen,convert(varchar,tanggal,103) as tanggal from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
             ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
-            $sql2="select a.nu, a.kode_barang,isnull(b.nilai_beli,0) as hrg_seb,a.satuan,a.jumlah,a.harga,a.diskon,a.total as subtotal,b.nama,a.stok 
+            $sql2="select a.nu, a.kode_barang,isnull(b.nilai_beli,0) as hrg_seb,a.satuan,a.jumlah,a.harga,a.diskon,a.total as subtotal,b.nama,a.stok, isnull(b.hna,0) as harga_jual 
             from brg_trans_d  a 
             left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             where  a.form='BRGBELI' and a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
@@ -245,7 +245,7 @@ class PembelianController extends Controller
             'satuan_barang' => 'required|array',
             'disc_barang' => 'required|array',
             'sub_barang' => 'required|array',
-
+            'harga_jual' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -408,7 +408,7 @@ class PembelianController extends Controller
             'satuan_barang' => 'required|array',
             'disc_barang' => 'required|array',
             'sub_barang' => 'required|array',
-
+            'harga_jual' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();

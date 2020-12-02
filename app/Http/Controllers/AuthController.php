@@ -373,7 +373,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('dago')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('dago')->setTTL(720)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
