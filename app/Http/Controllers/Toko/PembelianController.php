@@ -194,7 +194,7 @@ class PembelianController extends Controller
             }
             $no_bukti = $request->no_bukti;
 
-            $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
+            $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen,convert(varchar,tanggal,103) as tanggal from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
             ";
 
             $res = DB::connection($this->sql)->select($sql);
