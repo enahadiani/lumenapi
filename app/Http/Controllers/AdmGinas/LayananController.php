@@ -97,9 +97,18 @@ class LayananController extends Controller
             inner join lab_detail_layanan c on a.kode_lokasi=c.kode_lokasi and a.id_layanan=c.id_layanan
             inner join lab_sublayanan b on c.kode_lokasi=b.kode_lokasi and c.id_sublayanan=b.id_sublayanan
             where c.kode_lokasi = '$kode_lokasi'";
+
+            $jumlah = "select max(jumlah) as jumlah 
+            from (
+                select kode_lokasi, count(id_layanan) as jumlah
+                from lab_detail_layanan
+                group by id_layanan, kode_lokasi
+            ) b where kode_lokasi = '$kode_lokasi'";
                 
             $res = DB::connection($this->sql)->select($sql);
+            $jum = DB::connection($this->sql)->select($jumlah);
             $res = json_decode(json_encode($res),true);
+            $jum = json_decode(json_encode($jum),true);
             $result = array();
             foreach($res as $key) {
                 $result[$key['id_layanan']][] = $key;
@@ -108,6 +117,7 @@ class LayananController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $result;
+                $success['jumlah'] = $jum;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
