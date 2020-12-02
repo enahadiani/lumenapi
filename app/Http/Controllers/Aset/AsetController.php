@@ -117,6 +117,8 @@ class AsetController extends Controller
                 $filter .= "";
             }
 
+            
+
             $id_gedung = $request->id_gedung;
 
             $sql="SELECT a.no_ruangan,a.kode_lokasi,a.nama_ruangan,isnull(b.jumlah,0) as jumlah,isnull(b.nilai_perolehan,0) as nilai_perolehan
@@ -280,10 +282,19 @@ class AsetController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $sql2="select a.id_gedung,b.nama_gedung 
+            from amu_pnj_ruang a
+            inner join amu_gedung b on a.id_gedung=b.id_gedung and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.nik='$nik_user'";
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 //$success['sql'] = $sql;
                 $success['status'] = true;
                 $success['daftar'] = $res;
+                $success['data_gedung'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
