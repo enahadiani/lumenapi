@@ -274,7 +274,7 @@ class AsetController extends Controller
            
             $id_gedung = $request->id_gedung;
 
-            $sql="select distinct a.id_gedung,b.nama_gedung 
+            $sql="select top 1 a.id_gedung,b.nama_gedung 
             from amu_pnj_ruang a
             inner join amu_gedung b on a.id_gedung=b.id_gedung and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.nik='$nik_user'";
