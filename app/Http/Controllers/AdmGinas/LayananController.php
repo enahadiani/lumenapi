@@ -98,12 +98,12 @@ class LayananController extends Controller
             inner join lab_sublayanan b on c.kode_lokasi=b.kode_lokasi and c.id_sublayanan=b.id_sublayanan
             where c.kode_lokasi = '$kode_lokasi'";
 
-             $jumlah = "select max(jumlah) as jumlah 
+            $jumlah = "select max(jumlah) as jumlah 
             from (
                 select kode_lokasi, count(id_layanan) as jumlah
                 from lab_detail_layanan
                 group by id_layanan, kode_lokasi
-            ) where kode_lokasi = '$kode_lokasi'";
+            ) b where kode_lokasi = '$kode_lokasi'";
                 
             $res = DB::connection($this->sql)->select($sql);
             $jum = DB::connection($this->sql)->select($jumlah);
