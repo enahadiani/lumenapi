@@ -52,7 +52,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     //Stok Opname
     $router->get('stok-opname', 'Toko\StockOpnameController@index');
-    $router->post('stok-opname-load', 'Toko\StockOpnameController@load');
+    $router->get('stok-opname-exec', 'Toko\StockOpnameController@execSP');
+    $router->get('stok-opname-load', 'Toko\StockOpnameController@load');
     $router->post('upload-barang-fisik', 'Toko\StockOpnameController@importExcel');
     $router->post('stok-opname-rekon', 'Toko\StockOpnameController@simpanRekon');
     $router->post('stok-opname', 'Toko\StockOpnameController@store');

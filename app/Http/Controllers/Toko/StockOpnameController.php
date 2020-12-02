@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Imports\BarangFisikImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
+use App\BarangFisik;
 
 
 class StockOpnameController extends Controller
@@ -21,6 +22,13 @@ class StockOpnameController extends Controller
     public $successStatus = 200;
     public $sql = 'tokoaws';
     public $guard = 'toko';
+
+    public function joinNum($num){
+        // menggabungkan angka yang di-separate(10.000,75) menjadi 10000.00
+        $num = str_replace(".", "", $num);
+        $num = str_replace(",", ".", $num);
+        return $num;
+    }
 
     public function importExcel(Request $request)
     {
@@ -50,9 +58,13 @@ class StockOpnameController extends Controller
             // $file->move('uploads',$nama_file);
     
             // import data
+            $del = BarangFisik::where('nik_user',$nik)->where('kode_lokasi',$kode_lokasi)->delete();
             Excel::import(new BarangFisikImport, $nama_file);
             Storage::disk('local')->delete($nama_file);
 
+            $res = DB::connection($this->sql)->select("select nu as no,kode_barang,jumlah from brg_fisik_tmp where kode_lokasi='$kode_lokasi' and nik_user='$nik' order by nu ");
+            $res = json_decode(json_encode($res),true);
+            $success['data'] = $res;
             $success['status'] = true;
             $success['message'] = "Success!";
             return response()->json($success, $this->successStatus);
@@ -77,9 +89,9 @@ class StockOpnameController extends Controller
                 $nik= $request->nik;
             }
 
-            $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan 
+            $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tanggal,a.keterangan as deskripsi
             from trans_m a inner join brg_gudang b on a.param1=b.kode_gudang and a.kode_lokasi=b.kode_lokasi 
-            inner join karyawan_pp c on b.kode_pp=c.kode_pp and c.kode_lokasi=b.kode_lokasi and c.nik='".$nik."' 
+            inner join karyawan_pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi and c.nik='".$nik."' 
             where a.kode_lokasi='".$kode_lokasi."' and a.modul='IV' and a.form='BRGSOP'";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -127,7 +139,7 @@ class StockOpnameController extends Controller
             $sql=DB::connection($this->sql)->update("insert into brg_stok_tmp (kode_barang,nama_barang,satuan,stok,jumlah,selisih,barcode,kode_lokasi,nik_user,nu)
             select a.kode_barang,a.nama,a.sat_kecil as satuan,isnull(b.stok,0) as stok, 0 as jumlah, 0 as selisih, a.barcode, '$kode_lokasi' as kode_lokasi, '$nik' as nik_user,row_number() over (order by (select NULL)) 
             from brg_barang a 
-            inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.kode_gudang='".$kode_gudang."' and b.nik_user='".$nik."' 
+            inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.kode_gudang='".$request->kode_gudang."' and b.nik_user='".$nik."' 
             where a.kode_lokasi='".$kode_lokasi."' order by a.kode_barang");
 
             DB::connection($this->sql)->commit();
@@ -261,6 +273,37 @@ class StockOpnameController extends Controller
         
     }
     
+    public function execSP(Request $request)
+    {
+        DB::connection($this->sql)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
+            }
+
+            $periode = date('Ym');
+            $no_bukti= $request->no_bukti;
+
+            $exec = DB::connection($this->sql)->update("exec sp_brg_stok2 '".$periode."','".$kode_lokasi."','".$nik."' ");
+            $success['status'] = true;
+            $success['message'] = "Sukses";
+            DB::connection($this->sql)->commit();
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+    
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -314,7 +357,7 @@ class StockOpnameController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['no_jual'] = $id;
+            $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Stok Opname berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     

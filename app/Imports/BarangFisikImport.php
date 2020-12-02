@@ -20,6 +20,7 @@ class BarangFisikImport implements ToModel, WithHeadingRow
         if($data =  Auth::guard('toko')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
+            
             return new BarangFisik([
                 'kode_lokasi' => $kode_lokasi,
                 'nu' => $row['no'],
