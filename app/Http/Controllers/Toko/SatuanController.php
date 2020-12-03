@@ -47,7 +47,7 @@ class SatuanController extends Controller
                 $sql= "select kode_satuan,nama from brg_satuan where kode_lokasi='$kode_lokasi'
                 $filter ";
             }else{
-                $sql = "select kode_satuan,nama from brg_satuan where kode_lokasi='$kode_lokasi'";
+                $sql = "select kode_satuan,nama,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_satuan where kode_lokasi='$kode_lokasi'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -104,14 +104,17 @@ class SatuanController extends Controller
             }
             if($this->isUnik($request->kode_satuan,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into brg_satuan(kode_satuan,kode_lokasi,nama) values (?, ?, ?)', array($request->kode_satuan,$kode_lokasi,$request->nama));
+                $ins = DB::connection($this->sql)->insert("insert into brg_satuan(kode_satuan,kode_lokasi,nama,tgl_input) values ('$request->kode_satuan','$kode_lokasi','$request->nama',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Satuan Barang berhasil disimpan";
+                $success['kode'] = $request->kode_satuan;
+                $success['message'] = "Data Gudang berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Satuan Barang sudah ada di database!";
+                $success['kode'] = "-";
+                $success['jenis'] = "duplicate";
+                $success['message'] = "Error : Duplicate entry. Kode Gudang sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
@@ -164,10 +167,11 @@ class SatuanController extends Controller
             ->where('kode_satuan', $request->kode_satuan)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into brg_satuan(kode_satuan,kode_lokasi,nama) values (?, ?, ?)', array($request->kode_satuan,$kode_lokasi,$request->nama));
+            $ins = DB::connection($this->sql)->insert("insert into brg_satuan(kode_satuan,kode_lokasi,nama,tgl_input) values ('$request->kode_satuan','$kode_lokasi','$request->nama',getdate())");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_satuan;
             $success['message'] = "Data Satuan Barang berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
