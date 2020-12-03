@@ -67,6 +67,36 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('format-laporan-relakun','Yakes\FormatLaporanController@getRelakun');
     $router->post('format-laporan-relasi','Yakes\FormatLaporanController@simpanRelasi');
     $router->post('format-laporan-move','Yakes\FormatLaporanController@simpanMove');
+
+    //hr dashborad
+    //stsorganik
+    $router->get('cariStsOrganik','Yakes\StsOrganikController@cariStsOrganik');
+    $router->get('stsOrganik','Yakes\StsOrganikController@index');
+    $router->post('stsOrganik','Yakes\StsOrganikController@store');
+    $router->put('stsOrganik','Yakes\StsOrganikController@update');
+    $router->delete('stsOrganik','Yakes\StsOrganikController@destroy'); 
+
+    //stsmedis
+    $router->get('cariStsMedis','Yakes\StsMedisController@cariStsMedis');
+    $router->get('stsMedis','Yakes\StsMedisController@index');
+    $router->post('stsMedis','Yakes\StsMedisController@store');
+    $router->put('stsMedis','Yakes\StsMedisController@update');
+    $router->delete('stsMedis','Yakes\StsOrganikController@destroy'); 
+
+    //stsedu
+    $router->get('cariStsEdu','Yakes\StsEduController@cariStsEdu');
+    $router->get('stsEdu','Yakes\StsEduController@index');
+    $router->post('stsEdu','Yakes\StsEduController@store');
+    $router->put('stsEdu','Yakes\StsEduController@update');
+    $router->delete('stsEdu','Yakes\StsEduController@destroy'); 
+
+    //hrkaryawan
+    $router->get('cariNik','Yakes\HrKaryawanController@cariStsEdu');
+    $router->get('hrKaryawan','Yakes\HrKaryawanController@index');
+    $router->post('hrKaryawan','Yakes\HrKaryawanController@store');
+    $router->put('hrKaryawan','Yakes\HrKaryawanController@update');
+    $router->delete('hrKaryawan','Yakes\HrKaryawanController@destroy'); 
+    
     
 });
 
