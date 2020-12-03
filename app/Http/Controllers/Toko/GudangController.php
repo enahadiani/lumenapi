@@ -44,9 +44,12 @@ class GudangController extends Controller
                 }else{
                     $filter = " and a.kode_gudang='$request->kode_gudang' ";
                 }
-                $sql= "select a.kode_gudang,a.nama,a.pic,a.telp,a.alamat,a.kode_pp,b.nama as nama_pp from brg_gudang a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.kode_gudang,a.nama,a.pic,a.telp,a.alamat,a.kode_pp,b.nama as nama_pp, c.nama as nama_pic from brg_gudang a 
+                left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                left join karyawan c on a.pic=c.nik and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp from brg_gudang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_gudang where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -111,12 +114,14 @@ class GudangController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_gudang;
                 $success['message'] = "Data Gudang berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Gudang sudah ada di database!";
+                $success['kode'] = "-";
+                $success['jenis'] = "duplicate";
+                $success['message'] = "Error : Duplicate entry. Kode Gudang sudah ada di database!";
             }
-            
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
@@ -175,6 +180,7 @@ class GudangController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_gudang;
             $success['message'] = "Data Gudang berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
