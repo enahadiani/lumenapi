@@ -1789,6 +1789,9 @@ class AsetController extends Controller
     }
 
     function getMapsGedung(Request $request){
+        $this->validate($request,[
+            'id_provinsi' => 'array'
+        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -1809,11 +1812,28 @@ class AsetController extends Controller
                 $filter .= "";
             }
 
-            if(isset($request->id_provinsi)){
-                $filter .= " and b.id_provinsi = '$request->id_provinsi' ";
-            }else{
-                $filter .= "";
-            }
+            // if(isset($request->id_provinsi)){
+            //     $filter .= " and b.id_provinsi = '$request->id_provinsi' ";
+            // }else{
+            //     $filter .= "";
+            // }
+
+            if ($request->input('id_provinsi') != "") {
+                $id_provinsi = $request->input('id_provinsi');  
+                $this_in = "";
+                if(count($id_provinsi) > 0){
+                    for($x=0;$x<count($id_provinsi);$x++){
+                        if($x == 0){
+                            $this_in .= "'".$id_provinsi[$x]."'";
+                        }else{
+                            
+                            $this_in .= ","."'".$id_provinsi[$x]."'";
+                        }
+                    }
+                    $filter .= " and b.id_provinsi in ($this_in) ";
+                }      
+                
+            } 
 
             $sql="select a.id_gedung,a.nama_gedung,a.coor_y as latitude,a.coor_x as longitude,b.id_provinsi,a.status
             from amu_gedung a
