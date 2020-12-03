@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class StsOrganikController extends Controller
+class DemogController extends Controller
 {    
     public $successStatus = 200;
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
 
-    public function cariStsOrganik(Request $request) {
+    public function cariDemog(Request $request) {
         $this->validate($request, [    
-            'sts_organik' => 'required'            
+            'kode_demog' => 'required'            
         ]);
         
         try {
@@ -26,7 +26,7 @@ class StsOrganikController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select sts_organik, nama from hr_stsorganik where sts_organik='".$request->sts_organik."'");
+            $res = DB::connection($this->sql)->select("select kode_demog, nama from hr_demog where kode_demog='".$request->kode_demog."'");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;
@@ -43,7 +43,7 @@ class StsOrganikController extends Controller
 
     public function isUnik($isi)
     {        
-        $auth = DB::connection($this->sql)->select("select sts_organik from hr_stsorganik where sts_organik ='".$isi."'");
+        $auth = DB::connection($this->sql)->select("select kode_demog from hr_demog where kode_demog ='".$isi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -61,16 +61,16 @@ class StsOrganikController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->sts_organik)){
-                if($request->sts_organik == "all"){
+            if(isset($request->kode_demog)){
+                if($request->kode_demog == "all"){
                     $filter = "";
                 }else{
-                    $filter = " where sts_organik='".$request->sts_organik."' ";
+                    $filter = " where kode_demog='".$request->kode_demog."' ";
                 }
-                $sql= "select sts_organik, nama from hr_stsorganik ".$filter;
+                $sql= "select kode_demog, nama from hr_demog ".$filter;
             } 
             else {
-                $sql = "select sts_organik, nama from hr_stsorganik ";
+                $sql = "select kode_demog, nama from hr_demog ";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -97,9 +97,10 @@ class StsOrganikController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'sts_organik' => 'required|max:10',
+            'kode_demog' => 'required|max:10',
             'nama' => 'required|max:50',           
-            'sts_aktif' => 'required|max:1'          
+            'bawah' => 'required|numeric',
+            'atas' => 'required|numeric'          
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -109,24 +110,24 @@ class StsOrganikController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->sts_organik)){
+            if($this->isUnik($request->kode_demog)){
 
-                $ins = DB::connection($this->sql)->insert("insert into hr_stsorganik(sts_organik,nama,sts_aktif,tgl_input,nik_user) values 
-                                                         ('".$request->sts_organik."','".$request->nama."','".$request->sts_aktif."',getdate(),'".$nik."')");
+                $ins = DB::connection($this->sql)->insert("insert into hr_demog(kode_demog,nama,bawah,atas,tgl_input,nik_user) values 
+                                                         ('".$request->kode_demog."','".$request->nama."','".floatval($request->bawah)."','".floatval($request->atas)."',getdate(),'".$nik."')");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Status Organik berhasil disimpan";
+                $success['message'] = "Data Demografi berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Status Organik sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Data Demografi sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Status Organik gagal disimpan ".$e;
+            $success['message'] = "Data Demografi gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -136,9 +137,10 @@ class StsOrganikController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'sts_organik' => 'required|max:10',
+            'kode_demog' => 'required|max:10',
             'nama' => 'required|max:50',           
-            'sts_aktif' => 'required|max:1'  
+            'bawah' => 'required|numeric',
+            'atas' => 'required|numeric'          
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -149,21 +151,21 @@ class StsOrganikController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('hr_stsorganik')
-            ->where('sts_organik', $request->sts_organik)
+            $del = DB::connection($this->sql)->table('hr_demog')
+            ->where('kode_demog', $request->kode_demog)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into hr_stsorganik(sts_organik,nama,sts_aktif,tgl_input,nik_user) values 
-                                                     ('".$request->sts_organik."','".$request->nama."','".$request->sts_aktif."',getdate(),'".$nik."')");
+            $ins = DB::connection($this->sql)->insert("insert into hr_demog(kode_demog,nama,bawah,atas,tgl_input,nik_user) values 
+                                                         ('".$request->kode_demog."','".$request->nama."','".floatval($request->bawah)."','".floatval($request->atas)."',getdate(),'".$nik."')");
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Status Organik berhasil diubah";
+            $success['message'] = "Data Demografi berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Status Organik gagal diubah ".$e;
+            $success['message'] = "Data Demografi gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -171,7 +173,7 @@ class StsOrganikController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'sts_organik' => 'required|max:10'
+            'kode_demog' => 'required|max:10'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -181,19 +183,19 @@ class StsOrganikController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('hr_stsorganik')            
-            ->where('sts_organik', $request->sts_organik)
+            $del = DB::connection($this->sql)->table('hr_demog')            
+            ->where('kode_demog', $request->kode_demog)
             ->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Status Organik berhasil dihapus";
+            $success['message'] = "Data Demografi berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Status Organik gagal dihapus ".$e;
+            $success['message'] = "Data Demografi gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

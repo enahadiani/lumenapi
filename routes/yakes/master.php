@@ -88,7 +88,14 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('stsEdu','Yakes\StsEduController@index');
     $router->post('stsEdu','Yakes\StsEduController@store');
     $router->put('stsEdu','Yakes\StsEduController@update');
-    $router->delete('stsEdu','Yakes\StsEduController@destroy'); 
+    $router->delete('stsEdu','Yakes\StsEduController@destroy');
+    
+    //demografi
+    $router->get('cariDemog','Yakes\DemogController@cariDemog');
+    $router->get('demog','Yakes\DemogController@index');
+    $router->post('demog','Yakes\DemogController@store');
+    $router->put('demog','Yakes\DemogController@update');
+    $router->delete('demog','Yakes\DemogController@destroy');
 
     //hrkaryawan
     $router->get('cariNik','Yakes\HrKaryawanController@cariStsEdu');
@@ -96,7 +103,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('hrKaryawan','Yakes\HrKaryawanController@store');
     $router->put('hrKaryawan','Yakes\HrKaryawanController@update');
     $router->delete('hrKaryawan','Yakes\HrKaryawanController@destroy'); 
-    
+
     
 });
 
