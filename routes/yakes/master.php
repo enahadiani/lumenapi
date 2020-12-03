@@ -104,6 +104,15 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('hrKaryawan','Yakes\HrKaryawanController@update');
     $router->delete('hrKaryawan','Yakes\HrKaryawanController@destroy'); 
 
+
+    //dashbord SDM
+    $router->get('dataOrganik','Yakes\DashSDMController@dataOrganik');
+    $router->get('dataDemog','Yakes\DashSDMController@dataDemog');
+    $router->get('dataGender','Yakes\DashSDMController@dataGender');
+    $router->get('dataMedis','Yakes\DashSDMController@dataMedis');
+    $router->get('dataDokter','Yakes\DashSDMController@dataDokter');
+    $router->get('dataEdu','Yakes\DashSDMController@dataEdu');
+
     
 });
 
