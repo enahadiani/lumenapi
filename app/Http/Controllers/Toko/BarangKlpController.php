@@ -51,7 +51,7 @@ class BarangKlpController extends Controller
                 where a.kode_lokasi='".$kode_lokasi."'  
                 $filter ";
             }else{
-                $sql = "select kode_klp,nama,akun_pers,akun_pdpt,akun_hpp from brg_barangklp where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_klp,nama,akun_pers,akun_pdpt,akun_hpp,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_barangklp where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -111,16 +111,19 @@ class BarangKlpController extends Controller
             }
             if($this->isUnik($request->kode_klp,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp) values (?, ?, ?, ?, ?, ?)', array($request->kode_klp,$kode_lokasi,$request->nama,$request->akun_pers, $request->akun_pdpt, $request->akun_hpp));
+                $ins = DB::connection($this->sql)->insert("insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp,tgl_input) values ('$request->kode_klp','$kode_lokasi','$request->nama','$request->akun_pers',' $request->akun_pdpt',' $request->akun_hpp',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_klp;
                 $success['message'] = "Data Kelompok Barang berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Kelompok Barang sudah ada di database!";
+                $success['kode'] = "-";
+                $success['jenis'] = "duplicate";
+                $success['message'] = "Error : Duplicate entry. Kode Kelompok Barang sudah ada di database!";
             }
-            
+
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
@@ -174,10 +177,11 @@ class BarangKlpController extends Controller
             ->where('kode_klp', $request->kode_klp)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp) values (?, ?, ?, ?, ?, ?)', array($request->kode_klp,$kode_lokasi,$request->nama,$request->akun_pers, $request->akun_pdpt, $request->akun_hpp));
+            $ins = DB::connection($this->sql)->insert("insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp,tgl_input) values ('$request->kode_klp','$kode_lokasi','$request->nama','$request->akun_pers',' $request->akun_pdpt',' $request->akun_hpp',getdate())");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_klp;
             $success['message'] = "Data Kelompok Barang berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
@@ -234,7 +238,16 @@ class BarangKlpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '005' where  a.kode_lokasi='$kode_lokasi'";
+            $filter = "";
+            if(isset($request->kode_akun)){
+                if($request->kode_akun != ""){
+                    $filter .= " and a.kode_akun = '$request->kode_akun' ";
+                }else{
+                    $filter .= "";
+                }
+            }
+
+            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '005' where  a.kode_lokasi='$kode_lokasi' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -267,7 +280,16 @@ class BarangKlpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '022' where  a.kode_lokasi='$kode_lokasi'";
+            $filter = "";
+            if(isset($request->kode_akun)){
+                if($request->kode_akun != ""){
+                    $filter .= " and a.kode_akun = '$request->kode_akun' ";
+                }else{
+                    $filter .= "";
+                }
+            }
+
+            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '022' where  a.kode_lokasi='$kode_lokasi' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -300,7 +322,16 @@ class BarangKlpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '027' where  a.kode_lokasi='$kode_lokasi'";
+            $filter = "";
+            if(isset($request->kode_akun)){
+                if($request->kode_akun != ""){
+                    $filter .= " and a.kode_akun = '$request->kode_akun' ";
+                }else{
+                    $filter .= "";
+                }
+            }
+
+            $sql = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '027' where  a.kode_lokasi='$kode_lokasi' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
