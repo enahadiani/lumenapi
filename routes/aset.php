@@ -48,6 +48,7 @@ $router->group(['middleware' => 'auth:aset'], function () use ($router) {
     $router->post('profile-ubah', 'AdminAsetController@updateProfile');
     $router->post('ubah-foto', 'AdminAsetController@updatePhoto');
     
+    $router->get('provinsi','Aset\AsetController@getProvinsi');
     $router->get('gedung','Aset\AsetController@getGedung');
     $router->get('ruangan','Aset\AsetController@getRuangan');
     $router->get('lantai','Aset\AsetController@getLantai');
