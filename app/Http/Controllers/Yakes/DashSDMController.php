@@ -31,10 +31,17 @@ class DashSDMController extends Controller
                                                       where a.periode='".$request->periode."'");
             $res = json_decode(json_encode($res),true);
             
-            $success['status'] = true;
-            $success['data'] = $res;
-            $success['message'] = "Success!";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
             
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -60,10 +67,17 @@ class DashSDMController extends Controller
                                                        where a.periode ='".$request->periode."'");
             $res = json_decode(json_encode($res),true);
             
-            $success['status'] = true;
-            $success['data'] = $res;
-            $success['message'] = "Success!";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
             
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -89,10 +103,17 @@ class DashSDMController extends Controller
                                                        where a.periode ='".$request->periode."'");
             $res = json_decode(json_encode($res),true);
             
-            $success['status'] = true;
-            $success['data'] = $res;
-            $success['message'] = "Success!";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
             
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -119,10 +140,17 @@ class DashSDMController extends Controller
                                                        
             $res = json_decode(json_encode($res),true);
             
-            $success['status'] = true;
-            $success['data'] = $res;
-            $success['message'] = "Success!";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);    
             
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -150,10 +178,17 @@ class DashSDMController extends Controller
                                                        
             $res = json_decode(json_encode($res),true);
             
-            $success['status'] = true;
-            $success['data'] = $res;
-            $success['message'] = "Success!";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
             
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -180,10 +215,17 @@ class DashSDMController extends Controller
                                                        
             $res = json_decode(json_encode($res),true);
             
-            $success['status'] = true;
-            $success['data'] = $res;
-            $success['message'] = "Success!";
-            return response()->json(['success'=>$success], $this->successStatus);     
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
             
         } catch (\Throwable $e) {
             $success['status'] = false;
