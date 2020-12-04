@@ -16,7 +16,7 @@ class DashAkunController extends Controller
 
     public function dataBeban(Request $request) {
         $this->validate($request, [    
-            'periode' => 'required'            
+            'tahun' => 'required'            
         ]);
         
         try {
@@ -28,7 +28,7 @@ class DashAkunController extends Controller
 
             $res = DB::connection($this->sql)->select("select b.warna,a.periode,b.nama, a.nilai 
                                                       from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun
-                                                      where b.jenis='Beban' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' 
+                                                      where b.jenis='Beban' and substring(a.periode,1,4) = '".$request->tahun."' 
                                                       order by a.periode,b.idx");
 
             $res = json_decode(json_encode($res),true);
@@ -54,7 +54,7 @@ class DashAkunController extends Controller
 
     public function dataPdpt(Request $request) {
         $this->validate($request, [    
-            'periode' => 'required'            
+            'tahun' => 'required'            
         ]);
         
         try {
@@ -66,7 +66,7 @@ class DashAkunController extends Controller
 
             $res = DB::connection($this->sql)->select("select b.warna,a.periode,b.nama, a.nilai 
                                                       from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun
-                                                      where b.jenis='Pendapatan' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' 
+                                                      where b.jenis='Pendapatan' and substring(a.periode,1,4) = '".$request->tahun."' 
                                                       order by a.periode,b.idx");
 
             $res = json_decode(json_encode($res),true);
