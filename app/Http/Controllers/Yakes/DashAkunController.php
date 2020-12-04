@@ -26,7 +26,7 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.warna,a.periode,b.nama, a.nilai 
+            $res = DB::connection($this->sql)->select("select b.warna,a.periode,b.nama, a.nilai 
                                                       from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun
                                                       where b.jenis='Beban' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' 
                                                       order by a.periode,b.idx");
@@ -64,7 +64,7 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.warna,a.periode,b.nama, a.nilai 
+            $res = DB::connection($this->sql)->select("select b.warna,a.periode,b.nama, a.nilai 
                                                       from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun
                                                       where b.jenis='Pendapatan' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' 
                                                       order by a.periode,b.idx");
