@@ -26,7 +26,7 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql="select distinct substring(a.periode,1,4) from dash_klpakun_lap order by tahun desc";
+            $sql="select distinct substring(periode,1,4) as tahun from dash_klpakun_lap order by substring(periode,1,4) desc";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
