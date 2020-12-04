@@ -100,7 +100,7 @@ class DashSDMController extends Controller
 
             $res = DB::connection($this->sql)->select("select sum(jum_laki) as laki,sum(jum_per) as perempuan
                                                        from dash_sdm_demog 
-                                                       where a.periode ='".$request->periode."'");
+                                                       where periode ='".$request->periode."'");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
