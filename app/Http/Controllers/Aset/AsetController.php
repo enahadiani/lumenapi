@@ -535,8 +535,8 @@ class AsetController extends Controller
             } 
           
             $sql="SELECT a.no_bukti,a.barcode,a.no_seri,a.merk,a.tipe,a.warna,a.satuan,a.spesifikasi,a.id_gedung,a.no_ruang,a.kode_klp
-                    ,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama
-                    --dbo.fnGetBuktiFoto(no_bukti) as foto 
+                    ,a.tanggal_perolehan,a.kode_lokasi,a.kode_pp,a.nilai_perolehan,a.kd_asset,a.sumber_dana,a.nama_inv as nama,
+                    dbo.fnGetBuktiFoto(no_bukti) as foto 
                 FROM amu_asset_bergerak a
                 inner join amu_ruangan b on a.kode_lokasi=b.kode_lokasi and a.no_ruang=b.no_ruangan 
                 WHERE a.kode_lokasi='$kode_lokasi' and a.id_gedung='$id_gedung' $filter ";
