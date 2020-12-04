@@ -26,6 +26,11 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $tahunBef = intval(substr($request->periode,0,4));
+            $tahunBef = $tahunBef - 1;
+            $tahunBef = strval($tahunBef);
+            $perBef = $tahunBef.substr($request->periode,4,2); 
+
             $sql = "select a.warna,a.nama,a.idx
                     ,isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
@@ -42,7 +47,7 @@ class DashAkunController extends Controller
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
                     from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
-                    where a.jenis='BP' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
+                    where a.jenis='BP' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
@@ -90,6 +95,11 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $tahunBef = intval(substr($request->periode,0,4));
+            $tahunBef = $tahunBef - 1;
+            $tahunBef = strval($tahunBef);
+            $perBef = $tahunBef.substr($request->periode,4,2);
+
             $sql = "select a.warna,a.nama,a.idx
                     ,isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
@@ -106,7 +116,7 @@ class DashAkunController extends Controller
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
                     from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
-                    where a.jenis='CC' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
+                    where a.jenis='CC' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
