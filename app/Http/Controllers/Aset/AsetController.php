@@ -903,6 +903,10 @@ class AsetController extends Controller
                 $status = "Berfungsi";
             }else if($kondisi == "Rusak"){
                 $status = "Tidak Berfungsi";
+            }else if ($kondisi == "Berfungsi"){
+                $status = $kondisi;
+            }else if ($kondisi == "Tidak Berfungsi"){
+                $status = $kondisi;
             }
             
             $id = $this->generateKode("amu_mon_asset_bergerak", "mon_id", $kode_lokasi."-NMA".$periode.".", "001");
