@@ -19,6 +19,37 @@ class FilterController extends Controller
     public $db = 'dbsapkug';
 
     
+    function getFilterTahunDash(){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql="select distinct substring(a.periode,1,4) from dash_klpakun_lap order by tahun desc";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     public function getTglServer() {
         try {
             
@@ -137,11 +168,6 @@ class FilterController extends Controller
         
     }
    
-
-   
-
-    
-
     function getFilterPeriodeKeuangan(){
         try {
             
