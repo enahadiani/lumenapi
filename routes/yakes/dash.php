@@ -55,6 +55,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     //dashbord akun
     $router->get('dataBPCCtotal','Yakes\DashAkunController@dataBPCCtotal');
+    $router->get('dataBPCClayanan','Yakes\DashAkunController@dataBPCClayanan');
     $router->get('dataBebanYtd','Yakes\DashAkunController@dataBebanYtd');
     $router->get('dataBPytd','Yakes\DashAkunController@dataBPytd');
     $router->get('dataCCytd','Yakes\DashAkunController@dataCCytd');
