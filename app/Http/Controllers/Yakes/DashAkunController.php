@@ -39,7 +39,7 @@ class DashAkunController extends Controller
                     from dash_klp_akun a
                     
                     left join (
-                    select sum(b.nilai) as rea_now
+                    select a.kode_klpakun,sum(b.nilai) as rea_now
                     from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
                     where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
