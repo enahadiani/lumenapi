@@ -13,7 +13,77 @@ class DashAkunController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+    public function dataBPCCtotal(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',
+            'jenis' => 'required'            
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
 
+            $tahunBef = intval(substr($request->periode,0,4));
+            $tahunBef = $tahunBef - 1;
+            $tahunBef = strval($tahunBef);
+            $perBef = $tahunBef.substr($request->periode,4,2); 
+
+            $sql = "select 
+                    ,isnull(b.rea_now,0) as rea_now
+                    ,isnull(c.rea_bef,0) as rea_bef
+                    ,isnull(d.rka_now,0) as rka_now
+                    from dash_klp_akun a
+                    
+                    left join (
+                    select a.kode_klpakun,sum(b.nilai) as rea_now
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
+                    group by a.kode_klpakun
+                    ) b  on a.kode_klpakun=b.kode_klpakun
+                    
+                    left join (
+                    select a.kode_klpakun,sum(b.nilai) as rea_bef
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    where a.jenis='".$request->jenis."' and b.periode between '".$tahunBef."01' and '".$perBef."'
+                    group by a.kode_klpakun
+                    ) c  on a.kode_klpakun=c.kode_klpakun
+                    
+                    left join (
+                    select a.kode_klpakun,sum(b.nilai) as rka_now
+                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
+                    where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
+                    group by a.kode_klpakun
+                    ) d  on a.kode_klpakun=c.kode_klpakun
+                    
+                    where a.jenis='BP'
+                    order by a.idx";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    
     public function dataBebanYtd(Request $request) {
         $this->validate($request, [    
             'periode' => 'required'            
