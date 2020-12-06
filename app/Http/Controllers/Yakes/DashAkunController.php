@@ -31,8 +31,7 @@ class DashAkunController extends Controller
             $tahunBef = strval($tahunBef);
             $perBef = $tahunBef.substr($request->periode,4,2); 
 
-            $sql = "select 
-                    ,isnull(b.rea_now,0) as rea_now
+            $sql = "select isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
                     ,isnull(d.rka_now,0) as rka_now
                     from dash_klp_akun a
