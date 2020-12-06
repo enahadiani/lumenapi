@@ -58,7 +58,7 @@ class DashAkunController extends Controller
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=c.kode_klpakun
                     
-                    where a.jenis='BP'
+                    where a.jenis='".$request->jenis."'
                     order by a.idx";
 
             $res = DB::connection($this->sql)->select($sql);
