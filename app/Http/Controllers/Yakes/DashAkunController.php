@@ -31,13 +31,15 @@ class DashAkunController extends Controller
             $tahunBef = strval($tahunBef);
             $perBef = $tahunBef.substr($request->periode,4,2); 
 
-            $sql = "select sum(isnull(b.rea_now,0)) as rea_now
+            $sql = "select 
+                     sum(isnull(b.rea_now,0)) as rea_now
                     ,sum(isnull(c.rea_bef,0)) as rea_bef
                     ,sum(isnull(d.rka_now,0)) as rka_now
+
                     from dash_klp_akun a
                     
                     left join (
-                    select a.kode_klpakun,sum(b.nilai) as rea_now
+                    select sum(b.nilai) as rea_now
                     from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
                     where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
@@ -57,8 +59,7 @@ class DashAkunController extends Controller
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=c.kode_klpakun
                     
-                    where a.jenis='".$request->jenis."'
-                    order by a.idx";
+                    where a.jenis='".$request->jenis."'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -100,9 +101,11 @@ class DashAkunController extends Controller
             $tahunBef = strval($tahunBef);
             $perBef = $tahunBef.substr($request->periode,4,2); 
 
-            $sql = "select a.nama,isnull(b.rea_now,0) as rea_now
+            $sql = "select a.nama
+                    ,isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
                     ,isnull(d.rka_now,0) as rka_now
+                    
                     from dash_klp_akun a
                     
                     left join (
@@ -173,6 +176,7 @@ class DashAkunController extends Controller
                     ,isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
                     ,isnull(d.rka_now,0) as rka_now
+                    
                     from dash_klp_akun a
                     
                     left join (
@@ -242,6 +246,7 @@ class DashAkunController extends Controller
                     ,isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
                     ,isnull(d.rka_now,0) as rka_now
+                    
                     from dash_klp_akun a
                     
                     left join (
@@ -311,6 +316,7 @@ class DashAkunController extends Controller
                     ,isnull(b.rea_now,0) as rea_now
                     ,isnull(c.rea_bef,0) as rea_bef
                     ,isnull(d.rka_now,0) as rka_now
+                    
                     from dash_klp_akun a
                     
                     left join (
