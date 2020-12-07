@@ -26,7 +26,7 @@ class TransferDataController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql= "select periode from periode where kode_lokasi='".$kode_lokasi."' ";
+            $sql= "select periode from periode where kode_lokasi='".$kode_lokasi."' order by desc";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
