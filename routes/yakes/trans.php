@@ -46,8 +46,13 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('hrKaryawan','Yakes\HrKaryawanController@store');
     $router->put('hrKaryawan','Yakes\HrKaryawanController@update');
     $router->delete('hrKaryawan','Yakes\HrKaryawanController@destroy'); 
+    
+    $router->post('hrKaryawan-import','Yakes\HrKaryawanController@importExcel');
+    $router->get('hrKaryawan-tmp','Yakes\HrKaryawanController@getKaryawanTmp');
 
 });
+
+$router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
 
 
 
