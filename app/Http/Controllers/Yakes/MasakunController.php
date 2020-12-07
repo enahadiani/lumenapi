@@ -99,7 +99,7 @@ class MasakunController extends Controller
                 $sql= "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_lokasi='".$kode_lokasi."' $filter ";
             }
             else {
-                $sql = "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from masakun where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
