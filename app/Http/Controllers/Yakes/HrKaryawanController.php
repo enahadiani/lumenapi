@@ -16,7 +16,8 @@ class HrKaryawanController extends Controller
 
     public function cariNik(Request $request) {
         $this->validate($request, [    
-            'nik' => 'required'            
+            'nik' => 'required',
+            'periode' => 'required'
         ]);
         
         try {
@@ -26,7 +27,7 @@ class HrKaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select nik, nama from hr_karyawan where nik='".$request->nik."'");
+            $res = DB::connection($this->sql)->select("select nik, nama from hr_karyawan where nik='".$request->nik."' and periode='".$request->periode."' ");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;
@@ -41,9 +42,9 @@ class HrKaryawanController extends Controller
         }        
     }
 
-    public function isUnik($isi)
+    public function isUnik($isi,$periode)
     {        
-        $auth = DB::connection($this->sql)->select("select nik from hr_karyawan where nik ='".$isi."'");
+        $auth = DB::connection($this->sql)->select("select nik from hr_karyawan where nik ='".$isi."' and periode='".$periode."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -105,7 +106,8 @@ class HrKaryawanController extends Controller
             'sts_medis' => 'required|max:10',          
             'sts_edu' => 'required|max:10',                      
             'sts_aktif' => 'required|max:1',           
-            'kode_pp' => 'required|max:10'           
+            'kode_pp' => 'required|max:10',
+            'periode' => 'required|max:6'        
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -115,10 +117,10 @@ class HrKaryawanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->nik)){
+            if($this->isUnik($request->nik, $request->periode)){
 
-                $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user) values 
-                                                         ('".$request->nik."','".$request->nama."','".$request->tgl_lahir."','".$request->gender."','".$request->sts_organik."','".$request->sts_medis."','".$request->sts_edu."','".$request->sts_aktif."','".$request->kode_pp."',getdate(),'".$nik."')");
+                $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) values 
+                                                         ('".$request->nik."','".$request->nama."','".$request->tgl_lahir."','".$request->gender."','".$request->sts_organik."','".$request->sts_medis."','".$request->sts_edu."','".$request->sts_aktif."','".$request->kode_pp."',getdate(),'".$nik."','".$request->periode."')");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -150,7 +152,8 @@ class HrKaryawanController extends Controller
             'sts_medis' => 'required|max:10',          
             'sts_edu' => 'required|max:10',                      
             'sts_aktif' => 'required|max:1',           
-            'kode_pp' => 'required|max:10'           
+            'kode_pp' => 'required|max:10',
+            'periode' => 'required|max:6'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -165,8 +168,8 @@ class HrKaryawanController extends Controller
             ->where('nik', $request->nik)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user) values 
-                                                      ('".$request->nik."','".$request->nama."','".$request->tgl_lahir."','".$request->gender."','".$request->sts_organik."','".$request->sts_medis."','".$request->sts_edu."','".$request->sts_aktif."','".$request->kode_pp."',getdate(),'".$nik."')");
+            $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) values 
+                                                      ('".$request->nik."','".$request->nama."','".$request->tgl_lahir."','".$request->gender."','".$request->sts_organik."','".$request->sts_medis."','".$request->sts_edu."','".$request->sts_aktif."','".$request->kode_pp."',getdate(),'".$nik."','".$request->periode."')");
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -183,7 +186,8 @@ class HrKaryawanController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'nik' => 'required|max:10'
+            'nik' => 'required|max:10',
+            'periode' => 'required|max:6'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -195,6 +199,7 @@ class HrKaryawanController extends Controller
             
             $del = DB::connection($this->sql)->table('hr_karyawan')            
             ->where('nik', $request->nik)
+            ->where('periode', $request->periode)
             ->delete();
 
             DB::connection($this->sql)->commit();
