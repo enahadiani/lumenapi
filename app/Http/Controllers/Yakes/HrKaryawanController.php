@@ -296,7 +296,7 @@ class HrKaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->sql)->table('hr_karyawan_tmp')->where('periode', $request->kode_lokasi)->where('nik_user', $request->nik_user)->delete();
+            $del1 = DB::connection($this->sql)->table('hr_karyawan_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
             // menangkap file excel
             $file = $request->file('file');
     
@@ -327,7 +327,7 @@ class HrKaryawanController extends Controller
                         $sts = 1;
                     }
                     $nama = str_replace("'","",$row[1]);
-                    $tgl = Date::excelToDateTimeObject($row[2])->format('Y-m-d');
+                    $tgl = (is_int($row[2]) ? Date::excelToDateTimeObject($row[2])->format('Y-m-d') : $row[2]);
                     $query .= "insert into hr_karyawan_tmp(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode,sts_upload,ket_upload,nu) values ('".$row[0]."','".$nama."','".$tgl."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."',getdate(),'".$request->nik_user."','".$request->periode."','".$sts."','".$ket."',".$no.");";
                     $no++;
                 }
