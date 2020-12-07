@@ -184,6 +184,8 @@ class HrKaryawanController extends Controller
                 $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) 
                 select nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,'$nik' as nik_user,periode from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
 
+                $exec =  DB::connection($this->sql)->update("exec gen_dash_sdm '$request->periode','$request->nik' ");
+
                 $del2 = DB::connection($this->sql)->table('hr_karyawan_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
                 DB::connection($this->sql)->commit();
