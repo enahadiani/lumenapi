@@ -12,6 +12,7 @@ use App\Imports\HrKaryawanImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
 use App\HrKaryawanTmp;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class HrKaryawanController extends Controller
 {    
@@ -325,8 +326,9 @@ class HrKaryawanController extends Controller
                     }else{
                         $sts = 1;
                     }
-                    $nama = str_replace("'","",$row[2]);
-                    $query .= "insert into hr_karyawan_tmp(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode,sts_upload,ket_upload,nu) values ('".$row[0]."','".$row[1]."','".$nama."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."',getdate(),'".$request->nik_user."','".$request->periode."','".$sts."','".$ket."',".$no.");";
+                    $nama = str_replace("'","",$row[1]);
+                    $tgl = Date::excelToDateTimeObject($row[2])->format('Y-m-d');
+                    $query .= "insert into hr_karyawan_tmp(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode,sts_upload,ket_upload,nu) values ('".$row[0]."','".$nama."','".$tgl."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."',getdate(),'".$request->nik_user."','".$request->periode."','".$sts."','".$ket."',".$no.");";
                     $no++;
                 }
             }
