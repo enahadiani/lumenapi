@@ -230,7 +230,7 @@ class MenuController extends Controller
             ->where('kode_menu', $request->kode_menu)
             ->delete(); 
            
-            $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu,icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->index."','".$request->jenis_menu."','".$request->icon."')");
+            $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu,icon) values ('".$request->kode_menu."','".$request->link."','".$request->kode_klp."','".$request->nama."','".$request->level_menu."','".$request->rowindex."','".$request->jenis_menu."','".$request->icon."')");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -325,6 +325,7 @@ class MenuController extends Controller
                 for($i=0;$i<count($req['kode_menu']);$i++){
 
                     $ins = DB::connection($this->db)->insert("insert into menu (kode_menu,kode_form,kode_klp,nama,level_menu,rowindex,jenis_menu, icon) values ('".$req['kode_menu'][$i]."','".$req['kode_form'][$i]."','".$kode_klp."','".$req['nama_menu'][$i]."','".$req['level_menu'][$i]."','".$nu."','".$req['jenis_menu'][$i]."','".$req['icon'][$i]."')");
+                    $nu++;
                 }
 
                 DB::connection($this->db)->commit();

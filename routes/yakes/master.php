@@ -68,6 +68,48 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('format-laporan-relasi','Yakes\FormatLaporanController@simpanRelasi');
     $router->post('format-laporan-move','Yakes\FormatLaporanController@simpanMove');
 
+    //ADMIN
+    //Menu
+    $router->get('menu','Yakes\MenuController@index');
+    $router->post('menu','Yakes\MenuController@store');
+    $router->put('menu','Yakes\MenuController@update');
+    $router->delete('menu','Yakes\MenuController@destroy');
+    $router->get('menu-klp','Yakes\MenuController@getKlp');
+    $router->post('menu-move','Yakes\MenuController@simpanMove');
+
+    //Akses User
+    $router->get('akses-user','Yakes\HakaksesController@index');
+    $router->post('akses-user','Yakes\HakaksesController@store');
+    $router->get('akses-user-detail','Yakes\HakaksesController@show');
+    $router->put('akses-user','Yakes\HakaksesController@update');
+    $router->delete('akses-user','Yakes\HakaksesController@destroy');
+    $router->get('akses-user-menu','Yakes\HakaksesController@getMenu');
+    
+    //Form
+    $router->get('form','Yakes\FormController@index');
+    $router->post('form','Yakes\FormController@store');
+    $router->put('form','Yakes\FormController@update');
+    $router->delete('form','Yakes\FormController@destroy');
+
+    //Karyawan
+    $router->get('karyawan','Yakes\KaryawanController@index');
+    $router->post('karyawan','Yakes\KaryawanController@store');
+    $router->get('karyawan-detail','Yakes\KaryawanController@show');
+    $router->post('karyawan-ubah','Yakes\KaryawanController@update');
+    $router->delete('karyawan','Yakes\KaryawanController@destroy');
+
+    //Kelompok Menu
+    $router->get('menu-klp','Yakes\KelompokMenuController@index');
+    $router->post('menu-klp','Yakes\KelompokMenuController@store');
+    $router->put('menu-klp','Yakes\KelompokMenuController@update');
+    $router->delete('menu-klp','Yakes\KelompokMenuController@destroy');
+
+    //Unit
+    $router->get('unit','Yakes\UnitController@index');
+    $router->post('unit','Yakes\UnitController@store');
+    $router->put('unit','Yakes\UnitController@update');
+    $router->delete('unit','Yakes\UnitController@destroy');
+
 });
 
 
