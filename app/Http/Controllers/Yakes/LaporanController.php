@@ -1491,6 +1491,116 @@ class LaporanController extends Controller
         }
     }
 
+    function getNeracaJamkespen(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $nik_user=$request->nik_user;
+            $periode=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
+            $level = $request->input('level')[1];
+            $format = $request->input('format')[1];
+            $tahun = substr($periode,0,4);
+            $bln = substr($periode,4,2);
+            $tahunseb = intval($tahun)-1;
+
+            $sql= "exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';
+            ";
+            $res = DB::connection($this->sql)->getPdo()->exec($sql);
+
+            $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
+            $row = DB::connection($this->sql)->select($sql2);
+            $periode_aktif = $row[0]->periode;
+            $nama_periode="";
+            if ($periode > $periode_aktif)
+            {
+                $nama_periode="<br>(UnClosing)";
+            }
+
+            $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_awal'] = $get[0]->tglakhir;
+            
+            $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_akhir'] = $get2[0]->tglakhir;
+
+           
+            // $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            //     from exs_neraca a
+            //     $where and a.modul='A' 
+            //     union all
+            //     select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            //     from exs_neraca a
+            //     $where and a.modul='P'  ";
+            $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
+            union all
+            select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='P' 
+            order by a.kode_neraca";
+
+            $nama="";
+           
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+            
+            $success["nama_periode"] = $nama_periode;
+            $success["nama"] = $nama;
+            
+            if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res3;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']=[];
+                $success['res']=$res;
+                $success['sql3'] = $sql3;
+                $success['sql'] = $sql;
+                $success['status'] = true;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getNeracaJejer(Request $request){
         try {
             
