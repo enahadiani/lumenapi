@@ -20,7 +20,7 @@ class FormatArusKasController extends Controller
 
     public function isUnik($isi,$kode_lokasi,$kode_fs){
         
-        $auth = DB::connection($this->db)->select("select kode_neraca from neraca where kode_neraca ='".$isi."' and kode_lokasi='".$kode_lokasi."' and kode_fs='".$kode_fs."' ");
+        $auth = DB::connection($this->db)->select("select kode_neraca from neracakas where kode_neraca ='".$isi."' and kode_lokasi='".$kode_lokasi."' and kode_fs='".$kode_fs."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -74,24 +74,24 @@ class FormatArusKasController extends Controller
 
             if($this->isUnik($kode_neraca,$kode_lokasi,$kode_fs)){
                 //delete neraca tmp
-                $del_tmp = DB::connection($this->db)->table('neraca_tmp')
+                $del_tmp = DB::connection($this->db)->table('neracakas_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_fs', $kode_fs)
                 ->where('nik_user', $nik)
                 ->delete();
     
                 //insert neraca tmp
-                $nrc_tmp = DB::connection($this->db)->update("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi)
+                $nrc_tmp = DB::connection($this->db)->update("insert into neracakas_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi)
                 select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate(),kode_lokasi
-                from neraca 
+                from neracakas 
                 where modul = '$modul' and kode_fs='".$kode_fs."' and kode_lokasi='$kode_lokasi'
                 order by rowindex");
     
                 //insert 1 row to nrc tmp
-                $sql = DB::connection($this->db)->insert("insert into neraca_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($kode_neraca,$kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->nu,$request->modul,$nik,date('Y-m-d H:i:s'),$kode_lokasi));
+                $sql = DB::connection($this->db)->insert("insert into neracakas_tmp (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,nik_user,tgl_input,kode_lokasi) values ('$kode_neraca','$kode_fs','$request->nama','$request->level_spasi','$request->level_lap','$request->tipe','$request->sum_header','$request->jenis_akun','$request->kode_induk','$request->nu','$request->modul','$nik',getdate(),'$kode_lokasi')");
     
                 //del nrc
-                $del = DB::connection($this->db)->table('neraca')
+                $del = DB::connection($this->db)->table('neracakas')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_fs', $kode_fs)
                 ->where('modul', $modul)
@@ -99,7 +99,7 @@ class FormatArusKasController extends Controller
                
                 //get nrc dari tmp
                 $getnrc = DB::connection($this->db)->select("select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,(rowindex*100)+rowindex as rowindex,modul,'$nik' as nik_user,getdate() as tgl_input,kode_lokasi
-                from neraca_tmp 
+                from neracakas_tmp 
                 where modul = '$modul' and kode_fs='$kode_fs' and kode_lokasi='$kode_lokasi'
                 order by rowindex");
                 $getnrc = json_decode(json_encode($getnrc),true);
@@ -107,7 +107,7 @@ class FormatArusKasController extends Controller
                 //insert nrc
                 $i=1;
                 for($x=0;$x < count($getnrc);$x++){
-                    $ins[$x] =  DB::connection($this->db)->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($getnrc[$x]['kode_neraca'],$getnrc[$x]['kode_fs'],$getnrc[$x]['nama'],$getnrc[$x]['level_spasi'],$getnrc[$x]['level_lap'],$getnrc[$x]['tipe'],$getnrc[$x]['sum_header'],$getnrc[$x]['jenis_akun'],$getnrc[$x]['kode_induk'],$i,$getnrc[$x]['modul'],$kode_lokasi));
+                    $ins[$x] =  DB::connection($this->db)->insert("insert into neracakas (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values ('".$getnrc[$x]['kode_neraca']."','".$getnrc[$x]['kode_fs']."','".$getnrc[$x]['nama']."','".$getnrc[$x]['level_spasi']."','".$getnrc[$x]['level_lap']."','".$getnrc[$x]['tipe']."','".$getnrc[$x]['sum_header']."','".$getnrc[$x]['jenis_akun']."','".$getnrc[$x]['kode_induk']."',$i,'".$getnrc[$x]['modul']."','$kode_lokasi')");
                     $i++;
                 }
                 DB::connection($this->db)->commit();
@@ -155,7 +155,7 @@ class FormatArusKasController extends Controller
             $kode_fs = $request->kode_fs;
             $modul = $request->modul;
             $res = DB::connection($this->db)->select("select kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,(rowindex*100)+rowindex as nu 
-            from neraca 
+            from neracakas 
             where kode_fs='$kode_fs' and kode_lokasi='$kode_lokasi' and modul='$modul'
             order by rowindex				 
             ");
@@ -222,13 +222,13 @@ class FormatArusKasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del = DB::connection($this->db)->table('neraca')->where('kode_lokasi', $kode_lokasi)
+            $del = DB::connection($this->db)->table('neracakas')->where('kode_lokasi', $kode_lokasi)
             ->where('kode_fs', $request->kode_fs)
             ->where('kode_neraca', $request->kode_neraca)
             ->where('modul', $request->modul)
             ->delete();
 
-            $ins = DB::connection($this->db)->insert('insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->kode_neraca,$request->kode_fs,$request->nama,$request->level_spasi,$request->level_lap,$request->tipe,$request->sum_header,$request->jenis_akun,$request->kode_induk,$request->rowindex,$request->modul,$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert("insert into neracakas (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values ('$request->kode_neraca','$request->kode_fs','$request->nama','$request->level_spasi','$request->level_lap','$request->tipe','$request->sum_header','$request->jenis_akun','$request->kode_induk','$request->rowindex','$request->modul','$kode_lokasi')");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -265,12 +265,12 @@ class FormatArusKasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $cek = DB::connection($this->db)->select("select kode_neraca,rowindex from neraca where kode_neraca = '".$request->kode_neraca."' and kode_fs='$request->kode_fs' and kode_lokasi='$kode_lokasi' and modul='$request->modul' ");
+            $cek = DB::connection($this->db)->select("select kode_neraca,rowindex from neracakas where kode_neraca = '".$request->kode_neraca."' and kode_fs='$request->kode_fs' and kode_lokasi='$kode_lokasi' and modul='$request->modul' ");
             $cek = json_decode(json_encode($cek),true);
 
             if(count($cek) > 0){
                 
-                $del = DB::connection($this->db)->table('neraca')->where('kode_lokasi', $kode_lokasi)
+                $del = DB::connection($this->db)->table('neracakas')->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_fs', $request->kode_fs)
                 ->where('kode_neraca', $request->kode_neraca)
                 ->where('modul', $request->modul)
@@ -303,7 +303,7 @@ class FormatArusKasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_fs,nama from fs where kode_lokasi='$kode_lokasi' 
+            $res = DB::connection($this->db)->select("select kode_fs, nama from fskas where kode_lokasi='$kode_lokasi' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -327,9 +327,9 @@ class FormatArusKasController extends Controller
 
     public function getTipe(Request $request)
     {
-        $this->validate($request, [
-            'kode_menu' => 'required'
-        ]);
+        // $this->validate($request, [
+        //     'kode_menu' => 'required'
+        // ]);
 
         try {
             
@@ -339,11 +339,12 @@ class FormatArusKasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $kode_fs = $request->kode_fs;
-            $modul = $request->modul;
-            $res = DB::connection($this->db)->select("select kode_tipe,nama_tipe from tipe_neraca where kode_lokasi='$kode_lokasi' 
-            ");
-            $res = json_decode(json_encode($res),true);
+            $res = array(
+                0 => array (
+                    'kode_tipe' => 'CF',
+                    'nama_tipe' => 'CF'
+                )
+            );
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -390,7 +391,7 @@ class FormatArusKasController extends Controller
             $kode_neraca = $request->kode_neraca;
                
             //delete
-            $del = DB::connection($this->db)->table('neraca')
+            $del = DB::connection($this->db)->table('neracakas')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_fs', $kode_fs)
             ->where('modul', $modul)
@@ -399,7 +400,7 @@ class FormatArusKasController extends Controller
             $nu=1;
             for($i=0;$i<count($request->kode_neraca);$i++){
 
-                $ins = DB::connection($this->db)->insert("insert into neraca (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($request->kode_neraca[$i],$kode_fs,$request->nama[$i],$request->level_spasi[$i],$request->level_lap[$i],$request->tipe[$i],$request->sum_header[$i],$request->jenis_akun[$i],$request->kode_induk[$i],$nu,$request->modul,$kode_lokasi));
+                $ins = DB::connection($this->db)->insert("insert into neracakas (kode_neraca,kode_fs,nama,level_spasi,level_lap,tipe,sum_header,jenis_akun,kode_induk,rowindex,modul,kode_lokasi) values ('".$request->kode_neraca[$i]."','$kode_fs','".$request->nama[$i]."','".$request->level_spasi[$i]."','".$request->level_lap[$i]."','".$request->tipe[$i]."','".$request->sum_header[$i]."','".$request->jenis_akun[$i]."','".$request->kode_induk[$i]."',$nu,'".$request->modul."','$kode_lokasi')");
                 $nu++;
             }
         
@@ -434,13 +435,13 @@ class FormatArusKasController extends Controller
 
             $kode_neraca = $request->kode_neraca;
             $modul = $request->modul;
-            $res = DB::connection($this->db)->select("select kode_akun,nama from masakun where kode_lokasi='$kode_lokasi' and kode_akun not in (select distinct kode_akun from relakun where kode_lokasi='$kode_lokasi' and kode_neraca='$kode_neraca' ) and modul='$modul'
+            $res = DB::connection($this->db)->select("select kode_akun,nama from masakun where kode_lokasi='$kode_lokasi' and kode_akun not in (select distinct kode_akun from relakunkas where kode_lokasi='$kode_lokasi' and kode_neraca='$kode_neraca' ) and modul='$modul'
             ") ;
             
             $res = json_decode(json_encode($res),true);
 
             $sql= "select a.kode_akun,b.nama 
-            from relakun a
+            from relakunkas a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi' and a.kode_neraca='$kode_neraca' and b.modul='$modul'
             ";
@@ -486,7 +487,7 @@ class FormatArusKasController extends Controller
             $kode_neraca = $request->kode_neraca;
                
             //delete
-            $del = DB::connection($this->db)->table('relakun')
+            $del = DB::connection($this->db)->table('relakunkas')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('kode_fs', $kode_fs)
             ->where('kode_neraca', $kode_neraca)
@@ -496,7 +497,7 @@ class FormatArusKasController extends Controller
 
                 for($i=0;$i<count($request->kode_akun);$i++){
     
-                    $ins = DB::connection($this->db)->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values (?, ?, ?, ?)",array($kode_neraca,$kode_fs,$request->kode_akun[$i],$kode_lokasi));
+                    $ins = DB::connection($this->db)->insert("insert into relakunkas (kode_neraca,kode_fs,kode_akun,kode_lokasi) values ('$kode_neraca','$kode_fs','".$request->kode_akun[$i]."','$kode_lokasi')");
                 }
             }
         

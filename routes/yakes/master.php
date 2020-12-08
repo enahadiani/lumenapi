@@ -68,6 +68,17 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('format-laporan-relasi','Yakes\FormatLaporanController@simpanRelasi');
     $router->post('format-laporan-move','Yakes\FormatLaporanController@simpanMove');
 
+    //Format Arus Kas
+    $router->get('format-aruskas','Yakes\FormatArusKasController@show');
+    $router->post('format-aruskas','Yakes\FormatArusKasController@store');
+    $router->put('format-aruskas','Yakes\FormatArusKasController@update');
+    $router->delete('format-aruskas','Yakes\FormatArusKasController@destroy');
+    $router->get('format-aruskas-versi','Yakes\FormatArusKasController@getVersi');
+    $router->get('format-aruskas-tipe','Yakes\FormatArusKasController@getTipe');
+    $router->get('format-aruskas-relakun','Yakes\FormatArusKasController@getRelakun');
+    $router->post('format-aruskas-relasi','Yakes\FormatArusKasController@simpanRelasi');
+    $router->post('format-aruskas-move','Yakes\FormatArusKasController@simpanMove');
+
     //ADMIN
     //Menu
     $router->get('menu','Yakes\MenuController@index');
