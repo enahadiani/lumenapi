@@ -1419,9 +1419,13 @@ class LaporanController extends Controller
             $kode_fs=$request->input('kode_fs')[1];
             $level = $request->input('level')[1];
             $format = $request->input('format')[1];
+            $tahun = substr($periode,0,4);
+            $bln = substr($periode,4,2);
+            $tahunseb = intval($tahun)-1;
 
-            //$sql= "exec sp_neraca_dw '$kode_fs','A','K','$level','$periode','$kode_lokasi','$nik_user' ";
-            //$res = DB::connection($this->sql)->getPdo()->exec($sql);
+            $sql= "exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';
+            ";
+            $res = DB::connection($this->sql)->getPdo()->exec($sql);
 
             $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
             $row = DB::connection($this->sql)->select($sql2);
@@ -1432,14 +1436,28 @@ class LaporanController extends Controller
                 $nama_periode="<br>(UnClosing)";
             }
 
+            $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_awal'] = $get[0]->tglakhir;
+            
+            $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_akhir'] = $get2[0]->tglakhir;
+
            
-            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-                from exs_neraca a
-                $where and a.modul='A' 
-                union all
-                select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-                from exs_neraca a
-                $where and a.modul='P'  ";
+            // $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            //     from exs_neraca a
+            //     $where and a.modul='A' 
+            //     union all
+            //     select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            //     from exs_neraca a
+            //     $where and a.modul='P'  ";
+            $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
+            union all
+            select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='P' 
+            order by a.kode_neraca";
 
             $nama="";
            
@@ -1448,6 +1466,7 @@ class LaporanController extends Controller
             
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
+            
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res3;
