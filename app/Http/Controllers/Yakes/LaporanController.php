@@ -1819,22 +1819,26 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
+            $tahun = substr($periode,0,4);
+            $bln = substr($periode,4,2);
+            $tahunseb = intval($tahun)-1;
 
-            //$sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
-            //$res = DB::connection($this->sql)->update($sql);
-            //$success['sql'] = $sql;
+            $sql="exec sp_neraca2_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user'; ";
+            $res = DB::connection($this->sql)->update($sql);
             
-            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
-                        case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
-                        case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
-                        case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
-                        case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4
-                from exs_neraca a
-                $where and a.modul='L' 
-                order by a.rowindex ";
-            //$success['sql2'] = $sql;
-            $res = DB::connection($this->sql)->select($sql);
+            $sql2="select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='L'
+            order by a.rowindex  ";
+            $res = DB::connection($this->sql)->select($sql2);
             $res = json_decode(json_encode($res),true);
+
+            
+            $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_awal'] = $get[0]->tglakhir;
+            
+            $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_akhir'] = $get2[0]->tglakhir;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
