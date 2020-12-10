@@ -179,7 +179,7 @@ class TagihanController extends Controller
             'no_tagihan' => 'required'
         ]);
         
-        $no_tagihan = $request->tagihan;
+        $no_tagihan = $request->no_tagihan;
         DB::connection($this->db)->beginTransaction();
         
         try {
@@ -194,6 +194,8 @@ class TagihanController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
+            $success['kode_lokasi'] = $kode_lokasi;
+            $success['no_tagihan'] = $no_tagihan;
             $success['message'] = "Data Tagihan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
