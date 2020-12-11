@@ -2007,6 +2007,241 @@ class LaporanController extends Controller
     }
 
 
+    function getPerubahanAsetNeto(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $nik_user=$request->nik_user;
+            $periode=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
+            $tahun = substr($periode,0,4);
+            $bln = substr($periode,4,2);
+            $tahunseb = intval($tahun)-1;
+
+            $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';";
+            $res = DB::connection($this->sql)->update($sql);
+            
+            $sql2="select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
+            order by a.rowindex  ";
+            $res = DB::connection($this->sql)->select($sql2);
+            $res = json_decode(json_encode($res),true);
+
+            
+            $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_awal'] = $get[0]->tglakhir;
+            
+            $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_akhir'] = $get2[0]->tglakhir;
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                // $success['sql'] = $sql;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getAsetNeto(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $nik_user=$request->nik_user;
+            $periode=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
+            $tahun = substr($periode,0,4);
+            $bln = substr($periode,4,2);
+            $tahunseb = intval($tahun)-1;
+
+            $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';";
+            $res = DB::connection($this->sql)->update($sql);
+            
+            $sql2="select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            from neraca_tmp a
+            where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
+            order by a.rowindex  ";
+            $res = DB::connection($this->sql)->select($sql2);
+            $res = json_decode(json_encode($res),true);
+
+            
+            $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_awal'] = $get[0]->tglakhir;
+            
+            $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_akhir'] = $get2[0]->tglakhir;
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                // $success['sql'] = $sql;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getArusKas(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $nik_user=$request->nik_user;
+            $periode=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
+            $tahun = substr($periode,0,4);
+            $bln = substr($periode,4,2);
+            $tahunseb = intval($tahun)-1;
+
+            $sql="exec sp_aruskas2 '$kode_lokasi','$kode_fs','$periode','".$tahunseb.$bln."','$nik_user';";
+            $res = DB::connection($this->sql)->update($sql);
+            
+            $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi, 
+            case jenis_akun when  'Beban' then -n1 else -n1 end as n1,
+            case jenis_akun when  'Beban' then -n2 else -n2 end as n2
+            from neraca_tmp 
+            where nik_user='$nik_user' and kode_fs='$kode_fs' 
+            order by rowindex ";
+            $res = DB::connection($this->sql)->select($sql2);
+            $res = json_decode(json_encode($res),true);
+
+            
+            $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_awal'] = $get[0]->tglakhir;
+            
+            $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            $success['tgl_akhir'] = $get2[0]->tglakhir;
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                // $success['sql'] = $sql;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 
 }

@@ -38,6 +38,9 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('lap-neraca','Yakes\LaporanController@getNeraca');
     $router->get('lap-neraca-jamkespen','Yakes\LaporanController@getNeracaJamkespen');
     $router->get('lap-labarugi','Yakes\LaporanController@getLabaRugi');
+    $router->get('lap-perubahan-aset-neto','Yakes\LaporanController@getPerubahanAsetNeto');
+    $router->get('lap-aset-neto','Yakes\LaporanController@getAsetNeto');
+    $router->get('lap-arus-kas','Yakes\LaporanController@getArusKas');
 
     //Laporan pp
     $router->get('lap-nrclajur-pp','Yakes\LaporanController@getNrcLajurPp');
