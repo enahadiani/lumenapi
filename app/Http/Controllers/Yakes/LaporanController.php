@@ -1450,11 +1450,11 @@ class LaporanController extends Controller
             //     select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
             //     from exs_neraca a
             //     $where and a.modul='P'  ";
-            $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe,a.kode_induk
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
             union all
-            select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
+            select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe,a.kode_induk
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='P' 
             order by a.kode_neraca";

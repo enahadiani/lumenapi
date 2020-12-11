@@ -198,7 +198,7 @@ class DashAkunController extends Controller
                     from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
                     where a.jenis='Beban' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
-                    ) d  on a.kode_klpakun=c.kode_klpakun
+                    ) d  on a.kode_klpakun=d.kode_klpakun
                     
                     where a.jenis='Beban'
                     order by a.idx";
@@ -268,7 +268,7 @@ class DashAkunController extends Controller
                     from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
                     where a.jenis='BP' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
-                    ) d  on a.kode_klpakun=c.kode_klpakun
+                    ) d  on a.kode_klpakun=d.kode_klpakun
                     
                     where a.jenis='BP'
                     order by a.idx";
@@ -338,7 +338,7 @@ class DashAkunController extends Controller
                     from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
                     where a.jenis='CC' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
-                    ) d  on a.kode_klpakun=c.kode_klpakun
+                    ) d  on a.kode_klpakun=d.kode_klpakun
                     
                     where a.jenis='CC'
                     order by a.idx";
