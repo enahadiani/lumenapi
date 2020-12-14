@@ -19,7 +19,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
   
 	$router->get('periode', 'Ypt\DashboardController@getPeriode');
 	
-	//PAGE 1
+	
+    //PAGE 1
     $router->get('pencapaianYoY/{periode}', 'Ypt\DashboardController@pencapaianYoY');
     $router->get('rkaVSReal/{periode}', 'Ypt\DashboardController@rkaVSReal');
     $router->get('growthRKA/{periode}', 'Ypt\DashboardController@growthRKA');
@@ -56,12 +57,34 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('bebanJurusan/{periode}/{kode_neraca}/{kode_bidang}', 'Ypt\DashboardController@bebanJurusan');
     $router->get('detailBebanJurusan/{periode}/{kode_neraca}/{kode_bidang}/{tahun}', 'Ypt\DashboardController@detailBebanJurusan');
+
+    $router->get('user_device','UserDeviceController@index');
+    $router->get('user_device/{nik}','UserDeviceController@show');
+    $router->post('user_device','UserDeviceController@store');
+    $router->put('user_device/{nik}','UserDeviceController@update');
+    $router->delete('user_device/{nik}','UserDeviceController@destroy');
     
-	
+    $router->get('rka','Ypt\DashboardController@getBCRKA');
+    $router->get('growth-rka','Ypt\DashboardController@getBCGrowthRKA');
+    $router->get('tuition','Ypt\DashboardController@getBCTuition');
+    $router->get('growth-tuition','Ypt\DashboardController@getBCGrowthTuition');
+    $router->get('rka-persen','Ypt\DashboardController@getBCRKAPersen');
+    $router->get('tuition-persen','Ypt\DashboardController@getBCTuitionPersen');
+    
+    $router->post('notif-pusher', 'Ypt\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Ypt\NotifController@getNotifPusher');
+    $router->put('notif-update-status', 'Ypt\NotifController@updateStatusRead');
+
+    $router->post('search-form', 'AdminYptKugController@searchForm');
+    $router->get('search-form-list', 'AdminYptKugController@searchFormList');
+
+    $router->get('periode', 'Ypt\DashboardController@getPeriode');
     
     $router->get('komponen-investasi','Ypt\DashboardController@komponenInvestasi');
     $router->get('rka-real-investasi','Ypt\DashboardController@rkaVSRealInvestasi');
     $router->get('penyerapan-investasi','Ypt\DashboardController@penyerapanInvestasi');
+
+
 });
 
 
