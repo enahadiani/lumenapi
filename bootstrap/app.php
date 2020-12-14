@@ -193,12 +193,7 @@ $app->router->group([
     require __DIR__.'/../routes/apv.php';
 });
 
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/ypt'
-], function ($router) {
-    require __DIR__.'/../routes/ypt.php';
-});
+
 
 
 $app->router->group([
@@ -586,6 +581,52 @@ $app->router->group([
     'prefix' => 'api/yptkug'
 ], function ($router) {
     require __DIR__.'/../routes/yptkug.php';
+});
+
+/*
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt'
+], function ($router) {
+    require __DIR__.'/../routes/ypt.php';
+});
+*/
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt-auth'
+], function ($router) {
+    require __DIR__.'/../routes/ypt/auth.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt-master'
+], function ($router) {
+    require __DIR__.'/../routes/ypt/master.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt-trans'
+], function ($router) {
+    require __DIR__.'/../routes/ypt/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt-report'
+], function ($router) {
+    require __DIR__.'/../routes/ypt/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ypt-dash'
+], function ($router) {
+    require __DIR__.'/../routes/ypt/dash.php';
 });
 
 return $app;
