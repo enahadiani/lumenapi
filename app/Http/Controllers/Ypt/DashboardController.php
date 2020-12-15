@@ -2407,6 +2407,124 @@ class DashboardController extends Controller
         }
     }
 
+    // MS Beban
+    public function msBeban(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $sql=" select 'Tuition Fee' as nama, 73 as rka, 90 as act 
+            union all
+            select 'Non Tuition Fee' as nama, 73 as rka, 90 as act 
+            ";
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                
+                $dt[0] = array();
+                $dt[1] = array();
+                $ctg= array();
+                for($i=0;$i<count($rs);$i++){
+                    array_push($dt[0],floatval($rs[$i]['rka']));
+                    array_push($dt[1],floatval($rs[$i]['act']));  
+                    array_push($ctg,$rs[$i]['nama']);    
+                }
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> 'RKA', "type"=>'column',"color"=>'#4c4c4c',"data"=>$dt[0], "pointPadding"=> 0.3
+                );
+                
+                $success["series"][1] = array(
+                    "name"=> 'Actual', "type"=>'column',"color"=>'#900604',"data"=>$dt[1], "pointPadding"=> 0.4
+                );
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    // MS Beban
+    public function msBebanKlp(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $sql=" select 'Pendaftaran' as nama, 73 as rka, 90 as act 
+            union all
+            select 'Pelatihan' as nama, 73 as rka, 90 as act 
+            union all
+            select 'Proyek Kerjasama' as nama, 73 as rka, 90 as act 
+            union all
+            select 'Pengabdian Masyarakat' as nama, 73 as rka, 90 as act 
+            union all
+            select 'OP Lainnya' as nama, 73 as rka, 90 as act
+            union all
+            select 'Pengelolaan' as nama, 73 as rka, 90 as act  
+            ";
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                
+                $dt[0] = array();
+                $dt[1] = array();
+                $ctg= array();
+                for($i=0;$i<count($rs);$i++){
+                    array_push($dt[0],floatval($rs[$i]['rka']));
+                    array_push($dt[1],floatval($rs[$i]['act']));  
+                    array_push($ctg,$rs[$i]['nama']);    
+                }
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> 'RKA', "type"=>'column',"color"=>'#4c4c4c',"data"=>$dt[0], "pointPadding"=> 0.3
+                );
+                
+                $success["series"][1] = array(
+                    "name"=> 'Actual', "type"=>'column',"color"=>'#900604',"data"=>$dt[1], "pointPadding"=> 0.4
+                );
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 
     
 }

@@ -96,6 +96,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ms-pendapatan','Ypt\DashboardController@msPendapatan');
     $router->get('ms-pendapatan-klp','Ypt\DashboardController@msPendapatanKlp');
 
+    $router->get('ms-beban','Ypt\DashboardController@msBeban');
+    $router->get('ms-beban-klp','Ypt\DashboardController@msBebanKlp');
+
 
 });
 
