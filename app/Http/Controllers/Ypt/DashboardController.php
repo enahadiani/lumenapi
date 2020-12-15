@@ -2535,20 +2535,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $data = array(
-                0 => array("", "", array("role"=>"style") ),
-                1 => array("Fak1", 2.45, "#ad1d3e"),
-                2 => array("Fak2", 2.45, "#511dad"),
-                3 => array("Fak3", 2.45, "#30ad1d"),
-                4 => array("Fak4", 2.45, "#a31dad"),
-                5 => array("Fak5", 2.45, "#1dada8"),
-                6 => array("Fak6", 2.45, "#611dad"),
-                7 => array("Fak7", 2.45, "#1d78ad"),
-                8 => array("Fak8", 2.45, "#ad9b1d"),
-                9 => array("Fak9", 2.45, "#1dad6e"),
-                10 => array("Fak10", 2.45, "#ad571d")
-            );
+            
             $color = array('','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
             
             $sql=" select 'Judul' as nama, 0 as nilai
