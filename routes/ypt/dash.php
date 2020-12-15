@@ -84,6 +84,14 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('rka-real-investasi','Ypt\DashboardController@rkaVSRealInvestasi');
     $router->get('penyerapan-investasi','Ypt\DashboardController@penyerapanInvestasi');
 
+    // Management System
+    $router->get('profit-loss','Ypt\DashboardController@profitLoss');
+    $router->get('fx-position','Ypt\DashboardController@fxPosition');
+    $router->get('penyerapan-beban','Ypt\DashboardController@penyerapanBeban');
+    $router->get('debt','Ypt\DashboardController@debt');
+    $router->get('kelola-keuangan','Ypt\DashboardController@kelolaKeuangan');
+    $router->get('penjualan-pin','Ypt\DashboardController@penjualanPin');
+
 
 });
 

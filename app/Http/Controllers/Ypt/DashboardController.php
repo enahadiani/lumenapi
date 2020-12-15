@@ -2074,5 +2074,221 @@ class DashboardController extends Controller
         }
     }
 
+    // Management System
+    public function profitLoss(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $rs = DB::connection($this->db)->select("
+            select 'Penjualan' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'Beban' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'SHU' as nama, 1000000000 as nilai,120 as persen
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $rs;
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function fxPosition(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $rs = DB::connection($this->db)->select("
+            select 'Asset' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'Liability' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'Net Asset Position' as nama, 1000000000 as nilai,120 as persen
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $rs;
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function penyerapanBeban(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $rs = DB::connection($this->db)->select("
+            select 'Pengembangan' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'Operasional' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'Non Operasional' as nama, 1000000000 as nilai,120 as persen
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $rs;
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function debt(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $rs = DB::connection($this->db)->select("
+            select 'Mahasiswa' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'NTF' as nama, 1000000000 as nilai,120 as persen
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $rs;
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function kelolaKeuangan(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $rs = DB::connection($this->db)->select("
+            select 'Kas di Bank' as nama, 1000000000 as nilai,120 as persen
+            union all
+            select 'Kas Unit' as nama, 1000000000 as nilai,120 as persen
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $rs;
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function penjualanPin(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $rs = DB::connection($this->db)->select("
+            select 'Penjualan Pin' as nama, 1000000000 as nilai,120 as persen
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $rs;
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+
     
 }
