@@ -2196,9 +2196,9 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Mahasiswa' as nama, 1000000000 as nilai,120 as persen
+            select 'Mahasiswa' as nama, 1000000000 as nilai
             union all
-            select 'NTF' as nama, 1000000000 as nilai,120 as persen
+            select 'NTF' as nama, 1000000000 as nilai
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2231,9 +2231,9 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Kas di Bank' as nama, 1000000000 as nilai,120 as persen
+            select 'Kas di Bank' as nama, 1000000000 as nilai
             union all
-            select 'Kas Unit' as nama, 1000000000 as nilai,120 as persen
+            select 'Kas Unit' as nama, 1000000000 as nilai
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2514,6 +2514,84 @@ class DashboardController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+     // MS Pengembangan
+     public function msPengembanganRKA(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $data = array(
+                0 => array("", "", array("role"=>"style") ),
+                1 => array("Fak1", 2.45, "#ad1d3e"),
+                2 => array("Fak2", 2.45, "#511dad"),
+                3 => array("Fak3", 2.45, "#30ad1d"),
+                4 => array("Fak4", 2.45, "#a31dad"),
+                5 => array("Fak5", 2.45, "#1dada8"),
+                6 => array("Fak6", 2.45, "#611dad"),
+                7 => array("Fak7", 2.45, "#1d78ad"),
+                8 => array("Fak8", 2.45, "#ad9b1d"),
+                9 => array("Fak9", 2.45, "#1dad6e"),
+                10 => array("Fak10", 2.45, "#ad571d")
+            );
+            $color = array('','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            
+            $sql=" select 'Judul' as nama, 0 as nilai
+            union all
+            select 'Fak1' as nama, 2.45 as nilai
+            union all
+            select 'Fak2' as nama, 2.45 as nilai
+            union all
+            select 'Fak3' as nama, 2.45 as nilai
+            union all
+            select 'Fak4' as nama, 2.45 as nilai
+            union all
+            select 'Fak5' as nama, 2.45 as nilai
+            union all
+            select 'Fak6' as nama, 2.45 as nilai
+            union all
+            select 'Fak7' as nama, 2.45 as nilai
+            union all
+            select 'Fak8' as nama, 2.45 as nilai
+            union all
+            select 'Fak9' as nama, 2.45 as nilai
+            union all
+            select 'Fak10' as nama, 2.45 as nilai
+            ";
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                
+                $dt = array();
+                for($i=0;$i<count($rs);$i++){
+                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
+                }
+                $dt[0] = array('','',array('role'=>'style'));
+                $success['data'] = $dt;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);

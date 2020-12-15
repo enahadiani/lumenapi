@@ -99,6 +99,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ms-beban','Ypt\DashboardController@msBeban');
     $router->get('ms-beban-klp','Ypt\DashboardController@msBebanKlp');
 
+    $router->get('ms-pengembangan-rka','Ypt\DashboardController@msPengembanganRKA');
+
 
 });
 
