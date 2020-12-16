@@ -14,6 +14,130 @@ class DashBPJSController extends Controller
     public $guard = 'yakes';
 
 
+
+    public function dataClaimTahun(Request $request) {
+        $this->validate($request, [    
+            'tahun' => 'required',
+            'kode_pp' => 'required',   
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
+            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
+            
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = " select sum(a.claim) as cl_total, 
+                    sum(case when substring(a.periode,5,2)='01' then a.claim else 0 end) as cl_jan, 
+                    sum(case when substring(a.periode,5,2)='02' then a.claim else 0 end) as cl_feb, 
+                    sum(case when substring(a.periode,5,2)='03' then a.claim else 0 end) as cl_mar, 
+                    sum(case when substring(a.periode,5,2)='04' then a.claim else 0 end) as cl_apr, 
+                    sum(case when substring(a.periode,5,2)='05' then a.claim else 0 end) as cl_mei, 
+                    sum(case when substring(a.periode,5,2)='06' then a.claim else 0 end) as cl_jun, 
+                    sum(case when substring(a.periode,5,2)='07' then a.claim else 0 end) as cl_jul, 
+                    sum(case when substring(a.periode,5,2)='08' then a.claim else 0 end) as cl_agu, 
+                    sum(case when substring(a.periode,5,2)='09' then a.claim else 0 end) as cl_sep, 
+                    sum(case when substring(a.periode,5,2)='10' then a.claim else 0 end) as cl_okt, 
+                    sum(case when substring(a.periode,5,2)='11' then a.claim else 0 end) as cl_nov, 
+                    sum(case when substring(a.periode,5,2)='12' then a.claim else 0 end) as cl_des 
+                    from yk_bpjs_cob a 
+                    where a.jenis_tpkk='TPKK' and substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." ".$filterJenis;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function dataKapitasiTahun(Request $request) {
+        $this->validate($request, [    
+            'tahun' => 'required',
+            'kode_pp' => 'required',   
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
+            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
+            
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = "select 
+                    sum(a.nilai) as kap_total, 
+                    sum(case when substring(a.periode,5,2)='01' then a.nilai else 0 end) as kap_jan, 
+                    sum(case when substring(a.periode,5,2)='02' then a.nilai else 0 end) as kap_feb, 
+                    sum(case when substring(a.periode,5,2)='03' then a.nilai else 0 end) as kap_mar, 
+                    sum(case when substring(a.periode,5,2)='04' then a.nilai else 0 end) as kap_apr, 
+                    sum(case when substring(a.periode,5,2)='05' then a.nilai else 0 end) as kap_mei, 
+                    sum(case when substring(a.periode,5,2)='06' then a.nilai else 0 end) as kap_jun, 
+                    sum(case when substring(a.periode,5,2)='07' then a.nilai else 0 end) as kap_jul, 
+                    sum(case when substring(a.periode,5,2)='08' then a.nilai else 0 end) as kap_agu, 
+                    sum(case when substring(a.periode,5,2)='09' then a.nilai else 0 end) as kap_sep, 
+                    sum(case when substring(a.periode,5,2)='10' then a.nilai else 0 end) as kap_okt, 
+                    sum(case when substring(a.periode,5,2)='11' then a.nilai else 0 end) as kap_nov, 
+                    sum(case when substring(a.periode,5,2)='12' then a.nilai else 0 end) as kap_des 
+                    from yk_bpjs_kapitasi a                     
+                    where a.jenis_tpkk='TPKK' and substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." ".$filterJenis;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function dataBPCCTahun(Request $request) {
         $this->validate($request, [    
             'tahun' => 'required',
@@ -38,19 +162,19 @@ class DashBPJSController extends Controller
             }
 
             $sql = "select 
-                    sum(case when a.kode_lokasi=a.kode_lokasi then a.nilai else 0 end) as bpcc_total, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='01' then a.nilai else 0 end) as bpcc_jan, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='02' then a.nilai else 0 end) as bpcc_feb, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='03' then a.nilai else 0 end) as bpcc_mar, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='04' then a.nilai else 0 end) as bpcc_apr, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='05' then a.nilai else 0 end) as bpcc_mei, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='06' then a.nilai else 0 end) as bpcc_jun, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='07' then a.nilai else 0 end) as bpcc_jul, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='08' then a.nilai else 0 end) as bpcc_agu, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='09' then a.nilai else 0 end) as bpcc_sep, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='10' then a.nilai else 0 end) as bpcc_okt, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='11' then a.nilai else 0 end) as bpcc_nov, 
-                    sum(case when a.kode_lokasi=a.kode_lokasi and substring(a.periode,5,2)='12' then a.nilai else 0 end) as bpcc_des 
+                    sum(a.nilai) as bpcc_total, 
+                    sum(case when substring(a.periode,5,2)='01' then a.nilai else 0 end) as bpcc_jan, 
+                    sum(case when substring(a.periode,5,2)='02' then a.nilai else 0 end) as bpcc_feb, 
+                    sum(case when substring(a.periode,5,2)='03' then a.nilai else 0 end) as bpcc_mar, 
+                    sum(case when substring(a.periode,5,2)='04' then a.nilai else 0 end) as bpcc_apr, 
+                    sum(case when substring(a.periode,5,2)='05' then a.nilai else 0 end) as bpcc_mei, 
+                    sum(case when substring(a.periode,5,2)='06' then a.nilai else 0 end) as bpcc_jun, 
+                    sum(case when substring(a.periode,5,2)='07' then a.nilai else 0 end) as bpcc_jul, 
+                    sum(case when substring(a.periode,5,2)='08' then a.nilai else 0 end) as bpcc_agu, 
+                    sum(case when substring(a.periode,5,2)='09' then a.nilai else 0 end) as bpcc_sep, 
+                    sum(case when substring(a.periode,5,2)='10' then a.nilai else 0 end) as bpcc_okt, 
+                    sum(case when substring(a.periode,5,2)='11' then a.nilai else 0 end) as bpcc_nov, 
+                    sum(case when substring(a.periode,5,2)='12' then a.nilai else 0 end) as bpcc_des 
                     from yk_bpjs_bpcc a                     
                     where substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." ".$filterJenis;
 
