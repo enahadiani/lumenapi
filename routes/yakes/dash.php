@@ -66,6 +66,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     //dashbord bpjs
     $router->get('dataClaim','Yakes\DashBPJSController@dataClaim');
+    $router->get('dataKapitasi','Yakes\DashBPJSController@dataKapitasi');
     
 });
 
