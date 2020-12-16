@@ -13,6 +13,78 @@ class DashBPJSController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+
+
+    public function dataKapitasi(Request $request) {
+        $this->validate($request, [    
+            'tahun' => 'required',
+            'kode_pp' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
+            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_lokasi,3,2)."' ";
+
+            $sql = "select a.kode_bulan,a.nama,isnull(b.pensiun,0) as pensiun,isnull(b.pegawai,0) as pegawai, isnull(c.n1,0) as n1,isnull(c.n2,0) as n2, isnull(d.ni_akun,0) - isnull(c.n1,0) - isnull(c.n2,0) as n3,  isnull(d.ni_akun,0) as n4
+                    from yk_bulan a 
+                    
+                    left join 
+                    ( 
+                    select substring(a.periode,5,2) as kode_bulan, 
+                    sum(case when a.jenis='PENSIUN' then a.nilai else 0 end) as pensiun, 
+                    sum(case when a.jenis='PEGAWAI' then a.nilai else 0 end) as pegawai 
+                    from yk_bpjs_iuran a 
+                    where substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." 
+                    group by substring(a.periode,5,2) 
+                    ) b on a.kode_bulan=b.kode_bulan 
+                    
+                    left join ( 
+                    select substring(a.periode,5,2) as kode_bulan, 
+                    sum(case when a.jenis='PENSIUN' and a.jenis_tpkk='TPKK' then a.nilai else 0 end) as n1, 
+                    sum(case when a.jenis='PEGAWAI' and a.jenis_tpkk='TPKK' then a.nilai else 0 end) as n2
+                    from yk_bpjs_kapitasi a 
+                    where substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." 
+                    group by substring(a.periode,5,2) 
+                    )c on a.kode_bulan=c.kode_bulan 
+                    
+                    left join (
+                    select substring(a.periode,5,2) as kode_bulan,sum(a.nilai) as ni_akun
+                    from gldt a
+                    where substring(a.periode,1,4) ='".$tahun."' and a.kode_akun='21060103' and a.dc='C' ".$filterLokasi." 
+                    group by substring(a.periode,5,2) 
+                    ) d on a.kode_bulan=d.kode_bulan 
+                    
+                    order by a.kode_bulan ";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+
     public function dataClaim(Request $request) {
         $this->validate($request, [    
             'periode' => 'required',
