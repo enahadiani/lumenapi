@@ -363,6 +363,8 @@ class DashBPJSController extends Controller
                     and '".$request->periode."' ".$filterJenis." 
                     group by b.kode_biaya,b.nama ";
 
+                    $success['sql'] = $sql;
+
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
