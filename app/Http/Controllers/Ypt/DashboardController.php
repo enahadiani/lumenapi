@@ -2610,7 +2610,7 @@ class DashboardController extends Controller
             union all
             select 'Beban Pengembangan Akademik' as nama, 2752365994 as nilai, 18.7 as persen
             union all
-            select 'Beban Pengembangan Sistem' as nama, 158299985 as nilai, 1,1 as persen
+            select 'Beban Pengembangan Sistem' as nama, 158299985 as nilai, 1.1 as persen
             ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
