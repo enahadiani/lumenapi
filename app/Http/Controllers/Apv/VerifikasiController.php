@@ -324,11 +324,6 @@ class VerifikasiController extends Controller
                 $success['nik_device_app'] = '-'; 
             }
             $success['jum_id'] = count($rsi);
-            $success['foto'] = count($request->file);
-            $success['foto_ar'] = $arr_foto;
-            $success['nama_ar'] = $arr_nama;
-            $success['cek'] = $ok;
-            $success['ceknum'] = $ceknum;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
