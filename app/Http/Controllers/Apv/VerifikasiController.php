@@ -179,7 +179,8 @@ class VerifikasiController extends Controller
             $i=0;
             $cek = $request->file;
             $no_aju = $request->input('no_aju');
-
+            $ok = false;
+            $ceknum = 0;
             if(!empty($cek)){
 
                 if(count($request->nama_file) > 0){
@@ -201,6 +202,7 @@ class VerifikasiController extends Controller
                             }
                             Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                             $arr_foto[] = $foto;
+                            $ok = true;
                         }else{
                             $arr_foto[] = $request->nama_file_seb[$i];
                         }     
@@ -209,7 +211,7 @@ class VerifikasiController extends Controller
                         $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
                     }
 
-                    $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                    $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
                 }
             }
 
@@ -231,7 +233,8 @@ class VerifikasiController extends Controller
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,$arr_nama[$i],$i,$arr_foto[$i],$arr_jenis_dok[$i]]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i],$arr_jenis_dok[$i]]); 
+                    $ceknum++;
                 }
             }
 
@@ -321,6 +324,11 @@ class VerifikasiController extends Controller
                 $success['nik_device_app'] = '-'; 
             }
             $success['jum_id'] = count($rsi);
+            $success['foto'] = count($request->file);
+            $success['foto_ar'] = $arr_foto;
+            $success['nama_ar'] = $arr_nama;
+            $success['cek'] = $ok;
+            $success['ceknum'] = $ceknum;
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
