@@ -14,6 +14,67 @@ class DashBPJSController extends Controller
     public $guard = 'yakes';
 
 
+    public function dataPremiTahun(Request $request) {
+        $this->validate($request, [    
+            'tahun' => 'required',
+            'kode_pp' => 'required',   
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
+            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
+            
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = "select sum(a.nilai) as premi_total, 
+                    sum(case when substring(a.periode,5,2)='01' then a.nilai else 0 end) as pr_jan, 
+                    sum(case when substring(a.periode,5,2)='02' then a.nilai else 0 end) as pr_feb, 
+                    sum(case when substring(a.periode,5,2)='03' then a.nilai else 0 end) as pr_mar, 
+                    sum(case when substring(a.periode,5,2)='04' then a.nilai else 0 end) as pr_apr, 
+                    sum(case when substring(a.periode,5,2)='05' then a.nilai else 0 end) as pr_mei, 
+                    sum(case when substring(a.periode,5,2)='06' then a.nilai else 0 end) as pr_jun, 
+                    sum(case when substring(a.periode,5,2)='07' then a.nilai else 0 end) as pr_jul, 
+                    sum(case when substring(a.periode,5,2)='08' then a.nilai else 0 end) as pr_agu, 
+                    sum(case when substring(a.periode,5,2)='09' then a.nilai else 0 end) as pr_sep, 
+                    sum(case when substring(a.periode,5,2)='10' then a.nilai else 0 end) as pr_okt, 
+                    sum(case when substring(a.periode,5,2)='11' then a.nilai else 0 end) as pr_nov, 
+                    sum(case when substring(a.periode,5,2)='12' then a.nilai else 0 end) as pr_des
+                    
+                    from yk_bpjs_iuran a 
+                    where substring(a.periode,1,4) = '"..$request->tahun"' ".$filterLokasi." ".$filterJenis;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
 
     public function dataKapitasi(Request $request) {
         $this->validate($request, [    
