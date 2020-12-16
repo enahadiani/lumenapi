@@ -230,6 +230,8 @@ class DashBPJSController extends Controller
                     from yk_bpjs_iuran a 
                     where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
 
+            $success['sql'] = $sql;
+
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
