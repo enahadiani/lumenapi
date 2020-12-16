@@ -243,26 +243,46 @@ class JuspoController extends Controller
 
             $arr_foto = array();
             $arr_nama = array();
+            $arr_foto2 = array();
+            $arr_nama2 = array();
             $arr_jenis_dok = array();
             $i=0;
+            $cek = $request->file;
             $no_aju = $request->input('no_aju');
+            $ok = false;
+            $ceknum = 0;
+            if(!empty($cek)){
 
-            if($request->hasfile('file'))
-            {
-                foreach($request->file('file') as $file)
-                {                
-                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('apv/'.$foto)){
-                        Storage::disk('s3')->delete('apv/'.$foto);
+                if(count($request->nama_file) > 0){
+                    //looping berdasarkan nama dok
+                    for($i=0;$i<count($request->nama_file);$i++){
+                        //cek row i ada file atau tidak
+                        if(isset($request->file('file')[$i])){
+                            $file = $request->file('file')[$i];
+
+                            //kalo ada cek nama sebelumnya ada atau -
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('apv/'.$request->nama_file_seb[$i]);
+                            }
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            if(Storage::disk('s3')->exists('apv/'.$foto)){
+                                Storage::disk('s3')->delete('apv/'.$foto);
+                            }
+                            Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                            $ok = true;
+                        }else{
+                            $arr_foto[] = $request->nama_file_seb[$i];
+                        }     
+                        $arr_nama[] = $request->input('nama_file')[$i];
+                        $arr_nama2[] = count($request->nama_file).'|'.$i.'|'.isset($request->file('file')[$i]);
+                        $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
                     }
-                    Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
-                    $arr_foto[] = $foto;
-                    $arr_nama[] = $request->input('nama_file')[$i];
-                    $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
-                    $i++;
+
+                    $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
                 }
-                
             }
                 
             $ins = DB::connection($this->db)->insert('insert into apv_juspo_m (no_bukti,no_juskeb,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,tgl_input,kode_kota) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$request->input('no_aju'),$no_dokumen,$request->input('kode_pp'),$request->input('waktu'),$request->input('kegiatan'),$request->input('dasar'),$nik_user,$kode_lokasi,$request->input('total_barang'),$request->input('tgl_aju'),$progress,$request->input('tanggal'),$request->kode_kota]);
@@ -634,26 +654,46 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
 
             $arr_foto = array();
             $arr_nama = array();
+            $arr_foto2 = array();
+            $arr_nama2 = array();
             $arr_jenis_dok = array();
             $i=0;
+            $cek = $request->file;
             $no_aju = $request->input('no_aju');
+            $ok = false;
+            $ceknum = 0;
+            if(!empty($cek)){
 
-            if($request->hasfile('file'))
-            {
-                foreach($request->file('file') as $file)
-                {                
-                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('apv/'.$foto)){
-                        Storage::disk('s3')->delete('apv/'.$foto);
+                if(count($request->nama_file) > 0){
+                    //looping berdasarkan nama dok
+                    for($i=0;$i<count($request->nama_file);$i++){
+                        //cek row i ada file atau tidak
+                        if(isset($request->file('file')[$i])){
+                            $file = $request->file('file')[$i];
+
+                            //kalo ada cek nama sebelumnya ada atau -
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('apv/'.$request->nama_file_seb[$i]);
+                            }
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            if(Storage::disk('s3')->exists('apv/'.$foto)){
+                                Storage::disk('s3')->delete('apv/'.$foto);
+                            }
+                            Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                            $ok = true;
+                        }else{
+                            $arr_foto[] = $request->nama_file_seb[$i];
+                        }     
+                        $arr_nama[] = $request->input('nama_file')[$i];
+                        $arr_nama2[] = count($request->nama_file).'|'.$i.'|'.isset($request->file('file')[$i]);
+                        $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
                     }
-                    Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
-                    $arr_foto[] = $foto;
-                    $arr_nama[] = $request->input('nama_file')[$i];
-                    $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
-                    $i++;
+
+                    $del4 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->delete();
                 }
-                
             }
 
             $del = DB::connection($this->db)->table('apv_juspo_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
@@ -699,7 +739,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis_dok) values (?, ?, ?, ?, ?,?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i],$arr_jenis_dok[$i]]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis) values (?, ?, ?, ?, ?,?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i],$arr_jenis_dok[$i]]); 
                 }
             }
 

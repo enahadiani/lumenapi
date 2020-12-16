@@ -2659,8 +2659,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function LabaRugi5Tahun(Request $request){
-        $periode= $request->input('periode');
+    public function getLabaRugi5Tahun(Request $request){
         try {
             
             
@@ -2668,44 +2667,83 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            $rs = DB::connection($this->db)->select("
+            select '2015 RKA' as tahun 
+            union all
+            select '2015 Real' as tahun
+            union all 
+            select '2016 RKA' as tahun 
+            union all
+            select '2016 Real' as tahun 
+            union all
+            select '2017 RKA' as tahun 
+            union all
+            select '2017 Real' as tahun
+            union all 
+            select '2018 RKA' as tahun 
+            union all
+            select '2018 Real' as tahun 
+            union all
+            select '2019 RKA' as tahun 
+            union all
+            select '2019 Real' as tahun
+            union all 
+            select '2020 RKA' as tahun 
+            union all
+            select '2020 Real' as tahun 
             
-            $color = array('','#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
-            
-            $sql=" select 'Judul' as nama, 0 as pend, '' as pendlabel, 0 as beban, '' as bebanlabel, 0 as shu, '' as shulabel, 0 as capai, '' as capailabel
-            union all
-            select 'RKA 2015' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'Real 2015' as nama, 292.1 as pend,'' as pendlabel, 239.8 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'RKA 2016' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'Real 2016' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'RKA 2017' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'Real 2017' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'RKA 2018' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'Real 2018' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'RKA 2019' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            select 'Real 2019' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            union all
-            select 'RKA 2020' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            select 'Real 2020' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
-            ";
-            $rs = DB::connection($this->db)->select($sql);
+            ");
             $rs = json_decode(json_encode($rs),true);
-            
-            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
-                
-                $dt = array();
-                for($i=0;$i<count($rs);$i++){
-                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),floatval($rs[$i]['persen']),$color[$i]);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
                 }
-                $dt[0] = array('','','',array('role'=>'style'));
-                $success['data'] = $dt;
+            }
+            $success['ctg']=$ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select 'Pendapatan' as nama,273,292.1,340.6,355.2,378.2,415.5,448.5,475.4,500.9,525.5
+            union all
+            select 'Beban' as nama,248.6,239.8,304.4,290.8,57.95,66.84,91.77
+            union all
+            select 'SHU' as nama,29.85,30.37,46.02,46.93,57.95,66.84,91.77
+            union all
+            select 'OR' as nama,29.85,30.37,46.02,46.93,57.95,66.84,91.77");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg2);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg2[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg2[$c]);
+                        $c++;          
+                    }
+                }
+
+                $dtp = array();
+                for($i=0;$i< count($dt);$i++){
+                    $x = array();
+                    for($j=0;$j < count($dt[$i]);$j++){
+                        if($j != 0){
+                            $x[] = round((($dt[$i][$j]["y"]-$dt[$i][$j-1]["y"])/ $dt[$i][$j-1]["y"])*100);
+                        }
+                    }
+                    $dtp[] = $x;
+                }
+
+                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dtp[$i]
+                    );
+                }
+
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
@@ -2713,7 +2751,7 @@ class DashboardController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
+                $success['series'] = [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
