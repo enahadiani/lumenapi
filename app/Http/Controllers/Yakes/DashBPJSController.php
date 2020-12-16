@@ -56,7 +56,7 @@ class DashBPJSController extends Controller
                     left join (
                     select substring(a.periode,5,2) as kode_bulan,sum(a.nilai) as ni_akun
                     from gldt a
-                    where substring(a.periode,1,4) ='".$tahun."' and a.kode_akun='21060103' and a.dc='C' ".$filterLokasi." 
+                    where substring(a.periode,1,4) ='".$request->tahun."' and a.kode_akun='21060103' and a.dc='C' ".$filterLokasi." 
                     group by substring(a.periode,5,2) 
                     ) d on a.kode_bulan=d.kode_bulan 
                     
