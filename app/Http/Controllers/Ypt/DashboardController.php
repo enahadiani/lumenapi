@@ -2602,15 +2602,81 @@ class DashboardController extends Controller
             
             $color = array('','#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
             
-            $sql=" select 'Judul' as nama, 0 as nilai, 0 as persen
+            $sql=" select 'Judul' as nama, 0 as nilai
             union all
-            select 'Beban Bang Lembaga' as nama, 8284465321 as nilai, 56.2 as persen
+            select 'Beban Bang Lembaga' as nama, 8284465321 as nilai
             union all
-            select 'Beban Bang SDM' as nama, 3552831259 as nilai, 24.1 as persen
+            select 'Beban Bang SDM' as nama, 3552831259 as nilai
             union all
-            select 'Beban Pengembangan Akademik' as nama, 2752365994 as nilai, 18.7 as persen
+            select 'Beban Pengembangan Akademik' as nama, 2752365994 as nilai
             union all
-            select 'Beban Pengembangan Sistem' as nama, 158299985 as nilai, 1.1 as persen
+            select 'Beban Pengembangan Sistem' as nama, 158299985 as nilai
+            ";
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                
+                $dt = array();
+                for($i=0;$i<count($rs);$i++){
+                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
+                }
+                $dt[0] = array('','',array('role'=>'style'));
+                $success['data'] = $dt;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function LabaRugi5Tahun(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $color = array('','#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
+            
+            $sql=" select 'Judul' as nama, 0 as pend, '' as pendlabel, 0 as beban, '' as bebanlabel, 0 as shu, '' as shulabel, 0 as capai, '' as capailabel
+            union all
+            select 'RKA 2015' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'Real 2015' as nama, 292.1 as pend,'' as pendlabel, 239.8 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'RKA 2016' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'Real 2016' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'RKA 2017' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'Real 2017' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'RKA 2018' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'Real 2018' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'RKA 2019' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            select 'Real 2019' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            union all
+            select 'RKA 2020' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
+            select 'Real 2020' as nama, 273 as pend,'' as pendlabel, 248.6 as beban, '248,6' as bebanlabel, 24.4 as capai, '24,4' as capailabel
             ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
