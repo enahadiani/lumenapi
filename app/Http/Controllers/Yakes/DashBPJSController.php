@@ -27,7 +27,10 @@ class DashBPJSController extends Controller
             }
 
             if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
-            else $filterJenis = " and a.jenis = 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
 
             $sql = "select 'TAGIHAN AWAL' as jenis,b.kode_biaya,b.nama as nama_biaya, "+
                     "sum(case when a.kode_lokasi='01' then a.total else 0 end) as n1, "+
