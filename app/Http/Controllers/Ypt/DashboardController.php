@@ -2621,7 +2621,7 @@ class DashboardController extends Controller
                 for($i=0;$i<count($rs);$i++){
                     $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),floatval($rs[$i]['persen']),$color[$i]);
                 }
-                $dt[0] = array('','',array('role'=>'style'));
+                $dt[0] = array('','','',array('role'=>'style'));
                 $success['data'] = $dt;
                 $success['status'] = true;
                 $success['message'] = "Success!";
