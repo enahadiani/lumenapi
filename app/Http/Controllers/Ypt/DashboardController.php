@@ -2562,6 +2562,7 @@ class DashboardController extends Controller
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
             
+            $success['colors'] = $color;
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 
                 // $dt = array();
@@ -2610,8 +2611,7 @@ class DashboardController extends Controller
             
             $color = array('#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
             
-            $sql=" select 'Judul' as nama, 0 as nilai
-            union all
+            $sql="
             select 'Beban Bang Lembaga' as nama, 8284465321 as nilai
             union all
             select 'Beban Bang SDM' as nama, 3552831259 as nilai
@@ -2623,13 +2623,19 @@ class DashboardController extends Controller
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
             
+            $success['colors'] = $color;
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 
+                $success['total'] = 0;
                 $dt = array();
-                $success['colors'] = $color;
+                $ctg= array();
                 for($i=0;$i<count($rs);$i++){
-                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']));
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['nilai']),"color"=> $color[$i]);
+                    $success['total'] += floatval($rs[$i]['nilai']);    
                 }
+                $success["series"][0]= array(
+                    "name"=> 'Komposisi',"data"=>$dt
+                );
                 $dt[0] = array('','');
                 $success['data'] = $dt;
                 $success['status'] = true;
@@ -2638,6 +2644,8 @@ class DashboardController extends Controller
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
+                
+                $success['total'] = 0;
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
