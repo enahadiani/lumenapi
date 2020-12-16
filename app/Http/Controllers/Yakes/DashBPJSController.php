@@ -52,7 +52,7 @@ class DashBPJSController extends Controller
                     sum(case when substring(a.periode,5,2)='12' then a.nilai else 0 end) as pr_des
                     
                     from yk_bpjs_iuran a 
-                    where substring(a.periode,1,4) = '"..$request->tahun"' ".$filterLokasi." ".$filterJenis;
+                    where substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." ".$filterJenis;
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
