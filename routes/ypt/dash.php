@@ -100,6 +100,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ms-beban-klp','Ypt\DashboardController@msBebanKlp');
 
     $router->get('ms-pengembangan-rka','Ypt\DashboardController@msPengembanganRKA');
+    $router->get('ms-pengembangan-komposisi','Ypt\DashboardController@msPengembanganKomposisi');
 
 
 });

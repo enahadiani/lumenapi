@@ -2526,7 +2526,7 @@ class DashboardController extends Controller
     }
 
      // MS Pengembangan
-     public function msPengembanganRKA(Request $request){
+    public function msPengembanganRKA(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -2590,6 +2590,56 @@ class DashboardController extends Controller
         }
     }
 
-
+    public function msPengembanganKomposisi(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $color = array('','#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
+            
+            $sql=" select 'Judul' as nama, 0 as nilai, 0 as persen
+            union all
+            select 'Beban Bang Lembaga' as nama, 8284465321 as nilai, 56.2 as persen
+            union all
+            select 'Beban Bang SDM' as nama, 3552831259 as nilai, 24.1 as persen
+            union all
+            select 'Beban Pengembangan Akademik' as nama, 2752365994 as nilai, 18.7 as persen
+            union all
+            select 'Beban Pengembangan Sistem' as nama, 158299985 as nilai, 1,1 as persen
+            ";
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                
+                $dt = array();
+                for($i=0;$i<count($rs);$i++){
+                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),floatval($rs[$i]['persen']),$color[$i]);
+                }
+                $dt[0] = array('','',array('role'=>'style'));
+                $success['data'] = $dt;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 }
