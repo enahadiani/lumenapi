@@ -29,7 +29,7 @@ class DashBPJSController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
-            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_lokasi,3,2)."' ";
+            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,3,2)."' ";
 
             $sql = "select a.kode_bulan,a.nama,isnull(b.pensiun,0) as pensiun,isnull(b.pegawai,0) as pegawai, isnull(c.n1,0) as n1,isnull(c.n2,0) as n2, isnull(d.ni_akun,0) - isnull(c.n1,0) - isnull(c.n2,0) as n3,  isnull(d.ni_akun,0) as n4
                     from yk_bulan a 
