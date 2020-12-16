@@ -42,7 +42,7 @@ class DashBPJSController extends Controller
                     sum(case when a.kode_lokasi='07' then a.total else 0 end) as n7 
                     from yk_bpjs_biaya b 
                     left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01'  
-                    and '".$request->periode."') ".$filterJenis." 
+                    and '".$request->periode."' ".$filterJenis." 
                     group by b.kode_biaya,b.nama 
                     
                     union all 
@@ -57,7 +57,7 @@ class DashBPJSController extends Controller
                     sum(case when a.kode_lokasi='07' then a.claim else 0 end) as n7 
                     from yk_bpjs_biaya b 
                     left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' 
-                    and '".$request->periode."') ".$filterJenis." 
+                    and '".$request->periode."' ".$filterJenis." 
                     group by b.kode_biaya,b.nama  
                     
                     union all 
@@ -72,7 +72,7 @@ class DashBPJSController extends Controller
                     sum(case when a.kode_lokasi='07' then a.selisih else 0 end) as n7 
                     from yk_bpjs_biaya b 
                     left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' 
-                    and '".$request->periode."') ".$filterJenis." 
+                    and '".$request->periode."' ".$filterJenis." 
                     group by b.kode_biaya,b.nama ";
 
             $res = DB::connection($this->sql)->select($sql);
