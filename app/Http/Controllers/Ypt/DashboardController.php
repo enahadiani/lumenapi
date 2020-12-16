@@ -2536,10 +2536,9 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $color = array('','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
             
-            $sql=" select 'Judul' as nama, 0 as nilai
-            union all
+            $sql=" 
             select 'Fak1' as nama, 2.45 as nilai
             union all
             select 'Fak2' as nama, 2.45 as nilai
@@ -2565,12 +2564,21 @@ class DashboardController extends Controller
             
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 
+                // $dt = array();
+                // for($i=0;$i<count($rs);$i++){
+                //     $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
+                // }
+                // $dt[0] = array('','',array('role'=>'style'));
                 $dt = array();
+                $ctg= array();
                 for($i=0;$i<count($rs);$i++){
-                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['nilai']),"color"=> $color[$i]);
+                    array_push($ctg,$rs[$i]['nama']);    
                 }
-                $dt[0] = array('','',array('role'=>'style'));
-                $success['data'] = $dt;
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> 'Pengembangan',"colorByPoint" => false,"data"=>$dt
+                );
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
@@ -2600,7 +2608,7 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $color = array('','#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
+            $color = array('#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
             
             $sql=" select 'Judul' as nama, 0 as nilai
             union all
@@ -2618,10 +2626,11 @@ class DashboardController extends Controller
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 
                 $dt = array();
+                $success['colors'] = $color;
                 for($i=0;$i<count($rs);$i++){
-                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
+                    $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']));
                 }
-                $dt[0] = array('','',array('role'=>'style'));
+                $dt[0] = array('','');
                 $success['data'] = $dt;
                 $success['status'] = true;
                 $success['message'] = "Success!";

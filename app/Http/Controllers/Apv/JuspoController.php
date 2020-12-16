@@ -243,6 +243,7 @@ class JuspoController extends Controller
 
             $arr_foto = array();
             $arr_nama = array();
+            $arr_jenis_dok = array();
             $i=0;
             $no_aju = $request->input('no_aju');
 
@@ -258,6 +259,7 @@ class JuspoController extends Controller
                     Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                     $arr_foto[] = $foto;
                     $arr_nama[] = $request->input('nama_file')[$i];
+                    $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
                     $i++;
                 }
                 
@@ -281,7 +283,7 @@ class JuspoController extends Controller
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i],$arr_jenis_dok[$i]]); 
                 }
             }
 
@@ -407,9 +409,13 @@ class JuspoController extends Controller
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select a.no_bukti,a.nama,a.file_dok from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_bukti'  order by a.no_urut";
+            $sql3="select a.no_bukti,a.nama,a.file_dok from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_bukti' and a.jenis='PO' order by a.no_urut";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
+
+            $sql5="select a.no_bukti,a.nama,a.file_dok from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_bukti' and a.jenis='PBD' order by a.no_urut";
+            $res5 = DB::connection($this->db)->select($sql5);
+            $res5 = json_decode(json_encode($res5),true);
             
             // $sql4="
             
@@ -454,6 +460,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
+                $success['data_dokumen2'] = $res5;
                 $success['data_histori'] = $res4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -463,6 +470,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
+                $success['data_dokumen2'] = [];
                 $success['data_histori'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
@@ -495,9 +503,13 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti'  order by no_urut";
+            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and jenis='PO'  order by no_urut";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
+
+            $sql5="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_bukti' and jenis='PBD'  order by no_urut";
+            $res5 = DB::connection($this->db)->select($sql5);
+            $res5 = json_decode(json_encode($res5),true);
 
             
             $sql="select a.no_bukti
@@ -548,6 +560,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
                 $success['data_dokumen'] = $res3;
+                $success['data_dokumen2'] = $res5;
                 $success['data_histori'] = $res4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -557,6 +570,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 $success['data_dokumen'] = [];
+                $success['data_dokumen2'] = [];
                 $success['data_histori'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
@@ -620,6 +634,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
 
             $arr_foto = array();
             $arr_nama = array();
+            $arr_jenis_dok = array();
             $i=0;
             $no_aju = $request->input('no_aju');
 
@@ -635,6 +650,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                     Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
                     $arr_foto[] = $foto;
                     $arr_nama[] = $request->input('nama_file')[$i];
+                    $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
                     $i++;
                 }
                 
@@ -683,7 +699,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
-                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok) values (?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i]]); 
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis_dok) values (?, ?, ?, ?, ?,?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i],$arr_jenis_dok[$i]]); 
                 }
             }
 

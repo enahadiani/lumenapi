@@ -452,9 +452,13 @@ class JuskebApprovalController extends Controller
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju'  order by no_urut";
+            $sql3="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju' and jenis='PO' order by no_urut";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
+
+            $sql6="select no_bukti,nama,file_dok from apv_juskeb_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$no_aju' and jenis='PBD' order by no_urut";
+            $res6 = DB::connection($this->db)->select($sql6);
+            $res6 = json_decode(json_encode($res6),true);
 
             // $sql4="select a.no_bukti,case e.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,e.keterangan,e.nik_user as nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,a.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto  
             // from apv_juskeb_m a
@@ -513,6 +517,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data_detail'] = $res2;
                 $success['data_total'] = $res5;
                 $success['data_dokumen'] = $res3;
+                $success['data_dokumen2'] = $res6;
                 $success['data_histori'] = $res4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -523,6 +528,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data_detail'] = [];
                 $success['data_total'] = [];
                 $success['data_dokumen'] = [];
+                $success['data_dokumen2'] = [];
                 $success['data_histori'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
