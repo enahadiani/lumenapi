@@ -220,13 +220,13 @@ class DashBPJSController extends Controller
             }
 
             $sql = "select sum(a.nilai) as premi_total, 
-                    sum(case when substring(a.kode_lokasi,5,2)='01' then a.nilai else 0 end) as pr1, 
-                    sum(case when substring(a.kode_lokasi,5,2)='02' then a.nilai else 0 end) as pr2, 
-                    sum(case when substring(a.kode_lokasi,5,2)='03' then a.nilai else 0 end) as pr3, 
-                    sum(case when substring(a.kode_lokasi,5,2)='04' then a.nilai else 0 end) as pr4, 
-                    sum(case when substring(a.kode_lokasi,5,2)='05' then a.nilai else 0 end) as pr5, 
-                    sum(case when substring(a.kode_lokasi,5,2)='06' then a.nilai else 0 end) as pr6, 
-                    sum(case when substring(a.kode_lokasi,5,2)='07' then a.nilai else 0 end) as pr7                     
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as pr1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as pr2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as pr3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as pr4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as pr5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as pr6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as pr7                     
                     from yk_bpjs_iuran a 
                     where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
 
