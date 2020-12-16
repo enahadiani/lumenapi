@@ -32,48 +32,48 @@ class DashBPJSController extends Controller
                 else $filterJenis = " ";
             }
 
-            $sql = "select 'TAGIHAN AWAL' as jenis,b.kode_biaya,b.nama as nama_biaya, "+
-                    "sum(case when a.kode_lokasi='01' then a.total else 0 end) as n1, "+
-                    "sum(case when a.kode_lokasi='02' then a.total else 0 end) as n2, "+
-                    "sum(case when a.kode_lokasi='03' then a.total else 0 end) as n3, "+
-                    "sum(case when a.kode_lokasi='04' then a.total else 0 end) as n4, "+
-                    "sum(case when a.kode_lokasi='05' then a.total else 0 end) as n5, "+
-                    "sum(case when a.kode_lokasi='06' then a.total else 0 end) as n6, "+
-                    "sum(case when a.kode_lokasi='07' then a.total else 0 end) as n7 "+
-                    "from yk_bpjs_biaya b "+
-                    "left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' "+ 
-                    "and '".$request->periode."') ".$filterJenis." "+
-                    "group by b.kode_biaya,b.nama "+ 
+            $sql = "select 'TAGIHAN AWAL' as jenis,b.kode_biaya,b.nama as nama_biaya, 
+                    sum(case when a.kode_lokasi='01' then a.total else 0 end) as n1, 
+                    sum(case when a.kode_lokasi='02' then a.total else 0 end) as n2,
+                    sum(case when a.kode_lokasi='03' then a.total else 0 end) as n3,
+                    sum(case when a.kode_lokasi='04' then a.total else 0 end) as n4,
+                    sum(case when a.kode_lokasi='05' then a.total else 0 end) as n5,
+                    sum(case when a.kode_lokasi='06' then a.total else 0 end) as n6,
+                    sum(case when a.kode_lokasi='07' then a.total else 0 end) as n7 
+                    from yk_bpjs_biaya b 
+                    left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01'  
+                    and '".$request->periode."') ".$filterJenis." 
+                    group by b.kode_biaya,b.nama 
                     
-                    "union all "+
+                    union all 
                     
-                    "select 'CLAIM' as jenis,b.kode_biaya,b.nama as nama_biaya, "+
-                    "sum(case when a.kode_lokasi='01' then a.claim else 0 end) as n1, "+
-                    "sum(case when a.kode_lokasi='02' then a.claim else 0 end) as n2, "+
-                    "sum(case when a.kode_lokasi='03' then a.claim else 0 end) as n3, "+
-                    "sum(case when a.kode_lokasi='04' then a.claim else 0 end) as n4, "+
-                    "sum(case when a.kode_lokasi='05' then a.claim else 0 end) as n5, "+
-                    "sum(case when a.kode_lokasi='06' then a.claim else 0 end) as n6, "+
-                    "sum(case when a.kode_lokasi='07' then a.claim else 0 end) as n7 "+
-                    "from yk_bpjs_biaya b "+
-                    "left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' "+ 
-                    "and '".$request->periode."') ".$filterJenis." "+
-                    "group by b.kode_biaya,b.nama  "+
+                    select 'CLAIM' as jenis,b.kode_biaya,b.nama as nama_biaya, 
+                    sum(case when a.kode_lokasi='01' then a.claim else 0 end) as n1, 
+                    sum(case when a.kode_lokasi='02' then a.claim else 0 end) as n2, 
+                    sum(case when a.kode_lokasi='03' then a.claim else 0 end) as n3, 
+                    sum(case when a.kode_lokasi='04' then a.claim else 0 end) as n4, 
+                    sum(case when a.kode_lokasi='05' then a.claim else 0 end) as n5, 
+                    sum(case when a.kode_lokasi='06' then a.claim else 0 end) as n6, 
+                    sum(case when a.kode_lokasi='07' then a.claim else 0 end) as n7 
+                    from yk_bpjs_biaya b 
+                    left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' 
+                    and '".$request->periode."') ".$filterJenis." 
+                    group by b.kode_biaya,b.nama  
                     
-                    "union all "+
+                    union all 
                     
-                    "select 'DIBAYAR' as jenis,b.kode_biaya,b.nama as nama_biaya, "+
-                    "sum(case when a.kode_lokasi='01' then a.selisih else 0 end) as n1, "+
-                    "sum(case when a.kode_lokasi='02' then a.selisih else 0 end) as n2, "+
-                    "sum(case when a.kode_lokasi='03' then a.selisih else 0 end) as n3, "+
-                    "sum(case when a.kode_lokasi='04' then a.selisih else 0 end) as n4, "+
-                    "sum(case when a.kode_lokasi='05' then a.selisih else 0 end) as n5, "+
-                    "sum(case when a.kode_lokasi='06' then a.selisih else 0 end) as n6, "+
-                    "sum(case when a.kode_lokasi='07' then a.selisih else 0 end) as n7 "+
-                    "from yk_bpjs_biaya b "+
-                    "left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' "+ 
-                    "and '".$request->periode."') ".$filterJenis." "+
-                    "group by b.kode_biaya,b.nama ";
+                    select 'DIBAYAR' as jenis,b.kode_biaya,b.nama as nama_biaya, 
+                    sum(case when a.kode_lokasi='01' then a.selisih else 0 end) as n1, 
+                    sum(case when a.kode_lokasi='02' then a.selisih else 0 end) as n2, 
+                    sum(case when a.kode_lokasi='03' then a.selisih else 0 end) as n3, 
+                    sum(case when a.kode_lokasi='04' then a.selisih else 0 end) as n4, 
+                    sum(case when a.kode_lokasi='05' then a.selisih else 0 end) as n5, 
+                    sum(case when a.kode_lokasi='06' then a.selisih else 0 end) as n6, 
+                    sum(case when a.kode_lokasi='07' then a.selisih else 0 end) as n7 
+                    from yk_bpjs_biaya b 
+                    left join yk_bpjs_cob a on a.kode_biaya=b.kode_biaya and a.periode between '".$request->periode.substr(0,4)."01' 
+                    and '".$request->periode."') ".$filterJenis." 
+                    group by b.kode_biaya,b.nama ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
