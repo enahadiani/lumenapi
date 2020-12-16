@@ -138,10 +138,9 @@ class DashBPJSController extends Controller
         }        
     }
 
-    public function dataBPCCTahun(Request $request) {
+    public function dataBPCCLokasi(Request $request) {
         $this->validate($request, [    
-            'tahun' => 'required',
-            'kode_pp' => 'required',   
+            'periode' => 'required',
             'jenis' => 'required'       
         ]);
         
@@ -151,9 +150,6 @@ class DashBPJSController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
-            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
             
             if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
             else {
@@ -163,20 +159,17 @@ class DashBPJSController extends Controller
 
             $sql = "select 
                     sum(a.nilai) as bpcc_total, 
-                    sum(case when substring(a.periode,5,2)='01' then a.nilai else 0 end) as bpcc_jan, 
-                    sum(case when substring(a.periode,5,2)='02' then a.nilai else 0 end) as bpcc_feb, 
-                    sum(case when substring(a.periode,5,2)='03' then a.nilai else 0 end) as bpcc_mar, 
-                    sum(case when substring(a.periode,5,2)='04' then a.nilai else 0 end) as bpcc_apr, 
-                    sum(case when substring(a.periode,5,2)='05' then a.nilai else 0 end) as bpcc_mei, 
-                    sum(case when substring(a.periode,5,2)='06' then a.nilai else 0 end) as bpcc_jun, 
-                    sum(case when substring(a.periode,5,2)='07' then a.nilai else 0 end) as bpcc_jul, 
-                    sum(case when substring(a.periode,5,2)='08' then a.nilai else 0 end) as bpcc_agu, 
-                    sum(case when substring(a.periode,5,2)='09' then a.nilai else 0 end) as bpcc_sep, 
-                    sum(case when substring(a.periode,5,2)='10' then a.nilai else 0 end) as bpcc_okt, 
-                    sum(case when substring(a.periode,5,2)='11' then a.nilai else 0 end) as bpcc_nov, 
-                    sum(case when substring(a.periode,5,2)='12' then a.nilai else 0 end) as bpcc_des 
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as bpcc1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as bpcc2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as bpcc3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as bpcc4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as bpcc5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as bpcc6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as bpcc7
                     from yk_bpjs_bpcc a                     
-                    where substring(a.periode,1,4) = '".$request->tahun."' ".$filterLokasi." ".$filterJenis;
+                    where substring(a.periode,1,4) = '".$request->tahun."' ".$filterJenis;
+
+            $success['sql'] = $sql;
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -230,7 +223,7 @@ class DashBPJSController extends Controller
                     from yk_bpjs_iuran a 
                     where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
 
-            $success['sql'] = $sql;
+            //$success['sql'] = $sql; <--- alert
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
