@@ -15,6 +15,222 @@ class DashBPJSController extends Controller
 
 
 
+    public function dataClaimLokasi(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = " select sum(a.claim) as cl_total, 
+                    sum(case when a.kode_lokasi='01' then a.claim else 0 end) as cl1, 
+                    sum(case when a.kode_lokasi='02' then a.claim else 0 end) as cl2, 
+                    sum(case when a.kode_lokasi='03' then a.claim else 0 end) as cl3, 
+                    sum(case when a.kode_lokasi='04' then a.claim else 0 end) as cl4, 
+                    sum(case when a.kode_lokasi='05' then a.claim else 0 end) as cl5, 
+                    sum(case when a.kode_lokasi='06' then a.claim else 0 end) as cl6, 
+                    sum(case when a.kode_lokasi='07' then a.claim else 0 end) as cl7,
+                    sum(case when a.kode_lokasi='99' then a.claim else 0 end) as cl9
+                    from yk_bpjs_cob a 
+                    where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function dataKapitasiLokasi(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = "select 
+                    sum(a.nilai) as kap_total, 
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as kap1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as kap2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as kap3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as kap4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as kap5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as kap6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as kap7,
+                    sum(case when a.kode_lokasi='99' then a.nilai else 0 end) as kap9
+                    from yk_bpjs_kapitasi a                     
+                    where a.jenis_tpkk='TPKK' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function dataBPCCLokasi(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = "select 
+                    sum(a.nilai) as bpcc_total, 
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as bpcc1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as bpcc2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as bpcc3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as bpcc4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as bpcc5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as bpcc6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as bpcc7,
+                    sum(case when a.kode_lokasi='99' then a.nilai else 0 end) as bpcc9
+                    from yk_bpjs_bpcc a                     
+                    where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function dataPremiLokasi(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',            
+            'jenis' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->jenis) == 'PEGAWAI') $filterJenis = " and a.jenis <> 'PENSIUN' ";
+            else {
+                if (strtoupper($request->jenis) == 'PENSIUN') $filterJenis = " and a.jenis = 'PENSIUN' ";
+                else $filterJenis = " ";
+            }
+
+            $sql = "select sum(a.nilai) as premi_total, 
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as pr1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as pr2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as pr3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as pr4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as pr5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as pr6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as pr7,
+                    sum(case when a.kode_lokasi='99' then a.nilai else 0 end) as pr9                     
+                    from yk_bpjs_iuran a 
+                    where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
+
+            //$success['sql'] = $sql; <--- alert
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function dataKapitasi(Request $request) {
         $this->validate($request, [    
             'tahun' => 'required',
