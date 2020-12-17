@@ -2706,43 +2706,49 @@ class DashboardController extends Controller
             $success['ctg']=$ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'Pendapatan' as nama,273,292.1,340.6,355.2,378.2,415.5,448.5,475.4,500.9,525.5
+            select 'Pendapatan' as nama,273 as n1,292.1 as n2,340.6 as n3,355.2 as n4,378.2 as n5,415.5 as n6,448.5 as n7,475.4 as n8,500.9 as n9,525.5 as n10,543.3 as n11,503.0 as n12
             union all
-            select 'Beban' as nama,248.6,239.8,304.4,290.8,57.95,66.84,91.77
+            select 'Beban' as nama,248.6 as n1,239.8 as n2,304.4 as n3,290.8 as n4,307.4 as n5,329.5 as n6,352.5 as n7,379.2 as n8,391.9 as n9,420.6 as n10,435.6 as n11,417.2 as n12
             union all
-            select 'SHU' as nama,29.85,30.37,46.02,46.93,57.95,66.84,91.77
+            select 'SHU' as nama,24.4 as n1,52.3 as n2,36.2 as n3,64.4 as n4,70.8 as n5,86.0 as n6,96.0 as n7,96.3 as n8,108.9 as n9,104.9 as n10,101.9 as n11,85.8 as n12
             union all
-            select 'OR' as nama,29.85,30.37,46.02,46.93,57.95,66.84,91.77");
+            select 'OR' as nama,90.5 as n1,84.6 as n2,88.7 as n3,81.8 as n4,80.8 as n5,78.1 as n6,72.9 as n7,78.5 as n8,76.8 as n9,78.8 as n10,80.2 as n11,82.9 as n12");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
                     $dt[$i] = array();
                     $c=0;
-                    for($x=1;$x<=count($ctg2);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg2[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg2[$c]);
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
                         $c++;          
                     }
                 }
 
-                $dtp = array();
-                for($i=0;$i< count($dt);$i++){
-                    $x = array();
-                    for($j=0;$j < count($dt[$i]);$j++){
-                        if($j != 0){
-                            $x[] = round((($dt[$i][$j]["y"]-$dt[$i][$j-1]["y"])/ $dt[$i][$j-1]["y"])*100);
-                        }
-                    }
-                    $dtp[] = $x;
-                }
-
-                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                $color = array('#4c4c4c','#900604','#ffc114','#16ff14');
                 for($i=0;$i<count($row);$i++){
 
-                    $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dtp[$i]
-                    );
+                    if($i == 2){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>0,"color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                    else if($i == 3){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>1,"color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                    else{
+                        
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            
+                        );
+                    }
                 }
+
 
                 $success['status'] = true;
                 $success['message'] = "Success!";

@@ -50,9 +50,17 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('hrKaryawan-import','Yakes\HrKaryawanController@importExcel');
     $router->get('hrKaryawan-tmp','Yakes\HrKaryawanController@getKaryawanTmp');
 
+    
+    //dash Peserta
+    $router->post('dashPeserta','Yakes\PesertaController@store');
+    $router->post('dashPeserta-import','Yakes\PesertaController@importExcel');
+    $router->get('dashPeserta-tmp','Yakes\PesertaController@getPesertaTmp');
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
+$router->get('dashPeserta-export','Yakes\PesertaController@export');
+
 
 
 
