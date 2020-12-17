@@ -108,6 +108,13 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('pend-5tahun-ntf','Ypt\DashboardController@getPend5TahunNTF');
     $router->get('pend-5tahun-komposisi','Ypt\DashboardController@getPend5TahunKomposisi');
     $router->get('pend-5tahun-growth','Ypt\DashboardController@getPend5TahunGrowth');
+    
+    $router->get('beban-5tahun','Ypt\DashboardController@getBeban5Tahun');
+    $router->get('beban-5tahun-sdm','Ypt\DashboardController@getBeban5TahunSDM');
+    $router->get('beban-5tahun-komposisi','Ypt\DashboardController@getBeban5TahunKomposisi');
+    $router->get('beban-5tahun-growth','Ypt\DashboardController@getBeban5TahunGrowth');
+
+    $router->get('shu-5tahun','Ypt\DashboardController@getSHU5Tahun');
 });
 
 

@@ -3209,5 +3209,446 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+
+    public function getBeban5Tahun(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $rs = DB::connection($this->db)->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun
+            union all
+            select '2020' as tahun 
+            
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select 'RKA' as nama,248.6 as n1,304.4 as n2,307.4 as n3,352.5 as n4,391.9 as n5,435.6 as n6
+            union all
+            select 'Actual' as nama,239.8 as n1,290.8 as n2,329.5 as n3,379.2 as n4,420.6 as n5,417.2 as n6
+            union all
+            select 'Capaian' as nama,96.5 as n1,95.5 as n2,107.2 as n3,107.6 as n4,103.7 as n5,95.8 as n6
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#4c4c4c','#900604','#16ff14');
+                $success['colors'] = $color;
+                for($i=0;$i<count($row);$i++){
+
+                    if($i == 2){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>1,"color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                    else{
+                        
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                }
+
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBeban5TahunSDM(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $rs = DB::connection($this->db)->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun
+            union all
+            select '2020' as tahun 
+            
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select 'RKA' as nama,130.0 as n1,156.3 as n2,158.5 as n3,190.7 as n4,218.2 as n5,240.7 as n6
+            union all
+            select 'Actual' as nama,126.8 as n1,151.0 as n2,168.9 as n3,203.4 as n4,222.5 as n5,241.2 as n6
+            union all
+            select 'Capaian' as nama,52 as n1,51 as n2,52 as n3,54 as n4,56 as n5,55 as n6
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#4c4c4c','#900604','#16ff14');
+                $success['colors'] = $color;
+                for($i=0;$i<count($row);$i++){
+
+                    if($i == 2){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>1,"color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                    else{
+                        
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                }
+
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBeban5TahunKomposisi(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $rs = DB::connection($this->db)->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun
+            union all
+            select '2020' as tahun 
+            
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select 'SDM' as nama,126.8 as n1,151 as n2,168.9 as n3,203.4 as n4,222.5 as n5,241.2 as n6
+            union all
+            select 'Beban Lain' as nama,239 as n1,290.8 as n2,329.5 as n3,379.2 as n4,420.6 as n5,417.2 as n6
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#4c4c4c','#900604','#16ff14');
+                $success['colors'] = $color;
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                        
+                    );
+                }
+
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBeban5TahunGrowth(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $rs = DB::connection($this->db)->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun
+            union all
+            select '2020' as tahun 
+            
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select 'Total Beban' as nama,107.0 as n1,104.3 as n2,109.9 as n3,106.0 as n4,104.9 as n5,92.6 as n6
+            union all
+            select 'TF' as nama,104.0 as n1,101.6 as n2,110.2 as n3,108.4 as n4,103.7 as n5,98.8 as n6
+            union all
+            select 'NTF' as nama,139.7 as n1,125.2 as n2,107.8 as n3,92.5 as n4,113.3 as n5,62.2 as n6
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#4c4c4c','#900604','#16ff14');
+                $success['colors'] = $color;
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "dataLabels"=>array("enabled"=>true)
+                        
+                    );
+                }
+
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getSHU5Tahun(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $rs = DB::connection($this->db)->select("
+            select '2015' as tahun 
+            union all
+            select '2016' as tahun 
+            union all
+            select '2017' as tahun
+            union all
+            select '2018' as tahun 
+            union all
+            select '2019' as tahun
+            union all
+            select '2020' as tahun 
+            
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $ctg = array();
+            if(count($rs) > 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select 'RKA' as nama,24.2 as n1,36.2 as n2,70.8 as n3,96.0 as n4,108.9 as n5,101.9 as n6
+            union all
+            select 'Actual' as nama,52.3 as n1,64.4 as n2,86.0 as n3,96.3 as n4,104.9 as n5,85.8 as n6
+            union all
+            select 'Capaian' as nama,214.4 as n1,177.6 as n2,121.5 as n3,100.2 as n4,96.3 as n5,84.2 as n6
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+
+                $color = array('#4c4c4c','#900604','#16ff14');
+                $success['colors'] = $color;
+                for($i=0;$i<count($row);$i++){
+
+                    if($i == 2){
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>1,"color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                    else{
+                        
+                        $success["series"][$i]= array(
+                            "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            
+                        );
+                    }
+                }
+
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 }
