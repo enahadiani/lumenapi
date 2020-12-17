@@ -37,10 +37,10 @@ class KunjunganController extends Controller
             $keterangan .= "Kode Layanan $kode_biaya tidak valid";
         }
 
-        if($jenis == "Pegawai" || $jenis == "Pensiun"){
+        if($jenis == "PEGAWAI" || $jenis == "PENSIUN"){
             $keterangan .="";
         }else{
-            $keterangan .="Jenis $jenis tidak valid. Jenis yang diperbolehkan : Pegawai atau Pensiun ";
+            $keterangan .="Jenis $jenis tidak valid. Jenis yang diperbolehkan : PEGAWAI atau PENSIUN ";
         }
         return $keterangan;
 

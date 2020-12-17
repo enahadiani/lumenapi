@@ -2824,7 +2824,9 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -2916,7 +2918,9 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3008,7 +3012,9 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3098,7 +3104,9 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3181,7 +3189,9 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#005FB8','#FDC500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3265,7 +3275,10 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
+                
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3357,7 +3370,10 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3447,7 +3463,10 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3530,7 +3549,10 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                
+                $color = array('#005FB8','#FDC500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3613,7 +3635,10 @@ class DashboardController extends Controller
                     }
                 }
 
-                $color = array('#4c4c4c','#900604','#16ff14');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
