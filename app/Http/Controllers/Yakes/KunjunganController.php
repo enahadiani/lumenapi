@@ -7,19 +7,19 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-use App\Exports\PesertaExport;
-use App\Imports\PesertaImport;
+use App\Exports\KunjunganExport;
+use App\Imports\KunjunganImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class PesertaController extends Controller
+class KunjunganController extends Controller
 {    
     public $successStatus = 200;
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function validateData($jenis,$kode_pp){
+    public function validateData($jenis,$kode_pp,$kode_biaya){
         $keterangan = "";
         $auth = DB::connection($this->sql)->select("select kode_pp from pp where kode_pp='$kode_pp' 
         ");
@@ -27,6 +27,14 @@ class PesertaController extends Controller
             $keterangan .= "";
         }else{
             $keterangan .= "Kode PP $kode_pp tidak valid";
+        }
+
+        $auth = DB::connection($this->sql)->select("select kode_biaya from yk_bpjs_biaya where kode_biaya='$kode_biaya' 
+        ");
+        if(count($auth) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Kode Biaya $kode_biaya tidak valid";
         }
 
         if($jenis == "Pegawai" || $jenis == "Pensiun"){
@@ -53,23 +61,23 @@ class PesertaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del1 = DB::connection($this->sql)->table('dash_peserta')->where('periode', $request->periode)->delete();
+            $del1 = DB::connection($this->sql)->table('dash_kunj')->where('periode', $request->periode)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into dash_peserta(
-                periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,nik_user) 
-                select periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,'$nik' as nik_user from dash_peserta_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+            $ins = DB::connection($this->sql)->insert("insert into dash_kunj(
+                periode,kode_lokasi,jenis,kode_biaya,rka_kunj,jumlah,tgl_input,nik_user) 
+                select periode,kode_lokasi,jenis,kode_biaya,rka_kunj,jumlah,tgl_input,'$nik' as nik_user from dash_kunj_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
-                $del2 = DB::connection($this->sql)->table('dash_peserta_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+                $del2 = DB::connection($this->sql)->table('dash_kunj_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Peserta berhasil disimpan";
+                $success['message'] = "Data Kunjungan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Peserta gagal disimpan ".$e;
+            $success['message'] = "Data Kunjungan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -92,7 +100,7 @@ class PesertaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->sql)->table('dash_peserta_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+            $del1 = DB::connection($this->sql)->table('dash_kunj_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
             // menangkap file excel
             $file = $request->file('file');
     
@@ -100,7 +108,7 @@ class PesertaController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $dt = Excel::toArray(new PesertaImport(),$nama_file);
+            $dt = Excel::toArray(new KunjunganImport(),$nama_file);
             $excel = $dt[0];
             $x = array();
             $query = "";
@@ -115,7 +123,7 @@ class PesertaController extends Controller
             $commit = "commit tran;";
             foreach($excel as $row){
                 if($row[0] != ""){
-                    $ket = $this->validateData($row[0],$row[1]);
+                    $ket = $this->validateData($row[0],$row[1],$row[2]);
                     if($ket != ""){
                         $sts = 0;
                         $status_validate = false;
@@ -123,7 +131,7 @@ class PesertaController extends Controller
                         $sts = 1;
                     }
                     // $nama = str_replace("'","",$row[1]);
-                    $query .= "insert into dash_peserta_tmp(periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,nik_user,sts_upload,ket_upload,nu) values ('".$request->periode."','".$row[1]."','".$row[0]."',".intval($row[2]).",".intval($row[3]).",".intval($row[4]).",".intval($row[5]).",".floatval($row[6]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
+                    $query .= "insert into dash_kunj_tmp(periode,kode_lokasi,jenis,kode_biaya,rka_kunj,jumlah,tgl_input,nik_user,sts_upload,ket_upload,nu) values ('".$request->periode."','".$row[1]."','".$row[0]."','".$row[2]."',".floatval($row[3]).",".floatval($row[4]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
                     $no++;
                 }
             }
@@ -161,13 +169,13 @@ class PesertaController extends Controller
 
         date_default_timezone_set("Asia/Bangkok");
         if(isset($request->type) && $request->type == "template"){
-            return Excel::download(new PesertaExport($request->nik_user,$request->periode,$request->type), 'Peserta_'.$request->nik_user.'.xlsx');
+            return Excel::download(new KunjunganExport($request->nik_user,$request->periode,$request->type), 'Kunjungan_'.$request->nik_user.'.xlsx');
         }else{
-            return Excel::download(new PesertaExport($request->nik_user,$request->periode,$request->type), 'Peserta_'.$request->nik_user.'.xlsx');
+            return Excel::download(new KunjunganExport($request->nik_user,$request->periode,$request->type), 'Kunjungan_'.$request->nik_user.'.xlsx');
         }
     }
 
-    public function getPesertaTmp(Request $request)
+    public function getKunjunganTmp(Request $request)
     {
         
         $this->validate($request, [
@@ -184,8 +192,8 @@ class PesertaController extends Controller
             }
 
             $sql = "select 
-            periode,kode_lokasi as kode_pp,jenis,kk,pas,anak,jd,rka_claim,tgl_input,nik_user
-            from dash_peserta_tmp 
+            periode,kode_lokasi as kode_pp,jenis,kode_biaya,rka_kunj,jumlah,tgl_input,nik_user
+            from dash_kunj_tmp 
             where nik_user = '".$nik_user."' and periode='".$periode."' 
             order by nu";
             $res = DB::connection($this->sql)->select($sql);
