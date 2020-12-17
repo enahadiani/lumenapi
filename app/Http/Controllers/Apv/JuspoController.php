@@ -963,63 +963,99 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
 			// left join apv_pesan e on d.no_bukti=e.no_bukti and d.no_urut=e.no_urut and d.maxid=e.id
             // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
             // order by nu";
-            $sql3 = "select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu
+            // $sql3 = "select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu
+			// from apv_juskeb_m a
+            // inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
+			// inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
+            // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_juskeb'
+			// union all
+			// select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,-3 as nu
+			// from apv_juskeb_m a
+            // inner join apv_karyawan c on a.nik_ver=c.nik and a.kode_lokasi=c.kode_lokasi
+			// inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
+			// left join apv_ver_m d on a.no_bukti=d.no_juskeb and a.kode_lokasi=d.kode_lokasi
+            // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_juskeb'
+			// union all ";
+			// // "select 'Diapprove oleh' as ket,a.kode_jab,a.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu
+            // // from apv_flow a
+            // // inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+            // // inner join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi
+			// // left join (SELECT no_bukti,kode_lokasi,MAX(id) as maxid
+            // //             FROM apv_pesan
+            // //             GROUP BY no_bukti,kode_lokasi
+            // //             ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+            // // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+			// // left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id ";
+            // $sql3 .="
+            // select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu
+            // from apv_flow a
+            // inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+            // inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
+			// left join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_juskeb'
+			// union all
+            // select 'Diapprove oleh' as ket,c.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_input,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-1 as nu
+            // from apv_juspo_m a
+            // inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
+            // inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
+			// left join (SELECT no_bukti,kode_lokasi,MAX(id) as maxid
+            //             FROM apv_pesan
+			// 			where modul = 'PO'
+            //             GROUP BY no_bukti,kode_lokasi
+            //             ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+			// left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
+            // where a.kode_lokasi='$kode_lokasi' and a.no_juskeb='$no_juskeb'
+			// union all
+            // select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,a.no_urut as nu
+            // from apv_flow a
+			// inner join apv_juspo_m f on a.no_bukti=f.no_bukti and a.kode_lokasi=f.kode_lokasi
+            // inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+            // inner join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi
+			// left join (SELECT no_bukti,no_urut,kode_lokasi,MAX(id) as maxid
+            //             FROM apv_pesan
+			// 			where modul <> 'PO'
+            //             GROUP BY no_bukti,no_urut,kode_lokasi
+            //             ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
+			// left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
+            // where a.kode_lokasi='$kode_lokasi' and f.no_juskeb='$no_juskeb'
+			// order by nu
+			
+            // ";
+            $sql3 = "select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut
 			from apv_juskeb_m a
             inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_juskeb'
 			union all
-			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,-3 as nu
+			select 'Diverifikasi oleh' as ket,c.kode_jab,a.nik_ver as nik, c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,d.tanggal,103),'-') as tanggal,isnull(d.no_bukti,'-') as no_app,case d.status when 'V' then 'APPROVE' when 'F' then 'REVISI' else '-' end as status,-3 as nu, isnull(d.no_bukti,'X') as urut
 			from apv_juskeb_m a
             inner join apv_karyawan c on a.nik_ver=c.nik and a.kode_lokasi=c.kode_lokasi
 			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
 			left join apv_ver_m d on a.no_bukti=d.no_juskeb and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_juskeb'
-			union all ";
-			// "select 'Diapprove oleh' as ket,a.kode_jab,a.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu
-            // from apv_flow a
-            // inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
-            // inner join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi
-			// left join (SELECT no_bukti,kode_lokasi,MAX(id) as maxid
-            //             FROM apv_pesan
-            //             GROUP BY no_bukti,kode_lokasi
-            //             ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
-            // where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
-			// left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id ";
-            $sql3 .="
-            select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu
+			union all
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut
             from apv_flow a
             inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi
 			left join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_juskeb'
 			union all
-            select 'Diapprove oleh' as ket,c.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_input,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-1 as nu
+            select 'Diapprove oleh' as ket,c.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-1 as nu, isnull(convert(varchar,e.id),'X') as urut
             from apv_juspo_m a
             inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
             inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
-			left join (SELECT no_bukti,kode_lokasi,MAX(id) as maxid
-                        FROM apv_pesan
-						where modul = 'PO'
-                        GROUP BY no_bukti,kode_lokasi
-                        ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
-			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
+			left join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and e.modul='PO' 
             where a.kode_lokasi='$kode_lokasi' and a.no_juskeb='$no_juskeb'
 			union all
-            select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,d.maxid),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,a.no_urut as nu
+            select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,a.tgl_app,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,a.no_urut as nu, isnull(convert(varchar,e.id),'X') as urut
             from apv_flow a
 			inner join apv_juspo_m f on a.no_bukti=f.no_bukti and a.kode_lokasi=f.kode_lokasi
             inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi
-			left join (SELECT no_bukti,no_urut,kode_lokasi,MAX(id) as maxid
-                        FROM apv_pesan
-						where modul <> 'PO'
-                        GROUP BY no_bukti,no_urut,kode_lokasi
-                        ) d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
-			left join apv_pesan e on d.no_bukti=e.no_bukti and d.kode_lokasi=e.kode_lokasi and d.maxid=e.id 
+			left join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and e.modul <> 'PO' and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and f.no_juskeb='$no_juskeb'
-			order by nu
-			
+			order by urut,nu
             ";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
