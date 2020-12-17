@@ -51,13 +51,13 @@ class PesertaExport implements FromCollection, WithHeadings, WithColumnFormattin
         if($this->type == 'template'){
             return [
                 [
-                    'jenis','kode_pp','kk','pasangan','anak','jd_dd','rka_claimant'
+                    'pegawai/pensiun','regional','kk','pasangan','anak','jd_dd','rka_claimant'
                 ]
             ];
         }else{
             return [
                 [
-                    'jenis','kode_pp','kk','pasangan','anak','jd_dd','rka_claimant',
+                    'pegawai/pensiun','regional','kk','pasangan','anak','jd_dd','rka_claimant',
                     'sts_upload',
                     'ket_upload',
                     'nu'

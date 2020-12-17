@@ -26,7 +26,7 @@ class PesertaController extends Controller
         if(count($auth) > 0){
             $keterangan .= "";
         }else{
-            $keterangan .= "Kode PP $kode_pp tidak valid";
+            $keterangan .= "Regional $kode_pp tidak valid";
         }
 
         if($jenis == "Pegawai" || $jenis == "Pensiun"){

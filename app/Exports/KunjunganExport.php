@@ -52,13 +52,13 @@ class KunjunganExport implements FromCollection, WithHeadings, WithColumnFormatt
         if($this->type == 'template'){
             return [
                 [
-                    'jenis','kode_pp','kode_biaya','rka_kunjungan','jumlah'
+                    'pegawai/pensiun','regional','kode_layanan','rka_kunjungan','jumlah'
                 ]
             ];
         }else{
             return [
                 [
-                    'jenis','kode_pp','kode_biaya','rka_kunjungan','jumlah',
+                    'pegawai/pensiun','regional','kode_layanan','rka_kunjungan','jumlah',
                     'sts_upload',
                     'ket_upload',
                     'nu'

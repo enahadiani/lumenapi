@@ -26,7 +26,7 @@ class KunjunganController extends Controller
         if(count($auth) > 0){
             $keterangan .= "";
         }else{
-            $keterangan .= "Kode PP $kode_pp tidak valid";
+            $keterangan .= "Regional $kode_pp tidak valid";
         }
 
         $auth = DB::connection($this->sql)->select("select kode_biaya from yk_bpjs_biaya where kode_biaya='$kode_biaya' 
@@ -34,7 +34,7 @@ class KunjunganController extends Controller
         if(count($auth) > 0){
             $keterangan .= "";
         }else{
-            $keterangan .= "Kode Biaya $kode_biaya tidak valid";
+            $keterangan .= "Kode Layanan $kode_biaya tidak valid";
         }
 
         if($jenis == "Pegawai" || $jenis == "Pensiun"){
