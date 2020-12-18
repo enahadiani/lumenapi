@@ -27,6 +27,9 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if ($request->jenis == 'CC') $jenis = "PENSIUN"; 
+            else $jenis = "PEGAWAI"; 
+            
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and kode_lokasi like '%' ";
             else $filterLokasi = " and kode_lokasi = '".$request->kode_pp."' ";
 
@@ -37,20 +40,17 @@ class DashAkunController extends Controller
 
             $sql = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_now, sum(rka_claim) as rka_now
                     from dash_peserta 
-                    where jenis ='".$request->jenis."' and periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterLokasi;
+                    where jenis ='".$jenis."' and periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterLokasi;
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             $sql2 = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_bef
                     from dash_peserta 
-                    where jenis ='".$request->jenis."' and periode between '".substr($perBef,0,4)."01' and '".$perBef."' ".$filterLokasi;
+                    where jenis ='".$jenis."' and periode between '".substr($perBef,0,4)."01' and '".$perBef."' ".$filterLokasi;
 
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
-
-
-            $success['sql'] = $sql;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
