@@ -22,8 +22,8 @@ class DashboardController extends Controller
             }
             
 			$sql="select distinct a.periode
-            from exs_neraca a
-            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' 
+            from periode a
+            where a.kode_lokasi='$kode_lokasi'
             order by a.periode desc";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -2085,11 +2085,10 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Pendapatan' as nama, 1000000000 as nilai,120 as persen
-            union all
-            select 'Beban' as nama, 1000000000 as nilai,120 as persen
-            union all
-            select 'SHU' as nama, 1000000000 as nilai,120 as persen
+            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K01'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2122,11 +2121,10 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Asset' as nama, 1000000000 as nilai,120 as persen
-            union all
-            select 'Liability' as nama, 1000000000 as nilai,120 as persen
-            union all
-            select 'Net Asset Position' as nama, 1000000000 as nilai,120 as persen
+            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K02'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2159,11 +2157,10 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Pengembangan' as nama, 1000000000 as nilai,120 as persen
-            union all
-            select 'Operasional' as nama, 1000000000 as nilai,120 as persen
-            union all
-            select 'Non Operasional' as nama, 1000000000 as nilai,120 as persen
+            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K03'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2196,9 +2193,10 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Mahasiswa' as nama, 1000000000 as nilai
-            union all
-            select 'NTF' as nama, 1000000000 as nilai
+            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K06'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2231,9 +2229,10 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Kas di Bank' as nama, 1000000000 as nilai
-            union all
-            select 'Kas Unit' as nama, 1000000000 as nilai
+            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K04'
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2266,7 +2265,10 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select 'Pendapatan Pin' as nama, 1000000000 as nilai,120 as persen
+            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K05'
             ");
             $rs = json_decode(json_encode($rs),true);
             
