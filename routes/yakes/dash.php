@@ -46,7 +46,9 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('demog','Yakes\DemogController@update');
     $router->delete('demog','Yakes\DemogController@destroy');
 
-    //dashbord akun
+    //dashbord akun    
+    $router->get('dataKunjLayanan','Yakes\DashAkunController@dataKunjLayanan');
+    $router->get('dataKunjTotal','Yakes\DashAkunController@dataKunjTotal');
     $router->get('dataClaimant','Yakes\DashAkunController@dataClaimant');
     $router->get('dataBPCCtotal','Yakes\DashAkunController@dataBPCCtotal');
     $router->get('dataBPCClayanan','Yakes\DashAkunController@dataBPCClayanan');
