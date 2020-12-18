@@ -46,8 +46,11 @@ class DashAkunController extends Controller
                     from dash_peserta 
                     where jenis ='".$request->jenis."' and periode between '".substr($perBef,0,4)."01' and '".$perBef."' ".$filterLokasi;
 
-            $res2 = DB::connection($this->sql2)->select($sql2);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
+
+
+            $success['sql'] = $sql;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -511,8 +514,8 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_pp like '%' ";
+            else $filterLokasi = " and a.kode_pp = '".$request->kode_pp."' ";
 
             $res = DB::connection($this->sql)->select("select b.warna,b.nama,b.idx
                                                     ,sum(case substring(periode,5,2) when '01' then a.nilai else 0 end) as jan
