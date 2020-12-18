@@ -13,10 +13,11 @@ class DashAkunController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function dataBPCCtotal(Request $request) {
+    public function dataClaimant(Request $request) {
         $this->validate($request, [    
             'periode' => 'required',
-            'jenis' => 'required'            
+            'jenis' => 'required',
+            'kode_pp' => 'required'           
         ]);
         
         try {
@@ -25,6 +26,66 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and kode_lokasi like '%' ";
+            else $filterLokasi = " and kode_lokasi = '".$request->kode_pp."' ";
+
+            $tahunBef = intval(substr($request->periode,0,4));
+            $tahunBef = $tahunBef - 1;
+            $tahunBef = strval($tahunBef);
+            $perBef = $tahunBef.substr($request->periode,4,2); 
+
+            $sql = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_now, sum(rka_claim) as rka_now
+                    from dash_peserta 
+                    where jenis ='".$request->jenis."' and periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterLokasi;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            $sql2 = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_bef
+                    from dash_peserta 
+                    where jenis ='".$request->jenis."' and periode between '".substr($perBef,0,4)."01' and '".$perBef."' ".$filterLokasi;
+
+            $res2 = DB::connection($this->sql2)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data2'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data2'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function dataBPCCtotal(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',
+            'jenis' => 'required',
+            'kode_pp' => 'required'           
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -40,21 +101,21 @@ class DashAkunController extends Controller
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_now
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) b  on a.kode_klpakun=b.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='".$request->jenis."' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rka_now
-                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=d.kode_klpakun
@@ -86,7 +147,8 @@ class DashAkunController extends Controller
     public function dataBPCClayanan(Request $request) {
         $this->validate($request, [    
             'periode' => 'required',
-            'jenis' => 'required'            
+            'jenis' => 'required',       
+            'kode_pp' => 'required'        
         ]);
         
         try {
@@ -95,6 +157,9 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -110,21 +175,21 @@ class DashAkunController extends Controller
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_now
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) b  on a.kode_klpakun=b.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='".$request->jenis."' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rka_now
-                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='".$request->jenis."' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=d.kode_klpakun
@@ -157,7 +222,9 @@ class DashAkunController extends Controller
     
     public function dataBebanYtd(Request $request) {
         $this->validate($request, [    
-            'periode' => 'required'            
+            'periode' => 'required',
+            'kode_pp' => 'required'          
+
         ]);
         
         try {
@@ -166,6 +233,9 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -181,21 +251,21 @@ class DashAkunController extends Controller
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_now
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis = 'Beban' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) b  on a.kode_klpakun=b.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='Beban' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rka_now
-                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='Beban' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=d.kode_klpakun
@@ -227,7 +297,8 @@ class DashAkunController extends Controller
 
     public function dataBPytd(Request $request) {
         $this->validate($request, [    
-            'periode' => 'required'            
+            'periode' => 'required',
+            'kode_pp' => 'required'               
         ]);
         
         try {
@@ -236,6 +307,9 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -251,21 +325,21 @@ class DashAkunController extends Controller
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_now
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='BP' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) b  on a.kode_klpakun=b.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='BP' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rka_now
-                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='BP' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=d.kode_klpakun
@@ -297,7 +371,8 @@ class DashAkunController extends Controller
 
     public function dataCCytd(Request $request) {
         $this->validate($request, [    
-            'periode' => 'required'            
+            'periode' => 'required',
+            'kode_pp' => 'required'         
         ]);
         
         try {
@@ -306,6 +381,9 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -321,21 +399,21 @@ class DashAkunController extends Controller
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_now
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='CC' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) b  on a.kode_klpakun=b.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rea_bef
-                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_klpakun_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='CC' and b.periode between '".$tahunBef."01' and '".$perBef."'
                     group by a.kode_klpakun
                     ) c  on a.kode_klpakun=c.kode_klpakun
                     
                     left join (
                     select a.kode_klpakun,sum(b.nilai) as rka_now
-                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun
+                    from dash_klp_akun a inner join dash_gar_lap b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                     where a.jenis='CC' and b.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."'
                     group by a.kode_klpakun
                     ) d  on a.kode_klpakun=d.kode_klpakun
@@ -367,7 +445,8 @@ class DashAkunController extends Controller
 
     public function dataBeban(Request $request) {
         $this->validate($request, [    
-            'tahun' => 'required'            
+            'tahun' => 'required',
+            'kode_pp' => 'required'
         ]);
         
         try {
@@ -376,6 +455,9 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $res = DB::connection($this->sql)->select("select b.warna,b.nama,b.idx
                                                     ,sum(case substring(periode,5,2) when '01' then a.nilai else 0 end) as jan
@@ -390,7 +472,7 @@ class DashAkunController extends Controller
                                                     ,sum(case substring(periode,5,2) when '10' then a.nilai else 0 end) as okt
                                                     ,sum(case substring(periode,5,2) when '11' then a.nilai else 0 end) as nov
                                                     ,sum(case substring(periode,5,2) when '12' then a.nilai else 0 end) as des
-                                                    from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun
+                                                    from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                                                     where b.jenis='Beban' and substring(a.periode,1,4) = '".$request->tahun."' 
                                                     group by b.warna,b.nama,b.idx
                                                     order by b.idx");
@@ -418,7 +500,8 @@ class DashAkunController extends Controller
 
     public function dataPdpt(Request $request) {
         $this->validate($request, [    
-            'tahun' => 'required'            
+            'tahun' => 'required',
+            'kode_pp' => 'required'            
         ]);
         
         try {
@@ -427,6 +510,9 @@ class DashAkunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $res = DB::connection($this->sql)->select("select b.warna,b.nama,b.idx
                                                     ,sum(case substring(periode,5,2) when '01' then a.nilai else 0 end) as jan
@@ -441,7 +527,7 @@ class DashAkunController extends Controller
                                                     ,sum(case substring(periode,5,2) when '10' then a.nilai else 0 end) as okt
                                                     ,sum(case substring(periode,5,2) when '11' then a.nilai else 0 end) as nov
                                                     ,sum(case substring(periode,5,2) when '12' then a.nilai else 0 end) as des
-                                                    from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun
+                                                    from dash_klpakun_lap a inner join dash_klp_akun b on a.kode_klpakun=b.kode_klpakun ".$filterLokasi."
                                                     where b.jenis='Pendapatan' and substring(a.periode,1,4) = '".$request->tahun."' 
                                                     group by b.warna,b.nama,b.idx
                                                     order by b.idx");
@@ -466,8 +552,5 @@ class DashAkunController extends Controller
             return response()->json($success, $this->successStatus);
         }        
     }
-
-    
-
 
 }

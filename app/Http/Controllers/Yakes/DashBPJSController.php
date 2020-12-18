@@ -245,7 +245,11 @@ class DashBPJSController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
-            else $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
+            else {
+                $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
+                if (substr($request->kode_pp,2,2) == '00') $filterLokasi = " and a.kode_lokasi = '99' ";                
+                $filterPP = " and a.kode_pp = '".$request->kode_pp."' ";
+            }
 
             $sql = "select a.kode_bulan,a.nama,isnull(b.pensiun,0) as pensiun,isnull(b.pegawai,0) as pegawai, isnull(c.n1,0) as n1,isnull(c.n2,0) as n2, isnull(d.ni_akun,0) - isnull(c.n1,0) - isnull(c.n2,0) as n3,  isnull(d.ni_akun,0) as n4
                     from yk_bulan a 
@@ -272,7 +276,7 @@ class DashBPJSController extends Controller
                     left join (
                     select substring(a.periode,5,2) as kode_bulan,sum(a.nilai) as ni_akun
                     from gldt a
-                    where substring(a.periode,1,4) ='".$request->tahun."' and a.kode_akun='21060103' and a.dc='C' ".$filterLokasi." 
+                    where substring(a.periode,1,4) ='".$request->tahun."' and a.kode_akun='21060103' and a.dc='C' ".$filterPP." 
                     group by substring(a.periode,5,2) 
                     ) d on a.kode_bulan=d.kode_bulan 
                     
