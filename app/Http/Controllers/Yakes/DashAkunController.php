@@ -584,8 +584,8 @@ class DashAkunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_pp like '%' ";
+            else $filterLokasi = " and a.kode_pp = '".$request->kode_pp."' ";
 
             $res = DB::connection($this->sql)->select("select b.warna,b.nama,b.idx
                                                     ,sum(case substring(periode,5,2) when '01' then a.nilai else 0 end) as jan
