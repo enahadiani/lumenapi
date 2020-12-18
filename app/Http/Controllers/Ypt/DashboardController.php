@@ -2670,59 +2670,48 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015 RKA' as tahun 
-            union all
-            select '2015 Real' as tahun
-            union all 
-            select '2016 RKA' as tahun 
-            union all
-            select '2016 Real' as tahun 
-            union all
-            select '2017 RKA' as tahun 
-            union all
-            select '2017 Real' as tahun
-            union all 
-            select '2018 RKA' as tahun 
-            union all
-            select '2018 Real' as tahun 
-            union all
-            select '2019 RKA' as tahun 
-            union all
-            select '2019 Real' as tahun
-            union all 
-            select '2020 RKA' as tahun 
-            union all
-            select '2020 Real' as tahun 
             
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $ctg2 = array();
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                array_push($ctg2,'RKA '.$tahun);
+                array_push($ctg2,'Real '.$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg2'] = $ctg;
+            $success['ctg'] = $ctg2;
                         
             $row =  DB::connection($this->db)->select("
-            select 'Pendapatan' as nama,273 as n1,292.1 as n2,340.6 as n3,355.2 as n4,378.2 as n5,415.5 as n6,448.5 as n7,475.4 as n8,500.9 as n9,525.5 as n10,543.3 as n11,503.0 as n12
-            union all
-            select 'Beban' as nama,248.6 as n1,239.8 as n2,304.4 as n3,290.8 as n4,307.4 as n5,329.5 as n6,352.5 as n7,379.2 as n8,391.9 as n9,420.6 as n10,435.6 as n11,417.2 as n12
-            union all
-            select 'SHU' as nama,24.4 as n1,52.3 as n2,36.2 as n3,64.4 as n4,70.8 as n5,86.0 as n6,96.0 as n7,96.3 as n8,108.9 as n9,104.9 as n10,101.9 as n11,85.8 as n12
-            union all
-            select 'OR' as nama,90.5 as n1,84.6 as n2,88.7 as n3,81.8 as n4,80.8 as n5,78.1 as n6,72.9 as n7,78.5 as n8,76.8 as n9,78.8 as n10,80.2 as n11,82.9 as n12");
+            select a.kode_grafik,a.nama,b.n1,b.n2,c.n1 as n3,c.n2 as n4,d.n1 as n5,d.n2 as n6,e.n1 as n7,e.n2 as n8,
+            f.n1 as n9,f.n2 as n10,g.n1 as n11,g.n2 as n12
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K07'
+            
+            ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
                     $dt[$i] = array();
                     $c=0;
-                    for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                    for($x=1;$x<=count($ctg2);$x++){
+                        if($row[$i]['nama'] == "Beban"){
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg2[$c]);
+                        }else if($row[$i]['nama'] == "OR"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]*-1),"name"=>$row[$i]["nama"],"tahun"=>$ctg2[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]*-1)/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg2[$c]);
+                        }
                         $c++;          
                     }
                 }
