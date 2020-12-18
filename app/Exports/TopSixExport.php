@@ -21,7 +21,7 @@ use Maatwebsite\Excel\Events\BeforeExport;
 use Maatwebsite\Excel\Events\AfterSheet;
 
 
-class KunjunganExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
+class TopSixExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
 {
     public function __construct($nik_user,$periode,$type)
     {
@@ -33,12 +33,11 @@ class KunjunganExport implements FromCollection, WithHeadings, WithColumnFormatt
     public function collection()
     {
         if($this->type == 'template'){
-            $res = collect(DB::connection('dbsapkug')->select("select '' as jenis,'' as kode_pp,'' as kode_biaya,'' as rka_kunj,'' as jumlah"));
+            $res = collect(DB::connection('dbsapkug')->select("select '' as jenis,'' as nama,'' as penderita,'' as biaya"));
         }else{
             
-            $res = collect(DB::connection('dbsapkug')->select("select 
-            jenis,kode_lokasi as kode_pp,kode_biaya,rka_kunj,jumlah,sts_upload,ket_upload,nu 
-            from dash_kunj_tmp
+            $res = collect(DB::connection('dbsapkug')->select("select jenis,nama,penderita,biaya,sts_upload,ket_upload,nu 
+            from dash_peserta_tmp
             where nik_user ='$this->nik_user' and periode ='$this->periode' 
             order by nu"));
                         
@@ -51,13 +50,13 @@ class KunjunganExport implements FromCollection, WithHeadings, WithColumnFormatt
         if($this->type == 'template'){
             return [
                 [
-                    'pegawai/pensiun','regional','kode_layanan','rka_kunjungan','jumlah'
+                    'pegawai/pensiun','nama','penderita','biaya'
                 ]
             ];
         }else{
             return [
                 [
-                    'pegawai/pensiun','regional','kode_layanan','rka_kunjungan','jumlah',
+                    'pegawai/pensiun','nama','penderita','biaya',
                     'sts_upload',
                     'ket_upload',
                     'nu'
