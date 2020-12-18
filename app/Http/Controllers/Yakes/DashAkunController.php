@@ -28,7 +28,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -102,7 +102,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -178,7 +178,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -252,7 +252,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -326,7 +326,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $tahunBef = intval(substr($request->periode,0,4));
             $tahunBef = $tahunBef - 1;
@@ -400,7 +400,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $res = DB::connection($this->sql)->select("select b.warna,b.nama,b.idx
                                                     ,sum(case substring(periode,5,2) when '01' then a.nilai else 0 end) as jan
@@ -455,7 +455,7 @@ class DashAkunController extends Controller
             }
 
             if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and b.kode_pp like '%' ";
-            else $filterLokasi = " and b.kode_pp = '".substr($request->kode_pp,2,2)."' ";
+            else $filterLokasi = " and b.kode_pp = '".$request->kode_pp."' ";
 
             $res = DB::connection($this->sql)->select("select b.warna,b.nama,b.idx
                                                     ,sum(case substring(periode,5,2) when '01' then a.nilai else 0 end) as jan
