@@ -49,6 +49,9 @@ class DashAkunController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
+
+            $success['sql'] = $sql;
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
