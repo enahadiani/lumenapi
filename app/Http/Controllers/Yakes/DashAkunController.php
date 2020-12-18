@@ -13,6 +13,63 @@ class DashAkunController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+    public function dataClaimant(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required',
+            'jenis' => 'required',
+            'kode_pp' => 'required'           
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and kode_lokasi like '%' ";
+            else $filterLokasi = " and kode_lokasi = '".$request->kode_pp."' ";
+
+            $tahunBef = intval(substr($request->periode,0,4));
+            $tahunBef = $tahunBef - 1;
+            $tahunBef = strval($tahunBef);
+            $perBef = $tahunBef.substr($request->periode,4,2); 
+
+            $sql = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_now, sum(rka_claim) as rka_now
+                    from dash_peserta 
+                    where jenis ='".$request->jenis."' and periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterLokasi;
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            $sql2 = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_bef
+                    from dash_peserta 
+                    where jenis ='".$request->jenis."' and periode between '".substr($perBef,0,4)."01' and '".$perBef."' ".$filterLokasi;
+
+            $res2 = DB::connection($this->sql2)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data2'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data2'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function dataBPCCtotal(Request $request) {
         $this->validate($request, [    
             'periode' => 'required',
