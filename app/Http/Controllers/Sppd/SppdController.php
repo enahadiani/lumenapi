@@ -330,7 +330,7 @@ class SppdController extends Controller
         }
         
         $datam= $request->input("PBYR");
-        
+        Log::info($request->all());
         DB::connection('sqlsrvypt')->beginTransaction();
         try {
             $no_agenda = $this->generateKode("it_aju_m", "no_aju", $kode_lokasi."-".substr($datam[0]['periode'],2,2).".", "00001");
