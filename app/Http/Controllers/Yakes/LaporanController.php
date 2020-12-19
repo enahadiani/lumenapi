@@ -1823,6 +1823,7 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
+            /*
             $sql="exec sp_neraca2_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user'; ";
             $res = DB::connection($this->sql)->update($sql);
             
@@ -1830,7 +1831,15 @@ class LaporanController extends Controller
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='L'
             order by a.rowindex  ";
-            $res = DB::connection($this->sql)->select($sql2);
+            */
+            $sql="select a.kode_neraca,a.nama,a.level_spasi,a.tipe,
+                        isnull(b.n4,0) as n1,isnull(c.n4,0) as n2
+                from neraca a
+                left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs and b.periode='202011'
+                left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs and c.periode='201911'
+                where a.kode_lokasi='00' and a.kode_fs='FS5' and a.modul='L'
+                order by a.rowindex";
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             
