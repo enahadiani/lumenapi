@@ -2540,26 +2540,18 @@ class DashboardController extends Controller
             
             $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
             
-            $sql=" 
-            select 'Fak1' as nama, 2.45 as nilai
-            union all
-            select 'Fak2' as nama, 2.45 as nilai
-            union all
-            select 'Fak3' as nama, 2.45 as nilai
-            union all
-            select 'Fak4' as nama, 2.45 as nilai
-            union all
-            select 'Fak5' as nama, 2.45 as nilai
-            union all
-            select 'Fak6' as nama, 2.45 as nilai
-            union all
-            select 'Fak7' as nama, 2.45 as nilai
-            union all
-            select 'Fak8' as nama, 2.45 as nilai
-            union all
-            select 'Fak9' as nama, 2.45 as nilai
-            union all
-            select 'Fak10' as nama, 2.45 as nilai
+            $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
+            from aka_fakultas a
+            left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n8) as gar
+            from dash_grafik_d a
+            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik='GR07'  
+            group by d.kode_fakultas,a.kode_lokasi          
+                    )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
+            order by a.kode_fakultas
             ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
@@ -2575,7 +2567,7 @@ class DashboardController extends Controller
                 $dt = array();
                 $ctg= array();
                 for($i=0;$i<count($rs);$i++){
-                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['nilai']),"color"=> $color[$i]);
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['n1']),"color"=> $color[$i]);
                     array_push($ctg,$rs[$i]['nama']);    
                 }
                 $success['ctg'] = $ctg;
