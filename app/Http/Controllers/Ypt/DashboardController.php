@@ -2771,37 +2771,44 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'RKA' as nama,273.0 as n1,340.6 as n2,378.2 as n3,448.5 as n4,500.9 as n5,543.3 as n6
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR16'
             union all
-            select 'Actual' as nama,292.1 as n1,355.2 as n2,415.5 as n3,475.4 as n4,525.5 as n5,503.0 as n6
+            select 'Actual' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR16'
             union all
-            select 'Capaian' as nama,107.0 as n1,104.3 as n2,109.9 as n3,106.0 as n4,104.9 as n5,92.6 as n6
+            select 'Capaian' as nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR16'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -2810,7 +2817,13 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "Capaian"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]*-1)/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
@@ -2865,37 +2878,44 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'RKA' as nama,250.1 as n1,302.2 as n2,331.6 as n3,381.9 as n4,436.9 as n5,451.1 as n6
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR17'
             union all
-            select 'Actual' as nama,260.2 as n1,307.1 as n2,365.3 as n3,413.8 as n4,453.1 as n5,445.7 as n6
+            select 'Actual' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR17'
             union all
-            select 'Capaian' as nama,104.0 as n1,101.6 as n2,110.2 as n3,108.4 as n4,103.7 as n5,98.8 as n6
+            select 'Capaian' as nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR17'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -2904,7 +2924,13 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "Capaian"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]*-1)/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
@@ -2959,37 +2985,44 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'RKA' as nama,22.9 as n1,38.4 as n2,46.6 as n3,66.6 as n4,63.9 as n5,92.2 as n6
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR18'
             union all
-            select 'Actual' as nama,31.9 as n1,48.1 as n2,50.2 as n3,61.6 as n4,72.4 as n5,57.3 as n6
+            select 'Actual' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR18'
             union all
-            select 'Capaian' as nama,139.7 as n1,125.2 as n2,107.8 as n3,92.5 as n4,113.3 as n5,62.2 as n6
+            select 'Capaian' as nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR18'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -2998,7 +3031,13 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "Capaian"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]*-1)/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
@@ -3053,35 +3092,34 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'NTF' as nama,31.9 as n1,48.1 as n2,50.2 as n3,61.6 as n4,72.4 as n5,57.3 as n6
+            select a.kode_grafik, a.nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR18'
             union all
-            select 'TF' as nama,260 as n1,307 as n2,365 as n3,414 as n4,453 as n5,446 as n6
+            select a.kode_grafik, a.nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR17'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3090,7 +3128,7 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*-1,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
                         $c++;          
                     }
                 }
@@ -3136,37 +3174,24 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'Total Pendapatan' as nama,107.0 as n1,104.3 as n2,109.9 as n3,106.0 as n4,104.9 as n5,92.6 as n6
-            union all
-            select 'TF' as nama,104.0 as n1,101.6 as n2,110.2 as n3,108.4 as n4,103.7 as n5,98.8 as n6
-            union all
-            select 'NTF' as nama,139.7 as n1,125.2 as n2,107.8 as n3,92.5 as n4,113.3 as n5,62.2 as n6
+            select a.kode_grafik,a.nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K08'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3175,7 +3200,7 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
                         $c++;          
                     }
                 }
@@ -3187,7 +3212,7 @@ class DashboardController extends Controller
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "dataLabels"=>array("enabled"=>true)
+                        "name"=> $row[$i]['nama'], "yAxis"=>1, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "dataLabels"=>array("enabled"=>true)
                         
                     );
                 }
@@ -3222,37 +3247,44 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'RKA' as nama,248.6 as n1,304.4 as n2,307.4 as n3,352.5 as n4,391.9 as n5,435.6 as n6
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR19'
             union all
-            select 'Actual' as nama,239.8 as n1,290.8 as n2,329.5 as n3,379.2 as n4,420.6 as n5,417.2 as n6
+            select 'Actual' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR19'
             union all
-            select 'Capaian' as nama,96.5 as n1,95.5 as n2,107.2 as n3,107.6 as n4,103.7 as n5,95.8 as n6
+            select 'Capaian' as nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR19'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3261,7 +3293,13 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "Capaian"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
@@ -3269,7 +3307,6 @@ class DashboardController extends Controller
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
-                
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -3317,37 +3354,44 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'RKA' as nama,130.0 as n1,156.3 as n2,158.5 as n3,190.7 as n4,218.2 as n5,240.7 as n6
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
             union all
-            select 'Actual' as nama,126.8 as n1,151.0 as n2,168.9 as n3,203.4 as n4,222.5 as n5,241.2 as n6
+            select 'Actual' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
             union all
-            select 'Capaian' as nama,52 as n1,51 as n2,52 as n3,54 as n4,56 as n5,55 as n6
+            select 'Capaian' as nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3356,13 +3400,18 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "Capaian"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
-                
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
@@ -3395,8 +3444,7 @@ class DashboardController extends Controller
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
-            }
-        } catch (\Throwable $e) {
+            }        } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
@@ -3412,35 +3460,34 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'SDM' as nama,126.8 as n1,151 as n2,168.9 as n3,203.4 as n4,222.5 as n5,241.2 as n6
+            select a.kode_grafik, a.nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
             union all
-            select 'Beban Lain' as nama,239 as n1,290.8 as n2,329.5 as n3,379.2 as n4,420.6 as n5,417.2 as n6
+            select a.kode_grafik, a.nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR21'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3455,7 +3502,6 @@ class DashboardController extends Controller
                 }
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
-                
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
@@ -3496,37 +3542,24 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'Total Beban' as nama,107.0 as n1,104.3 as n2,109.9 as n3,106.0 as n4,104.9 as n5,92.6 as n6
-            union all
-            select 'TF' as nama,104.0 as n1,101.6 as n2,110.2 as n3,108.4 as n4,103.7 as n5,98.8 as n6
-            union all
-            select 'NTF' as nama,139.7 as n1,125.2 as n2,107.8 as n3,92.5 as n4,113.3 as n5,62.2 as n6
+            select a.kode_grafik,a.nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR19','GR20','GR22')
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3535,20 +3568,19 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
                         $c++;          
                     }
                 }
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
-                
-                $color = array('#005FB8','#FDC500','#FB8500');
+                $color = array('#005FB8','#FDC500','#FB8500','#FDC500');
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "dataLabels"=>array("enabled"=>true)
+                        "name"=> $row[$i]['nama'], "yAxis"=>1, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "dataLabels"=>array("enabled"=>true)
                         
                     );
                 }
@@ -3582,37 +3614,44 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun
-            union all
-            select '2020' as tahun 
-            
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(date('Y'))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
+            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
-            select 'RKA' as nama,24.2 as n1,36.2 as n2,70.8 as n3,96.0 as n4,108.9 as n5,101.9 as n6
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K10'
             union all
-            select 'Actual' as nama,52.3 as n1,64.4 as n2,86.0 as n3,96.3 as n4,104.9 as n5,85.8 as n6
+            select 'Actual' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K10'
             union all
-            select 'Capaian' as nama,214.4 as n1,177.6 as n2,121.5 as n3,100.2 as n4,96.3 as n5,84.2 as n6
+            select 'Capaian' as nama,b.n2/b.n1 as n1,c.n2/c.n1 as n2,d.n2/d.n1 as n3,e.n2/e.n1 as n4,f.n2/f.n1 as n5,g.n2/g.n1 as n6
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K10'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3621,13 +3660,18 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "Capaian"){
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]*-1)/1000000000,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
-                
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
