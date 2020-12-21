@@ -13,6 +13,7 @@ class DashboardController extends Controller
 	public $successStatus = 200;
     public $guard = 'yptkug';
     public $db = 'sqlsrvyptkug';
+    public $dark_color = array('#2200FF','#28DA66','#FFCD2F','#ED4346','#E225FF','#27D1E6','#FE732F','#C7C7C7');
 
     public function getPeriode(){
         try {
@@ -2302,6 +2303,9 @@ class DashboardController extends Controller
             }
             
             $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
             
             $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
             from aka_fakultas a
@@ -2367,6 +2371,10 @@ class DashboardController extends Controller
             }
             
             $color = array('#611dad','#4c4c4c','#ad1d3e','#ad571d','#30ad1d','#a31dad','#1dada8','#1d78ad','#ad9b1d','#1dad6e');
+
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
             
             $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n8) as gar
             from dash_grafik_d a
@@ -2471,6 +2479,9 @@ class DashboardController extends Controller
 
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[2],$this->dark_color[6]);
+                }
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
@@ -2583,6 +2594,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -2690,6 +2704,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -2797,6 +2814,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -2888,6 +2908,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -2960,6 +2983,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#005FB8','#FDC500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[2]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -3059,6 +3085,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -3166,6 +3195,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -3256,6 +3288,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[2],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -3328,6 +3363,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#005FB8','#FDC500','#FB8500','#FDC500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[2],$this->dark_color[3]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
@@ -3426,6 +3464,9 @@ class DashboardController extends Controller
 
                 // $color = array('#4c4c4c','#900604','#16ff14');
                 $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
                 $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
