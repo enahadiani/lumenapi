@@ -115,6 +115,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('beban-5tahun-growth','Ypt\DashboardController@getBeban5TahunGrowth');
 
     $router->get('shu-5tahun','Ypt\DashboardController@getSHU5Tahun');
+
+    $router->get('ms-pend-capai','Ypt\DashboardController@getPendCapai');
+    $router->get('ms-pend-capai-klp','Ypt\DashboardController@getPendCapaiKlp');
 });
 
 
