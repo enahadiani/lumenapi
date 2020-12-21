@@ -3784,13 +3784,10 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $tahun = substr($request->periode,0,4);
-            $row =  DB::connection($this->db)->select("
-            select a.kode_neraca,c.nama,b.n1*-1 as rka, b.n2*-1 as real,case when (b.n1*-1)-isnull((b.n2*-1),0) < 0 then abs((b.n1*-1)-isnull(b.n2*-1,0)) else 0 end as melampaui,  case when (b.n1*-1)-isnull((b.n2*-1),0) < 0 then 0 else abs((b.n1*-1)-isnull(b.n2*-1,0)) end as tidak_tercapai
-            from dash_grafik_d a
-            inner join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
-            inner join dash_grafik_m d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and d.kode_grafik in ('GR17','GR18') and a.kode_fs='FS1'
+            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,b.n4*-1 as rka, b.n8*-1 as real,case when (b.n4*-1)-isnull((b.n8*-1),0) < 0 then abs((b.n4*-1)-isnull(b.n8*-1,0)) else 0 end as melampaui,  case when (b.n4*-1)-isnull((b.n8*-1),0) < 0 then 0 else abs((b.n4*-1)-isnull(b.n8*-1,0)) end as tidak_tercapai
+                from dash_grafik_d a
+                inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik ='GR18' and a.kode_fs='FS1'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -3917,12 +3914,10 @@ class DashboardController extends Controller
             }
             $tahun = substr($request->periode,0,4);
             $row =  DB::connection($this->db)->select("
-            select a.kode_neraca,c.nama,b.n1 as rka, b.n2 as real,case when (b.n1)-isnull((b.n2),0) < 0 then abs((b.n1)-isnull(b.n2,0)) else 0 end as melampaui,  case when (b.n1)-isnull((b.n2),0) < 0 then 0 else abs((b.n1)-isnull(b.n2,0)) end as tidak_tercapai
-            from dash_grafik_d a
-            inner join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
-            inner join dash_grafik_m d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and d.kode_grafik in ('GR21') and a.kode_fs='FS1'
+                select a.kode_neraca,b.nama,b.n4 as rka, b.n8 as real,case when (b.n4)-isnull((b.n8),0) < 0 then abs((b.n4)-isnull(b.n8,0)) else 0 end as melampaui,  case when (b.n4)-isnull((b.n8),0) < 0 then 0 else abs((b.n4)-isnull(b.n8,0)) end as tidak_tercapai
+                from dash_grafik_d a
+                inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik='GR24' and a.kode_fs='FS1'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
