@@ -92,13 +92,6 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('kelola-keuangan','Ypt\DashboardController@kelolaKeuangan');
     $router->get('penjualan-pin','Ypt\DashboardController@penjualanPin');
 
-    
-    $router->get('ms-pendapatan','Ypt\DashboardController@msPendapatan');
-    $router->get('ms-pendapatan-klp','Ypt\DashboardController@msPendapatanKlp');
-
-    $router->get('ms-beban','Ypt\DashboardController@msBeban');
-    $router->get('ms-beban-klp','Ypt\DashboardController@msBebanKlp');
-
     $router->get('ms-pengembangan-rka','Ypt\DashboardController@msPengembanganRKA');
     $router->get('ms-pengembangan-komposisi','Ypt\DashboardController@msPengembanganKomposisi');
     
