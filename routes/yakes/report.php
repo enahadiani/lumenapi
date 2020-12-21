@@ -55,6 +55,10 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //email
     $router->post('send-laporan','Yakes\LaporanController@sendMail');
 
+    // BPJS
+    $router->get('lap-premi-kapitasi','Yakes\LaporanController@getPremiKapitasi');
+    $router->get('lap-claim-bpjs','Yakes\LaporanController@getClaimBPJS');
+
 });
 
 
