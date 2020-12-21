@@ -3844,5 +3844,137 @@ class DashboardController extends Controller
         }
     }
 
+    public function getBebanCapai(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $tahun = substr($request->periode,0,4);
+            $row =  DB::connection($this->db)->select("
+            select a.kode_grafik,a.nama,b.n1 as rka, b.n2 as real,case when (b.n1)-isnull(b.n2,0) < 0 then abs((b.n1)-isnull(b.n2,0)) else 0 end as melampaui,  case when (b.n1)-isnull((b.n2),0) < 0 then 0 else abs((b.n1)-isnull(b.n2,0)) end as tidak_tercapai
+            from dash_grafik_m a
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR08','GR09') and b.periode='$request->periode'
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
+                }
+                $success['rka'] = $rka;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBebanCapaiKlp(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $tahun = substr($request->periode,0,4);
+            $row =  DB::connection($this->db)->select("
+            select a.kode_neraca,c.nama,b.n1 as rka, b.n2 as real,case when (b.n1)-isnull((b.n2),0) < 0 then abs((b.n1)-isnull(b.n2,0)) else 0 end as melampaui,  case when (b.n1)-isnull((b.n2),0) < 0 then 0 else abs((b.n1)-isnull(b.n2,0)) end as tidak_tercapai
+            from dash_grafik_d a
+            inner join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
+            inner join dash_grafik_m d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and d.kode_grafik in ('GR21') and a.kode_fs='FS1'
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                $ctg = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
+                    array_push($ctg,$row[$i]['nama']);
+                }
+                $success['rka'] = $rka;
+                $success['ctg'] = $ctg;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['ctg'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 }

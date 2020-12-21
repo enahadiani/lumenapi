@@ -118,6 +118,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     $router->get('ms-pend-capai','Ypt\DashboardController@getPendCapai');
     $router->get('ms-pend-capai-klp','Ypt\DashboardController@getPendCapaiKlp');
+    
+    $router->get('ms-beban-capai','Ypt\DashboardController@getBebanCapai');
+    $router->get('ms-beban-capai-klp','Ypt\DashboardController@getBebanCapaiKlp');
 });
 
 
