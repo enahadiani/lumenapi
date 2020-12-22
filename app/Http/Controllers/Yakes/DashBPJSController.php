@@ -244,7 +244,10 @@ class DashBPJSController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if (strtoupper($request->kode_pp) == 'NASIONAL') $filterLokasi = " and a.kode_lokasi like '%' ";
+            if (strtoupper($request->kode_pp) == 'NASIONAL') {
+                $filterPP = " ";
+                $filterLokasi = " and a.kode_lokasi like '%' ";
+            }
             else {
                 $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
                 if (substr($request->kode_pp,2,2) == '00') $filterLokasi = " and a.kode_lokasi = '99' ";                
