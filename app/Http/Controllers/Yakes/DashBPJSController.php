@@ -207,7 +207,108 @@ class DashBPJSController extends Controller
                     from yk_bpjs_iuran a 
                     where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' ".$filterJenis;
 
-            //$success['sql'] = $sql; <--- alert
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function dataKapitasiRegional(Request $request) {
+        $this->validate($request, [                
+            'periode' => 'required'       
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if (strtoupper($request->kode_pp) == 'NASIONAL') {
+                $filterPP = " ";
+                $filterLokasi = " and a.kode_lokasi like '%' ";
+            }
+            else {
+                $filterLokasi = " and a.kode_lokasi = '".substr($request->kode_pp,2,2)."' ";
+                if (substr($request->kode_pp,2,2) == '00') $filterLokasi = " and a.kode_lokasi = '99' ";                
+                $filterPP = " and a.kode_pp = '".$request->kode_pp."' ";
+            }
+
+            $sql = "select 
+                    'KAP' as tipe,'PEGAWAI' as jenis,
+                    sum(a.nilai) as kap_total, 
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as kap1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as kap2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as kap3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as kap4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as kap5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as kap6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as kap7,
+                    sum(case when a.kode_lokasi='99' then a.nilai else 0 end) as kap9
+                    from yk_bpjs_kapitasi a                     
+                    where a.jenis_tpkk='TPKK' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' and a.jenis='PEGAWAI'
+                    
+                    union all
+                    
+                    select 
+                    'KAP' as tipe,'PENSIUN' as jenis,sum(a.nilai) as kap_total, 
+                    sum(case when a.kode_lokasi='01' then a.nilai else 0 end) as kap1, 
+                    sum(case when a.kode_lokasi='02' then a.nilai else 0 end) as kap2, 
+                    sum(case when a.kode_lokasi='03' then a.nilai else 0 end) as kap3, 
+                    sum(case when a.kode_lokasi='04' then a.nilai else 0 end) as kap4, 
+                    sum(case when a.kode_lokasi='05' then a.nilai else 0 end) as kap5, 
+                    sum(case when a.kode_lokasi='06' then a.nilai else 0 end) as kap6, 
+                    sum(case when a.kode_lokasi='07' then a.nilai else 0 end) as kap7,
+                    sum(case when a.kode_lokasi='99' then a.nilai else 0 end) as kap9
+                    from yk_bpjs_kapitasi a                     
+                    where a.jenis_tpkk='TPKK' and a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' and a.jenis='PENSIUN'
+                    
+                    union all
+                    
+                    select 
+                    'PESERTA' as tipe,'PENSIUN' as jenis,sum(a.jumlah) as peserta_total, 
+                    sum(case when a.kode_lokasi='01' then a.jumlah else 0 end) as peserta1, 
+                    sum(case when a.kode_lokasi='02' then a.jumlah else 0 end) as peserta2, 
+                    sum(case when a.kode_lokasi='03' then a.jumlah else 0 end) as peserta3, 
+                    sum(case when a.kode_lokasi='04' then a.jumlah else 0 end) as peserta4, 
+                    sum(case when a.kode_lokasi='05' then a.jumlah else 0 end) as peserta5, 
+                    sum(case when a.kode_lokasi='06' then a.jumlah else 0 end) as peserta6, 
+                    sum(case when a.kode_lokasi='07' then a.jumlah else 0 end) as peserta7,
+                    sum(case when a.kode_lokasi='99' then a.jumlah else 0 end) as peserta9
+                    from yk_bpjs_peserta a                     
+                    where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' and a.jenis='PENSIUN'                    
+                    
+                    union all
+                    
+                    select 
+                    'PESERTA' as tipe,'PEGAWAI' as jenis,sum(a.jumlah) as peserta_total, 
+                    sum(case when a.kode_lokasi='01' then a.jumlah else 0 end) as peserta1, 
+                    sum(case when a.kode_lokasi='02' then a.jumlah else 0 end) as peserta2, 
+                    sum(case when a.kode_lokasi='03' then a.jumlah else 0 end) as peserta3, 
+                    sum(case when a.kode_lokasi='04' then a.jumlah else 0 end) as peserta4, 
+                    sum(case when a.kode_lokasi='05' then a.jumlah else 0 end) as peserta5, 
+                    sum(case when a.kode_lokasi='06' then a.jumlah else 0 end) as peserta6, 
+                    sum(case when a.kode_lokasi='07' then a.jumlah else 0 end) as peserta7,
+                    sum(case when a.kode_lokasi='99' then a.jumlah else 0 end) as peserta9
+                    from yk_bpjs_peserta a                     
+                    where a.periode between '".substr($request->periode,0,4)."01' and '".$request->periode."' and a.jenis<>'PENSIUN' ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -306,7 +407,6 @@ class DashBPJSController extends Controller
             return response()->json($success, $this->successStatus);
         }        
     }
-
 
     public function dataClaim(Request $request) {
         $this->validate($request, [    
