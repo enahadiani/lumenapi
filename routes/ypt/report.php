@@ -59,6 +59,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     // LAPORAN ANGGARAN
     
     $router->get('lap-labarugi-agg','Ypt\LaporanController@getLabaRugiAgg');
+    $router->get('lap-neraca2','Ypt\LaporanController@getNeraca2');
 
 });
 
