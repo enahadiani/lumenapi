@@ -3578,7 +3578,7 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $tahun = substr($request->periode,0,4);
-            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,b.n4*-1 as rka, b.n8*-1 as real,case when (b.n4*-1)-isnull((b.n8*-1),0) < 0 then abs((b.n4*-1)-isnull(b.n8*-1,0)) else 0 end as melampaui,  case when (b.n4*-1)-isnull((b.n8*-1),0) < 0 then 0 else abs((b.n4*-1)-isnull(b.n8*-1,0)) end as tidak_tercapai
+            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,b.n4*-1 as real, b.n8*-1 as rka,case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n8*-1)-isnull(b.n4*-1,0)) else 0 end as melampaui,  case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n8*-1)-isnull(b.n4*-1,0)) end as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                 where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik ='GR18' and a.kode_fs='FS1'
