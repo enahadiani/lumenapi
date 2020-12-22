@@ -229,6 +229,57 @@ class DashBPJSController extends Controller
         }        
     }
 
+    public function dataKapitasiRegDetail(Request $request) {
+        $this->validate($request, [                
+            'periode' => 'required',
+            'lokasi' => 'required'     
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $sql = "select 'KAP' as tipe,b.kode_tpkk,b.nama,
+                    sum(case when a.jenis='PENSIUN' then nilai else 0 end) as pensiun,
+                    sum(case when a.jenis<>'PENSIUN' then nilai else 0 end) as pegawai
+                    from yk_bpjs_kapitasi_d a inner join yk_tpkk b on a.kode_tpkk=b.kode_tpkk and a.kode_lokasi=b.kode_lokasi and b.jenis='tpkk'
+                    where b.kode_lokasi ='".$request->lokasi."' and a.periode between '".substr($request->periode,0,4)."' and '".$request->periode."'
+                    group by b.kode_tpkk,b.nama
+                    
+                    union all
+                    
+                    select 'PESERTA' as tipe,b.kode_tpkk,b.nama,
+                    sum(case when a.jenis='PENSIUN' then jumlah else 0 end) as pensiun,
+                    sum(case when a.jenis<>'PENSIUN' then jumlah else 0 end) as pegawai
+                    from yk_bpjs_peserta a inner join yk_tpkk b on a.kode_tpkk=b.kode_tpkk and a.kode_lokasi=b.kode_lokasi and b.jenis='tpkk'
+                    where b.kode_lokasi ='".$request->lokasi."' and a.periode between '".substr($request->periode,0,4)."' and '".$request->periode."'
+                    group by b.kode_tpkk,b.nama ";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function dataKapitasiRegional(Request $request) {
         $this->validate($request, [                
             'periode' => 'required'       
