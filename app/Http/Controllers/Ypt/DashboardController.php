@@ -3516,7 +3516,7 @@ class DashboardController extends Controller
             }
             $tahun = substr($request->periode,0,4);
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1*-1 as rka, b.n2*-1 as real,case when (b.n1*-1)-isnull(b.n2*-1,0) < 0 then abs((b.n1*-1)-isnull(b.n2*-1,0)) else 0 end as melampaui,  case when (b.n1*-1)-isnull((b.n2*-1),0) < 0 then 0 else abs((b.n1*-1)-isnull(b.n2*-1,0)) end as tidak_tercapai
+            select a.kode_grafik,a.nama,b.n2*-1 as rka, b.n1*-1 as real,case when (b.n2*-1)-isnull(b.n1*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n1*-1,0)) else 0 end as melampaui,  case when (b.n2*-1)-isnull((b.n1*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n1*-1,0)) end as tidak_tercapai
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR17','GR18') and b.periode='$request->periode'
@@ -3645,7 +3645,7 @@ class DashboardController extends Controller
             }
             $tahun = substr($request->periode,0,4);
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as rka, b.n2 as real,case when (b.n1)-isnull(b.n2,0) < 0 then abs((b.n1)-isnull(b.n2,0)) else 0 end as melampaui,  case when (b.n1)-isnull((b.n2),0) < 0 then 0 else abs((b.n1)-isnull(b.n2,0)) end as tidak_tercapai
+            select a.kode_grafik,a.nama,b.n2 as rka, b.n1 as real,case when (b.n2)-isnull(b.n1,0) < 0 then abs((b.n2)-isnull(b.n1,0)) else 0 end as melampaui,  case when (b.n2)-isnull((b.n1),0) < 0 then 0 else abs((b.n2)-isnull(b.n1,0)) end as tidak_tercapai
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR08','GR09') and b.periode='$request->periode'
