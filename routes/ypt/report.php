@@ -51,9 +51,14 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-nrclajur-jejer','Ypt\LaporanController@getNrcLajurJejer');
     $router->get('lap-neraca-jejer','Ypt\LaporanController@getNeracaJejer');
     $router->get('lap-labarugi-jejer','Ypt\LaporanController@getLabaRugiJejer');
+    
 
     //email
     $router->post('send-laporan','Ypt\LaporanController@sendMail');
+
+    // LAPORAN ANGGARAN
+    
+    $router->get('lap-labarugi-agg','Ypt\LaporanController@getLabaRugiAgg');
 
 });
 
