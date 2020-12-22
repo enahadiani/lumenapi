@@ -68,6 +68,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('dataEdu','Yakes\DashSDMController@dataEdu');    
 
     //dashbord bpjs
+    $router->get('dash-bpjs-kapitasiregdetail','Yakes\DashBPJSController@dataKapitasiRegDetail');
     $router->get('dash-bpjs-kapitasireg','Yakes\DashBPJSController@dataKapitasiRegional');
     $router->get('dataClaim','Yakes\DashBPJSController@dataClaim');
     $router->get('dataKapitasi','Yakes\DashBPJSController@dataKapitasi');    
