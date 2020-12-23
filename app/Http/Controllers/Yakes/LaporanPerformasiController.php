@@ -54,12 +54,16 @@ class LaporanPerformasiController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data2'] = $res2;
+                $success['data3'] = $res3;
+                $success['data4'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data2'] = [];
+                $success['data2'] = $res2;
+                $success['data3'] = $res3;
+                $success['data4'] = $res4;
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
