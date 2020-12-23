@@ -28,6 +28,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('filter-bukti-jurnal','Yakes\FilterController@getFilterBuktiJurnal');
     $router->get('filter-mutasi','Yakes\FilterController@getFilterYaTidak');
     $router->get('filter-pp','Yakes\FilterController@getFilterPp');
+    $router->get('filter-klp-akun','Yakes\FilterController@getFilterKlpAkun');
 
     //Laporan lokasi
     $router->get('lap-nrclajur','Yakes\LaporanController@getNrcLajur');

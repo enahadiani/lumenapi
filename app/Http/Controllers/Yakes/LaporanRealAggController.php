@@ -42,13 +42,53 @@ class LaporanRealAggController extends Controller
             $bulan = substr($periode,4,2);
             $periodeseb = $tahunseb.$bulan;
 
+            $col_array = array('kode_klpakun');
+            $db_col_name = array('a.kode_klpakun');
+            $where = "where a.jenis='Beban' ";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
             $sql = "select a.kode_klpakun,a.nama
             from dash_klp_akun a
-            where a.jenis='Beban'
+            $where
             order by a.kode_klpakun ";
 
             $res = DB::connection($this->sql)->select($sql);
+            
+            $i=0;
+            $kode_klpakun = "";
+            foreach($res as $row){
+
+                if($i == 0){
+                    $kode_klpakun .= "'$row->kode_klpakun'";
+                }else{
+
+                    $kode_klpakun .= ","."'$row->kode_klpakun'";
+                }
+                $i++;
+            }
             $res = json_decode(json_encode($res),true);
+
 
             $sql2 = "select a.kode_akun,b.kode_klpakun,a.nama,isnull(b.rea_now,0) as rea_now,isnull(b.rea_bef,0) as rea_bef,isnull(b.rea_now,0)-isnull(b.rea_bef,0) as selisih
             from masakun a
@@ -58,7 +98,7 @@ class LaporanRealAggController extends Controller
                     from gldt a 
                     inner join dash_klp_akun_d b on a.kode_akun=b.kode_akun
                     inner join dash_klp_akun c on b.kode_klpakun=c.kode_klpakun
-                    where a.kode_lokasi='$kode_lokasi' and c.jenis in ('Beban','CC') 
+                    where a.kode_lokasi='$kode_lokasi' and c.jenis in ('Beban','CC') and b.kode_klpakun in ($kode_klpakun) 
                     group by a.kode_akun,b.kode_klpakun,a.kode_lokasi
                     )b on a.kode_lokasi=b.kode_lokasi and a.kode_akun=b.kode_akun
             where a.kode_lokasi='$kode_lokasi'";
