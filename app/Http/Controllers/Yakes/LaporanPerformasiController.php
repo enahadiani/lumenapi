@@ -74,6 +74,46 @@ class LaporanPerformasiController extends Controller
             return response()->json($success, $this->successStatus);
         }        
     }
+
+    public function getBinaSehat(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required'                     
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = $request->periode[1];
+
+            $sql = "select a.no,a.periode,a.uraian,a.satuan,a.rka,a.real,a.real_before,a.ach,a.yoy 
+            from dash_bina_sehat a
+            where a.periode ='$periode'
+            order by a.no_urut
+            ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
     
 
 }

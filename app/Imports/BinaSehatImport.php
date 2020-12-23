@@ -5,8 +5,9 @@ namespace App\Imports;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 
-class BinaSehatImport implements ToModel, WithStartRow
+class BinaSehatImport implements ToModel, WithStartRow, WithCalculatedFormulas
 {
     public function startRow(): int
     {

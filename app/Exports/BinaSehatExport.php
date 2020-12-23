@@ -33,10 +33,10 @@ class BinaSehatExport implements FromCollection, WithHeadings, WithColumnFormatt
     public function collection()
     {
         if($this->type == 'template'){
-            $res = collect(DB::connection('dbsapkug')->select("select '' as uraian,'' as satuan,'' as rka,'' as real"));
+            $res = collect(DB::connection('dbsapkug')->select("select '' as no,'' as uraian,'' as satuan,'' as rka,'' as real,'' as real_before, '' as ach, '' as yoy"));
         }else{
             
-            $res = collect(DB::connection('dbsapkug')->select("select uraian,satuan,rka,real,sts_upload,ket_upload,nu 
+            $res = collect(DB::connection('dbsapkug')->select("select '' as no,uraian,satuan,rka,real,real_before,ach,yoy,sts_upload,ket_upload,nu 
             from dash_bina_sehat_tmp
             where nik_user ='$this->nik_user' and periode ='$this->periode' 
             order by nu"));
@@ -50,13 +50,13 @@ class BinaSehatExport implements FromCollection, WithHeadings, WithColumnFormatt
         if($this->type == 'template'){
             return [
                 [
-                    'uraian','satuan','rka','real'
+                    'no','uraian','satuan','rka','real','real_before','ach','yoy'
                 ]
             ];
         }else{
             return [
                 [
-                    'uraian','satuan','rka','real',
+                    'no','uraian','satuan','rka','real','real_before','ach','yoy',
                     'sts_upload',
                     'ket_upload',
                     'nu'

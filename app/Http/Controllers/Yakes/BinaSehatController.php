@@ -49,8 +49,8 @@ class BinaSehatController extends Controller
             $del1 = DB::connection($this->sql)->table('dash_bina_sehat')->where('periode', $request->periode)->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into dash_bina_sehat(
-                no_urut,periode,uraian,satuan,rka,real,tgl_input,nik_user) 
-                select no_urut,periode,uraian,satuan,rka,real,tgl_input,'$nik' as nik_user from dash_bina_sehat_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+                no_urut,periode,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,nik_user,no) 
+                select no_urut,periode,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,'$nik' as nik_user,no from dash_bina_sehat_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
                 $del2 = DB::connection($this->sql)->table('dash_bina_sehat_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
@@ -116,7 +116,7 @@ class BinaSehatController extends Controller
                         $sts = 1;
                     // }
                     // $nama = str_replace("'","",$row[1]);
-                    $query .= "insert into dash_bina_sehat_tmp(no_urut,periode,uraian,satuan,rka,real,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."','".$row[1]."',".floatval($row[2]).",".floatval($row[3]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
+                    $query .= "insert into dash_bina_sehat_tmp(no_urut,periode,no,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."','".$row[1]."','".$row[2]."',".floatval($row[3]).",".floatval($row[4]).",".floatval($row[5]).",".floatval($row[6]).",".floatval($row[7]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
                     $no++;
                 // }
             }
@@ -177,7 +177,7 @@ class BinaSehatController extends Controller
             }
 
             $sql = "select 
-            no_urut,periode,uraian,satuan,rka,real,tgl_input,nik_user
+            no,no_urut,periode,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,nik_user
             from dash_bina_sehat_tmp 
             where nik_user = '".$nik_user."' and periode='".$periode."' 
             order by nu";
