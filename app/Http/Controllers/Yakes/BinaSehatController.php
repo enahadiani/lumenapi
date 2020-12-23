@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-use App\Exports\TopSixExport;
-use App\Imports\TopSixImport;
+use App\Exports\BinaSehatExport;
+use App\Imports\BinaSehatImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class TopSixController extends Controller
+class BinaSehatController extends Controller
 {    
     public $successStatus = 200;
     public $sql = 'dbsapkug';
@@ -46,23 +46,23 @@ class TopSixController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del1 = DB::connection($this->sql)->table('dash_top_icd')->where('periode', $request->periode)->delete();
+            $del1 = DB::connection($this->sql)->table('dash_bina_sehat')->where('periode', $request->periode)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into dash_top_icd(
-                no_urut,periode,jenis,nama,penderita,biaya,tgl_input,nik_user) 
-                select no_urut,periode,jenis,nama,penderita,biaya,tgl_input,'$nik' as nik_user from dash_top_icd_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+            $ins = DB::connection($this->sql)->insert("insert into dash_bina_sehat(
+                no_urut,periode,uraian,satuan,rka,real,tgl_input,nik_user) 
+                select no_urut,periode,uraian,satuan,rka,real,tgl_input,'$nik' as nik_user from dash_bina_sehat_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
-                $del2 = DB::connection($this->sql)->table('dash_top_icd_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+                $del2 = DB::connection($this->sql)->table('dash_bina_sehat_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Top Six berhasil disimpan";
+                $success['message'] = "Data Pembinaan Kesehatan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Top Six gagal disimpan ".$e;
+            $success['message'] = "Data Pembinaan Kesehatan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -85,7 +85,7 @@ class TopSixController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->sql)->table('dash_top_icd_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+            $del1 = DB::connection($this->sql)->table('dash_bina_sehat_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
             // menangkap file excel
             $file = $request->file('file');
     
@@ -93,7 +93,7 @@ class TopSixController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $dt = Excel::toArray(new TopSixImport(),$nama_file);
+            $dt = Excel::toArray(new BinaSehatImport(),$nama_file);
             $excel = $dt[0];
             $x = array();
             $query = "";
@@ -107,18 +107,18 @@ class TopSixController extends Controller
             ";
             $commit = "commit tran;";
             foreach($excel as $row){
-                if($row[0] != ""){
-                    $ket = $this->validateData($row[0],$row[1]);
-                    if($ket != ""){
-                        $sts = 0;
-                        $status_validate = false;
-                    }else{
+                // if($row[0] != ""){
+                    // $ket = $this->validateData($row[0],$row[1]);
+                    // if($ket != ""){
+                    //     $sts = 0;
+                    //     $status_validate = false;
+                    // }else{
                         $sts = 1;
-                    }
+                    // }
                     // $nama = str_replace("'","",$row[1]);
-                    $query .= "insert into dash_top_icd_tmp(no_urut,periode,jenis,nama,penderita,biaya,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."','".$row[1]."',".intval($row[2]).",".floatval($row[3]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
+                    $query .= "insert into dash_bina_sehat_tmp(no_urut,periode,uraian,satuan,rka,real,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."','".$row[1]."',".floatval($row[2]).",".floatval($row[3]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
                     $no++;
-                }
+                // }
             }
 
             $insert = DB::connection($this->sql)->insert($begin.$query.$commit);
@@ -154,13 +154,13 @@ class TopSixController extends Controller
 
         date_default_timezone_set("Asia/Bangkok");
         if(isset($request->type) && $request->type == "template"){
-            return Excel::download(new TopSixExport($request->nik_user,$request->periode,$request->type), 'TopSix_'.$request->nik_user.'.xlsx');
+            return Excel::download(new BinaSehatExport($request->nik_user,$request->periode,$request->type), 'BinaSehat_'.$request->nik_user.'.xlsx');
         }else{
-            return Excel::download(new TopSixExport($request->nik_user,$request->periode,$request->type), 'TopSix_'.$request->nik_user.'.xlsx');
+            return Excel::download(new BinaSehatExport($request->nik_user,$request->periode,$request->type), 'BinaSehat_'.$request->nik_user.'.xlsx');
         }
     }
 
-    public function getTopSixTmp(Request $request)
+    public function getBinaSehatTmp(Request $request)
     {
         
         $this->validate($request, [
@@ -177,8 +177,8 @@ class TopSixController extends Controller
             }
 
             $sql = "select 
-            no_urut,periode,jenis,nama,penderita,biaya,tgl_input,nik_user
-            from dash_top_icd_tmp 
+            no_urut,periode,uraian,satuan,rka,real,tgl_input,nik_user
+            from dash_bina_sehat_tmp 
             where nik_user = '".$nik_user."' and periode='".$periode."' 
             order by nu";
             $res = DB::connection($this->sql)->select($sql);

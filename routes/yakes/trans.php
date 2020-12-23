@@ -75,6 +75,10 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('dashKontrakManage-import','Yakes\KontrakManagemenController@importExcel');
     $router->get('dashKontrakManage-tmp','Yakes\KontrakManagemenController@getKontrakManagemenTmp');
 
+    $router->post('dashBinaSehat','Yakes\BinaSehatController@store');
+    $router->post('dashBinaSehat-import','Yakes\BinaSehatController@importExcel');
+    $router->get('dashBinaSehat-tmp','Yakes\BinaSehatController@getBinaSehatTmp');
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
@@ -83,6 +87,7 @@ $router->get('dashKunjungan-export','Yakes\KunjunganController@export');
 $router->get('dashTopSix-export','Yakes\TopSixController@export');
 $router->get('dashSDMCulture-export','Yakes\SDMCultureController@export');
 $router->get('dashKontrakManage-export','Yakes\KontrakManagemenController@export');
+$router->get('dashBinaSehat-export','Yakes\BinaSehatController@export');
 
 
 
