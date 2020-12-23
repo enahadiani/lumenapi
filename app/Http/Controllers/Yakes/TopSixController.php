@@ -49,8 +49,8 @@ class TopSixController extends Controller
             $del1 = DB::connection($this->sql)->table('dash_top_icd')->where('periode', $request->periode)->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into dash_top_icd(
-                no_urut,periode,jenis,nama,penderita,biaya,tgl_input,nik_user) 
-                select no_urut,periode,jenis,nama,penderita,biaya,tgl_input,'$nik' as nik_user from dash_top_icd_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+                no_urut,periode,no,jenis,nama,penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now,rata2_before,rata2_now,tgl_input,nik_user) 
+                select no_urut,periode,no,jenis,nama,penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now,rata2_before,rata2_now,tgl_input,'$nik' as nik_user from dash_top_icd_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
                 $del2 = DB::connection($this->sql)->table('dash_top_icd_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
@@ -107,18 +107,16 @@ class TopSixController extends Controller
             ";
             $commit = "commit tran;";
             foreach($excel as $row){
-                if($row[0] != ""){
-                    $ket = $this->validateData($row[0],$row[1]);
-                    if($ket != ""){
-                        $sts = 0;
-                        $status_validate = false;
-                    }else{
-                        $sts = 1;
-                    }
-                    // $nama = str_replace("'","",$row[1]);
-                    $query .= "insert into dash_top_icd_tmp(no_urut,periode,jenis,nama,penderita,biaya,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."','".$row[1]."',".intval($row[2]).",".floatval($row[3]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
-                    $no++;
+                $ket = $this->validateData($row[1]);
+                if($ket != ""){
+                    $sts = 0;
+                    $status_validate = false;
+                }else{
+                    $sts = 1;
                 }
+                // $nama = str_replace("'","",$row[1]);
+                $query .= "insert into dash_top_icd_tmp(no,no_urut,periode,jenis,nama,penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now,rata2_before,rata2_now,tgl_input,nik_user,sts_upload,ket_upload,nu) values ('".$row[0]."',".$no.",'".$request->periode."','".$row[1]."','".$row[2]."',".intval($row[3]).",".intval($row[4]).",".floatval($row[5]).",".floatval($row[6]).",".floatval($row[7]).",".floatval($row[8]).",".floatval($row[9]).",".floatval($row[10]).",".floatval($row[11]).",".floatval($row[12]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
+                $no++;
             }
 
             $insert = DB::connection($this->sql)->insert($begin.$query.$commit);
@@ -177,7 +175,7 @@ class TopSixController extends Controller
             }
 
             $sql = "select 
-            no_urut,periode,jenis,nama,penderita,biaya,tgl_input,nik_user
+            no_urut,periode,no,jenis,nama,penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now,rata2_before,rata2_now
             from dash_top_icd_tmp 
             where nik_user = '".$nik_user."' and periode='".$periode."' 
             order by nu";

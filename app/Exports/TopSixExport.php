@@ -33,11 +33,12 @@ class TopSixExport implements FromCollection, WithHeadings, WithColumnFormatting
     public function collection()
     {
         if($this->type == 'template'){
-            $res = collect(DB::connection('dbsapkug')->select("select '' as jenis,'' as nama,'' as penderita,'' as biaya"));
+            $res = collect(DB::connection('dbsapkug')->select("select '' as no,'' as jenis,'' as nama,'' as penderita_before,'' as penderita_now,'' as biaya_before,'' as biaya_now,'' as yoy_jiwa_before,'' as yoy_jiwa_now,'' as yoy_biaya_before,'' as yoy_biaya_now,'' as rata2_before, '' as rata2_now "));
         }else{
             
-            $res = collect(DB::connection('dbsapkug')->select("select jenis,nama,penderita,biaya,sts_upload,ket_upload,nu 
-            from dash_peserta_tmp
+            $res = collect(DB::connection('dbsapkug')->select("select no,jenis,nama,
+            penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now,rata2_before,rata2_now,sts_upload,ket_upload,nu 
+            from dash_top_icd_tmp
             where nik_user ='$this->nik_user' and periode ='$this->periode' 
             order by nu"));
                         
@@ -50,13 +51,13 @@ class TopSixExport implements FromCollection, WithHeadings, WithColumnFormatting
         if($this->type == 'template'){
             return [
                 [
-                    'pegawai/pensiun','nama','penderita','biaya'
+                    'no','jenis','nama','penderita_before','penderita_now','biaya_before','biaya_now','yoy_jiwa_before','yoy_jiwa_now','yoy_biaya_before','yoy_biaya_now','rata2_before','rata2_now'
                 ]
             ];
         }else{
             return [
                 [
-                    'pegawai/pensiun','nama','penderita','biaya',
+                    'no','jenis','nama','penderita_before','penderita_now','biaya_before','biaya_now','yoy_jiwa_before','yoy_jiwa_now','yoy_biaya_before','yoy_biaya_now','rata2_before','rata2_now',
                     'sts_upload',
                     'ket_upload',
                     'nu'

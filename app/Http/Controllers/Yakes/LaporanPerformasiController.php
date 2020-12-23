@@ -115,5 +115,54 @@ class LaporanPerformasiController extends Controller
         }        
     }
     
+    public function getTopSix(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required'                     
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = $request->periode[1];
+
+            $sql = "select no,jenis,nama,penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now*100 as yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now*100 as yoy_biaya_now,rata2_before,rata2_now 
+            from dash_top_icd 
+            where jenis='PENSIUN' and periode='$periode'
+            order by no_urut
+            ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2 = "select no,jenis,nama,penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now*100 as yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now*100 as yoy_biaya_now,rata2_before,rata2_now 
+            from dash_top_icd 
+            where jenis='PEGAWAI' and periode='$periode'
+            order by no_urut
+            ";
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data2'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data2'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
 
 }
