@@ -173,6 +173,103 @@ class LaporanBPJSController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    
+    function getUtilisasiBPJS(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $nik_user=$request->nik_user;
+            $periode=$request->input('periode')[1];
+            $jenis=$request->input('jenis')[1];
+            if($jenis != "TOTAL"){
+                $filter_jenis = " and a.jenis='".$jenis."' ";
+            }else{
+                $filter_jenis = "";
+            }
+            $tahun = substr($periode,0,4);
+            $tahunseb = intval($tahun)-1;
+            $bulan = substr($periode,4,2);
+            $periodeseb = $tahunseb.$bulan;
+
+            $sql = "select 'Iuran BPJS' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.nilai else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.nilai else 0 end)/1000000 as before                   
+            from yk_bpjs_iuran a 
+            union all
+            select 'Utilitas BPJS:' as nama, NULL as now, NULL as before
+            union all
+            select 'a.Kapitasi' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.nilai else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.nilai else 0 end)/1000000 as before                   
+            from yk_bpjs_kapitasi a                     
+            where a.jenis_tpkk='TPKK'
+            union all
+            select 'b.Claim BPJS' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.claim else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.claim else 0 end)/1000000 as before                   
+            from yk_bpjs_cob a ";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2 = "select 'Iuran BPJS' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.nilai else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.nilai else 0 end)/1000000 as before                   
+            from yk_bpjs_iuran a 
+            where a.jenis='PENSIUN'
+            union all
+            select 'Utilitas BPJS:' as nama, NULL as now, NULL as before
+            union all
+            select 'a.Kapitasi' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.nilai else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.nilai else 0 end)/1000000 as before                   
+            from yk_bpjs_kapitasi a                     
+            where a.jenis_tpkk='TPKK' and a.jenis='PENSIUN'
+            union all
+            select 'b.Claim BPJS' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.claim else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.claim else 0 end)/1000000 as before                   
+            from yk_bpjs_cob a
+            where a.jenis='PENSIUN' ";
+
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            
+            $sql3 = "select 'Iuran BPJS' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.nilai else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.nilai else 0 end)/1000000 as before                   
+            from yk_bpjs_iuran a 
+            where a.jenis='PEGAWAI'
+            union all
+            select 'Utilitas BPJS:' as nama, NULL as now, NULL as before
+            union all
+            select 'a.Kapitasi' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.nilai else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.nilai else 0 end)/1000000 as before                   
+            from yk_bpjs_kapitasi a                     
+            where a.jenis_tpkk='TPKK' and a.jenis='PEGAWAI'
+            union all
+            select 'b.Claim BPJS' as nama,sum(case when a.periode between '".$tahun."01' and '".$periode."' then a.claim else 0 end)/1000000 as now,sum(case when a.periode between '".$tahunseb."01' and '".$periodeseb."' then a.claim else 0 end)/1000000 as before                   
+            from yk_bpjs_cob a
+            where a.jenis='PEGAWAI' ";
+
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $res;
+                $success['data_pensiun'] = $res2;
+                $success['data_pegawai'] = $res3;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_pensiun'] = [];
+                $success['data_pegawai'] = [];
+                $success['status'] = true;
+                $success["auth_status"] = 2;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 
 }
