@@ -104,7 +104,7 @@ class LaporanRealAggController extends Controller
             $bulan = substr($periode,4,2);
             $periodeseb = $tahunseb.$bulan;
 
-            $sql = "select substring(a.kode_pp,3,2) as kode_pp, b.rka_tahun, b.rka_now, isnull(c.rea_now,0) as rea_now, isnull(c.rea_before,0) as rea_before, (isnull(c.rea_now,0)/b.rka_tahun)*100 as persen_rka,  (isnull(c.rea_now,0)/b.rka_now)*100 as persen_now
+            $sql = "select substring(a.kode_pp,3,2) as kode_pp, b.rka_tahun, b.rka_now, isnull(c.rea_now,0) as rea_now, isnull(c.rea_before,0) as rea_before, (isnull(c.rea_now,0)/b.rka_tahun)*100 as persen_rka,  (isnull(c.rea_now,0)/b.rka_now)*100 as persen_now, ((isnull(c.rea_now,0)- isnull(c.rea_before,0)) / isnull(c.rea_before,0))*100 as yoy
             from pp a
             inner join (select case substring(a.kode_pp,1,2) when '99' then '00' else substring(a.kode_pp,1,2) end as kode_pp,
                 sum(case when periode between '".$tahun."01' and '".$tahun."12' then a.nilai/1000000 else 0 end) as rka_tahun,
@@ -128,7 +128,7 @@ class LaporanRealAggController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2 = "select substring(a.kode_pp,3,2) as kode_pp, b.rka_tahun, b.rka_now, isnull(c.rea_now,0) as rea_now, isnull(c.rea_before,0) as rea_before, (isnull(c.rea_now,0)/b.rka_tahun)*100 as persen_rka,  (isnull(c.rea_now,0)/b.rka_now)*100 as persen_now
+            $sql2 = "select substring(a.kode_pp,3,2) as kode_pp, b.rka_tahun, b.rka_now, isnull(c.rea_now,0) as rea_now, isnull(c.rea_before,0) as rea_before, (isnull(c.rea_now,0)/b.rka_tahun)*100 as persen_rka,  (isnull(c.rea_now,0)/b.rka_now)*100 as persen_now, case isnull(rea_before,0) when 0 then 0 else ((isnull(c.rea_now,0)- isnull(c.rea_before,0)) / isnull(c.rea_before,0))*100  end as yoy
             from pp a
             inner join (select case substring(a.kode_pp,1,2) when '99' then '00' else substring(a.kode_pp,1,2) end as kode_pp,
                 sum(case when periode between '".$tahun."01' and '".$tahun."12' then a.nilai/1000000 else 0 end) as rka_tahun,
