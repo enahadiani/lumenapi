@@ -165,4 +165,84 @@ class LaporanPerformasiController extends Controller
         }        
     }
 
+    public function getKontrakManage(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required'                     
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = $request->periode[1];
+
+            $sql = "select no,indicator,unit,weight,target,real,formula*100 as formula,ach*100 as ach,score,warna
+            from dash_kontrak_manage
+            where periode='$periode'
+            order by no_urut 
+            ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
+    public function getSDMCulture(Request $request) {
+        $this->validate($request, [    
+            'periode' => 'required'                     
+        ]);
+        
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = $request->periode[1];
+
+            $sql = "select program,kode_pp,role_model,jumlah 
+            from dash_sdm_culture 
+            where periode='$periode'
+            order by no_urut
+            ";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0 || count($res2) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
 }

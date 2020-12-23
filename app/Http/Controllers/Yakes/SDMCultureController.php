@@ -111,13 +111,13 @@ class SDMCultureController extends Controller
             ";
             $commit = "commit tran;";
             foreach($excel as $row){
-                $ket = $this->validateData($row[1]);
-                if($ket != ""){
-                    $sts = 0;
-                    $status_validate = false;
-                }else{
+                // $ket = $this->validateData($row[1]);
+                // if($ket != ""){
+                //     $sts = 0;
+                //     $status_validate = false;
+                // }else{
                     $sts = 1;
-                }
+                // }
                 // $nama = str_replace("'","",$row[1]);
                 $query .= "insert into dash_sdm_culture_tmp(no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."',getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
                 $no++;
