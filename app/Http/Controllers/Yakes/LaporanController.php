@@ -1842,13 +1842,13 @@ class LaporanController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            
+            /*
             $get = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
             
             $get2 = DB::connection($this->sql)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
-
+            */
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
