@@ -85,7 +85,15 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('setting-grafik','Yakes\SettingGrafikController@update');    
     $router->delete('setting-grafik','Yakes\SettingGrafikController@destroy');   
     $router->get('setting-grafik-neraca','Yakes\SettingGrafikController@getNeraca');    
-    $router->get('setting-grafik-klp','Yakes\SettingGrafikController@getKlp');        
+    $router->get('setting-grafik-klp','Yakes\SettingGrafikController@getKlp');
+    
+    $router->get('setting-rasio','Yakes\SettingRasioController@index');     
+    $router->get('setting-rasio-detail','Yakes\SettingRasioController@show'); 
+    $router->post('setting-rasio','Yakes\SettingRasioController@store');
+    $router->put('setting-rasio','Yakes\SettingRasioController@update');    
+    $router->delete('setting-rasio','Yakes\SettingRasioController@destroy');   
+    $router->get('setting-rasio-neraca','Yakes\SettingRasioController@getNeraca');    
+    $router->get('setting-rasio-klp','Yakes\SettingRasioController@getKlp');
 
 });
 

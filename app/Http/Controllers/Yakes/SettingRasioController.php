@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-// use App\Imports\SettingGrafikImport;
-// use App\Exports\SettingGrafikExport;
+// use App\Imports\SettingRasioImport;
+// use App\Exports\SettingRasioExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
-// use App\SettingGrafikTmp;
+// use App\SettingRasioTmp;
 
-class SettingGrafikController extends Controller
+class SettingRasioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -29,14 +29,14 @@ class SettingGrafikController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
 
-        $strSQL = "select kode_grafik from dash_grafik_m where kode_grafik = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
+        $strSQL = "select kode_rasio from dash_rasio_m where kode_rasio = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
 
         $auth = DB::connection($this->db)->select($strSQL);
         $auth = json_decode(json_encode($auth),true);
 
         if(count($auth) > 0){
             $res['status'] = false;
-            $res['kode_grafik'] = $auth[0]['kode_grafik'];
+            $res['kode_rasio'] = $auth[0]['kode_rasio'];
         }else{
             $res['status'] = true;
         }
@@ -52,7 +52,7 @@ class SettingGrafikController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_grafik,nama,kode_klp,format,jenis,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_grafik_m where kode_lokasi='$kode_lokasi'	 
+            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_lokasi='$kode_lokasi'	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -85,13 +85,13 @@ class SettingGrafikController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_grafik' => 'required',
+            'kode_rasio' => 'required',
             'nama' => 'required',
             'kode_klp' => 'required',
-            'format' => 'required',
-            'jenis' => 'required',
+            'flag_box' => 'required',
+            'keterangan' => 'required',
+            'kode_fs' => 'required',
             'kode_neraca' => 'required|array',
-            'kode_fs' => 'required|array'
         ]);
 
         try {
@@ -104,44 +104,43 @@ class SettingGrafikController extends Controller
 
             DB::connection($this->db)->beginTransaction();
 
-            $res = $this->isUnik($request->kode_grafik);
+            $res = $this->isUnik($request->kode_rasio);
             if($res['status']){
                 
-                $sql = DB::connection($this->db)->insert("insert into dash_grafik_m (kode_grafik,nama,kode_klp,kode_lokasi,format,jenis,tgl_input) values ('$request->kode_grafik','$request->nama','$request->kode_klp','$kode_lokasi','$request->format','$request->jenis',getdate())");
-                
+                $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan',getdate())");
+            
                 if (count($request->kode_neraca) > 0){
                     for ($i=0;$i < count($request->kode_neraca);$i++){
-                            
-                        $ins = DB::connection($this->db)->insert("insert into dash_grafik_d (kode_grafik,kode_lokasi,kode_neraca,kode_fs,nu) values ('$request->kode_grafik','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs[$i]."',$i)");
+                        $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,nu) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."',$i)");
                     }
                 }	
-                
+
                 $tmp="sukses";
                 $sts=true;
                 
             }else{
-                $tmp = "Transaksi tidak valid. Kode Grafik '".$data[$i]['kode_grafik']."' sudah ada di database.";
+                $tmp = "Transaksi tidak valid. Kode Rasio '".$data[$i]['kode_rasio']."' sudah ada di database.";
                 $sts = false;
             }
 
             if($sts){
                 DB::connection($this->db)->commit();
                 $success['status'] = $sts;
-                $success['kode_grafik'] = $request->kode_grafik;
-                $success['message'] = "Data Setting Grafik berhasil disimpan ";
+                $success['kode_rasio'] = $request->kode_rasio;
+                $success['message'] = "Data Setting Rasio berhasil disimpan ";
                 return response()->json($success, $this->successStatus); 
 
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = $sts;
-                $success['kode_grafik'] = "-";
+                $success['kode_rasio'] = "-";
                 $success['message'] = $tmp;
                 return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Setting Grafik gagal disimpan ".$e;
+            $success['message'] = "Data Setting Rasio gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     
@@ -157,13 +156,13 @@ class SettingGrafikController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_grafik' => 'required',
+            'kode_rasio' => 'required',
             'nama' => 'required',
             'kode_klp' => 'required',
-            'format' => 'required',
-            'jenis' => 'required',
+            'flag_box' => 'required',
+            'keterangan' => 'required',
+            'kode_fs' => 'required',
             'kode_neraca' => 'required|array',
-            'kode_fs' => 'required|array'
         ]);
 
         try {
@@ -175,28 +174,28 @@ class SettingGrafikController extends Controller
             }
 
 
-            $del1 = DB::connection($this->db)->table('dash_grafik_m')->where('kode_lokasi', $kode_lokasi)->where('kode_grafik', $request->kode_grafik)->delete();
+            $del1 = DB::connection($this->db)->table('dash_rasio_m')->where('kode_lokasi', $kode_lokasi)->where('kode_rasio', $request->kode_rasio)->delete();
 
-            $del2 = DB::connection($this->db)->table('dash_grafik_d')->where('kode_lokasi', $kode_lokasi)->where('kode_grafik', $request->kode_grafik)->delete();
+            $del2 = DB::connection($this->db)->table('dash_rasio_d')->where('kode_lokasi', $kode_lokasi)->where('kode_rasio', $request->kode_rasio)->delete();
 
-            $sql = DB::connection($this->db)->insert("insert into dash_grafik_m (kode_grafik,nama,kode_klp,kode_lokasi,format,jenis,tgl_input) values ('$request->kode_grafik','$request->nama','$request->kode_klp','$kode_lokasi','$request->format','$request->jenis',getdate())");
+            $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan',getdate())");
             
             if (count($request->kode_neraca) > 0){
                 for ($i=0;$i < count($request->kode_neraca);$i++){
-                    $ins = DB::connection($this->db)->insert("insert into dash_grafik_d (kode_grafik,kode_lokasi,kode_neraca,kode_fs,nu) values ('$request->kode_grafik','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs[$i]."',$i)");
+                    $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,nu) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."',$i)");
                 }
             }	
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['kode_grafik'] = $request->kode_grafik;
-            $success['message'] = "Data Setting Grafik berhasil diubah ";
+            $success['kode_rasio'] = $request->kode_rasio;
+            $success['message'] = "Data Setting Rasio berhasil diubah ";
             return response()->json($success, $this->successStatus); 
 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Setting Grafik gagal diubah ".$e;
+            $success['message'] = "Data Setting Rasio gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -204,7 +203,7 @@ class SettingGrafikController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Jurnal  $Jurnal
+     * @param  \App\Rasio  $Rasio
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
@@ -217,19 +216,19 @@ class SettingGrafikController extends Controller
                 $kode_lokasi= $res->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->db)->table('dash_grafik_m')->where('kode_lokasi', $kode_lokasi)->where('kdoe_grafik', $request->kode_grafik)->delete();
+            $del1 = DB::connection($this->db)->table('dash_rasio_m')->where('kode_lokasi', $kode_lokasi)->where('kdoe_Rasio', $request->kode_rasio)->delete();
 
-            $del2 = DB::connection($this->db)->table('dash_grafik_d')->where('kode_lokasi', $kode_lokasi)->where('kdoe_grafik', $request->kode_grafik)->delete();
+            $del2 = DB::connection($this->db)->table('dash_rasio_d')->where('kode_lokasi', $kode_lokasi)->where('kdoe_Rasio', $request->kode_rasio)->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Jurnal berhasil dihapus";
+            $success['message'] = "Data Rasio berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jurnal gagal dihapus ".$e;
+            $success['message'] = "Data Rasio gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
@@ -244,15 +243,15 @@ class SettingGrafikController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $kode_grafik= $request->kode_grafik;
-            $res = DB::connection($this->db)->select("select kode_grafik,nama,kode_klp,format,jenis,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_grafik_m where kode_grafik = '".$kode_grafik."' and kode_lokasi='".$kode_lokasi."'");						
+            $kode_rasio= $request->kode_rasio;
+            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_rasio = '".$kode_rasio."' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_neraca,b.nama as nama_neraca,a.kode_fs,c.nama as nama_fs
-                    from dash_grafik_d a 
-                    inner join neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-                    inner join fs c on a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi 
-                    where a.kode_grafik = '".$kode_grafik."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
+            $res2 = DB::connection($this->db)->select("select a.kode_neraca,b.nama as nama_neraca
+                    from dash_rasio_d a
+                    inner join dash_rasio_m b on a.kode_rasio=b.kode_rasio and a.kode_lokasi=b.kode_lokasi 
+                    inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs
+                    where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
             $res2= json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -352,7 +351,7 @@ class SettingGrafikController extends Controller
         
     }
 
-    // public function validateJurnal($kode_neraca,$kode_pp,$dc,$ket,$nilai,$kode_lokasi){
+    // public function validateRasio($kode_neraca,$kode_pp,$dc,$ket,$nilai,$kode_lokasi){
     //     $keterangan = "";
     //     $auth = DB::connection($this->db)->select("select kode_neraca from masakun where kode_neraca='$kode_neraca' and kode_lokasi='$kode_lokasi'
     //     ");
@@ -411,7 +410,7 @@ class SettingGrafikController extends Controller
     //             $kode_lokasi= $data->kode_lokasi;
     //         }
             
-    //         $del1 = DB::connection($this->db)->table('jurnal_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->delete();
+    //         $del1 = DB::connection($this->db)->table('Rasio_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->delete();
 
     //         // menangkap file excel
     //         $file = $request->file('file');
@@ -420,22 +419,22 @@ class SettingGrafikController extends Controller
     //         $nama_file = rand().$file->getClientOriginalName();
 
     //         Storage::disk('local')->put($nama_file,file_get_contents($file));
-    //         // $excel = Excel::import(new JurnalImport($request->nik_user), $nama_file);
-    //         $dt = Excel::toArray(new JurnalImport($request->nik_user),$nama_file);
+    //         // $excel = Excel::import(new RasioImport($request->nik_user), $nama_file);
+    //         $dt = Excel::toArray(new RasioImport($request->nik_user),$nama_file);
     //         $excel = $dt[0];
     //         $x = array();
     //         $status_validate = true;
     //         $no=1;
     //         foreach($excel as $row){
     //             if($row[0] != ""){
-    //                 $ket = $this->validateJurnal(strval($row[0]),strval($row[4]),strval($row[1]),strval($row[2]),floatval($row[3]),$kode_lokasi);
+    //                 $ket = $this->validateRasio(strval($row[0]),strval($row[4]),strval($row[1]),strval($row[2]),floatval($row[3]),$kode_lokasi);
     //                 if($ket != ""){
     //                     $sts = 0;
     //                     $status_validate = false;
     //                 }else{
     //                     $sts = 1;
     //                 }
-    //                 $x[] = JurnalTmp::create([
+    //                 $x[] = RasioTmp::create([
     //                     'kode_neraca' => strval($row[0]),
     //                     'dc' => strval($row[1]),
     //                     'keterangan' => strval($row[2]),
@@ -479,10 +478,10 @@ class SettingGrafikController extends Controller
     //     $kode_lokasi = $request->kode_lokasi;
     //     $nik = $request->nik;
     //     date_default_timezone_set("Asia/Bangkok");
-    //     return Excel::download(new JurnalExport($nik_user,$kode_lokasi), 'Jurnal_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+    //     return Excel::download(new RasioExport($nik_user,$kode_lokasi), 'Rasio_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
     // }
 
-    // public function getJurnalTmp(Request $request)
+    // public function getRasioTmp(Request $request)
     // {
         
     //     $nik_user = $request->nik_user;
@@ -494,7 +493,7 @@ class SettingGrafikController extends Controller
     //         }
 
     //         $res = DB::connection($this->db)->select("select a.kode_neraca,a.dc,a.keterangan,a.nilai,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp 
-    //         from jurnal_tmp a
+    //         from Rasio_tmp a
     //         inner join masakun b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
     //         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
     //         where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
