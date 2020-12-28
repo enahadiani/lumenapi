@@ -79,6 +79,14 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('dashBinaSehat-import','Yakes\BinaSehatController@importExcel');
     $router->get('dashBinaSehat-tmp','Yakes\BinaSehatController@getBinaSehatTmp');
 
+    $router->get('setting-grafik','Yakes\SettingGrafikController@index');     
+    $router->get('setting-grafik-detail','Yakes\SettingGrafikController@show'); 
+    $router->post('setting-grafik','Yakes\SettingGrafikController@store');
+    $router->put('setting-grafik','Yakes\SettingGrafikController@update');    
+    $router->delete('setting-grafik','Yakes\SettingGrafikController@destroy');   
+    $router->get('setting-grafik-neraca','Yakes\SettingGrafikController@getNeraca');    
+    $router->get('setting-grafik-klp','Yakes\SettingGrafikController@getKlp');        
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
