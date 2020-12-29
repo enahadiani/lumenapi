@@ -80,6 +80,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     
     $router->get('rasio','Yakes\DashRasioController@dataRasio');
+    $router->get('klp-rasio','Yakes\DashRasioController@klpRasio');
     
 });
 
