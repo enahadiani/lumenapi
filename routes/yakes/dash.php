@@ -79,7 +79,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
 
     
-    $router->get('ebm','Yakes\DashRasioController@dataEBM');
+    $router->get('rasio','Yakes\DashRasioController@dataRasio');
     
 });
 
