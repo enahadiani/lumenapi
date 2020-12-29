@@ -52,7 +52,7 @@ class SettingRasioController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,flag_box,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_lokasi='$kode_lokasi'	 
+            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_lokasi='$kode_lokasi'	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -88,7 +88,6 @@ class SettingRasioController extends Controller
             'kode_rasio' => 'required',
             'nama' => 'required',
             'kode_klp' => 'required',
-            'flag_box' => 'required',
             'keterangan' => 'required',
             'kode_fs' => 'required',
             'kode_neraca' => 'required|array',
@@ -107,7 +106,7 @@ class SettingRasioController extends Controller
             $res = $this->isUnik($request->kode_rasio);
             if($res['status']){
                 
-                $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,kode_fs,flag_box,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan','$request->kode_fs','$request->flag_box',getdate())");
+                $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,kode_fs,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan','$request->kode_fs',getdate())");
             
                 if (count($request->kode_neraca) > 0){
                     for ($i=0;$i < count($request->kode_neraca);$i++){
@@ -159,7 +158,6 @@ class SettingRasioController extends Controller
             'kode_rasio' => 'required',
             'nama' => 'required',
             'kode_klp' => 'required',
-            'flag_box' => 'required',
             'keterangan' => 'required',
             'kode_fs' => 'required',
             'kode_neraca' => 'required|array',
@@ -178,7 +176,7 @@ class SettingRasioController extends Controller
 
             $del2 = DB::connection($this->db)->table('dash_rasio_d')->where('kode_lokasi', $kode_lokasi)->where('kode_rasio', $request->kode_rasio)->delete();
 
-            $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,kode_fs,flag_box,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan','$request->kode_fs','$request->flag_box',getdate())");
+            $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,kode_fs,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan','$request->kode_fs',getdate())");
             
             if (count($request->kode_neraca) > 0){
                 for ($i=0;$i < count($request->kode_neraca);$i++){
@@ -244,7 +242,7 @@ class SettingRasioController extends Controller
             }
 
             $kode_rasio= $request->kode_rasio;
-            $res = DB::connection($this->db)->select("select a.kode_rasio,a.nama,a.klp_rasio,a.keterangan,a.rumus,a.kode_fs,a.flag_box, a.tgl_input,b.nama as nama_klp,c.nama as nama_fs 
+            $res = DB::connection($this->db)->select("select a.kode_rasio,a.nama,a.klp_rasio,a.keterangan,a.rumus,a.kode_fs, a.tgl_input,b.nama as nama_klp,c.nama as nama_fs 
             from dash_rasio_m a 
             left join dash_klp b on a.klp_rasio=b.kode_klp and a.kode_lokasi=b.kode_lokasi
             left join fs c on a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi
