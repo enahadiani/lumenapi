@@ -91,6 +91,7 @@ class SettingRasioController extends Controller
             'keterangan' => 'required',
             'kode_fs' => 'required',
             'kode_neraca' => 'required|array',
+            'nama2' => 'required|array',
         ]);
 
         try {
@@ -110,7 +111,7 @@ class SettingRasioController extends Controller
             
                 if (count($request->kode_neraca) > 0){
                     for ($i=0;$i < count($request->kode_neraca);$i++){
-                        $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,kode_fs,no) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."',$i)");
+                        $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,kode_fs,no,nama) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."',$i,'".$request->nama2[$i]."')");
                     }
                 }	
 
@@ -161,6 +162,7 @@ class SettingRasioController extends Controller
             'keterangan' => 'required',
             'kode_fs' => 'required',
             'kode_neraca' => 'required|array',
+            'nama2'=>'required|array'
         ]);
 
         try {
@@ -180,7 +182,7 @@ class SettingRasioController extends Controller
             
             if (count($request->kode_neraca) > 0){
                 for ($i=0;$i < count($request->kode_neraca);$i++){
-                    $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,kode_fs,no) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."',$i)");
+                    $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,kode_fs,no,nama) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."',$i,'".$request->nama2[$i]."')");
                 }
             }	
 
@@ -249,7 +251,7 @@ class SettingRasioController extends Controller
             where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_neraca,c.nama as nama_neraca
+            $res2 = DB::connection($this->db)->select("select a.kode_neraca,c.nama as nama_neraca,a.nama
                     from dash_rasio_d a
                     inner join dash_rasio_m b on a.kode_rasio=b.kode_rasio and a.kode_lokasi=b.kode_lokasi 
                     inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
