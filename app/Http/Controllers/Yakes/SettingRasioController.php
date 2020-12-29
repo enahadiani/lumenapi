@@ -52,7 +52,7 @@ class SettingRasioController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_lokasi='$kode_lokasi'	 
+            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,flag_box,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_lokasi='$kode_lokasi'	 
             ");
             $res = json_decode(json_encode($res),true);
             

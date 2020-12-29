@@ -95,6 +95,10 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('setting-rasio-neraca','Yakes\SettingRasioController@getNeraca');    
     $router->get('setting-rasio-klp','Yakes\SettingRasioController@getKlp');
 
+    $router->post('arus-kas','Yakes\ArusKasController@store');
+    $router->post('arus-kas-import','Yakes\ArusKasController@importExcel');
+    $router->get('arus-kas-tmp','Yakes\ArusKasController@getArusKasTmp');
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
@@ -104,6 +108,7 @@ $router->get('dashTopSix-export','Yakes\TopSixController@export');
 $router->get('dashSDMCulture-export','Yakes\SDMCultureController@export');
 $router->get('dashKontrakManage-export','Yakes\KontrakManagemenController@export');
 $router->get('dashBinaSehat-export','Yakes\BinaSehatController@export');
+$router->get('arus-kas-export','Yakes\ArusKasController@export');
 
 
 
