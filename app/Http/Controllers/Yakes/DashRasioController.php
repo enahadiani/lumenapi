@@ -26,7 +26,7 @@ class DashRasioController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.kode_rasio,a.kode_lokasi,a.kode_neraca,b.n4 as nilai2, c.rumus, c.nama as nama_rasio,b.periode,a.nama
+            $res = DB::connection($this->sql)->select("select a.kode_rasio,a.kode_lokasi,a.kode_neraca,case when b.jenis_akun='Pendapatan' then b.n4*-1 else b.n4 end as nilai2, c.rumus, c.nama as nama_rasio,b.periode,a.nama
             from dash_rasio_d a
             inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
             inner join dash_rasio_m c on a.kode_rasio=c.kode_rasio and a.kode_lokasi=c.kode_lokasi
