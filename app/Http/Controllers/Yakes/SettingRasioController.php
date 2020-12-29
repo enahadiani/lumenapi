@@ -107,11 +107,11 @@ class SettingRasioController extends Controller
             $res = $this->isUnik($request->kode_rasio);
             if($res['status']){
                 
-                $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan',getdate())");
+                $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,kode_fs,flag_box,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan','$request->kode_fs','$request->flag_box',getdate())");
             
                 if (count($request->kode_neraca) > 0){
                     for ($i=0;$i < count($request->kode_neraca);$i++){
-                        $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,nu) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."',$i)");
+                        $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,kode_fs,no) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."',$i)");
                     }
                 }	
 
@@ -178,11 +178,11 @@ class SettingRasioController extends Controller
 
             $del2 = DB::connection($this->db)->table('dash_rasio_d')->where('kode_lokasi', $kode_lokasi)->where('kode_rasio', $request->kode_rasio)->delete();
 
-            $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan',getdate())");
+            $sql = DB::connection($this->db)->insert("insert into dash_rasio_m (kode_rasio,nama,klp_rasio,kode_lokasi,rumus,keterangan,kode_fs,flag_box,tgl_input) values ('$request->kode_rasio','$request->nama','$request->kode_klp','$kode_lokasi','$request->rumus','$request->keterangan','$request->kode_fs','$request->flag_box',getdate())");
             
             if (count($request->kode_neraca) > 0){
                 for ($i=0;$i < count($request->kode_neraca);$i++){
-                    $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,nu) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."',$i)");
+                    $ins = DB::connection($this->db)->insert("insert into dash_rasio_d (kode_rasio,kode_lokasi,kode_neraca,kode_fs,no) values ('$request->kode_rasio','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."',$i)");
                 }
             }	
 
@@ -244,14 +244,14 @@ class SettingRasioController extends Controller
             }
 
             $kode_rasio= $request->kode_rasio;
-            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_rasio = '".$kode_rasio."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select kode_rasio,nama,klp_rasio,keterangan,rumus,kode_fs,flag_box,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_rasio_m where kode_rasio = '".$kode_rasio."' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_neraca,b.nama as nama_neraca
+            $res2 = DB::connection($this->db)->select("select a.kode_neraca,c.nama as nama_neraca
                     from dash_rasio_d a
                     inner join dash_rasio_m b on a.kode_rasio=b.kode_rasio and a.kode_lokasi=b.kode_lokasi 
-                    inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs
-                    where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
+                    inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
+                    where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."' order by a.no");
             $res2= json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

@@ -217,9 +217,9 @@ class SettingGrafikController extends Controller
                 $kode_lokasi= $res->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->db)->table('dash_grafik_m')->where('kode_lokasi', $kode_lokasi)->where('kdoe_grafik', $request->kode_grafik)->delete();
+            $del1 = DB::connection($this->db)->table('dash_grafik_m')->where('kode_lokasi', $kode_lokasi)->where('kode_grafik', $request->kode_grafik)->delete();
 
-            $del2 = DB::connection($this->db)->table('dash_grafik_d')->where('kode_lokasi', $kode_lokasi)->where('kdoe_grafik', $request->kode_grafik)->delete();
+            $del2 = DB::connection($this->db)->table('dash_grafik_d')->where('kode_lokasi', $kode_lokasi)->where('kode_grafik', $request->kode_grafik)->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
