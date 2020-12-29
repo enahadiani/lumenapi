@@ -245,7 +245,10 @@ class SettingGrafikController extends Controller
             }
 
             $kode_grafik= $request->kode_grafik;
-            $res = DB::connection($this->db)->select("select kode_grafik,nama,kode_klp,format,jenis,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input from dash_grafik_m where kode_grafik = '".$kode_grafik."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select a.kode_grafik,a.nama,a.kode_klp,a.format,a.jenis, a.tgl_input, b.nama as nama_klp
+            from dash_grafik_m a 
+            left join dash_klp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_grafik = '".$kode_grafik."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
             $res2 = DB::connection($this->db)->select("select a.kode_neraca,b.nama as nama_neraca,a.kode_fs,c.nama as nama_fs
