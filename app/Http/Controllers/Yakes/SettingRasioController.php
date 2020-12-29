@@ -216,9 +216,9 @@ class SettingRasioController extends Controller
                 $kode_lokasi= $res->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->db)->table('dash_rasio_m')->where('kode_lokasi', $kode_lokasi)->where('kdoe_Rasio', $request->kode_rasio)->delete();
+            $del1 = DB::connection($this->db)->table('dash_rasio_m')->where('kode_lokasi', $kode_lokasi)->where('kode_rasio', $request->kode_rasio)->delete();
 
-            $del2 = DB::connection($this->db)->table('dash_rasio_d')->where('kode_lokasi', $kode_lokasi)->where('kdoe_Rasio', $request->kode_rasio)->delete();
+            $del2 = DB::connection($this->db)->table('dash_rasio_d')->where('kode_lokasi', $kode_lokasi)->where('kode_rasio', $request->kode_rasio)->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
