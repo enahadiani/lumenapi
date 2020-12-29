@@ -69,7 +69,11 @@ class DashRasioController extends Controller
 
                     }
                     $kode=$d['nama_rasio'];
-                    $hasil[]= eval('return '.$d['rumus'].';')*100;  
+                    try {
+                        $hasil[]= eval('return '.$d['rumus'].';')*100;  
+                    } catch (\Throwable $e) {
+                        $hasil[]=0;
+                    }
                 }
                 $data[count($data)] = $hasil;
                 $column[count($column)] = $kode;
