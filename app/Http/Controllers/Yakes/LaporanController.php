@@ -1005,12 +1005,13 @@ class LaporanController extends Controller
                 $nama_periode="<br>(UnClosing)";
             }
 
+            /*
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
             
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
-
+            */
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                  from exs_neraca a
@@ -1118,13 +1119,13 @@ class LaporanController extends Controller
             {
                 $nama_periode="<br>(UnClosing)";
             }
-
+            /*
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
             
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
-
+            */
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                  from exs_neraca a
@@ -1649,12 +1650,13 @@ class LaporanController extends Controller
                  $where and a.modul='P'  ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+            /*
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
             
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
-
+            */
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1734,13 +1736,14 @@ class LaporanController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            
+            /*
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
             
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
-
+            */
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
