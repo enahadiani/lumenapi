@@ -48,8 +48,7 @@ class JasaKirimController extends Controller
                 $filter = "";
             }
 
-            $sql= "select a.kode_kirim,a.nama,a.alamat,a.no_telp,a.email,a.pic,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pic
-            kode_lokasi from ol_kirim a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            $sql= "select a.kode_kirim,a.nama,a.alamat,a.no_telp,a.email,a.pic,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pic,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input,a.kode_lokasi from ol_kirim a where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -114,13 +113,16 @@ class JasaKirimController extends Controller
             }
             if($this->isUnik($request->kode_kirim,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into ol_kirim(kode_kirim,nama,alamat,no_telp,email,pic,bank,cabang,no_rek,nama_rek,no_pic,kode_lokasi) values ('".$request->kode_kirim."','".$request->nama."','".$request->alamat."','".$request->no_telp."','".$request->email."','".$request->pic."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->no_pic."','$kode_lokasi') ");
+                $ins = DB::connection($this->sql)->insert("insert into ol_kirim(kode_kirim,nama,alamat,no_telp,email,pic,bank,cabang,no_rek,nama_rek,no_pic,kode_lokasi,tgl_input) values ('".$request->kode_kirim."','".$request->nama."','".$request->alamat."','".$request->no_telp."','".$request->email."','".$request->pic."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->no_pic."','$kode_lokasi',getdate()) ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_kirim;
                 $success['message'] = "Data Jasa Kirim berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['kode'] = '-';
+                $success['jenis'] = 'duplicate';
                 $success['message'] = "Error : Duplicate entry. No Jasa Kirim sudah ada di database!";
             }
             
@@ -187,6 +189,7 @@ class JasaKirimController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_kirim;
             $success['message'] = "Data Jasa Kirim berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {

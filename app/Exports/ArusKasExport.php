@@ -33,10 +33,10 @@ class ArusKasExport implements FromCollection, WithHeadings, WithColumnFormattin
     public function collection()
     {
         if($this->type == 'template'){
-            $res = collect(DB::connection('dbsapkug')->select("select '' as keterangan,'' as n1,'' as n2 "));
+            $res = collect(DB::connection('dbsapkug')->select("select '' as keterangan,'' as n1,'' as n2,'' as jenis"));
         }else{
             
-            $res = collect(DB::connection('dbsapkug')->select("select keterangan,n1,n2,sts_upload,ket_upload,nu 
+            $res = collect(DB::connection('dbsapkug')->select("select keterangan,n1,n2,jenis,sts_upload,ket_upload,nu 
             from yks_arus_kas_tmp
             where nik_user ='$this->nik_user' and periode ='$this->periode' 
             order by nu"));
@@ -50,13 +50,13 @@ class ArusKasExport implements FromCollection, WithHeadings, WithColumnFormattin
         if($this->type == 'template'){
             return [
                 [
-                    'keterangan','n1','n2'
+                    'keterangan','n1','n2','Summary/Posting'
                 ]
             ];
         }else{
             return [
                 [
-                    'keterangan','n1','n2',
+                    'keterangan','n1','n2','Summary/Posting',
                     'sts_upload',
                     'ket_upload',
                     'nu'

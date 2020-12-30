@@ -1857,7 +1857,7 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql2="select keterangan,n1,n2
+            $sql2="select keterangan,n1,n2,jenis
             from yks_arus_kas 
             where periode ='$periode'
             order by no_urut";

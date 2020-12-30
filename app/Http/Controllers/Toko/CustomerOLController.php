@@ -49,7 +49,7 @@ class CustomerOLController extends Controller
                 $filter .= "";
             }
             
-            $sql= "select kode_cust,nama,alamat,no_tel,email,pic,id_lain,kota,provinsi,kecamatan from ol_cust a 
+            $sql= "select kode_cust,nama,alamat,no_tel,email,pic,id_lain,kota,provinsi,kecamatan,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from ol_cust
             where kode_lokasi='".$kode_lokasi."' $filter ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -113,14 +113,17 @@ class CustomerOLController extends Controller
             }
             if($this->isUnik($request->kode_cust,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi,kecamatan) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan') ");
+                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi,kecamatan,tgl_input) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan',getdate()) ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Customer berhasil disimpan";
+                $success['kode'] = $request->kode_cust;
             }else{
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. No Customer sudah ada di database!";
+                $success['kode'] = '-';
+                $success['jenis'] = 'duplicate';
             }
             
             return response()->json($success, $this->successStatus);     
@@ -179,11 +182,12 @@ class CustomerOLController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan') ");
+            $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi,tgl_input) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan',getdate()) ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Customer berhasil diubah";
+            $success['kode'] = $request->kode_cust;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();

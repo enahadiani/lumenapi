@@ -19,18 +19,14 @@ class ArusKasController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function validateData($kode_pp){
+    public function validateData($jenis){
         $keterangan = "";
-        if($kode_pp != ""){
-
-            $auth = DB::connection($this->sql)->select("select kode_pp from pp where kode_pp='$kode_pp' 
-            ");
-            if(count($auth) > 0){
-                $keterangan .= "";
-            }else{
-                $keterangan .= "Regional $kode_pp tidak valid";
-            }
+        if($jenis == "Summary" || $jenis == "Posting"){
+            $keterangan .="";
+        }else{
+            $keterangan .="Jenis $jenis tidak valid. Jenis yang diperbolehkan : Summary atau Posting ";
         }
+        return $keterangan;
         return $keterangan;
 
     }
@@ -53,8 +49,8 @@ class ArusKasController extends Controller
             $del1 = DB::connection($this->sql)->table('yks_arus_kas')->where('periode', $request->periode)->delete();
 
             $ins = DB::connection($this->sql)->insert("insert into yks_arus_kas(
-                no_urut,periode,keterangan,n1,n2,tgl_input,nik_user) 
-                select no_urut,periode,keterangan,n1,n2,tgl_input,'$nik' as nik_user from yks_arus_kas_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+                no_urut,periode,keterangan,n1,n2,jenis,tgl_input,nik_user) 
+                select no_urut,periode,keterangan,n1,n2,jenis,tgl_input,'$nik' as nik_user from yks_arus_kas_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
                 $del2 = DB::connection($this->sql)->table('yks_arus_kas_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
@@ -113,7 +109,7 @@ class ArusKasController extends Controller
             foreach($excel as $row){
                
                 $sts = 1;
-                $query .= "insert into yks_arus_kas_tmp(no_urut,periode,keterangan,n1,n2,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."',".floatval($row[1]).",".floatval($row[2]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
+                $query .= "insert into yks_arus_kas_tmp(no_urut,periode,keterangan,n1,n2,jenis,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."',".floatval($row[1]).",".floatval($row[2]).",'".$row[3]."',getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
                 $no++;
             }
 
@@ -173,7 +169,7 @@ class ArusKasController extends Controller
             }
 
             $sql = "select 
-            no_urut,periode,keterangan,n1,n2,tgl_input,nik_user
+            no_urut,periode,keterangan,n1,n2,jenis,tgl_input,nik_user
             from yks_arus_kas_tmp 
             where nik_user = '".$nik_user."' and periode='".$periode."' 
             order by nu";
