@@ -46,7 +46,7 @@ class CustomerController extends Controller
                 }
                 $sql= "select a.kode_cust, a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_piutang,b.nama as nama_akun from cust a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select kode_cust, nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_piutang  from cust where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_cust, nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_piutang,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input  from cust where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -111,13 +111,16 @@ class CustomerController extends Controller
             }
             if($this->isUnik($request->kode_cust,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_cust,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,$request->no_fax,$request->akun_piutang));
+                $ins = DB::connection($this->sql)->insert("insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang,tgl_input) values('$request->kode_cust','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->no_fax','$request->akun_piutang',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Customer berhasil disimpan";
+                $success['kode'] = $request->kode_cust;
             }else{
                 $success['status'] = false;
+                $success['kode'] = '-';
+                $success['jenis'] = 'duplicate';
                 $success['message'] = "Error : Duplicate entry. No Customer sudah ada di database!";
             }
             
@@ -179,10 +182,11 @@ class CustomerController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_cust,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,$request->no_fax,$request->akun_piutang));
+            $ins = DB::connection($this->sql)->insert("insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang,tgl_input) values('$request->kode_cust','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->no_fax','$request->akun_piutang',getdate())");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_cust;
             $success['message'] = "Data Customer berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
