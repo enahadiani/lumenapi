@@ -182,7 +182,7 @@ class CustomerOLController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi,tgl_input) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan',getdate()) ");
+            $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,email,pic,id_lain,kode_lokasi,kota,provinsi,kecamatan,tgl_input) values ('$request->kode_cust','$request->nama','$request->alamat','$request->no_tel','$request->email','$request->pic','$request->id_lain','$kode_lokasi','$request->kota','$request->provinsi','$request->kecamatan',getdate()) ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
