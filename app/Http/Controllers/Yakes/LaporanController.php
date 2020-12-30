@@ -1013,11 +1013,11 @@ class LaporanController extends Controller
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
            
-            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='A' 
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='P'  ";
             
@@ -1127,11 +1127,11 @@ class LaporanController extends Controller
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
            
-            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='A' 
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='P'  ";
 
@@ -1408,12 +1408,11 @@ class LaporanController extends Controller
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='L'
             order by a.rowindex  ";
             */
-            $sql="select a.kode_neraca,a.nama,a.level_spasi,a.tipe,
-                        isnull(b.n4,0) as n1,isnull(c.n4,0) as n2
-                from neraca a
-                left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs and b.periode='202011'
-                left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs and c.periode='201911'
-                where a.kode_lokasi='00' and a.kode_fs='FS5' and a.modul='L'
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
+                case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n1,
+                case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n2
+                from exs_neraca a
+                $where and a.modul='L' 
                 order by a.rowindex";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1641,11 +1640,11 @@ class LaporanController extends Controller
             order by a.rowindex  ";
             
             */
-            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='A' 
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='P'  ";
             $res = DB::connection($this->db)->select($sql);
@@ -1726,11 +1725,11 @@ class LaporanController extends Controller
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
             order by a.rowindex  ";
             */
-            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='A' 
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
                  $where and a.modul='P'  ";
             $res = DB::connection($this->db)->select($sql);
@@ -1743,7 +1742,7 @@ class LaporanController extends Controller
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
-            
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
