@@ -94,7 +94,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('user')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('user')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -111,7 +111,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('admin')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('admin')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -179,7 +179,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('sju')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('sju')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }else{
             if(isset($request->id_device)){
@@ -203,7 +203,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('rtrw')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('rtrw')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -220,7 +220,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('tarbak')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('tarbak')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -407,7 +407,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('yakes')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('yakes')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -484,7 +484,7 @@ class AuthController extends Controller
 
         $credentials = $request->only(['nik', 'password']);
 
-        if (! $token = Auth::guard('silo')->setTTL(60)->attempt($credentials)) {
+        if (! $token = Auth::guard('silo')->setTTL(1440)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }else{
             if(isset($request->id_device)){

@@ -101,7 +101,7 @@ class KaryawanController extends Controller
             'status' => 'required',
             'flag_aktif' => 'required',
             'email' => 'required',
-            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -112,16 +112,16 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('foto')){
-                $file = $request->file('foto');
+            if($request->hasfile('file_gambar')){
+                $file = $request->file('file_gambar');
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('toko/'.$foto)){
-                    Storage::disk('s3')->delete('toko/'.$foto);
+                if(Storage::disk('s3')->exists('yakes/'.$foto)){
+                    Storage::disk('s3')->delete('yakes/'.$foto);
                 }
-                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('yakes/'.$foto,file_get_contents($file));
             }else{
 
                 $foto="-";
@@ -132,6 +132,7 @@ class KaryawanController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->nik;
             $success['message'] = "Data Karyawan berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -163,7 +164,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $url = url('api/toko-auth/storage');
+            $url = url('api/yakes-auth/storage');
 
             $sql = "select nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' 
             ";
@@ -221,7 +222,7 @@ class KaryawanController extends Controller
             'status' => 'required',
             'flag_aktif' => 'required',
             'email' => 'required',
-            'foto' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
 
@@ -233,7 +234,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('foto')){
+            if($request->hasfile('file_gambar')){
 
                 $sql = "select foto as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' 
                 ";
@@ -243,20 +244,20 @@ class KaryawanController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('toko/'.$foto);
+                        Storage::disk('s3')->delete('yakes/'.$foto);
                     }
                 }else{
                     $foto = "-";
                 }
                 
-                $file = $request->file('foto');
+                $file = $request->file('file_gambar');
                 
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('toko/'.$foto)){
-                    Storage::disk('s3')->delete('toko/'.$foto);
+                if(Storage::disk('s3')->exists('yakes/'.$foto)){
+                    Storage::disk('s3')->delete('yakes/'.$foto);
                 }
-                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('yakes/'.$foto,file_get_contents($file));
                 
             }else{
 
@@ -269,6 +270,7 @@ class KaryawanController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->nik;
             $success['message'] = "Data Karyawan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
