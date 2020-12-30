@@ -42,6 +42,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('lap-perubahan-aset-neto','Yakes\LaporanController@getPerubahanAsetNeto');
     $router->get('lap-aset-neto','Yakes\LaporanController@getAsetNeto');
     $router->get('lap-arus-kas','Yakes\LaporanController@getArusKas');
+    $router->get('lap-arus-kas-upload','Yakes\LaporanController@getArusKasUpload');
 
     //Laporan pp
     $router->get('lap-nrclajur-pp','Yakes\LaporanController@getNrcLajurPp');
@@ -72,6 +73,8 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('lap-top-six','Yakes\LaporanPerformasiController@getTopSix');
     $router->get('lap-sdm-culture','Yakes\LaporanPerformasiController@getSDMCulture');
     $router->get('lap-kontrak-manage','Yakes\LaporanPerformasiController@getKontrakManage');
+
+    
 
 });
 
