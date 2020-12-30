@@ -64,6 +64,15 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->put('unit','Ypt\UnitController@update');
     $router->delete('unit','Ypt\UnitController@destroy');
 
+    
+    //fs
+    $router->get('listFSAktif','Ypt\FSController@listFSAktif');         
+    $router->get('cariFSAktif','Ypt\FSController@cariFSAktif');
+    $router->get('fs','Ypt\FSController@index');
+    $router->post('fs','Ypt\FSController@store');
+    $router->put('fs','Ypt\FSController@update');
+    $router->delete('fs','Ypt\FSController@destroy'); 
+
 });
 
 
