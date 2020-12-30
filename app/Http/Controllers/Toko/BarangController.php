@@ -44,7 +44,7 @@ class BarangController extends Controller
                 if($request->kode_barang == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and kode_barang='$request->kode_barang' ";
+                    $filter = " and a.kode_barang='$request->kode_barang' ";
                 }
                 $sql= "select a.kode_barang,a.nama,a.sat_kecil as satuan,a.hna,a.pabrik as keterangan,a.flag_aktif,a.ss,a.sm1,a.sm2,a.mm1,a.mm2,a.fm1,a.fm2,a.kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,a.barcode,a.hrg_satuan,a.ppn,a.profit,b.nama as nama_satuan,c.nama as nama_klp 
                 from brg_barang a
