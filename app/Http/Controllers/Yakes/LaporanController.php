@@ -993,9 +993,8 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql= "exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';
-            ";
-            $res = DB::connection($this->db)->getPdo()->exec($sql);
+            //$sql= "exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user'";
+            //$res = DB::connection($this->db)->getPdo()->exec($sql);
 
             $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
             $row = DB::connection($this->db)->select($sql2);
@@ -1013,13 +1012,15 @@ class LaporanController extends Controller
             $success['tgl_akhir'] = $get2[0]->tglakhir;
 
            
-            // $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-            //     from exs_neraca a
-            //     $where and a.modul='A' 
-            //     union all
-            //     select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-            //     from exs_neraca a
-            //     $where and a.modul='P'  ";
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='A' 
+                 union all
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='P'  ";
+            
+            /*
             $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe,a.kode_induk
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
@@ -1028,7 +1029,7 @@ class LaporanController extends Controller
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='P' 
             order by a.kode_neraca";
-
+            */
             $nama="";
            
             $res3 = DB::connection($this->db)->select($sql3);
@@ -1103,9 +1104,11 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
+            /*
             $sql= "exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';
             ";
             $res = DB::connection($this->db)->getPdo()->exec($sql);
+            */
 
             $sql2="select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'";
             $row = DB::connection($this->db)->select($sql2);
@@ -1123,13 +1126,15 @@ class LaporanController extends Controller
             $success['tgl_akhir'] = $get2[0]->tglakhir;
 
            
-            // $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-            //     from exs_neraca a
-            //     $where and a.modul='A' 
-            //     union all
-            //     select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
-            //     from exs_neraca a
-            //     $where and a.modul='P'  ";
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='A' 
+                 union all
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='P'  ";
+
+            /*
             $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
@@ -1138,7 +1143,7 @@ class LaporanController extends Controller
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='P' 
             order by a.kode_neraca";
-
+            */
             $nama="";
            
             $res3 = DB::connection($this->db)->select($sql3);
@@ -1625,7 +1630,7 @@ class LaporanController extends Controller
             $tahun = substr($periode,0,4);
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
-
+            /*
             $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';";
             $res = DB::connection($this->db)->update($sql);
             
@@ -1633,10 +1638,17 @@ class LaporanController extends Controller
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
             order by a.rowindex  ";
-            $res = DB::connection($this->db)->select($sql2);
-            $res = json_decode(json_encode($res),true);
-
             
+            */
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='A' 
+                 union all
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='P'  ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
             
@@ -1703,7 +1715,7 @@ class LaporanController extends Controller
             $tahun = substr($periode,0,4);
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
-
+            /*
             $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user';";
             $res = DB::connection($this->db)->update($sql);
             
@@ -1711,7 +1723,15 @@ class LaporanController extends Controller
             from neraca_tmp a
             where a.nik_user='$nik_user' and a.kode_fs='$kode_fs' and a.modul='A'
             order by a.rowindex  ";
-            $res = DB::connection($this->db)->select($sql2);
+            */
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='A' 
+                 union all
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
+                 from exs_neraca a
+                 $where and a.modul='P'  ";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             
