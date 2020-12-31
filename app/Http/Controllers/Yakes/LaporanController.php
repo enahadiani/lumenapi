@@ -20,6 +20,10 @@ class LaporanController extends Controller
     public $guard = 'yakes';
     public $db = 'dbsapkug';
 
+    function lastOfMonth($year, $month) {
+        return date("d", strtotime('-1 second', strtotime('+1 month',strtotime($month . '/01/' . $year. ' 00:00:00'))));
+    }
+
     public function sendMail(Request $request){
         $this->validate($request,[
             'email' => 'required'
@@ -1057,6 +1061,10 @@ class LaporanController extends Controller
             $resttd = DB::connection($this->db)->select($ttd);
             $resttd = json_decode(json_encode($resttd),true);
             $success['ttd'] = $resttd;
+
+            
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
             
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1172,6 +1180,9 @@ class LaporanController extends Controller
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
             
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
+            
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res3;
@@ -1263,6 +1274,7 @@ class LaporanController extends Controller
             
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
+            
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res3;
@@ -1444,6 +1456,9 @@ class LaporanController extends Controller
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
+            
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
             
             $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2,b.jabatan as jab1,c.jabatan as jab2 
             from dash_ttd a
@@ -1686,6 +1701,9 @@ class LaporanController extends Controller
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
+            
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
             $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2,b.jabatan as jab1,c.jabatan as jab2 
             from dash_ttd a
             inner join karyawan b on a.nik1=b.nik
@@ -1789,6 +1807,10 @@ class LaporanController extends Controller
             $resttd = json_decode(json_encode($resttd),true);
             $success['ttd'] = $resttd;
 
+            
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1863,11 +1885,14 @@ class LaporanController extends Controller
             $res = json_decode(json_encode($res),true);
 
             
-            $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
-            $success['tgl_awal'] = $get[0]->tglakhir;
+            // $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            // $success['tgl_awal'] = $get[0]->tglakhir;
             
-            $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
-            $success['tgl_akhir'] = $get2[0]->tglakhir;
+            // $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            // $success['tgl_akhir'] = $get2[0]->tglakhir;
+            
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
             
             $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2,b.jabatan as jab1,c.jabatan as jab2 
             from dash_ttd a
@@ -1928,11 +1953,14 @@ class LaporanController extends Controller
             $resttd = json_decode(json_encode($resttd),true);
             $success['ttd'] = $resttd;
 
-            $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
-            $success['tgl_awal'] = $get[0]->tglakhir;
+            // $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            // $success['tgl_awal'] = $get[0]->tglakhir;
             
-            $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
-            $success['tgl_akhir'] = $get2[0]->tglakhir;
+            // $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
+            // $success['tgl_akhir'] = $get2[0]->tglakhir;
+            
+            $success['tgl_awal'] = $this->lastOfMonth($tahun, $bln);
+            $success['tgl_akhir'] = $this->lastOfMonth($tahunseb, $bln);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
