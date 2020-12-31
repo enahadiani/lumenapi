@@ -67,6 +67,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('lap-real-beban','Yakes\LaporanRealAggController@getRealBeban');
     $router->get('lap-claim-cost','Yakes\LaporanRealAggController@getClaimCost');
     $router->get('lap-rekap-real-grid','Yakes\LaporanRealAggController@getRekapRealGrid');
+    $router->get('lap-rekap-real-detail','Yakes\LaporanRealAggController@getRekapRealDetail');
     
     // Performasi Yakes
     $router->get('lap-kepesertaan','Yakes\LaporanPerformasiController@getKepesertaan');
