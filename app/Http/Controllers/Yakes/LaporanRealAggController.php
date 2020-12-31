@@ -418,16 +418,16 @@ class LaporanRealAggController extends Controller
             $id = isset($request->kode_neraca) ? $request->kode_neraca : '-';
             $periode = $request->periode[1];
 
-            $sql = "select a.kode_akun,c.nama,
-                    case c.jenis when 'Pendapatan' then -a.n1 else a.n1 end as n1, 
-                    case c.jenis when 'Pendapatan' then -a.n2 else a.n2 end as n2, 
-                    case c.jenis when  'Pendapatan' then -a.n3 else a.n3 end as n3,
-                    case c.jenis when 'Pendapatan' then -a.n4 else a.n4 end as n4, 
-                    case c.jenis when 'Pendapatan' then -a.n5 else a.n5 end as n5, 
-                    case c.jenis when  'Pendapatan' then -a.n6 else a.n6 end as n6,
-                    case c.jenis when 'Pendapatan' then -a.n7 else a.n7 end as n7, 
-                    case c.jenis when 'Pendapatan' then -a.n8 else a.n8 end as n8, 
-                    case c.jenis when  'Pendapatan' then -a.n9 else a.n9 end as n9,3 as level_spasi
+            $sql = "select a.kode_akun+' - '+c.nama as nama,
+            case c.jenis when 'Pendapatan' then -a.n1 else a.n1 end as n1, 
+            case c.jenis when 'Pendapatan' then -a.n2 else a.n2 end as n2, 
+            case c.jenis when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+            case c.jenis when 'Pendapatan' then -a.n4 else a.n4 end as n4, 
+            case c.jenis when 'Pendapatan' then -a.n5 else a.n5 end as n5, 
+            case c.jenis when  'Pendapatan' then -a.n6 else a.n6 end as n6,
+            case c.jenis when 'Pendapatan' then -a.n7 else a.n7 end as n7, 
+            case c.jenis when 'Pendapatan' then -a.n8 else a.n8 end as n8, 
+            case c.jenis when  'Pendapatan' then -a.n9 else a.n9 end as n9,3 as level_spasi
             from exs_glma_gar a
             inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
