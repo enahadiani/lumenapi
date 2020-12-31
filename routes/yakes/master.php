@@ -121,6 +121,10 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('unit','Yakes\UnitController@update');
     $router->delete('unit','Yakes\UnitController@destroy');
 
+    //TTD
+    $router->get('ttd','Yakes\TtdController@index');
+    $router->post('ttd','Yakes\TtdController@store');
+
 });
 
 
