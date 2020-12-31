@@ -57,7 +57,7 @@ class LaporanRealAggController extends Controller
 
          
 
-            $sql = "select a.kode_neraca,a.nama,a.level_spasi,a.tipe,
+            $sql = "select a.kode_neraca,a.nama,a.level_spasi,a.tipe,a.kode_induk,
                             case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
                             case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
                             case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
@@ -281,6 +281,93 @@ class LaporanRealAggController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_bp'] = [];
+                $success['status'] = true;
+                $success["auth_status"] = 2;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function has_child($id){
+        $sql = "select count(*) as jum 
+        from exs_neraca a
+        where a.kode_fs='FS8' and a.kode_lokasi='00' and kode_induk='$id'";
+        $row = DB::connection($this->db)->select($sql);
+        return ($row[0]->jum > 0 ? true : false);
+    }
+    
+    function getRekapRealGrid(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $nik_user=$request->nik_user;
+
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $id = isset($request->id) ? $request->id : '00';
+
+            $sql = "select a.kode_neraca,a.nama,a.level_spasi,a.tipe,
+                            case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+                            case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+                            case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+                            case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4,
+                            case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
+                            case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
+                            case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7,
+                            case a.jenis_akun when  'Pendapatan' then -a.n8 else a.n8 end as n8, a.rowindex
+                    from exs_neraca a
+                    where a.kode_fs='FS8' and a.kode_lokasi='00' and kode_induk='$id'
+                    order by a.rowindex" ;
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $result = array();
+                foreach($res as $row){
+                    $row['state'] = $this->has_child($row['kode_neraca']) ? 'closed' : 'open';
+                    array_push($result, $row);
+                }
+                $success['data'] = $result;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = true;
                 $success["auth_status"] = 2;
                 return response()->json($success, $this->successStatus);
