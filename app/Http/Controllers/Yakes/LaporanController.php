@@ -100,6 +100,14 @@ class LaporanController extends Controller
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -205,6 +213,15 @@ class LaporanController extends Controller
             }
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -259,6 +276,16 @@ class LaporanController extends Controller
             $success['sql2'] = $sql;
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -336,6 +363,16 @@ class LaporanController extends Controller
                 $where order by a.no_bukti ";
             $res2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
+
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -404,6 +441,15 @@ class LaporanController extends Controller
                 $where order by a.no_bukti ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -491,6 +537,15 @@ class LaporanController extends Controller
                 $where order by a.no_bukti ";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -611,6 +666,15 @@ class LaporanController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data']=$res;
@@ -706,6 +770,15 @@ class LaporanController extends Controller
             }
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -811,6 +884,15 @@ class LaporanController extends Controller
             }
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -930,6 +1012,15 @@ class LaporanController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data']=$res;
@@ -1038,6 +1129,15 @@ class LaporanController extends Controller
             
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1152,6 +1252,16 @@ class LaporanController extends Controller
             
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
+
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1244,6 +1354,15 @@ class LaporanController extends Controller
             
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res3;
@@ -1336,6 +1455,15 @@ class LaporanController extends Controller
             
             $success["nama_periode"] = $nama_periode;
             $success["nama"] = $nama;
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res3;
@@ -1424,6 +1552,15 @@ class LaporanController extends Controller
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1494,6 +1631,16 @@ class LaporanController extends Controller
             //$success['sql2'] = $sql;
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1569,6 +1716,15 @@ class LaporanController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1656,6 +1812,15 @@ class LaporanController extends Controller
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1742,6 +1907,15 @@ class LaporanController extends Controller
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1822,6 +1996,15 @@ class LaporanController extends Controller
             
             $get2 = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahunseb."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_akhir'] = $get2[0]->tglakhir;
+            
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1863,6 +2046,15 @@ class LaporanController extends Controller
             order by no_urut";
             $res = DB::connection($this->db)->select($sql2);
             $res = json_decode(json_encode($res),true);
+
+            $ttd = " select a.nik1, a.nik2, b.nama, c.nama as nama2 
+            from dash_ttd a
+            inner join karyawan b on a.nik1=b.nik
+            inner join karyawan c on a.nik2=c.nik
+            ";
+            $resttd = DB::connection($this->db)->select($ttd);
+            $resttd = json_decode(json_encode($resttd),true);
+            $success['ttd'] = $resttd;
 
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
