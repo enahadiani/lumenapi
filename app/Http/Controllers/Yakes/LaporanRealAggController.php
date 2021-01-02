@@ -65,7 +65,8 @@ class LaporanRealAggController extends Controller
                             case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
                             case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
                             case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7,
-                            case a.jenis_akun when  'Pendapatan' then -a.n8 else a.n8 end as n8
+                            case a.jenis_akun when  'Pendapatan' then -a.n8 else a.n8 end as n8,
+                            case a.jenis_akun when  'Pendapatan' then -a.n9 else a.n9 end as n9
                     from exs_neraca a
                     where a.kode_fs='FS8' and a.kode_lokasi='00' 
                     order by a.rowindex" ;
@@ -346,7 +347,8 @@ class LaporanRealAggController extends Controller
                             case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
                             case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
                             case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7,
-                            case a.jenis_akun when  'Pendapatan' then -a.n8 else a.n8 end as n8, a.rowindex
+                            case a.jenis_akun when  'Pendapatan' then -a.n8 else a.n8 end as n8,
+                            case a.jenis_akun when  'Pendapatan' then -a.n9 else a.n9 end as n9, a.rowindex
                     from exs_neraca a
                     where a.kode_fs='FS8' and a.kode_lokasi='00' and kode_induk='$id' and a.periode='$periode'
                     order by a.rowindex" ;
@@ -431,7 +433,8 @@ class LaporanRealAggController extends Controller
             from exs_glma_gar a
             inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
-            where b.kode_fs='FS8' and b.kode_lokasi='00' and b.kode_neraca='$id' and a.periode='$periode' 
+            where b.kode_fs='FS8' and b.kode_lokasi='00' and b.kode_neraca='$id' and a.periode='$periode' and 
+            (a.n1<>0 or a.n2<>0 or a.n3<>0 or a.n4<>0 or a.n5<>0 or a.n6<>0 or a.n7<>0 or a.n8<>0 or a.n9<>0)
             order by a.kode_akun" ;
 
             $res = DB::connection($this->db)->select($sql);
