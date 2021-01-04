@@ -801,7 +801,7 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk,'open' as state,case when a.kode_induk = '-' then a.kode_akun else a.kode_akun+a.kode_pp end as kode 
+            $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk,'open' as state,case when a.kode_induk = '-' then a.kode_akun else (case when a.kode_pp = '' then a.kode_akun+'X' else a.kode_akun+a.kode_pp end) end as kode 
             from exs_glma_lap a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             $where and a.kode_induk='$id' ";
