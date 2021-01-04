@@ -118,18 +118,24 @@ class FlagRelasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag='".$kode_flag."' and b.kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->sql)->select("select a.kode_flag,a.nama from flag_akun a
+            where a.kode_flag='".$kode_flag."' ");						
             $res= json_decode(json_encode($res),true);
+
+            $res2 = DB::connection($this->sql)->select("select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun where b.kode_flag='".$kode_flag."' ");						
+            $res2= json_decode(json_encode($res2),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['detail'] = $res2;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
+                $success['detail'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }

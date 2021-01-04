@@ -166,10 +166,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('flagakun','Toko\FlagAkunController@destroy'); 
     
     //flagrelasi
-    $router->get('getFlag','Toko\FlagRelasiController@getFlag');
-    $router->get('getAkunFlag/{kode_flag}','Toko\FlagRelasiController@getAkunFlag');
-    $router->get('getAkun','Toko\FlagRelasiController@getAkun');    
-    $router->get('cariAkunFlag','Toko\FlagRelasiController@cariAkunFlag');    
+    $router->get('flagrelasi','Toko\FlagRelasiController@getFlag');
+    $router->get('flagrelasi/{kode_flag}','Toko\FlagRelasiController@getAkunFlag');
+    $router->get('flagrelasi-akun','Toko\FlagRelasiController@getAkun');    
+    $router->get('flagrelasi-cari','Toko\FlagRelasiController@cariAkunFlag');    
     $router->put('flagrelasi','Toko\FlagRelasiController@update');
     $router->delete('flagrelasi','Toko\FlagRelasiController@destroy'); 
 
