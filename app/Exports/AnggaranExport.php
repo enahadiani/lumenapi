@@ -29,12 +29,12 @@ class AnggaranExport implements FromCollection, WithHeadings
     public function collection()
     {
         if($this->type == 'template'){
-            $res = collect(DB::connection('dbsapkug')->select("select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 from anggaran_load a where kode_lokasi = '-' 
+            $res = collect(DB::connection('dbsapkug')->select("select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 from anggaran_tmp a where kode_lokasi = '-' 
             "));
             
         }else{
             $res = collect(DB::connection('dbsapkug')->select("select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12,a.status,a.keterangan,a.nu 
-            from anggaran_load a where a.kode_lokasi = '$this->kode_lokasi' and a.nik_user='$this->nik_user' and a.tahun='$this->tahun'
+            from anggaran_tmp a where a.kode_lokasi = '$this->kode_lokasi' and a.nik_user='$this->nik_user' and a.tahun='$this->tahun'
             "));
                         
         }
