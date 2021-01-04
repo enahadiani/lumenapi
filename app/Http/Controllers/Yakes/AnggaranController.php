@@ -278,7 +278,7 @@ class AnggaranController extends Controller
                     // }
                     // $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
 
-                    $x[] = DB::connection($this->db)->insert("insert into anggaran_tmp(kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi,tahun)  values ('".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi','$request->tahun') ");
+                    $x[] = DB::connection($this->db)->insert("insert into anggaran_tmp(kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi,tahun)  values ('".$kode_pp."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi','$request->tahun') ");
                     $no++;
                 }
             }
