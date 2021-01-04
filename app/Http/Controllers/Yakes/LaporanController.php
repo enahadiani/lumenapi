@@ -645,6 +645,111 @@ class LaporanController extends Controller
         }
     }
 
+    // function getNrcLajurGrid(Request $request){
+    //     try {
+            
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
+            
+    //         $col_array = array('periode','kode_akun','kode_neraca','kode_fs');
+    //         $db_col_name = array('a.periode','a.kode_akun','b.kode_neraca','b.kode_fs');
+    //         $where = "where a.kode_lokasi='$kode_lokasi' ";
+
+    //         $this_in = "";
+    //         for($i = 0; $i<count($col_array); $i++){
+    //             if(ISSET($request->input($col_array[$i])[0])){
+    //                 if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+    //                     $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+    //                 }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+    //                     $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+    //                 }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+    //                     $tmp = explode(",",$request->input($col_array[$i])[1]);
+    //                     for($x=0;$x<count($tmp);$x++){
+    //                         if($x == 0){
+    //                             $this_in .= "'".$tmp[$x]."'";
+    //                         }else{
+            
+    //                             $this_in .= ","."'".$tmp[$x]."'";
+    //                         }
+    //                     }
+    //                     $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+    //                 }
+    //             }
+    //         }
+
+            
+    //         $nik_user=$request->nik_user;
+    //         $periode=$request->input('periode')[1];
+
+    //         //$sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
+    //         //$res = DB::connection($this->db)->update($sqlex);
+
+    //         $mutasi="";
+    //         if($request->input('jenis') != ""){
+
+    //             if ($request->input('jenis')=="Tidak")
+    //             {
+    //                 $mutasi="and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0) ";
+    //             }
+    //         }
+
+    //         $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
+    //         from exs_glma_lap a
+    //         inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+    //         $where ";
+    //         if(isset($request->trail[1])){
+    //             if($request->input('trail')[1] != ""){
+    
+    //                 if ($request->input('trail')[1] == "1")
+    //                 {
+    //                     $sql = "select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
+    //                     from exs_glma_lap a
+    //                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+    //                     $where ";
+    //                 }
+    //                 if ($request->input('trail')[1] == "2")
+    //                 {
+    //                     $sql = "select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
+    //                     from exs_glma_lap a
+    //                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+    //                     $where ";
+    //                 }
+    //             }
+    //         }
+    //         $res = DB::connection($this->db)->select($sql);
+    //         $res = json_decode(json_encode($res),true);
+            
+    //         if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+    //             $success['status'] = true;
+    //             $success['data']=$res;
+    //             $success['message'] = "Success!";
+    //             $success["auth_status"] = 1;    
+    //             return response()->json($success, $this->successStatus);     
+    //         }
+    //         else{
+    //             $success['message'] = "Data Kosong!";
+    //             $success['data']=[];
+    //             $success['status'] = true;
+    //             return response()->json($success, $this->successStatus);
+    //         }
+    //     } catch (\Throwable $e) {
+    //         $success['status'] = false;
+    //         $success['message'] = "Error ".$e;
+    //         return response()->json($success, $this->successStatus);
+    //     }
+    // }
+
+    function has_child($id,$where){
+        $sql = "select count(a.kode_akun) as jum 
+        from exs_glma_lap a
+        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+        $where and a.kode_induk='$id' ";
+        $row = DB::connection($this->db)->select($sql);
+        return ($row[0]->jum > 0 ? true : false);
+    }
+
     function getNrcLajurGrid(Request $request){
         try {
             
@@ -652,7 +757,7 @@ class LaporanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+
             $col_array = array('periode','kode_akun','kode_neraca','kode_fs');
             $db_col_name = array('a.periode','a.kode_akun','b.kode_neraca','b.kode_fs');
             $where = "where a.kode_lokasi='$kode_lokasi' ";
@@ -686,6 +791,7 @@ class LaporanController extends Controller
             //$sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
             //$res = DB::connection($this->db)->update($sqlex);
 
+            $id = isset($request->id) ? $request->id : '-';
             $mutasi="";
             if($request->input('jenis') != ""){
 
@@ -695,43 +801,32 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
+            $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk,'open' as state,case when a.kode_induk = '-' then a.kode_akun else a.kode_akun+a.kode_pp end as kode 
             from exs_glma_lap a
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            $where ";
-            if(isset($request->trail[1])){
-                if($request->input('trail')[1] != ""){
-    
-                    if ($request->input('trail')[1] == "1")
-                    {
-                        $sql = "select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
-                        from exs_glma_lap a
-                        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                        $where ";
-                    }
-                    if ($request->input('trail')[1] == "2")
-                    {
-                        $sql = "select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk 
-                        from exs_glma_lap a
-                        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                        $where ";
-                    }
-                }
-            }
+            $where and a.kode_induk='$id' ";
+
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-            
+            $success['id'] = $id;
+            $success['sql'] = $sql;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $result = array();
+                foreach($res as $row){
+                    $row['state'] = $this->has_child($row['kode'],$where) ? 'closed' : 'open';
+                    array_push($result, $row);
+                }
+                $success['data'] = $result;
                 $success['status'] = true;
-                $success['data']=$res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data']=[];
-                $success['status'] = true;
+                $success['data'] = [];
+                $success['status'] = false;
+                $success["auth_status"] = 2;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
