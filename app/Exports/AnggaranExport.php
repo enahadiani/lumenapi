@@ -82,7 +82,7 @@ class AnggaranExport implements FromCollection, WithHeadings
                     'n12',
                     'status',
                     'keterangan',
-                    $this->tahun
+                    'nu'
                 ]
             ];
         }
