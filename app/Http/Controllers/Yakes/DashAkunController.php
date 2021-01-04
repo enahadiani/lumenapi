@@ -401,7 +401,7 @@ class DashAkunController extends Controller
                     where a.jenis='Beban'
                     order by a.idx";
 
-            $success['tampil'] = $sql;
+            //namilin di postman $success['tampil'] = $sql;
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
