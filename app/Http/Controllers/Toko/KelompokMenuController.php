@@ -106,9 +106,12 @@ class KelompokMenuController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_klp;
                 $success['message'] = "Data Kelompok Menu berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['kode'] = '-';
+                $success['jenis'] = 'duplicate';
                 $success['message'] = "Error : Duplicate entry. Kode Kelompok Menu sudah ada di database!";
             }
             
@@ -165,6 +168,7 @@ class KelompokMenuController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_klp;
             $success['message'] = "Data Kelompok Menu berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
