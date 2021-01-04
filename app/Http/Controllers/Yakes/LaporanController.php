@@ -741,15 +741,6 @@ class LaporanController extends Controller
     //     }
     // }
 
-    function has_child($id,$where){
-        $sql = "select count(a.kode_akun) as jum 
-        from exs_glma_lap a
-        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-        $where and a.kode_induk='$id' ";
-        $row = DB::connection($this->db)->select($sql);
-        return ($row[0]->jum > 0 ? true : false);
-    }
-
     function getNrcLajurGrid(Request $request){
         try {
             
@@ -788,9 +779,6 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
 
-            //$sqlex="exec sp_glma_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
-            //$res = DB::connection($this->db)->update($sqlex);
-
             $id = isset($request->id) ? $request->id : '-';
             $mutasi="";
             if($request->input('jenis') != ""){
@@ -801,22 +789,28 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.kode_akun,b.nama,a.kode_pp,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_induk,'open' as state,case when a.kode_induk = '-' then a.kode_akun else (case when a.kode_pp = '' then a.kode_akun+'X' else a.kode_akun+a.kode_pp end) end as kode 
-            from exs_glma_lap a
-            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            $where and a.kode_induk='$id' ";
-
+            if($id == "-"){
+                $sql="select a.kode_akun,b.nama,a.so_awal,a.debet,a.kredit,a.so_akhir,case when isnull(c.jum,0) = 0 then 'open' else 'closed' end as state,'-' as kode_pp
+                from exs_glma a
+                left join (select a.kode_akun,a.kode_lokasi,a.periode,count(a.kode_akun) as jum 
+                    from exs_glma_pp a
+                    group by a.kode_akun,a.kode_lokasi,a.periode
+                ) c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi and a.periode=c.periode
+                inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                $where ";
+            }else{
+                $sql="select a.kode_akun,b.nama,a.so_awal,a.debet,a.kredit,a.so_akhir,a.kode_akun as kode,'open' as state,a.kode_pp
+                from exs_glma_pp a
+                inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                $where and a.kode_akun='$id' ";   
+            }
+        
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['id'] = $id;
             $success['sql'] = $sql;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $result = array();
-                foreach($res as $row){
-                    $row['state'] = $this->has_child($row['kode'],$where) ? 'closed' : 'open';
-                    array_push($result, $row);
-                }
-                $success['data'] = $result;
+                $success['data'] = $res;
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
