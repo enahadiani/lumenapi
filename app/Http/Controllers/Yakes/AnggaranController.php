@@ -164,6 +164,8 @@ class AnggaranController extends Controller
                     where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
                 ");
             }
+
+            $exec = DB::connection($this->db)->update("exec gen_dash_gar '$request->tahun','$request->nik_user' ");
                 
             $del2 = DB::connection($this->db)->update("delete from anggaran_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' ");
 
