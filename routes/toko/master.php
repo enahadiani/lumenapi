@@ -149,6 +149,31 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('format-laporan-relasi','Toko\FormatLaporanController@simpanRelasi');
     $router->post('format-laporan-move','Toko\FormatLaporanController@simpanMove');
 
+    
+    //fs
+    $router->get('listFSAktif','Toko\FSController@listFSAktif');         
+    $router->get('cariFSAktif','Toko\FSController@cariFSAktif');
+    $router->get('fs','Toko\FSController@index');
+    $router->post('fs','Toko\FSController@store');
+    $router->put('fs','Toko\FSController@update');
+    $router->delete('fs','Toko\FSController@destroy'); 
+
+    //flagakun
+    $router->get('cariFlag','Toko\FlagAkunController@cariFlag');
+    $router->get('flagakun','Toko\FlagAkunController@index');
+    $router->post('flagakun','Toko\FlagAkunController@store');
+    $router->put('flagakun','Toko\FlagAkunController@update');
+    $router->delete('flagakun','Toko\FlagAkunController@destroy'); 
+    
+    //flagrelasi
+    $router->get('getFlag','Toko\FlagRelasiController@getFlag');
+    $router->get('getAkunFlag/{kode_flag}','Toko\FlagRelasiController@getAkunFlag');
+    $router->get('getAkun','Toko\FlagRelasiController@getAkun');    
+    $router->get('cariAkunFlag','Toko\FlagRelasiController@cariAkunFlag');    
+    $router->put('flagrelasi','Toko\FlagRelasiController@update');
+    $router->delete('flagrelasi','Toko\FlagRelasiController@destroy'); 
+
+
 });
 
 
