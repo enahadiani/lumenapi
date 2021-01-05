@@ -21,13 +21,13 @@ class HrKaryawanController extends Controller
     public $guard = 'yakes';
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
         return $id;
     }    
-    
+
     public function indexm(Request $request)
     {
         try {            
@@ -38,7 +38,7 @@ class HrKaryawanController extends Controller
 
             $sql= "select no_bukti,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
