@@ -104,8 +104,6 @@ class SDMCultureController extends Controller
 
             $insd = DB::connection($this->sql)->insert("insert into dash_sdm_culture_d(no_bukti,no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user) 
                 select '$no_bukti',no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,'$nik' as nik_user from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
-                
-            $exec = DB::connection($this->sql)->update("exec dbo.gen_dash_sdm '$request->periode','$request->nik_user'");
 
             $del2 = DB::connection($this->sql)->table('dash_sdm_culture_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
