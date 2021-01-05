@@ -36,7 +36,7 @@ class HrKaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql= "select no_bukti,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
+            $sql= "select no_bukti,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from hr_karyawan_m where kode_lokasi='".$kode_lokasi."' ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -238,6 +238,7 @@ class HrKaryawanController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Karyawan berhasil disimpan";
             }else{
                 $success['status'] = false;
