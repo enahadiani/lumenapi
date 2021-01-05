@@ -43,6 +43,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //hrkaryawan
     $router->get('cariNik','Yakes\HrKaryawanController@cariStsEdu');
     $router->get('hrKaryawan','Yakes\HrKaryawanController@index');
+    $router->get('hrKaryawan-listupload','Yakes\HrKaryawanController@indexm');
     $router->post('hrKaryawan','Yakes\HrKaryawanController@store');
     $router->put('hrKaryawan','Yakes\HrKaryawanController@update');
     $router->delete('hrKaryawan','Yakes\HrKaryawanController@destroy'); 

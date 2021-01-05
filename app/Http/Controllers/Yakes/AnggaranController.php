@@ -87,7 +87,7 @@ class AnggaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql= "select no_agg,tanggal,keterangan,tahun,nilai from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
+            $sql= "select no_agg,tanggal,keterangan,tahun,nilai,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
