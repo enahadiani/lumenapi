@@ -392,7 +392,8 @@ class StockOpnameController extends Controller
             if(isset($request->nik) && $request->nik != ""){
                 $nik= $request->nik;
             }
-            
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $per=substr($periode,2,4);
             $no_bukti = $request->no_bukti;
             $del1 = DB::connection($this->sql)->table('trans_m')
             ->where('kode_lokasi', $kode_lokasi)
