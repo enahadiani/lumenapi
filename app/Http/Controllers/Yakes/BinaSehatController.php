@@ -93,7 +93,7 @@ class BinaSehatController extends Controller
             $per = date('ym');
             $no_bukti = $this->generateKode("dash_bina_sehat_m", "no_bukti", $kode_lokasi."-UBS".$per.".", "0001");
 
-            $insm = DB::connection($this->sql)->insert("insert into dash_bina_sehat_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(jenis),getdate(),'$nik' from dash_bina_sehat_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
+            $insm = DB::connection($this->sql)->insert("insert into dash_bina_sehat_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(*),getdate(),'$nik' from dash_bina_sehat_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
 
 
             $ins = DB::connection($this->sql)->insert("insert into dash_bina_sehat(
