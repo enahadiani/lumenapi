@@ -101,8 +101,8 @@ class KontrakManagemenController extends Controller
                 no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,tgl_input,nik_user) 
                 select no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,tgl_input,'$nik' as nik_user from dash_kontrak_manage_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
 
-            $insd = DB::connection($this->sql)->insert("insert into dash_kontrak_manage_d(no_bukti,no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,jumlah,tgl_input,nik_user) 
-                select '$no_bukti',no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,jumlah,tgl_input,'$nik' as nik_user from dash_kontrak_manage_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+            $insd = DB::connection($this->sql)->insert("insert into dash_kontrak_manage_d(no_bukti,no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,tgl_input,nik_user) 
+                select '$no_bukti',no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,tgl_input,'$nik' as nik_user from dash_kontrak_manage_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
             $del2 = DB::connection($this->sql)->table('dash_kontrak_manage_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
