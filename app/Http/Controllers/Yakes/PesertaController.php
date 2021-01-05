@@ -19,6 +19,14 @@ class PesertaController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }    
+
     public function validateData($jenis,$kode_pp){
         $keterangan = "";
         $auth = DB::connection($this->sql)->select("select kode_pp from pp where kode_pp='$kode_pp' 
@@ -38,6 +46,38 @@ class PesertaController extends Controller
 
     }
 
+    public function index(Request $request)
+    {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql= "select no_bukti,tanggal,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from dash_peserta_m where kode_lokasi='".$kode_lokasi."' ";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -55,15 +95,23 @@ class PesertaController extends Controller
 
             $del1 = DB::connection($this->sql)->table('dash_peserta')->where('periode', $request->periode)->delete();
 
+            $per = date('ym');
+            $no_bukti = $this->generateKode("hr_karyawan_m", "no_bukti", $kode_lokasi."-UKR".$per.".", "0001");
+
+            $insm = DB::connection($this->sql)->insert("insert into dash_peserta_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(jenis),getdate(),'$nik' from dash_peserta_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
+
             $ins = DB::connection($this->sql)->insert("insert into dash_peserta(
                 periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,nik_user) 
                 select periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,'$nik' as nik_user from dash_peserta_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
-                
-                $del2 = DB::connection($this->sql)->table('dash_peserta_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
-                
-                DB::connection($this->sql)->commit();
-                $success['status'] = true;
-                $success['message'] = "Data Peserta berhasil disimpan";
+            
+            $insd = DB::connection($this->sql)->insert("insert into dash_peserta_d(no_bukti,periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,nik_user) 
+            select '$no_bukti',periode,kode_lokasi,jenis,kk,pas,anak,jd,rka_claim,tgl_input,'$nik' as nik_user from dash_peserta_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+            
+            $del2 = DB::connection($this->sql)->table('dash_peserta_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+            
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Peserta berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {

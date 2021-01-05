@@ -53,6 +53,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     
     //dash Peserta
+    $router->get('dashPeserta','Yakes\PesertaController@index');
     $router->post('dashPeserta','Yakes\PesertaController@store');
     $router->post('dashPeserta-import','Yakes\PesertaController@importExcel');
     $router->get('dashPeserta-tmp','Yakes\PesertaController@getPesertaTmp');
