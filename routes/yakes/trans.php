@@ -71,14 +71,17 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('dashTopSix-import','Yakes\TopSixController@importExcel');
     $router->get('dashTopSix-tmp','Yakes\TopSixController@getTopSixTmp');
 
+    $router->get('dashSDMCulture','Yakes\SDMCultureController@index');
     $router->post('dashSDMCulture','Yakes\SDMCultureController@store');
     $router->post('dashSDMCulture-import','Yakes\SDMCultureController@importExcel');
     $router->get('dashSDMCulture-tmp','Yakes\SDMCultureController@getSDMCultureTmp');
 
+    $router->get('dashKontrakManage','Yakes\KontrakManagemenController@index');
     $router->post('dashKontrakManage','Yakes\KontrakManagemenController@store');
     $router->post('dashKontrakManage-import','Yakes\KontrakManagemenController@importExcel');
     $router->get('dashKontrakManage-tmp','Yakes\KontrakManagemenController@getKontrakManagemenTmp');
 
+    $router->get('dashBinaSehat','Yakes\BinaSehatController@index');
     $router->post('dashBinaSehat','Yakes\BinaSehatController@store');
     $router->post('dashBinaSehat-import','Yakes\BinaSehatController@importExcel');
     $router->get('dashBinaSehat-tmp','Yakes\BinaSehatController@getBinaSehatTmp');
@@ -99,6 +102,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('setting-rasio-neraca','Yakes\SettingRasioController@getNeraca');    
     $router->get('setting-rasio-klp','Yakes\SettingRasioController@getKlp');
 
+    $router->get('arus-kas','Yakes\ArusKasController@index');
     $router->post('arus-kas','Yakes\ArusKasController@store');
     $router->post('arus-kas-import','Yakes\ArusKasController@importExcel');
     $router->get('arus-kas-tmp','Yakes\ArusKasController@getArusKasTmp');

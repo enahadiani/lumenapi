@@ -19,6 +19,14 @@ class SDMCultureController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }    
+
     public function validateData($kode_pp){
         $keterangan = "";
         if($kode_pp != ""){
@@ -35,6 +43,39 @@ class SDMCultureController extends Controller
 
     }
 
+    
+    public function index(Request $request)
+    {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql= "select no_bukti,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from dash_sdm_culture_m where kode_lokasi='".$kode_lokasi."' ";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }        
+    }
+    
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -52,15 +93,26 @@ class SDMCultureController extends Controller
 
             $del1 = DB::connection($this->sql)->table('dash_sdm_culture')->where('periode', $request->periode)->delete();
 
+            $per = date('ym');
+            $no_bukti = $this->generateKode("dash_sdm_culture_m", "no_bukti", $kode_lokasi."-USC".$per.".", "0001");
+
+            $insm = DB::connection($this->sql)->insert("insert into dash_sdm_culture_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(jenis),getdate(),'$nik' from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
+
             $ins = DB::connection($this->sql)->insert("insert into dash_sdm_culture(
                 no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user) 
                 select no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,'$nik' as nik_user from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+
+            $insd = DB::connection($this->sql)->insert("insert into dash_sdm_culture_d(no_bukti,no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,tgl_input,nik_user) 
+                select '$no_bukti',no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,tgl_input,'$nik' as nik_user from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
-                $del2 = DB::connection($this->sql)->table('dash_sdm_culture_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+            $exec = DB::connection($this->sql)->update("exec dbo.gen_dash_sdm '$request->periode','$request->nik_user'");
+
+            $del2 = DB::connection($this->sql)->table('dash_sdm_culture_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
-                DB::connection($this->sql)->commit();
-                $success['status'] = true;
-                $success['message'] = "Data Top Six berhasil disimpan";
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['no_bukti'] = $no_bukti;
+            $success['message'] = "Data SDM Culture berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
