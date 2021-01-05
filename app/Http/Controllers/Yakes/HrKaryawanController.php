@@ -224,7 +224,7 @@ class HrKaryawanController extends Controller
 
                 $del1 = DB::connection($this->sql)->table('hr_karyawan')->where('periode', $request->periode)->delete();
 
-                $insm = DB::connection($this->sql)->insert("insert into hr_karyawan_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(nik) from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
+                $insm = DB::connection($this->sql)->insert("insert into hr_karyawan_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(nik),getdate(),'$nik' from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
 
                 $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) 
                 select nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,'$nik' as nik_user,periode from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
