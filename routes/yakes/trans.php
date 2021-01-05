@@ -60,6 +60,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     
     //dash Kunjungan
+    $router->get('dashKunjungan','Yakes\KunjunganController@index');
     $router->post('dashKunjungan','Yakes\KunjunganController@store');
     $router->post('dashKunjungan-import','Yakes\KunjunganController@importExcel');
     $router->get('dashKunjungan-tmp','Yakes\KunjunganController@getKunjunganTmp');
