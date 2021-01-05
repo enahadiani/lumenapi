@@ -54,7 +54,7 @@ class PesertaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql= "select no_bukti,tanggal,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from dash_peserta_m where kode_lokasi='".$kode_lokasi."' ";
+            $sql= "select no_bukti,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from dash_peserta_m where kode_lokasi='".$kode_lokasi."' ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -96,7 +96,7 @@ class PesertaController extends Controller
             $del1 = DB::connection($this->sql)->table('dash_peserta')->where('periode', $request->periode)->delete();
 
             $per = date('ym');
-            $no_bukti = $this->generateKode("hr_karyawan_m", "no_bukti", $kode_lokasi."-UKR".$per.".", "0001");
+            $no_bukti = $this->generateKode("hr_karyawan_m", "no_bukti", $kode_lokasi."-UPS".$per.".", "0001");
 
             $insm = DB::connection($this->sql)->insert("insert into dash_peserta_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(jenis),getdate(),'$nik' from dash_peserta_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
 
@@ -111,6 +111,7 @@ class PesertaController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Peserta berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
