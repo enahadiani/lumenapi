@@ -108,7 +108,7 @@ class BinaSehatController extends Controller
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['no_bukti'] = $request->no_bukti;
+            $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Pembinaan Kesehatan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     

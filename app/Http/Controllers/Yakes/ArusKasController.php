@@ -105,6 +105,7 @@ class ArusKasController extends Controller
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Arus Kas berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
