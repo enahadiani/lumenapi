@@ -82,6 +82,7 @@ class PesertaController extends Controller
     {
         $this->validate($request, [
             'periode' => 'required|max:6',
+            'keterangan' => 'required|max:200',
             'nik_user'=> 'required' 
         ]);
 
