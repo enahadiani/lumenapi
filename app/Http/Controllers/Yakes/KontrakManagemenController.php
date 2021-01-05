@@ -95,7 +95,7 @@ class KontrakManagemenController extends Controller
             $per = date('ym');
             $no_bukti = $this->generateKode("dash_kontrak_manage_m", "no_bukti", $kode_lokasi."-UKM".$per.".", "0001");
 
-            $insm = DB::connection($this->sql)->insert("insert into dash_kontrak_manage_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(jenis),getdate(),'$nik' from dash_kontrak_manage_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
+            $insm = DB::connection($this->sql)->insert("insert into dash_kontrak_manage_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(*),getdate(),'$nik' from dash_kontrak_manage_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
 
             $ins = DB::connection($this->sql)->insert("insert into dash_kontrak_manage(
                 no_urut,periode,no,indicator,unit,weight,target,real,formula,ach,score,warna,tgl_input,nik_user) 
