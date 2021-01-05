@@ -21,7 +21,7 @@ use Maatwebsite\Excel\Events\BeforeExport;
 use Maatwebsite\Excel\Events\AfterSheet;
 
 
-class TopSixExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
+class ArusKasExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
 {
     public function __construct($nik_user,$periode,$type)
     {
@@ -33,12 +33,11 @@ class TopSixExport implements FromCollection, WithHeadings, WithColumnFormatting
     public function collection()
     {
         if($this->type == 'template'){
-            $res = collect(DB::connection('dbsapkug')->select("select '' as no,'' as jenis,'' as nama,'' as penderita_before,'' as penderita_now,'' as biaya_before,'' as biaya_now,'' as yoy_jiwa_before,'' as yoy_jiwa_now,'' as yoy_biaya_before,'' as yoy_biaya_now,'' as rata2_before, '' as rata2_now "));
+            $res = collect(DB::connection('dbsapkug')->select("select '' as keterangan,'' as n1,'' as n2,'' as jenis"));
         }else{
             
-            $res = collect(DB::connection('dbsapkug')->select("select no,jenis,nama,
-            penderita_before,penderita_now,biaya_before,biaya_now,yoy_jiwa_before,yoy_jiwa_now,yoy_biaya_before,yoy_biaya_now,rata2_before,rata2_now,sts_upload,ket_upload,nu 
-            from dash_top_icd_tmp
+            $res = collect(DB::connection('dbsapkug')->select("select keterangan,n1,n2,jenis,sts_upload,ket_upload,nu 
+            from yks_arus_kas_tmp
             where nik_user ='$this->nik_user' and periode ='$this->periode' 
             order by nu"));
                         
@@ -51,13 +50,13 @@ class TopSixExport implements FromCollection, WithHeadings, WithColumnFormatting
         if($this->type == 'template'){
             return [
                 [
-                    'no','jenis','nama','penderita_before','penderita_now','biaya_before','biaya_now','yoy_jiwa_before','yoy_jiwa_now','yoy_biaya_before','yoy_biaya_now','rata2_before','rata2_now'
+                    'keterangan','n1','n2','Summary/Posting'
                 ]
             ];
         }else{
             return [
                 [
-                    'no','jenis','nama','penderita_before','penderita_now','biaya_before','biaya_now','yoy_jiwa_before','yoy_jiwa_now','yoy_biaya_before','yoy_biaya_now','rata2_before','rata2_now',
+                    'keterangan','n1','n2','Summary/Posting',
                     'sts_upload',
                     'ket_upload',
                     'nu'

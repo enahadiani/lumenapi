@@ -25,7 +25,7 @@ class KaryawanController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
     
-        $strSQL = "select nik from karyawan where nik = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
+        $strSQL = "select nik from karyawan where nik = '".$isi."' ";
     
         $auth = DB::connection($this->sql)->select($strSQL);
         $auth = json_decode(json_encode($auth),true);
@@ -48,7 +48,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select nik,nama,alamat,jabatan,no_telp,email,kode_pp from karyawan where kode_lokasi='".$kode_lokasi."' 
+            $res = DB::connection($this->sql)->select("select nik,nama,alamat,jabatan,no_telp,email,kode_pp from karyawan 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -166,7 +166,7 @@ class KaryawanController extends Controller
 
             $url = url('api/yakes-auth/storage');
 
-            $sql = "select nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' 
+            $sql = "select nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto from karyawan where nik='$request->nik' 
             ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -300,7 +300,7 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
+            $del = DB::connection($this->sql)->table('karyawan')->where('nik', $request->nik)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;

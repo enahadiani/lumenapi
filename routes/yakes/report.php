@@ -28,6 +28,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('filter-bukti-jurnal','Yakes\FilterController@getFilterBuktiJurnal');
     $router->get('filter-mutasi','Yakes\FilterController@getFilterYaTidak');
     $router->get('filter-pp','Yakes\FilterController@getFilterPp');
+    $router->get('filter-klp-akun','Yakes\FilterController@getFilterKlpAkun');
 
     //Laporan lokasi
     $router->get('lap-nrclajur','Yakes\LaporanController@getNrcLajur');
@@ -41,6 +42,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('lap-perubahan-aset-neto','Yakes\LaporanController@getPerubahanAsetNeto');
     $router->get('lap-aset-neto','Yakes\LaporanController@getAsetNeto');
     $router->get('lap-arus-kas','Yakes\LaporanController@getArusKas');
+    $router->get('lap-arus-kas-upload','Yakes\LaporanController@getArusKasUpload');
 
     //Laporan pp
     $router->get('lap-nrclajur-pp','Yakes\LaporanController@getNrcLajurPp');
@@ -54,6 +56,27 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     //email
     $router->post('send-laporan','Yakes\LaporanController@sendMail');
+
+    // BPJS
+    $router->get('lap-premi-kapitasi','Yakes\LaporanBPJSController@getPremiKapitasi');
+    $router->get('lap-claim-bpjs','Yakes\LaporanBPJSController@getClaimBPJS');
+    $router->get('lap-utilisasi-bpjs','Yakes\LaporanBPJSController@getUtilisasiBPJS');
+    
+    // Real Anggaran
+    $router->get('lap-rekap-real','Yakes\LaporanRealAggController@getRekapReal');
+    $router->get('lap-real-beban','Yakes\LaporanRealAggController@getRealBeban');
+    $router->get('lap-claim-cost','Yakes\LaporanRealAggController@getClaimCost');
+    $router->get('lap-rekap-real-grid','Yakes\LaporanRealAggController@getRekapRealGrid');
+    $router->get('lap-rekap-real-detail','Yakes\LaporanRealAggController@getRekapRealDetail');
+    
+    // Performasi Yakes
+    $router->get('lap-kepesertaan','Yakes\LaporanPerformasiController@getKepesertaan');
+    $router->get('lap-bina-sehat','Yakes\LaporanPerformasiController@getBinaSehat');
+    $router->get('lap-top-six','Yakes\LaporanPerformasiController@getTopSix');
+    $router->get('lap-sdm-culture','Yakes\LaporanPerformasiController@getSDMCulture');
+    $router->get('lap-kontrak-manage','Yakes\LaporanPerformasiController@getKontrakManage');
+
+    
 
 });
 

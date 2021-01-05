@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 
-class KontrakManagemenImport implements ToModel, WithStartRow, WithCalculatedFormulas
+class ArusKasImport implements ToModel, WithStartRow, WithCalculatedFormulas
 {
     public function startRow(): int
     {

@@ -42,13 +42,15 @@ class BonusController extends Controller
                 if($request->kode_barang == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and kode_barang='$request->kode_barang' ";
+                    $filter = " and a.kode_barang='$request->kode_barang' ";
                 }
-                $sql= "select kode_barang,keterangan,ref_qty,bonus_qty,tgl_mulai,tgl_selesai from brg_bonus 
-                where kode_lokasi='".$kode_lokasi."'
+                $sql= "select a.kode_barang,a.keterangan,a.ref_qty,a.bonus_qty,a.tgl_mulai,a.tgl_selesai,b.nama as nama_barang 
+                from brg_bonus a
+                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."'
                 $filter ";
             }else{
-                $sql = "select kode_barang,keterangan,ref_qty,bonus_qty,tgl_mulai,tgl_selesai from brg_bonus where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_barang,keterangan,ref_qty,bonus_qty,tgl_mulai,tgl_selesai,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_bonus where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -109,10 +111,11 @@ class BonusController extends Controller
             }
             // if($this->isUnik($request->kode_bonus,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->keterangan,$kode_lokasi,$request->ref_qty,$request->bonus_qty,$request->tgl_mulai,$request->tgl_selesai));
+                $ins = DB::connection($this->sql)->insert("insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai,tgl_input) values ('$request->kode_barang','$request->keterangan','$kode_lokasi','$request->ref_qty','$request->bonus_qty','$request->tgl_mulai','$request->tgl_selesai',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_barang;
                 $success['message'] = "Data Bonus berhasil disimpan";
             // }else{
             //     $success['status'] = false;
@@ -173,10 +176,11 @@ class BonusController extends Controller
             ->where('kode_barang', $request->kode_barang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->keterangan,$kode_lokasi,$request->ref_qty, $request->bonus_qty,$request->tgl_mulai,$request->tgl_selesai));
+            $ins = DB::connection($this->sql)->insert("insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai,tgl_input) values ('$request->kode_barang','$request->keterangan','$kode_lokasi','$request->ref_qty','$request->bonus_qty','$request->tgl_mulai','$request->tgl_selesai',getdate())");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_barang;
             $success['message'] = "Data Bonus berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {

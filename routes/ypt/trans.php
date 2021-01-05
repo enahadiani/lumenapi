@@ -24,6 +24,15 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('periode','Ypt\TransferDataController@getPeriode');     
     $router->post('transfer-data','Ypt\TransferDataController@store'); 
 
+    $router->get('setting-grafik','Ypt\SettingGrafikController@index');     
+    $router->get('setting-grafik-detail','Ypt\SettingGrafikController@show'); 
+    $router->post('setting-grafik','Ypt\SettingGrafikController@store');
+    $router->put('setting-grafik','Ypt\SettingGrafikController@update');    
+    $router->delete('setting-grafik','Ypt\SettingGrafikController@destroy');   
+    $router->get('setting-grafik-neraca','Ypt\SettingGrafikController@getNeraca');    
+    $router->get('setting-grafik-klp','Ypt\SettingGrafikController@getKlp');
+    
+
    
    
 

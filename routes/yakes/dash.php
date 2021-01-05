@@ -46,7 +46,9 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->put('demog','Yakes\DemogController@update');
     $router->delete('demog','Yakes\DemogController@destroy');
 
-    //dashbord akun
+    //dashbord akun    
+    $router->get('dataKunjLayanan','Yakes\DashAkunController@dataKunjLayanan');
+    $router->get('dataKunjTotal','Yakes\DashAkunController@dataKunjTotal');
     $router->get('dataClaimant','Yakes\DashAkunController@dataClaimant');
     $router->get('dataBPCCtotal','Yakes\DashAkunController@dataBPCCtotal');
     $router->get('dataBPCClayanan','Yakes\DashAkunController@dataBPCClayanan');
@@ -66,12 +68,19 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('dataEdu','Yakes\DashSDMController@dataEdu');    
 
     //dashbord bpjs
+    $router->get('dash-bpjs-kapitasiregdetail','Yakes\DashBPJSController@dataKapitasiRegDetail');
+    $router->get('dash-bpjs-kapitasireg','Yakes\DashBPJSController@dataKapitasiRegional');
     $router->get('dataClaim','Yakes\DashBPJSController@dataClaim');
     $router->get('dataKapitasi','Yakes\DashBPJSController@dataKapitasi');    
     $router->get('dataPremiLokasi','Yakes\DashBPJSController@dataPremiLokasi');
     $router->get('dataBPCCLokasi','Yakes\DashBPJSController@dataBPCCLokasi');
     $router->get('dataKapitasiLokasi','Yakes\DashBPJSController@dataKapitasiLokasi');
     $router->get('dataClaimLokasi','Yakes\DashBPJSController@dataClaimLokasi');
+
+
+    
+    $router->get('rasio','Yakes\DashRasioController@dataRasio');
+    $router->get('klp-rasio','Yakes\DashRasioController@klpRasio');
     
 });
 

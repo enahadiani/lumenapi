@@ -7,29 +7,25 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-use App\Exports\SDMCultureExport;
-use App\Imports\SDMCultureImport;
+use App\Exports\BinaSehatExport;
+use App\Imports\BinaSehatImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-class SDMCultureController extends Controller
+class BinaSehatController extends Controller
 {    
     public $successStatus = 200;
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
-    public function validateData($kode_pp){
+    public function validateData($jenis){
         $keterangan = "";
-        if($kode_pp != ""){
 
-            $auth = DB::connection($this->sql)->select("select kode_pp from pp where kode_pp='$kode_pp' 
-            ");
-            if(count($auth) > 0){
-                $keterangan .= "";
-            }else{
-                $keterangan .= "Regional $kode_pp tidak valid";
-            }
+        if($jenis == "PEGAWAI" || $jenis == "PENSIUN"){
+            $keterangan .="";
+        }else{
+            $keterangan .="Jenis $jenis tidak valid. Jenis yang diperbolehkan : PEGAWAI atau PENSIUN ";
         }
         return $keterangan;
 
@@ -50,23 +46,23 @@ class SDMCultureController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $del1 = DB::connection($this->sql)->table('dash_sdm_culture')->where('periode', $request->periode)->delete();
+            $del1 = DB::connection($this->sql)->table('dash_bina_sehat')->where('periode', $request->periode)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into dash_sdm_culture(
-                no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user) 
-                select no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,'$nik' as nik_user from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+            $ins = DB::connection($this->sql)->insert("insert into dash_bina_sehat(
+                no_urut,periode,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,nik_user,no) 
+                select no_urut,periode,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,'$nik' as nik_user,no from dash_bina_sehat_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
                 
-                $del2 = DB::connection($this->sql)->table('dash_sdm_culture_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+                $del2 = DB::connection($this->sql)->table('dash_bina_sehat_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Top Six berhasil disimpan";
+                $success['message'] = "Data Pembinaan Kesehatan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Top Six gagal disimpan ".$e;
+            $success['message'] = "Data Pembinaan Kesehatan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -89,7 +85,7 @@ class SDMCultureController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del1 = DB::connection($this->sql)->table('dash_sdm_culture_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
+            $del1 = DB::connection($this->sql)->table('dash_bina_sehat_tmp')->where('periode', $request->periode)->where('nik_user', $request->nik_user)->delete();
             // menangkap file excel
             $file = $request->file('file');
     
@@ -97,7 +93,7 @@ class SDMCultureController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            $dt = Excel::toArray(new SDMCultureImport(),$nama_file);
+            $dt = Excel::toArray(new BinaSehatImport(),$nama_file);
             $excel = $dt[0];
             $x = array();
             $query = "";
@@ -111,16 +107,18 @@ class SDMCultureController extends Controller
             ";
             $commit = "commit tran;";
             foreach($excel as $row){
-                // $ket = $this->validateData($row[1]);
-                // if($ket != ""){
-                //     $sts = 0;
-                //     $status_validate = false;
-                // }else{
-                    $sts = 1;
+                // if($row[0] != ""){
+                    // $ket = $this->validateData($row[0],$row[1]);
+                    // if($ket != ""){
+                    //     $sts = 0;
+                    //     $status_validate = false;
+                    // }else{
+                        $sts = 1;
+                    // }
+                    // $nama = str_replace("'","",$row[1]);
+                    $query .= "insert into dash_bina_sehat_tmp(no_urut,periode,no,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[0]."','".$row[1]."','".$row[2]."',".floatval($row[3]).",".floatval($row[4]).",".floatval($row[5]).",".floatval($row[6]).",".floatval($row[7]).",getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
+                    $no++;
                 // }
-                // $nama = str_replace("'","",$row[1]);
-                $query .= "insert into dash_sdm_culture_tmp(no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user,sts_upload,ket_upload,nu) values (".$no.",'".$request->periode."','".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."',getdate(),'".$request->nik_user."','".$sts."','".$ket."',".$no.");";
-                $no++;
             }
 
             $insert = DB::connection($this->sql)->insert($begin.$query.$commit);
@@ -156,13 +154,13 @@ class SDMCultureController extends Controller
 
         date_default_timezone_set("Asia/Bangkok");
         if(isset($request->type) && $request->type == "template"){
-            return Excel::download(new SDMCultureExport($request->nik_user,$request->periode,$request->type), 'SDMCulture_'.$request->nik_user.'.xlsx');
+            return Excel::download(new BinaSehatExport($request->nik_user,$request->periode,$request->type), 'BinaSehat_'.$request->nik_user.'.xlsx');
         }else{
-            return Excel::download(new SDMCultureExport($request->nik_user,$request->periode,$request->type), 'SDMCulture_'.$request->nik_user.'.xlsx');
+            return Excel::download(new BinaSehatExport($request->nik_user,$request->periode,$request->type), 'BinaSehat_'.$request->nik_user.'.xlsx');
         }
     }
 
-    public function getSDMCultureTmp(Request $request)
+    public function getBinaSehatTmp(Request $request)
     {
         
         $this->validate($request, [
@@ -179,8 +177,8 @@ class SDMCultureController extends Controller
             }
 
             $sql = "select 
-            no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user
-            from dash_sdm_culture_tmp 
+            no,no_urut,periode,uraian,satuan,rka,real,real_before,ach,yoy,tgl_input,nik_user
+            from dash_bina_sehat_tmp 
             where nik_user = '".$nik_user."' and periode='".$periode."' 
             order by nu";
             $res = DB::connection($this->sql)->select($sql);

@@ -44,12 +44,15 @@ class BarangController extends Controller
                 if($request->kode_barang == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and kode_barang='$request->kode_barang' ";
+                    $filter = " and a.kode_barang='$request->kode_barang' ";
                 }
-                $sql= "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang
-                where kode_lokasi='".$kode_lokasi."' $filter";
+                $sql= "select a.kode_barang,a.nama,a.sat_kecil as satuan,a.hna,a.pabrik as keterangan,a.flag_aktif,a.ss,a.sm1,a.sm2,a.mm1,a.mm2,a.fm1,a.fm2,a.kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,a.barcode,a.hrg_satuan,a.ppn,a.profit,b.nama as nama_satuan,c.nama as nama_klp 
+                from brg_barang a
+                left join brg_satuan b on a.sat_kecil=b.kode_satuan and a.kode_lokasi=b.kode_lokasi
+                left join brg_barangklp c on a.kode_klp=c.kode_klp and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' $filter";
             }else{
-                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit from brg_barang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as keterangan,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_barang where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -140,14 +143,17 @@ class BarangController extends Controller
                     $foto="-";
                 }
 
-                $ins = DB::connection($this->sql)->insert('insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->nama,$kode_lokasi,$request->sat_kecil, $request->sat_besar, $request->jml_sat,$request->hna,$request->pabrik,$request->flag_gen, $request->flag_aktif,$request->ss, $request->sm1, $request->sm2, $request->mm1, $request->mm2, $request->fm1, $request->fm2, $request->kode_klp, $foto, $request->barcode,$request->hrg_satuan, $request->ppn, $request->profit));
+                $ins = DB::connection($this->sql)->insert("insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) values ('$request->kode_barang','$request->nama','$kode_lokasi','$request->sat_kecil','$request->sat_besar',$request->jml_sat,$request->hna,'$request->pabrik','$request->flag_gen','$request->flag_aktif',$request->ss,$request->sm1,$request->sm2,$request->mm1,$request->mm2,$request->fm1,$request->fm2,'$request->kode_klp','$foto','$request->barcode',$request->hrg_satuan,$request->ppn,$request->profit,getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Barang berhasil disimpan";
+                $success['kode'] = $request->kode_barang;
             }else{
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. No Barang sudah ada di database!";
+                $success['kode'] = $request->kode_barang;
+                $success['jenis'] = "duplicate";
             }
             
             return response()->json($success, $this->successStatus);     
@@ -247,7 +253,7 @@ class BarangController extends Controller
             ->where('kode_barang', $request->kode_barang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', array($request->kode_barang,$request->nama,$kode_lokasi,$request->sat_kecil, $request->sat_besar, $request->jml_sat,$request->hna,$request->pabrik,$request->flag_gen, $request->flag_aktif,$request->ss, $request->sm1, $request->sm2, $request->mm1, $request->mm2, $request->fm1, $request->fm2, $request->kode_klp, $foto, $request->barcode,$request->hrg_satuan, $request->ppn, $request->profit));
+            $ins = DB::connection($this->sql)->insert("insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) values ('$request->kode_barang','$request->nama','$kode_lokasi','$request->sat_kecil','$request->sat_besar',$request->jml_sat,$request->hna,'$request->pabrik','$request->flag_gen','$request->flag_aktif',$request->ss,$request->sm1,$request->sm2,$request->mm1,$request->mm2,$request->fm1,$request->fm2,'$request->kode_klp','$foto','$request->barcode',$request->hrg_satuan,$request->ppn,$request->profit,getdate())");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;

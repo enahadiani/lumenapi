@@ -20,6 +20,45 @@ class HrKaryawanController extends Controller
     public $sql = 'dbsapkug';
     public $guard = 'yakes';
 
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }    
+
+    public function indexm(Request $request)
+    {
+        try {            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql= "select no_bukti,keterangan,periode,total_upload,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from hr_karyawan_m where kode_lokasi='".$kode_lokasi."' ";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }        
+    }
 
     public function cariNik(Request $request) {
         $this->validate($request, [    
@@ -165,6 +204,7 @@ class HrKaryawanController extends Controller
             // 'kode_pp' => 'required|max:10',
             // 'periode' => 'required|max:6',
             'periode' => 'required|max:6',
+            'keterangan' => 'required|max:200',
             'nik_user'=> 'required' 
         ]);
 
@@ -179,10 +219,18 @@ class HrKaryawanController extends Controller
 
                 // $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) values 
                 //                                          ('".$request->nik."','".$request->nama."','".$request->tgl_lahir."','".$request->gender."','".$request->sts_organik."','".$request->sts_medis."','".$request->sts_edu."','".$request->sts_aktif."','".$request->kode_pp."',getdate(),'".$nik."','".$request->periode."')");
+                $per = date('ym');
+                $no_bukti = $this->generateKode("hr_karyawan_m", "no_bukti", $kode_lokasi."-UKR".$per.".", "0001");
+
                 $del1 = DB::connection($this->sql)->table('hr_karyawan')->where('periode', $request->periode)->delete();
+
+                $insm = DB::connection($this->sql)->insert("insert into hr_karyawan_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(nik),getdate(),'$nik' from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
 
                 $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) 
                 select nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,'$nik' as nik_user,periode from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
+
+                $insd = DB::connection($this->sql)->insert("insert into hr_karyawan_d(no_bukti,nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) 
+                select '$no_bukti',nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,'$nik' as nik_user,periode from hr_karyawan_tmp where nik_user='$request->nik_user' and periode ='$request->periode'  ");
 
                 $exec =  DB::connection($this->sql)->update("exec gen_dash_sdm '$request->periode','$request->nik' ");
 
@@ -190,6 +238,7 @@ class HrKaryawanController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Karyawan berhasil disimpan";
             }else{
                 $success['status'] = false;

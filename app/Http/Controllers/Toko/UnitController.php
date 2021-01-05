@@ -107,9 +107,12 @@ class UnitController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
+                $success['kode'] = $request->kode_pp;
                 $success['message'] = "Data Unit berhasil disimpan";
             }else{
                 $success['status'] = false;
+                $success['kode'] = '-';
+                $success['jenis'] = 'duplicate';
                 $success['message'] = "Error : Duplicate entry. Kode Unit sudah ada di database!";
             }
             
@@ -167,6 +170,7 @@ class UnitController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_pp;
             $success['message'] = "Data Unit berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {

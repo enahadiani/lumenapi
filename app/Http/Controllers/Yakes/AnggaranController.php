@@ -87,7 +87,7 @@ class AnggaranController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql= "select no_agg,tanggal,keterangan,tahun,nilai from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
+            $sql= "select no_agg,tanggal,keterangan,tahun,nilai,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from anggaran_m where kode_lokasi='".$kode_lokasi."' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -139,7 +139,7 @@ class AnggaranController extends Controller
             $del = DB::connection($this->db)->update("delete from anggaran_d where substring(periode,1,4)='".$request->tahun."' and kode_lokasi='$kode_lokasi' ");
 
             $get = DB::connection($this->db)->select("
-            select sum(a.n1+a.n2+a.n3+a.n4+a.n5+a.n6+a.n7+a.n8+a.n9+a.n10+a.n11+a.n12) as total from anggaran_tmp a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user'
+            select sum(a.n1+a.n2+a.n3+a.n4+a.n5+a.n6+a.n7+a.n8+a.n9+a.n10+a.n11+a.n12) as total from anggaran_tmp a where a.kode_lokasi='$kode_lokasi' and a.nik_user='$request->nik_user' and a.tahun='$request->tahun'
             ");
             $total = floatval($get[0]->total);
 
@@ -149,8 +149,8 @@ class AnggaranController extends Controller
             ");
 
             $ins2 = DB::connection($this->db)->insert("insert into anggaran_load(
-                no_bukti,kode_lokasi,kode_akun,kode_pp,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,status,keterangan,nu,nik_user)  
-                select '$no_bukti',kode_lokasi,kode_akun,kode_pp,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,status,keterangan,nu,nik_user
+                no_bukti,kode_lokasi,kode_akun,kode_pp,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,status,keterangan,nu,nik_user,tahun)  
+                select '$no_bukti',kode_lokasi,kode_akun,kode_pp,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,status,keterangan,nu,nik_user,tahun
                 from anggaran_tmp 
                 where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'            
             ");
@@ -164,6 +164,8 @@ class AnggaranController extends Controller
                     where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user'
                 ");
             }
+
+            $exec = DB::connection($this->db)->update("exec gen_dash_gar '$request->tahun','$request->nik_user' ");
                 
             $del2 = DB::connection($this->db)->update("delete from anggaran_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' ");
 
@@ -252,7 +254,13 @@ class AnggaranController extends Controller
             // $no_bukti = (int) $nobukti;
             foreach($excel as $row){
                 if($row[0] != ""){
-                    $ket = $this->validateData($row[0],$row[1],$kode_lokasi);
+                    $tmp = substr($row[1],0,2);
+                    if($tmp == "99"){
+                        $kode_pp = "KS00";
+                    }else{
+                        $kode_pp = "KS".$tmp;
+                    }
+                    $ket = $this->validateData($row[0],$kode_pp,$kode_lokasi);
                     if($ket != ""){
                         $sts = 0;
                         $status_validate = false;
@@ -272,7 +280,7 @@ class AnggaranController extends Controller
                     // }
                     // $no_buktiFix = $kode_lokasi."-RRU".$per.".".$noFix;
 
-                    $x[] = DB::connection($this->db)->insert("insert into anggaran_tmp(kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi)  values ('".$row[1]."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi') ");
+                    $x[] = DB::connection($this->db)->insert("insert into anggaran_tmp(kode_pp,kode_akun,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,nik_user,status,keterangan,nu,kode_lokasi,tahun)  values ('".$kode_pp."','".$row[0]."','".$row[2]."','".$row[3]."','".$row[4]."','".$row[5]."','".$row[6]."','".$row[7]."','".$row[8]."','".$row[9]."','".$row[10]."','".$row[11]."','".$row[12]."','".$row[13]."','".$request->nik_user."','".$sts."','".$ket."',".$no.",'$kode_lokasi','$request->tahun') ");
                     $no++;
                 }
             }
@@ -294,7 +302,7 @@ class AnggaranController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             // $success['message'] = "Error ".$e;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }
@@ -335,7 +343,7 @@ class AnggaranController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql = "select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12 
+            $sql = "select a.kode_akun,a.kode_pp,a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9,a.n10,a.n11,a.n12,a.tahun 
             from anggaran_tmp a
             where a.nik_user = '".$nik_user."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
             $res = DB::connection($this->db)->select($sql);

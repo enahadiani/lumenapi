@@ -43,6 +43,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     //hrkaryawan
     $router->get('cariNik','Yakes\HrKaryawanController@cariStsEdu');
     $router->get('hrKaryawan','Yakes\HrKaryawanController@index');
+    $router->get('hrKaryawan-listupload','Yakes\HrKaryawanController@indexm');
     $router->post('hrKaryawan','Yakes\HrKaryawanController@store');
     $router->put('hrKaryawan','Yakes\HrKaryawanController@update');
     $router->delete('hrKaryawan','Yakes\HrKaryawanController@destroy'); 
@@ -75,6 +76,30 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('dashKontrakManage-import','Yakes\KontrakManagemenController@importExcel');
     $router->get('dashKontrakManage-tmp','Yakes\KontrakManagemenController@getKontrakManagemenTmp');
 
+    $router->post('dashBinaSehat','Yakes\BinaSehatController@store');
+    $router->post('dashBinaSehat-import','Yakes\BinaSehatController@importExcel');
+    $router->get('dashBinaSehat-tmp','Yakes\BinaSehatController@getBinaSehatTmp');
+
+    $router->get('setting-grafik','Yakes\SettingGrafikController@index');     
+    $router->get('setting-grafik-detail','Yakes\SettingGrafikController@show'); 
+    $router->post('setting-grafik','Yakes\SettingGrafikController@store');
+    $router->put('setting-grafik','Yakes\SettingGrafikController@update');    
+    $router->delete('setting-grafik','Yakes\SettingGrafikController@destroy');   
+    $router->get('setting-grafik-neraca','Yakes\SettingGrafikController@getNeraca');    
+    $router->get('setting-grafik-klp','Yakes\SettingGrafikController@getKlp');
+    
+    $router->get('setting-rasio','Yakes\SettingRasioController@index');     
+    $router->get('setting-rasio-detail','Yakes\SettingRasioController@show'); 
+    $router->post('setting-rasio','Yakes\SettingRasioController@store');
+    $router->put('setting-rasio','Yakes\SettingRasioController@update');    
+    $router->delete('setting-rasio','Yakes\SettingRasioController@destroy');   
+    $router->get('setting-rasio-neraca','Yakes\SettingRasioController@getNeraca');    
+    $router->get('setting-rasio-klp','Yakes\SettingRasioController@getKlp');
+
+    $router->post('arus-kas','Yakes\ArusKasController@store');
+    $router->post('arus-kas-import','Yakes\ArusKasController@importExcel');
+    $router->get('arus-kas-tmp','Yakes\ArusKasController@getArusKasTmp');
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
@@ -83,6 +108,8 @@ $router->get('dashKunjungan-export','Yakes\KunjunganController@export');
 $router->get('dashTopSix-export','Yakes\TopSixController@export');
 $router->get('dashSDMCulture-export','Yakes\SDMCultureController@export');
 $router->get('dashKontrakManage-export','Yakes\KontrakManagemenController@export');
+$router->get('dashBinaSehat-export','Yakes\BinaSehatController@export');
+$router->get('arus-kas-export','Yakes\ArusKasController@export');
 
 
 

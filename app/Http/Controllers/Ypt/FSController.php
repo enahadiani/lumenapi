@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Toko;
+namespace App\Http\Controllers\Ypt;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class MasakunController extends Controller
+class FSController extends Controller
 {    
     public $successStatus = 200;
-    public $sql = 'tokoaws';
-    public $guard = 'toko';
+    public $sql = 'sqlsrvyptkug';
+    public $guard = 'yptkug';
 
 
-    public function listAkunAktif() {
+    public function listFSAktif() {
         try {            
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_akun,nama from masakun where block = '0' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -43,9 +43,9 @@ class MasakunController extends Controller
         }        
     }
 
-    public function cariAkunAktif(Request $request) {
+    public function cariFSAktif(Request $request) {
         $this->validate($request, [    
-            'kode_akun' => 'required'            
+            'kode_fs' => 'required'            
         ]);
         
         try {
@@ -55,7 +55,7 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where block='0' and kode_akun='".$request->kode_akun."' and kode_lokasi='".$kode_lokasi."'");
+            $res = DB::connection($this->sql)->select("select kode_fs, nama from fs where flag_status='1' and kode_fs='".$request->kode_fs."' and kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
             
             $success['status'] = true;
@@ -72,7 +72,7 @@ class MasakunController extends Controller
 
     public function isUnik($isi,$kode_lokasi)
     {        
-        $auth = DB::connection($this->sql)->select("select kode_akun from masakun where kode_akun ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_fs from fs where kode_fs ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -90,16 +90,16 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_akun)){
-                if($request->kode_akun == "all"){
+            if(isset($request->kode_fs)){
+                if($request->kode_fs == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and kode_akun='".$request->kode_akun."' ";
+                    $filter = " and kode_fs='".$request->kode_fs."' ";
                 }
-                $sql= "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal from masakun where kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select kode_fs, nama, flag_status from fs where kode_lokasi='".$kode_lokasi."' $filter ";
             }
             else {
-                $sql = "select kode_akun, kode_lokasi, nama, modul, jenis, kode_curr, block, status_gar, normal,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from masakun where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_fs, nama, flag_status from fs where kode_lokasi= '".$kode_lokasi."'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -127,14 +127,9 @@ class MasakunController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_akun' => 'required|max:20',
+            'kode_fs' => 'required|max:10',
             'nama' => 'required|max:100',
-            'modul' => 'required',
-            'jenis' => 'required',
-            'kode_curr' => 'required',
-            'block' => 'required',
-            'status_gar' => 'required',
-            'normal' => 'required'
+            'flag_status' => 'required'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -144,24 +139,24 @@ class MasakunController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_akun,$kode_lokasi)){
+            if($this->isUnik($request->kode_fs,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into masakun(kode_akun,nama,kode_lokasi,modul,jenis,kode_curr,block,status_gar,normal) values 
-                                                         ('".$request->kode_akun."','".$request->nama."','".$kode_lokasi."','".$request->modul."','".$request->jenis."','".$request->kode_curr."','".$request->block."','".$request->status_gar."','".$request->normal."')");
+                $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status,tgl_input) values 
+                                                         ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Akun berhasil disimpan";
+                $success['message'] = "Data FS berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode Akun sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode FS sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Akun gagal disimpan ".$e;
+            $success['message'] = "Data FS gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -171,14 +166,9 @@ class MasakunController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_akun' => 'required|max:20',
+            'kode_fs' => 'required|max:10',
             'nama' => 'required|max:100',
-            'modul' => 'required',
-            'jenis' => 'required',
-            'kode_curr' => 'required',
-            'block' => 'required',
-            'status_gar' => 'required',
-            'normal' => 'required'        
+            'flag_status' => 'required'                       
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -189,22 +179,22 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('masakun')
+            $del = DB::connection($this->sql)->table('fs')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_akun', $request->kode_akun)
+            ->where('kode_fs', $request->kode_fs)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into masakun(kode_akun,nama,kode_lokasi,modul,jenis,kode_curr,block,status_gar,normal) values 
-                                                      ('".$request->kode_akun."','".$request->nama."','".$kode_lokasi."','".$request->modul."','".$request->jenis."','".$request->kode_curr."','".$request->block."','".$request->status_gar."','".$request->normal."')");
+            $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status,tgl_input) values 
+                                                      ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."',getdate())");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Akun berhasil diubah";
+            $success['message'] = "Data FS berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Akun gagal diubah ".$e;
+            $success['message'] = "Data FS gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -212,7 +202,7 @@ class MasakunController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_akun' => 'required'
+            'kode_fs' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -222,20 +212,20 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('masakun')
+            $del = DB::connection($this->sql)->table('fs')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_akun', $request->kode_akun)
+            ->where('kode_fs', $request->kode_fs)
             ->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Akun berhasil dihapus";
+            $success['message'] = "Data FS berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Akun gagal dihapus ".$e;
+            $success['message'] = "Data FS gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

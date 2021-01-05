@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class SppdController extends Controller
 {
@@ -51,7 +52,8 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -112,7 +114,8 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -166,7 +169,8 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -233,7 +237,8 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -287,20 +292,45 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
 
     public function keepBudget(Request $request){
-
+        $this->validate($request,[
+            'PBYR' =>'required|array',
+            'PBYR.*.keterangan' =>'max:200',
+            'PBYR.*.tanggal' =>'date_format:Y-m-d H:i:s',
+            'PBYR.*.jenis' =>'max:100',
+            'PBYR.*.lama' =>'max:100',
+            'PBYR.*.kota' =>'max:100',
+            'PBYR.*.sarana' =>'max:100',
+            'PBYR.*.catatan' =>'max:200',
+            'PBYR.*.nik_buat' =>'max:10',
+            'PBYR.*.nik_app' =>'max:10',
+            'PBYR.*.jenis_trans' =>'max:10',
+            'PBYR.*.kode_pp' =>'max:10',
+            'PBYR.*.kode_akun' =>'max:20',
+            'PBYR.*.kode_drk' =>'max:30',
+            'PBYR.*.periode' =>'max:6',
+            'AJU' =>'required|array',
+            'AJU.*.nip' =>'max:20',
+            'AJU.*.nama_perjalanan' =>'max:200',
+            'AJU.*.pp_code' =>'max:10',
+            'REK' => 'array',
+            'REK.*.nama' => 'max:50',
+            'REK.*.no_rekening' => 'max:50',
+            'REK.*.bank' =>'max:100'
+        ]);
         if($data =  Auth::guard('ypt')->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }
         
         $datam= $request->input("PBYR");
-        
+        Log::info($request->all());
         DB::connection('sqlsrvypt')->beginTransaction();
         try {
             $no_agenda = $this->generateKode("it_aju_m", "no_aju", $kode_lokasi."-".substr($datam[0]['periode'],2,2).".", "00001");
@@ -423,7 +453,8 @@ class SppdController extends Controller
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
             $success['status'] = false;
-            $success['message'] = "Input data gagal. ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -458,7 +489,8 @@ class SppdController extends Controller
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
             $success['status'] = false;
-            $success['message'] = "Release Budget Gagal. ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -511,7 +543,8 @@ class SppdController extends Controller
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
             $success['status'] = false;
-            $success['message'] = "No agenda gagal terkirim. ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }
@@ -548,7 +581,8 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
 
@@ -587,7 +621,8 @@ class SppdController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
             return response()->json($success, $this->successStatus);
         }
     }

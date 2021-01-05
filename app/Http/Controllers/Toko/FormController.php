@@ -112,6 +112,7 @@ class FormController extends Controller
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode Form sudah ada di database!";
             }
+            $success['kode'] = $request->kode_form;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -168,6 +169,7 @@ class FormController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Form berhasil diubah";
+            $success['kode'] = $request->kode_form;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();

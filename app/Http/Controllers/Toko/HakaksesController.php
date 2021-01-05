@@ -95,7 +95,7 @@ class HakaksesController extends Controller
             'pass' => 'required',
             'status_admin' => 'required',
             'klp_akses' => 'required',
-            'kode_menu_lab'=> 'required'
+            'path_view'=> 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -124,6 +124,8 @@ class HakaksesController extends Controller
                 $success['status'] = $sts;
                 $success['message'] = $tmp;
             }
+            
+            $success['kode'] = $request->nik;
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
@@ -154,7 +156,11 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select nik,nama,kode_klp_menu,pass,status_admin,klp_akses,menu_mobile,path_view,kode_menu_lab from hakakses where kode_lokasi='".$kode_lokasi."' and nik='$request->nik'
+            $sql = "select a.nik,a.nama,a.kode_klp_menu,a.pass,a.status_admin,a.klp_akses,a.path_view,b.nama as nama_klp,c.nama_form
+            from hakakses a
+            left join menu_klp b on a.kode_klp_menu=b.kode_klp 
+            left join m_form c on a.path_view=c.kode_form 
+            where a.kode_lokasi='".$kode_lokasi."' and a.nik='$request->nik'
             ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -205,7 +211,7 @@ class HakaksesController extends Controller
             'pass' => 'required',
             'status_admin' => 'required',
             'klp_akses' => 'required',
-            'kode_menu_lab'=> 'required'
+            'path_view'=> 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -224,6 +230,7 @@ class HakaksesController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Hakakses berhasil diubah";
+            $success['kode'] = $request->nik;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
