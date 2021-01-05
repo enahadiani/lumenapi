@@ -143,13 +143,13 @@ class HrKaryawanController extends Controller
 
     public function validateData($nik,$gender,$sts_organik,$sts_medis,$sts_edu,$sts_aktif,$kode_pp,$periode){
         $keterangan = "";
-        $auth = DB::connection($this->sql)->select("select nik from hr_karyawan where nik='$nik' and periode='$periode'
-        ");
-        if(count($auth) > 0){
-            $keterangan .= "NIK $nik sudah ada di datatabase. ";
-        }else{
-            $keterangan .= "";
-        }
+        // $auth = DB::connection($this->sql)->select("select nik from hr_karyawan where nik='$nik' and periode='$periode'
+        // ");
+        // if(count($auth) > 0){
+        //     $keterangan .= "NIK $nik sudah ada di datatabase. ";
+        // }else{
+        //     $keterangan .= "";
+        // }
 
         if($gender == "L" || $gender == "P"){
             $keterangan .="";
@@ -215,7 +215,7 @@ class HrKaryawanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->nik, $request->periode)){
+            // if($this->isUnik($request->nik, $request->periode)){
 
                 // $ins = DB::connection($this->sql)->insert("insert into hr_karyawan(nik,nama,tgl_lahir,gender,sts_organik,sts_medis,sts_edu,sts_aktif,kode_pp,tgl_input,nik_user,periode) values 
                 //                                          ('".$request->nik."','".$request->nama."','".$request->tgl_lahir."','".$request->gender."','".$request->sts_organik."','".$request->sts_medis."','".$request->sts_edu."','".$request->sts_aktif."','".$request->kode_pp."',getdate(),'".$nik."','".$request->periode."')");
@@ -240,10 +240,10 @@ class HrKaryawanController extends Controller
                 $success['status'] = true;
                 $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Karyawan berhasil disimpan";
-            }else{
-                $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Karyawan sudah ada di database!";
-            }
+            // }else{
+            //     $success['status'] = false;
+            //     $success['message'] = "Error : Duplicate entry. Karyawan sudah ada di database!";
+            // }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
