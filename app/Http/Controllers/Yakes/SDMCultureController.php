@@ -96,7 +96,7 @@ class SDMCultureController extends Controller
             $per = date('ym');
             $no_bukti = $this->generateKode("dash_sdm_culture_m", "no_bukti", $kode_lokasi."-USC".$per.".", "0001");
 
-            $insm = DB::connection($this->sql)->insert("insert into dash_sdm_culture_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(jenis),getdate(),'$nik' from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
+            $insm = DB::connection($this->sql)->insert("insert into dash_sdm_culture_m(no_bukti,kode_lokasi,periode,keterangan,total_upload,tgl_input,nik_user) select  '$no_bukti','$kode_lokasi','$request->periode','$request->keterangan', count(program),getdate(),'$nik' from dash_sdm_culture_tmp where nik_user='$request->nik_user' and periode ='$request->periode' ");
 
             $ins = DB::connection($this->sql)->insert("insert into dash_sdm_culture(
                 no_urut,periode,kode_pp,program,role_model,jumlah,tgl_input,nik_user) 
