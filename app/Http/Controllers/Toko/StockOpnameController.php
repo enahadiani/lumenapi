@@ -424,7 +424,6 @@ class StockOpnameController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['no_jual'] = $id;
             $success['message'] = "Data Stok Opname berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
