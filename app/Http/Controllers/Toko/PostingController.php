@@ -120,7 +120,7 @@ class PostingController extends Controller
                 }
             }
 
-
+            $success['no_bukti'] = $no_bukti;
             if($sts){
                 DB::connection($this->sql)->commit();
                 $success['status'] = $sts;

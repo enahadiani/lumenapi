@@ -110,6 +110,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sync-retur-beli-detail','Toko\Sync2Controller@getSyncReturBeliDetail');
     $router->get('load-sync-retur-beli','Toko\Sync2Controller@loadSyncReturBeli');
 
+    $router->post('posting-jurnal','Toko\PostingController@loadData');
+    $router->get('modul2','Toko\PostingController@getModul');
+    $router->post('posting','Toko\PostingController@store');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
