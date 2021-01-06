@@ -114,6 +114,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('modul2','Toko\PostingController@getModul');
     $router->post('posting','Toko\PostingController@store');
 
+    $router->post('unposting-jurnal','Toko\UnPostingController@loadData');
+    $router->post('unposting','Toko\UnPostingController@store');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
