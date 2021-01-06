@@ -1263,7 +1263,7 @@ class PenilaianController extends Controller
                 }
 
             }else{
-                $filter .= "select distinct a.kode_matpel,b.nama
+                $sql = "select distinct a.kode_matpel,b.nama
                 from sis_guru_matpel_kelas a
                 inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' $filter_nik $filter";
@@ -1402,18 +1402,18 @@ class PenilaianController extends Controller
 
             if(isset($request->flag_kelas)){
                if($request->flag_kelas == "khusus"){
-                    $sql = "select a.nis,a.nama,a.nis2 from sis_siswa a 
+                    $sql = "select a.nis,a.nama,a.nis2,a.kode_kelas from sis_siswa a 
                     inner join sis_siswa_matpel_khusus b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
                     where a.kode_lokasi ='$kode_lokasi' $filter_nik  $filter order by a.nama ";
                }else{
-                    $sql = "select distinct a.nis,a.nama,a.nis2
+                    $sql = "select distinct a.nis,a.nama,a.nis2,a.kode_kelas
                     from sis_siswa a
                     inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
                }
             }else{
                 
-                $sql = "select distinct a.nis,a.nama,a.nis2
+                $sql = "select distinct a.nis,a.nama,a.nis2,a.kode_kelas
                 from sis_siswa a
                 inner join sis_guru_matpel_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' $filter_nik $filter ";
