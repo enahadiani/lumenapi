@@ -42,11 +42,11 @@ class UnitController extends Controller
                 if($request->kode_pp == "all"){
                     $filter = "";
                 }else{
-                    $filter = "where kode_pp='$request->kode_pp' ";
+                    $filter = " and kode_pp='$request->kode_pp' ";
                 }
-                $sql= "select  kode_pp,nama,flag_aktif from pp  $filter";
+                $sql= "select  kode_pp,nama,flag_aktif from pp  where kode_lokasi='$kode_lokasi' $filter";
             }else{
-                $sql = "select  kode_pp,nama,flag_aktif from pp ";
+                $sql = "select  kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' ";
             }
 
             $res = DB::connection($this->sql)->select($sql);

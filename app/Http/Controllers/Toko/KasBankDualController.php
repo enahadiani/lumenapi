@@ -52,7 +52,7 @@ class KasBankDualController extends Controller
                 $filter .= "";
             }
 
-            $sql = "select distinct a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan,a.nilai1,a.tanggal 
+            $sql = "select distinct a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan,a.nilai1,a.tanggal,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input 
             from trans_m a 
             where a.kode_lokasi='".$kode_lokasi."' and a.form = 'KBDUAL' and a.posted ='F' $filter
             order by a.tanggal";
@@ -160,6 +160,7 @@ class KasBankDualController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['no_bukti'] = $id;
             $success['message'] = "Data Kas Bank Dual berhasil disimpan. No Bukti: ".$id;
                 
             return response()->json($success, $this->successStatus);     
@@ -205,7 +206,10 @@ class KasBankDualController extends Controller
                 $filter .= "";
             }
 
-            $akun = DB::connection($this->sql)->select("select a.no_bukti,a.param1 as kode_ref,case a.param3 when 'BM' then 'PEMASUKAN' when 'BK' then 'PENGELUARAN' when 'PIN' then 'PINDAH BUKU' end as kode_jenis,a.kode_pp,a.keterangan,a.nilai1 from trans_m a 
+            $akun = DB::connection($this->sql)->select("select a.no_bukti,a.param1 as kode_ref,case a.param3 when 'BM' then 'PEMASUKAN' when 'BK' then 'PENGELUARAN' when 'PIN' then 'PINDAH BUKU' end as kode_jenis,a.kode_pp,a.keterangan,a.nilai1,b.nama as nama_ref,c.nama as nama_pp 
+            from trans_m a 
+            inner join trans_ref b on a.param1=b.kode_ref and a.kode_lokasi=b.kode_lokasi
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and a.form = 'KBDUAL' and a.no_bukti='$request->no_bukti' and a.posted ='F' $filter 
             ");
 
@@ -315,6 +319,7 @@ class KasBankDualController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['no_bukti'] = $request->no_bukti;
             $success['message'] = "Data Kas Bank Dual berhasil diubah. No Bukti: ".$id;
                 
             return response()->json($success, $this->successStatus);     
