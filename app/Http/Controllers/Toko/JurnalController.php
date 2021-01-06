@@ -376,7 +376,7 @@ class JurnalController extends Controller
 
             $res = DB::connection($this->db)->select("select a.tanggal,a.no_bukti,a.periode,keterangan as deskripsi,a.nilai1,a.no_dokumen,a.modul as jenis,a.nik2 as nik_periksa,b.nama as nama_periksa 
             from trans_m a
-            inner join karyawan b on a.nik2=b.nik and a.kode_lokasi=b.kode_lokasi
+            left join karyawan b on a.nik2=b.nik and a.kode_lokasi=b.kode_lokasi
             where a.no_bukti = '".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
