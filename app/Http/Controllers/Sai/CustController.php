@@ -151,7 +151,6 @@ class CustomerController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
             
             $del = DB::connection($this->sql)->table('sai_cust')
             ->where('kode_lokasi', $kode_lokasi)
