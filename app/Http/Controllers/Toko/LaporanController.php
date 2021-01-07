@@ -157,10 +157,26 @@ class LaporanController extends Controller
             
             $col_array = array('periode','nik_kasir','no_bukti');
             $db_col_name = array('a.periode','a.nik_user','a.no_jual');
-            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
-                if($request->input($col_array[$i]) !=""){
-                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
                 }
             }
 
@@ -174,7 +190,7 @@ class LaporanController extends Controller
             left join pp c on a.kode_pp=c.kode_pp 
             left join karyawan d on a.nik_user=d.nik and a.kode_lokasi=d.kode_lokasi
             left join brg_gudang e on b.kode_gudang=e.kode_gudang and b.kode_lokasi=e.kode_lokasi
-            $filter
+            $where
             order by a.no_jual";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
