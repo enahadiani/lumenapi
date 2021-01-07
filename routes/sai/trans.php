@@ -23,6 +23,12 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('kont-ubah','Sai\KontController@update');
     $router->delete('kont','Sai\KontController@destroy');
 
+    $router->get('billpr','Sai\BillprController@index');
+    $router->post('billpr','Sai\BillprController@store');
+    $router->get('billpr-detail','Sai\BillprController@show');
+    $router->post('billpr-ubah','Sai\BillprController@update');
+    $router->delete('billpr','Sai\BillprController@destroy');
+    
     $router->get('kontrak','Sai\KontrakController@index');
     $router->post('kontrak','Sai\KontrakController@store');
     $router->get('kontrak-detail','Sai\KontrakController@show');
