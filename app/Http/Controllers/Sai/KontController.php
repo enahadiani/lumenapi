@@ -124,7 +124,6 @@ class KontController extends Controller
             return response()->json($success, $this->successStatus); 
         }				
         
-        
     }
 
     public function show(Request $request)
