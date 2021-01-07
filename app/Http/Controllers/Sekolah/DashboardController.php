@@ -185,4 +185,262 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function progressNilai(Request $request){
+        $this->validate($request,[
+            'kode_sem' => 'required',
+            'kode_ta' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+                $kode_pp = $data->kode_pp;
+            }
+
+            $rs = DB::connection($this->db)->select("
+            select a.kode_tingkat, replace(a.nama,'SD ','') as nama, isnull(b.jum,0) as jum_kd, isnull(c.jum,0) as jum_nilai, case when isnull(b.jum,0) <> 0 then Cast (isnull(c.jum,0) AS Float) / Cast (isnull(b.jum,0) AS Float)*100 else 0 end as persen
+            from sis_tingkat a
+            left join ( select a.kode_tingkat, a.kode_pp, a.kode_lokasi, count(a.kode_kd) as jum
+                        from sis_kd a
+                        inner join sis_kelas b on a.kode_tingkat=b.kode_tingkat and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                        inner join sis_siswa c on b.kode_kelas=c.kode_kelas and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi and c.flag_aktif=1
+                        where a.kode_sem = '$request->kode_sem' and a.kode_ta='$request->kode_ta'
+                        group by a.kode_tingkat, a.kode_pp, a.kode_lokasi
+                        ) b on a.kode_tingkat=b.kode_tingkat and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            left join ( select b.kode_tingkat,a.kode_pp,a.kode_lokasi,count(a.kode_kd) as jum
+                        from sis_nilai_m a
+                        inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi
+                        inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_sem='$request->kode_sem' and a.kode_ta='$request->kode_ta'
+                        group by b.kode_tingkat, a.kode_pp, a.kode_lokasi 
+                        ) c on a.kode_tingkat=c.kode_tingkat and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+            ");
+            $row = json_decode(json_encode($rs),true);
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $row; 
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function komposisiSiswa(Request $request){
+        $this->validate($request,[
+            'kode_sem' => 'required',
+            'kode_ta' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+                $kode_pp = $data->kode_pp;
+            }
+
+            $rs = DB::connection($this->db)->select("select isnull(a.jk,'-') as jk,a.kode_lokasi,a.kode_pp,count(*) as jum
+            from sis_siswa a
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.flag_aktif=1 
+            group by a.jk,a.kode_lokasi,a.kode_pp
+            ");
+            $row = json_decode(json_encode($rs),true);
+
+            $colors = ['#3a86ff','#ff3c90'];
+            $success['colors'] = $colors;
+            $jum=0;
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar = array();
+                for($i=0;$i<count($row);$i++){
+                    $daftar[] = array("y"=>floatval($row[$i]['jum']),"name"=>$row[$i]['jk'],"key"=>$row[$i]['jk'],"color" => $colors[$i]); 
+                    $jum += floatval($row[$i]['jum']);
+                }
+                
+                $success['total'] = $jum;
+                $success['data'] = $daftar; 
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['total'] = $jum;
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function chartNilai(Request $request){
+        $this->validate($request,[
+            'kode_sem' => 'required',
+            'kode_ta' => 'required',
+            'kode_tingkat' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+                $kode_pp = $data->kode_pp;
+            }
+
+            $rs1 = DB::connection($this->db)->select("select distinct a.kode_matpel,d.skode
+            from sis_guru_matpel_kelas a
+            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_tingkat c on b.kode_tingkat=c.kode_tingkat and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+            where a.kode_pp='$kode_pp' and c.kode_tingkat='$request->kode_tingkat' and a.kode_lokasi='$kode_lokasi' and d.sifat <> 2
+            order by a.kode_matpel ");
+            $matpel = array();
+            if(count($rs1)> 0){
+                foreach($rs1 as $row){
+                    array_push($matpel,$row->kode_matpel);
+                }
+            }
+            $success['matpel']=$matpel;
+
+            $rs2 = DB::connection($this->db)->select("select distinct a.kode_kelas,b.nama
+            from sis_guru_matpel_kelas a
+            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_tingkat c on b.kode_tingkat=c.kode_tingkat and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and c.kode_tingkat='$request->kode_tingkat' 
+            order by a.kode_kelas ");
+            $kelas = array();
+            if(count($rs2)> 0){
+                foreach($rs2 as $row){
+                    array_push($kelas,$row->kode_kelas);
+                }
+            }
+            $success['kelas']=$kelas;
+
+            $rs = DB::connection($this->db)->select("
+            select distinct a.kode_matpel,d.skode,a.kode_kelas, isnull(e.jum,0) as jum_kd, isnull(f.jum,0) as jum_nilai, case when isnull(e.jum,0) <> 0 then round(Cast (isnull(f.jum,0) AS Float) / Cast (isnull(e.jum,0) AS Float)*100,2) else 0 end as persen
+            from sis_guru_matpel_kelas a
+            inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join sis_tingkat c on b.kode_tingkat=c.kode_tingkat and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+            left join ( select b.kode_kelas,a.kode_matpel,a.kode_pp, a.kode_lokasi, count(a.kode_kd) as jum
+                        from sis_kd a
+                        inner join sis_kelas b on a.kode_tingkat=b.kode_tingkat and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                        inner join sis_siswa c on b.kode_kelas=c.kode_kelas and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi and c.flag_aktif=1
+                        where a.kode_sem = '$request->kode_sem' and a.kode_ta='$request->kode_ta'
+                        group by b.kode_kelas,a.kode_matpel,a.kode_pp, a.kode_lokasi
+                        ) e on a.kode_kelas=e.kode_kelas and a.kode_matpel=e.kode_matpel and a.kode_pp=e.kode_pp and a.kode_lokasi=e.kode_lokasi
+            left join ( select a.kode_kelas,a.kode_matpel,a.kode_pp,a.kode_lokasi,count(a.kode_kd) as jum
+                        from sis_nilai_m a
+                        inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_sem='$request->kode_sem' and a.kode_ta='$request->kode_ta'
+                        group by a.kode_kelas,a.kode_matpel, a.kode_pp, a.kode_lokasi 
+                        ) f on a.kode_kelas=f.kode_kelas and a.kode_matpel=f.kode_matpel and a.kode_pp=f.kode_pp and a.kode_lokasi=f.kode_lokasi
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and c.kode_tingkat='$request->kode_tingkat' and d.sifat <> 2
+            order by a.kode_matpel,a.kode_kelas
+            ");
+            $row = json_decode(json_encode($rs),true);
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar = array();
+                for($i=0;$i<count($row);$i++){
+                    $daftar[] = array(  
+                        0 => array_search($row[$i]['kode_matpel'],$matpel),
+                        1 => array_search($row[$i]['kode_kelas'],$kelas),
+                        2 => (floatval($row[$i]['persen']) > 100 ? 100 : round(floatval($row[$i]['persen']),2))
+                    ); 
+                }
+                $success['data'] = $daftar; 
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getTingkat(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+                $kode_pp = $data->kode_pp;
+            }
+
+            $rs = DB::connection($this->db)->select("select distinct a.kode_tingkat,replace(a.nama,'SD ','') as nama
+            from sis_tingkat a
+            inner join sis_kelas b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
+            where b.kode_pp='$kode_pp' and a.kode_tingkat <> 'SD'");
+            $row = json_decode(json_encode($rs),true);
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+               
+                $success['data'] = $row; 
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

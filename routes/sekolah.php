@@ -296,11 +296,15 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('lap-kd','Sekolah\LaporanController@getKD');
 
     $router->post('notif','Sekolah\PenilaianController@sendNotif');
-
     
     $router->get('kartu-piutang','Sekolah\DashSiswaController@getKartuPiutang');
     $router->get('kartu-pdd','Sekolah\DashSiswaController@getKartuPDD');
     $router->get('dash-siswa-profile','Sekolah\DashSiswaController@getProfile');
+    
+    $router->get('dash-progress-nilai','Sekolah\DashboardController@progressNilai');
+    $router->get('dash-komposisi-siswa','Sekolah\DashboardController@komposisiSiswa');
+    $router->get('dash-chart-nilai','Sekolah\DashboardController@chartNilai');
+    $router->get('dash-tingkat','Sekolah\DashboardController@getTingkat');
     
     
 });
