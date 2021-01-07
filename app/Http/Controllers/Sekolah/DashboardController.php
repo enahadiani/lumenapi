@@ -325,7 +325,7 @@ class DashboardController extends Controller
             inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_tingkat c on b.kode_tingkat=c.kode_tingkat and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
             inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-            where a.kode_pp='$kode_pp' and c.kode_tingkat='$request->kode_tingkat' and a.kode_lokasi='$kode_lokasi' and d.sifat <> 2
+            where a.kode_pp='$kode_pp' and c.kode_tingkat='$request->kode_tingkat' and a.kode_lokasi='$kode_lokasi' 
             order by a.kode_matpel ");
             $matpel = array();
             if(count($rs1)> 0){
@@ -368,7 +368,7 @@ class DashboardController extends Controller
                         where a.kode_sem='$request->kode_sem' and a.kode_ta='$request->kode_ta'
                         group by a.kode_kelas,a.kode_matpel, a.kode_pp, a.kode_lokasi 
                         ) f on a.kode_kelas=f.kode_kelas and a.kode_matpel=f.kode_matpel and a.kode_pp=f.kode_pp and a.kode_lokasi=f.kode_lokasi
-            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and c.kode_tingkat='$request->kode_tingkat' and d.sifat <> 2
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and c.kode_tingkat='$request->kode_tingkat' 
             order by a.kode_matpel,a.kode_kelas
             ");
             $row = json_decode(json_encode($rs),true);
