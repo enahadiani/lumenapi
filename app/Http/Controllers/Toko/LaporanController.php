@@ -160,7 +160,7 @@ class LaporanController extends Controller
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
-                dd($request->input($col_array[$i]));
+                var_dump($request->input($col_array[$i]));
                 if(ISSET($request->input($col_array[$i])[0])){
                     if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
