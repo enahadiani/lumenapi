@@ -83,10 +83,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('barcode','Toko\BarcodeController@store');
 
     $router->get('jurnal','Toko\JurnalController@index');
-    $router->get('jurnal/{no_bukti}','Toko\JurnalController@show');
+    $router->get('jurnal-detail','Toko\JurnalController@show');
     $router->post('jurnal','Toko\JurnalController@store');
     $router->put('jurnal','Toko\JurnalController@update');
-    $router->delete('jurnal/{no_bukti}','Toko\JurnalController@destroy');
+    $router->delete('jurnal','Toko\JurnalController@destroy');
     $router->get('pp-list','Toko\JurnalController@getPP');
     $router->get('akun','Toko\JurnalController@getAkun');
     $router->get('nikperiksa','Toko\JurnalController@getNIKPeriksa');
@@ -109,6 +109,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sync-retur-beli','Toko\Sync2Controller@getSyncReturBeli');
     $router->get('sync-retur-beli-detail','Toko\Sync2Controller@getSyncReturBeliDetail');
     $router->get('load-sync-retur-beli','Toko\Sync2Controller@loadSyncReturBeli');
+
+    $router->post('posting-jurnal','Toko\PostingController@loadData');
+    $router->get('modul2','Toko\PostingController@getModul');
+    $router->post('posting','Toko\PostingController@store');
+
+    $router->post('unposting-jurnal','Toko\UnPostingController@loadData');
+    $router->post('unposting','Toko\UnPostingController@store');
 
 });
 

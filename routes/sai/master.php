@@ -46,6 +46,11 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->post('customer-ubah','Sai\CustomerController@update');
     $router->delete('customer','Sai\CustomerController@destroy');
 
+    $router->get('cust','Sai\CustController@index');
+    $router->post('cust','Sai\CustController@store');
+    $router->post('cust-ubah','Sai\CustController@update');
+    $router->delete('cust','Sai\CustController@destroy');
+
     $router->get('proyek','Sai\ProyekController@index');
     $router->post('proyek','Sai\ProyekController@store');
     $router->put('proyek-ubah','Sai\ProyekController@update');

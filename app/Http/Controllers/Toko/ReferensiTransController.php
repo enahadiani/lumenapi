@@ -91,7 +91,7 @@ class ReferensiTransController extends Controller
                 $filter .= "";
             }
 
-            $sql = "select a.kode_ref,a.nama,a.akun_debet,a.akun_kredit,a.jenis,a.kode_pp,a.kode_pp+' | '+b.nama as pp 
+            $sql = "select a.kode_ref,a.nama,a.akun_debet,a.akun_kredit,a.jenis,a.kode_pp,a.kode_pp+' | '+b.nama as pp,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input 
             from trans_ref a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             where a.kode_lokasi='".$kode_lokasi."' $filter order by a.kode_ref";
 
@@ -153,11 +153,12 @@ class ReferensiTransController extends Controller
             }
 
             if($this->isUnik($request->kode_ref,$kode_lokasi)){
-                $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp,kode_lokasi) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp','$kode_lokasi') ");
+                $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp,kode_lokasi,tgl_input) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp','$kode_lokasi',getdate()) ");
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Referensi Transaksi berhasil disimpan";
+                $success['kode'] = $request->kode_ref;
             }else{
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode Ref sudah ada di database!";
@@ -190,8 +191,11 @@ class ReferensiTransController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $akun = DB::connection($this->sql)->select("select a.kode_ref,a.nama,a.akun_debet,a.akun_kredit,a.jenis,a.kode_pp,b.nama as nama_pp
-            from trans_ref a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            $akun = DB::connection($this->sql)->select("select a.kode_ref,a.nama,a.akun_debet,a.akun_kredit,a.jenis,a.kode_pp,b.nama as nama_pp,c.nama as nama_akun_debet,d.nama as nama_akun_kredit
+            from trans_ref a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            inner join masakun c on a.akun_debet=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+            inner join masakun d on a.akun_kredit=d.kode_akun and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.kode_ref='$request->kode_ref'				 
             ");
 
@@ -255,10 +259,11 @@ class ReferensiTransController extends Controller
 
             $del = DB::connection($this->sql)->table('trans_ref')->where('kode_lokasi', $kode_lokasi)->where('kode_ref', $request->kode_ref)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp,kode_lokasi) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp','$kode_lokasi') ");
+            $ins = DB::connection($this->sql)->insert("insert into trans_ref (kode_ref,nama,akun_debet,akun_kredit,jenis,kode_pp,kode_lokasi,tgl_input) values ('$request->kode_ref','$request->nama','$request->akun_debet','$request->akun_kredit','$request->jenis','$request->kode_pp','$kode_lokasi',getdate()) ");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_ref;
             $success['message'] = "Data Referensi Transaksi berhasil diubah";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {

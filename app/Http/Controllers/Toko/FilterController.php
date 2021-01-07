@@ -836,10 +836,10 @@ class FilterController extends Controller
             }
 
             $sql="select a.no_bukti,a.keterangan 
-            from trans_m a $where";
+            from trans_m a 
+            $where and posted='T' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;

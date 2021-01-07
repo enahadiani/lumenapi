@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Toko;
+namespace App\Http\Controllers\Sai;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -8,26 +8,30 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class UnitController extends Controller
+class CustController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public $successStatus = 200;
-    public $sql = 'tokoaws';
-    public $guard = 'toko';
+    public $sql = 'sqlsrv2';
+    public $guard = 'admin';
 
-    public function isUnik($isi){
-        
-        $auth = DB::connection($this->sql)->select("select kode_pp from pp where kode_pp ='".$isi."' ");
+    function isUnik($isi){
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+    
+        $strSQL = "select kode_cust from sai_cust where kode_cust = '".$isi."' and kode_lokasi='".$kode_lokasi."' ";
+    
+        $auth = DB::connection($this->sql)->select($strSQL);
         $auth = json_decode(json_encode($auth),true);
+    
         if(count($auth) > 0){
             return false;
         }else{
             return true;
         }
+        return $res;
     }
 
     public function index(Request $request)
@@ -38,28 +42,38 @@ class UnitController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->kode_pp)){
-                if($request->kode_pp == "all"){
-                    $filter = "";
-                }else{
-                    $filter = " and kode_pp='$request->kode_pp' ";
-                }
-                $sql= "select  kode_pp,nama,flag_aktif from pp  where kode_lokasi='$kode_lokasi' $filter";
-            }else{
-                $sql = "select  kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' ";
-            }
 
+            $filter = "";
+            if(isset($request->kode_cust)){
+                if($request->kode_cust == "all"){
+                    $filter .= "";
+                }else{
+                    $filter .= " and a.kode_cust='$request->kode_cust' ";
+                }   
+                $sql="select a.kode_cust,a.nama,a.alamat,a.pic,jabatan_pic,a.email,a.no_telp from sai_cust a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            
+            }else{
+                
+                $sql = "select kode_cust,nama,alamat,pic,jabatan_pic,email,no_telp from sai_cust where kode_lokasi='".$kode_lokasi."' ";
+            }
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
+
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                if(isset($res2)){
+                    $success['data_lampiran'] = $res2;
+                }
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                if(isset($res2)){
+                    $success['data_lampiran'] = [];
+                }
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -71,28 +85,16 @@ class UnitController extends Controller
         
     }
 
-    /**
-     * Show the from for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_pp' => 'required',
+            'kode_cust' => 'required',
             'nama' => 'required',
-            'flag_aktif' => 'required'
+            'alamat' => 'required',
+            'pic' => 'required',
+            'jabatan_pic' => 'required',
+            'email' => 'required',
+            'no_telp' => 'required'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -102,56 +104,39 @@ class UnitController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_pp)){
-                $ins = DB::connection($this->sql)->insert("insert into pp(kode_pp,nama,flag_aktif,kode_lokasi) values ('".$request->kode_pp."','".$request->nama."','".$request->flag_aktif."','$kode_lokasi') ");
+
+            if($this->isUnik($request->kode_cust)){                
                 
+                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,email,no_telp,jabatan_pic) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$request->email."','".$request->no_telp."','$request->jabatan_pic')");
+
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['kode'] = $request->kode_pp;
-                $success['message'] = "Data Unit berhasil disimpan";
+                $success['message'] = "Data Customer berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['kode'] = '-';
-                $success['jenis'] = 'duplicate';
-                $success['message'] = "Error : Duplicate entry. Kode Unit sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode Customer sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Unit gagal disimpan ".$e;
+            $success['message'] = "Data Customer gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
-        
     }
 
-
-    /**
-     * Show the from for editing the specified resource.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Fs $Fs)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_pp' => 'required',
+            'kode_cust' => 'required',
             'nama' => 'required',
-            'flag_aktif' => 'required'
+            'alamat' => 'required',
+            'pic' => 'required',
+            'jabatan_pic' => 'required',
+            'email' => 'required',
+            'no_telp' => 'required'            
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -162,35 +147,29 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('pp')
-            ->where('kode_pp', $request->kode_pp)
+            $del = DB::connection($this->sql)->table('sai_cust')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into pp(kode_pp,nama,flag_aktif,kode_lokasi) values ('".$request->kode_pp."','".$request->nama."','".$request->flag_aktif."','$kode_lokasi') ");
+            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,email,no_telp,jabatan_pic) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$request->email."','".$request->no_telp."','$request->jabatan_pic')");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->kode_pp;
-            $success['message'] = "Data Unit berhasil diubah";
+            $success['message'] = "Data Customer berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Unit gagal diubah ".$e;
+            $success['message'] = "Data Customer gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_pp' => 'required'
+            'kode_cust' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -200,20 +179,20 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('pp')
-            ->where('kode_pp', $request->kode_pp)
+            $del = DB::connection($this->sql)->table('sai_cust')
             ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_cust', $request->kode_cust)
             ->delete();
-
+            
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Unit berhasil dihapus";
+            $success['message'] = "Data Customer berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Unit gagal dihapus ".$e;
+            $success['message'] = "Data Customer gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

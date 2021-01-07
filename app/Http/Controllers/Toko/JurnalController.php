@@ -332,7 +332,7 @@ class JurnalController extends Controller
      * @param  \App\Jurnal  $Jurnal
      * @return \Illuminate\Http\Response
      */
-    public function destroy($no_bukti)
+    public function destroy(Request $request)
     {
         DB::connection($this->db)->beginTransaction();
         
@@ -341,6 +341,7 @@ class JurnalController extends Controller
                 $nik= $res->nik;
                 $kode_lokasi= $res->kode_lokasi;
             }
+            $no_bukti = $request->no_bukti;
             
             $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
@@ -360,16 +361,23 @@ class JurnalController extends Controller
         }	
     }
 
-    public function show($no_bukti)
+    public function show(Request $request)
     {
+        $this->validate($request,[
+            'no_bukti' => 'required'
+        ]);
         try {
             
+            $no_bukti = $request->no_bukti;
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select tanggal,no_bukti,periode,keterangan as deskripsi,nilai1,no_dokumen,modul as jenis,nik2 as nik_periksa from trans_m where no_bukti = '".$no_bukti."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select a.tanggal,a.no_bukti,a.periode,keterangan as deskripsi,a.nilai1,a.no_dokumen,a.modul as jenis,a.nik2 as nik_periksa,b.nama as nama_periksa 
+            from trans_m a
+            left join karyawan b on a.nik2=b.nik and a.kode_lokasi=b.kode_lokasi
+            where a.no_bukti = '".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
             $res2 = DB::connection($this->db)->select("select a.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
