@@ -17,6 +17,12 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 
+    $router->get('kont','Sai\KontController@index');
+    $router->post('kont','Sai\KontController@store');
+    $router->get('kont-detail','Sai\KontController@show');
+    $router->post('kont-ubah','Sai\KontController@update');
+    $router->delete('kont','Sai\KontController@destroy');
+
     $router->get('kontrak','Sai\KontrakController@index');
     $router->post('kontrak','Sai\KontrakController@store');
     $router->get('kontrak-detail','Sai\KontrakController@show');
