@@ -10,12 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CustController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
+    
     public $successStatus = 200;
     public $sql = 'sqlsrv2';
     public $guard = 'admin';
