@@ -470,7 +470,7 @@ class ReportController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard(yptkug)->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -587,7 +587,7 @@ class ReportController extends Controller
 
         try {
             
-            if($data =  Auth::guard(yptkug)->user()){
+            if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
