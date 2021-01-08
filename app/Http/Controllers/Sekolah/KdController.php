@@ -30,6 +30,12 @@ class KdController extends Controller
         return floatval($num);
     }
 
+    public function addStriped($text){
+        // menggabungkan angka yang di-separate(10.000,75) menjadi 10000.00
+        $text = str_replace("'", "''", $text);
+        return $text;
+    }
+
     public function index(Request $request)
     {
         try {
@@ -147,7 +153,7 @@ class KdController extends Controller
                     for ($i=0;$i < count($request->kode_kd);$i++){
                         
                         $kkm = (isset($request->kkm[$i]) && $request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
-                        $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
+                        $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$this->addStriped($request->nama[$i])."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");
                     }				
                 }
                 
@@ -202,7 +208,7 @@ class KdController extends Controller
             if (count($request->kode_kd) > 0){
                 for ($i=0;$i < count($request->kode_kd);$i++){
                     $kkm = (isset($request->kkm[$i]) && $request->kkm[$i] != "" ? $this->joinNum($request->kkm[$i]) : 0);
-                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$request->nama[$i]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
+                    $ins[$i] = DB::connection($this->db)->insert("insert into sis_kd(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm) values ('".$request->kode_kd[$i]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$this->addStriped($request->nama[$i])."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$kkm.")");	
                 }				
             }
 
@@ -309,6 +315,13 @@ class KdController extends Controller
             if (count($res) > 0){
                 $success['message'] = "Success!";
                 $success['data'] = $res;
+                // $detail = array();
+                // if(count($res2) > 0){
+                //     foreach($res2 as $row){
+                //         $detail[] = (array) $row;
+                //         $detail['nama'] = stripslashes($row['nama']);
+                //     }
+                // }
                 $success['data_detail'] = $res2;
                 $success['status'] = true;
             } 
@@ -370,7 +383,7 @@ class KdController extends Controller
                 if($row[0] != ""){
                     $ket = '';
                     $sts = 1;
-                    $x[] = DB::connection($this->db)->insert("insert into sis_kd_tmp(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm,nu,nik_user,keterangan,status) values ('".$row[0]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$row[1]."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$row[2].",".$no.",'".$request->nik_user."','$ket','$sts')");	
+                    $x[] = DB::connection($this->db)->insert("insert into sis_kd_tmp(kode_kd,kode_lokasi,kode_matpel,kode_pp,nama,kode_tingkat,tgl_input,kode_sem,kode_ta,kkm,nu,nik_user,keterangan,status) values ('".$row[0]."','".$kode_lokasi."','".$request->kode_matpel."','".$request->kode_pp."','".$this->addStriped($row[1])."','".$request->kode_tingkat."','".$tgl_input."','".$request->kode_sem."','".$request->kode_ta."',".$row[2].",".$no.",'".$request->nik_user."','$ket','$sts')");	
                     $no++;
                 }
             }
@@ -445,6 +458,11 @@ class KdController extends Controller
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
+                $detail = array();
+                // foreach($res as $row){
+                //     $detail[] = (array) $row;
+                //     $detail['nama'] = stripslashes($row['nama']);
+                // }
                 $success['detail'] = $res;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
