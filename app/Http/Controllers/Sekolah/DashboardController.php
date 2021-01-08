@@ -350,7 +350,7 @@ class DashboardController extends Controller
             $success['kelas']=$kelas;
 
             $rs = DB::connection($this->db)->select("
-            select distinct a.kode_matpel,d.skode,a.kode_kelas, isnull(e.jum,0) as jum_kd, isnull(f.jum,0) as jum_nilai, case when isnull(e.jum,0) <> 0 then round(Cast (isnull(f.jum,0) AS Float) / Cast (isnull(e.jum,0) AS Float)*100,2) else 0 end as persen
+            select distinct a.kode_matpel,d.skode,a.kode_kelas, isnull(e.jum,0) as jum_kd, isnull(f.jum,0) as jum_nilai, case when isnull(e.jum,0) <> 0 then round(Cast (isnull(f.jum,0) AS Float) / Cast (isnull(e.jum,0) AS Float)*100,2) else 0 end as persen,a.nik,g.nama as nama_guru
             from sis_guru_matpel_kelas a
             inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_tingkat c on b.kode_tingkat=c.kode_tingkat and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
@@ -368,6 +368,8 @@ class DashboardController extends Controller
                         where a.kode_sem='$request->kode_sem' and a.kode_ta='$request->kode_ta'
                         group by a.kode_kelas,a.kode_matpel, a.kode_pp, a.kode_lokasi 
                         ) f on a.kode_kelas=f.kode_kelas and a.kode_matpel=f.kode_matpel and a.kode_pp=f.kode_pp and a.kode_lokasi=f.kode_lokasi
+                        
+            inner join sis_guru g on a.nik=g.nik and a.kode_pp=g.kode_pp and a.kode_lokasi=g.kode_lokasi
             where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and c.kode_tingkat='$request->kode_tingkat' 
             order by a.kode_matpel,a.kode_kelas
             ");
@@ -376,11 +378,17 @@ class DashboardController extends Controller
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
                 $daftar = array();
                 for($i=0;$i<count($row);$i++){
-                    $daftar[] = array(  
-                        0 => array_search($row[$i]['kode_matpel'],$matpel),
-                        1 => array_search($row[$i]['kode_kelas'],$kelas),
-                        2 => (floatval($row[$i]['persen']) > 100 ? 100 : round(floatval($row[$i]['persen']),2))
-                    ); 
+                    // $daftar[] = array(  
+                    //     0 => array_search($row[$i]['kode_matpel'],$matpel),
+                    //     1 => array_search($row[$i]['kode_kelas'],$kelas),
+                    //     2 => (floatval($row[$i]['persen']) > 100 ? 100 : round(floatval($row[$i]['persen']),2))
+                    // ); 
+                    $daftar[] = array(
+                        "x" => array_search($row[$i]['kode_matpel'],$matpel),
+                        "y" => array_search($row[$i]['kode_kelas'],$kelas),
+                        "value" => (floatval($row[$i]['persen']) > 100 ? 100 : round(floatval($row[$i]['persen']),2)),
+                        "name" => $row[$i]['nama_guru']
+                    );
                 }
                 $success['data'] = $daftar; 
                 $success['status'] = true;
