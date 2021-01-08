@@ -173,6 +173,19 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('flagrelasi','Toko\FlagRelasiController@update');
     $router->delete('flagrelasi','Toko\FlagRelasiController@destroy'); 
 
+    // ASET
+    //Data Akun Aktiva Tetap
+    $router->get('fa-klpakun','Toko\FaKlpAkunController@index');
+    $router->post('fa-klpakun','Toko\FaKlpAkunController@store');
+    $router->put('fa-klpakun','Toko\FaKlpAkunController@update');
+    $router->delete('fa-klpakun','Toko\FaKlpAkunController@destroy');
+
+    //Data Kelompok Barang
+    $router->get('klp-barang','Toko\KlpBarangController@index');
+    $router->post('klp-barang','Toko\KlpBarangController@store');
+    $router->put('klp-barang','Toko\KlpBarangController@update');
+    $router->delete('klp-barang','Toko\KlpBarangController@destroy');
+
 
 });
 
