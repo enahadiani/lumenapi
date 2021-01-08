@@ -92,14 +92,30 @@ class LaporanController extends Controller
             
             $col_array = array('periode','nik_kasir','no_bukti');
             $db_col_name = array("substring(convert(varchar(10),tgl_input,121),1,4)+''+substring(convert(varchar(10),tgl_input,121),6,2)",'a.nik_user','a.no_close');
-            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
-                if($request->input($col_array[$i]) !=""){
-                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
                 }
             }
 
-            $sql="select a.no_close as no_bukti,a.tgl_input as tanggal,a.saldo_awal,a.total_pnj,a.nik_user from kasir_close a $filter ";
+            $sql="select a.no_close as no_bukti,a.tgl_input as tanggal,a.saldo_awal,a.total_pnj,a.nik_user from kasir_close a $where ";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
