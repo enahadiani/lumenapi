@@ -240,6 +240,10 @@ class ReportController extends Controller
     }
 
     public function getTb(Request $request){
+        $this->validate($request,[
+            'kode_pp' => 'required',
+            'periode' => 'required'
+        ]);
         try {
             if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
@@ -250,10 +254,6 @@ class ReportController extends Controller
                 $kode_lokasi= '';
             }
             
-            $this->validate($request,[
-                'kode_pp' => 'required',
-                'periode' => 'required'
-            ]);
 
             $kode_pp=$request->input('kode_pp');
             $periode=$request->input('periode');
@@ -301,6 +301,10 @@ class ReportController extends Controller
     }
 
     public function getAnggaran(Request $request){
+        $this->validate($request,[
+            'kode_pp' => 'required',
+            'tahun' => 'required'
+        ]);
         try {
             if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
@@ -311,10 +315,6 @@ class ReportController extends Controller
                 $kode_lokasi= '';
             }
             
-            $this->validate($request,[
-                'kode_pp' => 'required',
-                'tahun' => 'required'
-            ]);
 
             $kode_pp=$request->input('kode_pp');
             $tahun=$request->input('tahun');
@@ -389,6 +389,10 @@ class ReportController extends Controller
     }
     
     public function getAnggaranRealBulan(Request $request){
+        $this->validate($request,[
+            'kode_pp' => 'required',
+            'tahun' => 'required'
+        ]);
         try {
             if($data =  Auth::guard('yptkug')->user()){
                 $nik= $data->nik;
@@ -399,10 +403,6 @@ class ReportController extends Controller
                 $kode_lokasi= '';
             }
             
-            $this->validate($request,[
-                'kode_pp' => 'required',
-                'tahun' => 'required'
-            ]);
 
             $kode_pp=$request->input('kode_pp');
             $tahun=$request->input('tahun');
@@ -470,7 +470,7 @@ class ReportController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard($this->guard)->user()){
+            if($data =  Auth::guard(yptkug)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -482,7 +482,7 @@ class ReportController extends Controller
             }
             $kode_pp = $request->kode_pp;
             $nis = $request->nis;
-            $res = DB::connection($this->db)->select("select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,f.nama as nama_jur,a.id_bank,a.kode_akt
+            $res = DB::connection('sqlsrvyptkug')->select("select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,f.nama as nama_jur,a.id_bank,a.kode_akt
             from sis_siswa a
             inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
             inner join sis_jur f on b.kode_jur=f.kode_jur and b.kode_lokasi=f.kode_lokasi and b.kode_pp=f.kode_pp
@@ -490,7 +490,7 @@ class ReportController extends Controller
             order by a.nis ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,a.periode,
+            $res2 = DB::connection('sqlsrvyptkug')->select("select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,a.periode,
 						b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param,
 						0 as masuk,0 as keluar
 			 from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,0 as bayar,x.periode 
@@ -587,7 +587,7 @@ class ReportController extends Controller
 
         try {
             
-            if($data =  Auth::guard($this->guard)->user()){
+            if($data =  Auth::guard(yptkug)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
@@ -599,7 +599,7 @@ class ReportController extends Controller
             }else{
                 $periode_filter = "";
             }
-            $res = DB::connection($this->db)->select("select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,f.nama as nama_jur,a.id_bank,a.kode_akt
+            $res = DB::connection('sqlsrvyptkug')->select("select a.nis,a.kode_lokasi,a.kode_pp,a.nama,a.kode_kelas,b.nama as nama_kelas,a.kode_lokasi,b.kode_jur,f.nama as nama_jur,a.id_bank,a.kode_akt
             from sis_siswa a
             inner join sis_kelas b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
             inner join sis_jur f on b.kode_jur=f.kode_jur and b.kode_lokasi=f.kode_lokasi and b.kode_pp=f.kode_pp
@@ -607,7 +607,7 @@ class ReportController extends Controller
             order by a.nis ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.kode_pp,a.kode_lokasi,a.no_bukti,a.tgl,a.keterangan,a.modul,a.debet,a.kredit,a.dc
+            $res2 = DB::connection('sqlsrvyptkug')->select("select a.kode_pp,a.kode_lokasi,a.no_bukti,a.tgl,a.keterangan,a.modul,a.debet,a.kredit,a.dc
             from (select a.kode_pp,a.kode_lokasi,a.no_bukti,a.nilai,convert(varchar(20),b.tanggal,103) as tgl,b.keterangan,b.modul,b.tanggal,
                        a.nilai as debet,0 as kredit,a.dc
                 from sis_cd_d a
