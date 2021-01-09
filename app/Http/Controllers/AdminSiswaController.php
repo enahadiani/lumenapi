@@ -443,4 +443,86 @@ class AdminSiswaController extends Controller
         
     }
 
+    public function updateDataPribadi(Request $request)
+    {  
+        $this->validate($request,[
+            'tgl_lahir' => 'date_format:Y-m-d'
+        ]);
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+                $status_login = $data->status_login;
+            }
+            if($status_login == "S"){
+
+                $res = DB::connection($this->db)->select("select tmp_lahir,tgl_lahir,jk,agama,email from sis_siswa where nis='$nik' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'");
+                $tmp_lahir = $res[0]->tmp_lahir;
+                $tgl_lahir = $res[0]->tgl_lahir;
+                $jk = $res[0]->jk;
+                $agama = $res[0]->agama;
+                $email = $res[0]->email;
+    
+                if(isset($request->tmp_lahir)){
+                    $tmp_lahir = $request->tmp_lahir;
+                }else{
+                    $tmp_lahir = "-";
+                }
+    
+                if(isset($request->tgl_lahir)){
+                    $tgl_lahir = $request->tgl_lahir;
+                }else{
+                    $tgl_lahir = $tgl_lahir;
+                }
+    
+                if(isset($request->jk)){
+                    $jk = $request->jk;
+                }else{
+                    $jk = $jk;
+                }
+    
+                if(isset($request->agama)){
+                    $agama = $request->agama;
+                }else{
+                    $agama = $agama;
+                }
+    
+                if(isset($request->email)){
+                    $email = $request->email;
+                }else{
+                    $email = $email;
+                }
+    
+                $update = DB::connection($this->db)->table('sis_siswa')
+                ->where('nis',$nik)
+                ->where('kode_pp',$kode_pp)
+                ->where('kode_lokasi',$kode_lokasi)
+                ->update([
+                    'tmp_lahir' => $tmp_lahir,
+                    'tgl_lahir' => $tgl_lahir,
+                    'jk' => $request->jk,
+                    'agama' => $agama,
+                    'email' => $email
+                ]);
+                
+                if($update){
+                    $success['status'] = true;
+                    $success['message'] = "Data Pribadi Siswa berhasil diubah";
+                }else{
+                    $success['status'] = false;
+                    $success['message'] = "Data Pribadi Siswa gagal diubah";
+                }
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Tidak dapat melakukan perubahan data. Login anda bukan login siswa.";
+            }
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Data Pribadi Siswa gagal diubah ".$e;
+            return response()->json($success, 200); 
+        }	
+    }
+
 }
