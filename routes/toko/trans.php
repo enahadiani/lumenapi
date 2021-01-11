@@ -121,6 +121,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('aktap-klpakun','Toko\AktapController@getKlpAkun');
     $router->post('aktap','Toko\AktapController@store');
 
+    //Data Penyusutan
+    $router->get('susut-drk','Toko\PenyusutanController@getDRK');
+    $router->post('susut','Toko\PenyusutanController@store');
+    
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {

@@ -30,7 +30,7 @@ class AktapController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'tgl_perolehan' => 'date_format:Y-m-d',
+            'tgl_perolehan' => 'required|date_format:Y-m-d',
             'jumlah' => 'required',
             'deskripsi' => 'required',
             'no_seri' => 'required',
@@ -82,7 +82,7 @@ class AktapController extends Controller
 
             if($sts){
                 $periodeSusut = substr($request->tgl_susut,0,4).substr($request->tgl_susut,5,2);
-                $nbfa = $nbfa2 = $this->generateKode("fa_asset", "no_fa", $kode_lokasi."-FA".substr($periode,2, 4).".", "000");
+                $nbfa = $nbfa2 = $this->generateKode("fa_asset", "no_fa", $kode_lokasi."-FA".substr($periode,2, 4).".", "001");
                 $nbfa = substr($nbfa,0, 10);
                 $idx = floatval(substr($nbfa2,10, 3));
                 $nu = $idx2 = "";

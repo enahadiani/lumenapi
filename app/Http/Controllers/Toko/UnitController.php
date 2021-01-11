@@ -38,6 +38,7 @@ class UnitController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
             if(isset($request->kode_pp)){
                 if($request->kode_pp == "all"){
                     $filter = "";
@@ -46,7 +47,15 @@ class UnitController extends Controller
                 }
                 $sql= "select  kode_pp,nama,flag_aktif from pp  where kode_lokasi='$kode_lokasi' $filter";
             }else{
-                $sql = "select  kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' ";
+
+                if(isset($request->tipe)){
+                    if($request->tipe == "all"){
+                        $filter = "";
+                    }else{
+                        $filter = " and tipe='$request->tipe' ";
+                    }
+                }
+                $sql = "select  kode_pp,nama,flag_aktif from pp where kode_lokasi='$kode_lokasi' $filter";
             }
 
             $res = DB::connection($this->sql)->select($sql);
