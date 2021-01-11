@@ -220,12 +220,10 @@ class LaporanController extends Controller
 
             $sql1 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
             $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
-            var_dump($sql1);
-            var_dump($sql2);
             DB::connection($this->sql)->update($sql1);
             DB::connection($this->sql)->update($sql2);
 
-            $sql3 = "select a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
+            $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
                 b.nama as nama_barang,c.nama as nama_gudang
                 from brg_stok a
                 inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
@@ -235,8 +233,7 @@ class LaporanController extends Controller
                 order by a.kode_barang,a.kode_gudang";
            
             $rs = DB::connection($this->sql)->select($sql3);
-            $res = json_decode(json_encode($rs),true);     
-            var_dump($sql3);
+            $res = json_decode(json_encode($rs),true);  
             $nb = "";
             $nb2 = "";
             $resdata = array();
@@ -271,27 +268,26 @@ class LaporanController extends Controller
                 inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
                 )a order by a.tgl_ed";
-            // $res2 = DB::connection($this->sql)->select($sql4);
-            // $res2 = json_decode(json_encode($res2),true);
-            var_dump($sql4);
+            $res2 = DB::connection($this->sql)->select($sql4);
+            $res2 = json_decode(json_encode($res2),true);
 
-            // if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-            //     $success['status'] = true;
-            //     $success['data'] = $res;
-            //     $success['data_detail'] = $res2;
-            //     $success['message'] = "Success!";
-            //     $success["auth_status"] = 1;        
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
 
-            //     return response()->json($success, $this->successStatus);     
-            // }
-            // else{
-            //     $success['message'] = "Data Kosong!";
-            //     $success['data'] = [];
-            //     $success['data_detail'] = [];
-            //     $success['sql'] = $sql;
-            //     $success['status'] = true;
-            //     return response()->json($success, $this->successStatus);
-            // }
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['sql'] = $sql;
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
 
        } catch (\Throwable $e) {
             $success['status'] = false;
