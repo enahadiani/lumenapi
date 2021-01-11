@@ -95,7 +95,7 @@ class AktapController extends Controller
                     if (strlen($idx2) == 3) $nu = $idx2;
                     
                     $nbfa2 = $nbfa.$nu;
-                    $ins[$i] = DB::connection($this->db)->insert("insert into fa_asset(no_fa,kode_lokasi,kode_klpfa,kode_klpakun,kode_akun,umur,persen,nama,merk,tipe,no_seri,nilai,nilai_residu,kode_pp,kode_pp_susut,tgl_perolehan,tgl_susut,periode,periode_susut,progress,nik_user,tgl_input,catatan,kode_lokfa,nik_pnj,nilai_susut,jenis,akum_nilai) values ('".$nbfa2."','".$kode_lokasi."','".$request->kode_klfa."','".$request->kode_klpakun."','".$request->kode_akun."',".floatval($request->umur).",".floatval($request->persen).",'".$request->deskripsi."','".$request->merk."','".$request->tipe."','".$request->seri."',".floatval($request->nilai).",".floatval($request->residu).",'".$request->kode_pp1."','".$request->kode_pp2."','".$request->tgl_perolehan."','".$request->tgl_susut."','".$periode."','".$periodeSusut."','2','".$nik."',getdate(),'".$request->no_bukti."','-','-',".$nsusut.",'A',0)");
+                    $ins[$i] = DB::connection($this->db)->insert("insert into fa_asset(no_fa,kode_lokasi,kode_klpfa,kode_klpakun,kode_akun,umur,persen,nama,merk,tipe,no_seri,nilai,nilai_residu,kode_pp,kode_pp_susut,tgl_perolehan,tgl_susut,periode,periode_susut,progress,nik_user,tgl_input,catatan,kode_lokfa,nik_pnj,nilai_susut,jenis,akum_nilai) values ('".$nbfa2."','".$kode_lokasi."','".$request->kode_klpfa."','".$request->kode_klpakun."','".$request->kode_akun."',".floatval($request->umur).",".floatval($request->persen).",'".$request->deskripsi."','".$request->merk."','".$request->tipe."','".$request->no_seri."',".floatval($request->nilai).",".floatval($request->residu).",'".$request->kode_pp1."','".$request->kode_pp2."','".$request->tgl_perolehan."','".$request->tgl_susut."','".$periode."','".$periodeSusut."','2','".$nik."',getdate(),'".$request->no_bukti."','-','-',".$nsusut.",'A',0)");
     
                     $ins2[$i] = DB::connection($this->db)->insert("insert into fa_nilai(no_fa,kode_lokasi,no_bukti,dc,nilai,periode) values ('".$nbfa2."','".$kode_lokasi."','".$request->no_bukti."','D',".floatval($request->nilai).",'".$periode."')");
                     $idx = $idx + 1;
@@ -120,22 +120,30 @@ class AktapController extends Controller
 
     public function getKlpAkun(Request $request)
     {
-        $this->validate($request,[
-            'kode_klpfa' => 'required'
-        ]);
         try {
             
-            $no_bukti = $request->no_bukti;
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
+            if(isset($request->kode_klpfa) && $request->kode_klpfa != ""){
+                $filter .= " and a.kode_klpfa = '$request->kode_klpfa'  ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_klpakun) && $request->kode_klpakun != ""){
+                $filter .= " and a.kode_klpakun = '$request->kode_klpakun'  ";
+            }else{
+                $filter .= "";
+            }
             $res = DB::connection($this->db)->select("select a.kode_klpakun,b.nama,b.kode_akun,c.nama as nama_akun,b.umur,b.persen 
             from fa_klp a 
             	 inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi 
             	 inner join masakun c on b.kode_akun=c.kode_akun and c.kode_lokasi = '$kode_lokasi'
-            where a.kode_klpfa = '$request->kode_klpfa' ");	
+            where a.kode_lokasi='$kode_lokasi' $filter ");	
             $res= json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
