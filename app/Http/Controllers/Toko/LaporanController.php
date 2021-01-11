@@ -241,7 +241,7 @@ class LaporanController extends Controller
             $nb2 = "";
             $resdata = array();
             $i=0;
-            foreach($rs as $row){
+            foreach($res as $row){
 
                 $resdata[]=(array)$row;
                 if($i == 0){
