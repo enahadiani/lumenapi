@@ -236,6 +236,7 @@ class LaporanController extends Controller
             $res = json_decode(json_encode($rs),true);     
             
             $nb = "";
+            $nb2 = "";
             $resdata = array();
             $i=0;
             foreach($rs as $row){
