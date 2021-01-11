@@ -87,7 +87,7 @@ class AktapController extends Controller
                 $idx = floatval(substr($nbfa2,10, 3));
                 $nu = $idx2 = "";
                 $jml = floatval($request->jumlah);
-                $nsusut = round(floatval($request->nilai) / floatval($request->tahun));
+                $nsusut = round(floatval($request->nilai) / floatval($request->umur));
                 for ($i = 0; $i < $jml; $i++) {
                     $idx2 = $idx;
                     if (count($idx2) == 1) $nu = "00".$idx2;
