@@ -120,22 +120,30 @@ class AktapController extends Controller
 
     public function getKlpAkun(Request $request)
     {
-        $this->validate($request,[
-            'kode_klpfa' => 'required'
-        ]);
         try {
             
-            $no_bukti = $request->no_bukti;
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
+            if(isset($request->kode_klpfa) && $request->kode_klpfa != ""){
+                $filter .= " and a.kode_klpfa = '$request->kode_klpfa'  ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_klpakun) && $request->kode_klpakun != ""){
+                $filter .= " and a.kode_klpakun = '$request->kode_klpakun'  ";
+            }else{
+                $filter .= "";
+            }
             $res = DB::connection($this->db)->select("select a.kode_klpakun,b.nama,b.kode_akun,c.nama as nama_akun,b.umur,b.persen 
             from fa_klp a 
             	 inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi 
             	 inner join masakun c on b.kode_akun=c.kode_akun and c.kode_lokasi = '$kode_lokasi'
-            where a.kode_klpfa = '$request->kode_klpfa' ");	
+            where a.kode_lokasi='$kode_lokasi' $filter ");	
             $res= json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
