@@ -90,9 +90,9 @@ class AktapController extends Controller
                 $nsusut = round(floatval($request->nilai) / floatval($request->umur));
                 for ($i = 0; $i < $jml; $i++) {
                     $idx2 = $idx;
-                    if (count($idx2) == 1) $nu = "00".$idx2;
-                    if (count($idx2) == 2) $nu = "0".$idx2;
-                    if (count($idx2) == 3) $nu = $idx2;
+                    if (strlen($idx2) == 1) $nu = "00".$idx2;
+                    if (strlen($idx2) == 2) $nu = "0".$idx2;
+                    if (strlen($idx2) == 3) $nu = $idx2;
                     
                     $nbfa2 = $nbfa.$nu;
                     $ins[$i] = DB::connection($this->db)->insert("insert into fa_asset(no_fa,kode_lokasi,kode_klpfa,kode_klpakun,kode_akun,umur,persen,nama,merk,tipe,no_seri,nilai,nilai_residu,kode_pp,kode_pp_susut,tgl_perolehan,tgl_susut,periode,periode_susut,progress,nik_user,tgl_input,catatan,kode_lokfa,nik_pnj,nilai_susut,jenis,akum_nilai) values ('".$nbfa2."','".$kode_lokasi."','".$request->kode_klfa."','".$request->kode_klpakun."','".$request->kode_akun."',".floatval($request->umur).",".floatval($request->persen).",'".$request->deskripsi."','".$request->merk."','".$request->tipe."','".$request->seri."',".floatval($request->nilai).",".floatval($request->residu).",'".$request->kode_pp1."','".$request->kode_pp2."','".$request->tgl_perolehan."','".$request->tgl_susut."','".$periode."','".$periodeSusut."','2','".$nik."',getdate(),'".$request->no_bukti."','-','-',".$nsusut.",'A',0)");
