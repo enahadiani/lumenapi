@@ -117,6 +117,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('unposting-jurnal','Toko\UnPostingController@loadData');
     $router->post('unposting','Toko\UnPostingController@store');
 
+    //Data Aktiva Tetap
+    $router->get('aktap-klpakun','Toko\AktapController@getKlpAkun');
+    $router->post('aktap','Toko\AktapController@store');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {

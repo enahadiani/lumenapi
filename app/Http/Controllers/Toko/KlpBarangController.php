@@ -52,10 +52,16 @@ class KlpBarangController extends Controller
                 ";
             }
             else {
+                $filter = "";
+                if(isset($request->jenis)){
+                    $filter .= " and a.jenis='".$request->jenis."' ";
+                }else{
+                    $filter .= "";
+                }
                 $sql = "select a.kode_klpfa,a.nama,a.kode_klpakun,a.kode_lokasi,case a.jenis when 'A' then 'AKTAP' when 'I' then 'INV' else 'NON' end as jenis,b.nama as nama_klpakun
                 from fa_klp a
                 inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi                
-                where a.kode_lokasi='$kode_lokasi'
+                where a.kode_lokasi='$kode_lokasi' $filter
                 order by a.kode_klpfa ";
             }
 
