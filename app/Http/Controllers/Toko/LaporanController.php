@@ -188,7 +188,7 @@ class LaporanController extends Controller
             }
 
             $col_array = array('periode','kode_gudang','kode_klp','kode_barang');
-            $db_col_name = array('substring(convert(varchar(10),a.tgl_input,121),1,4)','c.kode_gudang','b.kode_klp', 'a.kode_barang');
+            $db_col_name = array('substring(convert(varchar(10),a.tgl_input,112),1,4)','c.kode_gudang','b.kode_klp', 'a.kode_barang');
             $where = "where a.kode_lokasi='$kode_lokasi'";
 
             for($i = 0; $i<count($col_array); $i++){
