@@ -179,6 +179,123 @@ class LaporanController extends Controller
         }
     }
 
+    function getKartuStok(Request $request) {
+       try {
+           
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode','kode_gudang','kode_klp','kode_barang');
+            $db_col_name = array('substring(convert(varchar(10),a.tgl_input,121),1,4)','c.kode_gudang','b.kode_klp', 'a.kode_barang');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $nik_user=$nik."_".uniqid();
+            $periode=$request->input('periode');
+            if($periode == ""){
+                $periode = date('Ym');
+            }
+
+            $sql1 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
+            $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
+            DB::connection($this->sql)->update($sql1);
+            DB::connection($this->sql)->update($sql2);
+
+            $sql3 = "select a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
+                b.nama as nama_barang,c.nama as nama_gudang
+                from brg_stok a
+                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+                inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi 
+                inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang and a.nik_user=d.nik_user
+                $where
+                order by a.kode_barang,a.kode_gudang";
+           
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs),true);     
+            
+            $nb = "";
+            $resdata = array();
+            $i=0;
+            foreach($rs as $row){
+
+                $resdata[]=(array)$row;
+                if($i == 0){
+                    $nb .= "'$row->kode_barang'";
+                    $nb2 .= "'$row->kode_gudang'";
+                }else{
+                    $nb .= ","."'$row->kode_barang'";
+                    $nb2 .= ","."'$row->kode_gudang'";
+                }
+                $i++;
+            }
+
+            $sql4="select distinct * from (select convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+                case when a.dc='D' then a.jumlah else 0 end as debet,	      
+                case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
+                from brg_trans_d a
+                inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
+                inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
+                union all
+                select convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+                case when a.dc='D' then a.jumlah else 0 end as debet,	      
+                case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
+                from brg_trans_d a
+                inner join brg_jualpiu_d d on a.no_bukti=d.no_jual and a.kode_lokasi=d.kode_lokasi
+                inner join trans_m b on d.no_close=b.no_bukti and d.kode_lokasi=b.kode_lokasi 
+                inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
+                )a order by a.tgl_ed";
+            $res2 = DB::connection($this->sql)->select($sql4);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['sql'] = $sql;
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+
+       } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+       }
+    }
+
     function getReportPenjualan(Request $request){
         try {
             
