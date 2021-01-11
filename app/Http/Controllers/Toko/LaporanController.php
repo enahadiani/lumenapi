@@ -222,8 +222,8 @@ class LaporanController extends Controller
             $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
             var_dump($sql1);
             var_dump($sql2);
-            // DB::connection($this->sql)->update($sql1);
-            // DB::connection($this->sql)->update($sql2);
+            DB::connection($this->sql)->update($sql1);
+            DB::connection($this->sql)->update($sql2);
 
             $sql3 = "select a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
                 b.nama as nama_barang,c.nama as nama_gudang
@@ -234,8 +234,8 @@ class LaporanController extends Controller
                 $where
                 order by a.kode_barang,a.kode_gudang";
            
-            // $rs = DB::connection($this->sql)->select($sql3);
-            // $res = json_decode(json_encode($rs),true);     
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs),true);     
             var_dump($sql3);
             $nb = "";
             $nb2 = "";
