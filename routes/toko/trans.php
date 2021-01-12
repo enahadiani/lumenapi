@@ -127,7 +127,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Data Penyusutan
     $router->get('susut-drk','Toko\PenyusutanController@getDRK');
     $router->post('susut','Toko\PenyusutanController@store');
-    
+
+    // Jurnal Dok 
+    $router->get('jurnal-dok','Toko\JurnalDokController@show');
+    $router->post('jurnal-dok','Toko\JurnalDokController@store');
+    $router->delete('jurnal-dok','Toko\JurnalDokController@destroy');
 
 });
 
