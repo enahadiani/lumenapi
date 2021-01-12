@@ -44,7 +44,10 @@ class MutasiController extends Controller {
 
         $no_bukti = $this->generateKode("trans_m", "no_bukti", "$kodeAcuan/$periode/", "0001");
 
-        return $no_bukti;
+        $success['status'] = true;
+        $success['kode'] = $no_bukti;
+        
+        return response()->json($success, 200);
     }
 
 }
