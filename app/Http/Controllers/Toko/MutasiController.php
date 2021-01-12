@@ -34,8 +34,8 @@ class MutasiController extends Controller {
 
             $sql = "select distinct a.nama,a.sat_kecil,b.stok
                 from brg_barang a inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
-                and b.kode_gudang=$kode_gudang
-                where a.kode_barang=$kode_barang and a.kode_lokasi=$kode_lokasi";
+                and b.kode_gudang='$kode_gudang'
+                where a.kode_barang='$kode_barang' and a.kode_lokasi='$kode_lokasi'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
