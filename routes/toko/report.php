@@ -66,6 +66,27 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('send-laporan','Toko\LaporanController@sendMail');
     $router->post('send-email','EmailController@send');
 
+
+    // LAPORAN AKTIVA TETAP
+    $router->get('filter-periode','Toko\FilterAktapController@getFilterPeriode');
+    $router->get('filter-periode-susut','Toko\FilterAktapController@getFilterPeriodeSusut');
+    $router->get('filter-klp-akun','Toko\FilterAktapController@getFilterKlpAkun');
+    $router->get('filter-jenis','Toko\FilterAktapController@getFilterJenis');
+    $router->get('filter-aset','Toko\FilterAktapController@getFilterAset');
+    $router->get('filter-pp','Toko\FilterAktapController@getFilterPP');
+    $router->get('filter-tahun','Toko\FilterAktapController@getFilterTahun');
+    $router->get('filter-jenis-klp','Toko\FilterAktapController@getFilterJenisKlp');
+    $router->get('filter-bukti-jurnal-susut','Toko\FilterAktapController@getFilterBuktiJurnalSusut');
+    $router->get('filter-bukti-jurnal-wo','Toko\FilterAktapController@getFilterBuktiJurnalWO');
+
+    $router->get('lap-data-aktap','Toko\LaporanAktapController@getAktap');
+    $router->get('lap-kartu-aktap','Toko\LaporanAktapController@getKartuAktap');
+    $router->get('lap-saldo-aktap','Toko\LaporanAktapController@getSaldoAktap');
+    $router->get('lap-saldo-aktap-tahun','Toko\LaporanAktapController@getSaldoAktapTahun');
+    $router->get('lap-jurnal-aktap','Toko\LaporanAktapController@getJurnalAktap');
+    $router->get('lap-jurnal-wo','Toko\LaporanAktapController@getJurnalWO');
+    $router->get('lap-saldo-aktap-bulan','Toko\LaporanAktapController@getSaldoAktapBln');
+
 });
 
 
