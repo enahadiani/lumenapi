@@ -186,6 +186,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('klp-barang','Toko\KlpBarangController@update');
     $router->delete('klp-barang','Toko\KlpBarangController@destroy');
 
+    //Data Periode Aktif
+    $router->get('periode-aktif','Toko\PeriodeAktifController@index');
+    $router->post('periode-aktif','Toko\PeriodeAktifController@store');
+
 
 });
 
