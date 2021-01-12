@@ -18,6 +18,45 @@ class FilterController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
+    function getFilterBarangMutasi(Request $requst){
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $this->validate($request, [            
+                'kode_gudang' => 'required'                                    
+            ]);
+            $gudang = $request->gudang_asal;
+            
+            $sql="select distinct a.kode_barang, a.nama 
+                from brg_barang a
+                inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                inner join brg_gudang c on b.kode_gudang=b.kode_gudang and b.kode_lokasi=c.kode_lokasi
+                where c.kode_gudang = '$gudang' and a.kode_lokasi = '$kode_lokasi'";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getFilterKlpBarang(){
         try {
             
@@ -46,7 +85,6 @@ class FilterController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
-        
     }
 
     function getFilterGudang(){
