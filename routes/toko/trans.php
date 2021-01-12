@@ -20,6 +20,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Mutasi Barang//
     $router->get('generate-mutasi','Toko\MutasiController@handleNoBukti');
     $router->get('filter-barang-mutasi','Toko\FilterController@getFilterBarangMutasi');
+    $router->get('barang-mutasi-detail','Toko\MutasiController@getDetailBarangMutasi');
     //Penjualan (POS)
     $router->get('penjualan-open','Toko\PenjualanController@getNoOpen');
     $router->post('penjualan','Toko\PenjualanController@store');
