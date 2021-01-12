@@ -22,7 +22,7 @@ class MutasiController extends Controller {
             'kode_barang' => 'required',                             
             'kode_gudang' => 'required',                             
         ]);
-        
+
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -37,7 +37,7 @@ class MutasiController extends Controller {
                 and b.kode_gudang=$kode_gudang
                 where a.kode_barang=$kode_barang and a.kode_lokasi=$kode_lokasi";
 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
                 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
