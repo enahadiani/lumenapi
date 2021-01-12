@@ -17,6 +17,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
+    //Mutasi Barang//
+    $router->get('generate-mutasi','Toko\MutasiController@handleNoBukti');
     //Penjualan (POS)
     $router->get('penjualan-open','Toko\PenjualanController@getNoOpen');
     $router->post('penjualan','Toko\PenjualanController@store');
