@@ -55,7 +55,7 @@ class MutasiController extends Controller {
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, 500);
+            return response()->json($success, 200);
         }
     }
 
