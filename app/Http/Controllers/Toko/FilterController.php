@@ -18,7 +18,7 @@ class FilterController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    function getFilterBarangMutasi(Request $requst){
+    function getFilterBarangMutasi(Request $request){
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
