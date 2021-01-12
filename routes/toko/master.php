@@ -196,6 +196,22 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('dok-jenis','Toko\JenisDokController@update');
     $router->delete('dok-jenis','Toko\JenisDokController@destroy');
 
+    $router->get('setting-grafik','Toko\SettingGrafikController@index');     
+    $router->get('setting-grafik-detail','Toko\SettingGrafikController@show'); 
+    $router->post('setting-grafik','Toko\SettingGrafikController@store');
+    $router->put('setting-grafik','Toko\SettingGrafikController@update');    
+    $router->delete('setting-grafik','Toko\SettingGrafikController@destroy');   
+    $router->get('setting-grafik-neraca','Toko\SettingGrafikController@getNeraca');    
+    $router->get('setting-grafik-klp','Toko\SettingGrafikController@getKlp');
+    
+    $router->get('setting-rasio','Toko\SettingRasioController@index');     
+    $router->get('setting-rasio-detail','Toko\SettingRasioController@show'); 
+    $router->post('setting-rasio','Toko\SettingRasioController@store');
+    $router->put('setting-rasio','Toko\SettingRasioController@update');    
+    $router->delete('setting-rasio','Toko\SettingRasioController@destroy');   
+    $router->get('setting-rasio-neraca','Toko\SettingRasioController@getNeraca');    
+    $router->get('setting-rasio-klp','Toko\SettingRasioController@getKlp');
+
 
 });
 
