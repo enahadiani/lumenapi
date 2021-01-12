@@ -24,11 +24,11 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $this->validate($request, [            
-                'kode_gudang' => 'required'                                    
-            ]);
-            $gudang = $request->gudang_asal;
+            
+            $gudang = "G01";
+            if(isset($request->periode) && $request->periode != ""){ 
+                $gudang = $request->kode_gudang;
+            }
             
             $sql="select distinct a.kode_barang, a.nama 
                 from brg_barang a
