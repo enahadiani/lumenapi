@@ -18,16 +18,16 @@ class MutasiController extends Controller {
     public $guard = 'toko';
 
     function getDetailBarangMutasi(Request $request) {
+        $this->validate($request, [            
+            'kode_barang' => 'required',                             
+            'kode_gudang' => 'required',                             
+        ]);
+        
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $this->validate($request, [            
-                'kode_barang' => 'required',                             
-                'kode_gudang' => 'required',                             
-            ]);
 
             $kode_barang = $request->kode_barang;
             $kode_gudang = $request->kode_gudang;
