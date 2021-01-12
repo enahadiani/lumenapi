@@ -189,6 +189,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Data Periode Aktif
     $router->get('periode-aktif','Toko\PeriodeAktifController@index');
     $router->post('periode-aktif','Toko\PeriodeAktifController@store');
+    
+    //Data Dok Jenis
+    $router->get('dok-jenis','Toko\JenisDokController@index');
+    $router->post('dok-jenis','Toko\JenisDokController@store');
+    $router->put('dok-jenis','Toko\JenisDokController@update');
+    $router->delete('dok-jenis','Toko\JenisDokController@destroy');
 
 
 });
