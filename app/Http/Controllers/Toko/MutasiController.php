@@ -18,26 +18,26 @@ class MutasiController extends Controller {
     public $guard = 'toko';
 
     function getDetailBarangMutasi(Request $request) {
+        $this->validate($request, [            
+            'kode_barang' => 'required',                             
+            'kode_gudang' => 'required',                             
+        ]);
+
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $this->validate($request, [            
-                'kode_barang' => 'required',                             
-                'kode_gudang' => 'required',                             
-            ]);
-
             $kode_barang = $request->kode_barang;
             $kode_gudang = $request->kode_gudang;
 
             $sql = "select distinct a.nama,a.sat_kecil,b.stok
                 from brg_barang a inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
-                and b.kode_gudang=$kode_gudang
-                where a.kode_barang=$kode_barang and a.kode_lokasi=$kode_lokasi";
+                and b.kode_gudang='$kode_gudang'
+                where a.kode_barang='$kode_barang' and a.kode_lokasi='$kode_lokasi'";
 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
                 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -55,7 +55,7 @@ class MutasiController extends Controller {
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
-            return response()->json($success, 500);
+            return response()->json($success, 200);
         }
     }
 
