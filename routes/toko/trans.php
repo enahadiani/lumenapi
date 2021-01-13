@@ -134,6 +134,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('jurnal-dok','Toko\JurnalDokController@store');
     $router->delete('jurnal-dok','Toko\JurnalDokController@destroy');
 
+    //Closing Periode
+    $router->get('closing-periode','Toko\ClosingPeriodeController@show');
+    $router->post('closing-periode','Toko\ClosingPeriodeController@store');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
