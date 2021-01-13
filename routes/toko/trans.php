@@ -138,6 +138,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('closing-periode','Toko\ClosingPeriodeController@show');
     $router->post('closing-periode','Toko\ClosingPeriodeController@store');
 
+    //Jurnal Penutup
+    $router->get('jurnal-penutup','Toko\JurnalPenutupController@getDataAwal');
+    $router->post('jurnal-penutup','Toko\JurnalPenutupController@store');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
