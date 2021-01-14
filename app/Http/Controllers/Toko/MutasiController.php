@@ -62,7 +62,7 @@ class MutasiController extends Controller {
                     nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
                     values ('".$data[0]['no_bukti']."', '$kode_lokasi', 'getdate()', '$nik', '$periode', 'IV', 
                     'BRGKIRIM', 'X', '0', '0', '$kode_pp','".$data[0]['tanggal']."', '".$data[0]['no_dokumen']."', 
-                    ".$data[0]['keterangan'].", 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
+                    '".$data[0]['keterangan']."', 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
                     '".$data[0]['gudang_asal']."', '".$data[0]['gudang_tujuan']."', '-', null, null, null)";
                 echo "$sql2";
                 // DB::connection($this->sql)->insert($sql2);
