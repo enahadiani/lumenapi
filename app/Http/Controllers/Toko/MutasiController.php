@@ -48,9 +48,6 @@ class MutasiController extends Controller {
             
             $kode_pp = $res[0]['kode_pp'];
             $data = $request->input('mutasi');
-            echo "<pre>";
-            var_dump($data);
-            echo "</pre>";
             $periode = substr($data[0]['tanggal'],0,4).substr($data[0]['tanggal'],5,2);
             $no_bukti = $data[0]['no_bukti'];
             $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
