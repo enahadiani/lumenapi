@@ -276,4 +276,117 @@ class LaporanKeuLanjutController extends Controller
         }
     }
 
+    function getLabaRugiBulan(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $nik_user=$request->nik_user;
+            $tahun=$request->input('periode')[1];
+            $kode_fs=$request->input('kode_fs')[1];
+            $level=$request->input('level')[1];
+            $sql="exec sp_lr_tahun_dw '$kode_fs','L','S','$level','$tahun','$kode_lokasi','$nik_user'  ";
+            $res = DB::connection($this->sql)->update($sql);
+
+            $id = (isset($request->kode_neraca) && ($request->kode_neraca != "") ? $request->kode_neraca : "-");
+            if($id == "-"){
+                
+                $sql="select a.kode_lokasi,a.kode_neraca,a.nama,a.level_spasi,a.tipe,a.kode_fs,
+                case jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n01,
+                case jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n02,
+                case jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n03,
+                case jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n04,
+                case jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n05,
+                case jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n06,
+                case jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n07,
+                case jenis_akun when  'Pendapatan' then -a.n8 else a.n8 end as n08,
+                case jenis_akun when  'Pendapatan' then -a.n9 else a.n9 end as n09,
+                case jenis_akun when  'Pendapatan' then -a.n10 else a.n10 end as n10,
+                case jenis_akun when  'Pendapatan' then -a.n11 else a.n11 end as n11,
+                case jenis_akun when  'Pendapatan' then -a.n12 else a.n12 end as n12,
+                case jenis_akun when  'Pendapatan' then -a.n13 else a.n13 end as n13,
+                case jenis_akun when  'Pendapatan' then -a.n14 else a.n14 end as n14,
+                case jenis_akun when  'Pendapatan' then -a.n15 else a.n15 end as n15,
+                case jenis_akun when  'Pendapatan' then -a.n16 else a.n16 end as n16,
+                case jenis_akun when  'Pendapatan' then -a.n17 else a.n17 end as n17
+                from neraca_tmp a 
+                where nik_user='$nik_user' and modul='L' 
+                order by rowindex";
+            }else{
+                $sql="select a.kode_akun,a.nama,
+                case c.jenis_akun when  'Pendapatan' then -a.n01 else a.n01 end as n01,
+                case c.jenis_akun when  'Pendapatan' then -a.n02 else a.n02 end as n02,
+                case c.jenis_akun when  'Pendapatan' then -a.n03 else a.n03 end as n03,
+                case c.jenis_akun when  'Pendapatan' then -a.n04 else a.n04 end as n04,
+                case c.jenis_akun when  'Pendapatan' then -a.n05 else a.n05 end as n05,
+                case c.jenis_akun when  'Pendapatan' then -a.n06 else a.n06 end as n06,
+                case c.jenis_akun when  'Pendapatan' then -a.n07 else a.n07 end as n07,
+                case c.jenis_akun when  'Pendapatan' then -a.n08 else a.n08 end as n08,
+                case c.jenis_akun when  'Pendapatan' then -a.n09 else a.n09 end as n09,
+                case c.jenis_akun when  'Pendapatan' then -a.n10 else a.n10 end as n10,
+                case c.jenis_akun when  'Pendapatan' then -a.n11 else a.n11 end as n11,
+                case c.jenis_akun when  'Pendapatan' then -a.n12 else a.n12 end as n12,
+                case c.jenis_akun when  'Pendapatan' then -a.n13 else a.n13 end as n13,
+                case c.jenis_akun when  'Pendapatan' then -a.n14 else a.n14 end as n14,
+                case c.jenis_akun when  'Pendapatan' then -a.n15 else a.n15 end as n15,
+                case c.jenis_akun when  'Pendapatan' then -a.n16 else a.n16 end as n16,
+                case c.jenis_akun when  'Pendapatan' then -a.total else a.total end as total
+                from glma12_tmp a
+                inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                inner join neraca c on b.kode_neraca=c.kode_neraca and b.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi
+                where b.kode_fs='$kode_fs' and b.kode_lokasi='$kode_lokasi' and b.kode_neraca='$id' and a.nik_user='$nik_user' 
+                order by a.kode_akun ";
+            }
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                $success["auth_status"] = 2; 
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }
