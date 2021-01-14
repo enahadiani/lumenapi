@@ -48,7 +48,7 @@ class MutasiController extends Controller {
                     where a.no_bukti = '$no_bukti' and a.kode_lokasi='$kode_lokasi' order by a.nu";
             }
             $res2 = DB::connection($this->sql)->select($sql2);
-            $res2 = json_decode(json_encode($res),true);
+            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
