@@ -82,7 +82,7 @@ class MutasiController extends Controller {
             }
 
             DB::connection($this->sql)->commit();
-            $success['status'] = $sts;
+            $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Mutasi Barang berhasil disimpan ";
             return response()->json(['success'=>$success], $this->successStatus);
