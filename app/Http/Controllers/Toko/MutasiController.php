@@ -17,7 +17,7 @@ class MutasiController extends Controller {
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
-    function store(Request $request) {
+    public function store(Request $request) {
         $this->validate($request, [
             'mutasi.*.tanggal' => 'required',
             'mutasi.*.jenis' => 'required',
@@ -96,7 +96,7 @@ class MutasiController extends Controller {
 
     }
 
-    function getDetailBarangMutasi(Request $request) {
+    public function getDetailBarangMutasi(Request $request) {
         $this->validate($request, [            
             'kode_barang' => 'required',                             
             'kode_gudang' => 'required',                             
@@ -138,7 +138,7 @@ class MutasiController extends Controller {
         }
     }
 
-    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+    public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
@@ -146,7 +146,7 @@ class MutasiController extends Controller {
         return $id;
     }
 
-    function handleNoBukti(Request $request) {
+    public function handleNoBukti(Request $request) {
         $this->validate($request, [            
             'tanggal' => 'required',                                    
             'jenis' => 'required',                                    
