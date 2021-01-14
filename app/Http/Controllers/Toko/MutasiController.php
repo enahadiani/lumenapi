@@ -19,6 +19,7 @@ class MutasiController extends Controller {
 
     public function store(Request $request) {
         $this->validate($request, [
+            'mutasi' => 'required|array',
             'mutasi.*.tanggal' => 'required',
             'mutasi.*.jenis' => 'required',
             'mutasi.*.no_bukti' => 'required',
@@ -26,6 +27,7 @@ class MutasiController extends Controller {
             'mutasi.*.keterangan' => 'required',
             'mutasi.*.gudang_asal' => 'required',
             'mutasi.*.gudang_tujuan' => 'required',
+            'mutasi.*.detail' => 'required|array',
             'mutasi.*.detail.*.kode_barang' => 'required',
             'mutasi.*.detail.*.satuan' => 'required',
             'mutasi.*.detail.*.stok' => 'required',
