@@ -200,4 +200,80 @@ class LaporanKeuLanjutController extends Controller
         }
     }
 
+    
+    function getNrcLajurBulan(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_akun','kode_neraca','kode_fs');
+            $db_col_name = array('a.periode','a.kode_akun','b.kode_neraca','b.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            
+            $nik_user=$request->nik_user;
+            $tahun=$request->input('periode')[1];
+
+            $sqlex="exec sp_glma_tahun_dw_mutasi_tmp '$kode_lokasi','$tahun','$nik_user' ";
+            $res = DB::connection($this->sql)->update($sqlex);
+
+            $mutasi="";
+            if($request->input('jenis') != ""){
+
+                if ($request->input('jenis')=="Tidak")
+                {
+                    $mutasi="and (a.so_awal<>0 or a.n01<>0 or a.n02<>0 or a.n03<>0 or a.n04<>0 or a.n05<>0 or a.n06<>0 or a.n07<>0 or a.n08<>0 or a.n09<>0 or a.n10<>0 or a.n11<>0 or a.n12<>0 or a.n13<>0 or a.n14<>0 or a.n15<>0 or a.n16<>0 or a.total<>0) ";
+                }
+            }
+
+            $sql="select a.kode_akun,a.nama,a.kode_lokasi,a.so_awal,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06,a.n07,a.n08,a.n09,a.n10,a.n11,a.n12,a.n13,a.n14,a.n15,a.n16,a.total
+            from glma12_tmp a $where and a.nik_user='$nik_user' $mutasi
+            order by a.kode_akun";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data']=$res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']=[];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
