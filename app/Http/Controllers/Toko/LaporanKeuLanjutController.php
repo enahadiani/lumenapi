@@ -242,9 +242,9 @@ class LaporanKeuLanjutController extends Controller
             $res = DB::connection($this->sql)->update($sqlex);
 
             $mutasi="";
-            if($request->input('jenis') != ""){
+            if($request->input('jenis')[1] != ""){
 
-                if ($request->input('jenis')=="Tidak")
+                if ($request->input('jenis')[1] == "Tidak")
                 {
                     $mutasi="and (a.so_awal<>0 or a.n01<>0 or a.n02<>0 or a.n03<>0 or a.n04<>0 or a.n05<>0 or a.n06<>0 or a.n07<>0 or a.n08<>0 or a.n09<>0 or a.n10<>0 or a.n11<>0 or a.n12<>0 or a.n13<>0 or a.n14<>0 or a.n15<>0 or a.n16<>0 or a.total<>0) ";
                 }
