@@ -51,7 +51,7 @@ class MutasiController extends Controller {
             $periode = substr($data[0]['tanggal'],0,4).substr($data[0]['tanggal'],5,2);
             $no_bukti = $data[0]['no_bukti'];
             $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
-            DB::connection($this->sql)->update($sql1);
+            // DB::connection($this->sql)->update($sql1);
 
             DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
             DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
@@ -64,8 +64,8 @@ class MutasiController extends Controller {
                     'BRGKIRIM', 'X', '0', '0', '$kode_pp','".$data[0]['tanggal']."', '".$data[0]['no_dokumen']."', 
                     ".$data[0]['keterangan'].", 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
                     '".$data[0]['gudang_asal']."', '".$data[0]['gudang_tujuan']."', '-', null, null, null)";
-
-                DB::connection($this->sql)->insert($sql2);
+                echo "$sql2";
+                // DB::connection($this->sql)->insert($sql2);
 
                 $data2 = $data[0]['detail'];
                 if(count($data2) > 0) {
@@ -77,7 +77,8 @@ class MutasiController extends Controller {
                             diskon,tot_diskon,total) values ('".$data[0]['no_bukti']."', '$kode_lokasi', '$periode', 'BRGKIRIM',
                             'BRGKIRIM', '$i', '".$data[0]['gudang_asal']."', '".$data2[$i]['kode_barang']."', '-', 'getdate()', 
                             '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
-                        DB::connection($this->sql)->insert($sql3);
+                        // DB::connection($this->sql)->insert($sql3);
+                        echo "$sql3";
                     }
                 }
             }
