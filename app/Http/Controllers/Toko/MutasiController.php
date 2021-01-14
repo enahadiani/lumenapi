@@ -63,10 +63,29 @@ class MutasiController extends Controller {
                     $data[0]['keterangan'], 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
                     '$data[0]['gudang_asal']', '$data[0]['gudang_tujuan']', '-', null, null, null)";
 
-                $sql = DB::connection($this->db)->insert($sql2);
+                DB::connection($this->db)->insert($sql2);
 
-                $data2 = $request->input('jurnal')[$i]['detail'];
+                $data2 = $request->input('mutasi')[0]['detail'];
+
+                if(count($data2) > 0) {
+                    for($i=0;$i<count($data2);$i++) {
+                        $stok = floatval($data2['stok']);
+                        $jumlah = floatval($data2['jumlah']);
+                        $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
+                            kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
+                            diskon,tot_diskon,total) values ('$data[0]['no_bukti']', '$kode_lokasi', '$periode', 'BRGKIRIM',
+                            'BRGKIRIM', '$i', '$data[0]['gudang_asal']', '$data2[i]['kode_barang']', '-', 'getdate()', 
+                            '$data2[i]['satuan']', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
+                        DB::connection($this->db)->insert($sql3);
+                    }
+                }
             }
+
+            DB::connection($this->db)->commit();
+            $success['status'] = $sts;
+            $success['no_bukti'] = $no_bukti;
+            $success['message'] = "Data Mutasi Barang berhasil disimpan ";
+            return response()->json(['success'=>$success], $this->successStatus);
             
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
