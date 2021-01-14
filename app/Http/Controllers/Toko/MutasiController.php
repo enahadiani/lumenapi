@@ -48,46 +48,52 @@ class MutasiController extends Controller {
             
             $kode_pp = $res[0]['kode_pp'];
             $data = $request->input('mutasi');
-            $periode = substr($data[0]['tanggal'],0,4).substr($data[0]['tanggal'],5,2);
-            $no_bukti = $data[0]['no_bukti'];
-            $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
-            DB::connection($this->sql)->update($sql1);
+            echo "<pre>";
+            var_dump($data);
+            echo "</pre>";
+            // $periode = substr($data[0]['tanggal'],0,4).substr($data[0]['tanggal'],5,2);
+            // $no_bukti = $data[0]['no_bukti'];
+            // $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
+            // DB::connection($this->sql)->update($sql1);
 
-            DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
-            DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            // DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            // DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            $data2 = $request->input('mutasi')[0]['detail'];
+            echo "<pre>";
+            var_dump($data2);
+            echo "</pre>";
 
-            if($data[0]['jenis'] == "KRM") {
-                $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
-                    posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
-                    nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
-                    values ('$data[0]['no_bukti']', '$kode_lokasi', 'getdate()', '$nik', '$periode', 'IV', 
-                    'BRGKIRIM', 'X', '0', '0', '$kode_pp','$data[0]['tanggal']', '$data[0]['no_dokumen']', 
-                    $data[0]['keterangan'], 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
-                    '$data[0]['gudang_asal']', '$data[0]['gudang_tujuan']', '-', null, null, null)";
+            // if($data[0]['jenis'] == "KRM") {
+            //     $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
+            //         posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
+            //         nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
+            //         values ('$data[0]['no_bukti']', '$kode_lokasi', 'getdate()', '$nik', '$periode', 'IV', 
+            //         'BRGKIRIM', 'X', '0', '0', '$kode_pp','$data[0]['tanggal']', '$data[0]['no_dokumen']', 
+            //         $data[0]['keterangan'], 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
+            //         '$data[0]['gudang_asal']', '$data[0]['gudang_tujuan']', '-', null, null, null)";
 
-                DB::connection($this->sql)->insert($sql2);
+            //     DB::connection($this->sql)->insert($sql2);
 
-                $data2 = $request->input('mutasi')[0]['detail'];
+            //     $data2 = $request->input('mutasi')[0]['detail'];
+            //     if(count($data2) > 0) {
+            //         for($i=0;$i<count($data2);$i++) {
+            //             $stok = floatval($data2['stok']);
+            //             $jumlah = floatval($data2['jumlah']);
+            //             $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
+            //                 kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
+            //                 diskon,tot_diskon,total) values ('$data[0]['no_bukti']', '$kode_lokasi', '$periode', 'BRGKIRIM',
+            //                 'BRGKIRIM', '$i', '$data[0]['gudang_asal']', '$data2[i]['kode_barang']', '-', 'getdate()', 
+            //                 '$data2[i]['satuan']', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
+            //             DB::connection($this->sql)->insert($sql3);
+            //         }
+            //     }
+            // }
 
-                if(count($data2) > 0) {
-                    for($i=0;$i<count($data2);$i++) {
-                        $stok = floatval($data2['stok']);
-                        $jumlah = floatval($data2['jumlah']);
-                        $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
-                            kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
-                            diskon,tot_diskon,total) values ('$data[0]['no_bukti']', '$kode_lokasi', '$periode', 'BRGKIRIM',
-                            'BRGKIRIM', '$i', '$data[0]['gudang_asal']', '$data2[i]['kode_barang']', '-', 'getdate()', 
-                            '$data2[i]['satuan']', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
-                        DB::connection($this->sql)->insert($sql3);
-                    }
-                }
-            }
-
-            DB::connection($this->sql)->commit();
-            $success['status'] = true;
-            $success['no_bukti'] = $no_bukti;
-            $success['message'] = "Data Mutasi Barang berhasil disimpan ";
-            return response()->json(['success'=>$success], $this->successStatus);
+            // DB::connection($this->sql)->commit();
+            // $success['status'] = true;
+            // $success['no_bukti'] = $no_bukti;
+            // $success['message'] = "Data Mutasi Barang berhasil disimpan ";
+            // return response()->json(['success'=>$success], $this->successStatus);
             
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
