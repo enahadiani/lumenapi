@@ -28,7 +28,7 @@ class MutasiController extends Controller {
                 inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='esaku'
                 where a.kode_lokasi= '$kode_lokasi' and no_ref1='-' and form='BRGTERIMA'";
 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -62,7 +62,7 @@ class MutasiController extends Controller {
                 inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='esaku'
                 where a.kode_lokasi= '$kode_lokasi' and no_ref1='-' and form='BRGKIRIM'";
 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
