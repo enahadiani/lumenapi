@@ -25,6 +25,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('mutasi-kirim','Toko\MutasiController@getDataMutasiKirim');
     $router->get('mutasi-detail','Toko\MutasiController@getMutasiDetail');
     $router->post('mutasi-barang','Toko\MutasiController@store');
+    $router->put('mutasi-barang','Toko\MutasiController@update');
     //Penjualan (POS)
     $router->get('penjualan-open','Toko\PenjualanController@getNoOpen');
     $router->post('penjualan','Toko\PenjualanController@store');
