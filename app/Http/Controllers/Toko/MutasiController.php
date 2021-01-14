@@ -18,7 +18,7 @@ class MutasiController extends Controller {
     public $guard = 'toko';
 
     function store(Request $request) {
-        $this->validate($request, [
+        $request->validate([
             'mutasi.*.tanggal' => 'required',
             'mutasi.*.jenis' => 'required',
             'mutasi.*.no_bukti' => 'required',
