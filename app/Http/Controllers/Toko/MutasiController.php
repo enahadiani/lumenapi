@@ -27,7 +27,6 @@ class MutasiController extends Controller {
             'mutasi.*.gudang_asal' => 'required',
             'mutasi.*.gudang_tujuan' => 'required',
             'mutasi.*.detail.*.kode_barang' => 'required',
-            'mutasi.*.detail.*.nama_barang' => 'required',
             'mutasi.*.detail.*.satuan' => 'required',
             'mutasi.*.detail.*.stok' => 'required',
             'mutasi.*.detail.*.jumlah' => 'required'
@@ -39,8 +38,13 @@ class MutasiController extends Controller {
                 $kode_lokasi= $rs->kode_lokasi;
             }
 
+            $res = DB::connection($this->db)
+                    ->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'");
+            $res = json_decode(json_encode($res),true);
+
             DB::connection($this->db)->beginTransaction();
             
+            $kode_pp = $res[0]['kode_pp'];
             $data = $request->input('mutasi');
             $periode = substr($data[0]['tanggal'],0,4).substr($data[0]['tanggal'],5,2);
 
@@ -54,8 +58,14 @@ class MutasiController extends Controller {
                 $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
                     posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
                     nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
-                    values ('$data[0]['no_bukti']', '$kode_lokasi', '$data[0]['tanggal']', '$nik', '$periode', 'IV', 
-                    'BRGKIRIM', 'X', '')";
+                    values ('$data[0]['no_bukti']', '$kode_lokasi', 'getdate()', '$nik', '$periode', 'IV', 
+                    'BRGKIRIM', 'X', '0', '0', '$kode_pp','$data[0]['tanggal']', '$data[0]['no_dokumen']', 
+                    $data[0]['keterangan'], 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
+                    '$data[0]['gudang_asal']', '$data[0]['gudang_tujuan']', '-', null, null, null)";
+
+                $sql = DB::connection($this->db)->insert($sql2);
+
+                $data2 = $request->input('jurnal')[$i]['detail'];
             }
             
         } catch (\Throwable $e) {
@@ -85,7 +95,7 @@ class MutasiController extends Controller {
             $sql = "select distinct a.nama,a.sat_kecil,b.stok
                 from brg_barang a inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
                 and b.kode_gudang='$kode_gudang'
-                where a.kode_barang='$kode_barang' and a.kode_lokasi='$kode_lokasi'";
+                where a.kode_barang='$kode_barang' and a.kode_lokasi='$kode_lokasi' and b.nik_user='$nik'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
