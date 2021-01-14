@@ -33,13 +33,13 @@ class MutasiController extends Controller {
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['jurnal'] = $res;
+                $success['data'] = $res;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
-                $success['jurnal']= [];
+                $success['data']= [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
@@ -67,13 +67,13 @@ class MutasiController extends Controller {
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['jurnal'] = $res;
+                $success['data'] = $res;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
-                $success['jurnal']= [];
+                $success['data']= [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
