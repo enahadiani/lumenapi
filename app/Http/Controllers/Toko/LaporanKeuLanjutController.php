@@ -316,7 +316,7 @@ class LaporanKeuLanjutController extends Controller
             $sql="exec sp_lr_tahun_dw '$kode_fs','L','S','$level','$tahun','$kode_lokasi','$nik_user'  ";
             $res = DB::connection($this->sql)->update($sql);
 
-            $id = (isset($request->kode_neraca) && ($request->kode_neraca != "") ? $request->kode_neraca : "-");
+            $id = (isset($request->id) && ($request->id != "") ? $request->id : "-");
             if($id == "-"){
                 
                 $sql="select a.kode_lokasi,a.kode_neraca,a.nama,a.level_spasi,a.tipe,a.kode_fs,
@@ -358,7 +358,7 @@ class LaporanKeuLanjutController extends Controller
                 case c.jenis_akun when  'Pendapatan' then -a.n14 else a.n14 end as n14,
                 case c.jenis_akun when  'Pendapatan' then -a.n15 else a.n15 end as n15,
                 case c.jenis_akun when  'Pendapatan' then -a.n16 else a.n16 end as n16,
-                case c.jenis_akun when  'Pendapatan' then -a.total else a.total end as total
+                case c.jenis_akun when  'Pendapatan' then -a.total else a.total end as total,3 as level_spasi
                 from glma12_tmp a
                 inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
                 inner join neraca c on b.kode_neraca=c.kode_neraca and b.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi
