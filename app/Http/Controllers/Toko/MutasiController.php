@@ -77,7 +77,7 @@ class MutasiController extends Controller {
                         $jumlah = floatval($data2[$i]['jumlah']);
                         $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
                             kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
-                            diskon,tot_diskon,total) values ('$data[0]['no_bukti']', '$kode_lokasi', '$periode', 'BRGKIRIM',
+                            diskon,tot_diskon,total) values ('".$data[0]['no_bukti']."', '$kode_lokasi', '$periode', 'BRGKIRIM',
                             'BRGKIRIM', '$i', '".$data[0]['gudang_asal']."', '".$data2[$i]['kode_barang']."', '-', 'getdate()', 
                             '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
                         DB::connection($this->sql)->insert($sql3);
