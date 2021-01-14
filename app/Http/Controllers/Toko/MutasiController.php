@@ -17,6 +17,74 @@ class MutasiController extends Controller {
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
+    public function getDataMutasiTerima() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql = "select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan
+                from trans_m a
+                inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='esaku'
+                where a.kode_lokasi= '$kode_lokasi' and no_ref1='-' and form='BRGTERIMA'";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['jurnal'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['jurnal']= [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $th) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataMutasiKirim() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql = "select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan
+                from trans_m a
+                inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='esaku'
+                where a.kode_lokasi= '$kode_lokasi' and no_ref1='-' and form='BRGKIRIM'";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['jurnal'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['jurnal']= [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $th) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function store(Request $request) {
         $this->validate($request, [
             'mutasi' => 'required|array',
@@ -76,6 +144,30 @@ class MutasiController extends Controller {
                             kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
                             diskon,tot_diskon,total) values ('".$data[0]['no_bukti']."', '$kode_lokasi', '$periode', 'BRGKIRIM',
                             'BRGKIRIM', '$i', '".$data[0]['gudang_asal']."', '".$data2[$i]['kode_barang']."', '-', getdate(), 
+                            '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
+                        DB::connection($this->sql)->insert($sql3);
+                    }
+                }
+            } else {
+                $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
+                    posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
+                    nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
+                    values ('".$data[0]['no_bukti']."', '$kode_lokasi', getdate(), '$nik', '$periode', 'IV', 
+                    'BRGTERIMA', 'X', '0', '0', '$kode_pp','".$data[0]['tanggal']."', '".$data[0]['no_dokumen']."', 
+                    '".$data[0]['keterangan']."', 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
+                    '".$data[0]['gudang_asal']."', '".$data[0]['gudang_tujuan']."', '-', null, null, null)";
+                
+                DB::connection($this->sql)->insert($sql2);
+
+                $data2 = $data[0]['detail'];
+                if(count($data2) > 0) {
+                    for($i=0;$i<count($data2);$i++) {
+                        $stok = floatval($data2[$i]['stok']);
+                        $jumlah = floatval($data2[$i]['jumlah']);
+                        $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
+                            kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
+                            diskon,tot_diskon,total) values ('".$data[0]['no_bukti']."', '$kode_lokasi', '$periode', 'BRGTERIMA',
+                            'BRGTERIMA', '$i', '".$data[0]['gudang_asal']."', '".$data2[$i]['kode_barang']."', '-', getdate(), 
                             '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
                         DB::connection($this->sql)->insert($sql3);
                     }
