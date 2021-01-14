@@ -38,11 +38,11 @@ class MutasiController extends Controller {
                 $kode_lokasi= $rs->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)
+            $res = DB::connection($this->sql)
                     ->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'");
             $res = json_decode(json_encode($res),true);
 
-            DB::connection($this->db)->beginTransaction();
+            DB::connection($this->sql)->beginTransaction();
             
             $kode_pp = $res[0]['kode_pp'];
             $data = $request->input('mutasi');
@@ -51,8 +51,8 @@ class MutasiController extends Controller {
             $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
             DB::connection($this->sql)->update($sql1);
 
-            DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
-            DB::connection($this->db)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
 
             if($data[0]['jenis'] == "KRM") {
                 $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
@@ -63,7 +63,7 @@ class MutasiController extends Controller {
                     $data[0]['keterangan'], 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
                     '$data[0]['gudang_asal']', '$data[0]['gudang_tujuan']', '-', null, null, null)";
 
-                DB::connection($this->db)->insert($sql2);
+                DB::connection($this->sql)->insert($sql2);
 
                 $data2 = $request->input('mutasi')[0]['detail'];
 
@@ -76,19 +76,19 @@ class MutasiController extends Controller {
                             diskon,tot_diskon,total) values ('$data[0]['no_bukti']', '$kode_lokasi', '$periode', 'BRGKIRIM',
                             'BRGKIRIM', '$i', '$data[0]['gudang_asal']', '$data2[i]['kode_barang']', '-', 'getdate()', 
                             '$data2[i]['satuan']', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
-                        DB::connection($this->db)->insert($sql3);
+                        DB::connection($this->sql)->insert($sql3);
                     }
                 }
             }
 
-            DB::connection($this->db)->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = $sts;
             $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Mutasi Barang berhasil disimpan ";
             return response()->json(['success'=>$success], $this->successStatus);
             
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Mutasi gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus);
