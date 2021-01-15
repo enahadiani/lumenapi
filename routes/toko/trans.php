@@ -151,6 +151,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('jurnal-penutup','Toko\JurnalPenutupController@getDataAwal');
     $router->post('jurnal-penutup','Toko\JurnalPenutupController@store');
 
+    // UPLOAD SAWAL
+    $router->get('sawal','Toko\SawalController@index');
+    $router->post('sawal','Toko\SawalController@store');
+    $router->post('sawal-import','Toko\SawalController@importExcel');
+    $router->get('sawal-tmp','Toko\SawalController@getSawalTmp');
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
@@ -162,6 +168,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 });
 
 $router->get('export', 'Toko\JurnalController@export');
+$router->get('sawal-export', 'Toko\SawalController@export');
 
 
 
