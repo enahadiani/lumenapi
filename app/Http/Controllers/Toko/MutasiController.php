@@ -68,10 +68,14 @@ class MutasiController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql1 = "select tanggal, substring(no_bukti,1,2) as jenis, no_bukti, no_dokumen, keterangan, param1, param2 
+            $sql1 = "select tanggal, substring(no_bukti,1,2) as jenis, no_bukti, no_dokumen, keterangan, param1, param2, no_ref2 as no_kirim 
             from trans_m where no_bukti = '$no_bukti' and kode_lokasi = '$kode_lokasi'";
+            $sql3 = "select no_ref2 from trans_m no_bukti = '$no_bukti' and kode_lokasi = '$kode_lokasi'";
             $res = DB::connection($this->sql)->select($sql1);
             $res = json_decode(json_encode($res),true);
+
+            $res3 = DB::connection($this->sql)->select($sql3);
+            $res3 = json_decode(json_encode($res),true);
             
             if($res[0]['jenis'] == "MK") {
                 $sql2 = "select a.kode_barang,b.nama,a.satuan,a.jumlah,c.stok+a.jumlah as stok
@@ -82,7 +86,7 @@ class MutasiController extends Controller {
                 $sql2 = "select b.kode_barang,b.nama,a.satuan,c.jumlah as stok, a.jumlah
                     from brg_trans_d a
                     inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
-                    inner join brg_trans_d c on c.no_bukti='$no_bukti'
+                    inner join brg_trans_d c on c.no_bukti='".$res3[0]['no_ref2']."'
                     and a.kode_lokasi=c.kode_lokasi and a.kode_barang=c.kode_barang
                     where a.no_bukti = '$no_bukti' and a.kode_lokasi='$kode_lokasi' order by a.nu";
             }
@@ -211,6 +215,7 @@ class MutasiController extends Controller {
         $this->validate($request, [
             'mutasi' => 'required|array',
             'mutasi.*.tanggal' => 'required',
+            'mutasi.*.bukti_kirim' => 'required',
             'mutasi.*.jenis' => 'required',
             'mutasi.*.no_bukti' => 'required',
             'mutasi.*.no_dokumen' => 'required',
@@ -276,7 +281,7 @@ class MutasiController extends Controller {
                     nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
                     values ('".$data[0]['no_bukti']."', '$kode_lokasi', getdate(), '$nik', '$periode', 'IV', 
                     'BRGTERIMA', 'X', '0', '0', '$kode_pp','".$data[0]['tanggal']."', '".$data[0]['no_dokumen']."', 
-                    '".$data[0]['keterangan']."', 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
+                    '".$data[0]['keterangan']."', 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '".$data[0]['bukti_kirim']."', '-', 
                     '".$data[0]['gudang_asal']."', '".$data[0]['gudang_tujuan']."', '-', null, null, null)";
                 
                 DB::connection($this->sql)->insert($sql2);
@@ -299,6 +304,7 @@ class MutasiController extends Controller {
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
+            $success['no_kirim'] = $data[0]['bukti_kirim'];
             $success['message'] = "Data Mutasi Barang berhasil disimpan ";
             return response()->json(['success'=>$success], $this->successStatus);
             
@@ -314,6 +320,7 @@ class MutasiController extends Controller {
         $this->validate($request, [
             'mutasi' => 'required|array',
             'mutasi.*.tanggal' => 'required',
+            'mutasi.*.bukti_kirim' => 'required',
             'mutasi.*.jenis' => 'required',
             'mutasi.*.no_bukti' => 'required',
             'mutasi.*.no_dokumen' => 'required',
@@ -379,7 +386,7 @@ class MutasiController extends Controller {
                     nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
                     values ('".$data[0]['no_bukti']."', '$kode_lokasi', getdate(), '$nik', '$periode', 'IV', 
                     'BRGTERIMA', 'X', '0', '0', '$kode_pp','".$data[0]['tanggal']."', '".$data[0]['no_dokumen']."', 
-                    '".$data[0]['keterangan']."', 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '-', '-', 
+                    '".$data[0]['keterangan']."', 'IDR', '1', '0', '0', '0', '-', '-', '-', '-', '".$data[0]['bukti_kirim']."', '-', 
                     '".$data[0]['gudang_asal']."', '".$data[0]['gudang_tujuan']."', '-', null, null, null)";
                 
                 DB::connection($this->sql)->insert($sql2);
@@ -402,6 +409,7 @@ class MutasiController extends Controller {
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
+            $success['no_kirim'] = $data[0]['bukti_kirim'];
             $success['message'] = "Data Mutasi Barang berhasil disimpan ";
             return response()->json(['success'=>$success], $this->successStatus);
             
