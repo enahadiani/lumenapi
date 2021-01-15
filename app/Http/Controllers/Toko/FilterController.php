@@ -60,23 +60,20 @@ class FilterController extends Controller
             $sql="select a.no_bukti,a.keterangan 
             from trans_m 
             $where";
-            echo "<pre>";
-            var_dump($sql);
-            echo "</pre>";
-            // $res = DB::connection($this->db)->select($sql);
-            // $res = json_decode(json_encode($res),true);
-            // if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-            //     $success['status'] = true;
-            //     $success['data'] = $res;
-            //     $success['message'] = "Success!";
-            //     return response()->json($success, $this->successStatus);     
-            // }
-            // else{
-            //     $success['message'] = "Data Kosong!";
-            //     $success['data'] = [];
-            //     $success['status'] = true;
-            //     return response()->json($success, $this->successStatus);
-            // }
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
