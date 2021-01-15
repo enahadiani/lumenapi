@@ -499,4 +499,257 @@ class LaporanKeuLanjutController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    function getLabaRugiUnit(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('kode_pp');
+            $db_col_name = array('a.kode_pp');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $col_array = array('kode_pp','kode_fs','periode');
+            $db_col_name = array('a.kode_pp','a.kode_fs','a.periode');
+            $where2 = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where2 .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where2 .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where2 .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            
+            $nik_user=$request->nik_user;
+            $sql="select a.kode_pp,a.nama from pp a $where order by a.kode_pp";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            $kode_pp = "";
+            $resdata = array();
+            $i=0;
+            foreach($rs as $row){
+
+                $resdata[]=(array)$row;
+                if($i == 0){
+                    $kode_pp .= "'$row->kode_pp'";
+                }else{
+
+                    $kode_pp .= ","."'$row->kode_pp'";
+                }
+                $i++;
+            }
+
+
+            $id = (isset($request->id) && ($request->id != "") ? $request->id : "-");
+            if($id == "-"){
+                
+                $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_pp,
+                case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4
+                from exs_neraca_pp a
+                $where2 and a.modul='L' and a.kode_pp in ($kode_pp)
+                order by a.rowindex";
+
+            }else{
+                $sql="select a.kode_akun,c.nama,case c.jenis when  'Pendapatan' then -a.so_akhir else a.so_akhir end as n4
+                from exs_glma_pp a
+                inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+                where b.kode_fs='$kode_fs' and a.kode_lokasi='$kode_lokasi' and b.kode_neraca='$id' and a.periode='$periode' and a.kode_pp in ($kode_pp)
+                order by a.kode_akun ";
+            }
+
+            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail'] = [];
+                $success['status'] = true;
+                $success["auth_status"] = 2; 
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getLabaRugiUnitDC(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('kode_pp');
+            $db_col_name = array('a.kode_pp');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $col_array = array('kode_pp','kode_fs','periode');
+            $db_col_name = array('a.kode_pp','a.kode_fs','a.periode');
+            $where2 = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where2 .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where2 .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where2 .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            
+            $nik_user=$request->nik_user;
+            $sql="select a.kode_pp,a.nama from pp a $where order by a.kode_pp";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            $kode_pp = "";
+            $resdata = array();
+            $i=0;
+            foreach($rs as $row){
+
+                $resdata[]=(array)$row;
+                if($i == 0){
+                    $kode_pp .= "'$row->kode_pp'";
+                }else{
+
+                    $kode_pp .= ","."'$row->kode_pp'";
+                }
+                $i++;
+            }
+
+
+            $id = (isset($request->id) && ($request->id != "") ? $request->id : "-");
+            if($id == "-"){
+                
+                $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_pp,
+                case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+                case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+                case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+                case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4
+                from exs_neraca_pp a
+                $where2 and a.modul='L' and a.kode_pp in ($kode_pp)
+                order by a.rowindex";
+
+            }else{
+                $sql="select a.kode_akun,c.nama,
+                case c.jenis when  'Pendapatan' then -a.so_awal else a.so_awal end as n1,
+                case c.jenis when  'Pendapatan' then -a.debet else a.debet end as n2,
+                case c.jenis when  'Pendapatan' then -a.kredit else a.kredit end as n3,
+                case c.jenis when  'Pendapatan' then -a.so_akhir else a.so_akhir end as n4
+                from exs_glma_pp a
+                inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+                where b.kode_fs='$kode_fs' and a.kode_lokasi='$kode_lokasi' and b.kode_neraca='$id' and a.periode='$periode' and a.kode_pp in ($kode_pp)
+                order by a.kode_akun ";
+            }
+
+            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail'] = [];
+                $success['status'] = true;
+                $success["auth_status"] = 2; 
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }

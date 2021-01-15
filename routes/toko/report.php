@@ -45,6 +45,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-barang-klp','Toko\FilterController@getFilterKlpBarang');
     $router->get('filter-tahun-keu','Toko\FilterController@getFilterTahun');
     $router->get('filter-bukti-mutasi','Toko\FilterController@getFilterBuktiMutasi');
+    $router->get('filter-pp-keu','Toko\FilterController@getFilterPP');
 
     //Laporan
     $router->get('lap-barang','Toko\LaporanController@getReportBarang');
@@ -71,7 +72,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-nrclajur-bulan','Toko\LaporanKeuLanjutController@getNrcLajurBulan');
     $router->get('lap-labarugi-bulan','Toko\LaporanKeuLanjutController@getLabaRugiBulan');
     $router->get('lap-neraca-bulan','Toko\LaporanKeuLanjutController@getNeracaBulan');
-
+    $router->get('lap-labarugi-unit','Toko\LaporanKeuLanjutController@getLabaRugiUnit');
+    $router->get('lap-labarugi-unit-dc','Toko\LaporanKeuLanjutController@getLabaRugiUnitDC');
     
     $router->post('send-laporan','Toko\LaporanController@sendMail');
     $router->post('send-email','EmailController@send');
