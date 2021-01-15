@@ -68,7 +68,7 @@ class MutasiController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql1 = "select tanggal, substring(no_bukti,1,2) as jenis, no_bukti, no_dokumen, keterangan, param1, param2 
+            $sql1 = "select tanggal, substring(no_bukti,1,2) as jenis, no_bukti, no_dokumen, keterangan, param1, param2, no_ref2 as no_kirim 
             from trans_m where no_bukti = '$no_bukti' and kode_lokasi = '$kode_lokasi'";
             $sql3 = "select no_ref2 from trans_m no_bukti = '$no_bukti' and kode_lokasi = '$kode_lokasi'";
             $res = DB::connection($this->sql)->select($sql1);
