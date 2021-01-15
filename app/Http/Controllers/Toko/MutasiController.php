@@ -17,6 +17,45 @@ class MutasiController extends Controller {
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
+    public function getDataBarangMutasiKirim(Request $request) {
+        $this->validate($request,[
+            'no_bukti' => 'required'
+        ]);
+
+        try {
+            $no_bukti = $request->no_bukti;
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql1 = "select b.kode_barang,b.nama,a.satuan,a.jumlah as stok
+                from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti = '$no_bukti' and a.kode_lokasi= '$kode_lokasi' order by a.nu";
+            $res = DB::connection($this->sql)->select($sql1);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail'] = $res2;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['detail'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $th) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getMutasiDetail(Request $request) {
         $this->validate($request,[
             'no_bukti' => 'required'
