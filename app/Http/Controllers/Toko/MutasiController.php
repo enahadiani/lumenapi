@@ -49,7 +49,7 @@ class MutasiController extends Controller {
                 return response()->json(['success'=>$success], $this->successStatus);
             }
 
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
