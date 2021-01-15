@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class FilterController extends Controller
+class FilterAktapController extends Controller
 {
     /**
      * Display a listing of the resource.
