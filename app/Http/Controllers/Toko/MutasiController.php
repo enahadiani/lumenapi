@@ -151,8 +151,8 @@ class MutasiController extends Controller {
             }
             $no_bukti = $request->no_bukti;
             
-            DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
-            DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -162,7 +162,7 @@ class MutasiController extends Controller {
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jurnal gagal dihapus ".$e;
+            $success['message'] = "Data Mutasi gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
