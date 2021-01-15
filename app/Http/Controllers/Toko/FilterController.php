@@ -27,8 +27,8 @@ class FilterController extends Controller
             }
             
             $col_array = array('jenis');
-            $db_col_name = array('a.no_bukti');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $db_col_name = array('no_bukti');
+            $where = "where kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
                 if(ISSET($request->input($col_array[$i])[0])){
@@ -41,7 +41,7 @@ class FilterController extends Controller
                         } else {
                             $jenis = "MT";
                         }
-                        $where .= " and ".$db_col_name[$i]." like %".$jenis."";
+                        $where .= " and ".$db_col_name[$i]." like '%".$jenis."'";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
