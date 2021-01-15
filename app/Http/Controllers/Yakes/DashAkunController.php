@@ -163,14 +163,14 @@ class DashAkunController extends Controller
             $tahunBef = strval($tahunBef);
             $perBef = $tahunBef.substr($request->periode,4,2); 
 
-            $sql = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_now, sum(rka_claim) as rka_now
+            $sql = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk end) as jum_now, sum(rka_claim) as rka_now
                     from dash_peserta 
                     where jenis ='".$jenis."' and periode = '".$request->periode."' ".$filterLokasi;
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
-            $sql2 = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk+pas+anak end) as jum_bef
+            $sql2 = "select sum(case when jenis = 'PENSIUN' then (2 * kk)+jd else kk end) as jum_bef
                     from dash_peserta 
                     where jenis ='".$jenis."' and periode = '".$perBef."' ".$filterLokasi;
 
