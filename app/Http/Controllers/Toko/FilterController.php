@@ -41,7 +41,7 @@ class FilterController extends Controller
                         } else {
                             $jenis = "MT";
                         }
-                        $where .= " and ".$db_col_name[$i]." like %'".$jenis."'";
+                        $where .= " and ".$db_col_name[$i]." like %".$jenis."";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
