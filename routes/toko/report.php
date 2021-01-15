@@ -67,8 +67,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-neraca-komparasi','Toko\LaporanKeuLanjutController@getNeracaKomparasi');
     $router->get('lap-labarugi-komparasi','Toko\LaporanKeuLanjutController@getLabaRugiKomparasi');
     $router->get('lap-coa','Toko\LaporanKeuLanjutController@getCOA');
+    $router->get('lap-coa-struktur','Toko\LaporanKeuLanjutController@getCOAStruktur');
     $router->get('lap-nrclajur-bulan','Toko\LaporanKeuLanjutController@getNrcLajurBulan');
     $router->get('lap-labarugi-bulan','Toko\LaporanKeuLanjutController@getLabaRugiBulan');
+    $router->get('lap-neraca-bulan','Toko\LaporanKeuLanjutController@getNeracaBulan');
 
     
     $router->post('send-laporan','Toko\LaporanController@sendMail');
