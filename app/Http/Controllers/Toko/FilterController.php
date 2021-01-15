@@ -902,7 +902,8 @@ class FilterController extends Controller
             
             $res = array(
                 0 => array('kode' => 'Saldo Akhir'),
-                1 => array('kode' => 'Mutasi')
+                1 => array('kode' => 'Mutasi'),
+                2 => array('kode' => 'DC')
             );
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
