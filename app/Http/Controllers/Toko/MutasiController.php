@@ -140,6 +140,34 @@ class MutasiController extends Controller {
         }
     }
 
+    public function destroy(Request $request)
+    {
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($res =  Auth::guard($this->guard)->user()){
+                $nik= $res->nik;
+                $kode_lokasi= $res->kode_lokasi;
+            }
+            $no_bukti = $request->no_bukti;
+            
+            DB::connection($this->sql)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+            DB::connection($this->sql)->table('brg_trans_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $data[0]['no_bukti'])->delete();
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Mutasi Barang berhasil dihapus";
+            
+            return response()->json(['success'=>$success], $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Jurnal gagal dihapus ".$e;
+            
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    }
+
     public function update(Request $request) {
         $this->validate($request, [
             'mutasi' => 'required|array',
