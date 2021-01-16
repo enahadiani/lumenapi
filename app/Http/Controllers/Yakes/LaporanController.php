@@ -1776,11 +1776,8 @@ class LaporanController extends Controller
             */
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='A' 
-                 union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
-                 from exs_neraca a
-                 $where and a.modul='P'  ";
+                 $where and a.modul='M'
+                 order by a.rowindex  ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             /*
