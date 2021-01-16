@@ -20,7 +20,7 @@ class LaporanController extends Controller
     public $guard = 'admin';
     public $sql = 'sqlsrv';
 
-    function getSiswa(Request $request){
+    function getLapSiswa(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
