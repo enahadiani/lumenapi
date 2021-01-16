@@ -25,7 +25,7 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql="select a.lokasi,a.nama from lokasi a where a.kode_lokasi='$kode_lokasi' ";
+            $sql="select a.kode_lokasi,a.nama from lokasi a where a.kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
