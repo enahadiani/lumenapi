@@ -173,7 +173,7 @@ class BayarController extends Controller
      * @param  \App\Jurnal  $Jurnal
      * @return \Illuminate\Http\Response
      */
-    public function destroy($no_bayar)
+    public function destroy(Request $request)
     {
         DB::connection($this->db)->beginTransaction();
         
@@ -182,6 +182,8 @@ class BayarController extends Controller
                 $nik= $res->nik;
                 $kode_lokasi= $res->kode_lokasi;
             }
+
+            $no_bayar = $request->no_bayar;
             
             $del1 = DB::connection($this->db)->table('dev_bayar_m')->where('kode_lokasi', $kode_lokasi)->where('no_bayar', $no_bayar)->delete();
 
