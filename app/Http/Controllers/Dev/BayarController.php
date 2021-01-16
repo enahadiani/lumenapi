@@ -154,7 +154,7 @@ class BayarController extends Controller
             }	
             
             DB::connection($this->db)->commit();
-            $success['status'] = $sts;
+            $success['status'] = true;
             $success['no_bayar'] = $request->no_bayar;
             $success['message'] = "Data Pembayaran berhasil diubah ";
             return response()->json($success, $this->successStatus); 
