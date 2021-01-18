@@ -334,4 +334,99 @@ class DashInvesController extends Controller
         }      
     }
 
+    function curl_sql($i){
+        if($i == 22000){
+            $sts = false;
+        }else{
+            $sts = true;
+        }
+        $res['status'] = $sts;
+        return $res;
+    }
+    function cek(){
+       
+        $begin = "SET NOCOUNT on;
+        BEGIN tran;
+        ";
+        $commit = "commit tran;";
+        $sql = "";
+        $i=1;
+        // $total = 0;
+        // while($i <= 22705){
+        //     $sql .= ";";
+        //     if($i % 1000 == 0){
+        //         $sql = $sql;
+                
+        //         $response['curl'][] = strlen($sql);
+        //         $total +=strlen($sql);
+        //         $sql = "";
+        //     }
+        //     if($i == 22705 && ($i % 1000 != 0) ){
+        //         $sql = $sql;
+                
+        //         $response['curl'][] = strlen($sql);
+        //         $total +=strlen($sql);
+               
+        //         $sql = "";
+        //     }
+        //     $i++;
+        // }
+
+        $sts_loop = true;
+        $msg_loop = "";
+        $c = 1;
+        $total = 0;
+        $x=0;
+        while($i <= 22705){
+            $sql .= ";";
+            $x++;
+            if($i % 1000 == 0){
+                $sql = $sql;
+                // $len = strlen($sql);
+                // $sql2 .= "INSERT INTO sql_tmp (sql,periode,kode_lokasi,nik_user) values ('$sql','".$_POST['periode']."','$kode_lokasi','".$nik.$len."'); ";
+                $curl = $this->curl_sql($i);
+                $response['curl'][] = $curl;
+                if(!$curl['status']){
+                    $sts_loop = false;
+                    $msg_loop .= "gagal di looping 1000 ke ".$c;
+                }else{
+                    $total +=1000;
+                }
+                $sql = "";
+                $x = 0;
+                $c++;
+            }
+            if($i == 22705 && ($i % 1000 != 0) ){
+                $sql = $sql;
+                
+                $curl = $this->curl_sql($i);
+                $response['curl'][] = $curl;
+                if(!$curl['status']){
+                    $sts_loop = false;
+                    $msg_loop .= "gagal sync di looping 1000 ke ".$c;
+                }else{
+                    
+                    $total +=$x;
+                }
+                // $len = strlen($sql);
+                // $sql2 .= "INSERT INTO sql_tmp (sql,periode,kode_lokasi,nik_user) values ('$sql','".$_POST['periode']."','$kode_lokasi','".$nik.$len."'); ";
+                $sql = "";
+                $x = 0;
+                $c++;
+            }
+            $i++;
+        }
+        
+        // $sql2 = $begin.$sql2.$commit;
+        // array_push($exec,$sql2);
+        // $res = executeArray($exec,$err);
+        // if($err == null){
+        $response['sts'] = true;
+        $response['msg'] = "sukses. Total seluruh data: 22705. error: ".$msg_loop.". Total berhasil: ".$total;
+        $response['total'] = $total;
+
+        echo json_encode($response);
+
+    }
+
 }
