@@ -1118,11 +1118,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2,a.rowindex,a.modul
                  from exs_neraca a
-                 $where and a.modul='A' 
+                 $where and a.modul='A'  and a.level_lap <= '$level'
                  union all
                  select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2,a.rowindex,a.modul
                  from exs_neraca a
-                 $where and a.modul='P'
+                 $where and a.modul='P'  and a.level_lap <= '$level'
                  order by modul,rowindex  ";
             
             /*
@@ -1246,11 +1246,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='A' 
+                 $where and a.modul='A' and a.level_lap <= '$level'
                  union all
                  select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='P'  ";
+                 $where and a.modul='P' and a.level_lap <= '$level' ";
 
             /*
             $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
@@ -1351,11 +1351,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_jejer a
-                $where and a.modul='A' 
+                $where and a.modul='A'  and a.level_lap <= '$level'
                 union all
                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_jejer a
-                $where and a.modul='P'  ";
+                $where and a.modul='P'  and a.level_lap <= '$level' ";
 
             $nama="";
            
@@ -1444,11 +1444,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_pp a
-                $where and a.modul='A' 
+                $where and a.modul='A'  and a.level_lap <= '$level'
                 union all
                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_pp a
-                $where and a.modul='P'  ";
+                $where and a.modul='P'   and a.level_lap <= '$level' ";
 
             $nama="";
            
@@ -1489,8 +1489,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs','level');
-            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1517,6 +1517,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
+            $level=$request->input('level')[1];
             $tahun = substr($periode,0,4);
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
@@ -1534,7 +1535,7 @@ class LaporanController extends Controller
                 case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n1,
                 case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n2
                 from exs_neraca a
-                $where and a.modul='L' 
+                $where and a.modul='L' and a.level_lap <= '$level'
                 order by a.rowindex";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1615,6 +1616,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode');
             $kode_fs=$request->input('kode_fs');
+            $level=$request->input('level')[1];
 
             //$sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
             //$res = DB::connection($this->db)->update($sql);
@@ -1623,7 +1625,7 @@ class LaporanController extends Controller
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
                         a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9
                 from exs_neraca_jejer a
-                $where and a.modul='L' 
+                $where and a.modul='L' and a.level_lap <= '$level'
                 order by a.rowindex ";
             //$success['sql2'] = $sql;
             $res = DB::connection($this->db)->select($sql);
@@ -1687,6 +1689,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
+            $level=$request->input('level')[1];
 
             //$sql="exec sp_neraca_dw '$kode_fs','L','S',5,'$periode','$kode_lokasi','$nik_user' ";
             //$res = DB::connection($this->db)->update($sql);
@@ -1698,7 +1701,7 @@ class LaporanController extends Controller
                         case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
                         case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4
                 from exs_neraca_pp a
-                $where and a.modul='L' 
+                $where and a.modul='L' and a.level_lap <= '$level'
                 order by a.rowindex ";
             //$success['sql2'] = $sql;
             $res = DB::connection($this->db)->select($sql);
@@ -1762,6 +1765,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
+            $level=$request->input('level')[1];
             $tahun = substr($periode,0,4);
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
@@ -1777,7 +1781,7 @@ class LaporanController extends Controller
             */
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='M'
+                 $where and a.modul='M' and a.level_lap <= '$level'
                  order by a.rowindex  ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1856,6 +1860,8 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
+            
+            $level=$request->input('level')[1];
             $tahun = substr($periode,0,4);
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
@@ -1870,11 +1876,11 @@ class LaporanController extends Controller
             */
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='A' 
+                 $where and a.modul='A' and a.level_lap <= '$level'
                  union all
                  select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='P'  ";
+                 $where and a.modul='P' and a.level_lap <= '$level' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -1955,6 +1961,7 @@ class LaporanController extends Controller
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
+            $level=$request->input('level')[1];
             $tahun = substr($periode,0,4);
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
@@ -1966,7 +1973,7 @@ class LaporanController extends Controller
             case jenis_akun when  'Beban' then -n1 else -n1 end as n1,
             case jenis_akun when  'Beban' then -n2 else -n2 end as n2
             from neraca_tmp 
-            where nik_user='$nik_user' and kode_fs='$kode_fs' 
+            where nik_user='$nik_user' and kode_fs='$kode_fs' and level_lap <='$level'
             order by rowindex ";
             $res = DB::connection($this->db)->select($sql2);
             $res = json_decode(json_encode($res),true);
