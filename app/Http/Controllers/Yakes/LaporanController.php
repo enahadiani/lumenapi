@@ -1062,8 +1062,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1084,6 +1084,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1118,11 +1120,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2,a.rowindex,a.modul
                  from exs_neraca a
-                 $where and a.modul='A'  and a.level_lap <= '$level'
+                 $where and a.modul='A'
                  union all
                  select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2,a.rowindex,a.modul
                  from exs_neraca a
-                 $where and a.modul='P'  and a.level_lap <= '$level'
+                 $where and a.modul='P'
                  order by modul,rowindex  ";
             
             /*
@@ -1188,8 +1190,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1210,6 +1212,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1246,11 +1250,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='A' and a.level_lap <= '$level'
+                 $where and a.modul='A'
                  union all
                  select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='P' and a.level_lap <= '$level' ";
+                 $where and a.modul='P' ";
 
             /*
             $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
@@ -1305,8 +1309,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1327,6 +1331,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1351,11 +1357,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_jejer a
-                $where and a.modul='A'  and a.level_lap <= '$level'
+                $where and a.modul='A'
                 union all
                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_jejer a
-                $where and a.modul='P'  and a.level_lap <= '$level' ";
+                $where and a.modul='P' ";
 
             $nama="";
            
@@ -1398,8 +1404,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs','kode_pp');
-            $db_col_name = array('a.periode','a.kode_fs','a.kode_pp');
+            $col_array = array('periode','kode_fs','kode_pp','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.kode_pp','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1420,6 +1426,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1444,11 +1452,11 @@ class LaporanController extends Controller
            
             $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_pp a
-                $where and a.modul='A'  and a.level_lap <= '$level'
+                $where and a.modul='A'
                 union all
                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n1,a.n2,a.n3,a.n4
                 from exs_neraca_pp a
-                $where and a.modul='P'   and a.level_lap <= '$level' ";
+                $where and a.modul='P'  ";
 
             $nama="";
            
@@ -1489,8 +1497,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1511,6 +1519,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1535,11 +1545,11 @@ class LaporanController extends Controller
                 case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n1,
                 case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n2
                 from exs_neraca a
-                $where and a.modul='L' and a.level_lap <= '$level'
+                $where and a.modul='L' 
                 order by a.rowindex";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-
+            $success['where'] = $where;
             /*
             $get = DB::connection($this->db)->select("select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'".$tahun."-".$bln."-01')+1,0)) ,112),7,2) as tglakhir");
             $success['tgl_awal'] = $get[0]->tglakhir;
@@ -1588,8 +1598,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1610,6 +1620,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1625,7 +1637,7 @@ class LaporanController extends Controller
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
                         a.n1,a.n2,a.n3,a.n4,a.n5,a.n6,a.n7,a.n8,a.n9
                 from exs_neraca_jejer a
-                $where and a.modul='L' and a.level_lap <= '$level'
+                $where and a.modul='L'
                 order by a.rowindex ";
             //$success['sql2'] = $sql;
             $res = DB::connection($this->db)->select($sql);
@@ -1661,8 +1673,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs','kode_pp');
-            $db_col_name = array('a.periode','a.kode_fs','a.kode_pp');
+            $col_array = array('periode','kode_fs','kode_pp','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.kode_pp','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1683,6 +1695,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1701,7 +1715,7 @@ class LaporanController extends Controller
                         case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
                         case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4
                 from exs_neraca_pp a
-                $where and a.modul='L' and a.level_lap <= '$level'
+                $where and a.modul='L' 
                 order by a.rowindex ";
             //$success['sql2'] = $sql;
             $res = DB::connection($this->db)->select($sql);
@@ -1737,8 +1751,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1759,6 +1773,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1781,7 +1797,7 @@ class LaporanController extends Controller
             */
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='M' and a.level_lap <= '$level'
+                 $where and a.modul='M' 
                  order by a.rowindex  ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -1832,8 +1848,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1854,6 +1870,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1876,11 +1894,11 @@ class LaporanController extends Controller
             */
             $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='A' and a.level_lap <= '$level'
+                 $where and a.modul='A'
                  union all
                  select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
                  from exs_neraca a
-                 $where and a.modul='P' and a.level_lap <= '$level' ";
+                 $where and a.modul='P' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -1933,8 +1951,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','level');
+            $db_col_name = array('a.periode','a.kode_fs','a.level_lap');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -1955,6 +1973,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -1973,7 +1993,7 @@ class LaporanController extends Controller
             case jenis_akun when  'Beban' then -n1 else -n1 end as n1,
             case jenis_akun when  'Beban' then -n2 else -n2 end as n2
             from neraca_tmp 
-            where nik_user='$nik_user' and kode_fs='$kode_fs' and level_lap <='$level'
+            where nik_user='$nik_user' and kode_fs='$kode_fs' 
             order by rowindex ";
             $res = DB::connection($this->db)->select($sql2);
             $res = json_decode(json_encode($res),true);
