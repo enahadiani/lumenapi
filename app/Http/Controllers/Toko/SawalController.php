@@ -87,7 +87,7 @@ class SawalController extends Controller
             $del = DB::connection($this->db)->update("delete from glma where periode='".$request->periode."' and kode_lokasi='$kode_lokasi' ");
 
             $ins2 = DB::connection($this->db)->insert("insert into glma(kode_akun, kode_lokasi, periode, so_akhir,tgl_input)  
-                select kode_akun,kode_lokasi,periode,case when debet <> 0 then debet else kredit end as so_akhir,getdate() as tgl_input
+                select kode_akun,kode_lokasi,periode,case when debet <> 0 then debet else -kredit end as so_akhir,getdate() as tgl_input
                 from xsawal2 
                 where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user' and periode ='$request->periode'           
             ");
