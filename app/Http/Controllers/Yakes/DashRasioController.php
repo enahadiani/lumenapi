@@ -30,7 +30,7 @@ class DashRasioController extends Controller
             from dash_rasio_d a
             inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
             inner join dash_rasio_m c on a.kode_rasio=c.kode_rasio and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS9' and a.kode_rasio='$request->kode_rasio' order by a.kode_rasio";
+            where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS3' and a.kode_rasio='$request->kode_rasio' order by a.kode_rasio";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
