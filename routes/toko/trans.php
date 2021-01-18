@@ -21,6 +21,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('generate-mutasi','Toko\MutasiController@handleNoBukti');
     $router->get('filter-barang-mutasi','Toko\FilterController@getFilterBarangMutasi');
     $router->get('filter-bukti-mutasi-kirim','Toko\FilterController@getFilterBuktiMutasiKirim');
+    $router->get('filter-bukti-mutasi-terima','Toko\FilterController@getFilterBuktiMutasiTerima');
     $router->get('barang-mutasi-detail','Toko\MutasiController@getDetailBarangMutasi');
     $router->get('barang-mutasi-kirim','Toko\MutasiController@getDataBarangMutasiKirim');
     $router->get('mutasi-terima','Toko\MutasiController@getDataMutasiTerima');
