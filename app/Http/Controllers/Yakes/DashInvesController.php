@@ -22,9 +22,9 @@ class DashInvesController extends Controller
 
     function dbResultArray($sql){
     
-        $query = DB::connection($this->db)->select($sql);
-        $query = json_decode(json_encode($sql),true);
-        return $query;
+        $res = DB::connection($this->db)->select($sql);
+        $res = json_decode(json_encode($res),true);
+        return $res;
     }
 
     function getTglAkhir($perAkhir = null){
@@ -40,13 +40,15 @@ class DashInvesController extends Controller
                 select tanggal from inv_rd_kkp  $filter
                 union all 
                 select tanggal from inv_sp_kkp $filter
-                --union all 
-                --select tanggal from inv_depo_kkp $filter
+                union all 
+                select tanggal from inv_depo_kkp $filter
+                --union all
+                --select tanggal from inv_tab_kkp $filter
             ) a
             ";
         $rsta = $this->dbRowArray($sql2);
         if($rsta != NULL){
-            $tglakhir = $rsta[0]->tgl;     
+            $tglakhir = $rsta->tgl;     
         }else{
             $tglakhir = "";     
         }
@@ -188,7 +190,7 @@ class DashInvesController extends Controller
             $periode = $tahun.substr($tgl_akhir,5,2);
             $tahunLalu = intval($tahun)-1;
 
-            $sql = "select kode_klp from inv_persen";
+            $sql = "select distinct kode_klp from inv_persen";
             $res = $this->dbResultArray($sql);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -2915,9 +2917,7 @@ class DashInvesController extends Controller
 
             $tahun = substr($tgl_akhir,0,4);
             $tahunLalu = intval($tahun)-1;
-            $periode2 = $tahun.substr($tgl_akhir,5,2);
-            $periode1 = $tahunLalu."12";
-            $bulan = substr($periode2,4,2);
+            $periode = $tahun.substr($tgl_akhir,5,2);
 
             $sql = "select a.katalis_positif,a.katalis_negatif 
             from inv_issue_d a
