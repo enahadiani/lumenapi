@@ -131,7 +131,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }        
@@ -169,7 +169,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }        
@@ -207,7 +207,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }        
@@ -240,7 +240,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -287,7 +287,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -325,7 +325,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -372,7 +372,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -407,7 +407,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -447,7 +447,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -488,7 +488,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -591,7 +591,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -697,7 +697,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -798,7 +798,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -943,7 +943,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1008,7 +1008,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1077,7 +1077,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1168,7 +1168,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1394,7 +1394,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1426,7 +1426,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1458,7 +1458,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1558,7 +1558,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1629,7 +1629,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1816,7 +1816,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1882,7 +1882,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -1918,7 +1918,7 @@ class DashInvesController extends Controller
             return response()->json($success, $this->successStatus);                 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2187,7 +2187,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2223,7 +2223,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2265,7 +2265,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2423,7 +2423,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2505,7 +2505,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2584,7 +2584,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2661,7 +2661,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2750,7 +2750,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2798,7 +2798,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2847,7 +2847,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2896,7 +2896,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2942,7 +2942,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -2979,7 +2979,7 @@ class DashInvesController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -3017,7 +3017,7 @@ class DashInvesController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -3089,7 +3089,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -3158,7 +3158,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -3230,7 +3230,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -3294,7 +3294,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
@@ -3388,7 +3388,7 @@ class DashInvesController extends Controller
             
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Internal Server Error";
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }      
