@@ -79,7 +79,57 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     $router->get('rasio','Yakes\DashRasioController@dataRasio');
     $router->get('klp-rasio','Yakes\DashRasioController@klpRasio');
-    
+
+    // Dashboard Investasi
+    // FILTER
+    $router->get('filter-plan','Yakes\DashInvesController@getFilterPlan');
+    $router->get('filter-klp','Yakes\DashInvesController@getFilterKlp'); //komposisi
+    $router->get('filter-kolom','Yakes\DashInvesController@getFilKolom');
+    $router->post('filter-kolom','Yakes\DashInvesController@simpanFilterKolom');
+    $router->post('filter-tgl','Yakes\DashInvesController@updateTgl');
+    $router->post('filter-param','Yakes\DashInvesController@updateParam');
+    // GLOBAL MARKET
+    $router->get('global-market','Yakes\DashInvesController@getKatalis');
+     
+    // PERGERAKAN BINDO & JCI
+    $router->get('chart-index','Yakes/DashInvesController@getBMark');
+    $router->get('global-index','Yakes/DashInvesController@getGlobalIndex');
+    $router->get('bond-index','Yakes/DashInvesController@getBondIndex');
+
+    // ALOKASI ASET
+    $router->get('persen-aset','Yakes/DashInvesController@getPersenAset');
+    $router->get('table-alokasi','Yakes/DashInvesController@getTableAlokasi'); 
+    $router->get('roi-kkp','Yakes/DashInvesController@getRoiKkp');
+
+    // REALISASI INVEST
+    $router->get('portofolio','Yakes/DashInvesController@getPortofolio'); 
+    $router->get('persen','Yakes/DashInvesController@getBatasAlokasi'); 
+    $router->get('aset-chart','Yakes/DashInvesController@getAset'); 
+
+    // ROI
+    $router->get('table-real-hasil','Yakes/DashInvesController@getRealHasil');  
+    $router->get('table-roi','Yakes/DashInvesController@getROIReal'); 
+
+    // PLAN ASET
+    $router->get('plan-aset','Yakes/DashInvesController@getPlanAset');
+
+    // KINERJA
+    $router->get('kinerja-plan-aset','Yakes/DashInvesController@getKinerja');
+    $router->get('etf','Yakes/DashInvesController@getKinerjaETF');
+    $router->get('bindo','Yakes/DashInvesController@getKinerjaBindo');
+    $router->get('bmark','Yakes/DashInvesController@getKinerjaBMark');
+
+    // CASHOUT
+    $router->get('cash-out','Yakes/DashInvesController@getCashOut');
+
+    // Portofolio Fix Income
+    $router->get('table-portofolio','Yakes/DashInvesController@getTableObli');
+    $router->get('komposisi','Yakes/DashInvesController@getKomposisi');
+    $router->get('rating','Yakes/DashInvesController@getRating');
+
+    // TENOR
+    $router->get('komposisi','Yakes/DashInvesController@getKomposisiTenor');
+    $router->get('tenor','Yakes/DashInvesController@getTenor');
     
 });
 
