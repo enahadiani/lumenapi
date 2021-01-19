@@ -77,14 +77,11 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('dataKapitasiLokasi','Yakes\DashBPJSController@dataKapitasiLokasi');
     $router->get('dataClaimLokasi','Yakes\DashBPJSController@dataClaimLokasi');
 
-
-    
     $router->get('rasio','Yakes\DashRasioController@dataRasio');
     $router->get('klp-rasio','Yakes\DashRasioController@klpRasio');
     
     
 });
-$router->get('cek','Yakes\DashInvesController@cek');
 
 
 
