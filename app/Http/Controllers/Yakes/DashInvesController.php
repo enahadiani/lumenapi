@@ -40,10 +40,8 @@ class DashInvesController extends Controller
                 select tanggal from inv_rd_kkp  $filter
                 union all 
                 select tanggal from inv_sp_kkp $filter
-                union all 
-                select tanggal from inv_depo_kkp $filter
-                union all
-                select tanggal from inv_tab_kkp $filter
+                --union all 
+                --select tanggal from inv_depo_kkp $filter
             ) a
             ";
         $rsta = $this->dbRowArray($sql2);
