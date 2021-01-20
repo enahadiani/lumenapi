@@ -1017,6 +1017,7 @@ class AuthController extends Controller
                 $filter = "";
             }
 
+            $sql = "";
             $begin = "SET NOCOUNT on;
             BEGIN tran;
             ";
