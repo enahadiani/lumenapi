@@ -1016,13 +1016,28 @@ class AuthController extends Controller
             }else{
                 $filter = "";
             }
-            $users = DB::connection($db)->select("select nik,pass from $table where isnull(password,'-')= '-' $filter order by nik ");
 
+            $begin = "SET NOCOUNT on;
+            BEGIN tran;
+            ";
+            $commit = "commit tran;";
+
+            $users = DB::connection($db)->select("select nik,pass from $table where isnull(password,'-')= '-' $filter order by nik ");
+            $i=1;
             foreach ($users as $user) {
-                DB::connection($db)->table($table)
-                        ->where('nik', $user->nik)
-                        ->where('password',NULL)
-                        ->update(['password' => app('hash')->make($user->pass)]);
+                $sql .= " update $table set password = '".app('hash')->make($user->pass)."' where nik='$user->nik' and password is null ";
+                if($i % 1000 == 0){
+                    $sql = $begin.$sql.$commit;
+                    $ins[] = DB::connection($db)->update($sql);
+                    $sql = "";
+                }
+                if($i == count($users) && ($i % 1000 != 0) ){
+                    $sql = $begin.$sql.$commit;
+                    
+                    $ins[] = DB::connection($db)->update($sql);
+                    $sql = "";
+                }
+               $i++;
             }
                 
             DB::connection($db)->commit();
