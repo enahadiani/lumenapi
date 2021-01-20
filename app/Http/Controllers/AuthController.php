@@ -1006,7 +1006,7 @@ class AuthController extends Controller
 
     }
 
-    public function hashPasswordCostum($db,$table,$top,$kode_pp=null){
+    public function hashPasswordCostum($db,$table,$kode_pp=null){
         DB::connection($db)->beginTransaction();
         
         try {
@@ -1016,7 +1016,7 @@ class AuthController extends Controller
             }else{
                 $filter = "";
             }
-            $users = DB::connection($db)->select("select top $top nik,pass from $table where isnull(password,'-')= '-' $filter order by nik ");
+            $users = DB::connection($db)->select("select nik,pass from $table where isnull(password,'-')= '-' $filter order by nik ");
 
             foreach ($users as $user) {
                 DB::connection($db)->table($table)

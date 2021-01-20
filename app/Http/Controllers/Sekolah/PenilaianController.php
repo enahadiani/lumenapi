@@ -248,6 +248,30 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_matpel)){
+                $filter .= " and a.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->persen)){
+                if($request->persen == "= 0"){
+                    $filter .= " and isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) = 0 ";
+                }else if($request->persen == "= 100"){
+                    $filter .= " and isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) = 100 ";
+                }else if($request->persen == "< 100"){
+                    $filter .= " and isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) < 100 ";
+                }
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_kelas)){
+                $filter .= " and a.kode_kelas='$request->kode_kelas' ";
+            }else{
+                $filter .= "";
+            }
+
             if(isset($request->kode_sem)){
                 $filter .= " and a.kode_sem='$request->kode_sem' ";
             }else{
@@ -255,7 +279,7 @@ class PenilaianController extends Controller
             }
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
-            ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) as persen
+            ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) as persen, d.skode as singkatan_matpel,d.nama as nama_matpel,convert(varchar,a.tgl_input,103) as tgl
             from sis_nilai_m a
 			inner join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
 				from sis_nilai 
@@ -264,7 +288,8 @@ class PenilaianController extends Controller
 			left join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
 				from sis_nilai_dok 
 				group by no_bukti,kode_lokasi,kode_pp
-			) c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            ) c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            inner join sis_matpel d on a.kode_matpel=d.kode_matpel and a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='".$kode_lokasi."' and a.nik_user='$nik' $filter");
             $res = json_decode(json_encode($res),true);
             
