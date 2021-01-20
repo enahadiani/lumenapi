@@ -1875,6 +1875,13 @@ class DashInvesController extends Controller
                 }
             }
 
+            $sql = "select max(bindo) as max,min(bindo) as min
+            from inv_bmark $filter
+            ";
+            $rsMax=$this->dbRowArray($sql);
+            $success['max_bindo'] = (isset($rsMax->max) ? intval($rsMax->max) : 0 );
+            $success['min_bindo'] = (isset($rsMax->min) ? intval($rsMax->min) : 0 );
+
             $success["data"][0] = array("type"=>"spline","name" => 'BINDO', "color"=>$warna[0],"data" => $result['bindo'],"showInLegend"=>true,"turboThreshold"=>5000 );
 
             $sql = "select tanggal as tgl,
@@ -1889,6 +1896,13 @@ class DashInvesController extends Controller
                     $result['jci'][] = array($row->tgl,floatval($row->total));
                 }
             }
+            
+            $sql = "select max(ihsg) as max,min(ihsg) as min
+            from inv_bmark $filter
+            ";
+            $rsMax2=$this->dbRowArray($sql);
+            $success['max_jci'] = (isset($rsMax2->max) ? intval($rsMax2->max) : 0 );
+            $success['min_jci'] = (isset($rsMax2->min) ? intval($rsMax2->min) : 0 );
 
             $success["data"][1] = array("type"=>"spline","yAxis"=>1,"name" => 'JCI', "color"=>$warna[1],"data" => $result['jci'],"showInLegend"=>true,"turboThreshold"=>5000 );
             
