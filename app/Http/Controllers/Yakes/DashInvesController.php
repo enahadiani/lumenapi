@@ -75,7 +75,37 @@ class DashInvesController extends Controller
         $result["kode_plan"] = $kode_plan;
         $result["kode_klp"] = $kode_klp;
         return $result;
-    }   
+    }  
+    
+    function getParamDefault(){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $param = $this->getParam($nik);
+            $success['tgl_akhir'] = $param['tgl_akhir'];
+            $success['kode_plan'] = $param['kode_plan'];
+            $success['kode_klp'] = $param['kode_klp'];
+            $success['tgl_akhirx'] = $this->getTglAkhir();
+
+            $res = $this->dbRowArray("select nama from inv_plan where kode_plan='".$param['kode_plan']."' ");
+            $nama_plan = (isset($res->nama) ? $res->nama : '-');
+            $success['nama_plan'] = $nama_plan;
+            $success['status'] = true;
+            $success['message'] = "Success!";     
+            
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error".$e;
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }      
+    }  
 
     public function getFilKolom(Request $request) {
         
@@ -145,16 +175,9 @@ class DashInvesController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $param = $this->getParam($nik);
-            $tgl_akhir = $param['tgl_akhir'];
-            $tahun = substr($tgl_akhir,0,4);
-            $periode = $tahun.substr($tgl_akhir,5,2);
-            $tahunLalu = intval($tahun)-1;
 
             $sql = "select kode_plan,nama from inv_plan";
             $res = $this->dbResultArray($sql);
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['daftar'] = $res;
@@ -183,16 +206,9 @@ class DashInvesController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $param = $this->getParam($nik);
-            $tgl_akhir = $param['tgl_akhir'];
-            $tahun = substr($tgl_akhir,0,4);
-            $periode = $tahun.substr($tgl_akhir,5,2);
-            $tahunLalu = intval($tahun)-1;
 
             $sql = "select distinct kode_klp from inv_persen";
             $res = $this->dbResultArray($sql);
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['daftar'] = $res;

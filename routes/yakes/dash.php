@@ -82,12 +82,14 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     // Dashboard Investasi
     // FILTER
+    
+    $router->get('param-default','Yakes\DashInvesController@getParamDefault');
     $router->get('filter-plan','Yakes\DashInvesController@getFilterPlan');
     $router->get('filter-klp','Yakes\DashInvesController@getFilterKlp'); //komposisi
     $router->get('filter-kolom','Yakes\DashInvesController@getFilKolom');
     $router->post('filter-kolom','Yakes\DashInvesController@simpanFilterKolom');
-    $router->post('filter-tgl','Yakes\DashInvesController@updateTgl');
-    $router->post('filter-param','Yakes\DashInvesController@updateParam');
+    $router->post('update-tgl','Yakes\DashInvesController@updateTgl');
+    $router->post('update-param','Yakes\DashInvesController@updateParam');
     // GLOBAL MARKET
     $router->get('global-market','Yakes\DashInvesController@getKatalis');
      
