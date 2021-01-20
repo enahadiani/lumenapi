@@ -2173,11 +2173,11 @@ class DashInvesController extends Controller
 
             array_push($success['series1'],round(floatval($success["total"][0]["sawal"])/1000000000000,2));
             array_push($success['series2'],round(floatval($success["total"][0]["nab_now"])/1000000000000,2));
-            $success['sql']=$sql;
-            $success['sql2']=$sql2;
-            $success['sql3']=$sql3;
-            $success['sql4']=$sql4;
-            $success['sql5']=$sql5;
+            // $success['sql']=$sql;
+            // $success['sql2']=$sql2;
+            // $success['sql3']=$sql3;
+            // $success['sql4']=$sql4;
+            // $success['sql5']=$sql5;
             $success['name2']=$periode;
             $success['name1']=$tahunLalu."12";
             
@@ -2834,7 +2834,7 @@ class DashInvesController extends Controller
             $sql = "select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'$tahun-$bulan-01')+1,0)) ,112),7,2) as tglakhir ";
             $cek = DB::connection($this->db)->select($sql);
             if(count($cek)>0){
-                $tgl = $tahun."-".$bulan."-".$cek->fields[0];
+                $tgl = $tahun."-".$bulan."-".$cek[0]->tglakhir;
                 $sql = "select ihsg,dwjg,sgc,hsi,nikkei,lq45 from inv_bmark where tanggal ='$tahunLalu-12-31' ";
                 $success['nil1'] = $this->dbResultArray($sql);
                 $sql = "select ihsg,dwjg,sgc,hsi,nikkei,lq45 from inv_bmark where tanggal ='$tgl' ";
@@ -2883,7 +2883,7 @@ class DashInvesController extends Controller
             $sql = "select substring(convert(varchar,  dateadd(s,-1,dateadd(mm, datediff(m,0,'$tahun-$bulan-01')+1,0)) ,112),7,2) as tglakhir ";
             $cek = DB::connection($this->db)->select($sql);
             if(count($cek)>0){
-                $tgl = $tahun."-".$bulan."-".$cek->fields[0];
+                $tgl = $tahun."-".$bulan."-".$cek[0]->tglakhir;
                 $sql = "select yy10ind,yy10us,yy10jp from inv_bmark where tanggal ='$tahunLalu-12-31' ";
                 $success['nil1'] = $this->dbResultArray($sql);
                 $sql = "select yy10ind,yy10us,yy10jp from inv_bmark where tanggal ='$tgl' ";
@@ -3340,8 +3340,6 @@ class DashInvesController extends Controller
                     case when e.jenis = 'PEMERINTAH' then 1 else 2 end as basis,
                     isnull(h.h_wajar,100) as price, 
                     isnull(h.yield,0) as yield,
-                    
-                    
                     dbo.mduration (c.persen/100, (cast (datediff(day,'$tgl_akhir',c.tgl_selesai) as float) / (case when e.jenis = 'PEMERINTAH' then 365 else 360 end)), 
                     case when e.jenis = 'PEMERINTAH' then 2 else 4 end, a.p_price/100 , isnull(h.h_wajar,100)/100,isnull(h.yield,0)/100  ) as mo_duration,
                     
