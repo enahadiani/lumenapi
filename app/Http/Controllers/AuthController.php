@@ -1025,6 +1025,7 @@ class AuthController extends Controller
 
             $users = DB::connection($db)->select("SET NOCOUNT on; BEGIN tran; select nik,pass from $table where isnull(password,'-')= '-' $filter order by nik;commit tran; ");
             $i=1;
+            set_time_limit(300);
             foreach ($users as $user) {
                 $sql .= " update $table set password = '".app('hash')->make($user->pass)."' where nik='$user->nik' and password is null ";
                 if($i % 1000 == 0){
