@@ -1023,7 +1023,7 @@ class AuthController extends Controller
             ";
             $commit = "commit tran;";
 
-            $users = DB::connection($db)->select("select nik,pass from $table where isnull(password,'-')= '-' $filter order by nik ");
+            $users = DB::connection($db)->select("SET NOCOUNT on; BEGIN tran; select nik,pass from $table where isnull(password,'-')= '-' $filter order by nik;commit tran; ");
             $i=1;
             foreach ($users as $user) {
                 $sql .= " update $table set password = '".app('hash')->make($user->pass)."' where nik='$user->nik' and password is null ";
@@ -1034,11 +1034,10 @@ class AuthController extends Controller
                 }
                 if($i == count($users) && ($i % 1000 != 0) ){
                     $sql = $begin.$sql.$commit;
-                    
                     $ins[] = DB::connection($db)->update($sql);
                     $sql = "";
                 }
-               $i++;
+                $i++;
             }
                 
             DB::connection($db)->commit();
