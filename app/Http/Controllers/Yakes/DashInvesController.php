@@ -1926,7 +1926,7 @@ class DashInvesController extends Controller
             'kolom4' => 'required',
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -1934,14 +1934,14 @@ class DashInvesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
            
-            $del = DB::connection($this->sql)->table('inv_filter_kolom')
+            $del = DB::connection($this->db)->table('inv_filter_kolom')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('nik', $request->nik)
             ->delete();
             
-            $ins = DB::connection($this->sql)->insert("insert into inv_filter_kolom (kode_lokasi,kode_kolom,kode_form,isi_kolom,nik,flag_grafik) values ('$kode_lokasi','k1','ALOKASI','".$request->kolom1."','$nik_user','0'),('$kode_lokasi','k2','ALOKASI','".$request->kolom2."','$nik_user','0'),('$kode_lokasi','k3','ALOKASI','".$request->kolom3."','$nik_user','0'),('$kode_lokasi','k4','ALOKASI','".$request->kolom4."','$nik_user','0'); ");
+            $ins = DB::connection($this->db)->insert("insert into inv_filter_kolom (kode_lokasi,kode_kolom,kode_form,isi_kolom,nik,flag_grafik) values ('$kode_lokasi','k1','ALOKASI','".$request->kolom1."','$nik','0'),('$kode_lokasi','k2','ALOKASI','".$request->kolom2."','$nik','0'),('$kode_lokasi','k3','ALOKASI','".$request->kolom3."','$nik','0'),('$kode_lokasi','k4','ALOKASI','".$request->kolom4."','$nik','0'); ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Filter berhasil diubah";
             
