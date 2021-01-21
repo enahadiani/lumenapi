@@ -33,16 +33,16 @@ class DashRasioController extends Controller
             where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS3' and a.kode_rasio='$request->kode_rasio' order by a.kode_rasio";
             */
             $sql="select a.kode_rasio,a.kode_lokasi,a.kode_neraca,c.rumus, c.nama as nama_rasio,a.nama,b.periode,
-            isnull(b.nilai2,0) as nilai2
+            case when a.jenis='C' then isnull(b.nilai2,0)*-1 else isnull(b.nilai2,0) end  as nilai2
      from dash_rasio_d a
      inner join dash_rasio_m c on a.kode_rasio=c.kode_rasio and a.kode_lokasi=c.kode_lokasi
-     left join (select a.kode_dash as kode_neraca,a.kode_lokasi,b.periode,sum(case when b.jenis_akun='Pendapatan' then b.n4*-1 else b.n4 end) as nilai2
+     left join (select a.kode_dash as kode_neraca,a.kode_lokasi,b.periode,sum(b.n4) as nilai2
              from dash_neraca_d a
              inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
              where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS3'
              group by a.kode_dash,a.kode_lokasi,b.periode
              union all
-             select a.kode_neraca,a.kode_lokasi,b.periode,sum(case when b.jenis_akun='Pendapatan' then b.n4*-1 else b.n4 end) as nilai2
+             select a.kode_neraca,a.kode_lokasi,b.periode,sum(b.n4) as nilai2
              from dash_rasio_d a
              inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
              where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS3'
@@ -97,7 +97,6 @@ class DashRasioController extends Controller
                 }
                 $data[count($data)] = $hasil;
                 $column[count($column)] = $kode;
-                $success['sql'] = $sql;
                 $success['status'] = true;
                 $success['data'] = $data;
                 $success['column'] = $column;
