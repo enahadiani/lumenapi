@@ -45,7 +45,7 @@ class DashRasioController extends Controller
              select a.kode_neraca,a.kode_lokasi,b.periode,sum(b.n4) as nilai2
              from dash_rasio_d a
              inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-             where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS3'
+             where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$request->tahun' and a.kode_fs='FS3' and a.kode_rasio='$request->kode_rasio'
              group by a.kode_neraca,a.kode_lokasi,b.periode
               )b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
      where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS3'  and a.kode_rasio='$request->kode_rasio'
