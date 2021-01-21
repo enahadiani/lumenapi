@@ -251,11 +251,17 @@ class SettingRasioController extends Controller
             where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_neraca,c.nama as nama_neraca,a.nama
-                    from dash_rasio_d a
-                    inner join dash_rasio_m b on a.kode_rasio=b.kode_rasio and a.kode_lokasi=b.kode_lokasi 
-                    inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
-                    where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."' order by a.no");
+            $sql="select a.kode_neraca,c.nama as nama_neraca,a.nama
+            from dash_rasio_d a
+            inner join dash_rasio_m b on a.kode_rasio=b.kode_rasio and a.kode_lokasi=b.kode_lokasi 
+            inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
+            where a.kode_rasio = '$kode_rasio'  and a.kode_lokasi='$kode_lokasi'
+            union all
+            select a.kode_neraca,b.nama as nama_neraca,a.nama
+            from dash_rasio_d a
+            inner join dash_neraca b on a.kode_neraca=b.kode_dash and a.kode_lokasi=b.kode_lokasi 
+            where a.kode_rasio = '$kode_rasio' and a.kode_lokasi='$kode_lokasi' ";
+            $res2 = DB::connection($this->db)->select($sql);
             $res2= json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -295,7 +301,14 @@ class SettingRasioController extends Controller
             if(isset($request->kode_neraca) && $request->kode_neraca != ""){
                 $filter .= " and a.kode_neraca = '$request->kode_neraca' ";
             }
-            $res = DB::connection($this->db)->select("select a.kode_neraca,a.nama from neraca a where a.kode_lokasi='$kode_lokasi' $filter ");						
+            $sql="select a.kode_neraca,a.nama 
+            from neraca a 
+            where a.kode_lokasi='$kode_lokasi' $filter
+            union all
+            select a.kode_dash as kode_neraca,a.nama 
+            from dash_neraca a 
+            where a.kode_lokasi='$kode_lokasi' $filter";
+            $res = DB::connection($this->db)->select($sql);						
             $res= json_decode(json_encode($res),true);
             
            
