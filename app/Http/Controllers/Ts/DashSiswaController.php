@@ -41,71 +41,31 @@ class DashSiswaController extends Controller
             order by a.nis ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,a.periode,
-						b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param,
-						0 as masuk,0 as keluar
-			 from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,0 as bayar,x.periode 
-					from sis_bill_d x 
-					inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-					where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-					group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param,x.periode
-					 )a 
+            $res2 = DB::connection($this->db)->select("select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,
+			b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+			 from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,0 as bayar from sis_bill_d x 
+			inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+			 where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+			group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
 			inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
-			$periode_filter
-			union all 
-			select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
-				convert(varchar(10),b.tanggal,103) as tgl,a.periode,b.keterangan,'PDD' as modul, isnull(a.tagihan,0) as tagihan,
-				isnull(a.bayar,0) as bayar,a.kode_param,0 as masuk,0 as keluar
-			from (select x.kode_lokasi,x.no_rekon,x.kode_param,x.periode,
-						sum(case when x.modul in ('BTLREKON') then x.nilai else 0 end) as tagihan,
-						sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar
-					from sis_rekon_d x 
-					inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-					where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0
-					group by x.modul,x.nilai,x.kode_lokasi,x.no_rekon,x.nis,x.kode_param,x.periode
-				 )a 
+			union all select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+			convert(varchar(10),b.tanggal,103) as tgl,b.keterangan,'PDD' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+			 from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+			case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+			 from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+			where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0
+			 )a 
 			inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi 
-			$periode_filter
 			union all 
 			select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
-				convert(varchar(10),b.tanggal,103) as tgl,a.periode,b.keterangan,'KB' as modul, 
-				isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param,0 as masuk,0 as keluar
-			from (select x.kode_lokasi,x.no_rekon,x.kode_param,x.periode,
-						sum(case when x.modul in ('BTLREKON') then x.nilai else 0 end) as tagihan,
-						sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar
-				    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-					where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-					group by x.modul,x.nilai,x.kode_lokasi,x.no_rekon,x.nis,x.kode_param ,x.periode
-					)a
-					inner join (select tanggal,keterangan,no_kas,kode_lokasi from kas_m where kode_lokasi='$kode_lokasi' union select tanggal,keterangan,no_ju as no_kas,kode_lokasi from ju_m where kode_lokasi='$kode_lokasi') b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
-			$periode_filter
-			union all 
-			select a.no_bukti as no_bukti,a.kode_lokasi,b.tanggal,
-				convert(varchar(10),b.tanggal,103) as tgl,a.periode,b.keterangan,'KB' as modul, 
-				0 as tagihan,0 as bayar,'PDD' as kode_param,isnull(a.masuk,0) as masuk,isnull(a.keluar,0)  as keluar
-			from (select x.kode_lokasi,x.no_bukti,x.kode_param,x.periode,x.modul,
-						sum(case when x.dc='D' then x.nilai else 0 end) as masuk,
-						sum(case when x.dc='C' then x.nilai else 0 end) as keluar
-				    from sis_cd_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-					where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-					group by x.modul,x.nilai,x.kode_lokasi,x.no_bukti,x.nis,x.kode_param ,x.periode
-				  )a
-			inner join (select tanggal,keterangan,no_kas,kode_lokasi from kas_m where kode_lokasi='$kode_lokasi' union select tanggal,keterangan,no_ju as no_kas,kode_lokasi from ju_m where kode_lokasi='$kode_lokasi') b on a.no_bukti=b.no_kas and a.kode_lokasi=b.kode_lokasi 
-			$periode_filter
-			union all 
-			select a.no_bukti as no_bukti,a.kode_lokasi,b.tanggal,
-				convert(varchar(10),b.tanggal,103) as tgl,a.periode,b.keterangan,a.modul, 
-				0 as tagihan,0 as bayar,'PDD' as kode_param ,isnull(a.masuk,0) as masuk,isnull(a.keluar,0)  as keluar
-			from (select x.kode_lokasi,x.no_bukti,x.kode_param,x.periode,x.modul,
-						sum(case when x.dc='D' then x.nilai else 0 end) as masuk,
-						sum(case when x.dc='C' then x.nilai else 0 end) as keluar
-				    from sis_cd_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-					where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-					group by x.modul,x.nilai,x.kode_lokasi,x.no_bukti,x.nis,x.kode_param ,x.periode
-					)a
-			inner join sis_rekon_m b on a.no_bukti=b.no_rekon and a.kode_lokasi=b.kode_lokasi
-			$periode_filter
-			order by tanggal,modul ");
+			convert(varchar(10),b.tanggal,103) as tgl,b.keterangan,'KB' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param 
+			from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+			case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+			 from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+			where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+			)a
+			 inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
+			order by tanggal,modul,kode_param  ");
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
