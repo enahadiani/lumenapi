@@ -41,6 +41,15 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
 
     public function collection()
     {
+        $cek = DB::connection('sqlsrvtarbak')->select("select a.no_bukti from sis_set_absen a where a.kode_kelas ='$this->kode_kelas' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp'");
+        if(count($cek) > 0){
+            $orderby = " a.no_urut ";
+            $orderby2 = " b.no_urut ";
+        }else{
+            $orderby = " a.nama ";
+            $orderby2 = " b.nama ";
+        }
+
         if($this->type == 'template'){
             // $res = DB::connection('sqlsrvtarbak')->table('sis_siswa')
             //         ->select('sis_siswa.nis','sis_siswa.nis2','sis_siswa.nama')
@@ -53,10 +62,10 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
             if($this->flag_kelas == "khusus"){
                 $res = collect(DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama from sis_siswa a 
                 inner join sis_siswa_matpel_khusus b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                where b.kode_kelas ='$this->kode_kelas' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and b.kode_matpel='$this->kode_matpel2' and a.flag_aktif ='1' order by a.nama"));
+                where b.kode_kelas ='$this->kode_kelas' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and b.kode_matpel='$this->kode_matpel2' and a.flag_aktif ='1' order by $orderby "));
             }else{
 
-                $res = collect(DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama from sis_siswa a where a.kode_kelas ='$this->kode_kelas' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and a.flag_aktif ='1' order by a.nama"));
+                $res = collect(DB::connection('sqlsrvtarbak')->select("select a.nis as id,a.nis2 as nis,a.nama from sis_siswa a where a.kode_kelas ='$this->kode_kelas' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and a.flag_aktif ='1' order by $orderby "));
             }
             
         }else{
@@ -77,7 +86,7 @@ class NilaiExport implements FromCollection, WithHeadings, WithColumnFormatting,
             $res = collect(DB::connection('sqlsrvtarbak')->select("select a.nis as id,b.nis2 as nis,b.nama,a.nilai,a.status,a.keterangan,a.nu 
             from sis_nilai_tmp a
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.nik_user ='$this->nik_user' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and b.flag_aktif ='1' order by b.nama"));
+            where a.nik_user ='$this->nik_user' and a.kode_lokasi ='$this->kode_lokasi' and a.kode_pp ='$this->kode_pp' and b.flag_aktif ='1' order by $orderby2 "));
                         
         }
         return $res;

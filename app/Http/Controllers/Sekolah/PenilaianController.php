@@ -474,7 +474,16 @@ class PenilaianController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select a.nis,b.nis2,a.nilai,b.nama from sis_nilai a inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi and b.flag_aktif=1 where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  order by b.nama ");
+            $cek = DB::connection($this->db)->select("select a.no_bukti
+            from sis_set_absen a
+            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$request->kode_pp' and a.kode_kelas='".$res[0]['kode_kelas']."' ");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $orderby = " b.no_urut ";
+            }else{
+                $orderby = " b.nama ";
+            }
+            $res2 = DB::connection($this->db)->select("select a.nis,b.nis2,a.nilai,b.nama from sis_nilai a inner join sis_siswa b on a.nis=b.nis and a.kode_pp=b.kode_pp and a.kode_lokasi =b.kode_lokasi and b.flag_aktif=1 where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti='$request->no_bukti' and a.kode_pp='$request->kode_pp'  order by $orderby ");
             $res2 = json_decode(json_encode($res2),true);
 
             // $res3 = DB::connection($this->db)->select("select 
@@ -712,7 +721,17 @@ class PenilaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select nis,nama from sis_siswa where kode_kelas = '".$request->kode_kelas."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$request->kode_pp."'");
+            $cek = DB::connection($this->db)->select("select a.no_bukti
+            from sis_set_absen a
+            where a.kode_lokasi='".$kode_lokasi."' $filter ");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $orderby = " no_urut ";
+            }else{
+                $orderby = " nama ";
+            }            
+
+            $res = DB::connection($this->db)->select("select nis,nama from sis_siswa where kode_kelas = '".$request->kode_kelas."' and kode_lokasi='".$kode_lokasi."' and kode_pp='".$request->kode_pp."' and flag_aktif=1 order by $orderby ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1034,11 +1053,21 @@ class PenilaianController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
+            $cek = DB::connection($this->db)->select("select a.no_bukti
+            from sis_set_absen a
+            where a.kode_lokasi='".$kode_lokasi."' and a.kode_pp='$kode_pp' and a.kode_kelas='".$res[0]['kode_kelas']."' ");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $orderby = " b.no_urut ";
+            }else{
+                $orderby = " b.nama ";
+            }
+
             $sql2="select a.no_bukti,a.nis,b.nis2,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
             from sis_nilai a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
             left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp' ";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp' order by $orderby ";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             

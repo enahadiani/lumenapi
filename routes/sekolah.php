@@ -305,6 +305,9 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('dash-komposisi-siswa','Sekolah\DashboardController@komposisiSiswa');
     $router->get('dash-chart-nilai','Sekolah\DashboardController@chartNilai');
     $router->get('dash-tingkat','Sekolah\DashboardController@getTingkat');
+
+    $router->get('absen-kelas','Sekolah\AbsenKelasController@show');
+    $router->post('absen-kelas','Sekolah\AbsenKelasController@store');
     
     
 });
