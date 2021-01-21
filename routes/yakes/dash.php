@@ -130,7 +130,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('rating','Yakes\DashInvesController@getRating');
 
     // TENOR
-    $router->get('komposisi','Yakes\DashInvesController@getKomposisiTenor');
+    $router->get('komposisi-tenor','Yakes\DashInvesController@getKomposisiTenor');
     $router->get('tenor','Yakes\DashInvesController@getTenor');
     
 });
