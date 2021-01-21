@@ -107,6 +107,13 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->post('arus-kas-import','Yakes\ArusKasController@importExcel');
     $router->get('arus-kas-tmp','Yakes\ArusKasController@getArusKasTmp');
 
+    $router->get('pendukung','Yakes\PendukungController@index');     
+    $router->get('pendukung-detail','Yakes\PendukungController@show'); 
+    $router->post('pendukung','Yakes\PendukungController@store');
+    $router->put('pendukung','Yakes\PendukungController@update');    
+    $router->delete('pendukung','Yakes\PendukungController@destroy');   
+    $router->get('pendukung-neraca','Yakes\PendukungController@getNeraca');    
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
