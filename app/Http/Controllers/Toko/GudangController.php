@@ -110,7 +110,7 @@ class GudangController extends Controller
             }
             if($this->isUnik($request->kode_gudang,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp,tgl_input) values ('$request->kode_gudang,$kode_lokasi','$request->nama','$request->pic','$request->telp',' $request->alamat','$request->kode_pp',getdate())");
+                $ins = DB::connection($this->sql)->insert("insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp,tgl_input) values ('$request->kode_gudang','$kode_lokasi','$request->nama','$request->pic','$request->telp',' $request->alamat','$request->kode_pp',getdate())");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -176,7 +176,7 @@ class GudangController extends Controller
             ->where('kode_gudang', $request->kode_gudang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp,tgl_input) values ('$request->kode_gudang,$kode_lokasi','$request->nama','$request->pic','$request->telp',' $request->alamat','$request->kode_pp',getdate())");
+            $ins = DB::connection($this->sql)->insert("insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp,tgl_input) values ('$request->kode_gudang','$kode_lokasi','$request->nama','$request->pic','$request->telp',' $request->alamat','$request->kode_pp',getdate())");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
