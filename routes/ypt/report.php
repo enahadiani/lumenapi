@@ -30,6 +30,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-pp','Ypt\FilterController@getFilterPp');
     $router->get('filter-rektor','Ypt\FilterController@getFilterRektor');
     $router->get('filter-fakultas','Ypt\FilterController@getFilterFakultas');
+    $router->get('filter-prodi','Ypt\FilterController@getFilterProdi');
 
     //Laporan lokasi
     $router->get('lap-nrclajur','Ypt\LaporanController@getNrcLajur');
@@ -70,6 +71,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-labarugi-agg-detail','Ypt\LaporanController@getLabaRugiAggDetail');
     $router->get('lap-labarugi-agg-dir-detail','Ypt\LaporanController@getLabaRugiAggDirDetail');
     $router->get('lap-labarugi-agg-fak-detail','Ypt\LaporanController@getLabaRugiAggFakDetail');
+    $router->get('lap-labarugi-agg-prodi-detail','Ypt\LaporanController@getLabaRugiAggProdiDetail');
     $router->get('lap-neraca2-detail','Ypt\LaporanController@getNeraca2Detail');
 
 });
