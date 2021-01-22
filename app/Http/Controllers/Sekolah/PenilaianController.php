@@ -1063,7 +1063,7 @@ class PenilaianController extends Controller
                 $orderby = " b.nama ";
             }
 
-            $sql2="select a.no_bukti,a.nis,b.nis2,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa
+            $sql2="select a.no_bukti,a.nis,b.nis2,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa,a.nilai
             from sis_nilai a 
             inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
             left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
@@ -1495,6 +1495,86 @@ class PenilaianController extends Controller
         
     }
 
+    public function uploadDokSatuan(Request $request){
+        $this->validate($request,[
+            'file' => 'required|max:3072',
+            'no_bukti' => 'required',
+            'kode_pp' => 'required',
+            'nis' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            DB::connection($this->db)->beginTransaction();
+
+            if($request->hasfile('file')){
+
+                $sql = "select file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and nis='$request->nis' and kode_pp='$request->kode_pp' and no_bukti='$request->no_bukti'
+                ";
+                $res = DB::connection($this->db)->select($sql);
+                $res = json_decode(json_encode($res),true);
+                
+                $file = $request->file('file');
+                $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
+                $foto = $nama_foto;
+
+                if(count($res) > 0){
+                    $foto_seb = $res[0]['file_dok'];
+                    if($foto_seb != ""){
+                        Storage::disk('s3')->delete('sekolah/'.$foto_seb);
+                    }
+                    if(Storage::disk('s3')->exists('sekolah/'.$foto)){
+                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                    }
+                    Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                    
+                    $upd =  DB::connection($this->db)->table('sis_nilai_dok')
+                    ->where('nis', $request->nis)
+                    ->where('kode_pp', $request->kode_pp)
+                    ->where('no_bukti', $request->no_bukti)
+                    ->update(['file_dok' => $foto]);
+                }else{
+                    if(Storage::disk('s3')->exists('sekolah/'.$foto)){
+                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                    }
+                    Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                    $cek = "select max(no_urut) as no_urut from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and kode_pp='$request->kode_pp' and no_bukti='$request->no_bukti'
+                    ";
+                    $cek = DB::connection($this->db)->select($cek);
+                    if(count($cek) > 0){
+                        $no_urut = intval($cek[0]->no_urut)+1;
+                    }else{
+                        $no_urut = 0;
+                    }
+                    $ins =  DB::connection($this->db)->insert("insert into sis_nilai_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis)  values ('$request->no_bukti','$kode_lokasi','$foto','$no_urut','-','$request->kode_pp','$request->nis')
+                    ");
+                }
+                
+                DB::connection($this->db)->commit();
+                
+                $success['status'] = true;
+                $success['file_dok'] = $foto;
+                $success['message'] = "Upload File berhasil";
+                return response()->json($success, 200);     
+                
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Upload File gagal";
+                return response()->json($success, 200);
+            }
+
+        } catch (\Throwable $e) {
+            
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
 
 
 }
