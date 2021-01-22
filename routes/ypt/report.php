@@ -28,6 +28,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-bukti-jurnal','Ypt\FilterController@getFilterBuktiJurnal');
     $router->get('filter-mutasi','Ypt\FilterController@getFilterYaTidak');
     $router->get('filter-pp','Ypt\FilterController@getFilterPp');
+    $router->get('filter-rektor','Ypt\FilterController@getFilterRektor');
 
     //Laporan lokasi
     $router->get('lap-nrclajur','Ypt\LaporanController@getNrcLajur');
@@ -66,6 +67,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-investasi','Ypt\LaporanController@getInvestasi');
 
     $router->get('lap-labarugi-agg-detail','Ypt\LaporanController@getLabaRugiAggDetail');
+    $router->get('lap-labarugi-agg-dir-detail','Ypt\LaporanController@getLabaRugiAggDirDetail');
     $router->get('lap-neraca2-detail','Ypt\LaporanController@getNeraca2Detail');
 
 });
