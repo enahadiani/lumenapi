@@ -48,7 +48,50 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select nik,nama,alamat,jabatan,no_telp,email,kode_pp from karyawan 
+            $res = DB::connection($this->sql)->select("select nik,nama,alamat,jabatan,no_telp,email,kode_pp,kode_lokasi from karyawan 
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getLokasi(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->kode_lokasi)){
+                if($request->kode_lokasi == "all"){
+                    $filter = "";
+                }else{
+                    $filter = " and kode_lokasi='$request->kode_lokasi' ";
+                }
+                
+            }
+
+            $res = DB::connection($this->sql)->select("select kode_lokasi,nama from lokasi $filter
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -93,6 +136,7 @@ class KaryawanController extends Controller
         $this->validate($request, [
             'nik' => 'required',
             'nama' => 'required',
+            'kode_lokasi' => 'required',
             'kode_pp' => 'required',
             'alamat' => 'required',
             'jabatan' => 'required',
@@ -111,29 +155,36 @@ class KaryawanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            if($this->isUnik($request->nik)){
 
-            if($request->hasfile('file_gambar')){
-                $file = $request->file('file_gambar');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                // $picName = uniqid() . '_' . $picName;
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('yakes/'.$foto)){
-                    Storage::disk('s3')->delete('yakes/'.$foto);
+                if($request->hasfile('file_gambar')){
+                    $file = $request->file('file_gambar');
+                    
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    // $picName = uniqid() . '_' . $picName;
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('yakes/'.$foto)){
+                        Storage::disk('s3')->delete('yakes/'.$foto);
+                    }
+                    Storage::disk('s3')->put('yakes/'.$foto,file_get_contents($file));
+                }else{
+
+                    $foto="-";
                 }
-                Storage::disk('s3')->put('yakes/'.$foto,file_get_contents($file));
+
+                
+                $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$request->kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+                
+                DB::connection($this->sql)->commit();
+                $success['status'] = true;
+                $success['kode'] = $request->nik;
+                $success['message'] = "Data Karyawan berhasil disimpan";
             }else{
-
-                $foto="-";
+                $success['status'] = false;
+                $success['kode'] = "-";
+                $success['jenis'] = "duplicate";
+                $success['message'] = "Error : Duplicate entry. NIK sudah ada di database!";
             }
-
-            
-            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
-            
-            DB::connection($this->sql)->commit();
-            $success['status'] = true;
-            $success['kode'] = $request->nik;
-            $success['message'] = "Data Karyawan berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
@@ -154,7 +205,8 @@ class KaryawanController extends Controller
     public function show(Request $request)
     {
         $this->validate($request,[
-            'nik' => 'required'
+            'nik' => 'required',
+            'kode_lokasi' => 'required'
         ]);
         try {
             
@@ -166,7 +218,7 @@ class KaryawanController extends Controller
 
             $url = url('api/yakes-auth/storage');
 
-            $sql = "select nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto from karyawan where nik='$request->nik' 
+            $sql = "select nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,case when foto != '-' then '".$url."/'+foto else '-' end as foto from karyawan where nik='$request->nik' and kode_lokasi='$request->kode_lokasi'
             ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -214,6 +266,7 @@ class KaryawanController extends Controller
         $this->validate($request, [
             'nik' => 'required',
             'nama' => 'required',
+            'kode_lokasi' => 'required',
             'kode_pp' => 'required',
             'alamat' => 'required',
             'jabatan' => 'required',
@@ -236,7 +289,7 @@ class KaryawanController extends Controller
 
             if($request->hasfile('file_gambar')){
 
-                $sql = "select foto as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' 
+                $sql = "select foto as file_gambar from karyawan where kode_lokasi='".$request->kode_lokasi."' and nik='$request->nik' 
                 ";
                 $res = DB::connection($this->sql)->select($sql);
                 $res = json_decode(json_encode($res),true);
@@ -264,9 +317,9 @@ class KaryawanController extends Controller
                 $foto="-";
             }
             
-            $del = DB::connection($this->sql)->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
+            $del = DB::connection($this->sql)->table('karyawan')->where('kode_lokasi', $request->kode_lokasi)->where('nik', $request->nik)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            $ins = DB::connection($this->sql)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$request->kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -290,7 +343,8 @@ class KaryawanController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request,[
-            'nik' => 'required'
+            'nik' => 'required',
+            'kode_lokasi' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -300,7 +354,9 @@ class KaryawanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('karyawan')->where('nik', $request->nik)->delete();
+            $del = DB::connection($this->sql)->table('karyawan')
+            ->where('nik', $request->nik)
+            ->where('kode_lokasi', $request->kode_lokasi)->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;

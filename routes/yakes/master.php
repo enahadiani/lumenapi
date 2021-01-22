@@ -104,6 +104,7 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
 
     //Karyawan
     $router->get('karyawan','Yakes\KaryawanController@index');
+    $router->get('lokasi','Yakes\KaryawanController@getLokasi');
     $router->post('karyawan','Yakes\KaryawanController@store');
     $router->get('karyawan-detail','Yakes\KaryawanController@show');
     $router->post('karyawan-ubah','Yakes\KaryawanController@update');
