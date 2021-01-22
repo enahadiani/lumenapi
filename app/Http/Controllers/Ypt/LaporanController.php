@@ -2168,7 +2168,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getLabaRugiFak(Request $request){
+    function getLabaRugiAggFak(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -2176,8 +2176,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $col_array = array('periode','kode_fs','kode_fakultas');
+            $db_col_name = array('a.periode','a.kode_fs','a.kode_fakultas');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -2201,6 +2201,31 @@ class LaporanController extends Controller
                     }
                 }
             }
+
+            $col_array = array('kode_fakultas');
+            $db_col_name = array('a.kode_fakultas');
+            $whererek = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $whererek .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $whererek .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $whererek .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
             $nik_user=$request->nik_user;
             $periode=$request->input('periode')[1];
             $kode_fs=$request->input('kode_fs')[1];
@@ -2208,23 +2233,43 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->db)->update($sql);
+            // $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            // $res = DB::connection($this->db)->update($sql);
+
+            $sql="select a.kode_fakultas,a.nama from exs_fakultas a $whererek order by a.kode_fakultas ";
+            $rs = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+            $kode_fakultas = "";
+            $i=0;
+            foreach($rs as $row){
+                if($i == 0){
+                    $kode_fakultas .= "'$row->kode_fakultas'";
+                }else{
+                    $kode_fakultas .= ","."'$row->kode_fakultas'";
+                }
+                $i++;
+            }
+            $success['whererek'] = $sql;
             
-            $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi,
-            case jenis_akun when  'Pendapatan' then -n1 else n1 end as n1,
-            case jenis_akun when  'Pendapatan' then -n2 else n2 end as n2,
-            case jenis_akun when  'Pendapatan' then -n3 else n3 end as n3,
-            case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4
-            from neraca_tmp 
-            where modul='L' and nik_user='$nik_user' 
-            order by rowindex ";
-            $res = DB::connection($this->db)->select($sql2);
-            $res = json_decode(json_encode($res),true);
+            $sql2="
+            select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_fakultas,
+            case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+            case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+            case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+            case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4,
+            case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
+            case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
+            case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7
+            from exs_neraca_fakultas a
+            $where and a.modul='L' and a.kode_fakultas in ($kode_fakultas)
+            order by a.rowindex";
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -2232,6 +2277,7 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['detail'] = [];
                 $success['status'] = true;
                 // $success['sql'] = $sql;
                 return response()->json($success, $this->successStatus);
@@ -2243,16 +2289,18 @@ class LaporanController extends Controller
         }
     }
 
-    function getLabaRugiAggFak(Request $request){
+    function getLabaRugiAggFakDetail(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+
+            $nik_user=$request->nik_user;
+
             $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
+            $db_col_name = array('a.periode','b.kode_fs');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -2276,30 +2324,33 @@ class LaporanController extends Controller
                     }
                 }
             }
-            $nik_user=$request->nik_user;
-            $periode=$request->input('periode')[1];
-            $kode_fs=$request->input('kode_fs')[1];
-            $tahun = substr($periode,0,4);
-            $bln = substr($periode,4,2);
-            $tahunseb = intval($tahun)-1;
 
-            $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->db)->update($sql);
-            
-            $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi,
-            case jenis_akun when  'Pendapatan' then -n1 else n1 end as n1,
-            case jenis_akun when  'Pendapatan' then -n2 else n2 end as n2,
-            case jenis_akun when  'Pendapatan' then -n3 else n3 end as n3,
-            case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4
-            from neraca_tmp 
-            where modul='L' and nik_user='$nik_user' 
-            order by rowindex ";
-            $res = DB::connection($this->db)->select($sql2);
+            $id = isset($request->id) ? $request->id : '-';
+            $periode = $request->periode[1];
+            $kode = $request->kode;
+
+            $sql = "select a.kode_akun,c.nama,b.kode_fs,
+            sum(case c.jenis when  'Pendapatan' then -n1 else n1 end) as n1,
+            sum(case c.jenis when  'Pendapatan' then -n2 else n2 end) as n2,
+            sum(case c.jenis when  'Pendapatan' then -n3 else n3 end) as n3,
+            sum(case c.jenis when  'Pendapatan' then -n4 else n4 end) as n4,
+            sum(case c.jenis when  'Pendapatan' then -n5 else n5 end) as n5,3 as level_spasi
+            from exs_glma_gar_pp a
+            inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+            inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+            inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+            inner join exs_fakultas_bidang f on e.kode_bidang=f.kode_bidang and e.kode_lokasi=f.kode_lokasi
+            $where and b.kode_neraca='$id' and f.kode_fakultas='$kode'
+            group by a.kode_akun,c.nama,b.kode_fs
+            order by a.kode_akun" ;
+            $success['sql'] = $sql;
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+                
                 $success['data'] = $res;
+                $success['status'] = true;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -2308,7 +2359,7 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                // $success['sql'] = $sql;
+                $success["auth_status"] = 2;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
