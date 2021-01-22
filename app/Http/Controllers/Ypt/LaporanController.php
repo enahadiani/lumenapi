@@ -1857,17 +1857,18 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->db)->update($sql);
+            // $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            // $res = DB::connection($this->db)->update($sql);
             
-            $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,level_spasi,
-            case jenis_akun when  'Pendapatan' then -n1 else n1 end as n1,
-            case jenis_akun when  'Pendapatan' then -n2 else n2 end as n2,
-            case jenis_akun when  'Pendapatan' then -n3 else n3 end as n3,
-            case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4
-            from neraca_tmp 
-            where modul='L' and nik_user='$nik_user' 
-            order by rowindex ";
+            $sql2="
+            select a.kode_neraca,a.kode_fs,kode_lokasi,a.nama,a.tipe,a.level_spasi,a.level_lap,
+            case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+            case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+            case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+            case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4, a.rowindex
+            from exs_neraca a
+			$where and a.modul='L'
+			order by a.rowindex";
             $res = DB::connection($this->db)->select($sql2);
             $res = json_decode(json_encode($res),true);
 
@@ -1933,9 +1934,9 @@ class LaporanController extends Controller
 
             $sql = "select b.kode_fs,a.kode_akun,a.kode_akun+' - '+c.nama as nama,
             case c.jenis when 'Pendapatan' then -a.n1 else a.n1 end as n1, 
-            case c.jenis when 'Pendapatan' then -a.n5 else a.n5 end as n2, 
-            case c.jenis when  'Pendapatan' then -a.n1 else a.n1 end as n3,
-            case c.jenis when 'Pendapatan' then -a.n2 else a.n2 end as n4,3 as level_spasi
+            case c.jenis when 'Pendapatan' then -a.n2 else a.n2 end as n2, 
+            case c.jenis when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+            case c.jenis when 'Pendapatan' then -a.n4 else a.n4 end as n4,3 as level_spasi
             from exs_glma_gar a
             inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
