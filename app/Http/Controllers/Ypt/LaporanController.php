@@ -2726,8 +2726,8 @@ class LaporanController extends Controller
             }
             
             $col_array = array('periode','kode_fs');
-            $db_col_name = array('a.periode','a.kode_fs');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $db_col_name = array('periode','kode_fs');
+            $where = "where kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
             for($i = 0; $i<count($col_array); $i++){
@@ -2757,16 +2757,15 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql="exec sp_neraca2_gar_dw '$kode_fs','N','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";	
-            $res = DB::connection($this->db)->update($sql);
-		
-		    $sql2 = "select kode_neraca,kode_fs,kode_lokasi,tipe,nama,tipe,level_spasi,n3,n4,n1,n2
-			from neraca_tmp 
-			where modul='A' and nik_user='$nik_user' 
+            // $sql="exec sp_Investasi_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            // $res = DB::connection($this->db)->update($sql);
+            
+            $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n4 as n1,n5 as n2,rowindex 
+                from exs_neraca 
+                $where and modul='A'
 			order by rowindex ";
-            $res = DB::connection($this->db)->select($sql2);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -2779,6 +2778,78 @@ class LaporanController extends Controller
                 $success['data'] = [];
                 $success['status'] = true;
                 // $success['sql'] = $sql;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getInvestasiDetail(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $nik_user=$request->nik_user;
+
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','b.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $id = isset($request->id) ? $request->id : '-';
+
+            $sql = "select b.kode_fs,a.kode_akun,a.kode_akun+' - '+c.nama as nama,
+            case c.jenis when 'Pendapatan' then -a.n4 else a.n4 end as n1, 
+            case c.jenis when 'Pendapatan' then -a.n5 else a.n5 end as n2,3 as level_spasi
+            from exs_glma_gar a
+            inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+            $where and b.kode_neraca='$id' and 
+            (a.n4<>0 or a.n5<>0)
+            order by a.kode_akun" ;
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                $success["auth_status"] = 2;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {

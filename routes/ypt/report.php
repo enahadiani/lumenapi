@@ -73,6 +73,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-labarugi-agg-fak-detail','Ypt\LaporanController@getLabaRugiAggFakDetail');
     $router->get('lap-labarugi-agg-prodi-detail','Ypt\LaporanController@getLabaRugiAggProdiDetail');
     $router->get('lap-neraca2-detail','Ypt\LaporanController@getNeraca2Detail');
+    $router->get('lap-investasi-detail','Ypt\LaporanController@getInvestasiDetail');
 
 });
 
