@@ -629,4 +629,18 @@ $app->router->group([
     require __DIR__.'/../routes/ypt/dash.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/siaga-dash'
+], function ($router) {
+    require __DIR__.'/../routes/siaga/dash.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/siaga-auth'
+], function ($router) {
+    require __DIR__.'/../routes/siaga/auth.php';
+});
+
 return $app;

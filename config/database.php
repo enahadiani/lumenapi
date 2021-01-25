@@ -178,6 +178,16 @@ return [
             'password' => env('DB_PASSWORD14', ''),
             'charset' => 'utf8',
             'prefix' => '',
+        ],
+        'dbsiaga' => [
+            'driver' => env('DB_CONNECTION15','sqlsrv'),
+            'host' => env('DB_HOST15', 'localhost'),
+            'port' => env('DB_PORT15', '1433'),
+            'database' => env('DB_DATABASE15', 'forge'),
+            'username' => env('DB_USERNAME15', 'forge'),
+            'password' => env('DB_PASSWORD15', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
         ]
     
     ],

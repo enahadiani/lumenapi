@@ -82,6 +82,10 @@ return [
         'ts' => [
             'driver' => 'jwt',
             'provider' => 'ts',
+        ],
+        'siaga' => [
+            'driver' => 'jwt',
+            'provider' => 'siaga',
         ]
     ],
 
@@ -157,6 +161,10 @@ return [
         'ts' => [
             'driver' => 'eloquent',
             'model' => \App\AdminTs::class
+        ],
+        'siaga' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminSiaga::class
         ]
     ]
 ];
