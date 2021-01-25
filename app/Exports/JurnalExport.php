@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\JurnalTmp;
+use App\KasBankTmp;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class JurnalExport implements FromCollection, WithHeadings
+class KasBankExport implements FromCollection, WithHeadings
 {
     public function __construct($nik_user,$kode_lokasi)
     {
@@ -22,7 +22,7 @@ class JurnalExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return JurnalTmp::select('kode_akun','dc','keterangan','nilai','kode_pp','status','ket_status','nu')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->orderBy('nu')->get();
+        return KasBankTmp::select('kode_akun','dc','keterangan','nilai','kode_pp','status','ket_status','nu')->where('nik_user', $this->nik_user)->where('kode_lokasi', $this->kode_lokasi)->orderBy('nu')->get();
     }
 
     public function headings(): array

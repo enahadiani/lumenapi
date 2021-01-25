@@ -158,6 +158,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sawal-import','Toko\SawalController@importExcel');
     $router->get('sawal-tmp','Toko\SawalController@getSawalTmp');
 
+    $router->get('kass-bank','Toko\KasBankController@index');
+    $router->get('kass-bank-detail','Toko\KasBankController@show');
+    $router->post('kass-bank','Toko\KasBankController@store');
+    $router->put('kass-bank','Toko\KasBankController@update');
+    $router->delete('kass-bank','Toko\KasBankController@destroy');
+    $router->post('import-excel','Toko\KasBankController@importExcel');
+    $router->get('kas-bank-tmp','Toko\KasBankController@geDataTmp');
+
+
 });
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
