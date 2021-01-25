@@ -57,13 +57,16 @@ class OpenKasirController extends Controller
                 ->delete();
 
                 $success['status'] = true;
-                $success['message'] = "Data Barang berhasil dihapus";
+                $success['message'] = "Data Open Kasir berhasil dihapus";
                 $success['no_open'] = $no_open;
             }
         
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
-            //throw $th;
+            $success['status'] = false;
+            $success['no_open'] = '-';
+            $success['message'] = "Data Open Kasir gagal diubah ".$e;
+            return response()->json($success, $this->successStatus);
         }
     }
 
@@ -105,11 +108,11 @@ class OpenKasirController extends Controller
                 $success['data'] = [];
                 $success['status'] = false;
             }
-            return response()->json($success, 200);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data Open Kasir gagal dihapus ".$e;
-            return response()->json($success, 500);
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
         }   
     }
 
