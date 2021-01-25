@@ -25,7 +25,7 @@ class AdminSiagaController extends Controller
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
             left join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi 
-            left join m_form e on a.menu_mobile=e.kode_form 
+            left join m_form e on a.path_view=e.kode_form 
             where a.nik= '$nik' 
             ");
             $user = json_decode(json_encode($user),true);
