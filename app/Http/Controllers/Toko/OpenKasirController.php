@@ -43,7 +43,7 @@ class OpenKasirController extends Controller
             $no_open = $request->no_open;
             $getNoKasirDiPenjualan = "select no_open from brg_jualpiu_dloc where no_open = '$no_open'";
             $resultNoKasirDiPenjualan = DB::connection($this->sql)->select($getNoKasirDiPenjualan);
-            $resultNoKasirDiPenjualan = json_decode(json_encode($res),true);
+            $resultNoKasirDiPenjualan = json_decode(json_encode($resultNoKasirDiPenjualan),true);
 
             if(count($resultNoKasirDiPenjualan) > 0) {
                 $success['status'] = false;
@@ -234,7 +234,7 @@ class OpenKasirController extends Controller
         
             $getNoKasirDiPenjualan = "select no_open from brg_jualpiu_dloc where no_open = '$id'";
             $resultNoKasirDiPenjualan = DB::connection($this->sql)->select($getNoKasirDiPenjualan);
-            $resultNoKasirDiPenjualan = json_decode(json_encode($res),true);
+            $resultNoKasirDiPenjualan = json_decode(json_encode($resultNoKasirDiPenjualan),true);
 
             if(count($resultNoKasirDiPenjualan) > 0) {
                 $success['status'] = false;
