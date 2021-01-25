@@ -15,19 +15,12 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
     return response('');
 }]);
 
-$router->group(['middleware' => 'auth:toko'], function () use ($router) {
+$router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     
-    $router->get('top-selling','Toko\DashboardController@getTopSelling');
-    $router->get('ctg-selling','Toko\DashboardController@getSellingCtg');
-    $router->get('top-vendor','Toko\DashboardController@getTopVendor');
-    $router->get('data-box','Toko\DashboardController@getDataBox');
-    $router->get('buku-besar','Toko\DashboardController@getBukuBesar');
-    $router->get('income-chart','Toko\DashboardController@getIncomeChart');
-    $router->get('netprofit-chart','Toko\DashboardController@getNetProfitChart');
-    $router->get('cogs-chart','Toko\DashboardController@getCOGSChart');
-    $router->get('penjualan','Toko\DashboardController@getLapPnj');
-    $router->get('vendor','Toko\DashboardController@getLapVendor');
-    $router->get('jurnal','Toko\DashboardController@getJurnal');
+    $router->get('summary','Siaga\DashboardController@getSummary');
+    $router->get('dept','Siaga\DashboardController@getDept');
+    $router->get('periode','Siaga\DashboardController@getPeriode');
+    
 });
 
 
