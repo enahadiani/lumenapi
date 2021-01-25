@@ -40,7 +40,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('open-kasir','Toko\OpenKasirController@index');
     $router->post('open-kasir','Toko\OpenKasirController@store');
     $router->put('open-kasir','Toko\OpenKasirController@update');
-    
+    $router->delete('open-kasir','Toko\OpenKasirController@destroy');
+
     //Close Kasir
     $router->get('close-kasir-new','Toko\CloseKasirController@getOpenKasir');
     $router->get('close-kasir-finish','Toko\CloseKasirController@index');
