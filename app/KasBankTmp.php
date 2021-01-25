@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class JurnalTmp extends Model
+class KasBankTmp extends Model
 {
     protected $connection = 'tokoaws';
     protected $table = 'kas_bank_tmp';
