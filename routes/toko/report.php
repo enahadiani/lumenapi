@@ -100,6 +100,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-jurnal-wo','Toko\LaporanAktapController@getJurnalWO');
     $router->get('lap-saldo-aktap-bulan','Toko\LaporanAktapController@getSaldoAktapBln');
 
+    // KAS BANK
+    
+    $router->get('filter-periode-kb','Toko\FilterController@getFilterPeriodeKB');
+    $router->get('filter-bukti-jurnal-kb','Toko\FilterController@getFilterBuktiJurnalKB');
+
+    $router->get('lap-jurnal-kb','Toko\LaporanKasBankController@getJurnal');
+    $router->get('lap-buktijurnal-kb','Toko\LaporanKasBankController@getBuktiJurnal');
+    $router->get('lap-buku-kb','Toko\LaporanKasBankController@getBukuKas');
+    $router->get('lap-saldo-kb','Toko\LaporanKasBankController@getSaldoKB');
+
 });
 
 
