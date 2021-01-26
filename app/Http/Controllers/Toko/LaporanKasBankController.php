@@ -82,9 +82,10 @@ class LaporanKasBankController extends Controller
             $filter_nb = ($nb != "" ? " and no_bukti in ($nb) " : "" );
 
             $sql=" select a.no_bukti,a.kode_akun,b.nama,a.kode_pp,a.nilai,a.keterangan,isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit,a.kode_curr
-            from (select kode_lokasi,kode_akun,kode_pp,dc,nilai,keterangan,case when dc='D' then nilai else 0 end as debet,case when dc='C' then nilai else 0 end as kredit,kode_curr
-            from trans_j
-            where kode_lokasi='$kode_lokasi' and modul in ('KB','KBSPB','KBSPBPJ') $filter_nb 
+            from (
+                select no_bukti,kode_lokasi,kode_akun,kode_pp,dc,nilai,keterangan,case when dc='D' then nilai else 0 end as debet,case when dc='C' then nilai else 0 end as kredit,kode_curr
+                from trans_j
+                where kode_lokasi='$kode_lokasi' and modul in ('KB','KBSPB','KBSPBPJ') $filter_nb 
             )a 
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             order by a.dc desc
