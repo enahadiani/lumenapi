@@ -312,7 +312,7 @@ class KasBankController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jurnal gagal diubah ".$e;
+            $success['message'] = "Data KasBank gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -346,13 +346,13 @@ class KasBankController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Jurnal berhasil dihapus";
+            $success['message'] = "Data KasBank berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Jurnal gagal dihapus ".$e;
+            $success['message'] = "Data KasBank gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
@@ -589,7 +589,7 @@ class KasBankController extends Controller
     }
 
     
-    public function validateJurnal($kode_akun,$kode_pp,$dc,$ket,$nilai,$kode_lokasi){
+    public function validateKasBank($kode_akun,$kode_pp,$dc,$ket,$nilai,$kode_lokasi){
         $keterangan = "";
         $auth = DB::connection($this->db)->select("select kode_akun from masakun where kode_akun='$kode_akun' and kode_lokasi='$kode_lokasi'
         ");
@@ -657,22 +657,22 @@ class KasBankController extends Controller
             $nama_file = rand().$file->getClientOriginalName();
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
-            // $excel = Excel::import(new JurnalImport($request->nik_user), $nama_file);
-            $dt = Excel::toArray(new JurnalImport($request->nik_user),$nama_file);
+            // $excel = Excel::import(new KasBankImport($request->nik_user), $nama_file);
+            $dt = Excel::toArray(new KasBankImport($request->nik_user),$nama_file);
             $excel = $dt[0];
             $x = array();
             $status_validate = true;
             $no=1;
             foreach($excel as $row){
                 if($row[0] != ""){
-                    $ket = $this->validateJurnal(strval($row[0]),strval($row[4]),strval($row[1]),strval($row[2]),floatval($row[3]),$kode_lokasi);
+                    $ket = $this->validateKasBank(strval($row[0]),strval($row[4]),strval($row[1]),strval($row[2]),floatval($row[3]),$kode_lokasi);
                     if($ket != ""){
                         $sts = 0;
                         $status_validate = false;
                     }else{
                         $sts = 1;
                     }
-                    $x[] = JurnalTmp::create([
+                    $x[] = KasBankTmp::create([
                         'kode_akun' => strval($row[0]),
                         'dc' => strval($row[1]),
                         'keterangan' => strval($row[2]),

@@ -165,7 +165,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('kas-bank','Toko\KasBankController@update');
     $router->delete('kas-bank','Toko\KasBankController@destroy');
     $router->post('kas-bank-import-excel','Toko\KasBankController@importExcel');
-    $router->get('kas-bank-tmp','Toko\KasBankController@geDataTmp');
+    $router->get('kas-bank-tmp','Toko\KasBankController@getDataTmp');
+
+    $router->get('kas-bank-dok','Toko\KasBankDokController@show');
+    $router->post('kas-bank-dok','Toko\KasBankDokController@store');
+    $router->delete('kas-bank-dok','Toko\KasBankDokController@destroy');
 
 
 });
