@@ -170,7 +170,7 @@ class KasBankController extends Controller
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
-            $cek = $this->doCekPeriode2($request->jenis,$status_admin,$periode);
+            $cek = $this->doCekPeriode2('KB',$status_admin,$periode);
 
             if($cek['status']){
                 $res = $this->isUnik($request->no_dokumen,$no_bukti);
@@ -270,7 +270,7 @@ class KasBankController extends Controller
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $request->no_bukti;
-            $cek = $this->doCekPeriode2($request->jenis,$status_admin,$periode);
+            $cek = $this->doCekPeriode2('KB',$status_admin,$periode);
 
             if($cek['status']){
                 $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
