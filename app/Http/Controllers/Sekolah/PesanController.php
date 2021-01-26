@@ -781,34 +781,47 @@ class PesanController extends Controller
 
     public function historyPesan(Request $request)
     {
-        $this->validate($request,[
-            'kode_pp' => 'required'
-        ]);
+        // $this->validate($request,[
+        //     'kode_pp' => 'required'
+        // ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
             }
 
-            $sql = "select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
+            $sql = "select * from (	select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
                 select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
                 from sis_pesan_m a
-                inner join (select jenis,nis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                inner join (select jenis,nis,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
                             from sis_pesan_m
-                            where tipe in ('info','nilai')
-                            group by jenis,nis,kode_kelas,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.nis=b.nis and a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+                            where tipe in ('info','nilai') and nik_user='$nik' and jenis='Siswa'
+                            group by jenis,nis,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input and a.nis=b.nis
                 where a.tipe in ('info','nilai')  and a.nik_user = '$nik'
                 ) a
                 inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(a.foto,'-') as foto 
                             from sis_siswa a
-                            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi'
-                            union all
-                            select a.kode_kelas as kode,a.nama,a.kode_pp,a.kode_lokasi,'-' as foto 
-                            from sis_kelas a
-                            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi'
+                            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
                             )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
-                order by a.tgl_input desc";
+                union all
+				select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam from (
+                select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
+                from sis_pesan_m a
+                inner join (select jenis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                            from sis_pesan_m
+                            where tipe in ('info','nilai') and nik_user='$nik' and jenis='Kelas'
+                            group by jenis,kode_kelas,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input and a.kode_kelas=b.kode_kelas
+                where a.tipe in ('info','nilai')  and a.nik_user = '$nik'
+                ) a
+                inner join (select a.kode_kelas as kode,a.nama,a.kode_pp,a.kode_lokasi,'-' as foto 
+                            from sis_kelas a
+                            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+                            )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
+                
+				) a 
+				order by a.tgl_input desc";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
