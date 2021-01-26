@@ -292,4 +292,49 @@ class ReturPembelianController extends Controller
         
     }
 
+    public function destroy(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bukti = $request->no_bukti;
+
+            DB::connection($this->sql)->table('trans_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->where('nik_user', $nik)
+                ->delete();
+
+            DB::connection($this->sql)->table('trans_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->where('nik_user', $nik)
+                ->delete();
+
+            DB::connection($this->sql)->table('brg_belibayar_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->where('nik_user', $nik)
+                ->delete();
+
+            DB::connection($this->sql)->table('brg_trans_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+
+            DB::connection($this->sql)->commit();
+
+            $success['status'] = true;
+            $success['message'] = "Retur pembelian $no_bukti berhasil";    
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $th) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Retur Pembelian gagal dihapus ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }

@@ -62,6 +62,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('retur-beli-finish','Toko\ReturPembelianController@index');
     $router->get('retur-beli-detail','Toko\ReturPembelianController@show');
     $router->post('retur-beli','Toko\ReturPembelianController@store');
+    $router->delete('retur-beli','Toko\ReturPembelianController@destroy');
     $router->get('retur-beli-barang','Toko\ReturPembelianController@getBarang');
 
     //Stok Opname
