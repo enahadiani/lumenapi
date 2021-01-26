@@ -801,8 +801,9 @@ class PesanController extends Controller
                             group by jenis,nis,kode_lokasi,kode_pp) b on a.jenis=b.jenis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input and a.nis=b.nis
                 where a.tipe in ('info','nilai')  and a.nik_user = '$nik'
                 ) a
-                inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(a.foto,'-') as foto 
+                inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(b.foto,'-') as foto 
                             from sis_siswa a
+                            left join sis_hakakses b on a.nis=b.nik and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                             where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
                             )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
                 union all
@@ -822,6 +823,42 @@ class PesanController extends Controller
                 
 				) a 
 				order by a.tgl_input desc";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function historyPesanDetail(Request $request)
+    {
+        $this->validate($request,[
+            'kontak' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+
+            $sql = "";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
