@@ -300,46 +300,33 @@ class ReturPembelianController extends Controller
             }
             $no_bukti = $request->no_bukti;
 
-            $buktiRetur = "select no_bukti from trans_m where kode_lokasi = '$kode_lokasi' and nik_user = '$nik' and no_ref1 = '$no_bukti'";
-            $res = DB::connection($this->sql)->select($buktiRetur);
-            $res = json_decode(json_encode($res),true);
-
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $buktiRetur = $res[0]['no_bukti'];
-            
-                DB::connection($this->sql)->table('trans_m')
+            DB::connection($this->sql)->table('trans_m')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $buktiRetur)
+                ->where('no_bukti', $no_bukti)
                 ->where('nik_user', $nik)
                 ->delete();
 
-                DB::connection($this->sql)->table('trans_j')
+            DB::connection($this->sql)->table('trans_j')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $buktiRetur)
+                ->where('no_bukti', $no_bukti)
                 ->where('nik_user', $nik)
                 ->delete();
 
-                DB::connection($this->sql)->table('brg_belibayar_d')
+            DB::connection($this->sql)->table('brg_belibayar_d')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $buktiRetur)
+                ->where('no_bukti', $no_bukti)
                 ->where('nik_user', $nik)
-                ->where('no_beli', $no_bukti)
                 ->delete();
 
-                DB::connection($this->sql)->table('brg_trans_d')
+            DB::connection($this->sql)->table('brg_trans_d')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $buktiRetur)
+                ->where('no_bukti', $no_bukti)
                 ->delete();
 
-                DB::connection($this->sql)->commit();
+            DB::connection($this->sql)->commit();
 
-                $success['status'] = true;
-                $success['message'] = "Retur pembelian $buktiRetur berhasil";     
-            }
-            else{
-                $success['message'] = "Retur pembelian untuk pembelian $no_bukti belum dibuat";
-                $success['status'] = false;
-            }
+            $success['status'] = true;
+            $success['message'] = "Retur pembelian $no_bukti berhasil";    
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $th) {
