@@ -263,7 +263,7 @@ class PembelianController extends Controller
             $str_format="0000";
             $periode=date('Y').date('m');
             $per=date('y').date('m');
-            $prefix="PO/".substr($periode,2,4)."/";
+            $prefix="PO/".substr($periode,2,4)."/".$kode_lokasi."/";
             $sql="select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
 
             $get = DB::connection($this->sql)->select($sql);
