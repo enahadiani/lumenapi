@@ -173,7 +173,9 @@ class JurnalController extends Controller
                             if (count($data2) > 0){
                                 for ($j=0;$j < count($data2);$j++){
                                     if($data2[$j]['kode_akun'] != ""){
-                                        $nilai += floatval($data2[$j]['nilai']);
+                                        if($request->dc[$j] == "D"){
+                                            $nilai += floatval($request->nilai[$j]);
+                                        }
                                         $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','".$data[$i]['jenis']."','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
 
                                     }
@@ -282,7 +284,9 @@ class JurnalController extends Controller
                             if (count($data2) > 0){
                                 for ($j=0;$j < count($data2);$j++){
                                     if($data2[$j]['kode_akun'] != ""){
-                                        $nilai += floatval($data2[$j]['nilai']);
+                                        if($request->dc[$j] == "D"){
+                                            $nilai += floatval($request->nilai[$j]);
+                                        }
                                         $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','".$data[$i]['jenis']."','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
                                     }
                                 }
