@@ -59,10 +59,11 @@ class LaporanKasBankController extends Controller
 
 
             $sql="select a.no_bukti,a.keterangan,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,
-                        a.nik1,a.nik2,b.nama as nama1,c.nama as nama2
+                        a.nik1,a.nik2,b.nama as nama1,c.nama as nama2,d.nama as nama_lokasi,d.kota,a.no_ref1
                 from trans_m a 
                 left join karyawan b on a.nik1=b.nik and a.kode_lokasi=b.kode_lokasi
                 left join karyawan c on a.nik1=c.nik and a.kode_lokasi=c.kode_lokasi
+                inner join lokasi d on a.kode_lokasi=d.kode_lokasi
                 $where and a.modul in ('KB','KBSPB','KBSPBPJ') order by a.no_bukti ";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
@@ -263,7 +264,7 @@ class LaporanKasBankController extends Controller
                 $where .=" and a.tanggal between '".$request->input('tgl_awal')."' and '".$request->input('tgl_akhir')."' ";
             }
 
-            $sql2="select a.no_bukti,a.no_dokumen,convert(varchar,a.tanggal,'103') as tgl,a.kode_akun,a.kode_pp,a.kode_drk,a.keterangan,b.modul,b.form,
+            $sql2="select a.no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tgl,a.kode_akun,a.kode_pp,a.kode_drk,a.keterangan,b.modul,b.form,
             case when a.dc='D' then nilai else 0 end as debet,
             case when a.dc='C' then nilai else 0 end as kredit 
             from trans_j a 

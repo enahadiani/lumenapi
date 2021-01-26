@@ -279,7 +279,7 @@ class PenilaianController extends Controller
             }
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,a.nu,a.tgl_input
-            ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) as persen, d.skode as singkatan_matpel,d.nama as nama_matpel,convert(varchar,a.tgl_input,103) as tgl
+            ,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, isnull(round((CAST (c.jum as float) / b.jum)*100,1),0) as persen, d.skode as singkatan_matpel,d.nama as nama_matpel,convert(varchar,a.tgl_input,103) as tgl,a.kode_kd
             from sis_nilai_m a
 			inner join (select no_bukti,kode_lokasi,kode_pp, count(nis) as jum 
 				from sis_nilai 
