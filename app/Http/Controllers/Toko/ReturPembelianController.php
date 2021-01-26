@@ -292,4 +292,62 @@ class ReturPembelianController extends Controller
         
     }
 
+    public function destroy(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bukti = $request->no_bukti;
+
+            $buktiRetur = "select no_bukti from trans_m where kode_lokasi = '$kode_lokasi' and nik_user = '$nik' and no_ref1 = '$no_bukti'";
+            $res = DB::connection($this->sql)->select($buktiRetur);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $buktiRetur = $res[0]['no_bukti'];
+            
+                DB::connection($this->sql)->table('trans_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $buktiRetur)
+                ->where('nik_user', $nik)
+                ->delete();
+
+                DB::connection($this->sql)->table('trans_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $buktiRetur)
+                ->where('nik_user', $nik)
+                ->delete();
+
+                DB::connection($this->sql)->table('brg_belibayar_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $buktiRetur)
+                ->where('nik_user', $nik)
+                ->where('no_beli', $no_bukti)
+                ->delete();
+
+                DB::connection($this->sql)->table('brg_trans_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $buktiRetur)
+                ->delete();
+
+                DB::connection($this->sql)->commit();
+
+                $success['status'] = true;
+                $success['message'] = "Retur pembelian $buktiRetur berhasil";     
+            }
+            else{
+                $success['message'] = "Retur pembelian untuk pembelian $no_bukti belum dibuat";
+                $success['status'] = false;
+            }
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $th) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Retur Pembelian gagal dihapus ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
