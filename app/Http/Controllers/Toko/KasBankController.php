@@ -32,28 +32,38 @@ class KasBankController extends Controller
         return $id;
     }
 
+    function getPeriodeAktif($kode_lokasi){
+        $query = DB::connection($this->db)->select("select max(periode) as periode from periode where $kode_lokasi ='$kode_lokasi' ");
+        if(count($query) > 0){
+            $periode = $query[0]->periode;
+        }else{
+            $periode = "-";
+        }
+        return $periode;
+    }
+
     function doCekPeriode2($modul,$status,$periode) {
         try{
             
-            // $perValid = false;
-            // if($data =  Auth::guard($this->guard)->user()){
-            //     $nik= $data->nik;
-            //     $kode_lokasi= $data->kode_lokasi;
-            // }
+            $perValid = false;
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
             
-            // if ($status == "A") {
+            if ($status == "A") {
 
-            //     $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
-            // }else{
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
+            }else{
 
-            //     $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
-            // }
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
+            }
 
-            // $auth = DB::connection($this->db)->select($strSQL);
-            // $auth = json_decode(json_encode($auth),true);
-            // if(count($auth) > 0){
+            $auth = DB::connection($this->db)->select($strSQL);
+            $auth = json_decode(json_encode($auth),true);
+            if(count($auth) > 0){
                 $perValid = true;
-            // }
+            }
             $msg = "ok";
         } catch (\Throwable $e) {		
             $msg= " error " .  $e;
@@ -94,7 +104,9 @@ class KasBankController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul in ('KB') and param3 in ('BM','BK') and kode_lokasi='$kode_lokasi'	 
+            $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
+
+            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,posted,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul in ('KB') and param3 in ('BM','BK') and kode_lokasi='$kode_lokasi' and periode = '$periode_aktif'	 
             ");
             $res = json_decode(json_encode($res),true);
             
