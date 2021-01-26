@@ -21,6 +21,7 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('dept','Siaga\DashboardController@getDept');
     $router->get('periode','Siaga\DashboardController@getPeriode');
     $router->get('dataof-modul','Siaga\DashboardController@getDataOfModul');
+    $router->get('data-other','Siaga\DashboardController@getDataOther');
     
 });
 

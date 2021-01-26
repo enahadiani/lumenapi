@@ -289,6 +289,52 @@ class DashboardController extends Controller
         }
         
     }
+
+    public function getDataOther(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = $request->periode;
+            if($periode == ""){
+                $periode = date('Ym');
+            }
+            $tahun = substr($periode, 0, 4);
+            $klp = $request->klp;
+            if($klp == "NRC"){
+                $color = array("#D32f2f");
+            }else{
+                $color = array("green");
+            }
+            $sql = "select tipe,sum(nilai) as n1
+            from exs_nrc
+            where tahun='$tahun' and klp='$klp'
+            group by tipe";
+            $res = $this->execute($sql);
+            $success = array("summary" => array(),"categories" => array(),"series" => array());
+            
+            $success["series"][] = array("name" => "Tipe", "color" => $color[0], "data" => array() );
+            
+            foreach ($res as $row){
+                $tmp = (array)$row;
+                $success["summary"][] = $tmp;
+                $success["categories"][] = $tmp['tipe'];
+                $success["series"][0]["data"][] = floatval($row->n1);
+            }
+            $success['status'] = true;
+            
+            return response()->json($success, $this->successStatus);
+            
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
    
 
 }
