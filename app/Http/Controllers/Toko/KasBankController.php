@@ -50,21 +50,24 @@ class KasBankController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+
+            $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
             if ($status == "A") {
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between '$periode_aktif' and per_akhir2";
             }else{
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between '$periode_aktif' and per_akhir1";
             }
 
             $auth = DB::connection($this->db)->select($strSQL);
             $auth = json_decode(json_encode($auth),true);
             if(count($auth) > 0){
                 $perValid = true;
+                $msg = "ok";
+            }else{
+                $msg = "Periode transaksi yang diperbolehkan $periode_aktif s.d. periode akhir sistem";
             }
-            $msg = "ok";
         } catch (\Throwable $e) {		
             $msg= " error " .  $e;
             $perValid = false;
@@ -244,7 +247,7 @@ class KasBankController extends Controller
                     $sts = false;
                 }
             }else{
-                $tmp = "Periode transaksi modul tidak valid (KB - LOCKED). Hubungi Administrator Sistem .";
+                $tmp = "Periode transaksi modul tidak valid (KB - LOCKED). Hubungi Administrator Sistem . ".$cek['message'];
                 $sts = false;
             }    
             if($sts){
@@ -321,31 +324,35 @@ class KasBankController extends Controller
 
                 $res = $this->isUnik($request->no_dokumen,$no_bukti);
                 if($res['status']){
-                    
-                    $nilai = 0;
-                    if (count($request->kode_akun) > 0){
-                        for ($j=0;$j < count($request->kode_akun);$j++){
-                            if($request->kode_akun != ""){
-                                if($request->dc[$j] == "D"){
-                                    $nilai += floatval($request->nilai[$j]);
+                    $cekAkun = $this->cekAkunKas($request->kode_akun,$request->jenis,$request->dc,$kode_lokasi);
+                    if($cekAkun['status']){
+                        $nilai = 0;
+                        if (count($request->kode_akun) > 0){
+                            for ($j=0;$j < count($request->kode_akun);$j++){
+                                if($request->kode_akun != ""){
+                                    if($request->dc[$j] == "D"){
+                                        $nilai += floatval($request->nilai[$j]);
+                                    }
+                                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".$j.",'".$request->kode_akun[$j]."','".$request->dc[$j]."',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','".$request->jenis."','IDR',1,'".$request->kode_pp[$j]."','-','-','-','-','-','-','-','-')");
+                                    
                                 }
-                                $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".$j.",'".$request->kode_akun[$j]."','".$request->dc[$j]."',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','".$request->jenis."','IDR',1,'".$request->kode_pp[$j]."','-','-','-','-','-','-','-','-')");
-                                
                             }
-                        }
-                    }	
-                    
-                    $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','KB','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','-','".$request->status."','".$request->jenis."')");
-                    
-                    $tmp="sukses";
-                    $sts=true;
-                    
+                        }	
+                        
+                        $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','KB','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','-','".$request->status."','".$request->jenis."')");
+                        
+                        $tmp="sukses";
+                        $sts=true;
+                    }else{
+                        $tmp= $cekAkun['message'];
+                        $sts=false;
+                    }
                 }else{
                     $tmp = "Transaksi tidak valid. No Dokumen '".$request->no_dokumen."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
                     $sts = false;
                 }
             }else{
-                $tmp = "Periode transaksi modul tidak valid (KB - LOCKED). Hubungi Administrator Sistem .";
+                $tmp = "Periode transaksi modul tidak valid (KB - LOCKED). Hubungi Administrator Sistem . ".$cek['message'];
                 $sts = false;
             }         
 

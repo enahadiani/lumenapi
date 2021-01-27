@@ -50,21 +50,23 @@ class JurnalController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
             if ($status == "A") {
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between '$periode_aktif' and per_akhir2";
             }else{
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between '$periode_aktif' and per_akhir1";
             }
 
             $auth = DB::connection($this->db)->select($strSQL);
             $auth = json_decode(json_encode($auth),true);
             if(count($auth) > 0){
                 $perValid = true;
+                $msg = "ok";
+            }else{
+                $msg = "Periode transaksi yang diperbolehkan $periode_aktif s.d. periode akhir sistem";
             }
-            $msg = "ok";
         } catch (\Throwable $e) {		
             $msg= " error " .  $e;
             $perValid = false;
@@ -204,7 +206,7 @@ class JurnalController extends Controller
                             $sts = false;
                         }
                     }else{
-                        $tmp = "Periode transaksi modul tidak valid (MI - LOCKED). Hubungi Administrator Sistem .";
+                        $tmp = "Periode transaksi modul tidak valid (MI - LOCKED). Hubungi Administrator Sistem .".$cek['message'];
                         $sts = false;
                     }         
 
@@ -315,7 +317,7 @@ class JurnalController extends Controller
                             $sts = false;
                         }
                     }else{
-                        $tmp = "Periode transaksi modul tidak valid (MI - LOCKED). Hubungi Administrator Sistem .";
+                        $tmp = "Periode transaksi modul tidak valid (MI - LOCKED). Hubungi Administrator Sistem .".$cek['message'];
                         $sts = false;
                     }         
 
