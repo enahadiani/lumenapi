@@ -108,7 +108,7 @@ class JurnalController extends Controller
 
             $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
 
-            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,posted,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul='MI' and kode_lokasi='$kode_lokasi' and periode = '$periode_aktif'	 
+            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,case posted when 'T' then 'Close' else 'Open' end as posted,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul='MI' and kode_lokasi='$kode_lokasi' and periode = '$periode_aktif'	 
             ");
             $res = json_decode(json_encode($res),true);
             
