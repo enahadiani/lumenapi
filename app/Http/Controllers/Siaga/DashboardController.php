@@ -208,7 +208,7 @@ class DashboardController extends Controller
             if($dept == "All"){
                 $dept = "";
             }
-            $sql = "select a.".$field.",a.n1, b.n2, c.n2  as n3 from (
+            $sql = "select a.".$field.",b.n2, a.n1, c.n2  as n3 from (
                 select $field, sum(nilai) as n1 from exs_real where tahun = '$tahun' and periode <= '$periode'
                 and klp = '$modul' and dept like '%$dept%'
                 group by $field ) a 
@@ -223,27 +223,27 @@ class DashboardController extends Controller
             $res = $this->execute($sql);
 			$success = array("summary" => array(),"categories" => array(), "trend" => array(),"series" => array(), "series2" => array(), "series3" => array() );
             
-            $success["series"][] = array("name" => "Actual", "color" => $color[0], "data" => array() );
             $success["series"][] = array("name" => "RKAP", "color" => $color[1], "data" => array() );
+            $success["series"][] = array("name" => "Actual", "color" => $color[0], "data" => array() );
             
-            $success["series2"][] = array("name" => "Actual", "color" => $color[0], "data" => array() );
             $success["series2"][] = array("name" => "RKAP", "color" => $color[1], "data" => array() );
+            $success["series2"][] = array("name" => "Actual", "color" => $color[0], "data" => array() );
             
-            $success["series4"] = array("name" => "Actual", "color" => $color[0], "data" => array() );
             $success["series5"] = array("name" => "RKAP", "color" => $color[1], "data" => array() );
+            $success["series4"] = array("name" => "Actual", "color" => $color[0], "data" => array() );
             
             foreach ($res as $row){
                 $tmp = (array)$row;
                 $success["summary"][] = $tmp;
                 $success["categories"][] = $tmp[$field];
-                $success["series"][0]["data"][] = floatval($row->n1);
-                $success["series"][1]["data"][] = floatval($row->n2);
+                $success["series"][0]["data"][] = floatval($row->n2);
+                $success["series"][1]["data"][] = floatval($row->n1);
                 
-                $success["series2"][0]["data"][] = floatval($row->n1);
-                $success["series2"][1]["data"][] = floatval($row->n3);
+                $success["series2"][0]["data"][] = floatval($row->n3);
+                $success["series2"][1]["data"][] = floatval($row->n1);
                 
-                $success["series4"]["data"][] = array( $tmp[$field], floatval($row->n1) );
                 $success["series5"]["data"][] = array( $tmp[$field], floatval($row->n3) );
+                $success["series4"]["data"][] = array( $tmp[$field], floatval($row->n1) );
             }
             $sql = "select $field
             , sum(nilai) as total
