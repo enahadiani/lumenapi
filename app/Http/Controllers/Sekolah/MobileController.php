@@ -1496,14 +1496,14 @@ class MobileController extends Controller
                 $kode_kelas = "-";
             }
             
-            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,isnull(d.foto,'-') as foto,c.nama as nama_matpel,c.skode as singkatan 
+            $res2 = DB::connection($this->db)->select("select a.nik,a.kode_matpel,b.nama as nama_guru,isnull(d.foto,'-') as foto,c.nama as nama_matpel,c.skode as singkatan 
             from sis_guru_matpel_kelas a
             inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$kode_kelas' and a.nik='$request->nik_guru' 
             union all
-            select distinct a.nik,'-' as kode_matpel,a.nama as nama_guru,isnull(d.foto,'-') as foto,'-' as nama_matpel,'-' as singkatan 
+            select a.nik,'-' as kode_matpel,a.nama as nama_guru,isnull(d.foto,'-') as foto,'-' as nama_matpel,'-' as singkatan 
             from karyawan a
             left join sis_hakakses d on a.nik=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
             where a.kode_pp='$kode_pp' and a.nik='$request->nik_guru' 
@@ -1529,7 +1529,7 @@ class MobileController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,LEN(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+file_dok as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
+                    $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,DATALENGTH(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+convert(varchar,file_dok) as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
                 }
                 $success['status'] = true;
                 $success['data_guru'] = $res2;
