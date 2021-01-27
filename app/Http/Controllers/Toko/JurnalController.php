@@ -53,10 +53,10 @@ class JurnalController extends Controller
             $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
             if ($status == "A") {
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between '$periode_aktif' and per_akhir2";
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
             }else{
 
-                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between '$periode_aktif' and per_akhir1";
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
             }
 
             $auth = DB::connection($this->db)->select($strSQL);
@@ -143,7 +143,7 @@ class JurnalController extends Controller
         $this->validate($request, [
             'jurnal.*.no_dokumen' => 'required',
             'jurnal.*.tanggal' => 'required',
-            'jurnal.*.jenis' => 'required',
+            'jurnal.*.kode_form' => 'required',
             'jurnal.*.deskripsi' => 'required',
             'jurnal.*.total_debet' => 'required',
             'jurnal.*.total_kredit' => 'required',
@@ -176,7 +176,7 @@ class JurnalController extends Controller
                     $periode = substr($data[$i]['tanggal'],0,4).substr($data[$i]['tanggal'],5,2);
                     $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-JU".substr($periode,2,4).".", "0001");
 
-                    $cek = $this->doCekPeriode2($data[$i]['jenis'],$status_admin,$periode);
+                    $cek = $this->doCekPeriode2('MI',$status_admin,$periode);
                     
                     if($cek['status']){
                         $res = $this->isUnik($data[$i]['no_dokumen'],$no_bukti);
@@ -190,13 +190,13 @@ class JurnalController extends Controller
                                         if($data2[$j]['dc'] == "D"){
                                             $nilai += floatval($data2[$j]['nilai']);
                                         }
-                                        $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','".$data[$i]['jenis']."','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
+                                        $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','MI','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
 
                                     }
                                 }
                             }	
 
-                            $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".$nilai.",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
+                            $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','".$data[$i]['kode_form']."','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".$nilai.",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','MI')");
 
                             $tmp="sukses";
                             $sts=true;
@@ -249,7 +249,7 @@ class JurnalController extends Controller
             'jurnal.*.no_bukti' => 'required',
             'jurnal.*.no_dokumen' => 'required',
             'jurnal.*.tanggal' => 'required',
-            'jurnal.*.jenis' => 'required',
+            'jurnal.*.kode_form' => 'required',
             'jurnal.*.deskripsi' => 'required',
             'jurnal.*.total_debet' => 'required',
             'jurnal.*.total_kredit' => 'required',
@@ -287,7 +287,7 @@ class JurnalController extends Controller
 
                     $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
-                    $cek = $this->doCekPeriode2($data[$i]['jenis'],$status_admin,$periode);
+                    $cek = $this->doCekPeriode2('MI',$status_admin,$periode);
                     
                     if($cek['status']){
                         $res = $this->isUnik($data[$i]['no_dokumen'],$no_bukti);
@@ -301,12 +301,12 @@ class JurnalController extends Controller
                                         if($data2[$j]['dc'] == "D"){
                                             $nilai += floatval($data2[$j]['nilai']);
                                         }
-                                        $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','".$data[$i]['jenis']."','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
+                                        $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','MI','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
                                     }
                                 }
                             }	
 
-                            $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','MI','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".$nilai.",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','".$data[$i]['jenis']."')");
+                            $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','".$data[$i]['kode_form']."','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".$nilai.",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','MI')");
 
 
                             $tmp="sukses";
