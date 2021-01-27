@@ -96,7 +96,8 @@ class DashboardController extends Controller
             
             $sql = "select klp, portofolio, sum(nilai) as n1 from exs_real where tahun = '$tahun' and periode <= '$periode'
             and dept like '%$dept%'
-            group by klp, portofolio ";
+            group by klp, portofolio
+			order by klp ";
             
             $res = $this->execute($sql);
             $grouping = array();
