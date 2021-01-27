@@ -172,8 +172,17 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('kas-bank-dok','Toko\KasBankDokController@store');
     $router->delete('kas-bank-dok','Toko\KasBankDokController@destroy');
 
+    // ANGGARAN
+    $router->get('tahun','Toko\AnggaranController@getTahun'); 
+    $router->get('anggaran','Toko\AnggaranController@index');          
+    $router->post('anggaran-upload','Toko\AnggaranController@importExcel'); 
+    $router->get('anggaran-load','Toko\AnggaranController@loadAnggaran');    
+    $router->post('anggaran','Toko\AnggaranController@store');  
+
 
 });
+
+$router->get('anggaran-export','Toko\AnggaranController@export');    
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
