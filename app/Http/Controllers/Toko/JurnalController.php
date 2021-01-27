@@ -42,6 +42,28 @@ class JurnalController extends Controller
         return $periode;
     }
 
+    function namaPeriode($periode){
+        $bulan = substr($periode,4,2);
+        $tahun = substr($periode,0,4);
+        switch ($bulan){
+            case 1 : case '1' : case '01': $bulan = "Januari"; break;
+            case 2 : case '2' : case '02': $bulan = "Februari"; break;
+            case 3 : case '3' : case '03': $bulan = "Maret"; break;
+            case 4 : case '4' : case '04': $bulan = "April"; break;
+            case 5 : case '5' : case '05': $bulan = "Mei"; break;
+            case 6 : case '6' : case '06': $bulan = "Juni"; break;
+            case 7 : case '7' : case '07': $bulan = "Juli"; break;
+            case 8 : case '8' : case '08': $bulan = "Agustus"; break;
+            case 9 : case '9' : case '09': $bulan = "September"; break;
+            case 10 : case '10' : case '10': $bulan = "Oktober"; break;
+            case 11 : case '11' : case '11': $bulan = "November"; break;
+            case 12 : case '12' : case '12': $bulan = "Desember"; break;
+            default: $bulan = null;
+        }
+    
+        return $bulan.' '.$tahun;
+    }
+
     function doCekPeriode2($modul,$status,$periode) {
         try{
             
@@ -65,7 +87,21 @@ class JurnalController extends Controller
                 $perValid = true;
                 $msg = "ok";
             }else{
-                $msg = "Periode transaksi yang diperbolehkan $periode_aktif s.d. periode akhir sistem";
+                if ($status == "A") {
+
+                    $strSQL2 = "select per_awal2 as per_awal,per_akhir2 as per_akhir from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' ";
+                }else{
+    
+                    $strSQL2 = "select per_awal1 as per_awal,per_akhir1 as per_akhir from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."'";
+                }
+                $get = DB::connection($this->db)->select($strSQL2);
+                if(count($get) > 0){
+                    $per_awal = $this->namaPeriode($get[0]->per_awal);
+                    $per_akhir = $this->namaPeriode($get[0]->per_akhir);
+                    $msg = "Transaksi tidak dapat disimpan karena tanggal periode sudah di tutup. Periode Aktif ".$per_awal." s/d ".$per_akhir;
+                }else{
+                    $msg = "Transaksi tidak dapat disimpan karena periode aktif belum disetting ";
+                }
             }
         } catch (\Throwable $e) {		
             $msg= " error " .  $e;
@@ -206,7 +242,7 @@ class JurnalController extends Controller
                             $sts = false;
                         }
                     }else{
-                        $tmp = "Periode transaksi modul tidak valid (MI - LOCKED). Hubungi Administrator Sistem .".$cek['message'];
+                        $tmp = $cek['message'];
                         $sts = false;
                     }         
 
@@ -317,7 +353,7 @@ class JurnalController extends Controller
                             $sts = false;
                         }
                     }else{
-                        $tmp = "Periode transaksi modul tidak valid (MI - LOCKED). Hubungi Administrator Sistem .".$cek['message'];
+                        $tmp = $cek['message'];
                         $sts = false;
                     }         
 
@@ -335,7 +371,7 @@ class JurnalController extends Controller
                 DB::connection($this->db)->rollback();
                 $success['status'] = $sts;
                 $success['no_bukti'] = "-";
-                $success['message'] = $msg;
+                $success['message'] = $tmp;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
         } catch (\Throwable $e) {
