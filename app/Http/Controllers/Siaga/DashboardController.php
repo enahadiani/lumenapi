@@ -208,7 +208,7 @@ class DashboardController extends Controller
             if($dept == "All"){
                 $dept = "";
             }
-            $sql = "select a.".$field.",b.n2, a.n1, c.n2  as n3 from (
+            $sql = "select a.".$field.",b.n2, a.n1, c.n2  as n3, case when b.n2 <> 0 then (a.n1/b.n2)*100 else 0 end as persen1,case when c.n2 <> 0 then (a.n1/c.n2)*100 else 0 end as persen2 from (
                 select $field, sum(nilai) as n1 from exs_real where tahun = '$tahun' and periode <= '$periode'
                 and klp = '$modul' and dept like '%$dept%'
                 group by $field ) a 
