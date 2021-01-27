@@ -514,7 +514,9 @@ class JurnalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select nik, nama from karyawan where kode_lokasi='".$kode_lokasi."' and flag_aktif='1'");						
+            $res = DB::connection($this->db)->select("select nik, nama from karyawan where kode_lokasi='".$kode_lokasi."' and flag_aktif='1'
+            union all
+            select '-' as nik,'-' as nama ");						
             $res= json_decode(json_encode($res),true);
             
            
@@ -547,7 +549,10 @@ class JurnalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select nik, nama from karyawan where kode_lokasi='".$kode_lokasi."' and flag_aktif='1' and nik='$nik' ");						
+            $res = DB::connection($this->db)->select(" select * from ( select nik, nama from karyawan where kode_lokasi='".$kode_lokasi."' and flag_aktif='1'
+            union all
+            select '-' as nik,'-' as nama ) a
+            where a.nik='$nik' ");						
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
