@@ -177,18 +177,18 @@ class JurnalController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'jurnal.*.no_dokumen' => 'required',
-            'jurnal.*.tanggal' => 'required',
-            'jurnal.*.kode_form' => 'required',
-            'jurnal.*.deskripsi' => 'required',
-            'jurnal.*.total_debet' => 'required',
-            'jurnal.*.total_kredit' => 'required',
-            'jurnal.*.nik_periksa' => 'required',
-            'jurnal.*.detail.*.kode_akun' => 'required',
-            'jurnal.*.detail.*.keterangan' => 'required',
-            'jurnal.*.detail.*.dc' => 'required',
-            'jurnal.*.detail.*.nilai' => 'required',
-            'jurnal.*.detail.*.kode_pp' => 'required'
+            'no_dokumen' => 'required',
+            'tanggal' => 'required',
+            'kode_form' => 'required',
+            'deskripsi' => 'required',
+            'total_debet' => 'required',
+            'total_kredit' => 'required',
+            'nik_periksa' => 'required',
+            'kode_akun' => 'required|array',
+            'keterangan' => 'required|array',
+            'dc' => 'required|array',
+            'nilai' => 'required|array',
+            'kode_pp' => 'required|array'
         ]);
 
         try {
@@ -206,48 +206,87 @@ class JurnalController extends Controller
             $kode_pp = $res[0]['kode_pp'];
             $data = $request->input('jurnal');
             DB::connection($this->db)->beginTransaction();
-
-            if(count($data) > 0){
-                for($i=0;$i<count($data);$i++){
-                    $periode = substr($data[$i]['tanggal'],0,4).substr($data[$i]['tanggal'],5,2);
-                    $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-JU".substr($periode,2,4).".", "0001");
-
-                    $cek = $this->doCekPeriode2('MI',$status_admin,$periode);
-                    
-                    if($cek['status']){
-                        $res = $this->isUnik($data[$i]['no_dokumen'],$no_bukti);
-                        if($res['status']){
-
-                            $data2 = $request->input('jurnal')[$i]['detail'];
-                            $nilai = 0;
-                            if (count($data2) > 0){
-                                for ($j=0;$j < count($data2);$j++){
-                                    if($data2[$j]['kode_akun'] != ""){
-                                        if($data2[$j]['dc'] == "D"){
-                                            $nilai += floatval($data2[$j]['nilai']);
-                                        }
-                                        $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','MI','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
-
-                                    }
+            
+            
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-JU".substr($periode,2,4).".", "0001");
+            
+            $cek = $this->doCekPeriode2('MI',$status_admin,$periode);
+            
+            if($cek['status']){
+                $res = $this->isUnik($request->no_dokumen,$no_bukti);
+                if($res['status']){
+                    $nilai = 0;
+                    if (count($request->kode_akun) > 0){
+                        for ($j=0;$j < count($request->kode_akun);$j++){
+                            if($request->kode_akun[$j] != ""){
+                                if($request->dc[$j] == "D"){
+                                    $nilai += floatval($request->nilai[$j]);
                                 }
-                            }	
-
-                            $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','".$data[$i]['kode_form']."','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".$nilai.",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','MI')");
-
-                            $tmp="sukses";
-                            $sts=true;
-                        
-                        }else{
-                            $tmp = "Transaksi tidak valid. No Dokumen '".$data[$i]['no_dokumen']."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
-                            $sts = false;
+                                $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".$j.",'".$request->kode_akun[$j]."','".$request->dc[$j]."',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','MI','MI','IDR',1,'".$request->kode_pp[$j]."','-','-','-','-','-','-','-','-')");
+                                
+                            }
                         }
-                    }else{
-                        $tmp = $cek['message'];
-                        $sts = false;
-                    }         
-
+                    }	
+                    
+                    $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','".$request->kode_form."','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','".$request->nik_periksa."','-','-','-','-','-','-','MI')");
+                    
+                    $arr_foto = array();
+                    $arr_jenis = array();
+                    $arr_no_urut = array();
+                    $arr_nama_dok = array();
+                    $i=0;
+                    $cek = $request->file;
+                    if(!empty($cek)){
+                        if(count($request->nama_file_seb) > 0){
+                            //looping berdasarkan nama dok
+                            for($i=0;$i<count($request->nama_file_seb);$i++){
+                                //cek row i ada file atau tidak
+                                if(isset($request->file('file')[$i])){
+                                    $file = $request->file('file')[$i];
+                                    //kalo ada cek nama sebelumnya ada atau -
+                                    if($request->nama_file_seb[$i] != "-"){
+                                        //kalo ada hapus yang lama
+                                        Storage::disk('s3')->delete('toko/'.$request->nama_file_seb[$i]);
+                                    }
+                                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                    $foto = $nama_foto;
+                                    if(Storage::disk('s3')->exists('toko/'.$foto)){
+                                        Storage::disk('s3')->delete('toko/'.$foto);
+                                    }
+                                    Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                                    $arr_foto[] = $foto;
+                                    $arr_jenis[] = $request->jenis[$i];
+                                    $arr_no_urut[] = $request->no_urut[$i];
+                                    $arr_nama_dok[] = $request->nama_dok[$i];
+                                }else if($request->nama_file_seb[$i] != "-"){
+                                    $arr_foto[] = $request->nama_file_seb[$i];
+                                    $arr_jenis[] = $request->jenis[$i];
+                                    $arr_no_urut[] = $request->no_urut[$i];
+                                    $arr_nama_dok[] = $request->nama_dok[$i];
+                                }     
+                            }
+                            
+                            $deldok = DB::connection($this->db)->table('trans_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                        }
+        
+                        if(count($arr_no_urut) > 0){
+                            for($i=0; $i<count($arr_no_urut);$i++){
+                                $insdok[$i] = DB::connection($this->db)->insert("insert into trans_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,jenis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$arr_no_urut[$i]."','".$arr_nama_dok[$i]."','".$arr_jenis[$i]."') "); 
+                            }
+                        }
+                    }
+                    $tmp="sukses";
+                    $sts=true;
+                    
+                }else{
+                    $tmp = "Transaksi tidak valid. No Dokumen '".$request->no_dokumen."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
+                    $sts = false;
                 }
-            }
+            }else{
+                $tmp = $cek['message'];
+                $sts = false;
+            }         
 
             if($sts){
                 DB::connection($this->db)->commit();
@@ -282,19 +321,19 @@ class JurnalController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'jurnal.*.no_bukti' => 'required',
-            'jurnal.*.no_dokumen' => 'required',
-            'jurnal.*.tanggal' => 'required',
-            'jurnal.*.kode_form' => 'required',
-            'jurnal.*.deskripsi' => 'required',
-            'jurnal.*.total_debet' => 'required',
-            'jurnal.*.total_kredit' => 'required',
-            'jurnal.*.nik_periksa' => 'required',
-            'jurnal.*.detail.*.kode_akun' => 'required',
-            'jurnal.*.detail.*.keterangan' => 'required',
-            'jurnal.*.detail.*.dc' => 'required',
-            'jurnal.*.detail.*.nilai' => 'required',
-            'jurnal.*.detail.*.kode_pp' => 'required'
+            'no_bukti' => 'required',
+            'no_dokumen' => 'required',
+            'tanggal' => 'required',
+            'kode_form' => 'required',
+            'deskripsi' => 'required',
+            'total_debet' => 'required',
+            'total_kredit' => 'required',
+            'nik_periksa' => 'required',
+            'kode_akun' => 'required|array',
+            'keterangan' => 'required|array',
+            'dc' => 'required|array',
+            'nilai' => 'required|array',
+            'kode_pp' => 'required|array'
         ]);
 
         try {
@@ -310,55 +349,91 @@ class JurnalController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $kode_pp = $res[0]['kode_pp'];
-            $data = $request->input('jurnal');
             DB::connection($this->db)->beginTransaction();
-
-            if(count($data) > 0){
-                for($i=0;$i<count($data);$i++){
-                    $periode=substr($data[$i]['tanggal'],0,4).substr($data[$i]['tanggal'],5,2);
-                   
-                    $no_bukti = $data[$i]['no_bukti'];
-
-                    $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-
-                    $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-
-                    $cek = $this->doCekPeriode2('MI',$status_admin,$periode);
+            
+            $periode=substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $no_bukti = $request->no_bukti;
+            
+            $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            
+            $cek = $this->doCekPeriode2('MI',$status_admin,$periode);
+            
+            if($cek['status']){
+                $res = $this->isUnik($request->no_dokumen,$no_bukti);
+                if($res['status']){
                     
-                    if($cek['status']){
-                        $res = $this->isUnik($data[$i]['no_dokumen'],$no_bukti);
-                        if($res['status']){
-                            
-                            $data2 = $request->input('jurnal')[$i]['detail'];
-                            $nilai = 0;
-                            if (count($data2) > 0){
-                                for ($j=0;$j < count($data2);$j++){
-                                    if($data2[$j]['kode_akun'] != ""){
-                                        if($data2[$j]['dc'] == "D"){
-                                            $nilai += floatval($data2[$j]['nilai']);
-                                        }
-                                        $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$data[$i]['no_dokumen']."','".$data[$i]['tanggal']."',".$j.",'".$data2[$j]['kode_akun']."','".$data2[$j]['dc']."',".floatval($data2[$j]['nilai']).",".floatval($data2[$j]['nilai']).",'".$data2[$j]['keterangan']."','MI','MI','IDR',1,'".$data2[$j]['kode_pp']."','-','-','-','-','-','-','-','-')");
-                                    }
+                    $nilai = 0;
+                    if (count($request->kode_akun) > 0){
+                        for ($j=0;$j < count($request->kode_akun);$j++){
+                            if($request->kode_akun[$j] != ""){
+                                if($request->dc[$j] == "D"){
+                                    $nilai += floatval($request->nilai[$j]);
                                 }
-                            }	
-
-                            $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','".$data[$i]['kode_form']."','F','-','-','".$kode_pp."','".$data[$i]['tanggal']."','".$data[$i]['no_dokumen']."','".$data[$i]['deskripsi']."','IDR',1,".$nilai.",0,0,'".$nik."','".$data[$i]['nik_periksa']."','-','-','-','-','-','-','MI')");
-
-
-                            $tmp="sukses";
-                            $sts=true;
-                        
-                        }else{
-                            $tmp = "Transaksi tidak valid. No Dokumen '".$data[$i]['no_dokumen']."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
-                            $sts = false;
+                                $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".$j.",'".$request->kode_akun[$j]."','".$request->dc[$j]."',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','MI','MI','IDR',1,'".$request->kode_pp[$j]."','-','-','-','-','-','-','-','-')");
+                            }
                         }
-                    }else{
-                        $tmp = $cek['message'];
-                        $sts = false;
-                    }         
+                    }	
+                    
+                    $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','MI','".$request->kode_form."','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','".$request->nik_periksa."','-','-','-','-','-','-','MI')");
+                    
+                    $arr_foto = array();
+                    $arr_jenis = array();
+                    $arr_no_urut = array();
+                    $arr_nama_dok = array();
+                    $i=0;
+                    $cek = $request->file;
+                    if(!empty($cek)){
+                        if(count($request->nama_file_seb) > 0){
+                            //looping berdasarkan nama dok
+                            for($i=0;$i<count($request->nama_file_seb);$i++){
+                                //cek row i ada file atau tidak
+                                if(isset($request->file('file')[$i])){
+                                    $file = $request->file('file')[$i];
+                                    //kalo ada cek nama sebelumnya ada atau -
+                                    if($request->nama_file_seb[$i] != "-"){
+                                        //kalo ada hapus yang lama
+                                        Storage::disk('s3')->delete('toko/'.$request->nama_file_seb[$i]);
+                                    }
+                                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                    $foto = $nama_foto;
+                                    if(Storage::disk('s3')->exists('toko/'.$foto)){
+                                        Storage::disk('s3')->delete('toko/'.$foto);
+                                    }
+                                    Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
+                                    $arr_foto[] = $foto;
+                                    $arr_jenis[] = $request->jenis[$i];
+                                    $arr_no_urut[] = $request->no_urut[$i];
+                                    $arr_nama_dok[] = $request->nama_dok[$i];
+                                }else if($request->nama_file_seb[$i] != "-"){
+                                    $arr_foto[] = $request->nama_file_seb[$i];
+                                    $arr_jenis[] = $request->jenis[$i];
+                                    $arr_no_urut[] = $request->no_urut[$i];
+                                    $arr_nama_dok[] = $request->nama_dok[$i];
+                                }     
+                            }
+                            
+                            $deldok = DB::connection($this->db)->table('trans_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                        }
+        
+                        if(count($arr_no_urut) > 0){
+                            for($i=0; $i<count($arr_no_urut);$i++){
+                                $insdok[$i] = DB::connection($this->db)->insert("insert into trans_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,jenis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$arr_no_urut[$i]."','".$arr_nama_dok[$i]."','".$arr_jenis[$i]."') "); 
+                            }
+                        }
+                    }
 
+                    $tmp="sukses";
+                    $sts=true;
+                    
+                }else{
+                    $tmp = "Transaksi tidak valid. No Dokumen '".$request->no_dokumen."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
+                    $sts = false;
                 }
-            }
+            }else{
+                $tmp = $cek['message'];
+                $sts = false;
+            }         
 
             if($sts){
                 DB::connection($this->db)->commit();
@@ -449,10 +524,17 @@ class JurnalController extends Controller
                     where a.no_bukti = '".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
             $res2= json_decode(json_encode($res2),true);
 
+            $sql3="select a.no_bukti,a.kode_lokasi,a.jenis,a.file_dok as fileaddres,a.no_urut,a.nama from trans_dok a
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' order by a.no_urut ";
+            $res3 = DB::connection($this->db)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+            
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['jurnal'] = $res;
                 $success['detail'] = $res2;
+                $success['dokumen'] = $res3;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
@@ -460,6 +542,7 @@ class JurnalController extends Controller
                 $success['message'] = "Data Kosong!"; 
                 $success['jurnal'] = [];
                 $success['detail'] = [];
+                $success['dokumen'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }

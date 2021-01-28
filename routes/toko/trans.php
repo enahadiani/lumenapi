@@ -100,7 +100,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('jurnal','Toko\JurnalController@index');
     $router->get('jurnal-detail','Toko\JurnalController@show');
     $router->post('jurnal','Toko\JurnalController@store');
-    $router->put('jurnal','Toko\JurnalController@update');
+    $router->post('jurnal-ubah','Toko\JurnalController@update');
     $router->delete('jurnal','Toko\JurnalController@destroy');
     $router->get('pp-list','Toko\JurnalController@getPP');
     $router->get('akun','Toko\JurnalController@getAkun');
