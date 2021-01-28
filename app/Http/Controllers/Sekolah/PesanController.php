@@ -844,43 +844,6 @@ class PesanController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
-
-    public function historyPesanDetail(Request $request)
-    {
-        $this->validate($request,[
-            'kontak' => 'required'
-        ]);
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $kode_pp = $data->kode_pp;
-            }
-
-            $sql = "";
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Tidak ditemukan!";
-                $success['data'] = [];
-                $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
-
     
     public function rata2Nilai(Request $request){
         $this->validate($request,[
@@ -1029,6 +992,186 @@ class PesanController extends Controller
             $success['message'] = "Sukses!";
             return response()->json(['success'=>$success], $this->successStatus);
 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    // MOBILE GURU
+
+    public function getPesanKelas(Request $request)
+    {
+        $this->validate($request,[
+            'kode_kelas' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+
+            $sql = "select a.kode_matpel,b.nama,b.skode,isnull(c.jum,0) as jum_pesan, isnull(d.jum,0) as jum_baca, isnull(c.jum,0)- isnull(d.jum,0) as jum_belum
+            from sis_guru_matpel_kelas a
+            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join (select a.kode_matpel,c.kode_kelas,a.kode_pp,a.kode_lokasi,count(*) as jum
+                        from sis_pesan_m a 
+                        inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                        inner join sis_siswa c on b.nik=c.nis and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi and c.flag_aktif='1'
+                        where a.tipe in ('info','nilai')
+                        group by a.kode_matpel,c.kode_kelas,a.kode_pp,a.kode_lokasi ) c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_kelas=c.kode_kelas
+            left join (select a.kode_matpel,c.kode_kelas,a.kode_pp,a.kode_lokasi,count(*) as jum
+                        from sis_pesan_m a 
+                        inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                        inner join sis_siswa c on b.nik=c.nis and b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi and c.flag_aktif='1'
+                        where a.tipe in ('info','nilai') and b.sts_read_mob = 1
+                        group by a.kode_matpel,c.kode_kelas,a.kode_pp,a.kode_lokasi ) d on a.kode_matpel=d.kode_matpel and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_kelas=d.kode_kelas
+            where a.nik='$nik' and a.kode_kelas='$request->kode_kelas' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getPesanKelasHistory(Request $request)
+    {
+        $this->validate($request,[
+            'kode_kelas' => 'required',
+            'kode_matpel' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+            $kode_kelas = $request->kode_kelas;
+            $kode_matpel = $request->kode_matpel;
+            $sql = "select * from 
+            (select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam 
+            from (	select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
+                    from sis_pesan_m a
+                    inner join sis_siswa c on a.nis=c.nis and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                    inner join (select jenis,nis,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                                from sis_pesan_m
+                                where tipe in ('info','nilai') and nik_user='$nik' and jenis='Siswa'
+                                group by jenis,nis,kode_lokasi,kode_pp
+                                ) b on a.jenis=b.jenis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input and a.nis=b.nis
+                     where a.tipe in ('info','nilai')  and a.nik_user = '$nik'  and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and c.kode_kelas='$kode_kelas' and a.kode_matpel='$kode_matpel'
+                    ) a
+            inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(b.foto,'-') as foto 
+                from sis_siswa a
+                left join sis_hakakses b on a.nis=b.nik and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.flag_aktif='1'
+            )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
+            union all
+            select a.*,x.nama,x.foto,convert(varchar,a.tgl_input,103) as tgl, convert(varchar,a.tgl_input,108) as jam 
+            from (
+                select a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input
+                from sis_pesan_m a
+                inner join (select jenis,kode_kelas,kode_lokasi,kode_pp,max(tgl_input) as tgl_input
+                            from sis_pesan_m
+                            where tipe in ('info','nilai') and nik_user='$nik' and jenis='Kelas'
+                            group by jenis,kode_kelas,kode_lokasi,kode_pp
+                            ) b on a.jenis=b.jenis and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input and a.kode_kelas=b.kode_kelas
+                where a.tipe in ('info','nilai')  and a.nik_user = '$nik' and a.kode_kelas='$kode_kelas' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$kode_matpel'
+            ) a
+            inner join (select a.kode_kelas as kode,a.nama,a.kode_pp,a.kode_lokasi,'-' as foto 
+                        from sis_kelas a
+                        where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+                        )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
+            ) a 
+            order by a.tgl_input desc
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getPesanKelasDetail(Request $request)
+    {
+        $this->validate($request,[
+            'kode_matpel' => 'required',
+            'jenis' => 'required',
+            'kontak' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+            $sql = "select a.jenis,a.kontak,x.nama,a.judul,a.pesan,a.tgl_input,isnull(b.file_dok,'-')as file_dok from (
+                select a.no_bukti,a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input,a.kode_matpel,a.ref1
+            from sis_pesan_m a
+            ) a
+            inner join (select a.nis as kode,a.nama,a.kode_pp,a.kode_lokasi,isnull(b.foto,'-') as foto 
+                         from sis_siswa a
+                         left join sis_hakakses b on a.nis=b.nik and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                         where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.flag_aktif='1'
+                         union all
+                         select a.kode_kelas as kode,a.nama,a.kode_pp,a.kode_lokasi,'-' as foto 
+                         from sis_kelas a
+                         where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+                    )x on a.kontak=x.kode and a.kode_lokasi=x.kode_lokasi and a.kode_pp=x.kode_pp
+            left join sis_pesan_dok b on a.no_bukti=b.no_bukti and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kontak='$request->kontak' and a.jenis='$request->jenis' and a.kode_matpel='$request->kode_matpel'
+            order by a.tgl_input
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;

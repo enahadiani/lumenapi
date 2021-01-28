@@ -254,6 +254,10 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('pesan-history','Sekolah\PesanController@historyPesan');
     $router->get('rata2-nilai','Sekolah\PesanController@rata2Nilai');
     $router->get('data-box','Sekolah\PesanController@getDataBox');
+    
+    $router->get('pesan-kelas','Sekolah\PesanController@getPesanKelas');
+    $router->get('pesan-kelas-history','Sekolah\PesanController@getPesanKelasHistory');
+    $router->get('pesan-kelas-detail','Sekolah\PesanController@getPesanKelasDetail');
 
     // DASHBOARD 
     $router->get('rata2-nilai-dashboard','Sekolah\DashboardController@rata2Nilai');
