@@ -1860,12 +1860,14 @@ class LaporanController extends Controller
             // $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
             // $res = DB::connection($this->db)->update($sql);
             
-            $sql2="
-            select a.kode_neraca,a.kode_fs,kode_lokasi,a.nama,a.tipe,a.level_spasi,a.level_lap,
-            case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
-            case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
-            case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
-            case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4, a.rowindex
+            $sql2="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
+                    case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+                    case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+                    case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+                    case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4,
+                    case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
+                    case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
+                    case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7
             from exs_neraca a
 			$where and a.modul='L'
 			order by a.rowindex";
