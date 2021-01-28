@@ -88,6 +88,7 @@ class UploadDokController extends Controller
             'tgl_terima' => 'required',
             'no_reg' => 'required',
             'no_dokumen'=>'required|array',
+            'nama_file_seb'=>'required|array',
             'file_dok.*'=>'required|file|max:3072'
         ]);
 
@@ -99,37 +100,45 @@ class UploadDokController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            
             $arr_foto = array();
-            $i=0;
-            if($request->hasfile('file_dok'))
-            {
-                foreach($request->file('file_dok') as $file)
-                {                
-                    $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('dago/'.$foto)){
-                        Storage::disk('s3')->delete('dago/'.$foto);
-                    }
-                    Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
-                    $arr_foto[] = $foto;
-                    $i++;
+            $arr_no_dokumen = array();
+            if(count($request->nama_file_seb) > 0){
+                //looping berdasarkan nama dok
+                for($i=0;$i<count($request->nama_file_seb);$i++){
+                    //cek row i ada file atau tidak
+                    if(isset($request->file('file_dok')[$i])){
+                        $file = $request->file('file_dok')[$i];
+                        //kalo ada cek nama sebelumnya ada atau -
+                        if($request->nama_file_seb[$i] != "-"){
+                            //kalo ada hapus yang lama
+                            Storage::disk('s3')->delete('dago/'.$request->nama_file_seb[$i]);
+                        }
+                        $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                        $foto = $nama_foto;
+                        if(Storage::disk('s3')->exists('dago/'.$foto)){
+                            Storage::disk('s3')->delete('dago/'.$foto);
+                        }
+                        Storage::disk('s3')->put('dago/'.$foto,file_get_contents($file));
+                        $arr_foto[] = $foto;
+                        $arr_no_dokumen[] = $request->no_dokumen[$i];
+                    }else if($request->nama_file_seb[$i] != "-"){
+                        $arr_foto[] = $request->nama_file_seb[$i];
+                        $arr_no_dokumen[] = $request->no_dokumen[$i];
+                    }     
                 }
-            }        
+                
+                $del3 = DB::connection($this->sql)->table('dgw_scan')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $request->no_reg)->delete();
+            }
     
-            if(count($arr_foto) > 0){
-                for($i=0; $i<count($arr_foto);$i++){
+            if(count($arr_no_dokumen) > 0){
+                for($i=0; $i<count($arr_no_dokumen);$i++){
                     
-                    $del[$i] = DB::connection($this->sql)->table('dgw_scan')
-                    ->where('no_bukti', $request->no_reg)    
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->where('modul', $request->no_dokumen[$i])
-                    ->delete();
-                    
-                    $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_scan(no_bukti,modul,no_gambar,kode_lokasi,nik) values (?, ?, ?, ?, ?) ", [$request->no_reg,$request->no_dokumen[$i],$arr_foto[$i],$kode_lokasi,$nik_user]);
+                    $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_scan(no_bukti,modul,no_gambar,kode_lokasi,nik) values (?, ?, ?, ?, ?) ", [$request->no_reg,$arr_no_dokumen[$i],$arr_foto[$i],$kode_lokasi,$nik_user]);
 
                     $upd[$i] = DB::connection($this->sql)->table('dgw_reg_dok')
                     ->where('no_reg', $request->no_reg)    
-                    ->where('no_dok', $request->no_dokumen[$i]) 
+                    ->where('no_dok', $arr_no_dokumen[$i]) 
                     ->update(['tgl_terima' => $request->tgl_terima]);
                 }
             }
