@@ -54,7 +54,7 @@ class LapInternal2Controller extends Controller
             }
 
             $sql="select a.no_reg,a.kode_lokasi,a.no_peserta,a.no_paket,a.no_jadwal, convert(varchar,b.tgl_berangkat,103)  as tgl_berangkat,c.nama as nama_paket,c.jenis,e.nama as nama_room,f.nama_agen as agen,datediff(year,d.tgl_lahir,getdate()) as usia,
-            d.nama,d.jk,d.tempat,convert(varchar,d.tgl_lahir,103) as tgl_lahir,d.id_peserta,d.alamat,d.hp,d.nopass,convert(varchar,d.issued,103) as issued,convert(varchar,d.ex_pass,103) as ex_pass,d.kantor_mig,d.ibu,d.ayah,
+            d.nama,d.jk,d.tempat,convert(varchar,d.tgl_lahir,103) as tgl_lahir,''''+d.id_peserta as id_peserta,d.alamat,d.hp,d.nopass,convert(varchar,d.issued,103) as issued,convert(varchar,d.ex_pass,103) as ex_pass,d.kantor_mig,d.ibu,d.ayah,
             d.pendidikan,h.nama as pekerjaan,d.status,a.brkt_dgn,convert(varchar,b.tgl_datang,103) as tgl_aktual,'-' as kakek,g.nama_marketing
             from dgw_reg a
             inner join dgw_jadwal b on a.no_paket=b.no_paket and a.no_jadwal=b.no_jadwal and a.kode_lokasi=b.kode_lokasi
@@ -544,7 +544,8 @@ class LapInternal2Controller extends Controller
 			left join (select no_reg,kode_lokasi,count(no_kwitansi) as cicil_ke
                         from dgw_pembayaran 
                         group by no_reg,kode_lokasi ) n on b.no_reg=n.no_reg and b.kode_lokasi=n.kode_lokasi
-            $where  and a.flag_ver='1' ";
+            $where  and a.flag_ver='1' 
+            order by a.no_kb desc";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
