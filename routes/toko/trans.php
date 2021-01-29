@@ -166,6 +166,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('jurnal-upload-import','Toko\JurnalUploadController@importExcel');
     $router->get('jurnal-upload-tmp','Toko\JurnalUploadController@getJurnalUploadTmp');
 
+    // UPLOAD AKUN
+    $router->get('akun','Toko\AkunController@index');
+    $router->post('akun','Toko\AkunController@store');
+    $router->post('akun-import','Toko\AkunController@importExcel');
+    $router->get('akun-tmp','Toko\AkunController@getAkunTmp');
+
     // KAS BANK
     $router->get('kas-bank','Toko\KasBankController@index');
     $router->get('kas-bank-detail','Toko\KasBankController@show');
@@ -202,6 +208,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
 $router->get('export', 'Toko\JurnalController@export');
 $router->get('sawal-export', 'Toko\SawalController@export');
 $router->get('jurnal-upload-export', 'Toko\JurnalUploadController@export');
+$router->get('akun-export', 'Toko\AkunController@export');
 
 
 
