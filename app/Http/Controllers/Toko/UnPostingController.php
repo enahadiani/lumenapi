@@ -44,7 +44,6 @@ class UnPostingController extends Controller
         $this->validate($request, [
             'deskripsi' => 'required',
             'tanggal' => 'required',
-            'detail.*.status' => 'required',
             'detail.*.no_bukti' => 'required',
             'detail.*.form' => 'required'
         ]);
@@ -65,11 +64,9 @@ class UnPostingController extends Controller
                 $isAda = false;
                 for ($i=0;$i < count($det);$i++){
                     $line = $det[$i];
-                    if (strtoupper($line['status']) == "UNPOSTING"){
-                        $arr_nobukti[] = $line['no_bukti'];
-                        $arr_nobukti2 .= ",'".$line['no_bukti']."'"; 
-                        $isAda = true;
-                    }
+                    $arr_nobukti[] = $line['no_bukti'];
+                    $arr_nobukti2 .= ",'".$line['no_bukti']."'"; 
+                    $isAda = true;
                 }
             
                 if($isAda){
@@ -100,11 +97,7 @@ class UnPostingController extends Controller
                         $ins = DB::connection($this->sql)->insert("insert into unposting_m(no_unpost,kode_lokasi,periode,tanggal,modul,keterangan,nik_buat,nik_app,no_del,tgl_input,nik_user,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$periode,$request->tanggal,'-',$request->deskripsi,$nik,$nik,'-',date('Y-m-d H:i:s'),$nik,0));
         
                         for ($i=0;$i < count($det);$i++){
-                            if (strtoupper($det[$i]['status']) == "UNPOSTING"){
-                                
-                                DB::connection($this->sql)->getPdo()->exec("EXEC sp_unpost_bukti '$kode_lokasi','".$det[$i]['no_bukti']."','".$no_bukti."' ");
-                                
-                            }
+                            DB::connection($this->sql)->getPdo()->exec("EXEC sp_unpost_bukti '$kode_lokasi','".$det[$i]['no_bukti']."','".$no_bukti."' ");    
                         }
 
                         DB::connection($this->sql)->getPdo()->exec("EXEC sp_exs_proses '$kode_lokasi','$periode','FS1' ");
