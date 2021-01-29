@@ -11,6 +11,7 @@ use App\Exports\JurnalUploadExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use Log; 
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class JurnalUploadController extends Controller
 {
@@ -158,6 +159,7 @@ class JurnalUploadController extends Controller
             $x = array();
             $status_validate = true;
             $no=1;
+            $ket= "";
             foreach($excel as $row){
                 if($row[0] != ""){
                     
@@ -168,8 +170,8 @@ class JurnalUploadController extends Controller
                     // }else{
                         $sts = 1;
                     // }
-
-                    $x[] = DB::connection($this->db)->insert("insert into xjan(tanggal,no_bukti,keterangan,akun_debet,akun_kredit,nilai,sts_upload,ket_upload,nu,kode_lokasi,periode,tgl_input,nik_user)  values ('".$row[0]."','".$row[1]."','".$row[2]."','".$row[3]."','".$row[4]."',".floatval($row[5]).",'".$sts."','".$ket."',".$no.",'$kode_lokasi','$request->periode',getdate(),'$request->nik_user') ");
+                    $tgl = (is_int($row[0]) ? Date::excelToDateTimeObject($row[0])->format('Y-m-d') : $row[2]);
+                    $x[] = DB::connection($this->db)->insert("insert into xjan(tanggal,no_bukti,keterangan,akun_debet,akun_kredit,nilai,sts_upload,ket_upload,nu,kode_lokasi,periode,tgl_input,nik_user)  values ('".$tgl."','".$row[1]."','".$row[2]."','".$row[3]."','".$row[4]."',".floatval($row[5]).",'".$sts."','".$ket."',".$no.",'$kode_lokasi','$request->periode',getdate(),'$request->nik_user') ");
                     $no++;
                 }
             }
