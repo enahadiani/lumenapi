@@ -88,11 +88,11 @@ class JurnalUploadController extends Controller
             $del = DB::connection($this->db)->update("delete from gldt where periode='".$request->periode."' and kode_lokasi='$kode_lokasi' ");
 
             $ins2 = DB::connection($this->db)->insert("insert into gldt(kode_lokasi, periode, no_bukti, tanggal, kode_akun, dc, keterangan, nilai, kode_pp, nu,modul,jenis)  
-                select kode_lokasi, periode, no_bukti, tanggal, akun_debet, 'D', keterangan, nilai, kode_pp, nu,modul,jenis
+                select kode_lokasi, periode, no_bukti, tanggal, akun_debet, 'D', keterangan, nilai, 'KUG' as kode_pp, nu,'MI' as modul,'MI' as jenis
                 from xjan 
                 where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user' and periode ='$request->periode'   
                 union all
-                select kode_lokasi, periode, no_bukti, tanggal, akun_kredit, 'C', keterangan, nilai, kode_pp, nu,modul,jenis
+                select kode_lokasi, periode, no_bukti, tanggal, akun_kredit, 'C', keterangan, nilai, 'KUG' as kode_pp, nu,'MI' as modul,'MI' as jenis
                 from xjan 
                 where kode_lokasi='$kode_lokasi' and nik_user='$request->nik_user' and periode ='$request->periode'           
             ");
@@ -101,19 +101,19 @@ class JurnalUploadController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Saldo awal berhasil disimpan";
+            $success['message'] = "Data Jurnal berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Saldo awal gagal disimpan. Internal Server Error.";
+            $success['message'] = "Data Jurnal gagal disimpan. Internal Server Error.".$e;
             Log::error($e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
        
     }
 
-    public function validateData($kode_akun,$kode_lokasi){
+    public function validateData($kode_akun,$kode_akun2,$kode_lokasi){
         $keterangan = "";
         $auth = DB::connection($this->db)->select("select kode_akun from masakun where kode_akun='$kode_akun' and kode_lokasi='$kode_lokasi' 
         ");
@@ -121,7 +121,16 @@ class JurnalUploadController extends Controller
         if(count($auth) > 0){
             $keterangan .= "";
         }else{
-            $keterangan .= "Kode Akun $kode_akun tidak valid. ";
+            $keterangan .= "Akun Debet $kode_akun tidak valid. ";
+        }
+
+        $auth2 = DB::connection($this->db)->select("select kode_akun from masakun where kode_akun='$kode_akun2' and kode_lokasi='$kode_lokasi' 
+        ");
+        $auth2 = json_decode(json_encode($auth2),true);
+        if(count($auth2) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "Akun Kredit $kode_akun2 tidak valid. ";
         }
 
         return $keterangan;
@@ -163,13 +172,13 @@ class JurnalUploadController extends Controller
             foreach($excel as $row){
                 if($row[0] != ""){
                     
-                    // $ket = $this->validateData($row[0],$kode_lokasi);
-                    // if($ket != ""){
-                    //     $sts = 0;
-                    //     $status_validate = false;
-                    // }else{
+                    $ket = $this->validateData($row[3],$row[4],$kode_lokasi);
+                    if($ket != ""){
+                        $sts = 0;
+                        $status_validate = false;
+                    }else{
                         $sts = 1;
-                    // }
+                    }
                     $tgl = (is_int($row[0]) ? Date::excelToDateTimeObject($row[0])->format('Y-m-d') : $row[2]);
                     $x[] = DB::connection($this->db)->insert("insert into xjan(tanggal,no_bukti,keterangan,akun_debet,akun_kredit,nilai,sts_upload,ket_upload,nu,kode_lokasi,periode,tgl_input,nik_user)  values ('".$tgl."','".$row[1]."','".$row[2]."','".$row[3]."','".$row[4]."',".floatval($row[5]).",'".$sts."','".$ket."',".$no.",'$kode_lokasi','$request->periode',getdate(),'$request->nik_user') ");
                     $no++;
