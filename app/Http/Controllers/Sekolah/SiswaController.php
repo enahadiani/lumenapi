@@ -51,10 +51,11 @@ class SiswaController extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.flag_aktif,c.nama as nama_status,a.nis2
+            $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_kelas,a.kode_akt,a.kode_pp,a.kode_pp+'-'+b.nama as pp,a.tgl_input,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.flag_aktif,c.nama as nama_status,a.nis2,isnull(d.foto,'-') as foto
             from sis_siswa a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             inner join sis_siswa_status c on a.flag_aktif=c.kode_ss and a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            left join sis_hakakses d on a.nis=d.nik and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
             where a.kode_lokasi='$kode_lokasi' $filter
             order by a.nis ");
             $res = json_decode(json_encode($res),true);
