@@ -51,29 +51,22 @@ class CustController extends Controller
                     $filter .= " and a.kode_cust='$request->kode_cust' ";
                 }   
                 $sql="select a.kode_cust,a.nama,a.alamat,a.pic,jabatan_pic,a.email,a.no_telp from sai_cust a where a.kode_lokasi='".$kode_lokasi."' $filter ";
-            
+                
             }else{
                 
                 $sql = "select kode_cust,nama,alamat,pic,jabatan_pic,email,no_telp from sai_cust where kode_lokasi='".$kode_lokasi."' ";
             }
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
-
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                if(isset($res2)){
-                    $success['data_lampiran'] = $res2;
-                }
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                if(isset($res2)){
-                    $success['data_lampiran'] = [];
-                }
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
