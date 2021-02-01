@@ -192,6 +192,18 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('anggaran-load','Toko\AnggaranController@loadAnggaran');    
     $router->post('anggaran','Toko\AnggaranController@store');  
 
+    // RRA AJU
+    $router->get('rra-agg-drk','Toko\PengajuanRRAController@getDRK'); 
+    $router->get('rra-agg-saldo','Toko\PengajuanRRAController@getSaldo'); 
+    $router->get('rra-agg','Toko\PengajuanRRAController@index');          
+    $router->post('rra-agg','Toko\PengajuanRRAController@store'); 
+    $router->put('rra-agg','Toko\PengajuanRRAController@update');    
+    $router->delete('rra-agg','Toko\PengajuanRRAController@destroy'); 
+    $router->get('rra-nik-app','Toko\PengajuanRRAController@getNIKApp'); 
+    $router->get('rra-pp-terima','Toko\PengajuanRRAController@getPPTerima');
+    $router->get('rra-akun-terima','Toko\PengajuanRRAController@getAkunTerima');
+    $router->get('rra-drk-terima','Toko\PengajuanRRAController@getDRKTerima'); 
+
 
 });
 

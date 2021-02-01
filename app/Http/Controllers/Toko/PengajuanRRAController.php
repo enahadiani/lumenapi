@@ -417,7 +417,7 @@ class PengajuanRRAController extends Controller
         
     }
 
-    public function getDRK(Request $request)
+    public function getDRKTerima(Request $request)
     {
         $this->validate($request,[
             'tahun' => 'required'
@@ -483,7 +483,7 @@ class PengajuanRRAController extends Controller
                 $line = $res[0];
                 $data = explode(";",$line['gar']);
                 $sls = floatval($data[0]) - floatval($data[1]);
-                $e_saldo = floatToNilai($sls);
+                $success['saldo'] = floatToNilai($sls);
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
@@ -492,7 +492,7 @@ class PengajuanRRAController extends Controller
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
-                $e_saldo = 0;
+                $success['saldo'] = 0;
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
