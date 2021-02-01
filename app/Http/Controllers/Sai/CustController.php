@@ -58,7 +58,12 @@ class CustController extends Controller
             }
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
-
+            $sql2="select a.kode_lampiran,b.nama from sai_cust_d a 
+                inner join sai_lampiran b on a.kode_lampiran=b.kode_lampiran and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' $filter 
+                order by a.nu ";
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
