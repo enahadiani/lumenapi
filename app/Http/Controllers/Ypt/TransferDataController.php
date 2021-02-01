@@ -65,10 +65,12 @@ class TransferDataController extends Controller
             }
 
             $exec1 = DB::connection($this->sql)->update("exec sp_exs_proses '$kode_lokasi','$request->periode','$request->kode_fs'");
-            $exec2 = DB::connection($this->sql)->update("exec sp_exs_proses_trans '$kode_lokasi','$request->periode'");
-            $exec3 = DB::connection($this->sql)->update("exec sp_exs_proses_lap '$kode_lokasi','$request->periode','$request->kode_fs' ");
+            // $exec2 = DB::connection($this->sql)->update("exec sp_exs_proses_trans '$kode_lokasi','$request->periode'");
+            // $exec3 = DB::connection($this->sql)->update("exec sp_exs_proses_lap '$kode_lokasi','$request->periode','$request->kode_fs' ");
 
-            $sql= "select kode_proses,nama,'0' as status from exs_proses_m where kode_lokasi='".$kode_lokasi."' ";
+            // $sql= "select kode_proses,nama,'0' as status from exs_proses_m where kode_lokasi='".$kode_lokasi."' ";
+
+            $sql= "select 'P01' as kode_proses, 'Transfer data' as nama,'0' as status ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
