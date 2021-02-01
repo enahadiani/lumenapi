@@ -204,7 +204,6 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('rra-akun-terima','Toko\PengajuanRRAController@getAkunTerima');
     $router->get('rra-drk-terima','Toko\PengajuanRRAController@getDRKTerima'); 
 
-
 });
 
 $router->get('anggaran-export','Toko\AnggaranController@export');    
