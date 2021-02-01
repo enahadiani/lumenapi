@@ -51,12 +51,6 @@ class CustController extends Controller
                     $filter .= " and a.kode_cust='$request->kode_cust' ";
                 }   
                 $sql="select a.kode_cust,a.nama,a.alamat,a.pic,jabatan_pic,a.email,a.no_telp from sai_cust a where a.kode_lokasi='".$kode_lokasi."' $filter ";
-                $sql2="select a.kode_lampiran,b.nama from sai_cust_d a 
-                inner join sai_lampiran b on a.kode_lampiran=b.kode_lampiran and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi='".$kode_lokasi."' $filter 
-                order by a.nu";
-                $res2 = DB::connection($this->sql)->select($sql2);
-                $res2 = json_decode(json_encode($res2),true);
                 
             }else{
                 
@@ -68,17 +62,11 @@ class CustController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                if(isset($res2)){
-                    $success['data_lampiran'] = $res2;
-                }
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                if(isset($res2)){
-                    $success['data_lampiran'] = [];
-                }
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
