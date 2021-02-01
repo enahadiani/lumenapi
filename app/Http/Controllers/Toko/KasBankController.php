@@ -137,12 +137,14 @@ class KasBankController extends Controller
                 }
             }
             if (!$akunKB) {
-                $msg .= "Transaksi tidak valid. Akun KasBank tidak ditemukan";
+                $msg = "Transaksi tidak valid. Akun KasBank tidak ditemukan. ";
                 $sts = false;						
-            }
-            if (!$posisiDC) {
-                $msg .= "Transaksi tidak valid. Akun KasBank tidak sesuai posisi dengan jenis transaksi.(DC)";
-                $sts = false;						
+            }else{
+
+                if (!$posisiDC) {
+                    $msg = "Transaksi tidak valid. Akun KasBank tidak sesuai posisi dengan jenis transaksi.(DC)";
+                    $sts = false;						
+                }
             }
         } catch (\Throwable $e) {		
             $msg= " error " .  $e;
