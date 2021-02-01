@@ -64,7 +64,7 @@ class TransferDataController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $exec1 = DB::connection($this->sql)->update("exec sp_exs_proses_transfer '$kode_lokasi','$request->periode'");
+            $exec1 = DB::connection($this->sql)->update("exec sp_exs_proses '$kode_lokasi','$request->periode','$request->kode_fs'");
             $exec2 = DB::connection($this->sql)->update("exec sp_exs_proses_trans '$kode_lokasi','$request->periode'");
             $exec3 = DB::connection($this->sql)->update("exec sp_exs_proses_lap '$kode_lokasi','$request->periode','$request->kode_fs' ");
 
