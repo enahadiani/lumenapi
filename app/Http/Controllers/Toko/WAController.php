@@ -71,19 +71,13 @@ class WAController extends Controller
 		// DB::connection($this->db)->beginTransaction();
         try{
             $client = new Client();
+            $req = $request->all();
+            $req['token'] = $this->token;
             $response = $client->request('POST',  $this->api_url."messages",[
                 'headers' => [
                     'Content-type' => 'application/json'
                 ],
-                'query' => [
-                    'token' => $this->token,
-                    'chatId' => $request->chatId,
-                    'lastMessageNumber' => $request->lastMessageNumber,
-                    'last' => $request->last,
-                    'limit' => $request->limit,
-                    'min_time' => $request->min_time, 	
-                    'max_time' => $request->max_time
-                ]
+                'query' => $req
             ]);
 
             if ($response->getStatusCode() == 200) { // 200 OK
