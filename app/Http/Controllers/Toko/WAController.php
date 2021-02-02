@@ -73,7 +73,7 @@ class WAController extends Controller
             $client = new Client();
             $req = $request->all();
             $req['token'] = $this->token;
-            $response = $client->request('POST',  $this->api_url."messages",[
+            $response = $client->request('GET',  $this->api_url."messages",[
                 'headers' => [
                     'Content-type' => 'application/json'
                 ],
