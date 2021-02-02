@@ -71,7 +71,7 @@ class WAController extends Controller
 		// DB::connection($this->db)->beginTransaction();
         try{
             $client = new Client();
-            $response = $client->request('POST',  $api_url."messages",[
+            $response = $client->request('POST',  $this->api_url."messages",[
                 'headers' => [
                     'Content-type' => 'application/json'
                 ],
