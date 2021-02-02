@@ -63,7 +63,6 @@ class WAController extends Controller
     
     public function Messages(Request $request)
 	{
-
 		if($auth =  Auth::guard($this->guard)->user()){
 			$nik= $auth->nik;
 			$kode_lokasi= $auth->kode_lokasi;
