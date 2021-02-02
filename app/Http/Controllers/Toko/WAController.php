@@ -35,10 +35,7 @@ class WAController extends Controller
 		// DB::connection($this->db)->beginTransaction();
         try{
             $client = new Client();
-            $response = $client->request('GET',  $this->api_url."sendMessage",[
-                'query' => [
-                    'token' => $this->token
-                ],
+            $response = $client->request('GET',  $this->api_url."sendMessage?token=".$this->token,[
                 'form_params' => [
                     'body' => $request->body,
                     'phone' => $request->phone
