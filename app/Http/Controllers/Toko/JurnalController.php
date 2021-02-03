@@ -11,6 +11,8 @@ use App\Exports\JurnalExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
 use App\JurnalTmp;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 class JurnalController extends Controller
 {
@@ -22,7 +24,9 @@ class JurnalController extends Controller
     public $successStatus = 200;
     public $db = 'tokoaws';
     public $guard = 'toko';
-
+    public $api_url = "https://eu179.chat-api.com/instance222737/";
+    public $token = "p0wo8m8y3twd36o5";
+    
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
@@ -276,6 +280,16 @@ class JurnalController extends Controller
                             }
                         }
                     }
+
+                    // EMAIL WA STORE POOLING
+                    $pesan_body = "Data Jurnal berhasil disimpan dengan no transaksi: ".$no_bukti;
+                    $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+                    $inspool1= DB::connection($this->db)->insert("insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values('$request->no_telp_app','$request->email_app','$pesan_body','0',getdate(),NULL,'WA','$no_pool') ");
+        
+                    $inspool2= DB::connection($this->db)->insert("insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values('$request->no_telp_app','$request->email_app','$pesan_body','0',getdate(),NULL,'EMAIL','$no_pool') ");
+        
+                    $success['no_pooling'] = $no_pool;
+
                     $tmp="sukses";
                     $sts=true;
                     
@@ -913,6 +927,98 @@ class JurnalController extends Controller
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function sendNotifikasi(Request $request)
+	{
+		$this->validate($request,[
+			"no_pooling" => 'required'
+		]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            $client = new Client();
+
+            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis from pooling where flag_kirim=0 and no_pool ='$request->no_pooling'  ");
+            if(count($res) > 0){
+                $msg = "";
+                $sts = false;
+                foreach($res as $row){
+                    if($row->jenis == "WA"){
+
+                        $response = $client->request('GET',  $this->api_url."sendMessage?token=".$this->token,[
+                            'form_params' => [
+                                'body' => $row->pesan,
+                                'phone' => $row->no_hp
+                            ]
+                        ]);
+
+                        if ($response->getStatusCode() == 200) { // 200 OK
+                            $response_data = $response->getBody()->getContents();
+                            $data = json_decode($response_data,true);
+
+                            if($data['sent']){
+                                $success['data'] = $data;
+                                DB::connection($this->db)->update("update pooling set tgl_kirim=getdate(),flag_kirim=1 where flag_kirim=0 and no_pool ='$request->no_bukti' and jenis='WA'
+                                ");
+                                DB::connection($this->db)->commit();
+                                $sts = true;
+                                $msg .=$data['message'];
+                            }
+                        }
+
+
+                    }else if($row->jenis == "EMAIL") {
+                        $credentials = base64_encode('api:'.config('services.mailgun.secret'));
+                        $domain = "https://api.mailgun.net/v3/".config('services.mailgun.domain')."/messages";
+                        $response = $client->request('POST',  $domain,[
+                            'headers' => [
+                                'Authorization' => 'Basic '.$credentials
+                            ],
+                            'form_params' => [
+                                'from' => 'devsaku5@gmail.com',
+                                'to' => $row->email,
+                                'subject' => 'Jurnal (ESAKU)',
+                                'html' => $row->pesan
+                            ]
+                        ]);
+                        if ($response->getStatusCode() == 200) { // 200 OK
+                            $response_data = $response->getBody()->getContents();
+                            $data = json_decode($response_data,true);
+                            if(isset($data["id"])){
+                                $success['data2'] = $data;
+                                DB::connection($this->db)->update("update pooling set tgl_kirim=getdate(),flag_kirim=1 where flag_kirim=0 and no_pool ='$request->no_bukti' and jenis='EMAIL'
+                                ");
+                                DB::connection($this->db)->commit();
+                                $sts = true;
+                                $msg .= $data['message'];
+                            }
+                        }
+                    }
+                    
+                }
+
+                $success['message'] = $msg;
+                $success['status'] = $sts;
+            }else{
+                $success['message'] = "Data pooling tidak valid";
+                $success['status'] = false;
+            }
+            return response()->json($success, 200);
+        } catch (BadResponseException $ex) {
+            
+			DB::connection($this->db)->rollback();
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $data['message'] = $res;
+            $data['status'] = false;
+            return response()->json(['data' => $data], 500);
+        }
     }
 }
 
