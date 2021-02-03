@@ -1141,6 +1141,11 @@ class LaporanController extends Controller
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
+            $reslok = DB::connection($this->sql)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -1260,6 +1265,11 @@ class LaporanController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $reslok = DB::connection($this->sql)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data']=$res;
