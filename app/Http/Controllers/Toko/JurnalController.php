@@ -944,7 +944,7 @@ class JurnalController extends Controller
         try{
             $client = new Client();
 
-            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis from pooling where flag_kirim=0 and no_pool ='$request->no_pooling'  ");
+            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis,email from pooling where flag_kirim=0 and no_pool ='$request->no_pooling'  ");
             if(count($res) > 0){
                 $msg = "";
                 $sts = false;
@@ -964,7 +964,7 @@ class JurnalController extends Controller
 
                             if($data['sent']){
                                 $success['data'] = $data;
-                                DB::connection($this->db)->update("update pooling set tgl_kirim=getdate(),flag_kirim=1 where flag_kirim=0 and no_pool ='$request->no_bukti' and jenis='WA'
+                                DB::connection($this->db)->update("update pooling set tgl_kirim=getdate(),flag_kirim=1 where flag_kirim=0 and no_pool ='$request->no_pooling' and jenis='WA'
                                 ");
                                 DB::connection($this->db)->commit();
                                 $sts = true;
@@ -992,7 +992,7 @@ class JurnalController extends Controller
                             $data = json_decode($response_data,true);
                             if(isset($data["id"])){
                                 $success['data2'] = $data;
-                                DB::connection($this->db)->update("update pooling set tgl_kirim=getdate(),flag_kirim=1 where flag_kirim=0 and no_pool ='$request->no_bukti' and jenis='EMAIL'
+                                DB::connection($this->db)->update("update pooling set tgl_kirim=getdate(),flag_kirim=1 where flag_kirim=0 and no_pool ='$request->no_pooling' and jenis='EMAIL'
                                 ");
                                 DB::connection($this->db)->commit();
                                 $sts = true;
@@ -1017,7 +1017,7 @@ class JurnalController extends Controller
             $res = json_decode($response->getBody(),true);
             $data['message'] = $res;
             $data['status'] = false;
-            return response()->json(['data' => $data], 500);
+            return response()->json($data, 500);
         }
     }
 }
