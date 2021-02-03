@@ -2439,7 +2439,7 @@ class LaporanController extends Controller
             // $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
             // $res = DB::connection($this->db)->update($sql);
 
-            $sql="select a.kode_pp,a.nama from pp a $whererek order by a.kode_pp ";
+            $sql="select a.kode_pp,a.nama from pp a $whererek and kode_pp like '5%' order by a.kode_pp ";
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
             $kode_pp = "";
