@@ -125,6 +125,10 @@ $router->get('dashKontrakManage-export','Yakes\KontrakManagemenController@export
 $router->get('dashBinaSehat-export','Yakes\BinaSehatController@export');
 $router->get('arus-kas-export','Yakes\ArusKasController@export');
 
+$router->get('grab-curr','Yakes\SahamController@grabCurr');
+$router->get('multi-curr','Yakes\SahamController@getMultiCurr');
+$router->get('statistics','Yakes\SahamController@getStatistics');
+$router->get('parse-saham','Yakes\SahamController@getSaham');
 
 
 
