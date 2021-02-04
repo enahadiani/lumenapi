@@ -132,7 +132,7 @@ class SahamController extends Controller
                 
             //     $data = json_decode($response_data,true);
             // }
-            $data = array();
+            $data = array('result'=>array());
             return response()->json(['daftar' => $data, 'status'=>true, 'message' => 'success'], 200);
         } catch (BadResponseException $ex) {
             $response = $ex->getResponse();
