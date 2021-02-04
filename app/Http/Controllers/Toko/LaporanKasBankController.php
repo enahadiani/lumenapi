@@ -18,7 +18,7 @@ class LaporanKasBankController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'toko';
-    public $sql = 'tokoaws';
+    public $db = 'tokoaws';
 
     function getBuktiJurnal(Request $request){
         try {
@@ -65,7 +65,7 @@ class LaporanKasBankController extends Controller
                 left join karyawan c on a.nik1=c.nik and a.kode_lokasi=c.kode_lokasi
                 inner join lokasi d on a.kode_lokasi=d.kode_lokasi
                 $where and a.modul in ('KB','KBSPB','KBSPBPJ') order by a.no_bukti ";
-            $rs = DB::connection($this->sql)->select($sql);
+            $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
             $nb = "";
@@ -82,18 +82,19 @@ class LaporanKasBankController extends Controller
 
             $filter_nb = ($nb != "" ? " and no_bukti in ($nb) " : "" );
 
-            $sql=" select a.no_bukti,a.kode_akun,b.nama,a.kode_pp,a.nilai,a.keterangan,isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit,a.kode_curr
+            $sql=" select a.no_bukti,a.kode_akun,b.nama as nama_akun,a.kode_pp,a.nilai,a.keterangan,isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit,a.kode_curr,c.nama as nama_pp
             from (
                 select no_bukti,kode_lokasi,kode_akun,kode_pp,dc,nilai,keterangan,case when dc='D' then nilai else 0 end as debet,case when dc='C' then nilai else 0 end as kredit,kode_curr
                 from trans_j
                 where kode_lokasi='$kode_lokasi' and modul in ('KB','KBSPB','KBSPBPJ') $filter_nb 
             )a 
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             order by a.dc desc
             ";
 
                 
-            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
             
             $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
@@ -166,7 +167,7 @@ class LaporanKasBankController extends Controller
                 inner join trans_j b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
                 inner join masakun c on b.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi 
                 $where  and a.modul in ('KB','KBSPB','KBSPBPJ') order by a.no_bukti ";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
@@ -241,7 +242,7 @@ class LaporanKasBankController extends Controller
             $periode=$request->input('periode')[1];
 
             $sqlex="exec sp_kas_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
-            $res = DB::connection($this->sql)->update($sqlex);
+            $res = DB::connection($this->db)->update($sqlex);
 
             $tmp = "";
             if (isset($request->mutasi[1]) && $request->mutasi[1] == "Tidak")
@@ -254,7 +255,7 @@ class LaporanKasBankController extends Controller
                 inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                 $where and a.nik_user='$nik_user' $tmp
                 order by a.kode_akun ";
-            $rs = DB::connection($this->sql)->select($sql);
+            $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
             $akun = "";
             $i=0;
@@ -280,7 +281,7 @@ class LaporanKasBankController extends Controller
             from trans_j a 
             inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             $whereper $filter_akun order by a.tanggal,dc desc  ";
-            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
             $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
@@ -348,7 +349,7 @@ class LaporanKasBankController extends Controller
             $periode=$request->input('periode')[1];
 
             $sqlex="exec sp_kas_dw_tmp '$kode_lokasi','$periode','$nik_user' ";
-            $res = DB::connection($this->sql)->update($sqlex);
+            $res = DB::connection($this->db)->update($sqlex);
 
             $mutasi="";
             if($request->input('jenis') != ""){
@@ -369,7 +370,7 @@ class LaporanKasBankController extends Controller
             $where and a.nik_user='$nik_user'  $mutasi
             order by a.kode_akun ";
            
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
