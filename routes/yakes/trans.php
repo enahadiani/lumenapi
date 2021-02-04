@@ -118,7 +118,8 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('multi-curr','Yakes\SahamController@getMultiCurr');
     $router->get('statistics','Yakes\SahamController@getStatistics');
     $router->get('parse-saham','Yakes\SahamController@getSaham');
-    
+    $router->post('parse-saham','Yakes\SahamController@getSaham');
+
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
