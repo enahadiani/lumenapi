@@ -117,22 +117,22 @@ class SahamController extends Controller
         ]);
         try { 
             $client = new Client();
-            // $response = $client->request('GET',  'https://bloomberg-market-and-financial-news.p.rapidapi.com/market/get-full',[
-            //     "headers" => [
-            //         "x-rapidapi-host" => "bloomberg-market-and-financial-news.p.rapidapi.com",
-            //         "x-rapidapi-key" => "294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
-            //     ],
-            //     'query' => [
-            //         'id' => $request->id
-            //     ]
-            // ]);
+            $response = $client->request('GET',  'https://bloomberg-market-and-financial-news.p.rapidapi.com/market/get-full',[
+                "headers" => [
+                    "x-rapidapi-host" => "bloomberg-market-and-financial-news.p.rapidapi.com",
+                    "x-rapidapi-key" => "294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
+                ],
+                'query' => [
+                    'id' => $request->id
+                ]
+            ]);
 
-            // if ($response->getStatusCode() == 200) { // 200 OK
-            //     $response_data = $response->getBody()->getContents();
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
                 
-            //     $data = json_decode($response_data,true);
-            // }
-            $data = array('result'=>array());
+                $data = json_decode($response_data,true);
+            }
+            
             return response()->json(['daftar' => $data, 'status'=>true, 'message' => 'success'], 200);
         } catch (BadResponseException $ex) {
             $response = $ex->getResponse();
