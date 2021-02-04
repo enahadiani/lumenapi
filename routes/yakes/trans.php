@@ -114,6 +114,11 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->delete('pendukung','Yakes\PendukungController@destroy');   
     $router->get('pendukung-neraca','Yakes\PendukungController@getNeraca');    
 
+    $router->get('grab-curr','Yakes\SahamController@grabCurr');
+    $router->get('multi-curr','Yakes\SahamController@getMultiCurr');
+    $router->get('statistics','Yakes\SahamController@getStatistics');
+    $router->get('parse-saham','Yakes\SahamController@getSaham');
+    
 });
 
 $router->get('hrKaryawan-export','Yakes\HrKaryawanController@export');
@@ -125,10 +130,7 @@ $router->get('dashKontrakManage-export','Yakes\KontrakManagemenController@export
 $router->get('dashBinaSehat-export','Yakes\BinaSehatController@export');
 $router->get('arus-kas-export','Yakes\ArusKasController@export');
 
-$router->get('grab-curr','Yakes\SahamController@grabCurr');
-$router->get('multi-curr','Yakes\SahamController@getMultiCurr');
-$router->get('statistics','Yakes\SahamController@getStatistics');
-$router->get('parse-saham','Yakes\SahamController@getSaham');
+
 
 
 
