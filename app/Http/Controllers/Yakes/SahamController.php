@@ -58,9 +58,9 @@ class SahamController extends Controller
         try { 
             $client = new Client();
             $response = $client->request('GET',  'https://bloomberg-market-and-financial-news.p.rapidapi.com/market/get-cross-currencies',[
-                "header" => [
-                    "x-rapidapi-host: bloomberg-market-and-financial-news.p.rapidapi.com",
-                    "x-rapidapi-key: 294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
+                "headers" => [
+                    "x-rapidapi-host" => "bloomberg-market-and-financial-news.p.rapidapi.com",
+                    "x-rapidapi-key" => "294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
                 ],
                 'query' => [
                     'id' => $request->id
@@ -88,9 +88,9 @@ class SahamController extends Controller
         try { 
             $client = new Client();
             $response = $client->request('GET',  'https://bloomberg-market-and-financial-news.p.rapidapi.com/stock/get-statistics',[
-                "header" => [
-                    "x-rapidapi-host: bloomberg-market-and-financial-news.p.rapidapi.com",
-                    "x-rapidapi-key: 294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
+                "headers" => [
+                    "x-rapidapi-host" => "bloomberg-market-and-financial-news.p.rapidapi.com",
+                    "x-rapidapi-key" => "294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
                 ],
                 'query' => [
                     'id' => $request->id
@@ -118,9 +118,9 @@ class SahamController extends Controller
         try { 
             $client = new Client();
             $response = $client->request('GET',  'https://bloomberg-market-and-financial-news.p.rapidapi.com/market/get-full',[
-                "header" => [
-                    "x-rapidapi-host: bloomberg-market-and-financial-news.p.rapidapi.com",
-                    "x-rapidapi-key: 294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
+                "headers" => [
+                    "x-rapidapi-host" => "bloomberg-market-and-financial-news.p.rapidapi.com",
+                    "x-rapidapi-key" => "294c7e585fmshf0d82e87eaf4dfcp100cb1jsnabd7efddbcc2"
                 ],
                 'query' => [
                     'id' => $request->id
