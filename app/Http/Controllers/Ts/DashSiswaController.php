@@ -169,10 +169,23 @@ class DashSiswaController extends Controller
                 $kode_pp= $data->kode_pp;
             }
 
-            $periode = $request->periode;
+            $get = DB::connection($this->db)->select("select max(a.periode) as periode from ( select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+            union all
+            select max(periode) as periode from sis_cd_d where kode_lokasi='$kode_lokasi' and nis='$nik'
+            union all
+            select max(periode) as periode from sis_bill_d where kode_lokasi='$kode_lokasi' and nis='$nik' 
+            union all
+            select max(periode) as periode from sis_rekon_d where kode_lokasi='$kode_lokasi' and nis='$nik'
+            ) a");
+            if(count($get) > 0){
+                $periode = $get[0]->periode;
+            }else{
+                $periode = $request->periode;
+            }
+
             $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_lokasi,a.kode_pp,a.kode_akt
             ,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total,
-            a.kode_kelas,f.kode_jur,g.nama as nama_jur
+            a.kode_kelas,f.kode_jur,g.nama as nama_jur,isnull(a.foto,'-') as foto,a.hp_siswa as no_telp,a.id_bank
             from sis_siswa a 
             inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
             inner join sis_jur g on f.kode_jur=g.kode_jur and f.kode_lokasi=g.kode_lokasi and f.kode_pp=g.kode_pp
@@ -240,17 +253,66 @@ class DashSiswaController extends Controller
             order by a.kode_kelas,a.nis");
             $res2 = json_decode(json_encode($res2),true);
 
+
+            $res3 = DB::connection($this->db)->select("select  top 10 a.* from (
+                select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
+                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,
+                        0 as bayar from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                        group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
+                union all 
+                select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+                convert(varchar(10),b.tanggal,103) as tgl,b.periode,b.keterangan,'PDD' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+                    case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+                    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0
+                    )a 
+                inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi 
+                union all 
+                select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+                convert(varchar(10),b.tanggal,103) as tgl,b.periode,b.keterangan,'KB' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param 
+                from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+                    case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+                    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                )a
+                inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
+            ) a
+            order by a.tanggal desc ");
+            $res3 = json_decode(json_encode($res3),true);
+
+
+            $res4 = DB::connection($this->db)->select("select  top 10 a.* from (
+                select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
+                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,
+                0 as bayar from sis_bill_d x 
+                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
+                ) a
+                order by a.no_bukti desc");
+            $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data2'] = $res2;
+                $success['data3'] = $res3;
+                $success['data4'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data'] = [];
+                $success['data2'] = [];
+                $success['data3'] = [];
+                $success['data4'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);
