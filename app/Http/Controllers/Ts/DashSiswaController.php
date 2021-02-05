@@ -287,14 +287,20 @@ class DashSiswaController extends Controller
 
 
             $res4 = DB::connection($this->db)->select("select  top 10 a.* from (
+                
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
-                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
-                from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,
-                0 as bayar from sis_bill_d x 
-                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
-                inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
+                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(c.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+						from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                        group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi
+				left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                        group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+				where a.tagihan - isnull(c.bayar,0) > 0
                 ) a
                 order by a.no_bukti desc");
             $res4 = json_decode(json_encode($res4),true);
