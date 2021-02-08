@@ -286,10 +286,9 @@ class DashSiswaController extends Controller
             $res3 = json_decode(json_encode($res3),true);
 
 
-            $res4 = DB::connection($this->db)->select("select  top 10 a.* from (
-                
+            $res4 = DB::connection($this->db)->select("select a.* from (
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
-                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(c.bayar,0) as bayar,a.kode_param
+                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(c.bayar,0) as bayar,a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa
                 from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
 						from sis_bill_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
