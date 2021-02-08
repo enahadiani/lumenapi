@@ -16,7 +16,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'auth:dago'], function () use ($router) {
-    //
+    $router->get('data-box','Dago\DashboardController@getDataBox');
+    $router->get('top-agen','Dago\DashboardController@getTopAgen');
+    $router->get('reg-harian','Dago\DashboardController@getRegHarian');
+    $router->get('kuota-paket','Dago\DashboardController@getKuotaPaket');
+
 });
 
 
