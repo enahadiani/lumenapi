@@ -20,6 +20,8 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('top-agen','Dago\DashboardController@getTopAgen');
     $router->get('reg-harian','Dago\DashboardController@getRegHarian');
     $router->get('kuota-paket','Dago\DashboardController@getKuotaPaket');
+    $router->get('kartu','Dago\DashboardController@getKartu');
+    $router->get('dokumen','Dago\DashboardController@getDokumen');
 
 });
 
