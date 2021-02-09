@@ -515,8 +515,8 @@ class AsetController extends Controller
 
             $filter="";
 
-            if ($request->input('no_ruang') != "") {
-                $no_ruang = $request->input('no_ruang');                
+            if ($request->input('no_ruangan') != "") {
+                $no_ruang = $request->input('no_ruangan');                
                 $filter .= " and a.no_ruang='$no_ruang' ";
                 
             }    
