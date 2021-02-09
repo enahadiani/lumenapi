@@ -105,7 +105,7 @@ class DashSiswaController extends Controller
                 $periode_filter = "";
             }
 
-            $res2 = DB::connection($this->db)->select("select a.* from (select a.no_bill,a.tgl_input,a.keterangan,modul,a.jenis, isnull(b.nilai,0) as nilai, convert(varchar,a.tgl_input,103) as tgl
+            $rs = DB::connection($this->db)->select("select a.* from (select a.no_bill,a.tgl_input,a.keterangan,modul,a.jenis, isnull(b.nilai,0) as nilai, convert(varchar,a.tgl_input,103) as tgl
             from sis_bill_m a 
             inner join (select a.no_bill,a.kode_pp,a.kode_lokasi,sum(a.nilai) as nilai 
                         from sis_bill_d a
@@ -133,15 +133,64 @@ class DashSiswaController extends Controller
             where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
             ) a
             order by tgl_input");
-            $res = json_decode(json_encode($res2),true);
+            $res = json_decode(json_encode($rs),true);
+
+            $i=0;
+            $nb = "";
+            foreach($rs as $row){
+
+                if($i == 0){
+                    $nb .= "'$row->no_bill'";
+                }else{
+
+                    $nb .= ","."'$row->no_bill'";
+                }
+                $i++;
+            }
+
+            if($nb != ""){
+                $id_filter = " where a.no_bill in ($nb) ";
+            }else{
+                $id_filter = " where a.no_bill = '' ";
+            }
+
+            $res2 = DB::connection($this->db)->select("select a.* from (select a.no_bill, isnull(b.nilai,0) as nilai,b.kode_param,a.tgl_input
+            from sis_bill_m a 
+            inner join (select a.no_bill,a.kode_pp,a.kode_lokasi,a.nilai,a.kode_param
+                        from sis_bill_d a
+                        where a.nis ='$nik'
+                        )b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+            union all
+            select a.no_rekon, isnull(b.nilai,0) as nilai,b.kode_param,a.tgl_input
+            from sis_rekon_m a 
+            inner join (select a.no_rekon,a.kode_pp,a.kode_lokasi,a.nilai,a.kode_param
+                        from sis_rekon_d a
+                        where a.nis ='$nik' 
+                        )b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+            union all
+            select a.no_kas as no_rekon, isnull(b.nilai,0) as nilai,b.kode_param,a.tgl_input
+            from kas_m a 
+            inner join (select a.no_rekon,a.kode_pp,a.kode_lokasi,a.nilai,a.kode_param
+                        from sis_rekon_d a
+                        where a.nis ='$nik'
+                        )b on a.no_kas=b.no_rekon and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+            ) a
+            $id_filter
+            order by tgl_input");
+            $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['detail'] = $res;
+                $success['daftar'] = $res;
+                $success['detail'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
                 $success['detail'] = [];
                 $success['status'] = true;
             }
@@ -300,7 +349,7 @@ class DashSiswaController extends Controller
                 $periode_filter = "";
             }
 
-            $res2 = DB::connection($this->db)->select("select a.* from (
+            $rs = DB::connection($this->db)->select("select a.* from (
                 select a.no_rekon,a.tgl_input,a.keterangan,modul,'-' as jenis, isnull(b.nilai,0) as nilai, convert(varchar,a.tgl_input,103) as tgl
                 from sis_rekon_m a 
                 inner join (select a.no_bukti,a.kode_pp,a.kode_lokasi,sum(case dc when 'D' then a.nilai else -a.nilai end) as nilai
@@ -320,15 +369,57 @@ class DashSiswaController extends Controller
                 where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
                 ) a
                 order by tgl_input");
+            $res = json_decode(json_encode($rs),true);
+            
+            $i=0;
+            $nb = "";
+            foreach($rs as $row){
+
+                if($i == 0){
+                    $nb .= "'$row->no_rekon'";
+                }else{
+
+                    $nb .= ","."'$row->no_rekon'";
+                }
+                $i++;
+            }
+
+            if($nb != ""){
+                $id_filter = " where a.no_rekon in ($nb) ";
+            }else{
+                $id_filter = " where a.no_rekon = '' ";
+            }
+
+            $res2 = DB::connection($this->db)->select("select a.* from (
+                select a.no_rekon,a.tgl_input,a.keterangan,isnull(b.nilai,0) as nilai,b.kode_param,b.dc
+                from sis_rekon_m a 
+                inner join (select a.no_bukti,a.kode_pp,a.kode_lokasi,a.nilai,a.kode_param,a.dc
+                            from sis_cd_d a
+                            where a.nis ='$nik' 
+                            )b on a.no_rekon=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+                union all
+                select a.no_kas as no_rekon,a.tgl_input,a.keterangan,isnull(b.nilai,0) as nilai,b.kode_param,b.dc
+                from kas_m a 
+                inner join (select a.no_bukti,a.kode_pp,a.kode_lokasi,a.nilai,a.kode_param,a.dc
+                            from sis_cd_d a
+                            where a.nis ='$nik'
+                            )b on a.no_kas=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+                ) a
+                $id_filter
+                order by tgl_input");
             $res2 = json_decode(json_encode($res2),true);
             
-            if(count($res2) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
+                $success['daftar'] = $res;
                 $success['detail'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
                 $success['detail'] = [];
                 $success['status'] = true;
             }
