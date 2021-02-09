@@ -296,10 +296,11 @@ class NotifController extends Controller
 		
         try{
             
-			$sql = "select top 5 id,title,pesan,tgl_input,status,icon,convert(varchar,tgl_input,105) as tgl, convert(varchar,tgl_input,108) as jam
-			from user_message
-			where nik='$nik' and status in ('1')
-			order by id desc
+			$sql = "select top 5 a.id,a.title,a.pesan,a.tgl_input,a.status,a.icon,convert(varchar,a.tgl_input,105) as tgl, convert(varchar,a.tgl_input,108) as jam,LTRIM(replace(replace(a.pesan,'Pengajuan pembayaran ',''),' menunggu verifikasi anda','')) as no_bukti,b.no_kb,b.flag_ver 
+			from user_message a
+			inner join dgw_pembayaran b on LTRIM(replace(replace(a.pesan,'Pengajuan pembayaran ',''),' menunggu verifikasi anda',''))=b.no_kwitansi
+			where a.nik='$nik' and status in ('1') and b.flag_ver = 0
+			order by a.id desc
 			";
 
 			$get = DB::connection($this->db)->select($sql);
