@@ -82,6 +82,8 @@ $router->group(['middleware' => 'auth:aset'], function () use ($router) {
     $router->post('upload-dok-gedung','Aset\AsetController@uploadDokGedung');
     $router->post('upload-dok-pbb','Aset\AsetController@uploadDokPbb');
     $router->post('upload-dok-imb','Aset\AsetController@uploadDokImb');
+    
+    $router->post('upload-gambar-barang','Aset\AsetController@uploadDokBarang');
 
     $router->get('user_device','UserDeviceController@index');
     $router->get('user_device/{nik}','UserDeviceController@show');

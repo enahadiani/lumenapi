@@ -1263,6 +1263,77 @@ class AsetController extends Controller
         
     }
 
+    public function uploadDokBarang(Request $request){
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'file_gambar' => 'required|file|max:3072|image|mimes:jpeg,png,jpg'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $get = DB::connection($this->db)->select("select a.kode_pp
+                    from karyawan a
+                    where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' ");
+            $get = json_decode(json_encode($get),true);
+            if(count($get) > 0){
+                $kode_pp = $get[0]['kode_pp'];
+            }else{
+                $kode_pp = "";
+            }
+            $no_bukti = $request->no_bukti;
+
+            if($request->hasfile('file_gambar')){
+                $file = $request->file('file_gambar');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('aset/'.$foto)){
+                    Storage::disk('s3')->delete('aset/'.$foto);
+                }
+                Storage::disk('s3')->put('aset/'.$foto,file_get_contents($file));
+            }else{
+
+                $foto="-";
+            }
+
+            $cek = DB::connection($this->db)->select("
+            select no_bukti,count(file_dok) as nomor
+            from amu_asset_bergerak_dok 
+            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' 
+            group by no_bukti");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $no = $cek[0]['nomor'];
+            }else{
+                $no = 0;
+            }
+            
+            $ins = DB::connection($this->db)->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp) values (?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,'-',$no,$foto,$kode_pp]); 
+
+            $upd = DB::connection($this->db)->update("update amu_asset_bergerak set foto='$foto' where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' "); 
+            
+            $success['status'] = true;
+            $success['message'] = "Upload berhasil disimpan";
+
+            DB::connection($this->db)->commit();
+            return response()->json(['success'=>$success], $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Upload gagal disimpan. ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }				
+        
+        
+    }
+
     function getDetailUpload(Request $request){
         $this->validate($request, [
             'no_bukti' => 'required'
