@@ -1179,6 +1179,8 @@ class AsetController extends Controller
             ->where('no_urut', $no_urut)
             ->delete();
 
+            $upd = DB::connection($this->db)->update("update amu_asset_bergerak set foto='-' where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+
             if($file != ""){
                 Storage::disk('s3')->delete('aset/'.$file);
             }
