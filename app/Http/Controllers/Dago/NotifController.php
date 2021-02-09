@@ -216,10 +216,14 @@ class NotifController extends Controller
 		
         try{
             
-			$sql = "select id,title,pesan,tgl_input,status,icon,sts_read_mob 
-			from user_message
-			where nik='$nik' and status in ('1')
-			";
+			// $sql = "select id,title,pesan,tgl_input,status,icon,sts_read_mob 
+			// from user_message
+			// where nik='$nik' and status in ('1')
+			// ";
+			$sql ="select a.id,a.title,a.pesan,a.tgl_input,a.status,a.icon,a.sts_read_mob,LTRIM(replace(replace(a.pesan,'Pengajuan pembayaran ',''),' menunggu verifikasi anda','')) as no_bukti,b.no_kb,b.flag_ver 
+			from user_message a
+			inner join dgw_pembayaran b on LTRIM(replace(replace(a.pesan,'Pengajuan pembayaran ',''),' menunggu verifikasi anda',''))=b.no_kwitansi
+			where a.nik='$nik' and status in ('1') and b.flag_ver = 0";
 
 			$get = DB::connection($this->db)->select($sql);
 			$get = json_decode(json_encode($get),true);
