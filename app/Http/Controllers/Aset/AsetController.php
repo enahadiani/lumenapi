@@ -226,6 +226,14 @@ class AsetController extends Controller
                 $filter .= "";
             }
 
+            if ($request->input('no_ruangan') != "") {
+                $no_ruang = $request->input('no_ruangan');                
+                $filter .= " and a.no_ruang='$no_ruang' ";
+                
+            }else{
+                $filter .= "";
+            }
+
             $id_gedung = $request->id_gedung;
 
             $sql="select a.kode_klp,a.nama_klp,isnull(b.jumlah,0) as jumlah
