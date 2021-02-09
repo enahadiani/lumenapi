@@ -98,6 +98,49 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->post('kurs','Dago\KursController@store');
     $router->put('kurs','Dago\KursController@update');
     $router->delete('kurs','Dago\KursController@destroy');
+
+    //ADMIN
+    //Menu
+    $router->get('menu','Dago\MenuController@index');
+    $router->post('menu','Dago\MenuController@store');
+    $router->put('menu','Dago\MenuController@update');
+    $router->delete('menu','Dago\MenuController@destroy');
+    $router->get('menu-klp','Dago\MenuController@getKlp');
+    $router->post('menu-move','Dago\MenuController@simpanMove');
+
+    //Akses User
+    $router->get('akses-user','Dago\HakaksesController@index');
+    $router->post('akses-user','Dago\HakaksesController@store');
+    $router->get('akses-user-detail','Dago\HakaksesController@show');
+    $router->put('akses-user','Dago\HakaksesController@update');
+    $router->delete('akses-user','Dago\HakaksesController@destroy');
+    $router->get('akses-user-menu','Dago\HakaksesController@getMenu');
+    
+    //Form
+    $router->get('form','Dago\FormController@index');
+    $router->post('form','Dago\FormController@store');
+    $router->put('form','Dago\FormController@update');
+    $router->delete('form','Dago\FormController@destroy');
+
+    //Karyawan
+    $router->get('karyawan','Dago\KaryawanController@index');
+    $router->post('karyawan','Dago\KaryawanController@store');
+    $router->get('karyawan-detail','Dago\KaryawanController@show');
+    $router->post('karyawan-ubah','Dago\KaryawanController@update');
+    $router->delete('karyawan','Dago\KaryawanController@destroy');
+
+    //Kelompok Menu
+    $router->get('menu-klp','Dago\KelompokMenuController@index');
+    $router->post('menu-klp','Dago\KelompokMenuController@store');
+    $router->put('menu-klp','Dago\KelompokMenuController@update');
+    $router->delete('menu-klp','Dago\KelompokMenuController@destroy');
+
+    //Unit
+    $router->get('unit','Dago\UnitController@index');
+    $router->post('unit','Dago\UnitController@store');
+    $router->put('unit','Dago\UnitController@update');
+    $router->delete('unit','Dago\UnitController@destroy');
+
 });
 
 
