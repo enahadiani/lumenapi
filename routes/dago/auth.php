@@ -39,7 +39,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('users', 'AdminDagoController@allUsers');
     $router->get('cek_payload', 'AdminDagoController@cekPayload');
     //Menu
-    $router->get('menu/{kode_klp}', 'Gl\MenuController@show');
+    $router->get('menu/{kode_klp}', 'Dago\MenuController@show');
     
     $router->post('notif-pusher', 'Dago\NotifController@sendPusher');
     $router->get('notif-pusher', 'Dago\NotifController@getNotifPusher');
