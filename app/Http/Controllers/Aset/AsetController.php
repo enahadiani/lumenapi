@@ -1317,7 +1317,7 @@ class AsetController extends Controller
                 $no = 0;
             }
             
-            $ins = DB::connection($this->db)->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp,jenis) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,'-',$no,$foto,$kode_pp,'JD31']); 
+            $ins = DB::connection($this->db)->insert("insert into amu_asset_bergerak_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,kode_pp,kode_jenis) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_bukti,'-',$no,$foto,$kode_pp,'JD31']); 
 
             $upd = DB::connection($this->db)->update("update amu_asset_bergerak set foto='$foto' where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' "); 
             
