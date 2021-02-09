@@ -205,6 +205,7 @@ class PembayaranNonCashController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
             }
             
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
