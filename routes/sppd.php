@@ -60,4 +60,12 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     
     $router->post('cek', 'Sppd\SppdController@cek');
 
+    // RAB
+    $router->get('rab-cust', 'Sppd\RABController@getCust');
+    $router->get('rab-unit', 'Sppd\RABController@getPP');
+    $router->get('rab', 'Sppd\RABController@getRAB');
+    $router->get('rab-proyek', 'Sppd\RABController@getProyek');
+    $router->get('rab-proyek-saldo', 'Sppd\RABController@getSaldoProyek');
+    $router->post('aju-beban', 'Sppd\RABController@pengajuanBeban');
+
 });
