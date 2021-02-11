@@ -2120,12 +2120,17 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            
+            $periode = $request->periode;
+            $tahun = substr($periode,0,4);
+            $bulan = substr($periode,4,2);
+            $tahunLalu = intval($tahun)-1;
+            $periodeLalu = $tahunLalu.$bulan;
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n2,n1 as nilai,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,b.n1,b.n2,b.n1 as nilai,isnull(c.n1,0) as nilai_lalu, case isnull(c.n1,0) when 0 then 0 else ((b.n1 - isnull(c.n1,0))/isnull(c.n1,0)*100) end as persen
             from dash_grafik_m a
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K02'
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='$periode'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='$periodeLalu'
+            where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K02'
             ");
             $rs = json_decode(json_encode($rs),true);
             
