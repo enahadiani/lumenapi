@@ -1140,7 +1140,7 @@ class PesanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp = $data->kode_pp;
             }
-            $sql = "select a.jenis,a.kontak,x.nama,a.judul,a.pesan,a.tgl_input,isnull(b.file_dok,'-')as file_dok from (
+            $sql = "select a.jenis,a.kontak,x.nama,a.judul,a.pesan,a.tgl_input,isnull(b.file_dok,'-')as file_dok,a.no_bukti,a.kode_pp from (
                 select a.no_bukti,a.jenis,case a.jenis when 'Siswa' then a.nis when 'Kelas' then a.kode_kelas else '-' end as kontak,a.judul,a.pesan,a.kode_pp,a.kode_lokasi,a.tgl_input,a.kode_matpel,a.ref1
             from sis_pesan_m a
             ) a
