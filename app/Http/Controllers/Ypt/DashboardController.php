@@ -141,7 +141,7 @@ class DashboardController extends Controller
         }
     }
     
-    public function rkaVSReal($periode){
+    public function rkaVSReal(Request $request,$periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -174,11 +174,15 @@ class DashboardController extends Controller
                 }
                 $success['ctg'] = $ctg;
                 $success["series"][0]= array(
-                    "name"=> 'RKA', "type"=>'column',"color"=>'#ad1d3e',"data"=>$dt[0]
+                    "name"=> 'RKA', "type"=>'column',"color"=>($request->mode == 'dark' ? '#4c4c4c' : '#ad1d3e'), "data"=>$dt[0],
+                    "pointPadding" => 0.3,
+                    "pointPlacement" => 0.2
                 );
                 
                 $success["series"][1] = array(
-                    "name"=> 'Realisasi', "type"=>'column',"color"=>'#4c4c4c',"data"=>$dt[1]
+                    "name"=> 'Realisasi', "type"=>'column',"color"=>($request->mode == 'dark' ? $this->dark_color[1] : '#4c4c4c'),"data"=>$dt[1],
+                    "pointPadding" => 0.4,
+                    "pointPlacement" => 0.2
                 );
                 $success['status'] = true;
                 $success['message'] = "Success!";
