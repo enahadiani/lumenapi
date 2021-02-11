@@ -203,7 +203,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function growthRKA($periode){
+    public function growthRKA(Request $request,$periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -283,7 +283,10 @@ class DashboardController extends Controller
                     $dtp[] = $x;
                 }
 
-                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 for($i=0;$i<count($row);$i++){
 
                     if($row[$i]['kode_neraca'] == '47'){
@@ -321,7 +324,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function growthReal($periode){
+    public function growthReal(Request $request,$periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -398,7 +401,10 @@ class DashboardController extends Controller
                     $dtp[] = $x;
                 }
 
-                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
                 for($i=0;$i<count($row);$i++){
 
                     if($row[$i]['kode_neraca'] == '47'){
@@ -409,7 +415,7 @@ class DashboardController extends Controller
                     }else{
                         
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dtp[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dtp[$i],"type"=>"column"
                             
                         );
                     }
@@ -436,7 +442,7 @@ class DashboardController extends Controller
     }
 
     //PENDAPATAN
-    public function komposisiPdpt($periode){
+    public function komposisiPdpt(Request $request, $periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -445,6 +451,12 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
             $sql="select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
@@ -1735,8 +1747,8 @@ class DashboardController extends Controller
                 $dtp[2] = array();
                 for($i=0;$i< count($dt[0]);$i++){
                     $pend = 100;
-                    $tuition = round($dt[1][$i]["y"]/$dt[0][$i]["y"]*100);
-                    $nontuition = round($dt[2][$i]["y"]/$dt[0][$i]["y"]*100);
+                    $tuition =($dt[0][$i]["y"] != 0 ? round($dt[1][$i]["y"]/$dt[0][$i]["y"]*100) : 0);
+                    $nontuition = ($dt[0][$i]["y"] != 0 ? round($dt[2][$i]["y"]/$dt[0][$i]["y"]*100) : 0);
                     array_push($dtp[0], $pend);
                     array_push($dtp[1], $tuition);
                     array_push($dtp[2], $nontuition);
