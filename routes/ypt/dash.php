@@ -79,6 +79,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('search-form-list', 'AdminYptKugController@searchFormList');
 
     $router->get('periode', 'Ypt\DashboardController@getPeriode');
+    $router->get('tahun', 'Ypt\DashboardController@getTahun');
     
     $router->get('komponen-investasi','Ypt\DashboardController@komponenInvestasi');
     $router->get('rka-real-investasi','Ypt\DashboardController@rkaVSRealInvestasi');
