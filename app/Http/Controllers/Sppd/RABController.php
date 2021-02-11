@@ -133,7 +133,7 @@ class RABController extends Controller
 			
 
             $res = DB::connection($this->db)->select("select a.no_rab,a.keterangan,a.kode_pp,a.kode_cust,a.tgl_mulai,a.tgl_selesai,a.nilai,a.p_or as persen_or,a.nilai_or,a.nik_app,a.progress,
-            a.pp_kelola,a.periode,a.no_dok as no_konreak,a.nik_buat,a.tanggal,a.cat_app_proyek,a.ppn,a.pph42,a.no_memo,a.sts_va,a.bank,a.nama_rek,a.no_rek,a.tgl_admin,isnull(a.no_app_proyek,'-') as no_app_proyek 
+            a.pp_kelola,a.periode,a.no_dok as no_kontrak,a.nik_buat,a.tanggal,a.cat_app_proyek,a.ppn,a.pph42,a.no_memo,a.sts_va,a.bank,a.nama_rek,a.no_rek,a.tgl_admin,isnull(a.no_app_proyek,'-') as no_app_proyek 
             from prb_rab_m a
             where a.kode_lokasi='$kode_lokasi' $filter
             ");
