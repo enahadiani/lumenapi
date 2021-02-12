@@ -254,11 +254,11 @@ class AnggaranController extends Controller
             // $no_bukti = (int) $nobukti;
             foreach($excel as $row){
                 if($row[0] != ""){
-                    $tmp = substr($row[1],0,2);
-                    if($tmp == "99"){
+                    $tmp = substr($row[1],0,1);
+                    if($tmp == "9"){
                         $kode_pp = "KS00";
                     }else{
-                        $kode_pp = "KS".$tmp;
+                        $kode_pp = "KS0".$tmp;
                     }
                     $ket = $this->validateData($row[0],$kode_pp,$kode_lokasi);
                     if($ket != ""){
