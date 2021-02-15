@@ -126,6 +126,14 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('ttd','Yakes\TtdController@index');
     $router->post('ttd','Yakes\TtdController@store');
 
+    
+    $router->get('klp-akun','Yakes\KelompokAkunController@index');     
+    $router->get('klp-akun-detail','Yakes\KelompokAkunController@show'); 
+    $router->post('klp-akun','Yakes\KelompokAkunController@store');
+    $router->put('klp-akun','Yakes\KelompokAkunController@update');    
+    $router->delete('klp-akun','Yakes\KelompokAkunController@destroy');   
+    $router->get('klp-akun-akun','Yakes\KelompokAkunController@getAkun'); 
+
 });
 
 
