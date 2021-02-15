@@ -2002,10 +2002,23 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
             
-            $komponen = DB::connection($this->db)->select("select kode_neraca,nama,n1,n4,0 as on_progress 
-            from exs_neraca 
-            where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
+            $komponen = DB::connection($this->db)->select("select a.kode_neraca,a.nama,
+            case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
+            case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
+            case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
+            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            from exs_neraca a
+            inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS3' and a.periode='$request->periode' and b.kode_grafik='GR29' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            order by b.nu
+
             ");
             $komponen = json_decode(json_encode($komponen),true);
             
@@ -2047,59 +2060,83 @@ class DashboardController extends Controller
                 $kode_lokasi= '';
             }
 
-            $rs = DB::connection($this->db)->select("
-            select '2015' as tahun 
-            union all
-            select '2016' as tahun 
-            union all
-            select '2017' as tahun 
-            union all
-            select '2018' as tahun 
-            union all
-            select '2019' as tahun 
-            union all
-            select '2020' as tahun 
-            ");
-            $rs = json_decode(json_encode($rs),true);
             $ctg = array();
-            if(count($rs) > 0){
-                $i=1;
-                for($x=0;$x<count($rs);$x++){
-                    array_push($ctg,$rs[$x]['tahun']);
-                    $i++;
-                }
+            $tahun = intval(substr($request->periode,0,4))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
             }
-            $success['ctg']=$ctg;
-            
-            $row =  DB::connection($this->db)->select("select 'RKA' as nama,'411' as kode_neraca,248.04 as n2014,292.13 as n2015,355.15 as n2016,415.52 as n2017,473.90 as n2018,522.37 as n2019,543.28 as n2020
+            $success['ctg'] = $ctg;
+                        
+            $sql = "
+            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            from dash_grafik_d a
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR30'
             union all
-            select 'Real' as nama,'511' as kode_neraca,218.19,260.18,307.08,365.32,413.84,453.11,451.08
+            select 'Actual' as nama,b.n4 as n1,c.n4 as n2,d.n4 as n3,e.n4 as n4,f.n4 as n5,g.n4 as n6
+            from dash_grafik_d a
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR30'
             union all
-            select 'On Progress' as nama,'412' as kode_neraca,29.85,30.37,46.02,46.93,57.95,66.84,91.77");
+            select 'On Progress' as nama,case when b.n1 <> 0 then b.n4/b.n1 else 0 end as n1,case when c.n1 <> 0 then c.n4/c.n1 else 0 end as n2,case when d.n1 <> 0 then d.n4/d.n1 else 0 end as n3,case when e.n1 <> 0 then e.n4/e.n1 else 0 end as n4,case when f.n1 <> 0 then f.n4/f.n1 else 0 end as n5,case when g.n1 <> 0 then g.n4/g.n1 else 0 end as n6
+            from dash_grafik_d a
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR30'
+            ";
+            $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+            $success['row'] = $sql;
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$ctg[$c]]),"kode_neraca"=>$row[$i]["kode_neraca"],"tahun"=>$ctg[$c]);
+                        if($row[$i]['nama'] == "On Progress"){
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*100,"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }else{
+
+                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"name"=>$row[$i]["nama"],"tahun"=>$ctg[$c]);
+                        }
                         $c++;          
                     }
                 }
 
-                $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                // $color = array('#4c4c4c','#900604','#16ff14');
+                $color = array('#00509D','#005FB8','#FB8500','#FB8500');
+                if($request->mode == "dark"){
+                    $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[6]);
+                }
+                // 00296B,003F88,00509D,005FB8,208EAC,CED4DA,FDC500,FB8500
+                $success['colors'] = $color;
                 for($i=0;$i<count($row);$i++){
 
-                    if($row[$i]['kode_neraca'] == '412'){
+                    if($i == 2){
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
+                            "name"=> $row[$i]['nama'], "yAxis"=>1,"color"=>$color[$i],"data"=>$dt[$i],"type"=>"spline", "marker"=>array("enabled"=>true)
                             
                         );
-                    }else{
+                    }
+                    else{
                         
                         $success["series"][$i]= array(
-                            "name"=> $row[$i]['nama'], "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
+                            "name"=> $row[$i]['nama'], "yAxis"=>0, "color"=>$color[$i],"data"=>$dt[$i],"type"=>"column", "dataLabels"=>array("enabled"=>true)
                             
                         );
                     }
@@ -2134,18 +2171,15 @@ class DashboardController extends Controller
             }
 
             $rs = DB::connection($this->db)->select("
-            select sum(n1) as n1,sum(n4) as n4, 1 as on_progress
-            from exs_neraca 
-            where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
-            ");
-            $jumn1 = floatval($rs[0]->n1);
-            $jumn4 = floatval($rs[0]->n4);
-            $jumnprog = floatval($rs[0]->on_progress);
-
-            $rs = DB::connection($this->db)->select("
-            select kode_neraca,nama,(n1/$jumn1)*100 as n1,(n4/$jumn4)*100 as n4,0 as on_progress
-            from exs_neraca 
-            where kode_Lokasi='$kode_lokasi' and kode_fs='FS3' and periode='$request->periode' and tipe='Posting'
+            select a.kode_neraca,a.nama,
+            case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
+            case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
+            case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
+            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as on_progress
+            from exs_neraca a
+            inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS3' and a.periode='$request->periode' and b.kode_grafik='GR29' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            order by b.nu
             ");
             $rs = json_decode(json_encode($rs),true);
             
