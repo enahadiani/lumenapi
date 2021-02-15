@@ -644,7 +644,7 @@ class DashboardController extends Controller
 
     //BEBAN
 
-    public function komposisiBeban($periode){
+    public function komposisiBeban(Request $request, $periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -653,6 +653,12 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
             $sql="select a.kode_neraca,a.nama,
             case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
             case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
@@ -987,6 +993,13 @@ class DashboardController extends Controller
             order by a.kode_pp";
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
@@ -1002,7 +1015,7 @@ class DashboardController extends Controller
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color" => $color[$i]
                     );
                 }
 
@@ -1035,8 +1048,6 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $th = substr($periode,0,2);
-            $tahun = $th.$tahun;
 			$sql="select a.kode_pp,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,0)/isnull(b.n2,0))*100 else 0 end as capai
@@ -1080,7 +1091,7 @@ class DashboardController extends Controller
 
 
     //DETAIL BEBAN
-    public function bebanFakultas($periode,$kode_neraca){
+    public function bebanFakultas(Request $request,$periode,$kode_neraca){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -1132,6 +1143,11 @@ class DashboardController extends Controller
             order by a.kode_bidang";
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
@@ -1147,7 +1163,7 @@ class DashboardController extends Controller
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color" => $color[$i]
                     );
                 }
 
@@ -1220,7 +1236,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function bebanJurusan($periode,$kode_neraca,$kode_bidang){
+    public function bebanJurusan(Request $request, $periode,$kode_neraca,$kode_bidang){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -1272,6 +1288,13 @@ class DashboardController extends Controller
             order by a.kode_pp";
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
@@ -1287,7 +1310,7 @@ class DashboardController extends Controller
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color" => $color[$i]
                     );
                 }
 
