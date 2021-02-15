@@ -31,6 +31,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('komposisiPdpt/{periode}', 'Ypt\DashboardController@komposisiPdpt');
     $router->get('rkaVSRealPdpt/{periode}', 'Ypt\DashboardController@rkaVSRealPdpt');
+    $router->get('rkaVSRealPdptRp/{periode}', 'Ypt\DashboardController@rkaVSRealPdptRp');
     $router->get('totalPdpt/{periode}', 'Ypt\DashboardController@totalPdpt');
 
 
