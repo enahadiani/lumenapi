@@ -39,6 +39,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('komposisiBeban/{periode}', 'Ypt\DashboardController@komposisiBeban');
     $router->get('rkaVSRealBeban/{periode}', 'Ypt\DashboardController@rkaVSRealBeban');
+    $router->get('rkaVSRealBebanRp/{periode}', 'Ypt\DashboardController@rkaVSRealBebanRp');
     $router->get('totalBeban/{periode}', 'Ypt\DashboardController@totalBeban');
 
     //PAGE 4 Detail Pendapatan

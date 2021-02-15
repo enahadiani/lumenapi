@@ -698,7 +698,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function rkaVSRealBeban($periode){
+    public function rkaVSRealBeban(Request $request, $periode){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -725,6 +725,58 @@ class DashboardController extends Controller
                 $category = array();
                 for($i=0;$i<count($row);$i++){
                     $daftar[] = array("y"=>floatval($row[$i]['capai']),"name"=>$row[$i]['nama'],"key"=>$row[$i]['kode_neraca']); 
+                    $category[] = $row[$i]['nama'];
+                
+                }
+                $success['status'] = true;
+                $success['data'] = $daftar;
+                $success['category'] = $category;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['category'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function rkaVSRealBebanRp(Request $request, $periode){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql="select a.kode_neraca,a.nama,
+            case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
+            case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
+            case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
+            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            from exs_neraca a
+            inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D06' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            order by b.nu
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar = array();
+                $category = array();
+                for($i=0;$i<count($row);$i++){
+                    $daftar[] = array("y"=>floatval($row[$i]['n4']),"name"=>$row[$i]['nama'],"key"=>$row[$i]['kode_neraca']); 
                     $category[] = $row[$i]['nama'];
                 
                 }
@@ -1344,7 +1396,6 @@ class DashboardController extends Controller
             }
             
             $th = substr($periode,0,2);
-            $tahun = $th.$tahun;
 			$sql="select a.kode_pp,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,0)/isnull(b.n2,0))*100 else 0 end as capai
