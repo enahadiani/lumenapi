@@ -787,7 +787,7 @@ class DashboardController extends Controller
 
     //DETAIL PENDAPATAN
 
-    public function pdptFakultas($periode,$kode_neraca){
+    public function pdptFakultas(Request $request, $periode,$kode_neraca){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -840,6 +840,13 @@ class DashboardController extends Controller
             order by a.kode_bidang";
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
@@ -855,7 +862,7 @@ class DashboardController extends Controller
                 for($i=0;$i<count($row);$i++){
 
                     $success["series"][$i]= array(
-                        "name"=> $row[$i]['nama'], "data"=>$dt[$i]
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color"=> $color[$i]
                     );
                 }
 
@@ -878,7 +885,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function detailPdpt($periode,$kode_neraca){
+    public function detailPdpt(Request $request, $periode,$kode_neraca){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -930,7 +937,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function pdptJurusan($periode,$kode_neraca,$kode_bidang){
+    public function pdptJurusan(Request $request, $periode,$kode_neraca,$kode_bidang){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
