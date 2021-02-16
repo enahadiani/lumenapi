@@ -2239,7 +2239,7 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n4,b.n2 as nilai,case n2 when 0 then 0 else (n4/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K01'
@@ -2279,7 +2279,7 @@ class DashboardController extends Controller
             $tahunLalu = intval($tahun)-1;
             $periodeLalu = $tahunLalu.$bulan;
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n2 as rka,b.n4 as nilai,isnull(c.n4,0) as nilai_lalu, case isnull(c.n4,0) when 0 then 0 else ((b.n4 - isnull(c.n4,0))/isnull(c.n4,0)*100) end as persen
+            select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,isnull(c.n1,0) as real_lalu, case isnull(c.n1,0) when 0 then 0 else ((b.n1 - isnull(c.n1,0))/isnull(c.n1,0)*100) end as persen
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='$periode'
             left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='$periodeLalu'
@@ -2316,7 +2316,7 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n4,n2 as nilai,case n2 when 0 then 0 else (n4/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,b.n1 as real,n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K03'
@@ -2352,7 +2352,7 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n4,n2 as nilai,case n2 when 0 then 0 else (n4/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,b.n1 as real,n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K06'
@@ -2388,7 +2388,7 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n4,n2 as nilai,case n2 when 0 then 0 else (n4/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,b.n1 as real,n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K04'
@@ -2424,7 +2424,7 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n4,n2 as nilai,case n2 when 0 then 0 else (n4/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K05'
