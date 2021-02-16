@@ -2592,7 +2592,7 @@ class DashboardController extends Controller
             
             $ctg = array();
             $ctg2 = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 array_push($ctg2,'RKA '.$tahun);
@@ -2694,7 +2694,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -2804,7 +2804,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -2914,7 +2914,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3024,7 +3024,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3109,7 +3109,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3185,7 +3185,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3295,7 +3295,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3404,7 +3404,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3489,7 +3489,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -3564,7 +3564,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval(date('Y'))-5;
+            $tahun = intval(substr($request->periode,0,4))-5;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
