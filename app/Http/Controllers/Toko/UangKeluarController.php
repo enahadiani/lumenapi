@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage; 
 use App\KasBankTmp;
 
-class UangMasukController extends Controller
+class UangKeluarController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -186,7 +186,7 @@ class UangMasukController extends Controller
 
             $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
 
-            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,case posted when 'T' then 'Close' else 'Open' end as posted,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul in ('KB') and param3 in ('BM') and form='KSR103' and kode_lokasi='$kode_lokasi' and periode = '$periode_aktif'	 
+            $res = DB::connection($this->db)->select("select no_bukti,tanggal,no_dokumen,keterangan,nilai1,case posted when 'T' then 'Close' else 'Open' end as posted,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, tgl_input  from trans_m where modul in ('KB') and param3 in ('BK') and form='KSR104' and kode_lokasi='$kode_lokasi' and periode = '$periode_aktif'	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -248,7 +248,7 @@ class UangMasukController extends Controller
             DB::connection($this->db)->beginTransaction();
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BM".substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BK".substr($periode,2,4).".", "0001");
             $cek = $this->doCekPeriode2('KB',$status_admin,$periode);
 
             if($cek['status']){
@@ -262,15 +262,15 @@ class UangMasukController extends Controller
                                 $nilai += floatval($request->nilai[$j]);
                                 $tmp = explode(" - ",$request->kode_akun[$j]);
                                 $tmp2 = explode(" - ",$request->kode_pp[$j]);
-                                $ins[$j] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".($j+1).",'".$tmp[0]."','C',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','BM','IDR',1,'".$tmp2[0]."','-','-','-','-','-','-','-','-')");
+                                $ins[$j] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".($j+1).",'".$tmp[0]."','C',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','BK','IDR',1,'".$tmp2[0]."','-','-','-','-','-','-','-','-')");
                                 
                             }
                         }
                     }	
 
-                    $insj =  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_terima."','D',".$nilai.",".$nilai.",'".$request->deskripsi."','KB','BM','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                    $insj =  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_terima."','D',".$nilai.",".$nilai.",'".$request->deskripsi."','KB','BK','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
 
-                    $insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','".$request->terima_dari."','".$request->jenis_terima."','BM')");
+                    $insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','".$request->terima_dari."','".$request->jenis_terima."','BK')");
 
                     $tmp="sukses";
                     $sts=true;
@@ -361,15 +361,15 @@ class UangMasukController extends Controller
                                 $nilai += floatval($request->nilai[$j]);
                                 $tmp = explode(" - ",$request->kode_akun[$j]);
                                 $tmp2 = explode(" - ",$request->kode_pp[$j]);
-                                $ins[$j] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".($j+1).",'".$tmp[0]."','C',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','BM','IDR',1,'".$tmp2[0]."','-','-','-','-','-','-','-','-')");
+                                $ins[$j] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".($j+1).",'".$tmp[0]."','C',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','BK','IDR',1,'".$tmp2[0]."','-','-','-','-','-','-','-','-')");
                                 
                             }
                         }
                     }	
 
-                    $insj =  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_terima."','D',".$nilai.",".$nilai.",'".$request->deskripsi."','KB','BM','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                    $insj =  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_terima."','D',".$nilai.",".$nilai.",'".$request->deskripsi."','KB','BK','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
 
-                    $insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','".$request->terima_dari."','".$request->jenis_terima."','BM')");
+                    $insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','".$request->terima_dari."','".$request->jenis_terima."','BK')");
 
                     $tmp="sukses";
                     $sts=true;

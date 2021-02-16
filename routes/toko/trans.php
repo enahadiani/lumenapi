@@ -191,6 +191,14 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('uang-masuk-import-excel','Toko\UangMasukController@importExcel');
     $router->get('uang-masuk-tmp','Toko\UangMasukController@getDataTmp');
     
+    $router->get('uang-keluar','Toko\UangKeluarController@index');
+    $router->get('uang-keluar-detail','Toko\UangKeluarController@show');
+    $router->post('uang-keluar','Toko\UangKeluarController@store');
+    $router->post('uang-keluar-ubah','Toko\UangKeluarController@update');
+    $router->delete('uang-keluar','Toko\UangKeluarController@destroy');
+    $router->post('uang-keluar-import-excel','Toko\UangKeluarController@importExcel');
+    $router->get('uang-keluar-tmp','Toko\UangKeluarController@getDataTmp');
+    
     $router->get('terima-dari','Toko\UangMasukController@getTerimaDari');
     $router->get('akun-terima','Toko\UangMasukController@getAkunTerima');
 
