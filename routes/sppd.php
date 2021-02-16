@@ -67,5 +67,7 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
     $router->get('rab-proyek', 'Sppd\RABController@getProyek');
     $router->get('rab-proyek-saldo', 'Sppd\RABController@getSaldoProyek');
     $router->post('aju-beban', 'Sppd\RABController@pengajuanBeban');
+    $router->delete('rab-hapus/{no_bukti}', 'Sppd\RABController@hapusPengajuan');
+    $router->get('rab-bayar/{no_bukti}', 'Sppd\RABController@getAjuBayar');
 
 });

@@ -536,4 +536,80 @@ class RABController extends Controller
         }
     }
 
+    public function hapusPengajuan($no_bukti){
+        if($data =  Auth::guard('ypt')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+       
+        DB::connection('sqlsrvypt')->beginTransaction();
+        try {
+
+            $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+
+            $del2 = DB::connection('sqlsrvypt')->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+
+            $del3 = DB::connection('sqlsrvypt')->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+
+            $del4 = DB::connection('sqlsrvypt')->table('angg_r')->where('kode_lokasi', $kode_lokasi)
+            ->where('modul', 'PRBEBAN')
+            ->where('no_bukti', $no_bukti)->delete();
+
+            $del5 = DB::connection('sqlsrvypt')->table('prb_prbeban_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti' ,$no_bukti)->delete();
+           
+
+            DB::connection('sqlsrvypt')->commit();
+            $success['no_bukti']=$no_bukti;
+            $success['status'] = true;
+            $success['message'] = "Pengajuan berhasil dihapus";
+
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvypt')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getAjuBayar($no_bukti){
+
+        try {
+
+            if($data =  Auth::guard('ypt')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $res = DB::connection('sqlsrvypt')->select("select a.no_aju,a.no_spb,a.no_kas,convert(varchar,a.tanggal,103) as tgl_bayar
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_aju='".$no_bukti."' 
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                $success['rows']=count($res);
+                
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
