@@ -1609,22 +1609,24 @@ class DashboardController extends Controller
             $success['ctg'] = $ctg;
             $success['ctg2'] = $ctg2;
             
-            $row =  DB::connection($this->db)->select(" select a.kode_grafik,a.nama,
-            case when isnull(b.n1,0) <> 0 then (isnull(c.n1,0)/isnull(b.n1,0))*100 else 0 end as n1,
-            case when isnull(c.n1,0) <> 0 then (isnull(d.n1,0)/isnull(c.n1,0))*100 else 0 end as n2,
-            case when isnull(d.n1,0) <> 0 then (isnull(e.n1,0)/isnull(d.n1,0))*100 else 0 end as n3,
-            case when isnull(e.n1,0) <> 0 then (isnull(f.n1,0)/isnull(e.n1,0))*100 else 0 end as n4,
-            case when isnull(f.n1,0) <> 0 then (isnull(g.n1,0)/isnull(f.n1,0))*100 else 0 end as n5,
-            case when isnull(g.n1,0) <> 0 then (isnull(h.n1,0)/isnull(g.n1,0))*100 else 0 end as n6
-                      from dash_grafik_m a
-                      left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg2[0]."12'
-                      left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg2[1]."12'
-                      left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg2[2]."12'
-                      left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg2[3]."12'
-                      left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg2[4]."12'
-                      left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg2[5]."12'
-                      left join dash_grafik_lap h on a.kode_grafik=h.kode_grafik and a.kode_lokasi=h.kode_lokasi and h.periode='".$ctg2[6]."12'
-                      where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR01','GR02','GR03','GR08')");
+            $row =  DB::connection($this->db)->select(" select a.kode_grafik,a.kode_neraca,x.nama,
+            case when isnull(b.n4,0) <> 0 then (isnull(c.n4,0)/isnull(b.n4,0))*100 else 0 end as n1,
+            case when isnull(c.n4,0) <> 0 then (isnull(d.n4,0)/isnull(c.n4,0))*100 else 0 end as n2,
+            case when isnull(d.n4,0) <> 0 then (isnull(e.n4,0)/isnull(d.n4,0))*100 else 0 end as n3,
+            case when isnull(e.n4,0) <> 0 then (isnull(f.n4,0)/isnull(e.n4,0))*100 else 0 end as n4,
+            case when isnull(f.n4,0) <> 0 then (isnull(g.n4,0)/isnull(f.n4,0))*100 else 0 end as n5,
+            case when isnull(g.n4,0) <> 0 then (isnull(h.n4,0)/isnull(g.n4,0))*100 else 0 end as n6
+                      from dash_grafik_d a
+					  inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+                      left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs and b.periode='".$ctg2[0]."12'
+                      left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs and c.periode='".$ctg2[1]."12'
+                      left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and a.kode_fs=d.kode_fs and d.periode='".$ctg2[2]."12'
+                      left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and a.kode_fs=e.kode_fs and e.periode='".$ctg2[3]."12'
+                      left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and a.kode_fs=f.kode_fs and f.periode='".$ctg2[4]."12'
+                      left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and a.kode_fs=g.kode_fs and g.periode='".$ctg2[5]."12'
+                      left join exs_neraca h on a.kode_neraca=h.kode_neraca and a.kode_lokasi=h.kode_lokasi and a.kode_fs=h.kode_fs and h.periode='".$ctg2[6]."12'
+                      where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR01','GR02','GR03','GR20') 
+                      order by a.kode_grafik ");
 
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -1689,22 +1691,23 @@ class DashboardController extends Controller
             $success['ctg'] = $ctg;
             $success['ctg2'] = $ctg2;
             
-            $row =  DB::connection($this->db)->select(" select a.kode_grafik,a.nama,
-            case when isnull(b.n1,0) <> 0 then ((isnull(c.n1,0)-isnull(b.n1,0))/isnull(b.n1,0))*100 else 0 end as n1,
-            case when isnull(c.n1,0) <> 0 then ((isnull(d.n1,0)-isnull(c.n1,0))/isnull(c.n1,0))*100 else 0 end as n2,
-            case when isnull(d.n1,0) <> 0 then ((isnull(e.n1,0)-isnull(d.n1,0))/isnull(d.n1,0))*100 else 0 end as n3,
-            case when isnull(e.n1,0) <> 0 then ((isnull(f.n1,0)-isnull(e.n1,0))/isnull(e.n1,0))*100 else 0 end as n4,
-            case when isnull(f.n1,0) <> 0 then ((isnull(g.n1,0)-isnull(f.n1,0))/isnull(f.n1,0))*100 else 0 end as n5,
-            case when isnull(g.n1,0) <> 0 then ((isnull(h.n1,0)-isnull(g.n1,0))/isnull(g.n1,0))*100 else 0 end as n6
-                      from dash_grafik_m a
-                      left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg2[0]."12'
-                      left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg2[1]."12'
-                      left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg2[2]."12'
-                      left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg2[3]."12'
-                      left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg2[4]."12'
-                      left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg2[5]."12'
-                      left join dash_grafik_lap h on a.kode_grafik=h.kode_grafik and a.kode_lokasi=h.kode_lokasi and h.periode='".$ctg2[6]."12'
-                      where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR01','GR02','GR03','GR08')");
+            $row =  DB::connection($this->db)->select(" select a.kode_grafik,a.kode_neraca,x.nama,
+            case when isnull(b.n4,0) <> 0 then ((isnull(c.n4,0)-isnull(b.n4,0))/isnull(b.n4,0))*100 else 0 end as n1,
+            case when isnull(c.n4,0) <> 0 then ((isnull(d.n4,0)-isnull(c.n4,0))/isnull(c.n4,0))*100 else 0 end as n2,
+            case when isnull(d.n4,0) <> 0 then ((isnull(e.n4,0)-isnull(d.n4,0))/isnull(d.n4,0))*100 else 0 end as n3,
+            case when isnull(e.n4,0) <> 0 then ((isnull(f.n4,0)-isnull(e.n4,0))/isnull(e.n4,0))*100 else 0 end as n4,
+            case when isnull(f.n4,0) <> 0 then ((isnull(g.n4,0)-isnull(f.n4,0))/isnull(f.n4,0))*100 else 0 end as n5,
+            case when isnull(g.n4,0) <> 0 then ((isnull(h.n4,0)-isnull(g.n4,0))/isnull(g.n4,0))*100 else 0 end as n6
+                      from dash_grafik_d a
+                      inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+                      left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg2[0]."12'
+                      left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg2[1]."12'
+                      left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg2[2]."12'
+                      left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg2[3]."12'
+                      left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg2[4]."12'
+                      left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg2[5]."12'
+                      left join exs_neraca h on a.kode_neraca=h.kode_neraca and a.kode_fs=h.kode_fs and a.kode_lokasi=h.kode_lokasi and h.periode='".$ctg2[6]."12'
+                      where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR01','GR02','GR03','GR20')");
 
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -1764,15 +1767,18 @@ class DashboardController extends Controller
             }
             $success['ctg'] = $ctg;
             
-            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.nama, isnull(b.n1,0) as n1,isnull(c.n1,0) as n2,isnull(d.n1,0) as n3,isnull(e.n1,0) as n4,isnull(f.n1,0) as n5,isnull(g.n1,0) as n6
-            from dash_grafik_m a
-                left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
-                left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
-                left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
-                left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
-                left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
-                left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
-                where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR17','GR18') ");
+            $row =  DB::connection($this->db)->select("select a.kode_grafik,x.nama, isnull(sum(b.n4),0) as n1,isnull(sum(c.n4),0) as n2,isnull(sum(d.n4),0) as n3,isnull(sum(e.n4),0) as n4,isnull(sum(f.n4),0) as n5,isnull(sum(g.n4),0) as n6
+            from dash_grafik_d a
+            inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+                left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+                left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+                left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+                left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+                left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+                left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+                where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR17','GR18') 
+				group by a.kode_grafik,x.nama
+                order by a.kode_grafik ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
@@ -1842,15 +1848,18 @@ class DashboardController extends Controller
             }
             $success['ctg'] = $ctg;
             
-            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.nama, isnull(b.n1,0) as n1,isnull(c.n1,0) as n2,isnull(d.n1,0) as n3,isnull(e.n1,0) as n4,isnull(f.n1,0) as n5,isnull(g.n1,0) as n6
-            from dash_grafik_m a
-                left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
-                left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
-                left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
-                left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
-                left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
-                left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
-                where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR17','GR18') ");
+            $row =  DB::connection($this->db)->select("select a.kode_grafik,x.nama, isnull(sum(b.n4),0) as n1,isnull(sum(c.n4),0) as n2,isnull(sum(d.n4),0) as n3,isnull(sum(e.n4),0) as n4,isnull(sum(f.n4),0) as n5,isnull(sum(g.n4),0) as n6
+            from dash_grafik_d a
+            inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+                left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+                left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+                left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+                left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+                left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+                left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+                where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR17','GR18') 
+				group by a.kode_grafik,x.nama
+                order by a.kode_grafik ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
@@ -1937,22 +1946,25 @@ class DashboardController extends Controller
             $success['ctg'] = $ctg;
             $success['ctg2'] = $ctg2;
             
-            $row =  DB::connection($this->db)->select(" select a.kode_grafik,a.nama,
-            case when isnull(b.n1,0) <> 0 then ((isnull(c.n1,0)-isnull(b.n1,0))/isnull(b.n1,0))*100 else 0 end as n1,
-            case when isnull(c.n1,0) <> 0 then ((isnull(d.n1,0)-isnull(c.n1,0))/isnull(c.n1,0))*100 else 0 end as n2,
-            case when isnull(d.n1,0) <> 0 then ((isnull(e.n1,0)-isnull(d.n1,0))/isnull(d.n1,0))*100 else 0 end as n3,
-            case when isnull(e.n1,0) <> 0 then ((isnull(f.n1,0)-isnull(e.n1,0))/isnull(e.n1,0))*100 else 0 end as n4,
-            case when isnull(f.n1,0) <> 0 then ((isnull(g.n1,0)-isnull(f.n1,0))/isnull(f.n1,0))*100 else 0 end as n5,
-            case when isnull(g.n1,0) <> 0 then ((isnull(h.n1,0)-isnull(g.n1,0))/isnull(g.n1,0))*100 else 0 end as n6
-                      from dash_grafik_m a
-                      left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg2[0]."12'
-                      left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg2[1]."12'
-                      left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg2[2]."12'
-                      left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg2[3]."12'
-                      left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg2[4]."12'
-                      left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg2[5]."12'
-                      left join dash_grafik_lap h on a.kode_grafik=h.kode_grafik and a.kode_lokasi=h.kode_lokasi and h.periode='".$ctg2[6]."12'
-                      where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR17','GR18')");
+            $row =  DB::connection($this->db)->select(" select a.kode_grafik,x.nama,
+            case when isnull(sum(b.n1),0) <> 0 then ((isnull(sum(c.n1),0)-isnull(sum(b.n1),0))/isnull(sum(b.n1),0))*100 else 0 end as n1,
+            case when isnull(sum(c.n1),0) <> 0 then ((isnull(sum(d.n1),0)-isnull(sum(c.n1),0))/isnull(sum(c.n1),0))*100 else 0 end as n2,
+            case when isnull(sum(d.n1),0) <> 0 then ((isnull(sum(e.n1),0)-isnull(sum(d.n1),0))/isnull(sum(d.n1),0))*100 else 0 end as n3,
+            case when isnull(sum(e.n1),0) <> 0 then ((isnull(sum(f.n1),0)-isnull(sum(e.n1),0))/isnull(sum(e.n1),0))*100 else 0 end as n4,
+            case when isnull(sum(f.n1),0) <> 0 then ((isnull(sum(g.n1),0)-isnull(sum(f.n1),0))/isnull(sum(f.n1),0))*100 else 0 end as n5,
+            case when isnull(sum(g.n1),0) <> 0 then ((isnull(sum(h.n1),0)-isnull(sum(g.n1),0))/isnull(sum(g.n1),0))*100 else 0 end as n6
+                from dash_grafik_d a
+                inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+                left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg2[0]."12'
+                left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg2[1]."12'
+                left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg2[2]."12'
+                left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg2[3]."12'
+                left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg2[4]."12'
+                left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg2[5]."12'
+                left join exs_neraca h on a.kode_neraca=h.kode_neraca and a.kode_fs=h.kode_fs and a.kode_lokasi=h.kode_lokasi and h.periode='".$ctg2[6]."12'
+                where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR16','GR17','GR18') 
+				group by a.kode_grafik,x.nama
+                order by a.kode_grafik ");
 
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -2606,17 +2618,17 @@ class DashboardController extends Controller
             $success['ctg'] = $ctg2;
                         
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1,b.n2,c.n1 as n3,c.n2 as n4,d.n1 as n5,d.n2 as n6,e.n1 as n7,e.n2 as n8,
-            f.n1 as n9,f.n2 as n10,g.n1 as n11,g.n2 as n12
-            from dash_grafik_m a
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
-            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
-            left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
-            left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
-            left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
-            left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K07'
-            
+            select a.kode_grafik,x.nama,b.n1 as n1,b.n4 as n2,c.n1 as n3,c.n4 as n4,d.n1 as n5,d.n4 as n6,e.n1 as n7,e.n4 as n8,
+            f.n1 as n9,f.n4 as n10,g.n1 as n11,g.n4 as n12
+            from dash_grafik_d a
+            inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and x.kode_klp='K07'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
