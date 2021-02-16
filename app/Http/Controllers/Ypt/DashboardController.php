@@ -1528,15 +1528,23 @@ class DashboardController extends Controller
             }
             $success['ctg'] = $ctg;
             
-            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.nama, isnull(b.n1,0) as n1,isnull(c.n1,0) as n2,isnull(d.n1,0) as n3,isnull(e.n1,0) as n4,isnull(f.n1,0) as n5,isnull(g.n1,0) as n6
-            from dash_grafik_m a
-                left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
-                left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
-                left join dash_grafik_lap d on a.kode_grafik=d.kode_grafik and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
-                left join dash_grafik_lap e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
-                left join dash_grafik_lap f on a.kode_grafik=f.kode_grafik and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
-                left join dash_grafik_lap g on a.kode_grafik=g.kode_grafik and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
-                where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR01','GR02','GR03','GR08') ");
+            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.kode_neraca,x.nama, 
+            case when b.jenis_akun <> 'Pendapatan' then isnull(b.n4,0) else -isnull(b.n4,0) end as n1,
+            case when c.jenis_akun <> 'Pendapatan' then isnull(c.n4,0) else -isnull(c.n4,0) end as n2,
+            case when d.jenis_akun <> 'Pendapatan' then isnull(d.n4,0) else -isnull(d.n4,0) end as n3,
+            case when e.jenis_akun <> 'Pendapatan' then isnull(e.n4,0) else -isnull(e.n4,0) end as n4,
+            case when f.jenis_akun <> 'Pendapatan' then isnull(f.n4,0) else -isnull(f.n4,0) end as n5,
+            case when g.jenis_akun <> 'Pendapatan' then isnull(g.n4,0) else -isnull(g.n4,0) end as n6
+            from dash_grafik_d a
+            inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+                            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs and b.periode='".$ctg[0]."12'
+                            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs and c.periode='".$ctg[1]."12'
+                            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and a.kode_fs=d.kode_fs and d.periode='".$ctg[2]."12'
+                            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and a.kode_fs=e.kode_fs and e.periode='".$ctg[3]."12'
+                            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and a.kode_fs=f.kode_fs and f.periode='".$ctg[4]."12'
+                            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and a.kode_fs=g.kode_fs and g.periode='".$ctg[5]."12'
+                            where a.kode_lokasi='$kode_lokasi' and x.kode_grafik in ('GR01','GR02','GR03','GR20')
+            order by x.kode_grafik ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
@@ -1544,17 +1552,12 @@ class DashboardController extends Controller
                     $dt[$i] = array();
                     $c=0;
                     for($x=1;$x<=count($ctg);$x++){
-                        if($row[$i]['kode_grafik'] == "GR01" || $row[$i]['kode_grafik'] == "GR03"){
-                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x])*-1,"kode_grafik"=>$row[$i]["kode_grafik"],"tahun"=>$ctg[$c]);
-                        }else{
-
-                            $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"kode_grafik"=>$row[$i]["kode_grafik"],"tahun"=>$ctg[$c]);
-                        }
+                        $dt[$i][]=array("y"=>floatval($row[$i]["n".$x]),"kode_grafik"=>$row[$i]["kode_grafik"],"tahun"=>$ctg[$c]);
                         $c++;          
                     }
                 }
 
-                $color = array('#005FB8','#FDC500','#FB8500','#FDC500');
+                $color = array('#005FB8','#28da66','#FDC500','#FB8500');
                 if($request->mode == "dark"){
                     $color = array($this->dark_color[0],$this->dark_color[1],$this->dark_color[2],$this->dark_color[3]);
                 }
