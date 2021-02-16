@@ -220,16 +220,14 @@ class UangMasukController extends Controller
     {
         $this->validate($request, [
             'no_dokumen' => 'required',
-            'jenis' => 'required',
             'kode_form' => 'required',
-            'status' => 'required',
+            'jenis_terima' => 'required',
             'tanggal' => 'required',
             'deskripsi' => 'required',
-            'total_debet' => 'required',
-            'total_kredit' => 'required',
+            'akun_terima' => 'required',
+            'terima_dari' => 'required',
             'kode_akun' => 'required|array',
             'keterangan' => 'required|array',
-            'dc' => 'required|array',
             'nilai' => 'required|array',
             'kode_pp' => 'required|array'
         ]);
@@ -250,36 +248,32 @@ class UangMasukController extends Controller
             DB::connection($this->db)->beginTransaction();
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BM".substr($periode,2,4).".", "0001");
             $cek = $this->doCekPeriode2('KB',$status_admin,$periode);
 
             if($cek['status']){
                 $res = $this->isUnik($request->no_dokumen,$no_bukti);
                 if($res['status']){
-                    $cekAkun = $this->cekAkunKas($request->kode_akun,$request->jenis,$request->dc,$kode_lokasi);
-                    if($cekAkun['status']){
 
-                        $nilai = 0;
-                        if (count($request->kode_akun) > 0){
-                            for ($j=0;$j < count($request->kode_akun);$j++){
-                                if($request->kode_akun != ""){
-                                    if($request->dc[$j] == "D"){
-                                        $nilai += floatval($request->nilai[$j]);
-                                    }
-                                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".$j.",'".$request->kode_akun[$j]."','".$request->dc[$j]."',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','".$request->jenis."','IDR',1,'".$request->kode_pp[$j]."','-','-','-','-','-','-','-','-')");
-                                    
-                                }
+                    $nilai = 0;
+                    if (count($request->kode_akun) > 0){
+                        for ($j=0;$j < count($request->kode_akun);$j++){
+                            if($request->kode_akun != ""){
+                                $nilai += floatval($request->nilai[$j]);
+                                $tmp = explode(" - ",$request->kode_akun[$j]);
+                                $tmp2 = explode(" - ",$request->kode_pp[$j]);
+                                $ins[$j] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".($j+1).",'".$tmp[0]."','C',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','BM','IDR',1,'".$tmp2[0]."','-','-','-','-','-','-','-','-')");
+                                
                             }
-                        }	
-                        
-                        $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','-','".$request->status."','".$request->jenis."')");
-                        
-                        $tmp="sukses";
-                        $sts=true;
-                    }else{
-                        $tmp= $cekAkun['message'];
-                        $sts=false;
-                    }
+                        }
+                    }	
+
+                    $insj =  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_terima."','D',".$nilai.",".$nilai.",'".$request->deskripsi."','KB','BM','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+
+                    $insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','".$request->terima_dari."','".$request->jenis_terima."','BM')");
+
+                    $tmp="sukses";
+                    $sts=true;
                 }else{
                     $tmp = "Transaksi tidak valid. No Dokumen '".$request->no_dokumen."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
                     $sts = false;
@@ -292,7 +286,7 @@ class UangMasukController extends Controller
                 DB::connection($this->db)->commit();
                 $success['status'] = $sts;
                 $success['no_bukti'] = $no_bukti;
-                $success['message'] = "Data Kas Bank berhasil disimpan ";
+                $success['message'] = "Data Uang Masuk berhasil disimpan ";
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
@@ -305,7 +299,7 @@ class UangMasukController extends Controller
         } catch (\Throwable $e) {
             // DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Kas Bank gagal disimpan ".$e;
+            $success['message'] = "Data Uang Masuk gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     
@@ -321,18 +315,15 @@ class UangMasukController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required',
             'no_dokumen' => 'required',
-            'jenis' => 'required',
             'kode_form' => 'required',
-            'status' => 'required',
+            'jenis_terima' => 'required',
             'tanggal' => 'required',
             'deskripsi' => 'required',
-            'total_debet' => 'required',
-            'total_kredit' => 'required',
+            'akun_terima' => 'required',
+            'terima_dari' => 'required',
             'kode_akun' => 'required|array',
             'keterangan' => 'required|array',
-            'dc' => 'required|array',
             'nilai' => 'required|array',
             'kode_pp' => 'required|array'
         ]);
@@ -349,12 +340,11 @@ class UangMasukController extends Controller
             $res = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'
             ");
             $res = json_decode(json_encode($res),true);
-
+            $no_bukti = $request->no_bukti;
             $kode_pp = $res[0]['kode_pp'];
             DB::connection($this->db)->beginTransaction();
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $request->no_bukti;
             $cek = $this->doCekPeriode2('KB',$status_admin,$periode);
 
             if($cek['status']){
@@ -363,29 +353,26 @@ class UangMasukController extends Controller
 
                 $res = $this->isUnik($request->no_dokumen,$no_bukti);
                 if($res['status']){
-                    $cekAkun = $this->cekAkunKas($request->kode_akun,$request->jenis,$request->dc,$kode_lokasi);
-                    if($cekAkun['status']){
-                        $nilai = 0;
-                        if (count($request->kode_akun) > 0){
-                            for ($j=0;$j < count($request->kode_akun);$j++){
-                                if($request->kode_akun != ""){
-                                    if($request->dc[$j] == "D"){
-                                        $nilai += floatval($request->nilai[$j]);
-                                    }
-                                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".$j.",'".$request->kode_akun[$j]."','".$request->dc[$j]."',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','".$request->jenis."','IDR',1,'".$request->kode_pp[$j]."','-','-','-','-','-','-','-','-')");
-                                    
-                                }
+                    
+                    $nilai = 0;
+                    if (count($request->kode_akun) > 0){
+                        for ($j=0;$j < count($request->kode_akun);$j++){
+                            if($request->kode_akun != ""){
+                                $nilai += floatval($request->nilai[$j]);
+                                $tmp = explode(" - ",$request->kode_akun[$j]);
+                                $tmp2 = explode(" - ",$request->kode_pp[$j]);
+                                $ins[$j] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',".($j+1).",'".$tmp[0]."','C',".floatval($request->nilai[$j]).",".floatval($request->nilai[$j]).",'".$request->keterangan[$j]."','KB','BM','IDR',1,'".$tmp2[0]."','-','-','-','-','-','-','-','-')");
+                                
                             }
-                        }	
-                        
-                        $sql = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','-','".$request->status."','".$request->jenis."')");
-                        
-                        $tmp="sukses";
-                        $sts=true;
-                    }else{
-                        $tmp= $cekAkun['message'];
-                        $sts=false;
-                    }
+                        }
+                    }	
+
+                    $insj =  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_terima."','D',".$nilai.",".$nilai.",'".$request->deskripsi."','KB','BM','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+
+                    $insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KB','$request->kode_form','F','-','-','".$kode_pp."','".$request->tanggal."','".$request->no_dokumen."','".$request->deskripsi."','IDR',1,".$nilai.",0,0,'".$nik."','-','-','-','-','-','".$request->terima_dari."','".$request->jenis_terima."','BM')");
+
+                    $tmp="sukses";
+                    $sts=true;
                 }else{
                     $tmp = "Transaksi tidak valid. No Dokumen '".$request->no_dokumen."' sudah terpakai di No Bukti '".$res['no_bukti']."' .";
                     $sts = false;
@@ -400,7 +387,7 @@ class UangMasukController extends Controller
                 DB::connection($this->db)->commit();
                 $success['status'] = $sts;
                 $success['no_bukti'] = $no_bukti;
-                $success['message'] = "Data Kas Bank berhasil disimpan ";
+                $success['message'] = "Data Uang Masuk berhasil disimpan ";
                 return response()->json(['success'=>$success], $this->successStatus); 
 
             }else{
@@ -413,7 +400,7 @@ class UangMasukController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data KasBank gagal diubah ".$e;
+            $success['message'] = "Data Uang Masuk gagal diubah ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -447,13 +434,13 @@ class UangMasukController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data KasBank berhasil dihapus";
+            $success['message'] = "Data Uang Kas berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data KasBank gagal dihapus ".$e;
+            $success['message'] = "Data Uang Kas gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
@@ -472,17 +459,28 @@ class UangMasukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.tanggal,a.no_bukti,a.periode,keterangan as deskripsi,a.nilai1,a.no_dokumen,a.param3 as jenis,a.param2 as status
+            $res = DB::connection($this->db)->select("select a.tanggal,a.no_bukti,a.periode,a.keterangan as deskripsi,a.nilai1,a.no_dokumen,a.param1 as terima_dari,a.param2 as jenis_terima,b.kode_akun as akun_terima,c.nama as nama_akun,d.nama as nama_terima
             from trans_m a
+            inner join trans_j b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.dc='D'
+            left join masakun c on b.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi 
+            left join ( select kode_vendor as kode, nama,kode_lokasi from vendor where kode_lokasi='".$kode_lokasi."' 
+            union all
+            select kode_cust as kode, nama,kode_lokasi from cust where kode_lokasi='".$kode_lokasi."' )
+            d on a.param1 = d.kode and a.kode_lokasi=d.kode_lokasi
             where a.no_bukti = '".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp 
+            $res2 = DB::connection($this->db)->select("select a.kode_akun,b.nama as nama_akun,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,a.dc 
                     from trans_j a 
                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                     inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 
                     where a.no_bukti = '".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
             $res2= json_decode(json_encode($res2),true);
+
+            $sql3="select a.no_bukti,a.kode_lokasi,a.jenis,a.file_dok as fileaddres,a.no_urut,a.nama from trans_dok a
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' order by a.no_urut ";
+            $res3 = DB::connection($this->db)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
 
             $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
             from lokasi a
@@ -493,6 +491,7 @@ class UangMasukController extends Controller
                 $success['status'] = true;
                 $success['jurnal'] = $res;
                 $success['detail'] = $res2;
+                $success['dokumen'] = $res3;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
@@ -500,6 +499,7 @@ class UangMasukController extends Controller
                 $success['message'] = "Data Kosong!"; 
                 $success['jurnal'] = [];
                 $success['detail'] = [];
+                $success['dokumen'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
@@ -545,7 +545,7 @@ class UangMasukController extends Controller
         
     }
 
-    public function getNIKPeriksa()
+    public function getTerimaDari(Request $request)
     {
         try {
             
@@ -554,21 +554,32 @@ class UangMasukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select nik, nama from karyawan where kode_lokasi='".$kode_lokasi."' and flag_aktif='1'");						
+            if(isset($request->kode) && $request->kode != ""){
+                $filter = " where a.kode = '$request->kode' ";
+            }else{
+                $filter = "";
+            }
+
+            $res = DB::connection($this->db)->select("select * from (select kode_vendor as kode, nama from vendor where kode_lokasi='".$kode_lokasi."' 
+            union all
+            select kode_cust as kode, nama from cust where kode_lokasi='".$kode_lokasi."' 
+            ) a
+            $filter
+            ");						
             $res= json_decode(json_encode($res),true);
             
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['daftar'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
+                $success['daftar'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -578,7 +589,7 @@ class UangMasukController extends Controller
         
     }
 
-    public function getNIKPeriksaByNIK($nik)
+    public function getAkunTerima(Request $request)
     {
         try {
             
@@ -587,20 +598,20 @@ class UangMasukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select nik, nama from karyawan where kode_lokasi='".$kode_lokasi."' and flag_aktif='1' and nik='$nik' ");						
+            $res = DB::connection($this->db)->select("select a.kode_akun,b.nama from flag_relasi a inner join masakun b on a.kode_akun=b.kode_akun where a.kode_flag in ('001','009') and a.kode_lokasi='".$kode_lokasi."'");					
             $res= json_decode(json_encode($res),true);
            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['daftar'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
+                $success['daftar'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
