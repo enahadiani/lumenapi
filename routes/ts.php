@@ -69,5 +69,6 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('tahun-ajaran','Ts\DashSiswaController@getTA');
 
     $router->get('periode','Ts\DashSiswaController@getPeriode');
+    $router->get('detail-trans','Ts\DashSiswaController@getDetailTransaksi');
     
 });
