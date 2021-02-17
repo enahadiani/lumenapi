@@ -636,7 +636,7 @@ class DashSiswaController extends Controller
                 $kode_pp = $data->kode_pp;
             }
 
-            $res3 = DB::connection($this->db)->select("select distinc a.periode
+            $res = DB::connection($this->db)->select("select distinct dbo.fnNamaBulan(a.periode) as nama_periode,a.periode as periode
             from sis_bill_m a
             inner join (select x.kode_lokasi,x.kode_pp,x.no_bill,sum(x.nilai) as tagihan 
                                     from sis_bill_d x 
@@ -648,50 +648,55 @@ class DashSiswaController extends Controller
                                     where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
                                     group by x.kode_lokasi,x.no_bill,x.kode_pp) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_lokasi = '$kode_lokasi' and a.kode_pp='$kode_pp' and b.tagihan - isnull(c.bayar,0) <> 0
-            order by a.tanggal ");
-            $res3 = json_decode(json_encode($res3),true);
+            order by a.periode desc ");
+            $res = json_decode(json_encode($res),true);
+        
 
-            $kode_ta = $res3[0]['kode_ta'];
-            
-            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel,c.skode as singkatan 
-            from sis_guru_matpel_kelas a
-            inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
-            $res2 = json_decode(json_encode($res2),true);
-
-            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end as semester 
-            from sis_nilai_m a 
-            inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
-            order by a.kode_kd";
-            $rs = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($rs),true);
-
-            if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan,a.pelaksanaan as deskripsi,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end as semester
-                    from sis_nilai_m a 
-                    inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                    inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
-					inner join sis_kelas f on a.kode_kelas=f.kode_kelas and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
-                    left join sis_nilai_dok d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi and c.kode_pp=d.kode_pp and c.nis=d.nis 
-					inner join sis_kd e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and a.kode_sem=e.kode_sem and a.kode_ta=e.kode_ta and f.kode_tingkat=e.kode_tingkat
-                    where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' and a.kode_kd='".$res[$i]['kode_kd']."' and c.nis='$nik' $filter
-                    order by a.kode_jenis")),true);
+                    $res[$i]['daftar'] = json_decode(json_encode(DB::connection($this->db)->select("
+                    select a.no_bill,convert(varchar,a.tanggal,103) as tgl,b.tagihan - isnull(c.bayar,0) as sisa_tagihan,a.tgl_input
+                    from sis_bill_m a
+                    inner join (select x.kode_lokasi,x.kode_pp,x.no_bill,sum(x.nilai) as tagihan 
+                                            from sis_bill_d x 
+                                            inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                            where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                            group by x.kode_lokasi,x.kode_pp,x.no_bill,x.nis) b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    left join (select x.kode_lokasi,x.no_bill,x.kode_pp,sum(x.nilai) as bayar from sis_rekon_d x 
+                                            inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                            where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                            group by x.kode_lokasi,x.no_bill,x.kode_pp) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+                    where a.kode_lokasi = '$kode_lokasi' and a.kode_pp='$kode_pp' and b.tagihan - isnull(c.bayar,0) <> 0 and a.periode='".$res[$i]['periode']."'
+                    order by a.tgl_input desc
+                    ")),true);
+                    for($j=0;$j < count($res[$i]['daftar']);$j++)
+                    {
+                        $no_bill = $res[$i]['daftar'][$j]['no_bill'];
+                        $res[$i]['daftar'][$j]['detail'] = json_decode(json_encode(DB::connection($this->db)->select("
+                        select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa
+                        from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+                                from sis_bill_d x 
+                                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                        
+                        left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+                                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+                        where a.tagihan - isnull(c.bayar,0) > 0 and a.no_bill='".$no_bill."'
+                        order by a.kode_param
+                        ")),true);
+                    }
                 }
                 $success['status'] = true;
-                $success['data_ta'] = $res3;
-                $success['data_guru'] = $res2;
-                $success['data_kompetensi'] = $res;
+                $success['data'] = $res;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data_ta'] = [];
-                $success['data_guru'] = [];
-                $success['data_kompetensi'] = [];
+                $success['data'] = [];
                 $success['status'] = true;
             }
             return response()->json(['success'=>$success], $this->successStatus);
