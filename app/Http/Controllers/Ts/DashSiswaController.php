@@ -625,7 +625,171 @@ class DashSiswaController extends Controller
         
     }
 
-    // Belum selesai
+    public function getTA(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_ta,a.nama
+            from sis_ta a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' 
+            order by a.kode_ta desc
+            ");
+            $res = json_decode(json_encode($res),true);
+
+            $resget = DB::connection($this->db)->select("select a.kode_ta,a.nama
+            from sis_ta a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif=1
+            ");
+            $resget = json_decode(json_encode($resget),true);
+            $success['tahun_akademik_aktif'] = $resget[0]['kode_ta'];
+            $success['rows'] = count($res);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getRiwayatTransaksi(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+
+            $filter_jenis = "";
+            if(isset($request->jenis) && $request->jenis != ""){
+                if($request->jenis == "all"){
+                    $filter_jenis .="";
+                }else{  
+                    if($request->jenis == "tagihan"){
+                        $jenis = " where a.modul = 'BILL' ";
+                    }else{
+                        $jenis = " where a.modul <> 'BILL' ";
+                    }
+                    $filter_jenis .= $jenis;
+                }
+            }else{
+                $filter_jenis .="";
+            }
+
+            $filter_bill = "";
+            if(isset($request->kode_sem) && $request->kode_sem != ""){
+                if($request->kode_sem == "all"){
+                    $filter_bill .="";
+                }else{  
+                    $filter_bill .=" and x.kode_sem='$request->kode_sem' ";
+                }
+            }else{
+                $filter_bill .="";
+            }
+
+            if(isset($request->kode_ta) && $request->kode_ta != ""){
+                if($request->kode_ta == "all"){
+                    $filter_bill .="";
+                }else{  
+                    $filter_bill .=" and x.kode_ta='$request->kode_ta' ";
+                }
+            }else{
+                $filter_bill .="";
+            }
+
+
+            $filter_rekon = "";
+            if(isset($request->kode_sem) && $request->kode_sem != ""){
+                if($request->kode_sem == "all"){
+                    $filter_rekon .="";
+                }else{  
+                    $filter_rekon .=" and z.kode_sem='$request->kode_sem' ";
+                }
+            }else{
+                $filter_rekon .="";
+            }
+
+            if(isset($request->kode_ta) && $request->kode_ta != ""){
+                if($request->kode_ta == "all"){
+                    $filter_rekon .="";
+                }else{  
+                    $filter_rekon .=" and x.kode_ta='$request->kode_ta' ";
+                }
+            }else{
+                $filter_rekon .="";
+            }
+
+            $res = DB::connection($this->db)->select("select * from (
+                select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,b.periode,
+                b.keterangan,'BILL' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan,
+                        0 as bayar from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0  $filter_bill
+                        group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
+                union all 
+                select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+                convert(varchar(10),b.tanggal,103) as tgl,b.periode,b.keterangan,'PDD' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param
+                from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+                    case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+                    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                    inner join sis_bill_d z on x.no_bill=z.no_bill and x.kode_lokasi=z.kode_lokasi and x.kode_pp=z.kode_pp and x.periode_bill=z.periode and x.nis=z.nis and x.kode_param=z.kode_param
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_rekon
+                    )a 
+                inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi 
+                union all 
+                select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
+                convert(varchar(10),b.tanggal,103) as tgl,b.periode,b.keterangan,'KB' as modul, isnull(a.tagihan,0) as tagihan,isnull(a.bayar,0) as bayar,a.kode_param 
+                from (select x.kode_lokasi,x.no_rekon,x.kode_param,
+                    case when x.modul in ('BTLREKON') then x.nilai else 0 end as tagihan,case when x.modul <>'BTLREKON' then x.nilai else 0 end as bayar
+                    from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                    inner join sis_bill_d z on x.no_bill=z.no_bill and x.kode_lokasi=z.kode_lokasi and x.kode_pp=z.kode_pp and x.periode_bill=z.periode and x.nis=z.nis and x.kode_param=z.kode_param
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_rekon
+                )a
+                inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
+            ) a
+            $filter_jenis
+            order by a.tanggal desc ");
+            $res = json_decode(json_encode($res),true);
+            $success['rows'] = count($res);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     public function getRincianTagihan(Request $request)
     {
         try {
@@ -697,6 +861,73 @@ class DashSiswaController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function  getDetailTransaksi(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required' 
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+            }
+
+
+            $res = json_decode(json_encode(DB::connection($this->db)->select("
+            select a.no_bill,convert(varchar,a.tanggal,103) as tgl,b.tagihan - isnull(c.bayar,0) as sisa_tagihan,a.tgl_input
+            from sis_bill_m a
+            inner join (select x.kode_lokasi,x.kode_pp,x.no_bill,sum(x.nilai) as tagihan 
+                                    from sis_bill_d x 
+                                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                    group by x.kode_lokasi,x.kode_pp,x.no_bill,x.nis) b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join (select x.kode_lokasi,x.no_bill,x.kode_pp,sum(x.nilai) as bayar from sis_rekon_d x 
+                                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                    group by x.kode_lokasi,x.no_bill,x.kode_pp) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            where a.kode_lokasi = '$kode_lokasi' and a.kode_pp='$kode_pp' and b.tagihan - isnull(c.bayar,0) <> 0 and a.no_bill='".$request->no_bukti."'
+            order by a.tgl_input desc
+            ")),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($res);$i++){
+                    $res[$i]['detail'] = json_decode(json_encode(DB::connection($this->db)->select("
+                        select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa
+                        from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+                                from sis_bill_d x 
+                                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+                        
+                        left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+                                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+                        where a.tagihan - isnull(c.bayar,0) > 0 and a.no_bill='".$res[$i]['no_bill']."'
+                        order by a.kode_param
+                        ")),true);
+                }
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
                 $success['status'] = true;
             }
             return response()->json(['success'=>$success], $this->successStatus);
