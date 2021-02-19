@@ -129,6 +129,17 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('masakun-curr','Toko\MasakunController@getCurrency');
     $router->get('masakun-modul','Toko\MasakunController@getModul');
 
+    //Master Masakun Detail
+    $router->get('msakundet','Toko\MasakunDetailController@index');
+    $router->get('msakundet-detail','Toko\MasakunDetailController@show');
+    $router->post('msakundet','Toko\MasakunDetailController@store');
+    $router->put('msakundet','Toko\MasakunDetailController@update');
+    $router->delete('msakundet','Toko\MasakunDetailController@destroy');
+    $router->get('msakundet-curr','Toko\MasakunDetailController@getCurrency');
+    $router->get('msakundet-modul','Toko\MasakunDetailController@getModul');
+    $router->get('msakundet-flag','Toko\MasakunDetailController@getFlagAkun');
+    $router->get('msakundet-neraca','Toko\MasakunDetailController@getNeraca');
+
     //Master Ref Trans
     $router->get('reftrans-kode','Toko\ReferensiTransController@generateKodeByJenis');
     $router->get('reftrans','Toko\ReferensiTransController@index');
