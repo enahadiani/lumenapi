@@ -1118,11 +1118,11 @@ class LaporanController extends Controller
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
            
-            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2,a.rowindex,a.modul
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n7 as n2,a.rowindex,a.modul
                  from exs_neraca a
                  $where and a.modul='A'
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2,a.rowindex,a.modul
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n7 as n2,a.rowindex,a.modul
                  from exs_neraca a
                  $where and a.modul='P'
                  order by modul,rowindex  ";
