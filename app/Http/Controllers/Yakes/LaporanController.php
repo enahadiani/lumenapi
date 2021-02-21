@@ -1122,7 +1122,7 @@ class LaporanController extends Controller
                  from exs_neraca a
                  $where and a.modul='A'
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n7 as n2,a.rowindex,a.modul
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4*-1 as  n1,a.n7*-1 as  n2,a.rowindex,a.modul
                  from exs_neraca a
                  $where and a.modul='P'
                  order by modul,rowindex  ";
@@ -1248,13 +1248,14 @@ class LaporanController extends Controller
             $success['tgl_akhir'] = $get2[0]->tglakhir;
             */
            
-            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
+            $sql3="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n7 as n2,a.rowindex,a.modul
                  from exs_neraca a
                  $where and a.modul='A'
                  union all
-                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4 as n1,a.n5 as n2
+                 select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.n4*-1 as n1,a.n7*-1 as n2,a.rowindex,a.modul
                  from exs_neraca a
-                 $where and a.modul='P' ";
+                 $where and a.modul='P'
+                 order by modul,rowindex ";
 
             /*
             $sql3 = "select a.kode_neraca,a.nama,a.n1,a.n2,a.level_spasi,a.tipe
