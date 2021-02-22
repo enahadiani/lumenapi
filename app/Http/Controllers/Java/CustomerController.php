@@ -60,7 +60,9 @@ class CustomerController extends Controller
                 a.pic, a.no_telp_pic, a.email_pic, a.akun_piutang, b.nama as nama_akun 
                 from vendor a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
-                $bank = "select no_rek, nama_rekening, bank, cabang where kode_lokasi = '$kode_lokasi' $filter";
+                $bank = "select a.no_rek, a.nama_rekening, a.bank, a.cabang from java_cust_detail a
+                inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
+                where kode_lokasi = '$kode_lokasi' $filter";
                 $resBank = DB::connection($this->sql)->select($bank);
                 $resBank = json_decode(json_encode($resBank),true);
                 $success['bank'] = $resBank;
