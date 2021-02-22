@@ -784,7 +784,7 @@ class DashSiswaController extends Controller
                 if($request->kode_ta == "all"){
                     $filter_rekon .="";
                 }else{  
-                    $filter_rekon .=" and x.kode_ta='$request->kode_ta' ";
+                    $filter_rekon .=" and z.kode_ta='$request->kode_ta' ";
                 }
             }else{
                 $filter_rekon .="";
