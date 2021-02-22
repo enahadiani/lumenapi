@@ -140,9 +140,14 @@ class CustomerController extends Controller
                 
                 DB::connection($this->sql)->insert($insertCust);
                 
+                $no_rek = $request->input('no_rek');
+                $nama_rek = $request->input('nama_rek');
+                $bank = $request->input('bank');
+                $cabang = $request->input('cabang');
+
                 for($i=0;$i<count($request->no_rek);$i++) {
                     $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                    values ('$request->kode_cust', '$request->nama_rek[$i]', '$request->bank[$i]', '$request->cabang[$i]', '$kode_lokasi', '$request->no_rek[$i]')";
+                    values ('$request->kode_cust', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
                     DB::connection($this->sql)->insert($insertDetail);
                 }
                 
