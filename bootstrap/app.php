@@ -643,4 +643,18 @@ $app->router->group([
     require __DIR__.'/../routes/siaga/auth.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/java-auth'
+], function ($router) {
+    require __DIR__.'/../routes/java/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/java-master'
+], function ($router) {
+    require __DIR__.'/../routes/java/master.php';
+});
+
 return $app;
