@@ -286,7 +286,7 @@ class RABController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_pp,a.tgl_admin,a.nama,b.kode_drkb,b.akun_beban,b.akun_bdd,(a.nilai_or - a.pph42) - isnull(c.beban,0) as saldo_or, b.akun_bmhd,isnull(d.bmhd,0) as saldo_bmhd 
+            $sql = "select a.kode_pp,a.tgl_admin,a.nama,b.kode_drkb,b.akun_beban,b.akun_bdd,(a.nilai_or - a.pph42) - isnull(c.beban,0) as saldo_or, b.akun_bmhd,isnull(d.bmhd,0) as saldo_bmhd 
             from prb_proyek a 			             
                inner join prb_proyek_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
                left join ( 			             
@@ -303,7 +303,8 @@ class RABController extends Controller
             ) d on a.kode_proyek=d.kode_proyek and a.kode_lokasi=d.kode_lokasi 
                       
             where a.kode_proyek = '$kode_proyek' and a.kode_lokasi='$kode_lokasi' 
-            ");
+            ";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -315,9 +316,10 @@ class RABController extends Controller
                 return $success;    
             }
             else{
-                $success['message'] = "Data Kosong!";
+                $success['message'] = "Data Kosong!".$sql;
                 $success['data'] = [];
                 $success['status'] = false;
+                $success['rows']=count($res);
                 
                 return $success;
             }
@@ -372,13 +374,29 @@ class RABController extends Controller
 
     public function pengajuanBeban(Request $request){
         $this->validate($request,[
-            'AJU' => 'required|array',
-            'AJU.*.tanggal' => 'required',
-            'AJU.*.kode_pp' => 'required',
-            'AJU.*.kode_proyek'=> 'required',
-            'AJU.*.keterangan'=> 'required',
-            'AJU.*.status_pajak' => 'required',
-            'AJU.*.user_input' => 'required',
+            'PBYR' => 'required|array',
+            'PBYR.*.keterangan'=> 'required',
+            'PBYR.*.tanggal' => 'required',
+            'PBYR.*.jenis' => 'required',
+            'PBYR.*.lama' => 'required',
+            'PBYR.*.kota' => 'required',
+            'PBYR.*.sarana' => 'required',
+            'PBYR.*.catatan' => 'required',
+            'PBYR.*.nik_buat' => 'required',
+            'PBYR.*.nik_app' => 'required',
+            'PBYR.*.kode_pp' => 'required',
+            'PBYR.*.kode_proyek'=> 'required',
+            'PBYR.*.status_pajak' => 'required',
+            'PBYR.*.user_input' => 'required',
+            'PBYR.*.tipe_transfer' => 'required',
+            'AJU.*.name' => 'required',
+            'AJU.*.nip' => 'required',
+            'AJU.*.transport' => 'required',
+            'AJU.*.lain_lain' => 'required',
+            'AJU.*.harian' => 'required',
+            'AJU.*.total_biaya' => 'required',
+            'AJU.*.nama_perjalanan' => 'required',
+            'AJU.*.pp_code' => 'required',
             'REK' => 'required|array',
             'REK.*.nama_rek' => 'required',
             'REK.*.no_rek' => 'required',
@@ -391,13 +409,14 @@ class RABController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
         
-        $datam= $request->input("AJU")[0];
+        $datam= $request->input("PBYR")[0];
         Log::info($request->all());
         DB::connection($this->db)->beginTransaction();
         try {
             date_default_timezone_set("Asia/Jakarta");
             $periode = substr($datam['tanggal'],0,4).substr($datam['tanggal'],5,2);
             $no_bukti = $this->generateKode("it_aju_m", "no_aju", $kode_lokasi."-".substr($periode,2,2).".", "00001");
+            $no_app = $this->generateKode("tu_pdapp_m", "no_app", $kode_lokasi."-PDA".substr($periode,2,4).".", "0001");
 
             $detail_proyek = $this->getDetailProyek($datam['kode_proyek'],$no_bukti);
             // $success['detail_proyek'] = $detail_proyek;
@@ -408,7 +427,8 @@ class RABController extends Controller
                 $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh kurang dari periode aktif sistem.[".$app_periode."]";
                 $sts = false;
             } 
-            else if (intval($app_periode) < intval($periode)){
+            else 
+            if (intval($app_periode) < intval($periode)){
                 $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh melebihi periode aktif sistem.[".$app_periode."]";
                 $sts = false;
             }
@@ -446,72 +466,113 @@ class RABController extends Controller
                         $total_bruto =0; $total_netto =0;$total_pajak=0;
                         $datarek = $request->input('REK');
                         if (count($datarek) > 0){
-                            for ($i=0;$i < count($datarek); $i++){			$total_bruto += $datarek[$i]['nilai_bruto'];
+                            for ($i=0;$i < count($datarek); $i++){			
+                                $total_bruto += $datarek[$i]['nilai_bruto'];
                                 $total_pajak += $datarek[$i]['nilai_pajak'];
                                 $nbersih = 	$datarek[$i]['nilai_bruto'] - $datarek[$i]['nilai_pajak'];
                                 $total_netto += $nbersih;
                                 $ins9 = DB::connection($this->db)->insert("insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_bukti."','".$kode_lokasi."','".$datarek[$i]['bank']."','".$datarek[$i]['no_rek']."','".$datarek[$i]['nama_rek']."','-',".$nbersih.",'".$datam['keterangan']."',".$datarek[$i]['nilai_pajak'].",'-')");	
                             }
                         }
+
+                        
+                        $data_aju = $request->input('AJU');
+                        $total_biaya =0;
+                        if (count($data_aju) > 0){
+                            $nu = 1;
+                            for ($i=0;$i < count($data_aju); $i++){	
+                                $no_spj = $no_bukti."-".strval($nu);                               
+                                $total_biaya += $data_aju[$i]['total_biaya'];
+
+                                $ins10 = DB::connection($this->db)->insert("insert into tu_pdaju_m (no_spj,tanggal,kode_lokasi,kode_pp,kode_akun,kode_drk,keterangan,nik_buat,nik_spj,periode,tgl_input,progress,no_app,nilai,jenis_pd,sts_bmhd,kode_proyek) values ('$no_spj',getdate(),'".$kode_lokasi."','".$data_aju[$i]['pp_code']."','".$akun_beban."','".$kode_drk."','".$data_aju[$i]['nama_perjalanan']."','".$datam['nik_buat']."','".$data_aju[$i]['nip']."','".$periode."',getdate(),'1','".$no_bukti."',".$data_aju[$i]['total_biaya'].",'-','-','-') ");
+
+                                $sql="insert into tu_pdaju_d (no_spj,kode_lokasi,kode_param,jumlah,nilai,total) values ('$no_spj','$kode_lokasi','91',1,".$data_aju[$i]['transport'].",".$data_aju[$i]['transport'].") ";
+
+                                $insAjud1 = DB::connection($this->db)->insert($sql);
+                                
+                                $sql="insert into tu_pdaju_d (no_spj,kode_lokasi,kode_param,jumlah,nilai,total) values ('$no_spj','$kode_lokasi','92',1,".$data_aju[$i]['harian'].",".$data_aju[$i]['harian'].") ";
+
+                                $insAjud2 = DB::connection($this->db)->insert($sql);
+
+                                $sql="insert into tu_pdaju_d (no_spj,kode_lokasi,kode_param,jumlah,nilai,total) values ('$no_spj','$kode_lokasi','93',1,".$data_aju[$i]['lain_lain'].",".$data_aju[$i]['lain_lain'].") ";
+
+                                $insAjud3 = DB::connection($this->db)->insert($sql);
+
+                                $nu++;
+                            }
+                        }
     
+                        
                         if (floatval($total_bruto) <= 0) {
                             $msg = "Nilai transaksi tidak valid.Nilai tidak boleh nol atau kurang.";
                             $sts = false;
                             DB::connection($this->db)->rollback();
                         }else{
-    
-                            if (floatval($total_pajak) != 0 && $datam['status_pajak'] == "NON") {
-                                $msg = "Transaksi tidak valid. Nilai Pajak tidak sesuai dengan status pajak.";
+
+                            if(floatval($total_bruto) != floatval($total_biaya)){
+                                $msg = "Total nilai rekening tidak sama dengan total dipengajuan.";
                                 $sts = false;
                                 DB::connection($this->db)->rollback();
                             }else{
-    
-                                if ($modeBMHD == "NON" && (floatval($total_bruto) > floatval($saldo_or))) {
-                                    $msg = "Nilai transaksi tidak valid.Nilai tidak boleh melebihi Saldo OR.";
-                                    $sts = false;
-                                    DB::connection($this->db)->rollback();
-                                }else if ($modeBMHD == "BMHD" && (floatval($total_bruto) > floatval($saldo_bmhd))) {
-                                    $msg = "Nilai transaksi tidak valid. Nilai tidak boleh melebihi Saldo BMHD.";
+
+                                if (floatval($total_pajak) != 0 && $datam['status_pajak'] == "NON") {
+                                    $msg = "Transaksi tidak valid. Nilai Pajak tidak sesuai dengan status pajak.";
                                     $sts = false;
                                     DB::connection($this->db)->rollback();
                                 }else{
-                                    $ins = DB::connection($this->db)->insert("insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,no_ref1,dasar) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$datam['tanggal']."','UMUM','".$akun_beban."','".$ppKelola."','".$kode_drk."','".$datam['kode_proyek']." | ".$datam['keterangan']."',".floatval($total_netto).",getdate(),'".$nik."','-','-','-','A','-','-','".$datam['user_input']."','PRBEBAN','".$datam['status_pajak']."',".floatval($total_pajak).",'".$modeBMHD."','".$datam['kode_pp']."')");				
-                                    //jurnal bisa lebih dari satu akun (it_aju_d), akun_beban proyek dan akun_bdd 
-                                    //(jika nilai pengajuan melebihi saldo schedule,kelebihan nilai pengajuan (nilai aju-saldo sch) di BDD-kan)		
-                        
-                                    if ($modeBMHD == "NON") {
-                                        $nilaiBeban = 0; $nilaiBDD = 0;
-                                        if (floatval($total_bruto) > floatval($saldo_sch))	{
-                                            $nilaiBeban = floatval($saldo_sch);
-                                            $nilaiBDD = floatval($total_bruto) - floatval($saldo_sch);						
-                                            $ins2 = DB::connection($this->db)->insert("insert into prb_prbeban_d(no_bukti,kode_lokasi,periode,periode_sch,tanggal,kode_akun,kode_pp,kode_drk,keterangan,dc,nilai,tgl_input,kode_proyek,modul,no_ref1,jenis) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$periode."','".$datam['tanggal']."','".$akunBDD."','".$ppKelola."','-','".$datam['keterangan']."','D',".$nilaiBDD.",getdate(),'".$datam['kode_proyek']."','BDD','-','ITAJU')");									
-                                            $ins3 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akunBDD."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D','IDR',1,".$nilaiBDD.",".$nilaiBDD.",'".$ppKelola."','-','".$kode_lokasi."','PRBEBAN','BDD','".$periode."','".$nik."',getdate(),'-')");		
-                                        }
+        
+                                    if ($modeBMHD == "NON" && (floatval($total_bruto) > floatval($saldo_or))) {
+                                        $msg = "Nilai transaksi tidak valid.Nilai tidak boleh melebihi Saldo OR.";
+                                        $sts = false;
+                                        DB::connection($this->db)->rollback();
+                                    }else if ($modeBMHD == "BMHD" && (floatval($total_bruto) > floatval($saldo_bmhd))) {
+                                        $msg = "Nilai transaksi tidak valid. Nilai tidak boleh melebihi Saldo BMHD.";
+                                        $sts = false;
+                                        DB::connection($this->db)->rollback();
+                                    }else{
+                                        $ins = DB::connection($this->db)->insert("insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,no_ref1,dasar) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$datam['tanggal']."','UMUM','".$akun_beban."','".$ppKelola."','".$kode_drk."','".$datam['kode_proyek']." | ".$datam['keterangan']."',".floatval($total_netto).",getdate(),'".$nik."','-','-','-','A','-','-','".$datam['user_input']."','PRBEBAN','".$datam['status_pajak']."',".floatval($total_pajak).",'".$modeBMHD."','".$datam['kode_pp']."')");				
+                                        //jurnal bisa lebih dari satu akun (it_aju_d), akun_beban proyek dan akun_bdd 
+                                        //(jika nilai pengajuan melebihi saldo schedule,kelebihan nilai pengajuan (nilai aju-saldo sch) di BDD-kan)		
+                            
+                                        if ($modeBMHD == "NON") {
+                                            $nilaiBeban = 0; $nilaiBDD = 0;
+                                            if (floatval($total_bruto) > floatval($saldo_sch))	{
+                                                $nilaiBeban = floatval($saldo_sch);
+                                                $nilaiBDD = floatval($total_bruto) - floatval($saldo_sch);						
+                                                $ins2 = DB::connection($this->db)->insert("insert into prb_prbeban_d(no_bukti,kode_lokasi,periode,periode_sch,tanggal,kode_akun,kode_pp,kode_drk,keterangan,dc,nilai,tgl_input,kode_proyek,modul,no_ref1,jenis) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$periode."','".$datam['tanggal']."','".$akunBDD."','".$ppKelola."','-','".$datam['keterangan']."','D',".$nilaiBDD.",getdate(),'".$datam['kode_proyek']."','BDD','-','ITAJU')");									
+                                                $ins3 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akunBDD."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D','IDR',1,".$nilaiBDD.",".$nilaiBDD.",'".$ppKelola."','-','".$kode_lokasi."','PRBEBAN','BDD','".$periode."','".$nik."',getdate(),'-')");		
+                                            }
+                                            else {
+                                                $nilaiBeban = floatval($total_bruto);						
+                                            }
+                                            
+                                            if ($nilaiBeban != 0) {
+                                                $ins4 = DB::connection($this->db)->insert("insert into prb_prbeban_d(no_bukti,kode_lokasi,periode,periode_sch,tanggal,kode_akun,kode_pp,kode_drk,keterangan,dc,nilai,tgl_input,kode_proyek,modul,no_ref1,jenis) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$periode."','".$datam['tanggal']."','".$akun_beban."','".$ppKelola."','".$kode_drk."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D',".$nilaiBeban.",getdate(),'".$datam['kode_proyek']."','AJUBEBAN','-','ITAJU')");												
+                                                $ins5 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akun_beban."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D','IDR',1,".$nilaiBeban.",".$nilaiBeban.",'".$ppKelola."','".$kode_drk."','".$kode_lokasi."','PRBEBAN','BEBAN','".$periode."','".$nik."',getdate(),'-')");
+                            
+                                                $ins6 = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values ('".$no_bukti."','PRBEBAN','".$kode_lokasi."','".$akun_beban."','".$ppKelola."','".$kode_drk."','".$periode."','".$periode."','D',0,".$nilaiBeban.")");
+                                            }
+                                            
+                                        }					
                                         else {
-                                            $nilaiBeban = floatval($total_bruto);						
+                                            //BMHD
+                                            $ins7 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akun_beban."','".$datam['keterangan']."','D','IDR',1,".floatval($total_bruto).",".floatval($total_bruto).",'".$ppKelola."','-','".$kode_lokasi."','PRBEBAN','BMHD','".$periode."','".$nik."',getdate(),'-')");
+                            
+                                            $ins8 = DB::connection($this->db)->insert("insert into prb_bmhd_d(no_bukti,kode_lokasi,periode,tanggal,kode_akun,kode_pp,keterangan,dc,nilai,tgl_input,kode_proyek,modul,no_ref1) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$datam['tanggal']."','".$akun_beban."','".$ppKelola."','".$datam['keterangan']."','C',".floatval($total_bruto).",getdate(),'".$datam['kode_proyek']."','AJUBMHD','-')");	
                                         }
+    
+                                        // insert ke tu_pdapp_m
                                         
-                                        if ($nilaiBeban != 0) {
-                                            $ins4 = DB::connection($this->db)->insert("insert into prb_prbeban_d(no_bukti,kode_lokasi,periode,periode_sch,tanggal,kode_akun,kode_pp,kode_drk,keterangan,dc,nilai,tgl_input,kode_proyek,modul,no_ref1,jenis) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$periode."','".$datam['tanggal']."','".$akun_beban."','".$ppKelola."','".$kode_drk."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D',".$nilaiBeban.",getdate(),'".$datam['kode_proyek']."','AJUBEBAN','-','ITAJU')");												
-                                            $ins5 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akun_beban."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D','IDR',1,".$nilaiBeban.",".$nilaiBeban.",'".$ppKelola."','".$kode_drk."','".$kode_lokasi."','PRBEBAN','BEBAN','".$periode."','".$nik."',getdate(),'-')");
+                                        $ins9 = DB::connection($this->db)->insert("insert into tu_pdapp_m(no_app,kode_lokasi,nik_user,tgl_input,periode,tanggal,keterangan,jenis,lama,kota,sarana,catatan,nik_buat,nik_app,no_aju) values ('$no_app','$kode_lokasi','$nik',getdate(),'$periode','".$datam['tanggal']."','".$datam['keterangan']."','".$datam['jenis']."','".$datam['lama']."','".$datam['kota']."','".$datam['sarana']."','".$datam['catatan']."','".$datam['nik_buat']."','".$datam['nik_app']."','".$no_bukti."') ");
                         
-                                            $ins6 = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values ('".$no_bukti."','PRBEBAN','".$kode_lokasi."','".$akun_beban."','".$ppKelola."','".$kode_drk."','".$periode."','".$periode."','D',0,".$nilaiBeban.")");
-                                        }
-                                        
-                                    }					
-                                    else {
-                                        //BMHD
-                                        $ins7 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akun_beban."','".$datam['keterangan']."','D','IDR',1,".floatval($total_bruto).",".floatval($total_bruto).",'".$ppKelola."','-','".$kode_lokasi."','PRBEBAN','BMHD','".$periode."','".$nik."',getdate(),'-')");
-                        
-                                        $ins8 = DB::connection($this->db)->insert("insert into prb_bmhd_d(no_bukti,kode_lokasi,periode,tanggal,kode_akun,kode_pp,keterangan,dc,nilai,tgl_input,kode_proyek,modul,no_ref1) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$datam['tanggal']."','".$akun_beban."','".$ppKelola."','".$datam['keterangan']."','C',".floatval($total_bruto).",getdate(),'".$datam['kode_proyek']."','AJUBMHD','-')");	
+                                        DB::connection($this->db)->commit();
+                                        $sts = true;
+                                        $msg = "Data pengajuan beban berhasil disimpan";
+                                        $success['no_bukti'] = $no_bukti;
                                     }
-                    
-                                    DB::connection($this->db)->commit();
-                                    $sts = true;
-                                    $msg = "Data pengajuan beban berhasil disimpan";
-                                    $success['no_bukti'] = $no_bukti;
                                 }
                             }
+    
                         }
         
                     }
@@ -537,35 +598,39 @@ class RABController extends Controller
     }
 
     public function hapusPengajuan($no_bukti){
-        if($data =  Auth::guard('ypt')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
         }
        
-        DB::connection('sqlsrvypt')->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         try {
 
-            $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+            $del = DB::connection($this->db)->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
-            $del2 = DB::connection('sqlsrvypt')->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+            $del2 = DB::connection($this->db)->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
-            $del3 = DB::connection('sqlsrvypt')->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+            $del3 = DB::connection($this->db)->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
-            $del4 = DB::connection('sqlsrvypt')->table('angg_r')->where('kode_lokasi', $kode_lokasi)
+            $del4 = DB::connection($this->db)->table('angg_r')->where('kode_lokasi', $kode_lokasi)
             ->where('modul', 'PRBEBAN')
             ->where('no_bukti', $no_bukti)->delete();
 
-            $del5 = DB::connection('sqlsrvypt')->table('prb_prbeban_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti' ,$no_bukti)->delete();
+            $del5 = DB::connection($this->db)->table('prb_prbeban_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti' ,$no_bukti)->delete();
+
+            $del6 = DB::connection($this->db)->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+            $del7 = DB::connection($this->db)->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
+            $del8 = DB::connection($this->db)->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
            
 
-            DB::connection('sqlsrvypt')->commit();
+            DB::connection($this->db)->commit();
             $success['no_bukti']=$no_bukti;
             $success['status'] = true;
             $success['message'] = "Pengajuan berhasil dihapus";
 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection('sqlsrvypt')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Internal Server Error";
             Log::error($e);
@@ -577,12 +642,12 @@ class RABController extends Controller
 
         try {
 
-            if($data =  Auth::guard('ypt')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $res = DB::connection('sqlsrvypt')->select("select a.no_aju,a.no_spb,a.no_kas,convert(varchar,a.tanggal,103) as tgl_bayar
+            $res = DB::connection($this->db)->select("select a.no_aju,a.no_spb,a.no_kas,convert(varchar,a.tanggal,103) as tgl_bayar
             from it_aju_m a
             inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_aju='".$no_bukti."' 
