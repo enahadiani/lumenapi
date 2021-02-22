@@ -20,6 +20,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     // Helper 
     $router->get('customer-akun','Java\CustomerController@getAkun');
     $router->get('customer-check','Java\CustomerController@checkCustomer');
+    $router->get('vendor-akun','Java\VendorController@getAkun');
+    $router->get('vendor-check','Java\VendorController@checkVendor');
 
     //Customer
     $router->get('customer','Java\CustomerController@index');
