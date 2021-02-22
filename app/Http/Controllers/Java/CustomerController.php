@@ -136,7 +136,7 @@ class CustomerController extends Controller
                 kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
                 values('$request->kode_customer', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
                 '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-                '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi'";
+                '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
                 
                 DB::connection($this->sql)->insert($insertCust);
                 
