@@ -58,7 +58,7 @@ class CustomerController extends Controller
                 }
                 $sql= "select a.kode_cust, a.nama, a.alamat, a.no_telp, a.kode_pos, a.email, a.kecamatan, a.kota, a.negara,
                 a.pic, a.no_telp_pic, a.email_pic, a.akun_piutang, b.nama as nama_akun 
-                from vendor a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                from java_cust a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
                 $bank = "select a.no_rek, a.nama_rekening, a.bank, a.cabang from java_cust_detail a
                 inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
