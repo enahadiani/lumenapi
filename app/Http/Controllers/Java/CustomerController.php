@@ -50,14 +50,20 @@ class CustomerController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_vendor)){
-                if($request->kode_vendor == "all"){
+            if(isset($request->kode_customer)){
+                if($request->kode_customer == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.kode_vendor='$request->kode_vendor' ";
+                    $filter = " and a.kode_cust='$request->kode_customer' ";
                 }
-                $sql= "select a.kode_vendor,a.nama,a.alamat,a.no_telp,a.kode_pos,a.email,a.npwp,a.alamat2,a.pic,a.akun_hutang,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pictel,b.nama as nama_akun 
-                from vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.kode_cust, a.nama, a.alamat, a.no_telp, a.kode_pos, a.email, a.kecamatan, a.kota, a.negara,
+                a.pic, a.no_telp_pic, a.email_pic, a.akun_piutang, b.nama as nama_akun 
+                from vendor a left join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+
+                $bank = "select no_rek, nama_rekening, bank, cabang where kode_lokasi = '$kode_lokasi' $filter";
+                $resBank = DB::connection($this->sql)->select($bank);
+                $resBank = json_decode(json_encode($resBank),true);
+                $success['bank'] = $resBank;
             }else{
                 $sql = "select kode_cust,nama,alamat,no_telp, tgl_input,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_cust
@@ -166,11 +172,9 @@ class CustomerController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Vendor gagal disimpan ".$e;
+            $success['message'] = "Data Customer gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
-        
-        
     }
 
 
@@ -195,25 +199,23 @@ class CustomerController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required|max:10',
-            'nama' => 'required|max:50',
-            'alamat' => 'required|max:200',
-            'no_tel' => 'required|max:50',
-            'email' => 'required|max:50',
-            'npwp' => 'required|max:50',
-            'pic' => 'required|max:50',
-            'alamat2' => 'required|max:200',
-            'bank' => 'required|max:50',
-            'cabang' => 'required|max:50',
-            'no_rek' => 'required|max:50',
-            'nama_rek' => 'required|max:50',
-            'no_fax' => 'required|max:50',
-            'no_pictel' => 'required|max:50',
-            'spek' => 'required|max:200',
-            'kode_klpvendor' => 'required|max:10',
-            'penilaian' => 'required|max:50',
-            'bank_trans' => 'required|max:50',
-            'akun_hutang' => 'required|max:20'
+            'kode_customer' => 'required',
+            'nama' => 'required',
+            'no_telp' => 'required',
+            'email' => 'required',
+            'alamat' => 'required',
+            'kode_pos' => 'required',
+            'kecamatan' => 'required',
+            'kota' => 'required',
+            'negara' => 'required',
+            'pic' => 'required',
+            'no_telp_pic' => 'required',
+            'email_pic' => 'required',
+            'akun_piutang' => 'required',
+            'no_rek' => 'required|array',
+            'nama_rek' => 'required|array',
+            'bank' => 'required|array',
+            'cabang' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -223,26 +225,48 @@ class CustomerController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $del = DB::connection($this->sql)->table('vendor')
+
+            DB::connection($this->sql)->table('java_cust')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_vendor', $request->kode_vendor)
+            ->where('kode_cust', $request->kode_customer)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values ('$request->kode_vendor','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->no_fax','$request->no_pictel','$request->spek','$request->kode_klpvendor','$request->penilaian','$request->bank_trans','$request->akun_hutang',getdate()) ");
-            
+            DB::connection($this->sql)->table('java_cust_detail')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_cust', $request->kode_customer)
+            ->delete();
+
+            $insertCust = "insert into java_cust(kode_cust, nama, no_telp, email, alamat, kode_pos, kecamatan, 
+            kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
+            values('$request->kode_customer', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
+            '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
+            '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
+                
+             DB::connection($this->sql)->insert($insertCust);
+                
+            $no_rek = $request->input('no_rek');
+            $nama_rek = $request->input('nama_rek');
+            $bank = $request->input('bank');
+            $cabang = $request->input('cabang');
+
+            for($i=0;$i<count($request->no_rek);$i++) {
+                $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
+                values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
+                DB::connection($this->sql)->insert($insertDetail);
+            }
+                
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->kode_vendor;
-            $success['message'] = "Data Vendor berhasil diubah";
-            return response()->json($success, $this->successStatus); 
+            $success['kode'] = $request->kode_customer;
+            $success['message'] = "Data Customer berhasil disimpan";
+            
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['kode'] = "-";
-            $success['message'] = "Data Vendor gagal diubah ".$e;
+            $success['message'] = "Data Customer gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
-        }	
+        }
     }
 
     /**
@@ -254,7 +278,7 @@ class CustomerController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required'
+            'kode_customer' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         
@@ -264,20 +288,25 @@ class CustomerController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('vendor')
+            DB::connection($this->sql)->table('java_cust')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_vendor', $request->kode_vendor)
+            ->where('kode_cust', $request->kode_customer)
+            ->delete();
+
+            DB::connection($this->sql)->table('java_cust_detail')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_cust', $request->kode_customer)
             ->delete();
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Vendor berhasil dihapus";
+            $success['message'] = "Data Customer berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Vendor gagal dihapus ".$e;
+            $success['message'] = "Data Customer gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
