@@ -17,12 +17,14 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
+    // Helper 
+    $router->get('customer-akun','Java\CustomerController@getAkun');
+
     //Customer
     $router->get('customer','Java\CustomerController@index');
     $router->post('customer','Java\CustomerController@store');
     $router->put('customer','Java\CustomerController@update');
     $router->delete('customer','Java\CustomerController@destroy');
-    $router->get('customer-akun','Java\CustomerController@getAkun');
 
 });
 
