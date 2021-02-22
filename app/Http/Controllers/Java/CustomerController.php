@@ -20,13 +20,25 @@ class CustomerController extends Controller
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select kode_vendor from vendor where kode_vendor ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_cust from java_cust where kode_cust ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
         }else{
             return true;
         }
+    }
+
+    public function checkCustomer(Request $request){
+        
+        $auth = DB::connection($this->sql)->select("select kode_cust from java_cust where kode_cust ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $success['status'] = false;   
+        }else{
+            $success['status'] = true;
+        }
+        return response()->json($success, $this->successStatus);
     }
 
     public function index(Request $request)
@@ -93,25 +105,23 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required|max:10',
-            'nama' => 'required|max:50',
-            'alamat' => 'required|max:200',
-            'no_tel' => 'required|max:50',
-            'email' => 'required|max:50',
-            'npwp' => 'required|max:50',
-            'pic' => 'required|max:50',
-            'alamat2' => 'required|max:200',
-            'bank' => 'required|max:50',
-            'cabang' => 'required|max:50',
-            'no_rek' => 'required|max:50',
-            'nama_rek' => 'required|max:50',
-            'no_fax' => 'required|max:50',
-            'no_pictel' => 'required|max:50',
-            'spek' => 'required|max:200',
-            'kode_klpvendor' => 'required|max:10',
-            'penilaian' => 'required|max:50',
-            'bank_trans' => 'required|max:50',
-            'akun_hutang' => 'required|max:20'
+            'kode_customer' => 'required',
+            'nama' => 'required',
+            'no_telp' => 'required',
+            'email' => 'required',
+            'alamat' => 'required',
+            'kode_pos' => 'required',
+            'kecamatan' => 'required',
+            'kota' => 'required',
+            'negara' => 'required',
+            'pic' => 'required',
+            'no_telp_pic' => 'required',
+            'email_pic' => 'required',
+            'akun_piutang' => 'required',
+            'no_rek' => 'required|array',
+            'nama_rek' => 'required|array',
+            'bank' => 'required|array',
+            'cabang' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -122,18 +132,29 @@ class CustomerController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
-
-                $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values ('$request->kode_vendor','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->bank','$request->cabang','$request->no_rek','$request->nama_rek','$request->no_fax','$request->no_pictel','$request->spek','$request->kode_klpvendor','$request->penilaian','$request->bank_trans','$request->akun_hutang',getdate()) ");
+                $insertCust = "insert into java_cust(kode_cust, nama, no_telp, email, alamat, kode_pos, kecamatan, 
+                kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
+                values('$request->kode_customer', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
+                '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
+                '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi'";
+                
+                DB::connection($this->sql)->insert($insertCust);
+                
+                for($i=0;$i<count($request->no_rek);$i++) {
+                    $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
+                    values ('$request->kode_cust', '$request->nama_rek[$i]', '$request->bank[$i]', '$request->cabang[$i], '$kode_lokasi', '$request->no_rek[$i]')";
+                    DB::connection($this->sql)->insert($insertDetail);
+                }
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['kode'] = $request->kode_vendor;
-                $success['message'] = "Data Vendor berhasil disimpan";
+                $success['kode'] = $request->kode_customer;
+                $success['message'] = "Data Customer berhasil disimpan";
             }else{
                 $success['status'] = false;
                 $success['kode'] = "-";
                 $success['jenis'] = "duplicate";
-                $success['message'] = "Error : Duplicate entry. No Vendor sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. No Customer sudah ada di database!";
             }
             
             return response()->json($success, $this->successStatus);     

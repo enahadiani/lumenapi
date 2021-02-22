@@ -19,6 +19,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     // Helper 
     $router->get('customer-akun','Java\CustomerController@getAkun');
+    $router->get('customer-check','Java\CustomerController@checkCustomer');
 
     //Customer
     $router->get('customer','Java\CustomerController@index');
