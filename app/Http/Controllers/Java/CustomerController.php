@@ -30,6 +30,10 @@ class CustomerController extends Controller
     }
 
     public function checkCustomer(Request $request){
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
         
         $auth = DB::connection($this->sql)->select("select kode_cust from java_cust where kode_cust ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);

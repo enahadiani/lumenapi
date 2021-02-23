@@ -29,6 +29,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('customer','Java\CustomerController@update');
     $router->delete('customer','Java\CustomerController@destroy');
 
+    //Vendor
+    $router->get('vendor','Java\VendorController@index');
+    $router->post('vendor','Java\VendorController@store');
+    $router->put('vendor','Java\VendorController@update');
+    $router->delete('vendor','Java\VendorController@destroy');
+
 });
 
 
