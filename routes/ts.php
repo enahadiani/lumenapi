@@ -17,7 +17,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginTs');
     $router->get('hash-pass', 'AuthController@hashPasswordTs');
-    // $router->get('hash-pass-costum/{db}/{table}/{top}/{kode_pp}', 'AuthController@hashPasswordCostum');
+    $router->get('hash-pass-costum-top/{db}/{table}/{kode_pp}/{top}', 'AuthController@hashPasswordCostumTop');
     $router->get('hash-pass-costum/{db}/{table}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
 
