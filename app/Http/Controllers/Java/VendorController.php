@@ -61,7 +61,7 @@ class VendorController extends Controller
                     $filter = " and a.kode_vendor='$request->kode_vendor' ";
                 }
                 $sql= "select a.kode_vendor, a.nama, a.alamat, a.no_telp, a.kode_pos, a.email, a.kecamatan, a.kota, a.negara,
-                a.pic, a.no_telp_pic, a.email_pic, a.akun_piutang, b.nama as nama_akun 
+                a.pic, a.no_telp_pic, a.email_pic, a.akun_hutang, b.nama as nama_akun 
                 from java_vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
                 $bank = "select a.no_rek, a.nama_rekening, a.bank, a.cabang from java_vendor_detail a
