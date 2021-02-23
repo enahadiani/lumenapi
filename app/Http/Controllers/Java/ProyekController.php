@@ -135,7 +135,7 @@ class ProyekController extends Controller {
                 }else{
                     $filter = " and a.no_proyek='$request->no_proyek' ";
                 }
-                $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, a.tgl_selesai, a.nilai, a.status_ppn
+                $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, a.tgl_selesai, a.nilai, a.ppn, a.status_ppn
                 b.nama as nama 
                 from java_proyek a inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
@@ -182,14 +182,15 @@ class ProyekController extends Controller {
                 'tgl_mulai' => 'required',
                 'tgl_selesai' => 'required',
                 'nilai' => 'required',
+                'ppn' => 'required',
                 'status_ppn' => 'required',
                 'periode' => 'required'
             ]);
 
             if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
-                $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, status_ppn, periode, tgl_input)
+                $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, tgl_input)
                 values ('$request->no_proyek', '$kode_lokasi', '$request->keterangan', '$request->kode_cust', '$request->no_kontrak',
-                '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->status_ppn', '$request->periode', getdate()";
+                '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate()";
 
                 DB::connection($this->sql)->insert($insert);
 
@@ -227,6 +228,7 @@ class ProyekController extends Controller {
                 'tgl_mulai' => 'required',
                 'tgl_selesai' => 'required',
                 'nilai' => 'required',
+                'ppn' => 'required',
                 'status_ppn' => 'required',
                 'periode' => 'required'
             ]);
@@ -238,9 +240,9 @@ class ProyekController extends Controller {
             ->where('no_proyek', $request->no_proyek)
             ->delete();
 
-            $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, status_ppn, periode, tgl_input)
+            $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, tgl_input)
             values ('$request->no_proyek', '$kode_lokasi', '$request->keterangan', '$request->kode_cust', '$request->no_kontrak',
-            '$request->tgl_selesai', '$request->tgl_mulai', '$request->nilai', '$request->ppn', '$request->periode', getdate()";
+            '$request->tgl_selesai', '$request->tgl_mulai', '$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate()";
 
             DB::connection($this->sql)->insert($insert);
             
