@@ -1071,6 +1071,54 @@ class AuthController extends Controller
 
     }
 
+    public function hashPasswordCostumTop($db,$table,$kode_pp,$top){
+        DB::connection($db)->beginTransaction();
+        
+        try {
+        
+            if($kode_pp != "" OR $kode_pp != NULL){
+                $filter = " and kode_pp='$kode_pp' ";
+            }else{
+                $filter = "";
+            }
+
+            $sql = "";
+            $begin = "SET NOCOUNT on;
+            BEGIN tran;
+            ";
+            $commit = "commit tran;";
+
+            $users = DB::connection($db)->select("SET NOCOUNT on; BEGIN tran; select top $top nik,pass from $table where isnull(password,'-')= '-' $filter order by nik;commit tran; ");
+            $i=1;
+            set_time_limit(300);
+            foreach ($users as $user) {
+                $sql .= " update $table set password = '".app('hash')->make($user->pass)."' where nik='$user->nik' and password is null ";
+                if($i % 500 == 0){
+                    $sql = $begin.$sql.$commit;
+                    $ins[] = DB::connection($db)->update($sql);
+                    $sql = "";
+                }
+                if($i == count($users) && ($i % 500 != 0) ){
+                    $sql = $begin.$sql.$commit;
+                    $ins[] = DB::connection($db)->update($sql);
+                    $sql = "";
+                }
+                $i++;
+            }
+                
+            DB::connection($db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
     public function hashPasswordSiaga(){
         $db = "dbsiaga";
         $table = "hakakses";
