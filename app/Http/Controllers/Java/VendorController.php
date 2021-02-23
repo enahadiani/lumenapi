@@ -145,10 +145,10 @@ class VendorController extends Controller
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
                 $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, kecamatan, 
-                kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
+                kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi)
                 values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
                 '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-                '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
+                '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi')";
                 
                 DB::connection($this->sql)->insert($insertVend);
                 
@@ -217,7 +217,7 @@ class VendorController extends Controller
             'pic' => 'required',
             'no_telp_pic' => 'required',
             'email_pic' => 'required',
-            'akun_piutang' => 'required',
+            'akun_hutang' => 'required',
             'no_rek' => 'required|array',
             'nama_rek' => 'required|array',
             'bank' => 'required|array',
@@ -243,10 +243,10 @@ class VendorController extends Controller
             ->delete();
 
             $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, kecamatan, 
-            kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
+            kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi)
             values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
             '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-            '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
+            '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi')";
                 
              DB::connection($this->sql)->insert($insertVend);
                 
