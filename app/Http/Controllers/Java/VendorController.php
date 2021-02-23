@@ -30,8 +30,12 @@ class VendorController extends Controller
     }
 
     public function checkVendor(Request $request){
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
         
-        $auth = DB::connection($this->sql)->select("select kode_cust from java_vendor where kode_vendor ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_vendor from java_vendor where kode_vendor ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             $success['status'] = false;   
@@ -140,13 +144,13 @@ class VendorController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
-                $insertCust = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, kecamatan, 
+                $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, kecamatan, 
                 kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
                 values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
                 '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
                 '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
                 
-                DB::connection($this->sql)->insert($insertCust);
+                DB::connection($this->sql)->insert($insertVend);
                 
                 $no_rek = $request->input('no_rek');
                 $nama_rek = $request->input('nama_rek');
@@ -238,13 +242,13 @@ class VendorController extends Controller
             ->where('kode_vendor', $request->kode_vendor)
             ->delete();
 
-            $insertCust = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, kecamatan, 
+            $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, kecamatan, 
             kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi)
             values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
             '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
             '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
                 
-             DB::connection($this->sql)->insert($insertCust);
+             DB::connection($this->sql)->insert($insertVend);
                 
             $no_rek = $request->input('no_rek');
             $nama_rek = $request->input('nama_rek');
