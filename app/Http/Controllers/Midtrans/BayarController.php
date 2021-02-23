@@ -108,6 +108,7 @@ class BayarController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
             }
             $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-MID.", "0001");
 
@@ -115,12 +116,12 @@ class BayarController extends Controller
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Donasi berhasil disimpan";
+            $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Donasi gagal disimpan ".$e;
+            $success['message'] = "Data Pembayaran gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -172,12 +173,12 @@ class BayarController extends Controller
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Donasi berhasil disimpan";
+            $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Donasi gagal disimpan ".$e;
+            $success['message'] = "Data Pembayaran gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
