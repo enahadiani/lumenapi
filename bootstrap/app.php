@@ -657,4 +657,11 @@ $app->router->group([
     require __DIR__.'/../routes/java/master.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/java-trans'
+], function ($router) {
+    require __DIR__.'/../routes/java/trans.php';
+});
+
 return $app;
