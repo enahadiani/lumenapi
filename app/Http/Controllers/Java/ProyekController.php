@@ -190,7 +190,7 @@ class ProyekController extends Controller {
             if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
                 $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, tgl_input)
                 values ('$request->no_proyek', '$kode_lokasi', '$request->keterangan', '$request->kode_cust', '$request->no_kontrak',
-                '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate()";
+                '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate())";
 
                 DB::connection($this->sql)->insert($insert);
 
@@ -242,7 +242,7 @@ class ProyekController extends Controller {
 
             $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, tgl_input)
             values ('$request->no_proyek', '$kode_lokasi', '$request->keterangan', '$request->kode_cust', '$request->no_kontrak',
-            '$request->tgl_selesai', '$request->tgl_mulai', '$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate()";
+            '$request->tgl_selesai', '$request->tgl_mulai', '$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate())";
 
             DB::connection($this->sql)->insert($insert);
             
