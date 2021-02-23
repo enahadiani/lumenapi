@@ -85,10 +85,10 @@ class ProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            if(isset($request->kode_vendor)){
-                if($request->kode_vendor != "" ){
+            if(isset($request->kode_cust)){
+                if($request->kode_cust != "" ){
 
-                    $filter = " and a.kode_vendor='$request->kode_vendor' ";
+                    $filter = " and a.kode_cust='$request->kode_cust' ";
                 }else{
                     $filter = "";
                 }
@@ -96,8 +96,8 @@ class ProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select kode_vendor, nama 
-            from java_vendor where kode_lokasi='".$kode_lokasi."' $filter";
+            $sql= "select kode_cust, nama 
+            from java_cust where kode_lokasi='".$kode_lokasi."' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -135,7 +135,7 @@ class ProyekController extends Controller {
                 }else{
                     $filter = " and a.no_proyek='$request->no_proyek' ";
                 }
-                $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, convert(varchar(10), a.tgl_selesai, 120) as tgl_selesai, a.nilai, a.ppn, a.status_ppn
+                $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, convert(varchar(10), a.tgl_selesai, 120) as tgl_selesai, a.nilai, a.ppn, a.status_ppn,
                 b.nama as nama 
                 from java_proyek a inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
