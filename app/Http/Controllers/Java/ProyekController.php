@@ -263,7 +263,7 @@ class ProyekController extends Controller {
     public function destroy(Request $request) {
         try {
             $this->validate($request, [
-                'kode_vendor' => 'required'
+                'no_proyek' => 'required'
             ]);
 
             if($data =  Auth::guard($this->guard)->user()){
