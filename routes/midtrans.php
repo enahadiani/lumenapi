@@ -46,4 +46,15 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
 });
 
+$router->group(['middleware' => 'auth:ts'], function () use ($router) {
+    
+    //Bayar Tagihan Siswa
+    $router->get('sis-midtrans','Midtrans\BayarController@index');
+    $router->get('sis-midtrans-kode','Midtrans\BayarController@getKode');
+    $router->get('sis-midtrans/{no_bukti}','Midtrans\BayarController@show');
+    $router->post('sis-midtrans','Midtrans\BayarController@store');
+    
+});
+
+$router->put('sis-midtrans/{no_bukti}/{sts_bayar}','Midtrans\BayarController@ubahStatus');
 $router->put('donasi/{no_bukti}/{sts_bayar}','Midtrans\DonasiController@ubahStatus');
