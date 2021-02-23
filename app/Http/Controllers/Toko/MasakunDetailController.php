@@ -211,7 +211,8 @@ class MasakunDetailController extends Controller
                 $flag = $request->input('kode_flag');
                 if(count($flag) > 0){
                     for($f=0;$f<count($flag);$f++){
-                        $ins2 = DB::connection($this->sql)->insert("insert into flag_relasi(kode_akun,kode_lokasi,kode_flag) values ('".$request->kode_akun."','".$kode_lokasi."','".$request->kode_flag[$f]."' ) ");
+                        $tmp = explode(" - ", $request->kode_flag[$f]);
+                        $ins2 = DB::connection($this->sql)->insert("insert into flag_relasi(kode_akun,kode_lokasi,kode_flag) values ('".$request->kode_akun."','".$kode_lokasi."','".$tmp[0]."' ) ");
                     }
                 }
 
@@ -219,7 +220,9 @@ class MasakunDetailController extends Controller
 
                 if(count($keu) > 0){
                     for($k=0;$k<count($keu);$k++){
-                        $ins3 = DB::connection($this->sql)->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values ('".$request->kode_neraca[$k]."','".$request->kode_fs[$k]."','".$request->kode_akun."','$kode_lokasi') ");
+                        $tmp = explode(" - ", $request->kode_fs[$k]);
+                        $tmp2 = explode(" - ", $request->kode_neraca[$k]);
+                        $ins3 = DB::connection($this->sql)->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values ('".$tmp2[0]."','".$tmp[0]."','".$request->kode_akun."','$kode_lokasi') ");
                     }
                 }
                 
@@ -287,15 +290,18 @@ class MasakunDetailController extends Controller
             $flag = $request->input('kode_flag');
             if(count($flag) > 0){
                 for($f=0;$f<count($flag);$f++){
-                    $ins2 = DB::connection($this->sql)->insert("insert into flag_relasi(kode_akun,kode_lokasi,kode_flag) values ('".$request->kode_akun."','".$kode_lokasi."','".$request->kode_flag[$f]."' ) ");
+                    $tmp = explode(" - ", $request->kode_flag[$f]);
+                    $ins2 = DB::connection($this->sql)->insert("insert into flag_relasi(kode_akun,kode_lokasi,kode_flag) values ('".$request->kode_akun."','".$kode_lokasi."','".$tmp[0]."' ) ");
                 }
             }
-
+            
             $keu = $request->input('kode_neraca');
-
+            
             if(count($keu) > 0){
                 for($k=0;$k<count($keu);$k++){
-                    $ins3 = DB::connection($this->sql)->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values ('".$request->kode_neraca[$k]."','".$request->kode_fs[$k]."','".$request->kode_akun."','$kode_lokasi') ");
+                    $tmp = explode(" - ", $request->kode_fs[$k]);
+                    $tmp2 = explode(" - ", $request->kode_neraca[$k]);
+                    $ins3 = DB::connection($this->sql)->insert("insert into relakun (kode_neraca,kode_fs,kode_akun,kode_lokasi) values ('".$tmp2[0]."','".$tmp[0]."','".$request->kode_akun."','$kode_lokasi') ");
                 }
             }
 
