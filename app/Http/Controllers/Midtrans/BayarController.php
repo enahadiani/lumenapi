@@ -72,7 +72,7 @@ class BayarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp= $data->kode_pp;
             }
-            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-MID.", "0001");
+            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
             $success['no_bukti'] = $no_bukti;
             $success['status'] = true;
             $success['message'] = "Success";
@@ -110,7 +110,7 @@ class BayarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp= $data->kode_pp;
             }
-            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-MID.", "0001");
+            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
 
             $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','$request->status','$request->snap_token','$kode_lokasi','$nik',getdate())");
             
