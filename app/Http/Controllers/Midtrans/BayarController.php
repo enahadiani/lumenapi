@@ -33,9 +33,10 @@ class BayarController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
             }
 
-            $res = DB::connection($this->db)->select("select no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,tgl_input from sis_mid_bayar where kode_lokasi='$kode_lokasi' and nis='$nis' and kode_pp='$kode_pp'	 
+            $res = DB::connection($this->db)->select("select no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,tgl_input from sis_mid_bayar where kode_lokasi='$kode_lokasi' and nis='$nik' and kode_pp='$kode_pp'	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -72,7 +73,7 @@ class BayarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp= $data->kode_pp;
             }
-            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-MID.", "0001");
+            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
             $success['no_bukti'] = $no_bukti;
             $success['status'] = true;
             $success['message'] = "Success";
@@ -108,19 +109,20 @@ class BayarController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
             }
-            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-MID.", "0001");
+            $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
 
-            $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','$request->status','$request->snap_token','$kode_lokasi','$nik',getdate())");
+            $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp) values ('$no_bukti','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','$request->status','$request->snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp')");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Donasi berhasil disimpan";
+            $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Donasi gagal disimpan ".$e;
+            $success['message'] = "Data Pembayaran gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
@@ -172,12 +174,12 @@ class BayarController extends Controller
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Donasi berhasil disimpan";
+            $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Donasi gagal disimpan ".$e;
+            $success['message'] = "Data Pembayaran gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
