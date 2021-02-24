@@ -118,9 +118,9 @@ class BayarController extends Controller
 
             $client = new Client();
 
-            $url = ( !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/v2' : 'https://app.midtrans.com/snap/v2');
+            $url = ( !config('services.midtrans.isProduction') ? 'https://api.sandbox.midtrans.com/v2/' : 'https://api.midtrans.com/v2/');
 
-            $response = $client->request('GET',  $url.'/'.$request->order_id.'/status',[
+            $response = $client->request('GET',  $url.$request->order_id.'/status',[
                 'headers' => [
                     'Authorization' => 'Basic '.base64_encode(config('services.midtrans.serverKey')),
                     'Accept'     => 'application/json',
