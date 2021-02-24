@@ -54,7 +54,9 @@ class CustController extends Controller
                 
             }else{
                 
-                $sql = "select kode_cust,nama,alamat,pic,jabatan_pic,email,no_telp from sai_cust where kode_lokasi='".$kode_lokasi."' ";
+                $sql = "select kode_cust,nama,alamat,pic,jabatan_pic,email,no_telp, 
+                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
+                from sai_cust where kode_lokasi='".$kode_lokasi."' ";
             }
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -99,8 +101,10 @@ class CustController extends Controller
             }
 
             if($this->isUnik($request->kode_cust)){                
-                
-                $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,email,no_telp,jabatan_pic) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$request->email."','".$request->no_telp."','$request->jabatan_pic')");
+                $insert = "insert into sai_cust(kode_cust, nama, alamat, pic, kode_lokasi, email, no_telp, jabatan_pic, tgl_input)
+                values('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."', 
+                '".$kode_lokasi."','".$request->email."','".$request->no_telp."','$request->jabatan_pic', getdate())";
+                DB::connection($this->sql)->insert($insert);
 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -145,7 +149,10 @@ class CustController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into sai_cust(kode_cust,nama,alamat,pic,kode_lokasi,email,no_telp,jabatan_pic) values ('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."','".$kode_lokasi."','".$request->email."','".$request->no_telp."','$request->jabatan_pic')");
+            $insert = "insert into sai_cust(kode_cust, nama, alamat, pic, kode_lokasi, email, no_telp, jabatan_pic, tgl_input)
+            values('".$request->kode_cust."','".$request->nama."','".$request->alamat."','".$request->pic."', 
+            '".$kode_lokasi."','".$request->email."','".$request->no_telp."','$request->jabatan_pic', getdate())";
+            DB::connection($this->sql)->insert($insert);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;

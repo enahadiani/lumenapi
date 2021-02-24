@@ -48,6 +48,9 @@ class BillprController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $select = "select a.no_bill, a.no_dokumen, a.tanggal, a.keterangan, a.nilai, a.nilai_ppn, 
+            case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
+            from sai_bill_m a where a.kode_lokasi='".$kode_lokasi."'";
             $res = DB::connection($this->sql)->select("select a.no_bill,a.no_dokumen,a.tanggal,a.keterangan,a.nilai,a.nilai_ppn from sai_bill_m a where a.kode_lokasi='".$kode_lokasi."'");
             $res = json_decode(json_encode($res),true);
             
