@@ -115,9 +115,9 @@ class JuskebController extends Controller
             end as posisi,a.progress,isnull(z.nilai,0) as nilai_finish
             from apv_juskeb_m a
             inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
+            left join (SELECT no_juskeb,kode_lokasi,MAX(no_bukti) as MaxVer
                         FROM apv_ver_m
-                        GROUP BY no_juskeb,kode_lokasi,tanggal
+                        GROUP BY no_juskeb,kode_lokasi
                         ) b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
             left join apv_juspo_m c on a.no_bukti=c.no_juskeb and a.kode_lokasi=c.kode_lokasi
             left join (select a.no_bukti,b.nama as nama_jab
@@ -179,9 +179,9 @@ class JuskebController extends Controller
             end as posisi,a.progress,isnull(z.nilai,0) as nilai_finish
             from apv_juskeb_m a
             inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            left join (SELECT no_juskeb,kode_lokasi,tanggal,MAX(no_bukti) as MaxVer
+            left join (SELECT no_juskeb,kode_lokasi,MAX(no_bukti) as MaxVer
                         FROM apv_ver_m
-                        GROUP BY no_juskeb,kode_lokasi,tanggal
+                        GROUP BY no_juskeb,kode_lokasi
                         ) b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
             left join apv_juspo_m c on a.no_bukti=c.no_juskeb and a.kode_lokasi=c.kode_lokasi
             left join (select a.no_bukti,b.nama as nama_jab
