@@ -53,6 +53,9 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('sis-midtrans-kode','Midtrans\BayarController@getKode');
     $router->get('sis-midtrans/{no_bukti}','Midtrans\BayarController@show');
     $router->post('sis-midtrans','Midtrans\BayarController@store');
+
+    
+    $router->post('sis-midtrans/charge','Midtrans\BayarController@getSnapToken');
     
 });
 
