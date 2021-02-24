@@ -56,6 +56,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
 
     
     $router->post('sis-midtrans/charge','Midtrans\BayarController@getSnapToken');
+    $router->get('sis-midtrans/status','Midtrans\BayarController@getStatusTransaksi');
     
 });
 
