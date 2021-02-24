@@ -39,7 +39,9 @@ class ModulController extends Controller
                 $filter .="";
             }
 
-            $sql = "SELECT kode_modul, nama FROM sai_modul as status where kode_lokasi= '".$kode_lokasi."' $filter";
+            $sql = "select kode_modul, nama, 
+            case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
+            from sai_modul where kode_lokasi= '".$kode_lokasi."' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -101,8 +103,10 @@ class ModulController extends Controller
             $query = DB::connection($this->sql)->select($sql2);
     
             $id = $prefix.str_pad($query[0]->id, strlen($str_format), $str_format, STR_PAD_LEFT);
-
-            $ins = DB::connection($this->sql)->insert("insert into sai_modul (kode_lokasi,kode_modul,nama) values ('".$kode_lokasi."','".$id."','".$req['nama']."') ");
+            
+            $insert = "insert into sai_modul (kode_lokasi, kode_modul, nama, tgl_input) 
+            values('".$kode_lokasi."', '".$id."', '".$req['nama']."', getdate())";
+            DB::connection($this->sql)->insert($insert);
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
@@ -153,7 +157,15 @@ class ModulController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $req = $request->all();
-            $ins = DB::connection($this->sql)->update("update sai_modul set nama='".$req['nama']."' where kode_modul = '".$req['kode_modul']."' and kode_lokasi='".$kode_lokasi."'");
+
+            $del = DB::connection($this->sql)->table('sai_modul')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_modul', $request->kode_modul)
+            ->delete();
+
+            $insert = "insert into sai_modul (kode_lokasi, kode_modul, nama, tgl_input) 
+            values('".$kode_lokasi."', '".$request->kode_modul."', '".$req['nama']."', getdate())";
+            DB::connection($this->sql)->insert($insert);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;

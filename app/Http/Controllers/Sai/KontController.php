@@ -48,8 +48,11 @@ class KontController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $res = DB::connection($this->sql)->select("select a.no_kontrak,a.no_dokumen,a.tgl_awal,a.tgl_akhir,a.keterangan,a.nilai,a.nilai_ppn,a.nama_up,a.alamat_up,a.progress 
-                                                       from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.status_kontrak='PROYEK' ");
+            $select = "select a.no_kontrak, a.no_dokumen, a.tgl_awal, a.tgl_akhir, a.keterangan, a.nilai, a.nilai_ppn, 
+            a.nama_up,a.alamat_up,a.progress, case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status
+            from sai_kontrak a where a.kode_lokasi='".$kode_lokasi."' and a.status_kontrak='PROYEK'";
+            
+            $res = DB::connection($this->sql)->select($select);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
