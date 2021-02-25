@@ -401,9 +401,9 @@ class MasakunDetailController extends Controller
     
     public function getNeraca(Request $request)
     {
-        $this->validate($request,[
-            'kode_fs' => 'required'
-        ]);
+        // $this->validate($request,[
+        //     'kode_fs' => 'required'
+        // ]);
 
         try {
             
@@ -412,13 +412,20 @@ class MasakunDetailController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
             if(isset($request->kode_neraca) && $request->kode_neraca != ""){
-                $filter = " and kode_neraca='$request->kode_neraca' ";
+                $filter .= " and kode_neraca='$request->kode_neraca' ";
             }else{
-                $filter = "";
+                $filter .= "";
             }
 
-            $res = DB::connection($this->sql)->select("select kode_neraca, nama from neraca where kode_fs='".$request->kode_fs."' and tipe = 'posting' and kode_lokasi='".$kode_lokasi."'
+            if(isset($request->kode_fs) && $request->kode_fs != ""){
+                $filter .= " and kode_fs='$request->kode_fs' ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection($this->sql)->select("select distinct kode_neraca, nama from neraca where tipe = 'posting' and kode_lokasi='".$kode_lokasi."'
             $filter
             ");
             $res = json_decode(json_encode($res),true);

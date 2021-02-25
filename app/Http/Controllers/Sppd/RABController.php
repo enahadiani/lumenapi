@@ -427,11 +427,11 @@ class RABController extends Controller
                 $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh kurang dari periode aktif sistem.[".$app_periode."]";
                 $sts = false;
             } 
-            else 
-            if (intval($app_periode) < intval($periode)){
-                $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh melebihi periode aktif sistem.[".$app_periode."]";
-                $sts = false;
-            }
+            // else 
+            // if (intval($app_periode) < intval($periode)){
+            //     $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh melebihi periode aktif sistem.[".$app_periode."]";
+            //     $sts = false;
+            // }
             else{
 
                 if($detail_proyek['status']){
