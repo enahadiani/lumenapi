@@ -59,15 +59,19 @@ class RabProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->no_proyek)){
-                if($request->no_proyek == "all"){
+            if(isset($request->no_rab)){
+                if($request->no_rab == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.no_proyek='$request->no_proyek' ";
+                    $filter = " and a.no_rab='$request->no_rab' ";
                 }
-                $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, convert(varchar(10), a.tgl_selesai, 120) as tgl_selesai, a.nilai, a.ppn, a.status_ppn,
-                b.nama as nama 
-                from java_proyek a inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.no_proyek, b.keterangan, a.nilai_anggaran, b.nilai 
+                from java_rab_m a inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $detail = "select no, keterangan, jumlah, satuan, harga from java_rab_d where kode_lokasi = '$kode_lokasi' and no_rab = '$request->no_rab'";
+                
+                $det = DB::connection($this->sql)->select($detail);
+                $det = json_decode(json_encode($det),true);
+                $success['detail'] = $det;
             }else{
                 $sql = "select no_rab, no_proyek, tanggal, nilai_anggaran,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_rab_m
