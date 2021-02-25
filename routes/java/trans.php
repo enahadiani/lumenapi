@@ -28,6 +28,18 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('proyek','Java\ProyekController@update');
     $router->delete('proyek','Java\ProyekController@destroy');
 
+    // Anggaran Proyek
+    $router->get('rab-proyek','Java\RabProyekController@index');
+    $router->post('rab-proyek','Java\RabProyekController@store');
+    $router->put('rab-proyek','Java\RabProyekController@update');
+    $router->delete('rab-proyek','Java\RabProyekController@destroy');
+
+    //Biaya Proyek
+    $router->get('biaya-proyek','Java\BiayaProyekController@index');
+    $router->post('biaya-proyek','Java\BiayaProyekController@store');
+    $router->put('biaya-proyek','Java\BiayaProyekController@update');
+    $router->delete('biaya-proyek','Java\BiayaProyekController@destroy');
+
 });
 
 
