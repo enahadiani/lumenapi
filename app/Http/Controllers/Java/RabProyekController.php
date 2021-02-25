@@ -109,40 +109,41 @@ class RabProyekController extends Controller {
         ]);
 
         try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+            return 'test';
+            // if($data =  Auth::guard($this->guard)->user()){
+            //     $nik= $data->nik;
+            //     $kode_lokasi= $data->kode_lokasi;
+            // }
 
-            DB::connection($this->sql)->beginTransaction();
-            $tanggal = date('Y-m-d');
-            $periode = substr($tanggal,0,4).substr($tanggal,5,2);
-            $per = substr($periode, 2, 4);
-            $no_rab = $this->generateKode('java_rab_m', 'no_rab', $kode_lokasi."-AGR$per".".", '00001');
+            // DB::connection($this->sql)->beginTransaction();
+            // $tanggal = date('Y-m-d');
+            // $periode = substr($tanggal,0,4).substr($tanggal,5,2);
+            // $per = substr($periode, 2, 4);
+            // $no_rab = $this->generateKode('java_rab_m', 'no_rab', $kode_lokasi."-AGR$per".".", '00001');
 
-            $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', getdate(), '$request->nilai_anggaran')";
+            // $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
+            // values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', getdate(), '$request->nilai_anggaran')";
             
-            $jumlah = $request->input('jumlah');
-            $satuan = $request->input('satuan');
-            $harga  = $request->input('harga');
-            $nomor     = $request->input('nomor');
-            $keterangan = $request->input('keterangan');
+            // $jumlah = $request->input('jumlah');
+            // $satuan = $request->input('satuan');
+            // $harga  = $request->input('harga');
+            // $nomor     = $request->input('nomor');
+            // $keterangan = $request->input('keterangan');
 
-            for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
-                values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                '".$nomor[$i]."', '".$keterangan[$i]."')";
+            // for($i=0;$i<count($request->nomor);$i++) {
+            //     $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
+            //     values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
+            //     '".$nomor[$i]."', '".$keterangan[$i]."')";
 
-                DB::connection($this->sql)->insert($insertD);
-            }
+            //     DB::connection($this->sql)->insert($insertD);
+            // }
 
-            DB::connection($this->sql)->commit();
-            $success['status'] = true;
-            $success['kode'] = $no_rab;
-            $success['message'] = "Data Anggaran Project berhasil disimpan";
+            // DB::connection($this->sql)->commit();
+            // $success['status'] = true;
+            // $success['kode'] = $no_rab;
+            // $success['message'] = "Data Anggaran Project berhasil disimpan";
 
-            return response()->json($success, $this->successStatus);  
+            // return response()->json($success, $this->successStatus);  
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
