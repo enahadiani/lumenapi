@@ -26,7 +26,7 @@ class RabProyekController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $select = "select no_proyek, keterangan from java_proyek a 
+            $select = "select no_proyek, keterangan, nilai from java_proyek a 
             where not exists (select no_proyek from java_rab_m b where a.no_proyek=b.no_proyek) 
             and a.kode_lokasi = '$kode_lokasi'";
 
