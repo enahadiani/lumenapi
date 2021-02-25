@@ -69,7 +69,7 @@ class RabProyekController extends Controller {
                 b.nama as nama 
                 from java_proyek a inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select no_rab, no_proyek, tanggal, keterangan, nilai_anggaran,
+                $sql = "select no_rab, no_proyek, tanggal, nilai_anggaran,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_rab_m
                 where kode_lokasi= '$kode_lokasi'";
             }
