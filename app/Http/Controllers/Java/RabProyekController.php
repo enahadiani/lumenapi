@@ -97,21 +97,22 @@ class RabProyekController extends Controller {
     }
 
     public function store(Request $request) {
+
+        $this->validate($request, [
+            'no_proyek' => 'required',
+            'nilai_anggaran' => 'required',
+            'nomor' => 'required|array',
+            'keterangan' => 'required|array',
+            'jumlah' => 'required|array',
+            'satuan' => 'required|array',
+            'harga' => 'required|array'
+        ]);
+
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $this->validate($request, [
-                'no_proyek' => 'required',
-                'nilai_anggaran' => 'required',
-                'nomor' => 'required|array',
-                'keterangan' => 'required|array',
-                'jumlah' => 'required|array',
-                'satuan' => 'required|array',
-                'harga' => 'required|array'
-            ]);
 
             DB::connection($this->sql)->beginTransaction();
             $tanggal = date('Y-m-d');
