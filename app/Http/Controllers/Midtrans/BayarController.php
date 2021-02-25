@@ -44,6 +44,8 @@ class BayarController extends Controller
             $client = new Client();
 
             $orderId = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
+            date_default_timezone_set('Asia/Jakarta');
+            $start_time = date( 'Y-m-d H:i:s O', time() );
             $payload = [
                 'transaction_details' => [
                     'order_id'      => $orderId,
@@ -61,8 +63,15 @@ class BayarController extends Controller
                         'name'     => $request->keterangan
                     ]
                 ],
-                'enabled_payments' => ['echannel']
-
+                'enabled_payments' => ['echannel'],
+                'expiry' => [
+                    'start_time' => $start_time,
+                    'unit' => 'minutes',
+                    'duration' => 180
+                ],
+                'callbacks'=> [
+                    'finish'=> 'https://app.simkug.com/ts-auth/finish-trans'
+                ]
             ];
 
             $url = ( !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/v1/transactions' : 'https://app.midtrans.com/snap/v1/transactions');
