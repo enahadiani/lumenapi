@@ -106,7 +106,7 @@ class RabProyekController extends Controller {
             $this->validate($request, [
                 'no_proyek' => 'required',
                 'nilai_anggaran' => 'required',
-                'no' => 'required|array',
+                'nomor' => 'required|array',
                 'keterangan' => 'required|array',
                 'jumlah' => 'required|array',
                 'satuan' => 'required|array',
@@ -125,13 +125,13 @@ class RabProyekController extends Controller {
             $jumlah = $request->input('jumlah');
             $satuan = $request->input('satuan');
             $harga  = $request->input('harga');
-            $no     = $request->input('no');
+            $nomor     = $request->input('nomor');
             $keterangan = $request->input('keterangan');
 
-            for($i=0;$i<count($request->no);$i++) {
+            for($i=0;$i<count($request->nomor);$i++) {
                 $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
                 values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                '".$no[$i]."', '".$keterangan[$i]."')";
+                '".$nomor[$i]."', '".$keterangan[$i]."')";
 
                 DB::connection($this->sql)->insert($insertD);
             }
