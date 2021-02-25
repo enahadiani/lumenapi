@@ -104,7 +104,7 @@ class RabProyekController extends Controller {
             'nomor' => 'required|array',
             'keterangan' => 'required|array',
             'jumlah' => 'required|array',
-            // 'satuan' => 'required|array',
+            'satuan' => 'required|array',
             'harga' => 'required|array'
         ]);
 
