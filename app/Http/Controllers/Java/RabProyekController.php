@@ -111,14 +111,14 @@ class RabProyekController extends Controller {
             'satuan' => 'required|array',
             'harga' => 'required|array'
         ]);
-
+        
+        DB::connection($this->sql)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            DB::connection($this->sql)->beginTransaction();
             $tanggal = date('Y-m-d');
             $periode = substr($tanggal,0,4).substr($tanggal,5,2);
             $per = substr($periode, 2, 4);
@@ -166,14 +166,14 @@ class RabProyekController extends Controller {
             'satuan' => 'required|array',
             'harga' => 'required|array'
         ]);
-
+            
+        DB::connection($this->sql)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            DB::connection($this->sql)->beginTransaction();
             $tanggal = date('Y-m-d');
             $periode = substr($tanggal,0,4).substr($tanggal,5,2);
             $per = substr($periode, 2, 4);
