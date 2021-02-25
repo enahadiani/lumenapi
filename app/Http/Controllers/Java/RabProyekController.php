@@ -66,6 +66,21 @@ class RabProyekController extends Controller {
                 where kode_lokasi= '$kode_lokasi'";
             }
 
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+
         } catch (\Throwable $th) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
