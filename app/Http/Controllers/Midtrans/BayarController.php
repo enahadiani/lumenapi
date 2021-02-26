@@ -33,7 +33,9 @@ class BayarController extends Controller
             'nis' => 'required',
             'no_bill' => 'required',
             'nilai' => 'required',
-            'keterangan' => 'required'
+            'keterangan' => 'required',
+            'kode_param' => 'required',
+            'periode_bill' => 'required'
         ]);
         try { 
             if($data =  Auth::guard($this->guard)->user()){
@@ -94,7 +96,7 @@ class BayarController extends Controller
                 
                 try {
                     
-                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp) values ('$orderId','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp')");
+                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','$request->periode_bill','$request->kode_param')");
                     
                     DB::connection($this->db)->commit();
                     $result['status'] = true;
