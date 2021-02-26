@@ -30,12 +30,9 @@ class BayarController extends Controller
 
     public function getSnapToken(Request $request){
         $this->validate($request, [
-            'nis' => 'required',
-            'no_bill' => 'required',
+            'no_bill' => 'required|array',
             'nilai' => 'required',
-            'keterangan' => 'required',
-            'kode_param' => 'required',
-            'periode_bill' => 'required'
+            'periode_bill' => 'required|array'
         ]);
         try { 
             if($data =  Auth::guard($this->guard)->user()){
@@ -44,6 +41,66 @@ class BayarController extends Controller
                 $kode_pp= $data->kode_pp;
             }
 
+            $no_bill = $request->input('no_bill');  
+            $this_in = "";
+            $filter_in = "";
+            if(count($no_bill) > 0){
+                for($x=0;$x<count($no_bill);$x++){
+                    if($x == 0){
+                        $this_in .= "'".$no_bill[$x]."'";
+                    }else{
+                        
+                        $this_in .= ","."'".$no_bill[$x]."'";
+                    }
+                }
+                $filter_in = " and a.no_bill in ($this_in) ";
+            }     
+
+            $get = DB::connection($this->db)->select("select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa,a.no_bill
+            from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+                    from sis_bill_d x 
+                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+            
+            left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+            where a.tagihan - isnull(c.bayar,0) > 0 $filter_in
+            order by a.no_bill,a.kode_param");
+            $get = json_decode(json_encode($get),true);
+            $item_details = array();
+            $total_bayar = intval($request->nilai);
+            $total_tmp =0;
+            if(count($get) > 0){
+                $sisa_bayar = $total_bayar;
+                for($i=0;$i < count($get); $i++){
+                    $row = $get[$i];
+                    if($sisa_bayar > 0){
+                        if($sisa_bayar >= intval($row['sisa'])){
+                            
+                            $item_details[] = array(
+                                'id'       => $row['no_bill'],
+                                'price'    => intval($row['sisa']),
+                                'quantity' => 1,
+                                'name'     => $row['kode_param']
+                            );
+                        }else{
+                            $item_details[] = array(
+                                'id'       => $row['no_bill'],
+                                'price'    => $sisa_bayar,
+                                'quantity' => 1,
+                                'name'     => $row['kode_param']
+                            );
+                        }
+                        $sisa_bayar = $sisa_bayar - intval($row['sisa']);
+                    }else if($sisa_bayar == 0){
+                        break;
+                    }
+                }
+            }
+            
             $client = new Client();
 
             $orderId = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
@@ -55,17 +112,10 @@ class BayarController extends Controller
                     'gross_amount'  => $request->nilai,
                 ],
                 'customer_details' => [
-                    'first_name'    => $request->nis,
+                    'first_name'    => $nik,
                     'email' => "tes@gmail.com"
                 ],
-                'item_details' => [
-                    [
-                        'id'       => $request->no_bill,
-                        'price'    => $request->nilai,
-                        'quantity' => 1,
-                        'name'     => $request->keterangan
-                    ]
-                ],
+                'item_details' => $item_details,
                 'enabled_payments' => ['echannel'],
                 'expiry' => [
                     'start_time' => $start_time,
@@ -96,7 +146,12 @@ class BayarController extends Controller
                 
                 try {
                     
-                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','$request->periode_bill','$request->kode_param')");
+                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$request->no_bill[0]."','$request->nilai','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$request->periode_bill[0]."','".$item_details[0]."')");
+
+                    for($i=0;$i<count($item_details);$i++){
+
+                        $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi) values ('$orderId','".$request->no_bill[$i]."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi')");
+                    }
                     
                     DB::connection($this->db)->commit();
                     $result['status'] = true;
@@ -242,9 +297,60 @@ class BayarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp= $data->kode_pp;
             }
+
+            $get = DB::connection($this->db)->select("select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa,a.no_bill
+            from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+                    from sis_bill_d x 
+                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+            
+            left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+            where a.tagihan - isnull(c.bayar,0) > 0 and a.no_bill='$request->no_bill' and a.kode_param='$request->kode_param'
+            order by a.no_bill,a.kode_param");
+            $get = json_decode(json_encode($get),true);
+            $item_details = array();
+            $total_bayar = intval($request->nilai);
+            $total_tmp =0;
+            if(count($get) > 0){
+                $sisa_bayar = $total_bayar;
+                for($i=0;$i < count($get); $i++){
+                    $row = $get[$i];
+                    if($sisa_bayar > 0){
+                        if($sisa_bayar >= intval($row['sisa'])){
+                            
+                            $item_details[] = array(
+                                'id'       => $row['no_bill'],
+                                'price'    => intval($row['sisa']),
+                                'quantity' => 1,
+                                'name'     => $row['kode_param']
+                            );
+                        }else{
+                            $item_details[] = array(
+                                'id'       => $row['no_bill'],
+                                'price'    => $sisa_bayar,
+                                'quantity' => 1,
+                                'name'     => $row['kode_param']
+                            );
+                        }
+                        $sisa_bayar = $sisa_bayar - intval($row['sisa']);
+                    }else if($sisa_bayar == 0){
+                        break;
+                    }
+                }
+            }
+
             $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
 
             $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$no_bukti','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','$request->status','$request->snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','$request->periode_bill','$request->kode_param')");
+
+            for($i=0;$i<count($item_details);$i++){
+
+                $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi) values ('$orderId','".$request->no_bill."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi')");
+            }
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -307,18 +413,17 @@ class BayarController extends Controller
 
                 
                 $get = DB::connection($this->db)->select("
-                select a.no_bukti,a.nis,a.no_bill,a.nilai,a.periode_bill,a.kode_param,b.akun_piutang,a.kode_pp,a.kode_lokasi from sis_mid_bayar a
-                inner join sis_bill_d b on a.nis=b.nis and a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and a.periode_bill=b.periode
+                select a.no_bukti,a.nis,a.nilai,a.kode_pp,a.kode_lokasi from sis_mid_bayar a
                 where a.no_bukti = '$no_bukti' 
                 ");
                 if(count($get) > 0){
 
-                    $akun_piu = $get[0]->akun_piutang;
+                    // $akun_piu = $get[0]->akun_piutang;
                     $nilai = $get[0]->nilai;
                     $nis = $get[0]->nis;
-                    $no_bill = $get[0]->no_bill;
-                    $kode_param = $get[0]->kode_param;
-                    $periode_bill = $get[0]->periode_bill;
+                    // $no_bill = $get[0]->no_bill;
+                    // $kode_param = $get[0]->kode_param;
+                    // $periode_bill = $get[0]->periode_bill;
                     $kode_pp = $get[0]->kode_pp;
                     $kode_lokasi = $get[0]->kode_lokasi;
 
@@ -327,12 +432,29 @@ class BayarController extends Controller
                     $akun_kb = "1112126";
     
                     $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values ('".$no_kb."','".$kode_lokasi."','-','-','$akun_kb',getdate(),'Pembayaran via midtrans','$kode_pp','KBBILSIS','BM','$periode','IDR',1,".floatval($nilai).",'midtrans','midtrans',getdate(),'midtrans','F','-','".$no_bukti."','$nis','-')");
+
+                    $getdet = DB::connection($this->db)->select("
+                    select a.nilai,a.no_bill,a.periode_bill,a.kode_param, b.akun_piutang 
+                    from sis_mid_bayar_d a
+                    inner join sis_bill_d b on a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and b.nis='$nis'
+                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'  a.no_bukti = '$no_bukti' ");
                     
-                    $insj1 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),1,'$akun_kb','Pembayaran via midtrans','D',".floatval($nilai).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','KB','$periode','IDR',1,'midtrans',getdate(),'-',".floatval($nilai).")");
-                    
-                    $insj2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),2,'$akun_piu','Pembayaran via midtrans','C',".floatval($nilai).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','PIUT','$periode','IDR',1,'midtrans',getdate(),'-',".floatval($nilai).")");
-    
-                    $insd = DB::connection($this->db)->insert("insert into sis_rekon_d(no_rekon,nis,no_bill,periode,nilai,kode_lokasi,akun_titip,akun_piutang,kode_param,dc,modul,id_bank,kode_pp, nilai_cd,periode_bill) values ('$no_kb','$nis','$no_bill','$periode',".floatval($nilai).",'$kode_lokasi','$akun_kb','$akun_piu','$kode_param','D','REKONCD','-','$kode_pp', 0,'$periode_bill')");
+                    if(count($getdet) > 0){
+                        for($i=0; $i < count($getdet); $i++){
+                            $line = $getdet[$i];
+                            $akun_piu = $line['akun_piutang'];
+                            $periode_bill = $line['periode_bill'];
+                            $no_bill = $line['no_bill'];
+                            $nilai_det = $line['nilai'];
+                            $kode_param = $line['kode_param'];
+
+                            $insj1[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),1,'$akun_kb','Pembayaran via midtrans','D',".floatval($nilai_det).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','KB','$periode','IDR',1,'midtrans',getdate(),'-',".floatval($nilai_det).")");
+                            
+                            $insj2[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),2,'$akun_piu','Pembayaran via midtrans','C',".floatval($nilai_det).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','PIUT','$periode','IDR',1,'midtrans',getdate(),'-',".floatval($nilai_det).")");
+            
+                            $insd[$i] = DB::connection($this->db)->insert("insert into sis_rekon_d(no_rekon,nis,no_bill,periode,nilai,kode_lokasi,akun_titip,akun_piutang,kode_param,dc,modul,id_bank,kode_pp, nilai_cd,periode_bill) values ('$no_kb','$nis','$no_bill','$periode',".floatval($nilai_det).",'$kode_lokasi','$akun_kb','$akun_piu','$kode_param','D','REKONCD','-','$kode_pp', 0,'$periode_bill')");
+                        }
+                    }
                 }
 
             }

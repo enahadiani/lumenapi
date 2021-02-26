@@ -1037,5 +1037,119 @@ class DashSiswaController extends Controller
         
     }
 
+    public function generatePriority(Request $request){
+        $this->validate($request, [
+            'no_bill' => 'required|array',
+            'nilai' => 'required'
+        ]);
+        try { 
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+
+            $no_bill = $request->input('no_bill');  
+            $this_in = "";
+            $filter_in = "";
+            if(count($no_bill) > 0){
+                for($x=0;$x<count($no_bill);$x++){
+                    if($x == 0){
+                        $this_in .= "'".$no_bill[$x]."'";
+                    }else{
+                        
+                        $this_in .= ","."'".$no_bill[$x]."'";
+                    }
+                }
+                $filter_in = " and a.no_bill in ($this_in) ";
+            }     
+
+            $get = DB::connection($this->db)->select("select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa,a.no_bill
+            from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+                    from sis_bill_d x 
+                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+            
+            left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+            where a.tagihan - isnull(c.bayar,0) > 0 $filter_in
+            order by a.no_bill,a.kode_param");
+            $get = json_decode(json_encode($get),true);
+            $item_details = array();
+            $total_bayar = intval($request->nilai);
+            $total_tmp =0;
+            if(count($get) > 0){
+                $sisa_bayar = $total_bayar;
+                for($i=0;$i < count($get); $i++){
+                    $row = $get[$i];
+                    if($sisa_bayar > 0){
+                        if($sisa_bayar >= intval($row['sisa'])){
+                            
+                            $item_details[] = array(
+                                'id'       => $row['no_bill'],
+                                'price'    => intval($row['sisa']),
+                                'quantity' => 1,
+                                'name'     => $row['kode_param']
+                            );
+                        }else{
+                            $item_details[] = array(
+                                'id'       => $row['no_bill'],
+                                'price'    => $sisa_bayar,
+                                'quantity' => 1,
+                                'name'     => $row['kode_param']
+                            );
+                        }
+                        $sisa_bayar = $sisa_bayar - intval($row['sisa']);
+                    }else if($sisa_bayar == 0){
+                        break;
+                    }
+                }
+            }
+
+
+            // $orderId = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
+            // date_default_timezone_set('Asia/Jakarta');
+            // $start_time = date( 'Y-m-d H:i:s O', time() );
+            // $payload = [
+            //     'transaction_details' => [
+            //         'order_id'      => $orderId,
+            //         'gross_amount'  => $request->nilai,
+            //     ],
+            //     'customer_details' => [
+            //         'first_name'    => $request->nis,
+            //         'email' => "tes@gmail.com"
+            //     ],
+            //     'item_details' => $item_details,
+            //     // 'item_details' => [
+            //     //     [
+            //     //         'id'       => $request->no_bill,
+            //     //         'price'    => $request->nilai,
+            //     //         'quantity' => 1,
+            //     //         'name'     => $request->keterangan
+            //     //     ]
+            //     // ],
+            //     'enabled_payments' => ['echannel'],
+            //     'expiry' => [
+            //         'start_time' => $start_time,
+            //         'unit' => 'minutes',
+            //         'duration' => 180
+            //     ],
+            //     'callbacks'=> [
+            //         'finish'=> 'https://app.simkug.com/ts-auth/finish-trans'
+            //     ]
+            // ];
+
+            return response()->json($item_details, 200);
+        } catch (BadResponseException $ex) {
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $result['status'] = false;
+            $result['message'] = $res;
+            return response()->json($result, 200);
+        } 
+    }
 
 }
