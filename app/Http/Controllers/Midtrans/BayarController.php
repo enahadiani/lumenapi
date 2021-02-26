@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Log;
 
 class BayarController extends Controller
 {
@@ -302,9 +303,7 @@ class BayarController extends Controller
 
             if($sts_bayar == "success"){
 
-                $periode = date('Ym');
-                $no_kb = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-BM".substr($periode,2,4), "0001");
-                $akun_kb = "1112126";
+                
                 $get = DB::connection($this->db)->select("
                 select a.no_bukti,a.nis,a.no_bill,a.nilai,a.periode_bill,a.kode_param,b.akun_piutang,a.kode_pp,a.kode_lokasi from sis_mid_bayar a
                 inner join sis_bill_d b on a.nis=b.nis and a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and a.periode_bill=b.periode
@@ -320,6 +319,10 @@ class BayarController extends Controller
                     $periode_bill = $get[0]->periode_bill;
                     $kode_pp = $get[0]->kode_pp;
                     $kode_lokasi = $get[0]->kode_lokasi;
+
+                    $periode = date('Ym');
+                    $no_kb = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-BM".substr($periode,2,4), "0001");
+                    $akun_kb = "1112126";
     
                     $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values ('".$no_kb."','".$kode_lokasi."','-','-','$akun_kb',getdate(),'Pembayaran via midtrans','$kode_pp','KBBILSIS','BM','$periode','IDR',1,".floatval($nilai).",'midtrans','midtrans',getdate(),'midtrans','F','-','".$no_bukti."','$nis','-')");
                     
@@ -340,6 +343,7 @@ class BayarController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pembayaran gagal disimpan ".$e;
+            Log::error("Error update from midtrans".$e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
