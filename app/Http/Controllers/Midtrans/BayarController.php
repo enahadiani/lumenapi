@@ -438,7 +438,7 @@ class BayarController extends Controller
                     select a.nilai,a.no_bill,a.periode_bill,a.kode_param, b.akun_piutang 
                     from sis_mid_bayar_d a
                     inner join sis_bill_d b on a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and b.nis='$nis'
-                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'  a.no_bukti = '$no_bukti' ");
+                    where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.no_bukti = '$no_bukti' ");
                     
                     if(count($getdet) > 0){
                         for($i=0; $i < count($getdet); $i++){
