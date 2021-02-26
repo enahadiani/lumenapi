@@ -125,7 +125,7 @@ class RabProyekController extends Controller {
             $no_rab = $this->generateKode('java_rab_m', 'no_rab', $kode_lokasi."-AGR$per".".", '00001');
 
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', getdate(), '$request->nilai_anggaran')";
+            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
             DB::connection($this->sql)->insert($insertM);
 
             $jumlah = $request->input('jumlah');
@@ -190,7 +190,7 @@ class RabProyekController extends Controller {
             ->delete();
 
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', getdate(), '$request->nilai_anggaran')";
+            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
             DB::connection($this->sql)->insert($insertM);
             
             $jumlah = $request->input('jumlah');
