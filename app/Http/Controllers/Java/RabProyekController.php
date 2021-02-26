@@ -232,7 +232,7 @@ class RabProyekController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            $no_rab = $request->no_rab;
             DB::connection($this->sql)->table('java_rab_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_rab', $no_rab)
@@ -251,7 +251,7 @@ class RabProyekController extends Controller {
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Vendor gagal dihapus ".$e;
+            $success['message'] = "Data Anggaran gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
