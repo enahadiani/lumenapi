@@ -443,11 +443,11 @@ class BayarController extends Controller
                     if(count($getdet) > 0){
                         for($i=0; $i < count($getdet); $i++){
                             $line = $getdet[$i];
-                            $akun_piu = $line['akun_piutang'];
-                            $periode_bill = $line['periode_bill'];
-                            $no_bill = $line['no_bill'];
-                            $nilai_det = $line['nilai'];
-                            $kode_param = $line['kode_param'];
+                            $akun_piu = $line->akun_piutang;
+                            $periode_bill = $line->periode_bill;
+                            $no_bill = $line->no_bill;
+                            $nilai_det = $line->nilai;
+                            $kode_param = $line->kode_param;
 
                             $insj1[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),1,'$akun_kb','Pembayaran via midtrans','D',".floatval($nilai_det).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','KB','$periode','IDR',1,'midtrans',getdate(),'-',".floatval($nilai_det).")");
                             
