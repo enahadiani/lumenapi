@@ -150,7 +150,7 @@ class BayarController extends Controller
 
                     for($i=0;$i<count($item_details);$i++){
 
-                        $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi) values ('$orderId','".$request->no_bill[$i]."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi')");
+                        $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$orderId','".$request->no_bill[$i]."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','".$request->periode_bill[0]."')");
                     }
                     
                     DB::connection($this->db)->commit();
@@ -349,7 +349,7 @@ class BayarController extends Controller
 
             for($i=0;$i<count($item_details);$i++){
 
-                $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi) values ('$orderId','".$request->no_bill."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi')");
+                $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$no_bukti','".$request->no_bill."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','$request->periode_bill')");
             }
             
             DB::connection($this->db)->commit();
@@ -359,6 +359,7 @@ class BayarController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
+            Log::error($e);
             $success['message'] = "Data Pembayaran gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
