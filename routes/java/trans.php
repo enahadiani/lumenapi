@@ -19,9 +19,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     // Helper 
     $router->get('customer','Java\ProyekController@getCustomer');
+    $router->get('vendor','Java\BiayaProyekController@getVendor');
     $router->get('proyek-check','Java\ProyekController@checkProyek');
     $router->get('kontrak-check','Java\VendorController@checkKontrak');
     $router->get('proyek-rab-cbbl','Java\RabProyekController@getProyek');
+    $router->get('proyek-biaya-cbbl','Java\BiayaProyekController@getProyek');
 
     //Proyek
     $router->get('proyek','Java\ProyekController@index');
