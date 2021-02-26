@@ -99,7 +99,7 @@ class BiayaProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select select kode_vendor, nama from java_vendor 
+            $sql= "select kode_vendor, nama from java_vendor 
             where kode_lokasi='".$kode_lokasi."' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
