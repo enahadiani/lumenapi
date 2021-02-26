@@ -437,7 +437,7 @@ class BayarController extends Controller
                     $getdet = DB::connection($this->db)->select("
                     select a.nilai,a.no_bill,a.periode_bill,a.kode_param, b.akun_piutang 
                     from sis_mid_bayar_d a
-                    inner join sis_bill_d b on a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and b.nis='$nis'
+                    inner join sis_bill_d b on a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and b.nis='$nis' and a.periode_bill=b.periode
                     where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.no_bukti = '$no_bukti' ");
                     
                     if(count($getdet) > 0){
@@ -468,7 +468,7 @@ class BayarController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pembayaran gagal disimpan ".$e;
-            Log::error("Error update from midtrans".$e);
+            Log::error("Error update from midtrans ".$e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
