@@ -567,6 +567,18 @@ class RABController extends Controller
                                         
                                         $ins9 = DB::connection($this->db)->insert("insert into tu_pdapp_m(no_app,kode_lokasi,nik_user,tgl_input,periode,tanggal,keterangan,jenis,lama,kota,sarana,catatan,nik_buat,nik_app,no_aju) values ('$no_app','$kode_lokasi','$nik',getdate(),'$periode','".$datam['tanggal']."','".$datam['keterangan']."','".$datam['jenis']."','".$datam['lama']."','".$datam['kota']."','".$datam['sarana']."','".$datam['catatan']."','".$datam['nik_buat']."','".$datam['nik_app']."','".$no_bukti."') ");
                         
+                                        //insert it_aju_dok
+                                        $dataDok = $request->input("URL_DOK");
+                                        $nu=1;
+                                        if(count($dataDok) > 0 ){
+                                            for ($i=0;$i < count($dataDok);$i++){
+                                                
+                                                $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_bukti."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
+                                                $upload = DB::connection($this->db)->insert($sql);
+                                                $nu++;
+                                            }	
+                                        }
+                                        
                                         DB::connection($this->db)->commit();
                                         $sts = true;
                                         $msg = "Data pengajuan beban berhasil disimpan";
@@ -574,6 +586,8 @@ class RABController extends Controller
                                     }
                                 }
                             }
+
+ 
     
                         }
         
@@ -623,6 +637,8 @@ class RABController extends Controller
             $del6 = DB::connection($this->db)->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
             $del7 = DB::connection($this->db)->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
             $del8 = DB::connection($this->db)->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
+
+            $del9 = DB::connection($this->db)->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
            
 
             DB::connection($this->db)->commit();

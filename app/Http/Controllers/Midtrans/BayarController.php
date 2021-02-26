@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Log;
 
 class BayarController extends Controller
 {
@@ -32,7 +33,9 @@ class BayarController extends Controller
             'nis' => 'required',
             'no_bill' => 'required',
             'nilai' => 'required',
-            'keterangan' => 'required'
+            'keterangan' => 'required',
+            'kode_param' => 'required',
+            'periode_bill' => 'required'
         ]);
         try { 
             if($data =  Auth::guard($this->guard)->user()){
@@ -93,7 +96,7 @@ class BayarController extends Controller
                 
                 try {
                     
-                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp) values ('$orderId','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp')");
+                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','$request->periode_bill','$request->kode_param')");
                     
                     DB::connection($this->db)->commit();
                     $result['status'] = true;
@@ -226,7 +229,9 @@ class BayarController extends Controller
             'nilai' => 'required',
             'keterangan' => 'required',
             'status' => 'required',
-            'snap_token' => 'required'
+            'snap_token' => 'required',
+            'kode_param' => 'required',
+            'periode_bill' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -239,7 +244,7 @@ class BayarController extends Controller
             }
             $no_bukti = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
 
-            $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp) values ('$no_bukti','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','$request->status','$request->snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp')");
+            $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$no_bukti','$request->nis','$request->no_bill','$request->nilai','$request->keterangan','$request->status','$request->snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','$request->periode_bill','$request->kode_param')");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -297,6 +302,40 @@ class BayarController extends Controller
             $upd = DB::connection($this->db)->table('sis_mid_bayar')
             ->where('no_bukti', $no_bukti)      
             ->update(['status' => $sts_bayar]);
+
+            if($sts_bayar == "success"){
+
+                
+                $get = DB::connection($this->db)->select("
+                select a.no_bukti,a.nis,a.no_bill,a.nilai,a.periode_bill,a.kode_param,b.akun_piutang,a.kode_pp,a.kode_lokasi from sis_mid_bayar a
+                inner join sis_bill_d b on a.nis=b.nis and a.no_bill=b.no_bill and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.kode_param=b.kode_param and a.periode_bill=b.periode
+                where a.no_bukti = '$no_bukti' 
+                ");
+                if(count($get) > 0){
+
+                    $akun_piu = $get[0]->akun_piutang;
+                    $nilai = $get[0]->nilai;
+                    $nis = $get[0]->nis;
+                    $no_bill = $get[0]->no_bill;
+                    $kode_param = $get[0]->kode_param;
+                    $periode_bill = $get[0]->periode_bill;
+                    $kode_pp = $get[0]->kode_pp;
+                    $kode_lokasi = $get[0]->kode_lokasi;
+
+                    $periode = date('Ym');
+                    $no_kb = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-BM".substr($periode,2,4), "0001");
+                    $akun_kb = "1112126";
+    
+                    $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values ('".$no_kb."','".$kode_lokasi."','-','-','$akun_kb',getdate(),'Pembayaran via midtrans','$kode_pp','KBBILSIS','BM','$periode','IDR',1,".floatval($nilai).",'midtrans','midtrans',getdate(),'midtrans','F','-','".$no_bukti."','$nis','-')");
+                    
+                    $insj1 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),1,'$akun_kb','Pembayaran via midtrans','D',".floatval($nilai).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','KB','$periode','IDR',1,'mitrans',getdate(),'-',".floatval($nilai).")");
+                    
+                    $insj2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ('$no_kb','-',getdate(),2,'$akun_piu','Pembayaran via midtrans','C',".floatval($nilai).",'$kode_pp','-','-','-','$kode_lokasi','KBBILSIS','PIUT','$periode','IDR',1,'midtrans',getdate(),'-',".floatval($nilai).")");
+    
+                    $insd = DB::connection($this->db)->insert("insert into sis_rekon_d(no_rekon,nis,no_bill,periode,nilai,kode_lokasi,akun_titip,akun_piutang,kode_param,dc,modul,id_bank,kode_pp, nilai_cd,periode_bill) values ('$no_kb','$nis','$no_bill','$periode',".floatval($nilai).",'$kode_lokasi','$akun_kb','$akun_piu','$kode_param','D','REKONCD','-','$kode_pp', 0,'$periode_bill')");
+                }
+
+            }
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -306,6 +345,7 @@ class BayarController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pembayaran gagal disimpan ".$e;
+            Log::error("Error update from midtrans".$e);
             return response()->json(['success'=>$success], $this->successStatus); 
         }				
         
