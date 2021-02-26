@@ -59,15 +59,19 @@ class RabProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->no_proyek)){
-                if($request->no_proyek == "all"){
+            if(isset($request->no_rab)){
+                if($request->no_rab == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.no_proyek='$request->no_proyek' ";
+                    $filter = " and a.no_rab='$request->no_rab' ";
                 }
-                $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, convert(varchar(10), a.tgl_selesai, 120) as tgl_selesai, a.nilai, a.ppn, a.status_ppn,
-                b.nama as nama 
-                from java_proyek a inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.no_proyek, b.keterangan, a.nilai_anggaran, b.nilai, b.no_kontrak 
+                from java_rab_m a inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $detail = "select no, keterangan, jumlah, satuan, harga from java_rab_d where kode_lokasi = '$kode_lokasi' and no_rab = '$request->no_rab'";
+                
+                $det = DB::connection($this->sql)->select($detail);
+                $det = json_decode(json_encode($det),true);
+                $success['detail'] = $det;
             }else{
                 $sql = "select no_rab, no_proyek, tanggal, nilai_anggaran,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_rab_m
@@ -97,41 +101,43 @@ class RabProyekController extends Controller {
     }
 
     public function store(Request $request) {
+
+        $this->validate($request, [
+            'no_proyek' => 'required',
+            'nilai_anggaran' => 'required',
+            'nomor' => 'required|array',
+            'keterangan' => 'required|array',
+            'jumlah' => 'required|array',
+            'satuan' => 'required|array',
+            'harga' => 'required|array'
+        ]);
+        
+        DB::connection($this->sql)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $this->validate($request, [
-                'no_proyek' => 'required',
-                'nilai_anggaran' => 'required',
-                'no' => 'required|array',
-                'keterangan' => 'required|array',
-                'jumlah' => 'required|array',
-                'satuan' => 'required|array',
-                'harga' => 'required|array'
-            ]);
-
-            DB::connection($this->sql)->beginTransaction();
             $tanggal = date('Y-m-d');
             $periode = substr($tanggal,0,4).substr($tanggal,5,2);
             $per = substr($periode, 2, 4);
             $no_rab = $this->generateKode('java_rab_m', 'no_rab', $kode_lokasi."-AGR$per".".", '00001');
 
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', getdate(), '$request->nilai_anggaran')";
-            
+            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
+            DB::connection($this->sql)->insert($insertM);
+
             $jumlah = $request->input('jumlah');
             $satuan = $request->input('satuan');
             $harga  = $request->input('harga');
-            $no     = $request->input('no');
+            $nomor     = $request->input('nomor');
             $keterangan = $request->input('keterangan');
 
-            for($i=0;$i<count($request->no);$i++) {
+            for($i=0;$i<count($request->nomor);$i++) {
                 $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
                 values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                '".$no[$i]."', '".$keterangan[$i]."')";
+                '".$nomor[$i]."', '".$keterangan[$i]."')";
 
                 DB::connection($this->sql)->insert($insertD);
             }
@@ -151,24 +157,23 @@ class RabProyekController extends Controller {
     }
 
     public function update(Request $request) {
+        $this->validate($request, [
+            'no_proyek' => 'required',
+            'nilai_anggaran' => 'required',
+            'nomor' => 'required|array',
+            'keterangan' => 'required|array',
+            'jumlah' => 'required|array',
+            'satuan' => 'required|array',
+            'harga' => 'required|array'
+        ]);
+            
+        DB::connection($this->sql)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $this->validate($request, [
-                'no_rab' => 'required',
-                'no_proyek' => 'required',
-                'nilai_anggaran' => 'required',
-                'no' => 'required|array',
-                'keterangan' => 'required|array',
-                'jumlah' => 'required|array',
-                'satuan' => 'required|array',
-                'harga' => 'required|array'
-            ]);
-
-            DB::connection($this->sql)->beginTransaction();
             $tanggal = date('Y-m-d');
             $periode = substr($tanggal,0,4).substr($tanggal,5,2);
             $per = substr($periode, 2, 4);
@@ -185,18 +190,19 @@ class RabProyekController extends Controller {
             ->delete();
 
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', getdate(), '$request->nilai_anggaran')";
+            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
+            DB::connection($this->sql)->insert($insertM);
             
             $jumlah = $request->input('jumlah');
             $satuan = $request->input('satuan');
             $harga  = $request->input('harga');
-            $no     = $request->input('no');
+            $nomor     = $request->input('nomor');
             $keterangan = $request->input('keterangan');
 
-            for($i=0;$i<count($request->no);$i++) {
+            for($i=0;$i<count($request->nomor);$i++) {
                 $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
                 values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                '".$no[$i]."', '".$keterangan[$i]."')";
+                '".$nomor[$i]."', '".$keterangan[$i]."')";
 
                 DB::connection($this->sql)->insert($insertD);
             }
