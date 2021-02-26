@@ -65,7 +65,7 @@ class RabProyekController extends Controller {
                 }else{
                     $filter = " and a.no_rab='$request->no_rab' ";
                 }
-                $sql= "select a.no_proyek, b.keterangan, a.nilai_anggaran, b.nilai 
+                $sql= "select a.no_proyek, b.keterangan, a.nilai_anggaran, b.nilai, b.no_kontrak 
                 from java_rab_m a inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
                 $detail = "select no, keterangan, jumlah, satuan, harga from java_rab_d where kode_lokasi = '$kode_lokasi' and no_rab = '$request->no_rab'";
                 
