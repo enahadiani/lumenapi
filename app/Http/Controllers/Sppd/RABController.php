@@ -448,10 +448,12 @@ class RABController extends Controller
                     $date2=date_create($datam['tanggal']);
                     $diff=date_diff($date1,$date2);
                     $jumlah = intval($diff->format("%R%a"));
+                    /*
                     if ($jumlah > 0) {
                         $msg = "Transaksi tidak valid. Tanggal Transaksi melebihi Tgl Maksimal Administrasi";
                         $sts = false;
                     }else{
+                    */
     
                         if (floatval($saldo_or) == 0 && floatval($saldo_bmhd) != 0) {
                             $modeBMHD = "BMHD";				
@@ -575,7 +577,7 @@ class RABController extends Controller
     
                         }
         
-                    }
+                    //}
                 }else{
                     $sts = true;
                     $msg = "Data pengajuan beban gagal disimpan. Kode Proyek tidak valid.";
