@@ -143,7 +143,7 @@ class BiayaProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select select no_proyek, nilai anggaran from java_rab_m a
+            $sql= "select a.no_proyek, a.no_rab, nilai_anggaran from java_rab_m a
             inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi 
             where kode_lokasi='".$kode_lokasi."' and b.kode_cust = '$request->kode_cust' $filter";
 
