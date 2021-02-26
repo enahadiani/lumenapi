@@ -36,6 +36,50 @@ class BiayaProyekController extends Controller {
         }
     }
 
+    public function getCust() {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            if(isset($request->kode_cust)){
+                if($request->kode_cust != "" ){
+
+                    $filter = " and kode_cust='$request->kode_cust' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $sql= "select select kode_cust, nama from java_cust 
+            where kode_lokasi='".$kode_lokasi."' $filter";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getVendor() {
         try {
             
@@ -80,7 +124,7 @@ class BiayaProyekController extends Controller {
         }
     }
 
-    public function getProyek() {
+    public function getProyek(Request $request) {
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -91,7 +135,7 @@ class BiayaProyekController extends Controller {
             if(isset($request->no_proyek)){
                 if($request->no_proyek != "" ){
 
-                    $filter = " and no_proyek='$request->no_proyek' ";
+                    $filter = " and a.no_proyek='$request->no_proyek' ";
                 }else{
                     $filter = "";
                 }
@@ -99,8 +143,9 @@ class BiayaProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select select no_proyek, nilai anggaran from java_rab_m 
-            where kode_lokasi='".$kode_lokasi."' $filter";
+            $sql= "select select no_proyek, nilai anggaran from java_rab_m a
+            inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi 
+            where kode_lokasi='".$kode_lokasi."' and b.kode_cust = '$request->kode_cust' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
