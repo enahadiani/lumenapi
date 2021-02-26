@@ -221,6 +221,7 @@ class BiayaProyekController extends Controller {
         $this->validate($request, [
             'tanggal' => 'required',
             'kode_vendor' => 'required',
+            'kode_cust' => 'required',
             'nilai' => 'required',
             'status' => 'required',
             'no_proyek' => 'required',
@@ -241,9 +242,9 @@ class BiayaProyekController extends Controller {
             $no_bukti = $this->generateKode('java_beban', 'no_bukti', $kode_lokasi."-BYP$per".".", '00001');
 
             if($this->isUnikDokumen($request->no_dokumen, $kode_lokasi)) {
-                $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, tgl_input)
+                $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, tgl_input)
                 values ('$no_bukti', '$kode_lokasi', '$request->tanggal', '$request->keterangan', '$request->no_dokumen',
-                '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek'', getdate())";
+                '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', getdate())";
 
                 DB::connection($this->sql)->insert($insert);
 
@@ -270,6 +271,7 @@ class BiayaProyekController extends Controller {
             'no_bukti' => 'required',
             'tanggal' => 'required',
             'kode_vendor' => 'required',
+            'kode_cust' => 'required',
             'nilai' => 'required',
             'status' => 'required',
             'no_proyek' => 'required',
@@ -291,9 +293,9 @@ class BiayaProyekController extends Controller {
             ->where('no_bukti', $request->no_bukti)
             ->delete();
 
-            $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, tgl_input)
+            $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, tgl_input)
             values ('$no_bukti', '$kode_lokasi', '$request->tanggal', '$request->keterangan', '$request->no_dokumen',
-            '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek'', getdate())";
+            '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', getdate())";
 
             DB::connection($this->sql)->insert($insert);
 
