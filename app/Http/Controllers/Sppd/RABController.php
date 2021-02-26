@@ -574,6 +574,19 @@ class RABController extends Controller
                                     }
                                 }
                             }
+
+                            //insert it_aju_dok
+                            $dataDok = $request->input("URL_DOK");
+                            $nu=1;
+                            if(count($dataDok) > 0 ){
+                                for ($i=0;$i < count($dataDok);$i++){
+                                    
+                                    $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_bukti."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
+                                    $upload = DB::connection($this->db)->insert($sql);
+                                    $nu++;
+                                }	
+                            }
+ 
     
                         }
         
@@ -623,6 +636,8 @@ class RABController extends Controller
             $del6 = DB::connection($this->db)->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
             $del7 = DB::connection($this->db)->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
             $del8 = DB::connection($this->db)->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
+
+            $del9 = DB::connection($this->db)->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
            
 
             DB::connection($this->db)->commit();
