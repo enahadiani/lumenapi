@@ -185,7 +185,7 @@ class BiayaProyekController extends Controller {
                 }
                 $sql= "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust, 
                 convert(varchar(10), a.tanggal, 120) as tanggal, a.nilai, a.status,
-                b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, d.nilai_anggaran
+                b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, d.nilai_anggaran, a.no_proyek
                 from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
                 inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
