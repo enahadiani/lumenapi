@@ -41,5 +41,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     $router->get('kartu-piutang','Dashboard\ReportController@getKartuPiutang');
     $router->get('kartu-pdd','Dashboard\ReportController@getKartuPDD');
+    
+    $router->get('saldo-piutang','Dashboard\ReportController@getSaldoPiutang');
 
 });
