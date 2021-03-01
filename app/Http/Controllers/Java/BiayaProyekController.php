@@ -183,11 +183,12 @@ class BiayaProyekController extends Controller {
                 }else{
                     $filter = " and a.no_bukti='$request->no_bukti' ";
                 }
-                $sql= "select a.no_bukti, a.tanggal, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust, 
+                $sql= "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust, 
                 convert(varchar(10), a.tanggal, 120) as tanggal, a.nilai, a.status,
-                b.nama as nama_vendor, c.nama as nama_customer 
+                b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, d.nilai_anggaran
                 from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
+                inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select no_bukti, no_proyek, keterangan, nilai,
@@ -227,6 +228,7 @@ class BiayaProyekController extends Controller {
             'no_proyek' => 'required',
             'no_dokumen' => 'required',
             'keterangan' => 'required',
+            'no_rab' => 'required'
         ]);
 
         try {
@@ -242,14 +244,14 @@ class BiayaProyekController extends Controller {
             $no_bukti = $this->generateKode('java_beban', 'no_bukti', $kode_lokasi."-BYP$per".".", '00001');
 
             if($this->isUnikDokumen($request->no_dokumen, $kode_lokasi)) {
-                $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, tgl_input)
+                $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
                 values ('$no_bukti', '$kode_lokasi', '$request->tanggal', '$request->keterangan', '$request->no_dokumen',
-                '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', getdate())";
+                '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', '$request->no_rab', getdate())";
 
                 DB::connection($this->sql)->insert($insert);
 
                 $success['status'] = true;
-                $success['kode'] = $request->no_bukti;
+                $success['kode'] = $no_bukti;
                 $success['message'] = "Data Biaya Proyek berhasil disimpan";
             } else {
                 $success['status'] = false;
@@ -277,6 +279,7 @@ class BiayaProyekController extends Controller {
             'no_proyek' => 'required',
             'no_dokumen' => 'required',
             'keterangan' => 'required',
+            'no_rab' => 'required'
         ]);
         DB::connection($this->sql)->beginTransaction();
         try {
@@ -293,14 +296,14 @@ class BiayaProyekController extends Controller {
             ->where('no_bukti', $request->no_bukti)
             ->delete();
 
-            $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, tgl_input)
+            $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
             values ('$no_bukti', '$kode_lokasi', '$request->tanggal', '$request->keterangan', '$request->no_dokumen',
-            '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', getdate())";
+            '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', '$request->no_rab', getdate())";
 
             DB::connection($this->sql)->insert($insert);
 
             $success['status'] = true;
-            $success['kode'] = $request->no_bukti;
+            $success['kode'] = $no_bukti;
             $success['message'] = "Data Biaya Proyek berhasil disimpan";
             
             DB::connection($this->sql)->commit();
