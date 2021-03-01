@@ -125,7 +125,7 @@ class JuspoController extends Controller
             from apv_juskeb_m a
             inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi 
             left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
-            where (a.kode_lokasi='$kode_lokasi' and a.progress='S') and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
+            where (a.kode_lokasi='$kode_lokasi' and a.progress='S') --and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
             ";
             $res = DB::connection($this->db)->select($sql);
 
