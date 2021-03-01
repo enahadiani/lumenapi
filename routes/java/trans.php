@@ -24,6 +24,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('kontrak-check','Java\VendorController@checkKontrak');
     $router->get('proyek-rab-cbbl','Java\RabProyekController@getProyek');
     $router->get('proyek-biaya-cbbl','Java\BiayaProyekController@getProyek');
+    $router->get('tagihan-proyek-cbbl','Java\TagihanController@getProyek');
 
     //Proyek
     $router->get('proyek','Java\ProyekController@index');
@@ -42,6 +43,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('biaya-proyek','Java\BiayaProyekController@store');
     $router->put('biaya-proyek','Java\BiayaProyekController@update');
     $router->delete('biaya-proyek','Java\BiayaProyekController@destroy');
+
+    //Tagihan Proyek
+    $router->get('tagihan-proyek','Java\TagihanProyekController@index');
+    $router->post('tagihan-proyek','Java\TagihanProyekController@store');
+    $router->put('tagihan-proyek','Java\TagihanProyekController@update');
+    $router->delete('tagihan-proyek','Java\TagihanProyekController@destroy');
 
 });
 
