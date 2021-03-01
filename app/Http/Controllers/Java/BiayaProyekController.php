@@ -183,11 +183,12 @@ class BiayaProyekController extends Controller {
                 }else{
                     $filter = " and a.no_bukti='$request->no_bukti' ";
                 }
-                $sql= "select a.no_bukti, a.tanggal, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust, 
+                $sql= "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust, 
                 convert(varchar(10), a.tanggal, 120) as tanggal, a.nilai, a.status,
                 b.nama as nama_vendor, c.nama as nama_customer 
                 from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
+                inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select no_bukti, no_proyek, keterangan, nilai,
