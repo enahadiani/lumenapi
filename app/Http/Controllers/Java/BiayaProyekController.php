@@ -249,7 +249,7 @@ class BiayaProyekController extends Controller {
                 DB::connection($this->sql)->insert($insert);
 
                 $success['status'] = true;
-                $success['kode'] = $request->no_bukti;
+                $success['kode'] = $no_bukti;
                 $success['message'] = "Data Biaya Proyek berhasil disimpan";
             } else {
                 $success['status'] = false;
@@ -300,7 +300,7 @@ class BiayaProyekController extends Controller {
             DB::connection($this->sql)->insert($insert);
 
             $success['status'] = true;
-            $success['kode'] = $request->no_bukti;
+            $success['kode'] = $no_bukti;
             $success['message'] = "Data Biaya Proyek berhasil disimpan";
             
             DB::connection($this->sql)->commit();
