@@ -329,7 +329,7 @@ class ReportController extends Controller
                 $filter .= "";
             }
             
-            $sql="select a.kode_akun,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp,f.nama as nama_drk,
+            $sql="select a.kode_akun,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp,a.kode_drk,f.nama as nama_drk,
             isnull(e.agg_01,0) as n1,isnull(e.agg_02,0) as n2,isnull(e.agg_03,0) as n3,isnull(e.agg_04,0) as n4,
             isnull(e.agg_05,0) as n5,isnull(e.agg_06,0) as n6,isnull(e.agg_07,0) as n7,isnull(e.agg_08,0) as n8,
             isnull(e.agg_09,0) as n9,isnull(e.agg_10,0) as n10,isnull(e.agg_11,0) as n11,isnull(e.agg_12,0) as n12,isnull(e.total,0) as total
