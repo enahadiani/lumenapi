@@ -648,7 +648,95 @@ class ReportController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
-        
     }
+
+    public function getSaldoPiutang(Request $request){
+        $this->validate($request,[
+            'kode_pp' => 'required',
+            'nis' => 'required',
+        ]);
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik= '';
+                $kode_lokasi= '';
+            }
+
+            $get = DB::connection('sqlsrvyptkug')->select("select max(a.periode) as periode from ( select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+            union all
+            select max(periode) as periode from sis_cd_d where kode_lokasi='$kode_lokasi' and nis='$request->nis'
+            union all
+            select max(periode) as periode from sis_bill_d where kode_lokasi='$kode_lokasi' and nis='$request->nis' 
+            union all
+            select max(periode) as periode from sis_rekon_d where kode_lokasi='$kode_lokasi' and nis='$request->nis'
+            ) a");
+
+            if(count($get) > 0){
+                $periode = $get[0]->periode;
+            }else{
+                $periode = date('Ym');
+            }
+
+            $sql="select isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total
+            from sis_siswa a 
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periode') and x.kode_pp='$request->kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periode') and x.kode_pp='$request->kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )c on a.nis=c.nis and a.kode_lokasi=c.kode_lokasi
+            left join (select y.nis,y.kode_lokasi,  
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                        from sis_rekon_d x 	
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periode')	and x.kode_pp='$request->kode_pp'		
+                        group by y.nis,y.kode_lokasi 			
+                        )d on a.nis=d.nis and a.kode_lokasi=d.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
+                        from sis_rekon_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periode') and x.kode_pp='$request->kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )e on a.nis=e.nis and a.kode_lokasi=e.kode_lokasi
+            where a.nis='$request->nis'
+            order by a.kode_kelas,a.nis";
+
+            $res = DB::connection('sqlsrvyptkug')->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ 
+                $success['saldo'] = floatval($res[0]['sak_total']);
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['saldo'] = 0;
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+    
 
 }
