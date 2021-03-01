@@ -716,7 +716,7 @@ class ReportController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ 
-                $success['saldo'] = $res[0]['sak_total'];
+                $success['saldo'] = floatval($res[0]['sak_total']);
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
