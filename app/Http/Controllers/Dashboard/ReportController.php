@@ -329,19 +329,20 @@ class ReportController extends Controller
                 $filter .= "";
             }
             
-            $sql="select a.kode_akun,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp,
+            $sql="select a.kode_akun,a.kode_pp,b.nama as nama_akun,c.nama as nama_pp,f.nama as nama_drk,
             isnull(e.agg_01,0) as n1,isnull(e.agg_02,0) as n2,isnull(e.agg_03,0) as n3,isnull(e.agg_04,0) as n4,
             isnull(e.agg_05,0) as n5,isnull(e.agg_06,0) as n6,isnull(e.agg_07,0) as n7,isnull(e.agg_08,0) as n8,
             isnull(e.agg_09,0) as n9,isnull(e.agg_10,0) as n10,isnull(e.agg_11,0) as n11,isnull(e.agg_12,0) as n12,isnull(e.total,0) as total
-     from (select x.kode_lokasi,x.kode_akun,x.kode_pp
+     from (select x.kode_lokasi,x.kode_akun,x.kode_pp,x.kode_drk
            from anggaran_d x
            inner join masakun y on x.kode_akun=y.kode_akun and x.kode_lokasi=y.kode_lokasi
            where x.kode_lokasi='$kode_lokasi' and x.kode_pp='$kode_pp' and substring(x.periode,1,4)='$tahun' $filter
-           group by x.kode_lokasi,x.kode_akun,x.kode_pp
+           group by x.kode_lokasi,x.kode_akun,x.kode_pp,x.kode_drk
            ) a
      inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
      inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-     left join (select x.kode_lokasi,x.kode_akun,x.kode_pp
+     inner join drk f on a.kode_drk=f.kode_drk and a.kode_lokasi=f.kode_lokasi
+     left join (select x.kode_lokasi,x.kode_akun,x.kode_pp,x.kode_drk
                            , sum(case when substring(x.periode,5,2) between '01' and '01' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_01
                        , sum(case when substring(x.periode,5,2) between '02' and '02' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_02
                        , sum(case when substring(x.periode,5,2) between '03' and '03' then case when dc='D' then nilai else -nilai end else 0 end ) as agg_03
@@ -358,8 +359,8 @@ class ReportController extends Controller
                 from anggaran_d x
                   inner join masakun y on x.kode_akun=y.kode_akun and x.kode_lokasi=y.kode_lokasi 
                 where x.kode_lokasi='$kode_lokasi' and x.kode_pp='$kode_pp' and substring(x.periode,1,4)='$tahun' $filter
-                group by x.kode_lokasi,x.kode_akun,x.kode_pp
-                ) e on a.kode_akun=e.kode_akun and a.kode_pp=e.kode_pp and a.kode_lokasi=e.kode_lokasi
+                group by x.kode_lokasi,x.kode_akun,x.kode_pp,x.kode_drk
+                ) e on a.kode_akun=e.kode_akun and a.kode_pp=e.kode_pp and a.kode_lokasi=e.kode_lokasi and a.kode_drk=e.kode_drk
     order by a.kode_akun,a.kode_pp ";
             $res = DB::connection('sqlsrvyptkug')->select($sql);
             $res = json_decode(json_encode($res),true);
