@@ -894,12 +894,13 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='D04' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.thn1,0)<>0
+            where a.kode_lokasi='$kode_lokasi' and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0)
             order by a.kode_bidang";
+            $success['sql'] = $sql;
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
 
-            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
             if($request->mode == "dark"){
                 $color = $this->dark_color;
             }
@@ -915,7 +916,8 @@ class DashboardController extends Controller
                         $c++;          
                     }
                 }
-
+                $success['row'] = $row;
+                $success['dt'] = $dt;
                 // $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
                 for($i=0;$i<count($row);$i++){
 
@@ -1191,7 +1193,7 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='D06' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.thn1,0)<>0
+            where a.kode_lokasi='$kode_lokasi' and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0)
             order by a.kode_bidang";
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
