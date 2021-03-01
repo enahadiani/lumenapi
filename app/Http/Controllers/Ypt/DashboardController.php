@@ -2294,7 +2294,11 @@ class DashboardController extends Controller
             $tahunLalu = intval($tahun)-1;
             $periodeLalu = $tahunLalu.$bulan;
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,isnull(c.n1,0) as real_lalu, case isnull(c.n1,0) when 0 then 0 else ((b.n1 - isnull(c.n1,0))/isnull(c.n1,0)*100) end as persen
+            select a.kode_grafik,a.nama,
+                case when a.dc='D' then b.n1 else b.n1*-1 end as real,
+                case when a.dc='D' then b.n2 else b.n2*-1 end as rka,
+                case when a.dc='D' then c.n1 else c.n1*-1 end as real_lalu, 
+                case isnull(c.n1,0) when 0 then 0 else ((b.n1 - isnull(c.n1,0))/isnull(c.n1,0)*100) end as persen
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='$periode'
             left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='$periodeLalu'
@@ -2442,7 +2446,7 @@ class DashboardController extends Controller
             select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K05'
+            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_klp='K12'
             ");
             $rs = json_decode(json_encode($rs),true);
             
