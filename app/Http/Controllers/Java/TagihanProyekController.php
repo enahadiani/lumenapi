@@ -66,7 +66,7 @@ class TagihanProyekController extends Controller {
                 }
                 $sql= "select a.no_tagihan, convert(varchar(10), tanggal, 120) as tanggal, a.kode_cust, a.nilai, a.biaya_lain, a.pajak, a.uang_muka, 
                 a.keterangan, a.no_proyek, b.keterangan, c.nama 
-                from java_tagihan_detail a 
+                from java_tagihan a 
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
