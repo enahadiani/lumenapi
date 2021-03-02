@@ -47,7 +47,7 @@ class RegistrasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group
+            $res = DB::connection($this->sql)->select("select a.no_reg,a.no_peserta,b.nama,a.tgl_daftar as tgl_input,e.nama as nama_paket,c.tgl_berangkat,a.flag_group
             from dgw_reg a
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi 
             left join dgw_jadwal c on a.no_paket=c.no_paket and a.no_jadwal=c.no_jadwal and a.kode_lokasi=c.kode_lokasi
@@ -84,6 +84,7 @@ class RegistrasiController extends Controller
     {
         $this->validate($request, [
             'periode' => 'required',
+            'tanggal' => 'required',
             'paket' => 'required',
             'jadwal' => 'required|integer',
             'no_peserta' => 'required',
@@ -140,7 +141,7 @@ class RegistrasiController extends Controller
                 $noFee = "-";
             }
 
-            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,date('Y-m-d H:i:s'),$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->ukuran_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta_ref,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
+            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon,tgl_daftar) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,date('Y-m-d H:i:s'),$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->ukuran_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta_ref,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon,$request->tanggal));
 
             $dok = $request->dokumen;
             if (count($dok) > 0){
@@ -202,7 +203,7 @@ class RegistrasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select( "select a.no_reg,a.kode_harga,a.harga, a.harga_room,a.no_paket,a.no_jadwal,b.tgl_berangkat,a.tgl_input, a.no_type,b.lama_hari, a.uk_pakaian, a.no_peserta, a.no_agen,a.no_jadwal,a.no_paket, a.no_marketing, a.info, a.jenis, a.no_peserta_ref, a.kode_pp, a.diskon,c.kode_curr,a.no_quota,a.flag_group,a.brkt_dgn,a.hubungan,a.referal,a.ket_diskon,h.nama as nama_peserta,c.nama as nama_room, d.nama as nama_paket,e.nama_marketing,f.nama_agen,g.nama as nama_pp
+            $res = DB::connection($this->sql)->select( "select a.no_reg,a.kode_harga,a.harga, a.harga_room,a.no_paket,a.no_jadwal,b.tgl_berangkat,a.tgl_daftar as tgl_input, a.no_type,b.lama_hari, a.uk_pakaian, a.no_peserta, a.no_agen,a.no_jadwal,a.no_paket, a.no_marketing, a.info, a.jenis, a.no_peserta_ref, a.kode_pp, a.diskon,c.kode_curr,a.no_quota,a.flag_group,a.brkt_dgn,a.hubungan,a.referal,a.ket_diskon,h.nama as nama_peserta,c.nama as nama_room, d.nama as nama_paket,e.nama_marketing,f.nama_agen,g.nama as nama_pp
             from dgw_reg a 
 			inner join dgw_paket d on a.no_paket=d.no_paket and a.kode_lokasi=d.kode_lokasi
 			inner join pp g on a.kode_pp=g.kode_pp and a.kode_lokasi=g.kode_lokasi
@@ -268,6 +269,7 @@ class RegistrasiController extends Controller
         $this->validate($request, [
             'no_reg' => 'required',
             'periode' => 'required',
+            'tanggal' => 'required',
             'paket' => 'required',
             'jadwal' => 'required|integer',
             'no_peserta' => 'required',
@@ -346,7 +348,7 @@ class RegistrasiController extends Controller
                 $noFee = "-";
             }
 
-            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,date('Y-m-d H:i:s'),$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->ukuran_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta_ref,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon));
+            $ins2 = DB::connection($this->sql)->insert("insert into dgw_reg(no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian, no_marketing,kode_harga,periode, jenis,no_fee, no_peserta_ref, kode_pp, diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon,tgl_daftar) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($no_reg,date('Y-m-d H:i:s'),$request->no_peserta,$request->paket,$request->jadwal,$request->agen,$request->type_room,$request->harga_room,$request->sumber,$kode_lokasi,$request->quota,$request->harga_paket,$request->ukuran_pakaian,$request->marketing,$request->jenis_promo,$request->periode,$request->jenis_paket,$noFee,$request->no_peserta_ref,$request->kode_pp,$request->diskon,$request->flag_group,$request->berangkat_dengan,$request->hubungan,$request->referal,$request->ket_diskon,$request->tanggal));
 
             $dok = $request->dokumen;
             if (count($dok) > 0){
@@ -767,7 +769,7 @@ class RegistrasiController extends Controller
 
             
             $url = url('api/dago/storage');
-            $sql="select a.no_reg,b.alamat, a.no_quota, a.uk_pakaian, b.hp, a.no_peserta, b.nopass, b.norek, b.nama as peserta, b.status, a.no_paket, c.nama as namapaket, a.no_jadwal, d.tgl_berangkat, a.no_agen, e.nama_agen, a.no_type, f.nama as type, a.harga, h.nama_marketing, a.kode_lokasi,b.id_peserta,b.jk,b.tgl_lahir,b.tempat,b.th_umroh,b.th_haji,b.pekerjaan,b.kantor_mig,b.hp,b.telp,b.email,b.ec_telp,a.info,a.uk_pakaian,a.diskon,a.no_peserta_ref,isnull(a.brkt_dgn,'-') as brkt_dgn,isnull(a.hubungan,'-') as hubungan,isnull(a.referal,'-') as referal,g.nama as nama_pekerjaan,c.jenis as jenis_paket,a.harga_room,case when b.foto != '-' then '".$url."/'+b.foto else '-' end as foto,convert(varchar,a.tgl_input,103) as tgl_input
+            $sql="select a.no_reg,b.alamat, a.no_quota, a.uk_pakaian, b.hp, a.no_peserta, b.nopass, b.norek, b.nama as peserta, b.status, a.no_paket, c.nama as namapaket, a.no_jadwal, d.tgl_berangkat, a.no_agen, e.nama_agen, a.no_type, f.nama as type, a.harga, h.nama_marketing, a.kode_lokasi,b.id_peserta,b.jk,b.tgl_lahir,b.tempat,b.th_umroh,b.th_haji,b.pekerjaan,b.kantor_mig,b.hp,b.telp,b.email,b.ec_telp,a.info,a.uk_pakaian,a.diskon,a.no_peserta_ref,isnull(a.brkt_dgn,'-') as brkt_dgn,isnull(a.hubungan,'-') as hubungan,isnull(a.referal,'-') as referal,g.nama as nama_pekerjaan,c.jenis as jenis_paket,a.harga_room,case when b.foto != '-' then '".$url."/'+b.foto else '-' end as foto,convert(varchar,a.tgl_daftar,103) as tgl_input
             from dgw_reg a
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi=b.kode_lokasi
             left join dgw_agent e on a.no_agen=e.no_agen and a.kode_lokasi=e.kode_lokasi 
