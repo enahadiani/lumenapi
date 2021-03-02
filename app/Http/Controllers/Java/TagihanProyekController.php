@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class TagihanController extends Controller { 
+class TagihanProyekController extends Controller { 
 
     public $successStatus = 200;
     public $sql = 'tokoaws';

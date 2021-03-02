@@ -24,7 +24,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('kontrak-check','Java\VendorController@checkKontrak');
     $router->get('proyek-rab-cbbl','Java\RabProyekController@getProyek');
     $router->get('proyek-biaya-cbbl','Java\BiayaProyekController@getProyek');
-    $router->get('tagihan-proyek-cbbl','Java\TagihanController@getProyek');
+    $router->get('tagihan-proyek-cbbl','Java\TagihanProyekController@getProyek');
 
     //Proyek
     $router->get('proyek','Java\ProyekController@index');
