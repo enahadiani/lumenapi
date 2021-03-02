@@ -242,7 +242,7 @@ class TagihanProyekController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $no_rab = $request->no_rab;
+            $no_tagihan = $request->no_tagihan;
             DB::connection($this->sql)->table('java_tagihan')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_tagihan', $no_tagihan)
