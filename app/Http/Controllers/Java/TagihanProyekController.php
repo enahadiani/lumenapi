@@ -64,7 +64,7 @@ class TagihanProyekController extends Controller {
                 }else{
                     $filter = " and a.no_tagihan='$request->no_tagihan' ";
                 }
-                $sql= "select a.no_tagihan, a.tanggal, a.kode_cust, a.nilai, a.biaya_lain, a.pajak, a.uang_muka, 
+                $sql= "select a.no_tagihan, convert(varchar(10), tanggal, 120) as tanggal, a.kode_cust, a.nilai, a.biaya_lain, a.pajak, a.uang_muka, 
                 a.keterangan, a.no_proyek, b.keterangan, c.nama 
                 from java_tagihan_detail a 
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
@@ -76,8 +76,8 @@ class TagihanProyekController extends Controller {
                 $det = json_decode(json_encode($det),true);
                 $success['detail'] = $det;
             }else{
-                $sql = "select no_tagihan, no_proyek, tanggal, nilai,
-                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_rab_m
+                $sql = "select no_tagihan, no_proyek, convert(varchar(10), tanggal, 120) as tanggal, nilai,
+                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_tagihan
                 where kode_lokasi= '$kode_lokasi'";
             }
 
