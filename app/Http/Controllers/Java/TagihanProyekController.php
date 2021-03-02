@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class RabProyekController extends Controller { 
+class TagihanProyekController extends Controller { 
 
     public $successStatus = 200;
     public $sql = 'tokoaws';
@@ -26,8 +26,8 @@ class RabProyekController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $select = "select no_proyek, keterangan from java_proyek
-            and a.kode_lokasi = '$kode_lokasi'";
+            $select = "select no_proyek, keterangan from java_proyek where
+            kode_lokasi = '$kode_lokasi'";
 
             $res = DB::connection($this->sql)->select($select);
             $res = json_decode(json_encode($res),true);
@@ -64,9 +64,9 @@ class RabProyekController extends Controller {
                 }else{
                     $filter = " and a.no_tagihan='$request->no_tagihan' ";
                 }
-                $sql= "select a.no_tagihan, a.tanggal, a.kode_cust, a.nilai, a.biaya_lain, a.pajak, a.uang_muka, 
+                $sql= "select a.no_tagihan, convert(varchar(10), tanggal, 120) as tanggal, a.kode_cust, a.nilai, a.biaya_lain, a.pajak, a.uang_muka, 
                 a.keterangan, a.no_proyek, b.keterangan, c.nama 
-                from java_tagihan_detail a 
+                from java_tagihan a 
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
@@ -76,8 +76,8 @@ class RabProyekController extends Controller {
                 $det = json_decode(json_encode($det),true);
                 $success['detail'] = $det;
             }else{
-                $sql = "select no_tagihan, no_proyek, tanggal, nilai,
-                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_rab_m
+                $sql = "select no_tagihan, no_proyek, convert(varchar(10), tanggal, 120) as tanggal, nilai,
+                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_tagihan
                 where kode_lokasi= '$kode_lokasi'";
             }
 
@@ -151,7 +151,7 @@ class RabProyekController extends Controller {
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $no_rab;
+            $success['kode'] = $no_tagihan;
             $success['message'] = "Data Tagihan Project berhasil disimpan";
 
             return response()->json($success, $this->successStatus);  
@@ -219,7 +219,7 @@ class RabProyekController extends Controller {
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $no_rab;
+            $success['kode'] = $no_tagihan;
             $success['message'] = "Data Tagihan Project berhasil disimpan";
 
             return response()->json($success, $this->successStatus);  
