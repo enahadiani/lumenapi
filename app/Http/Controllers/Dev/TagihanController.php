@@ -222,7 +222,7 @@ class TagihanController extends Controller
 
             $no_tagihan = $request->no_tagihan;
 
-            $res = DB::connection($this->db)->select("select no_tagihan,tanggal,periode,keterangan,periode from dev_tagihan_m where no_tagihan = '".$no_tagihan."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select no_tagihan,convert(varchar,tanggal,103) as tanggal,periode,keterangan,periode,nim from dev_tagihan_m where no_tagihan = '".$no_tagihan."' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
             $res2 = DB::connection($this->db)->select("select a.kode_jenis,b.nama as nama_jenis,a.nilai
