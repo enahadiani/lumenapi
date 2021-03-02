@@ -216,7 +216,7 @@ class BayarController extends Controller
             }
             $no_bayar = $request->no_bayar;
 
-            $res = DB::connection($this->db)->select("select no_bayar,,substring(convert(varchar,tanggal,120),1,10) as tanggal,periode,keterangan,periode,nim from dev_bayar_m where no_bayar = '".$no_bayar."' and kode_lokasi='".$kode_lokasi."'");						
+            $res = DB::connection($this->db)->select("select no_bayar,substring(convert(varchar,tanggal,120),1,10) as tanggal,periode,keterangan,periode,nim from dev_bayar_m where no_bayar = '".$no_bayar."' and kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
 
             $res2 = DB::connection($this->db)->select("select c.no_tagihan,c.keterangan,a.nilai as nilai_t, b.nilai as nilai_b 
