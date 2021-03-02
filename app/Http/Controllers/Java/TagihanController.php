@@ -26,7 +26,7 @@ class TagihanController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $select = "select no_proyek, keterangan from java_proyek
+            $select = "select no_proyek, keterangan from java_proyek where
             kode_lokasi = '$kode_lokasi'";
 
             $res = DB::connection($this->sql)->select($select);
