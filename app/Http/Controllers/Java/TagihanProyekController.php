@@ -187,7 +187,7 @@ class TagihanProyekController extends Controller {
             }
 
             $tanggal = $request->tanggal;
-            $no_tagihan = $this->no_tagihan;
+            $no_tagihan = $request->no_tagihan;
 
             DB::connection($this->sql)->table('java_tagihan')
             ->where('kode_lokasi', $kode_lokasi)
