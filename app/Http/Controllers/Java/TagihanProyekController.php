@@ -151,7 +151,7 @@ class TagihanProyekController extends Controller {
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $no_rab;
+            $success['kode'] = $no_tagihan;
             $success['message'] = "Data Tagihan Project berhasil disimpan";
 
             return response()->json($success, $this->successStatus);  
@@ -219,7 +219,7 @@ class TagihanProyekController extends Controller {
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $no_rab;
+            $success['kode'] = $no_tagihan;
             $success['message'] = "Data Tagihan Project berhasil disimpan";
 
             return response()->json($success, $this->successStatus);  
