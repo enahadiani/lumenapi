@@ -27,7 +27,7 @@ class TagihanController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             $select = "select no_proyek, keterangan from java_proyek
-            a.kode_lokasi = '$kode_lokasi'";
+            kode_lokasi = '$kode_lokasi'";
 
             $res = DB::connection($this->sql)->select($select);
             $res = json_decode(json_encode($res),true);
