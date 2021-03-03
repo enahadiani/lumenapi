@@ -65,10 +65,23 @@ class JuskebController extends Controller
     }
 
     public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
-        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = DB::connection($this->db)->select("select max(right($kolom_acuan, ".strlen($str_format)."))+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
+    public function generateKodeBaru($tabel, $kolom_acuan, $prefix, $str_format,$prefix2){
+        $query = DB::connection($this->db)->select("select max(right($kolom_acuan, ".strlen($str_format)."))+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        if(intval($kode) == 9999){
+            $id = $this->generateKode($tabel,$kolom_acuan,$prefix2,$str_format);
+        }else{
+
+            $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        }
         return $id;
     }
 
@@ -292,7 +305,10 @@ class JuskebController extends Controller
                     }
                 }
     
-                $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
+                // $no_bukti = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
+                $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+                $no_bukti = $this->generateKodeBaru("apv_juskeb_m", "no_bukti", "APV-", "0001",$kode_lokasi."-APV".$periode.substr(2,2).".");
+
                 $format = $this->reverseDate($request->tanggal,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
                 $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
                 $tahun = substr($request->tanggal,0,4);
@@ -1394,6 +1410,32 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function cekKode(Request $request)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $kode1 = $this->generateKode("apv_juskeb_m", "no_bukti", "APV-", "0001");
+            $kode2 = $this->generateKodeBaru("apv_juskeb_m", "no_bukti", "APV-", "0001","51-APV2102.");
+
+            $success['status'] = true;
+            $success['kode1'] = $kode1;
+            $success['kode2'] = $kode2;
+            $success['message'] = "Success!";
+            return response()->json(['success'=>$success], $this->successStatus);     
+
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;

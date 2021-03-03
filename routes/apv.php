@@ -203,7 +203,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->put('notif-update-status', 'Apv\NotifController@updateStatusRead');
 });
 
-
+$router->get('cek-kode','Apv\JuskebController@cekKode');
 
 
 ?>

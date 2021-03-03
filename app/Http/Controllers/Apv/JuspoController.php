@@ -43,10 +43,23 @@ class JuspoController extends Controller
     }
 
     public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun,$kode_lokasi){
-        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
+        $query = DB::connection($this->db)->select("select max(right($kolom_acuan, ".strlen($str_format)."))+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
+    public function generateKodeBaru($tabel, $kolom_acuan, $prefix, $str_format,$prefix2){
+        $query = DB::connection($this->db)->select("select max(right($kolom_acuan, ".strlen($str_format)."))+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        if(intval($kode) == 9999){
+            $id = $this->generateKode($tabel,$kolom_acuan,$prefix2,$str_format);
+        }else{
+
+            $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        }
         return $id;
     }
 
@@ -217,7 +230,10 @@ class JuspoController extends Controller
 
             }else{
                 
-                $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
+                // $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
+                $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+                $no_bukti = $this->generateKodeBaru("apv_juspo_m", "no_bukti", "APP-", "0001",$kode_lokasi."-APP".$periode.substr(2,2).".");
+
                 $format = $this->reverseDate($request->waktu,"-","-")."/".$request->kode_pp."/".$request->kode_kota."/";
                 $format2 = "/".$request->kode_pp."/".$request->kode_kota."/";
                 $tahun = substr($request->tanggal,0,4);
