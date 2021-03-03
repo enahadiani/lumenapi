@@ -27,7 +27,8 @@ class PembayaranProyekController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $select = "select no_tagihan from java_tagihan where
+            $select = "select no_tagihan, ((nilai*(pajak/100) + biaya_lain + nilai) - uang_muka) as sisa_bayar 
+            from java_tagihan where
             kode_lokasi = '$kode_lokasi' and kode_cust = '$request->kode_cust'";
 
             $res = DB::connection($this->sql)->select($select);
@@ -142,7 +143,7 @@ class PembayaranProyekController extends Controller {
             'kode_cust' => 'required',
             'kode_bank' => 'required',
             'jenis' => 'required',
-            'deskripsi' => 'required',
+            'keterangan' => 'required',
             'nilai' => 'required',
             'biaya_lain' => 'required',
             'nomor' => 'required|array',
@@ -205,7 +206,7 @@ class PembayaranProyekController extends Controller {
             'kode_cust' => 'required',
             'kode_bank' => 'required',
             'jenis' => 'required',
-            'deskripsi' => 'required',
+            'keterangan' => 'required',
             'nilai' => 'required',
             'biaya_lain' => 'required',
             'nomor' => 'required|array',
