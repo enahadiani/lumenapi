@@ -1525,7 +1525,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval($request->tahun)-5;
+            $tahun = intval(substr($request->periode[1],0,4))-5;
             for($x=0;$x <= 5;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -1602,7 +1602,7 @@ class DashboardController extends Controller
 
             $ctg2 = array();
             $ctg = array();
-            $tahun = intval($request->tahun)-6;
+            $tahun = intval(substr($request->periode[1],0,4))-6;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun.'-'.($tahun+1));
                 array_push($ctg2,$tahun);
@@ -1684,7 +1684,7 @@ class DashboardController extends Controller
 
             $ctg2 = array();
             $ctg = array();
-            $tahun = intval($request->tahun)-6;
+            $tahun = intval(substr($request->periode[1],0,4))-6;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun.'-'.($tahun+1));
                 array_push($ctg2,$tahun);
@@ -1764,7 +1764,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval($request->tahun)-5;
+            $tahun = intval(substr($request->periode[1],0,4))-5;
             for($x=0;$x <= 5;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -1845,7 +1845,7 @@ class DashboardController extends Controller
             }
 
             $ctg = array();
-            $tahun = intval($request->tahun)-5;
+            $tahun = intval(substr($request->periode[1],0,4))-5;
             for($x=0;$x <= 5;$x++){
                 array_push($ctg,$tahun);
                 $tahun++;
@@ -1939,7 +1939,7 @@ class DashboardController extends Controller
 
             $ctg2 = array();
             $ctg = array();
-            $tahun = intval($request->tahun)-6;
+            $tahun = intval(substr($request->periode[1],0,4))-6;
             for($x=0;$x < 6;$x++){
                 array_push($ctg,$tahun.'-'.($tahun+1));
                 array_push($ctg2,$tahun);
@@ -2266,6 +2266,8 @@ class DashboardController extends Controller
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -2283,10 +2285,11 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(b.n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             $where and a.kode_klp='K01'
+            group by a.kode_grafik,a.nama
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2372,6 +2375,8 @@ class DashboardController extends Controller
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -2388,10 +2393,11 @@ class DashboardController extends Controller
             }
 
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as real,n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             $where and a.kode_klp='K03'
+            group by a.kode_grafik,a.nama
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2432,6 +2438,8 @@ class DashboardController extends Controller
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -2448,10 +2456,11 @@ class DashboardController extends Controller
             }
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as real,n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             $where and a.kode_klp='K06'
+            group by a.kode_grafik,a.nama
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2492,6 +2501,8 @@ class DashboardController extends Controller
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -2508,10 +2519,11 @@ class DashboardController extends Controller
             }
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as real,n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             $where and a.kode_klp='K04'
+            group by a.kode_grafik,a.nama
             ");
             $rs = json_decode(json_encode($rs),true);
             
@@ -2552,6 +2564,8 @@ class DashboardController extends Controller
                         $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                     }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                         $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                         $tmp = explode(",",$request->input($col_array[$i])[1]);
                         for($x=0;$x<count($tmp);$x++){
@@ -2568,10 +2582,11 @@ class DashboardController extends Controller
             }
 
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n1 as real,b.n2 as rka,case n2 when 0 then 0 else (n1/n2)*100 end as persen  
+            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             $where and a.kode_klp='K12'
+            group by a.kode_grafik,a.nama
             ");
             $rs = json_decode(json_encode($rs),true);
             
