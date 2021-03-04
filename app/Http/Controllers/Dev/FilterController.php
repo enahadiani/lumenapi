@@ -56,7 +56,7 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from dev_tagihan_m a where a.kode_lokasi='$kode_lokasi' and a.periode is not null ";
+            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from dev_tagihan_m a where a.kode_lokasi='$kode_lokasi' and a.periode is not null order by a.periode desc ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
