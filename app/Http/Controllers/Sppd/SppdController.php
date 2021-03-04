@@ -470,21 +470,26 @@ class SppdController extends Controller
 
             //$exec = array();
           
+            $cek = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress <> 'A' ");
+            if(count($cek) > 0){
+                $success['status'] = false;
+                $success['message'] = "Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.";
+            }else{
 
-            $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
-            $del2 = DB::connection('sqlsrvypt')->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
-            $del3 = DB::connection('sqlsrvypt')->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
-            $del4 = DB::connection('sqlsrvypt')->table('angg_r')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
-            $del5 = DB::connection('sqlsrvypt')->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_spj','like' ,$no_agenda.'-%')->delete();
-            $del6 = DB::connection('sqlsrvypt')->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_spj','like' ,$no_agenda.'-%')->delete();
-            $del7 = DB::connection('sqlsrvypt')->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
-            $del8 = DB::connection('sqlsrvypt')->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
-
-            DB::connection('sqlsrvypt')->commit();
-            $success['no_agenda']=$no_agenda;
-            $success['status'] = true;
-            $success['message'] = "Release Budget Sukses";
-
+                $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
+                $del2 = DB::connection('sqlsrvypt')->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
+                $del3 = DB::connection('sqlsrvypt')->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
+                $del4 = DB::connection('sqlsrvypt')->table('angg_r')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
+                $del5 = DB::connection('sqlsrvypt')->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_spj','like' ,$no_agenda.'-%')->delete();
+                $del6 = DB::connection('sqlsrvypt')->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_spj','like' ,$no_agenda.'-%')->delete();
+                $del7 = DB::connection('sqlsrvypt')->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
+                $del8 = DB::connection('sqlsrvypt')->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
+                DB::connection('sqlsrvypt')->commit();
+                $success['no_agenda']=$no_agenda;
+                $success['status'] = true;
+                $success['message'] = "Release Budget Sukses";
+            }
+            
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
