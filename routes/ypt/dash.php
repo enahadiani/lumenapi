@@ -21,10 +21,10 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 	
 	
     //PAGE 1
-    $router->get('pencapaianYoY/{periode}', 'Ypt\DashboardController@pencapaianYoY');
-    $router->get('rkaVSReal/{periode}', 'Ypt\DashboardController@rkaVSReal');
-    $router->get('growthRKA/{periode}', 'Ypt\DashboardController@growthRKA');
-    $router->get('growthReal/{periode}', 'Ypt\DashboardController@growthReal');
+    $router->get('pencapaianYoY', 'Ypt\DashboardController@pencapaianYoY');
+    $router->get('rkaVSReal', 'Ypt\DashboardController@rkaVSReal');
+    $router->get('growthRKA', 'Ypt\DashboardController@growthRKA');
+    $router->get('growthReal', 'Ypt\DashboardController@growthReal');
 
 
     //PAGE 2
