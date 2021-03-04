@@ -29,9 +29,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     //PAGE 2
     
-    $router->get('komposisiPdpt/{periode}', 'Ypt\DashboardController@komposisiPdpt');
-    $router->get('rkaVSRealPdpt/{periode}', 'Ypt\DashboardController@rkaVSRealPdpt');
-    $router->get('rkaVSRealPdptRp/{periode}', 'Ypt\DashboardController@rkaVSRealPdptRp');
+    $router->get('komposisiPdpt', 'Ypt\DashboardController@komposisiPdpt');
+    $router->get('rkaVSRealPdpt', 'Ypt\DashboardController@rkaVSRealPdpt');
+    $router->get('rkaVSRealPdptRp', 'Ypt\DashboardController@rkaVSRealPdptRp');
     $router->get('totalPdpt/{periode}', 'Ypt\DashboardController@totalPdpt');
 
 
@@ -44,12 +44,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     //PAGE 4 Detail Pendapatan
     
-    $router->get('pdptFakultas/{periode}/{kode_neraca}', 'Ypt\DashboardController@pdptFakultas');
-    $router->get('detailPdpt/{periode}/{kode_neraca}', 'Ypt\DashboardController@detailPdpt');
+    $router->get('pdptFakultas', 'Ypt\DashboardController@pdptFakultas');
+    $router->get('detailPdpt', 'Ypt\DashboardController@detailPdpt');
 
     
-    $router->get('pdptJurusan/{periode}/{kode_neraca}/{kode_bidang}', 'Ypt\DashboardController@pdptJurusan');
-    $router->get('detailPdptJurusan/{periode}/{kode_neraca}/{kode_bidang}/{tahun}', 'Ypt\DashboardController@detailPdptJurusan');
+    $router->get('pdptJurusan', 'Ypt\DashboardController@pdptJurusan');
+    $router->get('detailPdptJurusan', 'Ypt\DashboardController@detailPdptJurusan');
 
     //PAGE 5 Detail Beban
     

@@ -498,7 +498,7 @@ class DashboardController extends Controller
     }
 
     //PENDAPATAN
-    public function komposisiPdpt(Request $request, $periode){
+    public function komposisiPdpt(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -513,14 +513,43 @@ class DashboardController extends Controller
                 $color = $this->dark_color;
             }
             $success['colors'] = $color;
-            $sql="select a.kode_neraca,a.nama,
-            case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
-            case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
-            case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
-            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select a.kode_neraca,a.nama,b.nu,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS4' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            group by a.kode_neraca,a.nama,b.nu
             order by b.nu";
             $komposisi = DB::connection($this->db)->select($sql);
             $komposisi = json_decode(json_encode($komposisi),true);
@@ -551,7 +580,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function rkaVSRealPdpt(Request $request, $periode){
+    public function rkaVSRealPdpt(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -561,14 +590,42 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.kode_neraca,a.nama,
-            case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
-            case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
-            case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
-            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select a.kode_neraca,a.nama,b.nu,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS4' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            group by a.kode_neraca,a.nama,b.nu
             order by b.nu
             ";
             $row = DB::connection($this->db)->select($sql);
@@ -604,7 +661,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function rkaVSRealPdptRp(Request $request, $periode){
+    public function rkaVSRealPdptRp(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -614,16 +671,45 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $sql="select a.kode_neraca,a.nama,
-            case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end as n1,
-            case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end as n4,
-            case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end as n5,
-            case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end as capai
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select a.kode_neraca,a.nama,b.nu,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and a.periode='$periode' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS4' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            group by a.kode_neraca,a.nama,b.nu
             order by b.nu
             ";
+
             $row = DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
             
@@ -901,7 +987,7 @@ class DashboardController extends Controller
 
     //DETAIL PENDAPATAN
 
-    public function pdptFakultas(Request $request, $periode,$kode_neraca){
+    public function pdptFakultas(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -910,8 +996,8 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $bulan = substr($periode,4,2);
-
+            $bulan = substr($request->periode[1],4,2);
+            $kode_neraca = $request->kode_neraca;
             $sql="SELECT
             tahun
             FROM
@@ -1001,7 +1087,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function detailPdpt(Request $request, $periode,$kode_neraca){
+    public function detailPdpt(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -1010,8 +1096,8 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $tahun= substr($periode,0,4);
+            $kode_neraca = $request->kode_neraca;
+            $tahun= substr($request->periode[1],0,4);
             $sql=" select a.kode_bidang,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
             case when isnull(b.n2,0)<>0 then (isnull(b.n4,4)/isnull(b.n2,0))*100 else 0 end as capai
@@ -1053,7 +1139,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function pdptJurusan(Request $request, $periode,$kode_neraca,$kode_bidang){
+    public function pdptJurusan(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -1061,7 +1147,9 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $bulan = substr($periode,4,2);
+            $bulan = substr($request->periode[1],4,2);
+            $kode_neraca = $request->kode_neraca;
+            $kode_bidang = $request->kode_bidang;
 			$sql="SELECT
             tahun
             FROM
@@ -1148,7 +1236,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function detailPdptJurusan($periode,$kode_neraca,$kode_bidang,$tahun){
+    public function detailPdptJurusan(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
@@ -1157,6 +1245,11 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            
+            $tahun = $request->tahun;
+            $kode_neraca = $request->kode_neraca;
+            $kode_bidang = $request->kode_bidang;
 
 			$sql="select a.kode_pp,a.nama,
             isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
