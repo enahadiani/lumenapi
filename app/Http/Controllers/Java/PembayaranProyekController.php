@@ -98,9 +98,10 @@ class PembayaranProyekController extends Controller {
                     $filter = " and a.no_bayar='$request->no_bayar' ";
                 }
                 $sql= "select a.no_bayar, convert(varchar(10), a.tanggal, 120) as tanggal, a.kode_cust, 
-                a.nilai, a.biaya_lain, a.jenis, a.keterangan, b.nama 
+                a.nilai, a.biaya_lain, a.jenis, a.keterangan, b.nama, a.kode_bank, c.nama as nama_bank 
                 from java_bayar a 
                 inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
+                inner join java_bank c on a.kode_bank=c.kode_bank and a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
                 
                 $detail = "select no, no_tagihan, nilai_bayar, no_dokumen 
