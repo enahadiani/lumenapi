@@ -491,7 +491,7 @@ class SppdController extends Controller
                     $success['no_agenda']=$no_agenda;
                     $success['status'] = true;
                     $success['message'] = "Release Budget Sukses";
-                    
+
                 }else{
                     $success['status'] = false;
                     $success['message'] = "Release Budget Gagal. No Agenda tidak valid.";
@@ -500,6 +500,42 @@ class SppdController extends Controller
             }
 
             return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvypt')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getProgress($no_agenda){
+        if($data =  Auth::guard('ypt')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+       
+        DB::connection('sqlsrvypt')->beginTransaction();
+        try {
+          
+            $res = DB::connection('sqlsrvypt')->select("select progress from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' ");
+            
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['progress'] = $res[0]['progress'];
+                $success['message'] = "Success!";
+                
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Agenda Tidak ditemukan!";
+                $success['progress'] = "-";
+                $success['status'] = false;
+                
+                return response()->json($success, $this->successStatus);
+            }
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
             $success['status'] = false;
