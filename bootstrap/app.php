@@ -664,4 +664,41 @@ $app->router->group([
     require __DIR__.'/../routes/java/trans.php';
 });
 
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/esaku-auth'
+], function ($router) {
+    require __DIR__.'/../routes/esaku/auth.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/esaku-master'
+], function ($router) {
+    require __DIR__.'/../routes/esaku/master.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/esaku-trans'
+], function ($router) {
+    require __DIR__.'/../routes/esaku/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/esaku-report'
+], function ($router) {
+    require __DIR__.'/../routes/esaku/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/esaku-dash'
+], function ($router) {
+    require __DIR__.'/../routes/esaku/dash.php';
+});
 return $app;

@@ -49,6 +49,37 @@ class FilterController extends Controller
         
     }
 
+    function getFilterPeriode(){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama from dev_tagihan_m a where a.kode_lokasi='$kode_lokasi' and a.periode is not null order by a.periode desc ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     function getFilterNIM(){
         try {
             
@@ -121,8 +152,8 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('nim');
-            $db_col_name = array('a.nim');
+            $col_array = array('periode','nim');
+            $db_col_name = array('a.periode','a.nim');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -178,8 +209,8 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('nim');
-            $db_col_name = array('a.nim');
+            $col_array = array('periode','nim');
+            $db_col_name = array('a.periode','a.nim');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){

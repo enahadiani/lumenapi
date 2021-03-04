@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dev;
+namespace App\Http\Controllers\Esaku\Aktap;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\LaporanNrcLajur;
 
-class LaporanController extends Controller
+class FilterAktapController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,55 +15,28 @@ class LaporanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'admin';
-    public $sql = 'sqlsrv';
+    public $guard = 'toko';
+    public $db = 'tokoaws';
 
-    function getLapSiswa(Request $request){
+    function getFilterPeriode(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $col_array = array('kode_jur','nim');
-            $db_col_name = array('a.kode_jur','a.nim');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
-            $this_in = "";
-            for($i = 0; $i<count($col_array); $i++){
-                if(ISSET($request->input($col_array[$i])[0])){
-                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
-                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
-                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
-                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
-                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
-                        $tmp = explode(",",$request->input($col_array[$i])[1]);
-                        for($x=0;$x<count($tmp);$x++){
-                            if($x == 0){
-                                $this_in .= "'".$tmp[$x]."'";
-                            }else{
-            
-                                $this_in .= ","."'".$tmp[$x]."'";
-                            }
-                        }
-                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
-                    }
-                }
-            }
-          
-            $sql="select a.nim,a.nama,a.kode_jur,b.nama as nama_jur
-            from dev_siswa a 
-            inner join dev_jur b on a.kode_jur = b.kode_jur
-            $where
-            order by a.nim";
-            $res = DB::connection($this->sql)->select($sql);
+
+            $sql="select a.periode from (
+                select distinct periode from fa_asset where kode_lokasi='".$kode_lokasi."' 
+                union all
+                select distinct periode from periode where kode_lokasi='".$kode_lokasi."'
+            ) a order by a.periode desc";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
             }
             else{
@@ -81,57 +52,27 @@ class LaporanController extends Controller
         }
     }
 
-    function getLapTagihan(Request $request){
+    function getFilterPeriodeSusut(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $col_array = array('periode','nim','no_tagihan');
-            $db_col_name = array('a.periode','a.nim','a.no_tagihan');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
-            $this_in = "";
-            for($i = 0; $i<count($col_array); $i++){
-                if(ISSET($request->input($col_array[$i])[0])){
-                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
-                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
-                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
-                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
-                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
-                        $tmp = explode(",",$request->input($col_array[$i])[1]);
-                        for($x=0;$x<count($tmp);$x++){
-                            if($x == 0){
-                                $this_in .= "'".$tmp[$x]."'";
-                            }else{
-            
-                                $this_in .= ","."'".$tmp[$x]."'";
-                            }
-                        }
-                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
-                    }
-                }
-            }
-            
-            $sql="select a.no_tagihan,a.kode_lokasi,convert(varchar,a.tanggal,103) as tanggal,a.nim,a.keterangan,d.nama,a.periode
-            from dev_tagihan_m a
-            inner join dev_siswa d on a.nim = d.nim
-            $where
-            order by a.no_tagihan";
-            $res = DB::connection($this->sql)->select($sql);
-            
+
+            $sql="select distinct periode from fasusut_d where kode_lokasi='".$kode_lokasi."' order by periode desc";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['message'] = "Success!"; 
-                $success["auth_status"] = 1;    
+                $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['status'] = true;
                 $success['data'] = [];
+                $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -141,7 +82,37 @@ class LaporanController extends Controller
         }
     }
 
-    function getLapSaldo(Request $request){
+    function getFilterKlpAkun(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.kode_klpakun,a.nama from fa_klpakun a where a.kode_lokasi='$kode_lokasi' ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterJenis(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -149,8 +120,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','nim');
-            $db_col_name = array('a.periode','a.nim');
+            $col_array = array('periode','kode_klpakun');
+            $db_col_name = array('a.periode','a.kode_klpakun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -173,32 +144,21 @@ class LaporanController extends Controller
                     }
                 }
             }
-            
-            $sql="select a.no_tagihan,a.nim,d.nama,c.nilai as nilai_t,b.nilai as nilai_b,c.nilai-b.nilai as saldo
-            from dev_tagihan_m a
-            inner join (select a.nim,a.kode_lokasi,a.no_tagihan,sum(b.nilai) as nilai 
-                        from dev_tagihan_m a 
-                        inner join dev_tagihan_d b on a.no_tagihan=b.no_tagihan 
-                        group by a.nim,a.no_tagihan,a.kode_lokasi) c on a.no_tagihan=c.no_tagihan and a.kode_lokasi=c.kode_lokasi
-            left join (select a.nim,a.kode_lokasi,b.no_tagihan,sum(b.nilai) as nilai 
-                       from dev_bayar_m a 
-                       inner join dev_bayar_d b on a.no_bayar=b.no_bayar 
-                       group by a.nim,a.kode_lokasi,b.no_tagihan) b on a.no_tagihan=b.no_tagihan and a.no_tagihan=b.no_tagihan and a.kode_lokasi=b.kode_lokasi
-            inner join dev_siswa d on a.nim=d.nim and a.kode_lokasi=c.kode_lokasi
+
+            $sql="select distinct a.jenis from fa_asset a
             $where ";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['message'] = "Success!"; 
-                $success["auth_status"] = 1;    
+                $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['status'] = true;
                 $success['data'] = [];
+                $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -208,7 +168,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getLapBayar(Request $request){
+    function getFilterAset(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -216,11 +176,10 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('a.periode','nim','no_bayar');
-            $db_col_name = array('a.periode','a.nim','a.no_bayar');
+            $col_array = array('periode','kode_klpakun','jenis');
+            $db_col_name = array('a.periode','a.kode_klpakun','a.jenis');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
-
             for($i = 0; $i<count($col_array); $i++){
                 if(ISSET($request->input($col_array[$i])[0])){
                     if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
@@ -242,28 +201,20 @@ class LaporanController extends Controller
                 }
             }
 
-          
-            $sql="select a.no_bayar,a.kode_lokasi,convert(varchar,a.tanggal,103) as tanggal,a.nim,a.keterangan,d.nama,a.periode
-			from dev_bayar_m a
-			inner join dev_siswa d on a.nim = d.nim
-			$where
-            order by a.no_bayar";
-            
-            $res = DB::connection($this->sql)->select($sql);
+            $sql="select a.no_fa,a.nama from fa_asset a
+            $where ";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                // $success['sql'] = $sql;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
@@ -273,7 +224,217 @@ class LaporanController extends Controller
         }
     }
 
+    function getFilterPP(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+        
+            $where = "where a.kode_lokasi='$kode_lokasi'";
 
-    
+            $sql="select a.kode_pp,a.nama from pp a
+            $where ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterTahun(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+
+            $sql="select distinct substring(a.periode,1,4) as tahun
+            from (
+                select distinct periode from fa_asset where kode_lokasi='".$kode_lokasi."' 
+                union 
+                select periode from periode where kode_lokasi='".$kode_lokasi."' 
+            )a 
+            order by substring(a.periode,1,4) desc";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterJenisKlp(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select distinct jenis from fa_klp where kode_lokasi='".$kode_lokasi."' order by jenis asc";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterBuktiJurnalSusut(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select distinct a.no_fasusut,a.keterangan from fasusut_m a
+            $where ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterBuktiJurnalWO(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select a.no_woapp,a.keterangan from fawoapp_m a
+            $where ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 
 }
