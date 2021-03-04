@@ -89,8 +89,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('nim','no_tagihan');
-            $db_col_name = array('a.nim','a.no_tagihan');
+            $col_array = array('periode','nim','no_tagihan');
+            $db_col_name = array('a.periode','a.nim','a.no_tagihan');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -149,8 +149,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('nim');
-            $db_col_name = array('a.nim');
+            $col_array = array('periode','nim');
+            $db_col_name = array('a.periode','a.nim');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -216,8 +216,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('nim','no_bayar');
-            $db_col_name = array('a.nim','a.no_bayar');
+            $col_array = array('a.periode','nim','no_bayar');
+            $db_col_name = array('a.periode','a.nim','a.no_bayar');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 

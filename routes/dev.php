@@ -80,6 +80,7 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->delete('bayar','Dev\BayarController@destroy');    
 
     $router->get('filter-lokasi','Dev\FilterController@getFilterLokasi');
+    $router->get('filter-periode','Dev\FilterController@getFilterPeriode');
     $router->get('filter-nim','Dev\FilterController@getFilterNIM');
     $router->get('filter-jurusan','Dev\FilterController@getFilterJurusan');
     $router->get('filter-tagihan','Dev\FilterController@getFilterTagihan');
