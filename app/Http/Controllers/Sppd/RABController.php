@@ -622,29 +622,45 @@ class RABController extends Controller
         DB::connection($this->db)->beginTransaction();
         try {
 
-            $del = DB::connection($this->db)->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+            $cek = DB::connection($this->db)->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_bukti' and progress <> 'A' ");
+            if(count($cek) > 0){
+                $success['status'] = false;
+                $success['message'] = "Pengajuan gagal dihapus. No Pengajuan tidak dapat dihapus karena sudah diproses di Keuangan.";
+            }else{
 
-            $del2 = DB::connection($this->db)->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+                $cek2 = DB::connection($this->db)->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_bukti' and progress = 'A'  ");
+                if(count($cek2) > 0){
+                    
+                    $del = DB::connection($this->db)->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
-            $del3 = DB::connection($this->db)->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+                    $del2 = DB::connection($this->db)->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
-            $del4 = DB::connection($this->db)->table('angg_r')->where('kode_lokasi', $kode_lokasi)
-            ->where('modul', 'PRBEBAN')
-            ->where('no_bukti', $no_bukti)->delete();
+                    $del3 = DB::connection($this->db)->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
-            $del5 = DB::connection($this->db)->table('prb_prbeban_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti' ,$no_bukti)->delete();
+                    $del4 = DB::connection($this->db)->table('angg_r')->where('kode_lokasi', $kode_lokasi)
+                    ->where('modul', 'PRBEBAN')
+                    ->where('no_bukti', $no_bukti)->delete();
 
-            $del6 = DB::connection($this->db)->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
-            $del7 = DB::connection($this->db)->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
-            $del8 = DB::connection($this->db)->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
+                    $del5 = DB::connection($this->db)->table('prb_prbeban_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti' ,$no_bukti)->delete();
 
-            $del9 = DB::connection($this->db)->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-           
+                    $del6 = DB::connection($this->db)->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
+                    $del7 = DB::connection($this->db)->table('tu_pdaju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
+                    $del8 = DB::connection($this->db)->table('tu_pdaju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju','like', $no_bukti.'-%')->delete();
 
-            DB::connection($this->db)->commit();
-            $success['no_bukti']=$no_bukti;
-            $success['status'] = true;
-            $success['message'] = "Pengajuan berhasil dihapus";
+                    $del9 = DB::connection($this->db)->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                
+
+                    DB::connection($this->db)->commit();
+                    $success['no_bukti']=$no_bukti;
+                    $success['status'] = true;
+                    $success['message'] = "Pengajuan berhasil dihapus";
+
+                }else{
+                    $success['status'] = false;
+                    $success['message'] = "Pengajuan gagal dihapus. No Pengajuan tidak valid.";
+                }
+
+            }
 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -688,6 +704,42 @@ class RABController extends Controller
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getProgress($no_bukti){
+        if($data =  Auth::guard('ypt')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+       
+        DB::connection('sqlsrvypt')->beginTransaction();
+        try {
+          
+            $res = DB::connection('sqlsrvypt')->select("select progress from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_bukti' ");
+            
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['progress'] = $res[0]['progress'];
+                $success['message'] = "Success!";
+                
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Pengajuan Tidak ditemukan!";
+                $success['progress'] = "-";
+                $success['status'] = false;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvypt')->rollback();
             $success['status'] = false;
             $success['message'] = "Internal Server Error";
             Log::error($e);
