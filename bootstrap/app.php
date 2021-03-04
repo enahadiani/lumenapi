@@ -664,6 +664,12 @@ $app->router->group([
     require __DIR__.'/../routes/java/trans.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/java-report'
+], function ($router) {
+    require __DIR__.'/../routes/java/report.php';
+});
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
