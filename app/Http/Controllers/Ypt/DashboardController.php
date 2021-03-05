@@ -4377,12 +4377,41 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $tahun = substr($request->periode,0,4);
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n2*-1 as rka, b.n1*-1 as real,case when (b.n2*-1)-isnull(b.n1*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n1*-1,0)) else 0 end as melampaui,  case when (b.n2*-1)-isnull((b.n1*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n1*-1,0)) end as tidak_tercapai
+            select a.kode_grafik,a.nama,sum(b.n2*-1) as rka, sum(b.n1*-1) as real,sum(case when (b.n2*-1)-isnull(b.n1*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n1*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n1*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n1*-1,0)) end) as tidak_tercapai
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR17','GR18') and b.periode='$request->periode'
+            $where and a.kode_grafik in ('GR17','GR18') 
+            group by a.kode_grafik,a.nama
+            order by a.kode_grafik
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -4440,11 +4469,40 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $tahun = substr($request->periode,0,4);
-            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,b.n4*-1 as real, b.n8*-1 as rka,case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n8*-1)-isnull(b.n4*-1,0)) else 0 end as melampaui,  case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n8*-1)-isnull(b.n4*-1,0)) end as tidak_tercapai
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,sum(b.n4*-1) as real, sum(b.n8*-1) as rka,sum(case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n8*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n8*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-                where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik ='GR18' 
+                $where and a.kode_grafik ='GR18' 
+            group by a.kode_neraca,b.nama
+            order by a.kode_neraca
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -4506,12 +4564,41 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $tahun = substr($request->periode,0,4);
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,b.n2 as rka, b.n1 as real,case when (b.n2)-isnull(b.n1,0) < 0 then abs((b.n2)-isnull(b.n1,0)) else 0 end as melampaui,  case when (b.n2)-isnull((b.n1),0) < 0 then 0 else abs((b.n2)-isnull(b.n1,0)) end as tidak_tercapai
+            select a.kode_grafik,a.nama,sum(b.n2) as rka, sum(b.n1) as real,sum(case when (b.n2)-isnull(b.n1,0) < 0 then abs((b.n2)-isnull(b.n1,0)) else 0 end) as melampaui,  sum(case when (b.n2)-isnull((b.n1),0) < 0 then 0 else abs((b.n2)-isnull(b.n1,0)) end) as tidak_tercapai
             from dash_grafik_m a
             left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR08','GR09') and b.periode='$request->periode'
+            $where and a.kode_grafik in ('GR08','GR09') 
+            group by a.kode_grafik,a.nama
+            order by a.kode_grafik
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -4569,12 +4656,40 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $tahun = substr($request->periode,0,4);
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
             $row =  DB::connection($this->db)->select("
-                select a.kode_neraca,b.nama,b.n8 as rka, b.n4 as real,case when (b.n8)-isnull((b.n4),0) < 0 then abs((b.n8)-isnull(b.n4,0)) else 0 end as melampaui,  case when (b.n8)-isnull((b.n4),0) < 0 then 0 else abs((b.n8)-isnull(b.n4,0)) end as tidak_tercapai
+                select a.kode_neraca,b.nama,sum(b.n8) as rka, sum(b.n4) as real,sum(case when (b.n8)-isnull((b.n4),0) < 0 then abs((b.n8)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n8)-isnull((b.n4),0) < 0 then 0 else abs((b.n8)-isnull(b.n4,0)) end) as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-                where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik='GR24'
+                $where and a.kode_grafik='GR24'
+                group by a.kode_neraca,b.nama 
+                order by a.kode_neraca
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
