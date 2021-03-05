@@ -21,10 +21,26 @@ class LaporanProyekController extends Controller {
             
             $col_array = array('no_proyek');
             $db_col_name = array('a.no_proyek');
-            $filter = "where a.kode_lokasi='$kode_lokasi'";
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
-                if($request->input($col_array[$i]) !=""){
-                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i][1])."' ";
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
                 }
             }
 
@@ -32,7 +48,7 @@ class LaporanProyekController extends Controller {
             convert(varchar,tgl_selesai,103) as tgl_selesai, a.keterangan,b.nama as nama_cust
             from java_proyek a
             inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
-            $filter";
+            $where";
 
             $res1 = DB::connection($this->sql)->select($proyek);
             $res1 = json_decode(json_encode($res1),true);
@@ -40,7 +56,7 @@ class LaporanProyekController extends Controller {
             $rab = "select b.jumlah, b.satuan, b.harga, b.keterangan
             from  java_rab_m a
             inner join java_rab_d b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
-            $filter
+            $where
             order by b.no";
 
             $res2 = DB::connection($this->sql)->select($rab);
@@ -50,7 +66,7 @@ class LaporanProyekController extends Controller {
             b.nama as nama_vendor, a.nilai,a.status
             from java_beban a
             inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
-            $filter";
+            $where";
 
             $res3 = DB::connection($this->sql)->select($beban);
             $res3 = json_decode(json_encode($res3),true);
