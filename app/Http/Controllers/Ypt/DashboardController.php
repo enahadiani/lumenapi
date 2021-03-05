@@ -2954,13 +2954,39 @@ class DashboardController extends Controller
     }
      // MS Pengembangan
     public function msPengembanganRKA(Request $request){
-        $periode= $request->input('periode');
         try {
             
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
             }
             
             // $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
@@ -2977,7 +3003,7 @@ class DashboardController extends Controller
             inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and a.kode_grafik='GR07'  
+            $where and a.kode_grafik='GR07'  
             group by d.kode_fakultas,a.kode_lokasi          
                     )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
@@ -2997,7 +3023,101 @@ class DashboardController extends Controller
                 $dt = array();
                 $ctg= array();
                 for($i=0;$i<count($rs);$i++){
-                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['n1']),"color"=> $color[$i]);
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['n2']),"color"=> $color[$i]);
+                    array_push($ctg,$rs[$i]['nama']);    
+                }
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> 'Pengembangan',"colorByPoint" => false,"data"=>$dt
+                );
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function msPengembanganRKADir(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+
+            $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
+            from rektor a
+            left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n8) as gar
+            from dash_grafik_d a
+            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+			inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+            $where and a.kode_grafik='GR07'  
+            group by e.kode_rektor,a.kode_lokasi          
+                    )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
+            ";
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            
+            $success['colors'] = $color;
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                
+                // $dt = array();
+                // for($i=0;$i<count($rs);$i++){
+                //     $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
+                // }
+                // $dt[0] = array('','',array('role'=>'style'));
+                $dt = array();
+                $ctg= array();
+                for($i=0;$i<count($rs);$i++){
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['n2']),"color"=> $color[$i]);
                     array_push($ctg,$rs[$i]['nama']);    
                 }
                 $success['ctg'] = $ctg;
@@ -3024,7 +3144,6 @@ class DashboardController extends Controller
     }
 
     public function msPengembanganKomposisi(Request $request){
-        $periode= $request->input('periode');
         try {
             
             
@@ -3038,12 +3157,39 @@ class DashboardController extends Controller
             if($request->mode == "dark"){
                 $color = $this->dark_color;
             }
+
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
             
             $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n8) as gar
             from dash_grafik_d a
             inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and b.periode='$request->periode' and c.jenis='Posting' and a.kode_grafik in ('GR25','GR26','GR27','GR28')
+            $where and c.jenis='Posting' and a.kode_grafik in ('GR25','GR26','GR27','GR28')
             group by a.kode_lokasi,a.kode_grafik,c.nama
             ";
             $rs = DB::connection($this->db)->select($sql);
@@ -3053,17 +3199,25 @@ class DashboardController extends Controller
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 
                 $success['total'] = 0;
+                $success['total_real'] = 0;
                 $dt = array();
-                $ctg= array();
+                $dt2= array();
                 for($i=0;$i<count($rs);$i++){
-                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['nilai']),"color"=> $color[$i]);
-                    $success['total'] += floatval($rs[$i]['nilai']);    
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['gar']),"color"=> $color[$i]);
+                    $dt2[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['nilai']),"color"=> $color[$i]);
+                    $success['total'] += floatval($rs[$i]['gar']);    
+                    $success['total_real'] += floatval($rs[$i]['nilai']);    
                 }
                 $success["series"][0]= array(
-                    "name"=> 'Komposisi',"data"=>$dt
+                    "name"=> 'Komposisi RKA',"data"=>$dt
+                );
+                $success["series_real"][0]= array(
+                    "name"=> 'Komposisi Realisasi',"data"=>$dt2
                 );
                 $dt[0] = array('','');
                 $success['data'] = $dt;
+                $dt2[0] = array('','');
+                $success['data2'] = $dt2;
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
