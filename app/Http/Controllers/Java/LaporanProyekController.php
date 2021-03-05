@@ -45,7 +45,7 @@ class LaporanProyekController extends Controller {
             }
 
             $proyek = "select a.no_proyek, a.no_kontrak, convert(varchar,tgl_mulai,103) as tgl_mulai, 
-            convert(varchar,tgl_selesai,103) as tgl_selesai, a.keterangan,b.nama as nama_cust
+            convert(varchar,tgl_selesai,103) as tgl_selesai, a.keterangan,b.nama as nama_cust, a.nilai
             from java_proyek a
             inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
             $where";
