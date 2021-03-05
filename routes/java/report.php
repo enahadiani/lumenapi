@@ -20,6 +20,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-proyek','Java\FilterController@getNoBukti');
 
     $router->get('lap-kartu-proyek','Java\LaporanProyekController@getKartuProyek');     
+    $router->get('lap-saldo-proyek','Java\LaporanProyekController@getSaldoProyek');     
 
 });
 
