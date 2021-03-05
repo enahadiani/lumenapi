@@ -2904,6 +2904,13 @@ class DashboardController extends Controller
             $where and a.kode_klp='K12'
             group by a.kode_grafik,a.nama
             ");
+            $total =0; $total_rka=0;
+            foreach($rs as $row){
+                $total+=floatval($row->real);
+                $total_rka+=floatval($row->rka);
+            }
+            $success['total_real'] = $total;
+            $success['total_rka'] = $total_rka;
             $rs = json_decode(json_encode($rs),true);
             
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
