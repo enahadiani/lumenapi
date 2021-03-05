@@ -62,7 +62,7 @@ class LaporanProyekController extends Controller {
                 'data_beban' => $res3
             );
 
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $result;
                 $success['message'] = "Success!";
