@@ -53,12 +53,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     //PAGE 5 Detail Beban
     
-    $router->get('bebanFakultas/{periode}/{kode_neraca}', 'Ypt\DashboardController@bebanFakultas');
-    $router->get('detailBeban/{periode}/{kode_neraca}', 'Ypt\DashboardController@detailBeban');
+    $router->get('bebanFakultas', 'Ypt\DashboardController@bebanFakultas');
+    $router->get('detailBeban', 'Ypt\DashboardController@detailBeban');
 
     
-    $router->get('bebanJurusan/{periode}/{kode_neraca}/{kode_bidang}', 'Ypt\DashboardController@bebanJurusan');
-    $router->get('detailBebanJurusan/{periode}/{kode_neraca}/{kode_bidang}/{tahun}', 'Ypt\DashboardController@detailBebanJurusan');
+    $router->get('bebanJurusan', 'Ypt\DashboardController@bebanJurusan');
+    $router->get('detailBebanJurusan', 'Ypt\DashboardController@detailBebanJurusan');
 
     $router->get('user_device','UserDeviceController@index');
     $router->get('user_device/{nik}','UserDeviceController@show');
