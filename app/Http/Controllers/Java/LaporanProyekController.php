@@ -108,8 +108,8 @@ class LaporanProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('no_proyek');
-            $db_col_name = array('a.no_proyek');
+            $col_array = array('no_proyek', 'kode_cust');
+            $db_col_name = array('a.no_proyek', 'a.kode_cust');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -142,14 +142,16 @@ class LaporanProyekController extends Controller {
             $res1 = DB::connection($this->sql)->select($proyek);
             $res1 = json_decode(json_encode($res1),true);
 
-            $rab = "select b.jumlah, b.satuan, b.harga, b.keterangan
-            from  java_rab_m a
-            inner join java_rab_d b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
-            $where
-            order by b.no";
+            if(count($res1) > 0) {
+                $rab = "select b.jumlah, b.satuan, b.harga, b.keterangan
+                from  java_rab_m a
+                inner join java_rab_d b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
+                where a.no_proyek = '".$request->input('no_proyek')[1]."'
+                order by b.no";
 
-            $res2 = DB::connection($this->sql)->select($rab);
-            $res2 = json_decode(json_encode($res2),true);
+                $res2 = DB::connection($this->sql)->select($rab);
+                $res2 = json_decode(json_encode($res2),true);
+            }
 
             $beban = "select a.no_bukti, a.no_dokumen, convert(varchar,tanggal,103) as tgl, a.keterangan, 
             b.nama as nama_vendor, a.nilai,a.status
