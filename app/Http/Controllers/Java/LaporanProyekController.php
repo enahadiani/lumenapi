@@ -75,7 +75,7 @@ class LaporanProyekController extends Controller {
                 $success['data'] = [];
                 $success['data_rab'] = [];
                 $success['data_beban'] = [];
-                $success['sql'] = $sql;
+                // $success['sql'] = $sql;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
