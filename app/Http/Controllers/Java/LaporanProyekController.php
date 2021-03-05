@@ -55,11 +55,16 @@ class LaporanProyekController extends Controller {
             $res3 = DB::connection($this->sql)->select($beban);
             $res3 = json_decode(json_encode($res3),true);
 
+
+            $result = array(
+                'data_proyek' => $res1,
+                'data_rab' => $res2,
+                'data_beban' => $res3
+            );
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res1;
-                $success['data_rab'] = $res2;
-                $success['data_beban'] = $res3;
+                $success['data'] = $result;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
