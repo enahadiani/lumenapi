@@ -24,7 +24,7 @@ class LaporanProyekController extends Controller {
             $filter = "where a.kode_lokasi='$kode_lokasi'";
             for($i = 0; $i<count($col_array); $i++){
                 if($request->input($col_array[$i]) !=""){
-                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])."' ";
+                    $filter .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i][1])."' ";
                 }
             }
 
