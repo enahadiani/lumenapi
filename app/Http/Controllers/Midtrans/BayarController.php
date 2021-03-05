@@ -28,104 +28,161 @@ class BayarController extends Controller
         return $id;
     }
 
+    // public function getSnapTokenv2(Request $request){
+    //     $this->validate($request, [
+    //         'no_bill' => 'required|array',
+    //         'nilai' => 'required',
+    //         'periode_bill' => 'required|array'
+    //     ]);
+    //     try { 
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //             $kode_pp= $data->kode_pp;
+    //         }
+
+    //         $no_bill = $request->input('no_bill');  
+    //         $this_in = "";
+    //         $filter_in = "";
+    //         if(count($no_bill) > 0){
+    //             for($x=0;$x<count($no_bill);$x++){
+    //                 if($x == 0){
+    //                     $this_in .= "'".$no_bill[$x]."'";
+    //                 }else{
+                        
+    //                     $this_in .= ","."'".$no_bill[$x]."'";
+    //                 }
+    //             }
+    //             $filter_in = " and a.no_bill in ($this_in) ";
+    //         }     
+
+    //         $get = DB::connection($this->db)->select("select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa,a.no_bill
+    //         from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
+    //                 from sis_bill_d x 
+    //                 inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+    //                 where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+    //                 group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
+            
+    //         left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
+    //                 inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+    //                 where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+    //                 group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
+    //         where a.tagihan - isnull(c.bayar,0) > 0 $filter_in
+    //         order by a.no_bill,a.kode_param");
+    //         $get = json_decode(json_encode($get),true);
+    //         $item_details = array();
+    //         $total_bayar = intval($request->nilai);
+    //         $total_tmp =0;
+    //         if(count($get) > 0){
+    //             $sisa_bayar = $total_bayar;
+    //             for($i=0;$i < count($get); $i++){
+    //                 $row = $get[$i];
+    //                 if($sisa_bayar > 0){
+    //                     if($sisa_bayar >= intval($row['sisa'])){
+                            
+    //                         $item_details[] = array(
+    //                             'id'       => $row['no_bill'],
+    //                             'price'    => intval($row['sisa']),
+    //                             'quantity' => 1,
+    //                             'name'     => $row['kode_param']
+    //                         );
+    //                     }else{
+    //                         $item_details[] = array(
+    //                             'id'       => $row['no_bill'],
+    //                             'price'    => $sisa_bayar,
+    //                             'quantity' => 1,
+    //                             'name'     => $row['kode_param']
+    //                         );
+    //                     }
+    //                     $sisa_bayar = $sisa_bayar - intval($row['sisa']);
+    //                 }else if($sisa_bayar == 0){
+    //                     break;
+    //                 }
+    //             }
+    //         }
+            
+    //         $client = new Client();
+
+    //         $orderId = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
+    //         date_default_timezone_set('Asia/Jakarta');
+    //         $start_time = date( 'Y-m-d H:i:s O', time() );
+    //         $payload = [
+    //             'transaction_details' => [
+    //                 'order_id'      => $orderId,
+    //                 'gross_amount'  => $request->nilai,
+    //             ],
+    //             'customer_details' => [
+    //                 'first_name'    => $nik,
+    //                 'email' => "tes@gmail.com"
+    //             ],
+    //             'item_details' => $item_details,
+    //             'enabled_payments' => ['echannel'],
+    //             'expiry' => [
+    //                 'start_time' => $start_time,
+    //                 'unit' => 'minutes',
+    //                 'duration' => 180
+    //             ],
+    //             'callbacks'=> [
+    //                 'finish'=> 'https://app.simkug.com/ts-auth/finish-trans'
+    //             ]
+    //         ];
+
+    //         $url = ( !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/v1/transactions' : 'https://app.midtrans.com/snap/v1/transactions');
+
+    //         $response = $client->request('POST',  $url,[
+    //             'headers' => [
+    //                 'Authorization' => 'Basic '.base64_encode(config('services.midtrans.serverKey')),
+    //                 'Accept'     => 'application/json',
+    //                 'Content-Type' => 'application/json'
+    //             ],
+    //             'body' => json_encode($payload)
+    //         ]);
+
+    //         if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) { // 200 OK
+    //             $response_data = $response->getBody()->getContents();
+    //             $result = json_decode($response_data,true);
+    //             $snap_token = $result['token'];
+    //             DB::connection($this->db)->beginTransaction();
+                
+    //             try {
+                    
+    //                 $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$request->no_bill[0]."','$request->nilai','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$request->periode_bill[0]."','".$item_details[0]['name']."')");
+
+    //                 for($i=0;$i<count($item_details);$i++){
+
+    //                     $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$orderId','".$request->no_bill[$i]."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','".$request->periode_bill[0]."')");
+    //                 }
+                    
+    //                 DB::connection($this->db)->commit();
+    //                 $result['status'] = true;
+    //                 $result['message'] = "Data Pembayaran berhasil disimpan";    
+    //             } catch (\Throwable $e) {
+    //                 DB::connection($this->db)->rollback();
+    //                 $result['status'] = false;
+    //                 $result['message'] = "Data Pembayaran gagal disimpan ".$e;
+    //             }				
+    //         }
+    //         return response()->json($result, 200);
+    //     } catch (BadResponseException $ex) {
+    //         $response = $ex->getResponse();
+    //         $res = json_decode($response->getBody(),true);
+    //         $result['status'] = false;
+    //         $result['message'] = $res;
+    //         return response()->json($result, 200);
+    //     } 
+    // }
+
     public function getSnapToken(Request $request){
-        $this->validate($request, [
-            'no_bill' => 'required|array',
-            'nilai' => 'required',
-            'periode_bill' => 'required|array'
-        ]);
         try { 
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp= $data->kode_pp;
             }
+            Log::info('Request dari android :');
+            Log::info($request->all());
 
-            $no_bill = $request->input('no_bill');  
-            $this_in = "";
-            $filter_in = "";
-            if(count($no_bill) > 0){
-                for($x=0;$x<count($no_bill);$x++){
-                    if($x == 0){
-                        $this_in .= "'".$no_bill[$x]."'";
-                    }else{
-                        
-                        $this_in .= ","."'".$no_bill[$x]."'";
-                    }
-                }
-                $filter_in = " and a.no_bill in ($this_in) ";
-            }     
-
-            $get = DB::connection($this->db)->select("select a.kode_param,isnull(a.tagihan,0)-isnull(c.bayar,0) as sisa,a.no_bill
-            from (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as tagihan 
-                    from sis_bill_d x 
-                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param )a 
-            
-            left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar from sis_rekon_d x 
-                    inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                    where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
-                    group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
-            where a.tagihan - isnull(c.bayar,0) > 0 $filter_in
-            order by a.no_bill,a.kode_param");
-            $get = json_decode(json_encode($get),true);
-            $item_details = array();
-            $total_bayar = intval($request->nilai);
-            $total_tmp =0;
-            if(count($get) > 0){
-                $sisa_bayar = $total_bayar;
-                for($i=0;$i < count($get); $i++){
-                    $row = $get[$i];
-                    if($sisa_bayar > 0){
-                        if($sisa_bayar >= intval($row['sisa'])){
-                            
-                            $item_details[] = array(
-                                'id'       => $row['no_bill'],
-                                'price'    => intval($row['sisa']),
-                                'quantity' => 1,
-                                'name'     => $row['kode_param']
-                            );
-                        }else{
-                            $item_details[] = array(
-                                'id'       => $row['no_bill'],
-                                'price'    => $sisa_bayar,
-                                'quantity' => 1,
-                                'name'     => $row['kode_param']
-                            );
-                        }
-                        $sisa_bayar = $sisa_bayar - intval($row['sisa']);
-                    }else if($sisa_bayar == 0){
-                        break;
-                    }
-                }
-            }
-            
             $client = new Client();
-
-            $orderId = $this->generateKode("sis_mid_bayar", "no_bukti", $kode_pp."-TES.", "0001");
-            date_default_timezone_set('Asia/Jakarta');
-            $start_time = date( 'Y-m-d H:i:s O', time() );
-            $payload = [
-                'transaction_details' => [
-                    'order_id'      => $orderId,
-                    'gross_amount'  => $request->nilai,
-                ],
-                'customer_details' => [
-                    'first_name'    => $nik,
-                    'email' => "tes@gmail.com"
-                ],
-                'item_details' => $item_details,
-                'enabled_payments' => ['echannel'],
-                'expiry' => [
-                    'start_time' => $start_time,
-                    'unit' => 'minutes',
-                    'duration' => 180
-                ],
-                'callbacks'=> [
-                    'finish'=> 'https://app.simkug.com/ts-auth/finish-trans'
-                ]
-            ];
 
             $url = ( !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/v1/transactions' : 'https://app.midtrans.com/snap/v1/transactions');
 
@@ -135,32 +192,35 @@ class BayarController extends Controller
                     'Accept'     => 'application/json',
                     'Content-Type' => 'application/json'
                 ],
-                'body' => json_encode($payload)
+                'body' => json_encode($request->all())
             ]);
 
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) { // 200 OK
                 $response_data = $response->getBody()->getContents();
                 $result = json_decode($response_data,true);
-                $snap_token = $result['token'];
-                DB::connection($this->db)->beginTransaction();
+                // $snap_token = $result['token'];
+                // DB::connection($this->db)->beginTransaction();
                 
-                try {
-                    
-                    $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$request->no_bill[0]."','$request->nilai','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$request->periode_bill[0]."','".$item_details[0]['name']."')");
+                // try {
+                //     $item_details = $request->item_details;
+                //     $trans_det = $request->transaction_details[0];
+                //     $orderId = $trans_det['order_id'];
+                //     $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$item_details[0]['id']."','$request->nilai','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$item_details[0]['periode_bill']."','".$item_details[0]['name']."')");
 
-                    for($i=0;$i<count($item_details);$i++){
+                //     for($i=0;$i<count($item_details);$i++){
 
-                        $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$orderId','".$request->no_bill[$i]."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','".$request->periode_bill[0]."')");
-                    }
+                //         $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$orderId','".$item_details[$i]['id']."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','".$item_details[$i]['periode_bill']."')");
+                //     }
                     
-                    DB::connection($this->db)->commit();
-                    $result['status'] = true;
-                    $result['message'] = "Data Pembayaran berhasil disimpan";    
-                } catch (\Throwable $e) {
-                    DB::connection($this->db)->rollback();
-                    $result['status'] = false;
-                    $result['message'] = "Data Pembayaran gagal disimpan ".$e;
-                }				
+                //     DB::connection($this->db)->commit();
+                //     $result['status'] = true;
+                //     $result['message'] = "Data Pembayaran berhasil disimpan";    
+                // } catch (\Throwable $e) {
+                //     DB::connection($this->db)->rollback();
+                //     $result['status'] = false;
+                //     $result['message'] = "Data Pembayaran gagal disimpan ".$e;
+                // }	
+                			
             }
             return response()->json($result, 200);
         } catch (BadResponseException $ex) {

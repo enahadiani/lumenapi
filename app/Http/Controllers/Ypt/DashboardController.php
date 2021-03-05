@@ -2807,40 +2807,61 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "where a.kode_lokasi='$kode_lokasi'";
-            $this_in = "";
-            for($i = 0; $i<count($col_array); $i++){
-                if(ISSET($request->input($col_array[$i])[0])){
-                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
-                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
-                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
-                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
-                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
-                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
-                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
-                        $tmp = explode(",",$request->input($col_array[$i])[1]);
-                        for($x=0;$x<count($tmp);$x++){
-                            if($x == 0){
-                                $this_in .= "'".$tmp[$x]."'";
-                            }else{
+            // $col_array = array('periode');
+            // $db_col_name = array('b.periode');
+            // $where = "where a.kode_lokasi='$kode_lokasi'";
+            // $this_in = "";
+            // for($i = 0; $i<count($col_array); $i++){
+            //     if(ISSET($request->input($col_array[$i])[0])){
+            //         if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+            //             $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+            //         }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+            //             $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+            //         }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+            //             $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+            //         }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+            //             $tmp = explode(",",$request->input($col_array[$i])[1]);
+            //             for($x=0;$x<count($tmp);$x++){
+            //                 if($x == 0){
+            //                     $this_in .= "'".$tmp[$x]."'";
+            //                 }else{
             
-                                $this_in .= ","."'".$tmp[$x]."'";
-                            }
-                        }
-                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
-                    }
-                }
-            }
+            //                     $this_in .= ","."'".$tmp[$x]."'";
+            //                 }
+            //             }
+            //             $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+            //         }
+            //     }
+            // }
             
+            // $rs = DB::connection($this->db)->select("
+            // select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
+            // from dash_grafik_m a
+            // left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            // $where and a.kode_klp='K04'
+            // group by a.kode_grafik,a.nama
+            // ");
+            $periode = $request->periode[1];
+            $tahun = substr($periode,0,4);
+            $bulan = substr($periode,4,2);
+            $tahunLalu = intval($tahun)-1;
+            $periodeLalu = $tahunLalu.$bulan;
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
+            select a.kode_grafik,a.nama,
+                case when a.dc='D' then b.n1 else b.n1*-1 end as real,
+                case when a.dc='D' then b.n2 else b.n2*-1 end as rka,
+                case when a.dc='D' then c.n1 else c.n1*-1 end as real_lalu, 
+                case isnull(c.n1,0) when 0 then 0 else ((b.n1 - isnull(c.n1,0))/isnull(c.n1,0)*100) end as yoy
             from dash_grafik_m a
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            $where and a.kode_klp='K04'
-            group by a.kode_grafik,a.nama
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi and b.periode='$periode'
+            left join dash_grafik_lap c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi and c.periode='$periodeLalu'
+            where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K04'
             ");
+            $total = 0;
+            foreach($rs as $row){
+                $total+= floatval($row->real);
+            }
+            $success['total'] = $total;
             $rs = json_decode(json_encode($rs),true);
             
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
@@ -2904,6 +2925,13 @@ class DashboardController extends Controller
             $where and a.kode_klp='K12'
             group by a.kode_grafik,a.nama
             ");
+            $total =0; $total_rka=0;
+            foreach($rs as $row){
+                $total+=floatval($row->real);
+                $total_rka+=floatval($row->rka);
+            }
+            $success['total_real'] = $total;
+            $success['total_rka'] = $total_rka;
             $rs = json_decode(json_encode($rs),true);
             
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
@@ -2935,10 +2963,12 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
-            if($request->mode == "dark"){
-                $color = $this->dark_color;
-            }
+            // $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            // if($request->mode == "dark"){
+            //     $color = $this->dark_color;
+            // }
+            // Warna per fakultas
+            $color = array('#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66');
             
             $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
             from aka_fakultas a
