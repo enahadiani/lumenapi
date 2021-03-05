@@ -13,7 +13,7 @@ class FilterController extends Controller {
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
-    public function getNoBukti() {
+    public function getNoBukti(Request $request) {
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -28,7 +28,15 @@ class FilterController extends Controller {
                 }else{
                     $filter = "";
                 }
-            }else{
+            }elseif(isset($request->kode_cust)) {
+                if($request->kode_cust != "" ){
+
+                    $filter = " and kode_cust='$request->kode_cust' ";
+                }else{
+                    $filter = "";
+                }
+            } 
+            else{
                 $filter = "";
             }
 
