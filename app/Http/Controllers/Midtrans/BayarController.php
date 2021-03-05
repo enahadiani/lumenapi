@@ -179,6 +179,8 @@ class BayarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $kode_pp= $data->kode_pp;
             }
+            Log::info('Request dari android :');
+            Log::info($request->all());
 
             $client = new Client();
 
