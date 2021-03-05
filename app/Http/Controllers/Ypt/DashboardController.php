@@ -2963,10 +2963,12 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
-            if($request->mode == "dark"){
-                $color = $this->dark_color;
-            }
+            // $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            // if($request->mode == "dark"){
+            //     $color = $this->dark_color;
+            // }
+            // Warna per fakultas
+            $color = array('#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66');
             
             $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
             from aka_fakultas a

@@ -202,12 +202,14 @@ class BayarController extends Controller
                 // DB::connection($this->db)->beginTransaction();
                 
                 // try {
-                    
-                //     $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$request->no_bill[0]."','$request->nilai','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$request->periode_bill[0]."','".$item_details[0]['name']."')");
+                //     $item_details = $request->item_details;
+                //     $trans_det = $request->transaction_details[0];
+                //     $orderId = $trans_det['order_id'];
+                //     $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$item_details[0]['id']."','$request->nilai','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$item_details[0]['periode_bill']."','".$item_details[0]['name']."')");
 
                 //     for($i=0;$i<count($item_details);$i++){
 
-                //         $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$orderId','".$request->no_bill[$i]."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','".$request->periode_bill[0]."')");
+                //         $insd[$i] = DB::connection($this->db)->insert("insert into sis_mid_bayar_d (no_bukti,no_bill,nilai,kode_param,kode_pp,kode_lokasi,periode_bill) values ('$orderId','".$item_details[$i]['id']."','".$item_details[$i]['price']."','".$item_details[$i]['name']."','$kode_pp','$kode_lokasi','".$item_details[$i]['periode_bill']."')");
                 //     }
                     
                 //     DB::connection($this->db)->commit();
