@@ -148,7 +148,7 @@ class CustomerController extends Controller
                 
                 DB::connection($this->sql)->insert($insertCust);
 
-                if(count($request->input('no_rek')) > 0) {
+                if(!empty($request->input('no_rek'))) {
                     $no_rek = $request->input('no_rek');
                     $nama_rek = $request->input('nama_rek');
                     $bank = $request->input('bank');
@@ -248,7 +248,7 @@ class CustomerController extends Controller
                 
             DB::connection($this->sql)->insert($insertCust);
                 
-            if(count($request->input('no_rek')) > 0) {
+            if(!empty($request->input('no_rek'))) {
                 $no_rek = $request->input('no_rek');
                 $nama_rek = $request->input('nama_rek');
                 $bank = $request->input('bank');
