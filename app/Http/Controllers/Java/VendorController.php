@@ -121,19 +121,15 @@ class VendorController extends Controller
             'nama' => 'required',
             'no_telp' => 'required',
             'email' => 'required',
-            'alamat' => 'required',
-            'kode_pos' => 'required',
-            'kecamatan' => 'required',
-            'kota' => 'required',
-            'negara' => 'required',
-            'pic' => 'required',
-            'no_telp_pic' => 'required',
-            'email_pic' => 'required',
-            'akun_hutang' => 'required',
-            'no_rek' => 'required|array',
-            'nama_rek' => 'required|array',
-            'bank' => 'required|array',
-            'cabang' => 'required|array'
+            // 'alamat' => 'required',
+            // 'kode_pos' => 'required',
+            // 'kecamatan' => 'required',
+            // 'kota' => 'required',
+            // 'negara' => 'required',
+            // 'pic' => 'required',
+            // 'no_telp_pic' => 'required',
+            // 'email_pic' => 'required',
+            'akun_hutang' => 'required'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -152,6 +148,7 @@ class VendorController extends Controller
                 
                 DB::connection($this->sql)->insert($insertVend);
                 
+                if(count($request->input('no_rek')) > 0) { 
                 $no_rek = $request->input('no_rek');
                 $nama_rek = $request->input('nama_rek');
                 $bank = $request->input('bank');
@@ -162,6 +159,7 @@ class VendorController extends Controller
                     values ('$request->kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
                     DB::connection($this->sql)->insert($insertDetail);
                 }
+            }
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -209,19 +207,19 @@ class VendorController extends Controller
             'nama' => 'required',
             'no_telp' => 'required',
             'email' => 'required',
-            'alamat' => 'required',
-            'kode_pos' => 'required',
-            'kecamatan' => 'required',
-            'kota' => 'required',
-            'negara' => 'required',
-            'pic' => 'required',
-            'no_telp_pic' => 'required',
-            'email_pic' => 'required',
-            'akun_hutang' => 'required',
-            'no_rek' => 'required|array',
-            'nama_rek' => 'required|array',
-            'bank' => 'required|array',
-            'cabang' => 'required|array'
+            // 'alamat' => 'required',
+            // 'kode_pos' => 'required',
+            // 'kecamatan' => 'required',
+            // 'kota' => 'required',
+            // 'negara' => 'required',
+            // 'pic' => 'required',
+            // 'no_telp_pic' => 'required',
+            // 'email_pic' => 'required',
+            // 'akun_hutang' => 'required',
+            // 'no_rek' => 'required|array',
+            // 'nama_rek' => 'required|array',
+            // 'bank' => 'required|array',
+            // 'cabang' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -248,17 +246,19 @@ class VendorController extends Controller
             '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
             '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi')";
                 
-             DB::connection($this->sql)->insert($insertVend);
-                
-            $no_rek = $request->input('no_rek');
-            $nama_rek = $request->input('nama_rek');
-            $bank = $request->input('bank');
-            $cabang = $request->input('cabang');
+            DB::connection($this->sql)->insert($insertVend);
 
-            for($i=0;$i<count($request->no_rek);$i++) {
-                $insertDetail = "insert into java_vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                values ('$request->kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
-                DB::connection($this->sql)->insert($insertDetail);
+            if(count($request->input('no_rek')) > 0) { 
+                $no_rek = $request->input('no_rek');
+                $nama_rek = $request->input('nama_rek');
+                $bank = $request->input('bank');
+                $cabang = $request->input('cabang');
+
+                for($i=0;$i<count($request->no_rek);$i++) {
+                    $insertDetail = "insert into java_vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
+                    values ('$request->kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
+                    DB::connection($this->sql)->insert($insertDetail);
+                }
             }
                 
             DB::connection($this->sql)->commit();
