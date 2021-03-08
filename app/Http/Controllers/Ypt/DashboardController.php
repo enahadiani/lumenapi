@@ -617,19 +617,42 @@ class DashboardController extends Controller
                 }
             }
 
-            $sql="select a.kode_neraca,a.nama,b.nu,
+            // $sql="select a.kode_neraca,a.nama,b.nu,
+            // sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
+            // sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            // sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            // sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
+            // from exs_neraca a
+            // inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            // $where and a.kode_fs='FS4' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            // group by a.kode_neraca,a.nama,b.nu
+            // order by b.nu
+            // ";
+            $sql = "select a.kode_neraca,a.nama,b.nu,
             sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
             sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
             sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
-            inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_fs='FS4' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_fs='FS4' and b.kode_grafik='GR17' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
             group by a.kode_neraca,a.nama,b.nu
-            order by b.nu
-            ";
+            order by b.nu ";
             $row = DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+
+            $sql2 = "select a.kode_neraca,a.nama,b.nu,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
+            from exs_neraca a
+            inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_fs='FS4' and b.kode_grafik='GR18' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            group by a.kode_neraca,a.nama,b.nu
+            order by b.nu ";
+            $row2 = DB::connection($this->db)->select($sql2);
+            $row2 = json_decode(json_encode($row2),true);
             
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
                 $daftar = array();
@@ -639,21 +662,34 @@ class DashboardController extends Controller
                     $category[] = $row[$i]['nama'];
                 
                 }
-                $success['status'] = true;
-                $success['data'] = $daftar;
-                $success['category'] = $category;
-                $success['message'] = "Success!";
-                
-                return response()->json(['success'=>$success], $this->successStatus);     
+                $success['data_tf'] = $daftar;
+                $success['categori_tf'] = $category;
             }
             else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['categori'] = [];
-                $success['status'] = true;
+                $success['data_tf'] = [];
+                $success['categori_tf'] = [];
                 
-                return response()->json(['success'=>$success], $this->successStatus);
             }
+
+            if(count($row2) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar2 = array();
+                $category2 = array();
+                for($i=0;$i<count($row2);$i++){
+                    $daftar2[] = array("y"=>floatval($row2[$i]['capai']),"name"=>$row2[$i]['nama'],"key"=>$row2[$i]['kode_neraca']); 
+                    $category2[] = $row2[$i]['nama'];
+                
+                }
+                $success['data_ntf'] = $daftar2;
+                $success['categori_ntf'] = $category2;
+            }
+            else{
+                $success['data_ntf'] = [];
+                $success['categori_ntf'] = [];
+                
+            }
+            $success['message'] = "Success!";
+            $success['status'] = true;
+            return response()->json(['success'=>$success], $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
@@ -698,20 +734,31 @@ class DashboardController extends Controller
                 }
             }
 
-            $sql="select a.kode_neraca,a.nama,b.nu,
+            $sql = "select a.kode_neraca,a.nama,b.nu,
             sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
             sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
             sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
-            inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_fs='FS4' and b.kode_grafik='D04' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_fs='FS4' and b.kode_grafik='GR17' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
             group by a.kode_neraca,a.nama,b.nu
-            order by b.nu
-            ";
-
+            order by b.nu ";
             $row = DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
+
+            $sql2 = "select a.kode_neraca,a.nama,b.nu,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
+            from exs_neraca a
+            inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_fs='FS4' and b.kode_grafik='GR18' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            group by a.kode_neraca,a.nama,b.nu
+            order by b.nu ";
+            $row2 = DB::connection($this->db)->select($sql2);
+            $row2 = json_decode(json_encode($row2),true);
             
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
                 $daftar = array();
@@ -721,21 +768,34 @@ class DashboardController extends Controller
                     $category[] = $row[$i]['nama'];
                 
                 }
-                $success['status'] = true;
-                $success['data'] = $daftar;
-                $success['category'] = $category;
-                $success['message'] = "Success!";
-                
-                return response()->json(['success'=>$success], $this->successStatus);     
+                $success['data_tf'] = $daftar;
+                $success['categori_tf'] = $category;
             }
             else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['categori'] = [];
-                $success['status'] = true;
+                $success['data_tf'] = [];
+                $success['categori_tf'] = [];
                 
-                return response()->json(['success'=>$success], $this->successStatus);
             }
+
+            if(count($row2) > 0){ //mengecek apakah data kosong atau tidak
+                $daftar2 = array();
+                $category2 = array();
+                for($i=0;$i<count($row2);$i++){
+                    $daftar2[] = array("y"=>floatval($row2[$i]['n4']),"name"=>$row2[$i]['nama'],"key"=>$row2[$i]['kode_neraca']); 
+                    $category2[] = $row2[$i]['nama'];
+                
+                }
+                $success['data_ntf'] = $daftar2;
+                $success['categori_ntf'] = $category2;
+            }
+            else{
+                $success['data_ntf'] = [];
+                $success['categori_ntf'] = [];
+                
+            }
+            $success['message'] = "Success!";
+            $success['status'] = true;
+            return response()->json(['success'=>$success], $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
