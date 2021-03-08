@@ -55,7 +55,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('bebanFakultas', 'Ypt\DashboardController@bebanFakultas');
     $router->get('detailBeban', 'Ypt\DashboardController@detailBeban');
-
+    
+    $router->get('bebanFakultasNon', 'Ypt\DashboardController@bebanFakultasNon');
+    $router->get('detailBebanNon', 'Ypt\DashboardController@detailBebanNon');
     
     $router->get('bebanJurusan', 'Ypt\DashboardController@bebanJurusan');
     $router->get('detailBebanJurusan', 'Ypt\DashboardController@detailBebanJurusan');
