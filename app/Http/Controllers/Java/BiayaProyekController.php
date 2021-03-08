@@ -143,8 +143,11 @@ class BiayaProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select a.no_proyek, a.no_rab, nilai_anggaran from java_rab_m a
-            inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi 
+            $sql= "select a.no_proyek, a.no_rab, (a.nilai_anggaran - c.anggaran_dipake) as sisa_anggaran from java_rab_m a
+            inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
+            inner join (select SUM(ab.nilai) as anggaran_dipake, ab.kode_lokasi, ab.no_rab from java_beban as ab
+            group by ab.kode_lokasi, ab.no_rab) c
+            on a.no_rab=c.no_rab and a.kode_lokasi = c.kode_lokasi 
             where a.kode_lokasi='".$kode_lokasi."' and b.kode_cust = '$request->kode_cust' $filter";
 
             $res = DB::connection($this->sql)->select($sql);
