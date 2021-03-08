@@ -104,12 +104,7 @@ class RabProyekController extends Controller {
 
         $this->validate($request, [
             'no_proyek' => 'required',
-            'nilai_anggaran' => 'required',
-            'nomor' => 'required|array',
-            'keterangan' => 'required|array',
-            'jumlah' => 'required|array',
-            'satuan' => 'required|array',
-            'harga' => 'required|array'
+            'nilai_anggaran' => 'required'
         ]);
         
         DB::connection($this->sql)->beginTransaction();
