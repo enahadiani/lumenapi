@@ -46,6 +46,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('pdptFakultas', 'Ypt\DashboardController@pdptFakultas');
     $router->get('detailPdpt', 'Ypt\DashboardController@detailPdpt');
+    $router->get('pdptFakultasNon', 'Ypt\DashboardController@pdptFakultasNon');
+    $router->get('detailPdptNon', 'Ypt\DashboardController@detailPdptNon');
 
     
     $router->get('pdptJurusan', 'Ypt\DashboardController@pdptJurusan');
