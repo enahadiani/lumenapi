@@ -203,7 +203,7 @@ class BiayaProyekController extends Controller {
                 // inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
                 // where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select no_bukti, no_proyek, keterangan, nilai, status, no_rab
+                $sql = "select no_bukti, no_proyek, keterangan, nilai, status, no_rab,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_beban
                 where kode_lokasi= '$kode_lokasi'";
             }
