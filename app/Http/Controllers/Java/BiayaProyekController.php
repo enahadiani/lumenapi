@@ -183,15 +183,27 @@ class BiayaProyekController extends Controller {
                 }else{
                     $filter = " and a.no_bukti='$request->no_bukti' ";
                 }
-                $sql= "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust, 
+                $sql = "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust,
                 convert(varchar(10), a.tanggal, 120) as tanggal, a.nilai, a.status,
-                b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, d.nilai_anggaran, a.no_proyek
+                b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, a.no_proyek, d.anggaran_dipake, (e.nilai_anggaran - d.anggaran_dipake) as sisa_anggaran
                 from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
-                inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
-                inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
-                where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi
+                inner join (
+                select SUM(ab.nilai) as anggaran_dipake, ab.kode_lokasi, ab.no_rab from java_beban as ab where ab.no_rab = '".$request->no_rab."'
+                group by ab.kode_lokasi, ab.no_rab
+                ) d 
+                on d.no_rab=a.no_rab and a.kode_lokasi=d.kode_lokasi
+                inner join java_rab_m e on a.no_rab = e.no_rab and a.kode_lokasi=e.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' $filter";
+                // $sql= "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust,
+                // convert(varchar(10), a.tanggal, 120) as tanggal, a.nilai, a.status,
+                // b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, d.nilai_anggaran, a.no_proyek
+                // from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
+                // inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
+                // inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
+                // where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
-                $sql = "select no_bukti, no_proyek, keterangan, nilai,
+                $sql = "select no_bukti, no_proyek, keterangan, nilai, status, no_rab
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_beban
                 where kode_lokasi= '$kode_lokasi'";
             }
