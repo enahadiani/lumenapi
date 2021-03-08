@@ -982,7 +982,7 @@ class DashboardController extends Controller
             sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
             inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_fs='FS4' and b.kode_grafik='GR08' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS4' and b.kode_grafik='GR23' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
             group by a.kode_neraca,a.nama,b.nu
             order by b.nu ";
             $row = DB::connection($this->db)->select($sql);
@@ -995,7 +995,7 @@ class DashboardController extends Controller
             sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
             from exs_neraca a
             inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_fs='FS4' and b.kode_grafik='GR09' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS4' and b.kode_grafik='GR24' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
             group by a.kode_neraca,a.nama,b.nu
             order by b.nu ";
             $row2 = DB::connection($this->db)->select($sql2);
