@@ -215,7 +215,7 @@ class VendorController extends Controller
             // 'pic' => 'required',
             // 'no_telp_pic' => 'required',
             // 'email_pic' => 'required',
-            // 'akun_hutang' => 'required',
+            'akun_hutang' => 'required',
             // 'no_rek' => 'required|array',
             // 'nama_rek' => 'required|array',
             // 'bank' => 'required|array',

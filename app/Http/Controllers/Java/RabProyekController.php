@@ -104,12 +104,7 @@ class RabProyekController extends Controller {
 
         $this->validate($request, [
             'no_proyek' => 'required',
-            'nilai_anggaran' => 'required',
-            'nomor' => 'required|array',
-            'keterangan' => 'required|array',
-            'jumlah' => 'required|array',
-            'satuan' => 'required|array',
-            'harga' => 'required|array'
+            'nilai_anggaran' => 'required'
         ]);
         
         DB::connection($this->sql)->beginTransaction();
@@ -128,18 +123,20 @@ class RabProyekController extends Controller {
             values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
             DB::connection($this->sql)->insert($insertM);
 
-            $jumlah = $request->input('jumlah');
-            $satuan = $request->input('satuan');
-            $harga  = $request->input('harga');
-            $nomor     = $request->input('nomor');
-            $keterangan = $request->input('keterangan');
+            if(!empty($request->input('nomor'))) {
+                $jumlah = $request->input('jumlah');
+                $satuan = $request->input('satuan');
+                $harga  = $request->input('harga');
+                $nomor     = $request->input('nomor');
+                $keterangan = $request->input('keterangan');
 
-            for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
-                values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                '".$nomor[$i]."', '".$keterangan[$i]."')";
+                for($i=0;$i<count($request->nomor);$i++) {
+                    $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
+                    values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
+                    '".$nomor[$i]."', '".$keterangan[$i]."')";
 
-                DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD);
+                }
             }
 
             DB::connection($this->sql)->commit();
@@ -159,12 +156,7 @@ class RabProyekController extends Controller {
     public function update(Request $request) {
         $this->validate($request, [
             'no_proyek' => 'required',
-            'nilai_anggaran' => 'required',
-            'nomor' => 'required|array',
-            'keterangan' => 'required|array',
-            'jumlah' => 'required|array',
-            'satuan' => 'required|array',
-            'harga' => 'required|array'
+            'nilai_anggaran' => 'required'
         ]);
             
         DB::connection($this->sql)->beginTransaction();
@@ -192,19 +184,21 @@ class RabProyekController extends Controller {
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
             values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
             DB::connection($this->sql)->insert($insertM);
-            
-            $jumlah = $request->input('jumlah');
-            $satuan = $request->input('satuan');
-            $harga  = $request->input('harga');
-            $nomor     = $request->input('nomor');
-            $keterangan = $request->input('keterangan');
 
-            for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
-                values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                '".$nomor[$i]."', '".$keterangan[$i]."')";
+            if(!empty($request->input('nomor'))) {
+                $jumlah = $request->input('jumlah');
+                $satuan = $request->input('satuan');
+                $harga  = $request->input('harga');
+                $nomor     = $request->input('nomor');
+                $keterangan = $request->input('keterangan');
 
-                DB::connection($this->sql)->insert($insertD);
+                for($i=0;$i<count($request->nomor);$i++) {
+                    $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
+                    values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
+                    '".$nomor[$i]."', '".$keterangan[$i]."')";
+
+                    DB::connection($this->sql)->insert($insertD);
+                }
             }
 
             DB::connection($this->sql)->commit();
