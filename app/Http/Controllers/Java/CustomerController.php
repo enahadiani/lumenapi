@@ -130,10 +130,6 @@ class CustomerController extends Controller
             'no_telp_pic' => 'required',
             'email_pic' => 'required',
             'akun_piutang' => 'required',
-            'no_rek' => 'required|array',
-            'nama_rek' => 'required|array',
-            'bank' => 'required|array',
-            'cabang' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -151,16 +147,18 @@ class CustomerController extends Controller
                 '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
                 
                 DB::connection($this->sql)->insert($insertCust);
-                
-                $no_rek = $request->input('no_rek');
-                $nama_rek = $request->input('nama_rek');
-                $bank = $request->input('bank');
-                $cabang = $request->input('cabang');
 
-                for($i=0;$i<count($request->no_rek);$i++) {
-                    $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                    values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
-                    DB::connection($this->sql)->insert($insertDetail);
+                if(count($request->input('no_rek')) > 0) {
+                    $no_rek = $request->input('no_rek');
+                    $nama_rek = $request->input('nama_rek');
+                    $bank = $request->input('bank');
+                    $cabang = $request->input('cabang');
+
+                    for($i=0;$i<count($request->no_rek);$i++) {
+                        $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
+                        values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
+                        DB::connection($this->sql)->insert($insertDetail);
+                    }
                 }
                 
                 DB::connection($this->sql)->commit();
@@ -248,17 +246,19 @@ class CustomerController extends Controller
             '$request->kode_pos', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
             '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi')";
                 
-             DB::connection($this->sql)->insert($insertCust);
+            DB::connection($this->sql)->insert($insertCust);
                 
-            $no_rek = $request->input('no_rek');
-            $nama_rek = $request->input('nama_rek');
-            $bank = $request->input('bank');
-            $cabang = $request->input('cabang');
+            if(count($request->input('no_rek')) > 0) {
+                $no_rek = $request->input('no_rek');
+                $nama_rek = $request->input('nama_rek');
+                $bank = $request->input('bank');
+                $cabang = $request->input('cabang');
 
-            for($i=0;$i<count($request->no_rek);$i++) {
-                $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
-                DB::connection($this->sql)->insert($insertDetail);
+                for($i=0;$i<count($request->no_rek);$i++) {
+                    $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
+                    values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
+                    DB::connection($this->sql)->insert($insertDetail);
+                }
             }
                 
             DB::connection($this->sql)->commit();
