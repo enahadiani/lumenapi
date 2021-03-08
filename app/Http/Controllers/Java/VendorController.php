@@ -148,18 +148,18 @@ class VendorController extends Controller
                 
                 DB::connection($this->sql)->insert($insertVend);
                 
-                if(count($request->input('no_rek')) > 0) { 
-                $no_rek = $request->input('no_rek');
-                $nama_rek = $request->input('nama_rek');
-                $bank = $request->input('bank');
-                $cabang = $request->input('cabang');
+                if(!empty($request->input('no_rek'))) { 
+                    $no_rek = $request->input('no_rek');
+                    $nama_rek = $request->input('nama_rek');
+                    $bank = $request->input('bank');
+                    $cabang = $request->input('cabang');
 
-                for($i=0;$i<count($request->no_rek);$i++) {
-                    $insertDetail = "insert into java_vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                    values ('$request->kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
-                    DB::connection($this->sql)->insert($insertDetail);
+                    for($i=0;$i<count($request->no_rek);$i++) {
+                        $insertDetail = "insert into java_vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
+                        values ('$request->kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
+                        DB::connection($this->sql)->insert($insertDetail);
+                    }
                 }
-            }
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -248,7 +248,7 @@ class VendorController extends Controller
                 
             DB::connection($this->sql)->insert($insertVend);
 
-            if(count($request->input('no_rek')) > 0) { 
+            if(!empty($request->input('no_rek'))) { 
                 $no_rek = $request->input('no_rek');
                 $nama_rek = $request->input('nama_rek');
                 $bank = $request->input('bank');
