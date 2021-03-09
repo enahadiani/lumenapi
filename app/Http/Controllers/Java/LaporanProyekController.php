@@ -148,7 +148,7 @@ class LaporanProyekController extends Controller {
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
                 inner join java_rab_d c on a.no_rab=c.no_rab and a.kode_lokasi=c.kode_lokasi
                 $where
-                order by b.no";
+                order by c.no";
 
                 $res2 = DB::connection($this->sql)->select($rab);
                 $res2 = json_decode(json_encode($res2),true);
