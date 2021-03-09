@@ -155,7 +155,7 @@ class LaporanProyekController extends Controller {
             }
 
             $beban = "select b.no_bukti, b.no_dokumen, convert(varchar,tanggal,103) as tgl, b.keterangan, 
-            a.nama as nama_vendor, b.nilai,a.status
+            a.nama as nama_vendor, b.nilai,b.status
             from java_vendor a
             inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
             $where";
