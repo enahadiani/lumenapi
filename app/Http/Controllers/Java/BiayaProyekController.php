@@ -198,13 +198,6 @@ class BiayaProyekController extends Controller {
                 on d.no_rab=a.no_rab and a.kode_lokasi=d.kode_lokasi
                 inner join java_rab_m e on a.no_rab = e.no_rab and a.kode_lokasi=e.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter";
-                // $sql= "select a.no_bukti, a.keterangan, a.no_dokumen, a.kode_vendor, a.kode_cust,
-                // convert(varchar(10), a.tanggal, 120) as tanggal, a.nilai, a.status,
-                // b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, d.nilai_anggaran, a.no_proyek
-                // from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
-                // inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
-                // inner join java_rab_m d on a.no_rab = d.no_rab and a.kode_lokasi=d.kode_lokasi 
-                // where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select no_bukti, no_proyek, keterangan, nilai, status as status_bayar, no_rab,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_beban
