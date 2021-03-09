@@ -1681,10 +1681,23 @@ class DashboardController extends Controller
         // $kode_lokasi= $request->input('kode_lokasi');
         try {
             
-            
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->form) && $request->form != ""){
+                if($request->form == "fDashMSBeban"){
+
+                    $filter_tahun = " where tahun = '".substr($request->periode[1],0,4)."' ";
+                    $filter_nol = " and (isnull(b.thn1,0)<>0) ";
+                }else{
+                    $filter_tahun = "";
+                    $filter_nol = " and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) ";
+                }
+            }else{
+                $filter_tahun = "";
+                $filter_nol = " and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) ";
             }
             
             $bulan = substr($request->periode[1],4,2);
@@ -1700,6 +1713,7 @@ class DashboardController extends Controller
                 ) a
                 ORDER BY tahun DESC
             ) SQ
+            $filter_tahun
             ORDER BY tahun ASC ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
@@ -1728,7 +1742,7 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) and a.kode_bidang like '5%'
+            where a.kode_lokasi='$kode_lokasi' $filter_nol and a.kode_bidang like '5%'
             order by a.kode_bidang";
             $success['sql'] = $sql;
             
@@ -1789,6 +1803,19 @@ class DashboardController extends Controller
             
             $bulan = substr($request->periode[1],4,2);
             $kode_neraca = $request->kode_neraca;
+            if(isset($request->form) && $request->form != ""){
+                if($request->form == "fDashMSBeban"){
+
+                    $filter_tahun = " where tahun = '".substr($request->periode[1],0,4)."' ";
+                    $filter_nol = " and (isnull(b.thn1,0)<>0) ";
+                }else{
+                    $filter_tahun = "";
+                    $filter_nol = " and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) ";
+                }
+            }else{
+                $filter_tahun = "";
+                $filter_nol = " and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) ";
+            }
 			$sql="SELECT
             tahun
             FROM
@@ -1800,6 +1827,7 @@ class DashboardController extends Controller
                 ) a
                 ORDER BY tahun DESC
             ) SQ
+            $filter_tahun
             ORDER BY tahun ASC ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
@@ -1829,7 +1857,7 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) and a.kode_bidang not like '5%'
+            where a.kode_lokasi='$kode_lokasi' $filter_nol and a.kode_bidang not like '5%'
             order by a.kode_bidang";
             $success['sql'] = $sql;
             
