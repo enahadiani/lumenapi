@@ -139,14 +139,14 @@ class LaporanProyekController extends Controller {
             inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
             $where";
 
-            $res1 = DB::connection($this->sql)->select($proyek);
-            $res1 = json_decode(json_encode($res1),true);
+            $rs1 = DB::connection($this->sql)->select($proyek);
+            $res1 = json_decode(json_encode($rs1),true);
 
             if(count($res1) > 0) {
                 $no_proyek = "";
                 $resdata = array();
                 $i=0;
-                foreach($rs as $row){
+                foreach($rs1 as $row){
 
                     $resdata[]=(array)$row;
                     if($i == 0){
