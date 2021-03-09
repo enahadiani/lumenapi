@@ -1916,7 +1916,7 @@ class DashboardController extends Controller
             }
             $kode_neraca = $request->kode_neraca;
             $tahun= substr($request->periode[1],0,4);
-            
+            $periode = $request->periode[1];
             $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
             $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
 
@@ -1931,7 +1931,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode like '$tahun%'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode = '$periode'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang like '5%'
@@ -1971,7 +1971,7 @@ class DashboardController extends Controller
             }
             $kode_neraca = $request->kode_neraca;
             $tahun= substr($request->periode[1],0,4);
-
+            $periode = $request->periode[1];
             
             $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
             $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
@@ -1987,7 +1987,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode like '$tahun%'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode = '$periode'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang not like '5%'
@@ -2146,6 +2146,7 @@ class DashboardController extends Controller
             }
             
             $tahun = $request->tahun;
+            $periode = $request->periode[1];
             $kode_neraca = $request->kode_neraca;
             $kode_bidang = $request->kode_bidang;
             $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
@@ -2161,10 +2162,10 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and c.kode_bidang='$kode_bidang' and a.periode like '$tahun%' 
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and c.kode_bidang='$kode_bidang' and a.periode = '$periode' 
                         group by c.kode_pp,a.kode_lokasi
                     )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang like '5%'
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.n4,0)<>0 and a.kode_bidang like '5%'
             order by a.kode_bidang
             ";
             $row = DB::connection($this->db)->select($sql);
