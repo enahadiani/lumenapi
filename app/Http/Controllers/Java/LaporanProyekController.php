@@ -161,7 +161,7 @@ class LaporanProyekController extends Controller {
                 $rab = "select b.jumlah, b.satuan, b.harga, b.keterangan
                 from  java_rab_m a
                 inner join java_rab_d b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi = '".$kode_lokasi."' and a.no_proyek in ($no_proyek)'
+                where a.kode_lokasi = '".$kode_lokasi."' and a.no_proyek in ($no_proyek)
                 order by c.no";
 
                 $res2 = DB::connection($this->sql)->select($rab);
