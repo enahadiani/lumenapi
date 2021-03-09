@@ -158,16 +158,16 @@ class LaporanProyekController extends Controller {
                     $i++;
                 }
 
-                $rab = "select b.jumlah, b.satuan, b.harga, b.keterangan
+                $rab = "select a.no_proyek, b.jumlah, b.satuan, b.harga, b.keterangan
                 from  java_rab_m a
                 inner join java_rab_d b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi = '".$kode_lokasi."' and a.no_proyek in ($no_proyek)
-                order by c.no";
+                order by b.no";
 
                 $res2 = DB::connection($this->sql)->select($rab);
                 $res2 = json_decode(json_encode($res2),true);
 
-                $beban = "select b.no_bukti, b.no_dokumen, convert(varchar,tanggal,103) as tgl, b.keterangan, 
+                $beban = "select b.no_proyek, b.no_bukti, b.no_dokumen, convert(varchar,tanggal,103) as tgl, b.keterangan, 
                 a.nama as nama_vendor, b.nilai,b.status
                 from java_vendor a
                 inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
