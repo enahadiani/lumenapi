@@ -178,13 +178,11 @@ class LaporanProyekController extends Controller {
             }
 
             $result = array(
-                'data_proyek' => $res1,
                 'data_rab' => $res2,
                 'data_beban' => $res3
             );
 
             $sql = array(
-                'data_proyek' => $proyek,
                 'data_rab' => $rab,
                 'data_beban' => $beban
             );
