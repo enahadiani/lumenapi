@@ -148,14 +148,14 @@ class LaporanProyekController extends Controller {
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
                 inner join java_rab_d c on a.no_rab=c.no_rab and a.kode_lokasi=c.kode_lokasi
                 $where
-                order by b.no";
+                order by c.no";
 
                 $res2 = DB::connection($this->sql)->select($rab);
                 $res2 = json_decode(json_encode($res2),true);
             }
 
             $beban = "select b.no_bukti, b.no_dokumen, convert(varchar,tanggal,103) as tgl, b.keterangan, 
-            a.nama as nama_vendor, b.nilai,a.status
+            a.nama as nama_vendor, b.nilai,b.status
             from java_vendor a
             inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
             $where";
@@ -178,7 +178,8 @@ class LaporanProyekController extends Controller {
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $result;
+                $success['data'] = $res1;
+                $success['data_detail'] = $result;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
