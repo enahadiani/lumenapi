@@ -146,7 +146,7 @@ class LaporanProyekController extends Controller {
                 $rab = "select c.jumlah, c.satuan, c.harga, c.keterangan
                 from  java_rab_m a
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
-                inner join java_rab_d c on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
+                inner join java_rab_d c on a.no_rab=c.no_rab and a.kode_lokasi=c.kode_lokasi
                 $where
                 order by b.no";
 
