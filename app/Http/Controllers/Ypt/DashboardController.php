@@ -1256,7 +1256,9 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) and a.kode_bidang like '5%'
+            where a.kode_lokasi='$kode_lokasi' 
+            and a.nama like 'Fakultas%'
+            --and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) 
             order by a.kode_bidang";
             $success['sql'] = $sql;
             $row =  DB::connection($this->db)->select($sql);
@@ -1439,7 +1441,8 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode like '$tahun%'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang like '5%'
+            where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
+            and a.nama like 'Fakultas%'
             order by a.kode_bidang
             ";
             $row = DB::connection($this->db)->select($sql);
@@ -1495,7 +1498,8 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode like '$tahun%'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang not like '5%'
+            where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
+            and a.kode_bidang not like '5%'
             order by a.kode_bidang
             ";
             $row = DB::connection($this->db)->select($sql);
@@ -1742,7 +1746,7 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' $filter_nol and a.kode_bidang like '5%'
+            where a.kode_lokasi='$kode_lokasi' and a.nama like 'Fakultas%'
             order by a.kode_bidang";
             $success['sql'] = $sql;
             
@@ -1857,7 +1861,7 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' $filter_nol and a.kode_bidang not like '5%'
+            where a.kode_lokasi='$kode_lokasi' and a.kode_bidang not like '5%'
             order by a.kode_bidang";
             $success['sql'] = $sql;
             
@@ -1934,7 +1938,8 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode = '$periode'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang like '5%'
+            where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
+            and a.nama like 'Fakultas%'
             order by a.kode_bidang
             ";
             $row = DB::connection($this->db)->select($sql);
@@ -1990,7 +1995,8 @@ class DashboardController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode = '$periode'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0 and a.kode_bidang not like '5%'
+            where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
+            and a.kode_bidang not like '5%'
             order by a.kode_bidang
             ";
             $row = DB::connection($this->db)->select($sql);
