@@ -138,15 +138,17 @@ class TagihanProyekController extends Controller {
             '$request->uang_muka', '$request->kode_cust')";
             DB::connection($this->sql)->insert($insertM);
 
-            $harga  = $request->input('harga');
-            $nomor  = $request->input('nomor');
-            $item = $request->input('item');
+            if(!empty($request->input('nomor'))) { 
+                $harga  = $request->input('harga');
+                $nomor  = $request->input('nomor');
+                $item = $request->input('item');
 
-            for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_tagihan_detail (no_tagihan, kode_lokasi, no, item, harga)
-                values ('$no_tagihan', '$kode_lokasi', '".$nomor[$i]."', '".$item[$i]."', '".$harga[$i]."')";
+                for($i=0;$i<count($request->nomor);$i++) {
+                    $insertD = "insert into java_tagihan_detail (no_tagihan, kode_lokasi, no, item, harga)
+                    values ('$no_tagihan', '$kode_lokasi', '".$nomor[$i]."', '".$item[$i]."', '".$harga[$i]."')";
 
-                DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD);
+                }
             }
 
             DB::connection($this->sql)->commit();
@@ -173,10 +175,7 @@ class TagihanProyekController extends Controller {
             'biaya_lain' => 'required',
             'pajak' => 'required',
             'uang_muka' => 'required',
-            'kode_cust' => 'required',
-            'nomor' => 'required|array',
-            'item' => 'required|array',
-            'harga' => 'required|array'
+            'kode_cust' => 'required'
         ]);
         
         DB::connection($this->sql)->beginTransaction();
@@ -206,15 +205,17 @@ class TagihanProyekController extends Controller {
             '$request->uang_muka', '$request->kode_cust')";
             DB::connection($this->sql)->insert($insertM);
 
-            $harga  = $request->input('harga');
-            $nomor  = $request->input('nomor');
-            $item = $request->input('item');
+            if(!empty($request->input('nomor'))) { 
+                $harga  = $request->input('harga');
+                $nomor  = $request->input('nomor');
+                $item = $request->input('item');
 
-            for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_tagihan_detail (no_tagihan, kode_lokasi, no, item, harga)
-                values ('$no_tagihan', '$kode_lokasi', '".$nomor[$i]."', '".$item[$i]."', '".$harga[$i]."')";
+                for($i=0;$i<count($request->nomor);$i++) {
+                    $insertD = "insert into java_tagihan_detail (no_tagihan, kode_lokasi, no, item, harga)
+                    values ('$no_tagihan', '$kode_lokasi', '".$nomor[$i]."', '".$item[$i]."', '".$harga[$i]."')";
 
-                DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD);
+                }
             }
 
             DB::connection($this->sql)->commit();
