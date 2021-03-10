@@ -139,39 +139,50 @@ class LaporanProyekController extends Controller {
             inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
             $where";
 
-            $res1 = DB::connection($this->sql)->select($proyek);
-            $res1 = json_decode(json_encode($res1),true);
+            $rs1 = DB::connection($this->sql)->select($proyek);
+            $res1 = json_decode(json_encode($rs1),true);
 
             if(count($res1) > 0) {
-                $rab = "select c.jumlah, c.satuan, c.harga, c.keterangan
+                $no_proyek = "";
+                $resdata = array();
+                $i=0;
+                foreach($rs1 as $row){
+
+                    $resdata[]=(array)$row;
+                    if($i == 0){
+                        $no_proyek .= "'$row->no_proyek'";
+                    }else{
+
+                        $no_proyek .= ","."'$row->no_proyek'";
+                    }
+                    $i++;
+                }
+
+                $rab = "select a.no_proyek, b.jumlah, b.satuan, b.harga, b.keterangan
                 from  java_rab_m a
-                inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
-                inner join java_rab_d c on a.no_rab=c.no_rab and a.kode_lokasi=c.kode_lokasi
-                $where
-                order by c.no";
+                inner join java_rab_d b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi = '".$kode_lokasi."' and a.no_proyek in ($no_proyek)
+                order by b.no";
 
                 $res2 = DB::connection($this->sql)->select($rab);
                 $res2 = json_decode(json_encode($res2),true);
+
+                $beban = "select b.no_proyek, b.no_bukti, b.no_dokumen, convert(varchar,tanggal,103) as tgl, b.keterangan, 
+                a.nama as nama_vendor, b.nilai,b.status
+                from java_vendor a
+                inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
+                where b.kode_lokasi = '".$kode_lokasi."' and b.no_proyek in ($no_proyek)";
+
+                $res3 = DB::connection($this->sql)->select($beban);
+                $res3 = json_decode(json_encode($res3),true);
             }
 
-            $beban = "select b.no_bukti, b.no_dokumen, convert(varchar,tanggal,103) as tgl, b.keterangan, 
-            a.nama as nama_vendor, b.nilai,b.status
-            from java_vendor a
-            inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
-            $where";
-
-            $res3 = DB::connection($this->sql)->select($beban);
-            $res3 = json_decode(json_encode($res3),true);
-
-
             $result = array(
-                'data_proyek' => $res1,
                 'data_rab' => $res2,
                 'data_beban' => $res3
             );
 
             $sql = array(
-                'data_proyek' => $proyek,
                 'data_rab' => $rab,
                 'data_beban' => $beban
             );
