@@ -114,9 +114,9 @@ class TagihanProyekController extends Controller {
             'pajak' => 'required',
             'uang_muka' => 'required',
             'kode_cust' => 'required',
-            'nomor' => 'required|array',
-            'item' => 'required|array',
-            'harga' => 'required|array'
+            // 'nomor' => 'required|array',
+            // 'item' => 'required|array',
+            // 'harga' => 'required|array'
         ]);
         
         DB::connection($this->sql)->beginTransaction();
