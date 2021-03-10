@@ -20,14 +20,14 @@ class TagihanProyekController extends Controller {
         return $id;
     }
 
-    public function getProyek() {
+    public function getProyek(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $select = "select no_proyek, keterangan from java_proyek where
-            kode_lokasi = '$kode_lokasi'";
+            $select = "select no_proyek, keterangan, nilai from java_proyek where
+            kode_lokasi = '$kode_lokasi' and kode_cust = '".$request->query('kode_cust')."'";
 
             $res = DB::connection($this->sql)->select($select);
             $res = json_decode(json_encode($res),true);
