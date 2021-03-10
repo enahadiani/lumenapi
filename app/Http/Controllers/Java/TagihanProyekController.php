@@ -65,7 +65,7 @@ class TagihanProyekController extends Controller {
                     $filter = " and a.no_tagihan='$request->no_tagihan' ";
                 }
                 $sql= "select a.no_tagihan, convert(varchar(10), tanggal, 120) as tanggal, a.kode_cust, a.nilai, a.biaya_lain, a.pajak, a.uang_muka, 
-                a.keterangan, a.no_proyek, b.keterangan, c.nama 
+                a.keterangan, a.no_proyek, b.keterangan, c.nama, b.nilai
                 from java_tagihan a 
                 inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi 
