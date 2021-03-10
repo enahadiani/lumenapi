@@ -338,7 +338,7 @@ class SppdController extends Controller
             // cek tgl & periode
             if($tglperiode != $periodecek){
 
-                $msg = "Periode tidak valid. Periode $periodecek tidak sama dengan periode di tanggal ($tglperiode). ";
+                $msg = "Periode tidak valid. Periode $periodecek tidak sama dengan periode di tanggal (".$datam[0]['tanggal']."). ";
                 $sts = false;	
 
             }else{
