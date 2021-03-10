@@ -76,7 +76,7 @@ class TagihanProyekController extends Controller {
                 $det = json_decode(json_encode($det),true);
                 $success['detail'] = $det;
             }else{
-                $sql = "select no_tagihan, no_proyek, convert(varchar(10), tanggal, 120) as tanggal, nilai,
+                $sql = "select no_tagihan, no_proyek, convert(varchar(10), tanggal, 120) as tanggal, (nilai+ biaya_lain + (pajak/100)) as nilai,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_tagihan
                 where kode_lokasi= '$kode_lokasi'";
             }
