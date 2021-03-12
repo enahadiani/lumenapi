@@ -80,7 +80,7 @@ class KartuSimpController extends Controller
                 }else{
                     $filter = " and a.no_simp='$request->no_simp' ";
                 }
-                $sql= "select a.no_simp,a.kode_lokasi,a.nama,a.tgl_lahir,a.alamat,a.no_tel,a.bank,a.cabang,a.no_rek,a.nama_rek,a.flag_aktif,a.id_lain 
+                $sql= "select a.no_simp,a.kode_lokasi,a.no_agg,a.kode_param,a.jenis,a.nilai,a.p_bunga,a.tgl_tagih,a.status_bayar,a.periode_gen,a.flag_aktif,a.nik_user,a.tgl_input,a.periode_bunga
                 from kop_simp_m a 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
@@ -133,17 +133,14 @@ class KartuSimpController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'no_simp' => 'required|max:20',
-            'nama' => 'required|max:50',
-            'tgl_lahir'=>'required|date_format:Y-m-d',
-            'alamat'=>'required|max:200',
-            'no_tel'=>'required|max:50',
-            'bank'=>'required|max:50',
-            'cabang'=>'required|max:100',
-            'no_rek'=>'required|max:50',
-            'nama_rek'=>'required|max:50',
-            'flag_aktif'=>'required|in:1,0',
-            'id_lain'=> 'required|max:20'
+            'no_agg' => 'required|max:20',
+            'kode_param' => 'required|max:10',
+            'jenis' => 'required|max:10',
+            'nilai' => 'required',
+            'p_bunga' => 'required',
+            'tgl_tagih' => 'required|date_format:Y-m-d',
+            'status_bayar' => 'required|max:10',
+            'flag_aktif' => 'required|max:1|in:1,0'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -153,26 +150,23 @@ class KartuSimpController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->no_simp,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into kop_simp_m(no_simp,kode_lokasi,nama,tgl_lahir,alamat,no_tel,bank,cabang,no_rek,nama_rek,flag_aktif,id_lain,tgl_input) values ('".$request->no_simp."','".$kode_lokasi."','".$request->nama."','".$request->tgl_lahir."','".$request->alamat."','".$request->no_tel."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->flag_aktif."','".$request->id_lain."',getdate()) ");
-                
-                DB::connection($this->sql)->commit();
-                $success['status'] = true;
-                $success['kode'] = $request->no_simp;
-                $success['message'] = "Data Anggota berhasil disimpan";
-            }else{
-                $success['status'] = false;
-                $success['kode'] = "-";
-                $success['jenis'] = "duplicate";
-                $success['message'] = "Error : Duplicate entry. No Anggota sudah ada di database!";
-            }
+            $no_bukti = $this->generateKode("kop_simp_m", "no_simp", $kode_lokasi."-".$request->kode_param.''.$request->no_simp.".", "01");
+            
+            $thnBln = substr($request->tgl_tagih,0,4).''.substr($request->tgl_tagih,5,2);
+
+            $ins = DB::connection($this->sql)->insert("insert into kop_simp_m (no_simp,kode_lokasi,no_agg,kode_param,jenis,nilai,p_bunga,tgl_tagih,status_bayar,periode_gen,flag_aktif,nik_user,tgl_input,periode_bunga) values ('$no_bukti','$kode_lokasi','$request->kode_param','$request->jenis','".floatval($request->nilai)."','".floatval($request->nilai)."','".floatval($request->p_bunga)."','$request->tgl_tagih','$request->status_bayar','$thnBln','$request->flag_aktif','$nik',getdate(),'$thnBln') ");
+            
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['kode'] = $request->no_simp;
+            $success['message'] = "Data Kartu Simpanan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Anggota gagal disimpan ".$e;
+            $success['message'] = "Data Kartu Simpanan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -202,16 +196,14 @@ class KartuSimpController extends Controller
     {
         $this->validate($request, [
             'no_simp' => 'required|max:20',
-            'nama' => 'required|max:50',
-            'tgl_lahir'=>'required|date_format:Y-m-d',
-            'alamat'=>'required|max:200',
-            'no_tel'=>'required|max:50',
-            'bank'=>'required|max:50',
-            'cabang'=>'required|max:100',
-            'no_rek'=>'required|max:50',
-            'nama_rek'=>'required|max:50',
-            'flag_aktif'=>'required|in:1,0',
-            'id_lain'=> 'required|max:20'
+            'no_agg' => 'required|max:20',
+            'kode_param' => 'required|max:10',
+            'jenis' => 'required|max:10',
+            'nilai' => 'required',
+            'p_bunga' => 'required',
+            'tgl_tagih' => 'required|date_format:Y-m-d',
+            'status_bayar' => 'required|max:10',
+            'flag_aktif' => 'required|max:1|in:1,0'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -227,18 +219,18 @@ class KartuSimpController extends Controller
             ->where('no_simp', $request->no_simp)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into kop_simp_m(no_simp,kode_lokasi,nama,tgl_lahir,alamat,no_tel,bank,cabang,no_rek,nama_rek,flag_aktif,id_lain,tgl_input) values ('".$request->no_simp."','".$kode_lokasi."','".$request->nama."','".$request->tgl_lahir."','".$request->alamat."','".$request->no_tel."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->flag_aktif."','".$request->id_lain."',getdate()) ");
+            $ins = DB::connection($this->sql)->insert("insert into kop_simp_m (no_simp,kode_lokasi,no_agg,kode_param,jenis,nilai,p_bunga,tgl_tagih,status_bayar,periode_gen,flag_aktif,nik_user,tgl_input,periode_bunga) values ('$request->no_simp','$kode_lokasi','$request->kode_param','$request->jenis','".floatval($request->nilai)."','".floatval($request->nilai)."','".floatval($request->p_bunga)."','$request->tgl_tagih','$request->status_bayar','$thnBln','$request->flag_aktif','$nik',getdate(),'$thnBln') ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->no_simp;
-            $success['message'] = "Data Anggota berhasil diubah";
+            $success['no_bukti'] = $request->no_simp;
+            $success['message'] = "Data Kartu Simpanan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['kode'] = "-";
-            $success['message'] = "Data Anggota gagal diubah ".$e;
+            $success['no_bukti'] = "-";
+            $success['message'] = "Data Kartu Simpanan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -269,13 +261,13 @@ class KartuSimpController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Anggota berhasil dihapus";
+            $success['message'] = "Data Kartu Simpanan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Anggota gagal dihapus ".$e;
+            $success['message'] = "Data Kartu Simpanan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
