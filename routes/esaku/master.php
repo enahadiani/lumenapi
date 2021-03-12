@@ -230,6 +230,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('reftrans','Esaku\KasBank\ReferensiTransController@update');
     $router->delete('reftrans','Esaku\KasBank\ReferensiTransController@destroy');
 
+    // SIMPANAN
+    $router->get('anggota','Esaku\Simpanan\AnggotaController@index');
+    $router->post('anggota','Esaku\Simpanan\AnggotaController@store');
+    $router->put('anggota','Esaku\Simpanan\AnggotaController@update');
+    $router->delete('anggota','Esaku\Simpanan\AnggotaController@destroy');
+
 
 });
 
