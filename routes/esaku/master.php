@@ -237,9 +237,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('anggota','Esaku\Simpanan\AnggotaController@destroy');
 
     $router->get('jenis-simpanan','Esaku\Simpanan\JenisController@index');
+    $router->get('akun-simpanan','Esaku\Simpanan\JenisController@getAkun');
     $router->post('jenis-simpanan','Esaku\Simpanan\JenisController@store');
     $router->put('jenis-simpanan','Esaku\Simpanan\JenisController@update');
     $router->delete('jenis-simpanan','Esaku\Simpanan\JenisController@destroy');
+
+    $router->get('generate-nokartu','Esaku\Simpanan\KartuSimpController@generateNo');
+    $router->get('kartu-simpanan','Esaku\Simpanan\KartuSimpController@index');
+    $router->post('kartu-simpanan','Esaku\Simpanan\KartuSimpController@store');
+    $router->put('kartu-simpanan','Esaku\Simpanan\KartuSimpController@update');
+    $router->delete('kartu-simpanan','Esaku\Simpanan\KartuSimpController@destroy');
 
 
 });

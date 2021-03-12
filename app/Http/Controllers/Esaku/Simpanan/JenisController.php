@@ -242,4 +242,50 @@ class JenisController extends Controller
         }	
     }
 
+    public function getAkun(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->kode_akun)){
+                if($request->kode_akun != "" ){
+
+                    $filter = " and a.kode_akun='$request->kode_akun' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+            $sql = "select a.kode_akun, a.nama from masakun a 
+            where a.kode_lokasi='$kode_lokasi' $filter ";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    
 }
