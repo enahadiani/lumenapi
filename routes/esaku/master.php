@@ -236,6 +236,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('anggota','Esaku\Simpanan\AnggotaController@update');
     $router->delete('anggota','Esaku\Simpanan\AnggotaController@destroy');
 
+    $router->get('jenis-simpanan','Esaku\Simpanan\JenisController@index');
+    $router->post('jenis-simpanan','Esaku\Simpanan\JenisController@store');
+    $router->put('jenis-simpanan','Esaku\Simpanan\JenisController@update');
+    $router->delete('jenis-simpanan','Esaku\Simpanan\JenisController@destroy');
+
 
 });
 
