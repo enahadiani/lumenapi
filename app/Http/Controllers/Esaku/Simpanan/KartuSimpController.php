@@ -15,12 +15,12 @@ class KartuSimpController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $sql = 'tokoaws';
+    public $db = 'tokoaws';
     public $guard = 'toko';
 
     public function isUnik($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select no_simp from kop_simp_m where no_simp ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->db)->select("select no_simp from kop_simp_m where no_simp ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -40,7 +40,7 @@ class KartuSimpController extends Controller
     public function generateNo(Request $request) {
         $this->validate($request, [    
             'kode_param' => 'required',
-            'no_simp' => 'required'           
+            'no_agg' => 'required'           
         ]);
         
         try {
@@ -50,7 +50,7 @@ class KartuSimpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }	
 
-            $no_bukti = $this->generateKode("kop_simp_m", "no_simp", $kode_lokasi."-".$request->kode_param.''.$request->no_simp.".", "01");
+            $no_bukti = $this->generateKode("kop_simp_m", "no_simp", $kode_lokasi."-".$request->kode_param.''.$request->no_agg.".", "01");
 
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
@@ -92,7 +92,7 @@ class KartuSimpController extends Controller
                 where a.kode_lokasi= '".$kode_lokasi."' ";
             }
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -143,7 +143,7 @@ class KartuSimpController extends Controller
             'flag_aktif' => 'required|max:1|in:1,0'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -151,20 +151,20 @@ class KartuSimpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $no_bukti = $this->generateKode("kop_simp_m", "no_simp", $kode_lokasi."-".$request->kode_param.''.$request->no_simp.".", "01");
+            $no_bukti = $this->generateKode("kop_simp_m", "no_simp", $kode_lokasi."-".$request->kode_param.''.$request->no_agg.".", "01");
             
             $thnBln = substr($request->tgl_tagih,0,4).''.substr($request->tgl_tagih,5,2);
 
-            $ins = DB::connection($this->sql)->insert("insert into kop_simp_m (no_simp,kode_lokasi,no_agg,kode_param,jenis,nilai,p_bunga,tgl_tagih,status_bayar,periode_gen,flag_aktif,nik_user,tgl_input,periode_bunga) values ('$no_bukti','$kode_lokasi','$request->kode_param','$request->jenis','".floatval($request->nilai)."','".floatval($request->nilai)."','".floatval($request->p_bunga)."','$request->tgl_tagih','$request->status_bayar','$thnBln','$request->flag_aktif','$nik',getdate(),'$thnBln') ");
+            $ins = DB::connection($this->db)->insert("insert into kop_simp_m (no_simp,kode_lokasi,no_agg,kode_param,jenis,nilai,p_bunga,tgl_tagih,status_bayar,periode_gen,flag_aktif,nik_user,tgl_input,periode_bunga) values ('$no_bukti','$kode_lokasi','$request->no_agg','$request->kode_param','$request->jenis','".floatval($request->nilai)."','".floatval($request->p_bunga)."','$request->tgl_tagih','$request->status_bayar','$thnBln','$request->flag_aktif','$nik',getdate(),'$thnBln') ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->no_simp;
+            $success['kode'] = $no_bukti;
             $success['message'] = "Data Kartu Simpanan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kartu Simpanan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -206,7 +206,7 @@ class KartuSimpController extends Controller
             'flag_aktif' => 'required|max:1|in:1,0'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -214,20 +214,22 @@ class KartuSimpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('kop_simp_m')
+            $del = DB::connection($this->db)->table('kop_simp_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_simp', $request->no_simp)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into kop_simp_m (no_simp,kode_lokasi,no_agg,kode_param,jenis,nilai,p_bunga,tgl_tagih,status_bayar,periode_gen,flag_aktif,nik_user,tgl_input,periode_bunga) values ('$request->no_simp','$kode_lokasi','$request->kode_param','$request->jenis','".floatval($request->nilai)."','".floatval($request->nilai)."','".floatval($request->p_bunga)."','$request->tgl_tagih','$request->status_bayar','$thnBln','$request->flag_aktif','$nik',getdate(),'$thnBln') ");
+            $thnBln = substr($request->tgl_tagih,0,4).''.substr($request->tgl_tagih,5,2);
             
-            DB::connection($this->sql)->commit();
+            $ins = DB::connection($this->db)->insert("insert into kop_simp_m (no_simp,kode_lokasi,no_agg,kode_param,jenis,nilai,p_bunga,tgl_tagih,status_bayar,periode_gen,flag_aktif,nik_user,tgl_input,periode_bunga) values ('$request->no_simp','$kode_lokasi','$request->no_agg','$request->kode_param','$request->jenis','".floatval($request->nilai)."','".floatval($request->p_bunga)."','$request->tgl_tagih','$request->status_bayar','$thnBln','$request->flag_aktif','$nik',getdate(),'$thnBln') ");
+            
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['no_bukti'] = $request->no_simp;
             $success['message'] = "Data Kartu Simpanan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['no_bukti'] = "-";
             $success['message'] = "Data Kartu Simpanan gagal diubah ".$e;
@@ -246,7 +248,7 @@ class KartuSimpController extends Controller
         $this->validate($request, [
             'no_simp' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -254,18 +256,18 @@ class KartuSimpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('kop_simp_m')
+            $del = DB::connection($this->db)->table('kop_simp_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_simp', $request->no_simp)
             ->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Kartu Simpanan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Kartu Simpanan gagal dihapus ".$e;
             
