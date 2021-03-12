@@ -38,6 +38,7 @@ class SettingGrafikController extends Controller
             $res['status'] = false;
             $res['kode_grafik'] = $auth[0]['kode_grafik'];
         }else{
+            $res['kode_grafik'] = $isi;
             $res['status'] = true;
         }
         return $res;
@@ -120,7 +121,7 @@ class SettingGrafikController extends Controller
                 $sts=true;
                 
             }else{
-                $tmp = "Transaksi tidak valid. Kode Grafik '".$data[$i]['kode_grafik']."' sudah ada di database.";
+                $tmp = "Transaksi tidak valid. Kode Grafik '".$res['kode_grafik']."' sudah ada di database.";
                 $sts = false;
             }
 
