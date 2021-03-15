@@ -61,7 +61,7 @@ class VendorController extends Controller
                     $filter = " and a.kode_vendor='$request->kode_vendor' ";
                 }
                 $sql= "select a.kode_vendor, a.nama, a.alamat, a.no_telp, a.kode_pos, a.email, a.provinsi, a.kecamatan, a.kota, a.negara,
-                a.pic, a.no_telp_pic, a.email_pic, a.akun_hutang, b.nama as nama_akun 
+                a.pic, a.no_telp_pic, a.email_pic, a.akun_hutang, b.nama as nama_akun, a.provinsi_name, a.kota_name, a.kecamatan_name 
                 from java_vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
                 $bank = "select a.no_rek, a.nama_rekening, a.bank, a.cabang from java_vendor_detail a
@@ -140,11 +140,11 @@ class VendorController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
-                $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
-                kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi)
-                values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
-                '$request->kode_pos', '$request->provinsi', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-                '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi')";
+            $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
+            kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
+            values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
+            '$request->kode_pos', '$request->provinsi', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
+            '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi', '$request->provinsi_name', '$request->kota_name', '$request->kecamatan_name')";
                 
                 DB::connection($this->sql)->insert($insertVend);
                 
@@ -241,10 +241,10 @@ class VendorController extends Controller
             ->delete();
 
             $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
-            kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi)
+            kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
             values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
             '$request->kode_pos', '$request->provinsi', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-            '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi')";
+            '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi', '$request->provinsi_name', '$request->kota_name', '$request->kecamatan_name')";
                 
             DB::connection($this->sql)->insert($insertVend);
 
