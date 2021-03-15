@@ -234,6 +234,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('msg-whatsapp','Esaku\Setting\WAController@Messages'); 
     $router->post('pooling','Esaku\Setting\WAController@storePooling'); 
     $router->post('jurnal-notifikasi','Esaku\Keuangan\JurnalController@sendNotifikasi'); 
+    
+    // AKRU SIMPANAN
+    $router->get('akru-simp','Esaku\Simpanan\AkruSimpController@index');
+    $router->get('akru-simp-detail','Esaku\Simpanan\AkruSimpController@show');
+    $router->post('akru-simp','Esaku\Simpanan\AkruSimpController@store');
+    $router->put('akru-simp','Esaku\Simpanan\AkruSimpController@update');
+    $router->delete('akru-simp','Esaku\Simpanan\AkruSimpController@destroy');
+    $router->get('akru-simp-jurnal','Esaku\Simpanan\AkruSimpController@getDaftarKartu');
+    $router->get('akru-simp-kartu','Esaku\Simpanan\AkruSimpController@getDaftarJurnal');
 
 });
 
