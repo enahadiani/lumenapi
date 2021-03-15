@@ -208,7 +208,7 @@ class AkruSimpController extends Controller
             where a.kode_lokasi = '".$kode_lokasi."' and x.flag_aktif='1' and y.flag_aktif='1' and 
                   ((x.jenis in ('SP','SW')) or (x.jenis='SS' and x.status_bayar='PGAJI')) and x.nilai>0  and x.periode_gen<='".$periode."'");
             
-            $pNext = nextNPeriode($periode,1);		
+            $pNext = $this->nextNPeriode($periode,1);		
             $ins7 = DB::connection($this->db)->update("update a set a.periode_gen ='".$pNext."',a.periode_bunga ='".$pNext."' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis<>'SP' ");
 
             $ins8 = DB::connection($this->db)->update("update a set a.periode_gen ='999999' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis='SP' ");
@@ -358,14 +358,14 @@ class AkruSimpController extends Controller
             where a.kode_lokasi = '".$kode_lokasi."' and x.flag_aktif='1' and y.flag_aktif='1' and 
                   ((x.jenis in ('SP','SW')) or (x.jenis='SS' and x.status_bayar='PGAJI')) and x.nilai>0  and x.periode_gen<='".$periode."'");
             
-            $pNext = nextNPeriode($periode,1);		
+            $pNext = $this->nextNPeriode($periode,1);		
             $ins7 = DB::connection($this->db)->update("update a set a.periode_gen ='".$pNext."',a.periode_bunga ='".$pNext."' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis<>'SP' ");
 
             $ins8 = DB::connection($this->db)->update("update a set a.periode_gen ='999999' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis='SP' ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['no_bukti'] = $request->no_simp;
+            $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Akru Simpanan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
