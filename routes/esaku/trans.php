@@ -241,8 +241,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('akru-simp','Esaku\Simpanan\AkruSimpController@store');
     $router->put('akru-simp','Esaku\Simpanan\AkruSimpController@update');
     $router->delete('akru-simp','Esaku\Simpanan\AkruSimpController@destroy');
-    $router->get('akru-simp-jurnal','Esaku\Simpanan\AkruSimpController@getDaftarKartu');
-    $router->get('akru-simp-kartu','Esaku\Simpanan\AkruSimpController@getDaftarJurnal');
+    $router->get('akru-simp-jurnal','Esaku\Simpanan\AkruSimpController@getDaftarJurnal');
+    $router->get('akru-simp-kartu','Esaku\Simpanan\AkruSimpController@getDaftarKartu');
 
 });
 

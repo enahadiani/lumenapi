@@ -467,7 +467,7 @@ class AkruSimpController extends Controller
                  x.periode_gen<='".$periode."' and x.nilai>0 
                  group by x.jenis,a.kode_param,a.nama,a.akun_piutang,b.nama,a.akun_titip,c.nama 
             union all 
-            select 'BS' as jenis,c.kode_param,c.nama,'".$akunBunga+"','".$namaBunga."',c.akun_titip,d.nama as nama_titip, 
+            select 'BS' as jenis,c.kode_param,c.nama,'".$akunBunga."','".$namaBunga."',c.akun_titip,d.nama as nama_titip, 
             round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga 
             	from 
             	kop_simpangs_d a 
@@ -480,7 +480,6 @@ class AkruSimpController extends Controller
             		  and b.flag_aktif='1' and y.flag_aktif='1' 
                       group by  b.jenis,c.kode_param,c.nama,c.akun_titip,d.nama 
             order by x.jenis,a.kode_param";
-
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
