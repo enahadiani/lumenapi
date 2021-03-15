@@ -482,13 +482,13 @@ class SppdController extends Controller
 
             //$exec = array();
           
-            $cek = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress <> 'A' ");
+            $cek = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress not in ('A','R') ");
             if(count($cek) > 0){
                 $success['status'] = false;
                 $success['message'] = "Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.";
             }else{
 
-                $cek2 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress = 'A'  ");
+                $cek2 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress in ('A','R')  ");
                 if(count($cek2) > 0){
                     
                     $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
