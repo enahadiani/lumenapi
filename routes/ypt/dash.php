@@ -122,6 +122,14 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('ms-beban-capai','Ypt\DashboardController@getBebanCapai');
     $router->get('ms-beban-capai-klp','Ypt\DashboardController@getBebanCapaiKlp');
+
+    $router->get('ms-bank','Ypt\DashboardController@getDaftarBank');
+    $router->get('ms-shu','Ypt\DashboardController@getSHUDetail');
+
+    $router->get('ms-aset','Ypt\DashboardController@getMSAset');
+    $router->get('ms-hutang','Ypt\DashboardController@getMSHutang');
+
+
 });
 
 
