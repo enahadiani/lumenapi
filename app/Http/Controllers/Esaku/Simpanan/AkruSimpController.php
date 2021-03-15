@@ -26,6 +26,87 @@ class AkruSimpController extends Controller
         return $id;
     }
 
+    function getPeriodeAktif($kode_lokasi){
+        $query = DB::connection($this->db)->select("select max(periode) as periode from periode where $kode_lokasi ='$kode_lokasi' ");
+        if(count($query) > 0){
+            $periode = $query[0]->periode;
+        }else{
+            $periode = "-";
+        }
+        return $periode;
+    }
+
+    function namaPeriode($periode){
+        $bulan = substr($periode,4,2);
+        $tahun = substr($periode,0,4);
+        switch ($bulan){
+            case 1 : case '1' : case '01': $bulan = "Januari"; break;
+            case 2 : case '2' : case '02': $bulan = "Februari"; break;
+            case 3 : case '3' : case '03': $bulan = "Maret"; break;
+            case 4 : case '4' : case '04': $bulan = "April"; break;
+            case 5 : case '5' : case '05': $bulan = "Mei"; break;
+            case 6 : case '6' : case '06': $bulan = "Juni"; break;
+            case 7 : case '7' : case '07': $bulan = "Juli"; break;
+            case 8 : case '8' : case '08': $bulan = "Agustus"; break;
+            case 9 : case '9' : case '09': $bulan = "September"; break;
+            case 10 : case '10' : case '10': $bulan = "Oktober"; break;
+            case 11 : case '11' : case '11': $bulan = "November"; break;
+            case 12 : case '12' : case '12': $bulan = "Desember"; break;
+            default: $bulan = null;
+        }
+    
+        return $bulan.' '.$tahun;
+    }
+
+    function doCekPeriode2($modul,$status,$periode) {
+        try{
+            
+            $perValid = false;
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
+            if ($status == "A") {
+
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal2 and per_akhir2";
+            }else{
+
+                $strSQL = "select modul from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' and '".$periode."' between per_awal1 and per_akhir1";
+            }
+
+            $auth = DB::connection($this->db)->select($strSQL);
+            $auth = json_decode(json_encode($auth),true);
+            if(count($auth) > 0){
+                $perValid = true;
+                $msg = "ok";
+            }else{
+                if ($status == "A") {
+
+                    $strSQL2 = "select per_awal2 as per_awal,per_akhir2 as per_akhir from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."' ";
+                }else{
+    
+                    $strSQL2 = "select per_awal1 as per_awal,per_akhir1 as per_akhir from periode_aktif where kode_lokasi ='".$kode_lokasi."'  and modul ='".$modul."'";
+                }
+                $get = DB::connection($this->db)->select($strSQL2);
+                if(count($get) > 0){
+                    $per_awal = $this->namaPeriode($get[0]->per_awal);
+                    $per_akhir = $this->namaPeriode($get[0]->per_akhir);
+                    $msg = "Transaksi tidak dapat disimpan karena tanggal di periode tersebut di tutup. Periode Aktif ".$per_awal." s/d ".$per_akhir;
+                }else{
+                    $msg = "Transaksi tidak dapat disimpan karena periode aktif modul $modul belum disetting.";
+                }
+            }
+        } catch (\Throwable $e) {		
+            $msg= " error " .  $e;
+            $perValid = false;
+        } 	
+        $result['status'] = $perValid;
+        $result['message'] = $msg;
+        // $result['sql'] = $strSQL;
+        return $result;		
+    }
+
     function nextNPeriode($periode, $n) 
     {
         $bln = floatval(substr($periode,4,2));
@@ -43,8 +124,7 @@ class AkruSimpController extends Controller
 
     public function generateNo(Request $request) {
         $this->validate($request, [    
-            'kode_param' => 'required',
-            'no_agg' => 'required'           
+            'tanggal' => 'required'       
         ]);
         
         try {
@@ -54,7 +134,8 @@ class AkruSimpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }	
 
-            $no_bukti = $this->generateKode("kop_simp_m", "no_simp", $kode_lokasi."-".$request->kode_param.''.$request->no_agg.".", "01");
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BSM".substr($periode,2,4).".", "0001");
 
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
@@ -136,88 +217,111 @@ class AkruSimpController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
 
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BSM".substr($periode.$request->no_agg,2,4).".", "0001");
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BSM".substr($periode,2,4).".", "0001");
 
-            $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
-            if(count($getPP) > 0){
-                $kode_pp = $getPP[0]->kode_pp;
-            }else{
-                $kode_pp = "-";
-            }
+            $cek = $this->doCekPeriode2('KP',$status_admin,$periode);
 
-            $getSPRO = DB::connection($this->db)->select("select a.kode_spro,a.flag,b.nama from spro a inner join masakun b on a.flag=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_spro in ('BSIMP') and a.kode_lokasi = '".$kode_lokasi."'");
-            if(count($getSPRO) > 0){
-                $line = $getSPRO[0];
-                if ($line->kode_spro == "BSIMP") $akunBunga = $line->flag;
-				if ($line->kode_spro == "BSIMP") $namaBunga = $line->nama;
-            }else{
-                $akunBunga = "-";
-                $namaBunga = "-";
-            }
-            
-            $j = 0;
-            $total = 0;
-            for ($i=0; $i<count($request->akun_piutang); $i++){
-                $j = $i+1000;			
-                $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$i.",'".$request->akun_piutang[$i]."','D',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','PIUTANG','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+            if($cek['status']){
+
+                $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+                if(count($getPP) > 0){
+                    $kode_pp = $getPP[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
+
+                $getSPRO = DB::connection($this->db)->select("select a.kode_spro,a.flag,b.nama from spro a inner join masakun b on a.flag=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_spro in ('BSIMP') and a.kode_lokasi = '".$kode_lokasi."'");
+                if(count($getSPRO) > 0){
+                    $line = $getSPRO[0];
+                    if ($line->kode_spro == "BSIMP") $akunBunga = $line->flag;
+                    if ($line->kode_spro == "BSIMP") $namaBunga = $line->nama;
+                }else{
+                    $akunBunga = "-";
+                    $namaBunga = "-";
+                }
                 
-                $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$j.",'".$request->akun_simpanan[$i]."','C',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','SIMP','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                $j = 0;
+                $total = 0;
+                for ($i=0; $i<count($request->akun_piutang); $i++){
+                    $j = $i+1000;			
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$i.",'".$request->akun_piutang[$i]."','D',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','PIUTANG','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                    
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$j.",'".$request->akun_simpanan[$i]."','C',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','SIMP','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
 
-                $total+= floatval($request->nilai[$i]);
+                    $total+= floatval($request->nilai[$i]);
+                }
+
+                if($total > 0){
+
+                    $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','GENBILL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($total).",0,0,'-','-','-','-','-','-','-','-','-')");
+                    
+                    //hitung dan generate bunga simp sukarela (sebagai setoran angsuran)
+                    $ins4 = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis)
+                    select '".$no_bukti."',a.no_simp,'".$no_bukti."','".$akunBunga."', round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,a.kode_lokasi,'D','".$periode."','BSIMP',b.no_agg,'BSIMP' 
+                    from 
+                    kop_simpangs_d a 
+                    inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi
+                    inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
+                    inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
+                    inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
+                    where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' and b.periode_bunga <= '".$periode."' and b.flag_aktif='1' and y.flag_aktif='1' 
+                    group by a.no_simp,a.kode_lokasi,b.no_agg ");
+                    
+                    //generate billing untuk bunga simp sukarela (sebagai billingnya)
+                    $ins5 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
+                    select a.no_simp,'".$no_bukti."',a.kode_lokasi,'".$periode."', 
+                    round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,'".$akunBunga."',c.akun_titip,'D','BSIMP',b.no_agg 
+                    from 
+                    kop_simpangs_d a 
+                    inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi 
+                    inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
+                    inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
+                    inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
+                    where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' 
+                        and b.periode_bunga <= '".$periode."' 
+                        and b.flag_aktif='1' and y.flag_aktif='1' 
+                    group by a.no_simp,a.kode_lokasi,c.akun_titip,b.no_agg ");
+                    
+                    //generate billing untuk seluruh jenis simpanan (kecuali ss yg tunai angsurannya / bukan potong gaji)
+                    $ins6 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
+                    select x.no_simp,'".$no_bukti."',x.kode_lokasi,'".$periode."',x.nilai,a.akun_piutang,a.akun_titip,'D','GENBILL',x.no_agg 
+                    from kop_simp_m x 
+                        inner join kop_agg y on x.no_agg=y.no_agg and x.kode_lokasi=y.kode_lokasi 
+                        inner join kop_simp_param a on x.kode_param=a.kode_param and x.kode_lokasi = a.kode_lokasi 
+                    where a.kode_lokasi = '".$kode_lokasi."' and x.flag_aktif='1' and y.flag_aktif='1' and 
+                        ((x.jenis in ('SP','SW')) or (x.jenis='SS' and x.status_bayar='PGAJI')) and x.nilai>0  and x.periode_gen<='".$periode."'");
+                    
+                    $pNext = $this->nextNPeriode($periode,1);		
+                    $ins7 = DB::connection($this->db)->update("update a set a.periode_gen ='".$pNext."',a.periode_bunga ='".$pNext."' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis<>'SP' ");
+        
+                    $ins8 = DB::connection($this->db)->update("update a set a.periode_gen ='999999' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis='SP' ");
+                    
+                    
+                    DB::connection($this->db)->commit();
+                    $success['status'] = true;
+                    $success['kode'] = $no_bukti;
+                    $success['message'] = "Data Akru Simpanan berhasil disimpan";
+                    
+
+                }else{
+
+                    DB::connection($this->db)->rollback();
+                    $success['status'] = false;
+                    $success['kode'] = "-";
+                    $success['message'] = "Transaksi tidak valid. Total akru simpanan tidak boleh kurang dari atau sama dengan nol";
+                }
+            }else{
+
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['kode'] = "-";
+                $success['message'] = $cek["message"];
             }
-            
-            $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','GENBILL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($total).",0,0,'-','-','-','-','-','-','-','-','-')");
-            
-            //hitung dan generate bunga simp sukarela (sebagai setoran angsuran)
-            $ins4 = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis)
-            select '".$no_bukti."',a.no_simp,'".$no_bukti."','".$akunBunga."', round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,a.kode_lokasi,'D','".$periode."','BSIMP',b.no_agg,'BSIMP' 
-            from 
-            kop_simpangs_d a 
-            inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi
-            inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
-            inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
-            inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
-            where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' and b.periode_bunga <= '".$periode."' and b.flag_aktif='1' and y.flag_aktif='1' 
-            group by a.no_simp,a.kode_lokasi,b.no_agg ");
-            
-            //generate billing untuk bunga simp sukarela (sebagai billingnya)
-            $ins5 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
-            select a.no_simp,'".$no_bukti."',a.kode_lokasi,'".$periode."', 
-            round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,'".$akunBunga."',c.akun_titip,'D','BSIMP',b.no_agg 
-            from 
-            kop_simpangs_d a 
-            inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi 
-            inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
-            inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
-            inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
-            where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' 
-            	  and b.periode_bunga <= '".$periode."' 
-            	  and b.flag_aktif='1' and y.flag_aktif='1' 
-            group by a.no_simp,a.kode_lokasi,c.akun_titip,b.no_agg ");
-            
-            //generate billing untuk seluruh jenis simpanan (kecuali ss yg tunai angsurannya / bukan potong gaji)
-            $ins6 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
-            select x.no_simp,'".$no_bukti."',x.kode_lokasi,'".$periode."',x.nilai,a.akun_piutang,a.akun_titip,'D','GENBILL',x.no_agg 
-            from kop_simp_m x 
-                 inner join kop_agg y on x.no_agg=y.no_agg and x.kode_lokasi=y.kode_lokasi 
-                 inner join kop_simp_param a on x.kode_param=a.kode_param and x.kode_lokasi = a.kode_lokasi 
-            where a.kode_lokasi = '".$kode_lokasi."' and x.flag_aktif='1' and y.flag_aktif='1' and 
-                  ((x.jenis in ('SP','SW')) or (x.jenis='SS' and x.status_bayar='PGAJI')) and x.nilai>0  and x.periode_gen<='".$periode."'");
-            
-            $pNext = $this->nextNPeriode($periode,1);		
-            $ins7 = DB::connection($this->db)->update("update a set a.periode_gen ='".$pNext."',a.periode_bunga ='".$pNext."' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis<>'SP' ");
-
-            $ins8 = DB::connection($this->db)->update("update a set a.periode_gen ='999999' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis='SP' ");
-            
-            
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['kode'] = $no_bukti;
-            $success['message'] = "Data Akru Simpanan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -292,81 +396,105 @@ class AkruSimpController extends Controller
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
 
-            $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
-            if(count($getPP) > 0){
-                $kode_pp = $getPP[0]->kode_pp;
-            }else{
-                $kode_pp = "-";
-            }
+            $cek = $this->doCekPeriode2('KP',$status_admin,$periode);
 
-            $getSPRO = DB::connection($this->db)->select("select a.kode_spro,a.flag,b.nama from spro a inner join masakun b on a.flag=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_spro in ('BSIMP') and a.kode_lokasi = '".$kode_lokasi."'");
-            if(count($getSPRO) > 0){
-                $line = $getSPRO[0];
-                if ($line->kode_spro == "BSIMP") $akunBunga = $line->flag;
-				if ($line->kode_spro == "BSIMP") $namaBunga = $line->nama;
-            }else{
-                $akunBunga = "-";
-                $namaBunga = "-";
-            }
-            
-            $j = 0;
-            $total = 0;
-            for ($i=0; $i<count($request->akun_piutang); $i++){
-                $j = $i+1000;			
-                $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$i.",'".$request->akun_piutang[$i]."','D',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','PIUTANG','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+            if($cek['status']){
+
+                $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+                if(count($getPP) > 0){
+                    $kode_pp = $getPP[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
+
+                $getSPRO = DB::connection($this->db)->select("select a.kode_spro,a.flag,b.nama from spro a inner join masakun b on a.flag=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_spro in ('BSIMP') and a.kode_lokasi = '".$kode_lokasi."'");
+                if(count($getSPRO) > 0){
+                    $line = $getSPRO[0];
+                    if ($line->kode_spro == "BSIMP") $akunBunga = $line->flag;
+                    if ($line->kode_spro == "BSIMP") $namaBunga = $line->nama;
+                }else{
+                    $akunBunga = "-";
+                    $namaBunga = "-";
+                }
                 
-                $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$j.",'".$request->akun_simpanan[$i]."','C',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','SIMP','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                $j = 0;
+                $total = 0;
+                for ($i=0; $i<count($request->akun_piutang); $i++){
+                    $j = $i+1000;			
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$i.",'".$request->akun_piutang[$i]."','D',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','PIUTANG','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                    
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$j.",'".$request->akun_simpanan[$i]."','C',".floatval($request->nilai[$i]).",".floatval($request->nilai[$i]).",'".$request->keterangan."','GENBILL','SIMP','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
 
-                $total+= floatval($request->nilai[$i]);
+                    $total+= floatval($request->nilai[$i]);
+                }
+
+                if($total > 0){
+
+                    $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','GENBILL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($total).",0,0,'-','-','-','-','-','-','-','-','-')");
+                    
+                    //hitung dan generate bunga simp sukarela (sebagai setoran angsuran)
+                    $ins4 = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis)
+                    select '".$no_bukti."',a.no_simp,'".$no_bukti."','".$akunBunga."', round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,a.kode_lokasi,'D','".$periode."','BSIMP',b.no_agg,'BSIMP' 
+                    from 
+                    kop_simpangs_d a 
+                    inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi
+                    inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
+                    inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
+                    inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
+                    where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' and b.periode_bunga <= '".$periode."' and b.flag_aktif='1' and y.flag_aktif='1' 
+                    group by a.no_simp,a.kode_lokasi,b.no_agg ");
+                    
+                    //generate billing untuk bunga simp sukarela (sebagai billingnya)
+                    $ins5 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
+                    select a.no_simp,'".$no_bukti."',a.kode_lokasi,'".$periode."', 
+                    round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,'".$akunBunga."',c.akun_titip,'D','BSIMP',b.no_agg 
+                    from 
+                    kop_simpangs_d a 
+                    inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi 
+                    inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
+                    inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
+                    inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
+                    where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' 
+                        and b.periode_bunga <= '".$periode."' 
+                        and b.flag_aktif='1' and y.flag_aktif='1' 
+                    group by a.no_simp,a.kode_lokasi,c.akun_titip,b.no_agg ");
+                    
+                    //generate billing untuk seluruh jenis simpanan (kecuali ss yg tunai angsurannya / bukan potong gaji)
+                    $ins6 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
+                    select x.no_simp,'".$no_bukti."',x.kode_lokasi,'".$periode."',x.nilai,a.akun_piutang,a.akun_titip,'D','GENBILL',x.no_agg 
+                    from kop_simp_m x 
+                        inner join kop_agg y on x.no_agg=y.no_agg and x.kode_lokasi=y.kode_lokasi 
+                        inner join kop_simp_param a on x.kode_param=a.kode_param and x.kode_lokasi = a.kode_lokasi 
+                    where a.kode_lokasi = '".$kode_lokasi."' and x.flag_aktif='1' and y.flag_aktif='1' and 
+                        ((x.jenis in ('SP','SW')) or (x.jenis='SS' and x.status_bayar='PGAJI')) and x.nilai>0  and x.periode_gen<='".$periode."'");
+                    
+                    $pNext = $this->nextNPeriode($periode,1);		
+                    $ins7 = DB::connection($this->db)->update("update a set a.periode_gen ='".$pNext."',a.periode_bunga ='".$pNext."' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis<>'SP' ");
+        
+                    $ins8 = DB::connection($this->db)->update("update a set a.periode_gen ='999999' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis='SP' ");
+                    
+                    
+                    DB::connection($this->db)->commit();
+                    $success['status'] = true;
+                    $success['kode'] = $no_bukti;
+                    $success['message'] = "Data Akru Simpanan berhasil diubah";
+                    
+
+                }else{
+
+                    DB::connection($this->db)->rollback();
+                    $success['status'] = false;
+                    $success['kode'] = "-";
+                    $success['message'] = "Transaksi tidak valid. Total akru simpanan tidak boleh kurang dari atau sama dengan nol";
+                }
+            }else{
+
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['kode'] = "-";
+                $success['message'] = $cek["message"];
             }
             
-            $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','GENBILL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($total).",0,0,'-','-','-','-','-','-','-','-','-')");
-            
-            //hitung dan generate bunga simp sukarela (sebagai setoran angsuran)
-            $ins4 = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis)
-            select '".$no_bukti."',a.no_simp,'".$no_bukti."','".$akunBunga."', round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,a.kode_lokasi,'D','".$periode."','BSIMP',b.no_agg,'BSIMP' 
-            from 
-            kop_simpangs_d a 
-            inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi
-            inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
-            inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
-            inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
-            where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' and b.periode_bunga <= '".$periode."' and b.flag_aktif='1' and y.flag_aktif='1' 
-            group by a.no_simp,a.kode_lokasi,b.no_agg ");
-            
-            //generate billing untuk bunga simp sukarela (sebagai billingnya)
-            $ins5 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
-            select a.no_simp,'".$no_bukti."',a.kode_lokasi,'".$periode."', 
-            round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,'".$akunBunga."',c.akun_titip,'D','BSIMP',b.no_agg 
-            from 
-            kop_simpangs_d a 
-            inner join kop_simp_m b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi 
-            inner join kop_simp_param c on c.kode_param=b.kode_param and b.kode_lokasi=c.kode_lokasi 
-            inner join masakun d on c.akun_titip=d.kode_akun and c.kode_lokasi=d.kode_lokasi 
-            inner join kop_agg y on b.no_agg=y.no_agg and b.kode_lokasi = y.kode_lokasi 
-            where b.jenis = 'SS' and b.p_bunga <>0 and a.periode<='".$periode."' and a.kode_lokasi='".$kode_lokasi."' 
-            	  and b.periode_bunga <= '".$periode."' 
-            	  and b.flag_aktif='1' and y.flag_aktif='1' 
-            group by a.no_simp,a.kode_lokasi,c.akun_titip,b.no_agg ");
-            
-            //generate billing untuk seluruh jenis simpanan (kecuali ss yg tunai angsurannya / bukan potong gaji)
-            $ins6 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
-            select x.no_simp,'".$no_bukti."',x.kode_lokasi,'".$periode."',x.nilai,a.akun_piutang,a.akun_titip,'D','GENBILL',x.no_agg 
-            from kop_simp_m x 
-                 inner join kop_agg y on x.no_agg=y.no_agg and x.kode_lokasi=y.kode_lokasi 
-                 inner join kop_simp_param a on x.kode_param=a.kode_param and x.kode_lokasi = a.kode_lokasi 
-            where a.kode_lokasi = '".$kode_lokasi."' and x.flag_aktif='1' and y.flag_aktif='1' and 
-                  ((x.jenis in ('SP','SW')) or (x.jenis='SS' and x.status_bayar='PGAJI')) and x.nilai>0  and x.periode_gen<='".$periode."'");
-            
-            $pNext = $this->nextNPeriode($periode,1);		
-            $ins7 = DB::connection($this->db)->update("update a set a.periode_gen ='".$pNext."',a.periode_bunga ='".$pNext."' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis<>'SP' ");
-
-            $ins8 = DB::connection($this->db)->update("update a set a.periode_gen ='999999' from kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp and a.kode_lokasi=b.kode_lokasi where b.no_bill='".$no_bukti."' and b.kode_lokasi = '".$kode_lokasi."' and a.jenis='SP' ");
-
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['no_bukti'] = $no_bukti;
-            $success['message'] = "Data Akru Simpanan berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
@@ -397,6 +525,13 @@ class AkruSimpController extends Controller
             }
             
             $no_bukti = $request->no_bukti;
+            // Cek periode aktif
+            // $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+
+            // $cek = $this->doCekPeriode2('KP',$status_admin,$periode);
+
+            // if($cek['status']){
+            // }
             
             $del = DB::connection($this->db)->table('trans_m')
             ->where('kode_lokasi', $kode_lokasi)

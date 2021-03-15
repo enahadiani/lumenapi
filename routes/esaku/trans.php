@@ -244,6 +244,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('akru-simp-jurnal','Esaku\Simpanan\AkruSimpController@getDaftarJurnal');
     $router->get('akru-simp-kartu','Esaku\Simpanan\AkruSimpController@getDaftarKartu');
 
+    // REVERSE AKRU SIMPANAN
+    $router->get('reverse-akru-simp','Esaku\Simpanan\AkruSimpController@index');
+    $router->get('reverse-akru-simp-detail','Esaku\Simpanan\AkruSimpController@show');
+    $router->post('reverse-akru-simp','Esaku\Simpanan\AkruSimpController@store');
+    $router->put('reverse-akru-simp','Esaku\Simpanan\AkruSimpController@update');
+    $router->delete('reverse-akru-simp','Esaku\Simpanan\AkruSimpController@destroy');
+    $router->get('reverse-akru-simp-agg','Esaku\Simpanan\AkruSimpController@getAnggota');
+    $router->get('reverse-akru-simp-nokartu','Esaku\Simpanan\AkruSimpController@getNoKartu');
+    $router->get('reverse-akru-simp-listakru','Esaku\Simpanan\AkruSimpController@getDaftarAkru');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
