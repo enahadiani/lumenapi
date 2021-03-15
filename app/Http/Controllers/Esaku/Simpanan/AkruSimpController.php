@@ -261,7 +261,7 @@ class AkruSimpController extends Controller
                     $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','GENBILL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($total).",0,0,'-','-','-','-','-','-','-','-','-')");
                     
                     //hitung dan generate bunga simp sukarela (sebagai setoran angsuran)
-                    $ins4 = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis)
+                    $ins4 = DB::connection($this->db)->update("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis)
                     select '".$no_bukti."',a.no_simp,'".$no_bukti."','".$akunBunga."', round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,a.kode_lokasi,'D','".$periode."','BSIMP',b.no_agg,'BSIMP' 
                     from 
                     kop_simpangs_d a 
@@ -273,7 +273,7 @@ class AkruSimpController extends Controller
                     group by a.no_simp,a.kode_lokasi,b.no_agg ");
                     
                     //generate billing untuk bunga simp sukarela (sebagai billingnya)
-                    $ins5 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
+                    $ins5 = DB::connection($this->db)->update("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
                     select a.no_simp,'".$no_bukti."',a.kode_lokasi,'".$periode."', 
                     round(sum( case a.dc when 'D' then a.nilai else -a.nilai end * b.p_bunga/100/12),0) as bunga,'".$akunBunga."',c.akun_titip,'D','BSIMP',b.no_agg 
                     from 
@@ -288,7 +288,7 @@ class AkruSimpController extends Controller
                     group by a.no_simp,a.kode_lokasi,c.akun_titip,b.no_agg ");
                     
                     //generate billing untuk seluruh jenis simpanan (kecuali ss yg tunai angsurannya / bukan potong gaji)
-                    $ins6 = DB::connection($this->db)->insert("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
+                    $ins6 = DB::connection($this->db)->update("insert into kop_simp_d (no_simp,no_bill,kode_lokasi,periode,nilai,akun_piutang,akun_titip,dc,modul,no_agg) 
                     select x.no_simp,'".$no_bukti."',x.kode_lokasi,'".$periode."',x.nilai,a.akun_piutang,a.akun_titip,'D','GENBILL',x.no_agg 
                     from kop_simp_m x 
                         inner join kop_agg y on x.no_agg=y.no_agg and x.kode_lokasi=y.kode_lokasi 
@@ -370,6 +370,7 @@ class AkruSimpController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
             
             $no_bukti = $request->no_bukti;

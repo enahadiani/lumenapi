@@ -209,6 +209,7 @@ class ReverseAkruController extends Controller
             'keterangan' => 'required|max:100',
             'akun_piutang' => 'required|array',
             'akun_simpanan' => 'required|array',
+            'no_agg' => 'required',
             'no_akru' => 'required|array',
             'no_kartu' => 'required|array',
             'nilai' => 'required|array',
@@ -221,6 +222,7 @@ class ReverseAkruController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
@@ -243,13 +245,13 @@ class ReverseAkruController extends Controller
                     //selisih antara nilai_bill - nilai_bayar, bisa dilunasi sebagai reverse jurnal (modul diisi BTLBILL--> supaya tidak dihitung sbg total angsuran)
                     $nilai = floatval($request->nilai[$i]) - floatval($request->angsuran[$i]);
                     
-                    $ins2[$i] = ("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_simpanan[$i]."','D',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','APSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_simpanan[$i]."','D',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','APSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
                     $idx++;
                     
-                    $ins3[$i] = ("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_piutang[$i]."','C',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','ARSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_piutang[$i]."','C',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','ARSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
                     $idx++;
                     
-                    $ins4[$i] = ("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg) values ('".$no_bukti."','".$request->no_kartu[$i]."','".$request->no_akru[$i]."','".$request->no_piutang[$i]."',".$nilai.",'".$kode_lokasi."','D','".$periode."','BTLBILL','".$request->no_agg."')");	
+                    $ins4[$i] = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg) values ('".$no_bukti."','".$request->no_kartu[$i]."','".$request->no_akru[$i]."','".$request->akun_piutang[$i]."',".$nilai.",'".$kode_lokasi."','D','".$periode."','BTLBILL','".$request->no_agg."')");	
                     
                     $total += $nilai;
                 }		
@@ -315,6 +317,7 @@ class ReverseAkruController extends Controller
             'keterangan' => 'required|max:100',
             'akun_piutang' => 'required|array',
             'akun_simpanan' => 'required|array',
+            'no_agg' => 'required',
             'no_akru' => 'required|array',
             'no_kartu' => 'required|array',
             'nilai' => 'required|array',
@@ -327,6 +330,7 @@ class ReverseAkruController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
             
             $no_bukti = $request->no_bukti;
@@ -335,6 +339,7 @@ class ReverseAkruController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
+            
             $del2 = DB::connection($this->db)->table('trans_j')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
@@ -363,13 +368,13 @@ class ReverseAkruController extends Controller
                     //selisih antara nilai_bill - nilai_bayar, bisa dilunasi sebagai reverse jurnal (modul diisi BTLBILL--> supaya tidak dihitung sbg total angsuran)
                     $nilai = floatval($request->nilai[$i]) - floatval($request->angsuran[$i]);
                     
-                    $ins2[$i] = ("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_simpanan[$i]."','D',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','APSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
+                    $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_simpanan[$i]."','D',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','APSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
                     $idx++;
                     
-                    $ins3[$i] = ("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_piutang[$i]."','C',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','ARSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_piutang[$i]."','C',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','ARSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
                     $idx++;
                     
-                    $ins4[$i] = ("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg) values ('".$no_bukti."','".$request->no_kartu[$i]."','".$request->no_akru[$i]."','".$request->no_piutang[$i]."',".$nilai.",'".$kode_lokasi."','D','".$periode."','BTLBILL','".$request->no_agg."')");	
+                    $ins4[$i] = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg) values ('".$no_bukti."','".$request->no_kartu[$i]."','".$request->no_akru[$i]."','".$request->akun_piutang[$i]."',".$nilai.",'".$kode_lokasi."','D','".$periode."','BTLBILL','".$request->no_agg."')");	
                     
                     $total += $nilai;
                 }		
