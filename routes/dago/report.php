@@ -67,6 +67,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('lap2-paket','Dago\LapInternal2Controller@getPaket');
     $router->get('lap2-dokumen','Dago\LapInternal2Controller@getDokumen');
     $router->get('lap2-jamaah','Dago\LapInternal2Controller@getJamaah');
+    $router->get('lap2-jamaah-list','Dago\LapInternal2Controller@getDaftarJamaah');
 
     $router->get('lap2-form-registrasi','Dago\LapInternal2Controller@getFormRegistrasi');
     $router->get('lap2-registrasi','Dago\LapInternal2Controller@getRegistrasi');
