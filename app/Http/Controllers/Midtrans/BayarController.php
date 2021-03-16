@@ -203,7 +203,7 @@ class BayarController extends Controller
                 
                 try {
                     $item_details = $request->item_details;
-                    $trans_det = $request->transaction_details[0];
+                    $trans_det = $request->transaction_details;
                     $orderId = $trans_det['order_id'];
                     $tmp = explode("|",$item_details[0]['name']);
                     $kode_param = $tmp[0];
