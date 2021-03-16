@@ -222,6 +222,7 @@ class BayarController extends Controller
                     $result['status'] = true;
                     $result['message'] = "Data Pembayaran berhasil disimpan";    
                 } catch (\Throwable $e) {
+                    Log::error($e);
                     DB::connection($this->db)->rollback();
                     $result['status'] = false;
                     $result['message'] = "Data Pembayaran gagal disimpan ".$e;
@@ -232,6 +233,7 @@ class BayarController extends Controller
         } catch (BadResponseException $ex) {
             $response = $ex->getResponse();
             $res = json_decode($response->getBody(),true);
+            Log::error($res);
             $result['status'] = false;
             $result['message'] = $res;
             return response()->json($result, 200);
