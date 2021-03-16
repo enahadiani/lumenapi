@@ -186,13 +186,33 @@ class BayarController extends Controller
 
             $url = ( !config('services.midtrans.isProduction') ? 'https://app.sandbox.midtrans.com/snap/v1/transactions' : 'https://app.midtrans.com/snap/v1/transactions');
 
+            $item_details = $request->item_details;
+            for($i=0; $i < count($item_details); $i++){
+                $tmp = explode("|",$item_details[$i]['name']);
+                $kode_param = $tmp[0];
+                $item_details[$i]['name'] = $kode_param;
+            }
+
+            date_default_timezone_set('Asia/Jakarta');
+            $start_time = date( 'Y-m-d H:i:s O', time() );
+            $payload = [
+                'transaction_details' => $request->transaction_details,
+                'customer_details' => $request->customer_details,
+                'item_details' => $item_details,
+                'expiry' => [
+                    'start_time' => $start_time,
+                    'unit' => 'minutes',
+                    'duration' => 180
+                ]
+            ];
+
             $response = $client->request('POST',  $url,[
                 'headers' => [
                     'Authorization' => 'Basic '.base64_encode(config('services.midtrans.serverKey')),
                     'Accept'     => 'application/json',
                     'Content-Type' => 'application/json'
                 ],
-                'body' => json_encode($request->all())
+                'body' => json_encode($payload)
             ]);
 
             if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) { // 200 OK
@@ -208,6 +228,10 @@ class BayarController extends Controller
                     $tmp = explode("|",$item_details[0]['name']);
                     $kode_param = $tmp[0];
                     $periode_bill = $tmp[1];
+                    $kode_pp = $tmp[2];
+                    $nik = $tmp[3];
+
+                    $kode_lokasi = substr($item_details[0]['id'],0,2);
 
                     $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$item_details[0]['id']."','".floatval($trans_det['gross_amount'])."','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$periode_bill."','".$kode_param."')");
 
