@@ -44,7 +44,7 @@ class AnggotaController extends Controller
                 }else{
                     $filter = " and a.no_agg='$request->no_agg' ";
                 }
-                $sql= "select a.no_agg,a.kode_lokasi,a.nama,a.tgl_lahir,a.alamat,a.no_tel,a.bank,a.cabang,a.no_rek,a.nama_rek,a.flag_aktif,a.id_lain 
+                $sql= "select a.no_agg,a.kode_lokasi,a.nama,a.tgl_lahir,a.alamat,a.no_tel,a.bank,a.cabang,a.no_rek,a.nama_rek,a.flag_aktif,a.id_lain,a.email,a.provinsi,a.kota,a.kecamatan,a.kode_pos 
                 from kop_agg a 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
@@ -102,7 +102,12 @@ class AnggotaController extends Controller
             'no_rek'=>'required|max:50',
             'nama_rek'=>'required|max:50',
             'flag_aktif'=>'required|in:1,0',
-            'id_lain'=> 'required|max:20'
+            'id_lain'=> 'required|max:20',
+            'email' => 'required|max:50',
+            'provinsi' => 'required|max:200',
+            'kota' => 'required|max:200',
+            'kecamatan' => 'required|max:200',
+            'kode_pos' => 'required|max:20'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -114,7 +119,7 @@ class AnggotaController extends Controller
             }
             if($this->isUnik($request->no_agg,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into kop_agg(no_agg,kode_lokasi,nama,tgl_lahir,alamat,no_tel,bank,cabang,no_rek,nama_rek,flag_aktif,id_lain,tgl_input) values ('".$request->no_agg."','".$kode_lokasi."','".$request->nama."','".$request->tgl_lahir."','".$request->alamat."','".$request->no_tel."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->flag_aktif."','".$request->id_lain."',getdate()) ");
+                $ins = DB::connection($this->sql)->insert("insert into kop_agg(no_agg,kode_lokasi,nama,tgl_lahir,alamat,no_tel,bank,cabang,no_rek,nama_rek,flag_aktif,id_lain,tgl_input,email,provinsi,kota,kecamatan,kode_pos) values ('".$request->no_agg."','".$kode_lokasi."','".$request->nama."','".$request->tgl_lahir."','".$request->alamat."','".$request->no_tel."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->flag_aktif."','".$request->id_lain."',getdate(),'".$request->email."','".$request->provinsi."','".$request->kota."','".$request->kecamatan."','".$request->kode_pos."') ");
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -170,7 +175,12 @@ class AnggotaController extends Controller
             'no_rek'=>'required|max:50',
             'nama_rek'=>'required|max:50',
             'flag_aktif'=>'required|in:1,0',
-            'id_lain'=> 'required|max:20'
+            'id_lain'=> 'required|max:20',
+            'email' => 'required|max:50',
+            'provinsi' => 'required|max:200',
+            'kota' => 'required|max:200',
+            'kecamatan' => 'required|max:200',
+            'kode_pos' => 'required|max:20'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -186,7 +196,7 @@ class AnggotaController extends Controller
             ->where('no_agg', $request->no_agg)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into kop_agg(no_agg,kode_lokasi,nama,tgl_lahir,alamat,no_tel,bank,cabang,no_rek,nama_rek,flag_aktif,id_lain,tgl_input) values ('".$request->no_agg."','".$kode_lokasi."','".$request->nama."','".$request->tgl_lahir."','".$request->alamat."','".$request->no_tel."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->flag_aktif."','".$request->id_lain."',getdate()) ");
+            $ins = DB::connection($this->sql)->insert("insert into kop_agg(no_agg,kode_lokasi,nama,tgl_lahir,alamat,no_tel,bank,cabang,no_rek,nama_rek,flag_aktif,id_lain,tgl_input,email,provinsi,kota,kecamatan,kode_pos) values ('".$request->no_agg."','".$kode_lokasi."','".$request->nama."','".$request->tgl_lahir."','".$request->alamat."','".$request->no_tel."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->flag_aktif."','".$request->id_lain."',getdate(),'".$request->email."','".$request->provinsi."','".$request->kota."','".$request->kecamatan."','".$request->kode_pos."') ");
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
