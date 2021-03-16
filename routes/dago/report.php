@@ -35,6 +35,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('filter2-peserta','Dago\FilterController@getFilter2Peserta');
     $router->get('filter2-kwitansi','Dago\FilterController@getFilter2Kwitansi');
     $router->get('filter2-jk','Dago\FilterController@getFilter2JK');
+    $router->get('filter2-status','Dago\FilterController@getFilter2Status');
     $router->get('filter2-terima','Dago\FilterController@getFilter2Terima');
     $router->get('filter2-periode-bayar','Dago\FilterController@getFilter2PeriodeBayar');
 

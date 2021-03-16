@@ -256,12 +256,12 @@ class PenerimaanTunaiController extends Controller
                     $ins = DB::connection($this->db)->insert("insert into kop_cd_d (no_bukti,kode_lokasi,no_agg,periode,nilai,kode_akun,dc,modul,no_ref1) values ('".$no_bukti."','".$kode_lokasi."','".$request->no_agg."','".$periode."',".floatval($request->nilai_deposit).",'".$akunCD."','C','KBSIMP','-')");								
                 }
 
-                for ($i=0;$i < count($request->no_akru); $i++){
-                    $nilaiPiu = floatval(this.sg1.cells(7,i));							
-                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('"+this.e_nb.getText()+"','"+this.app._lokasi+"',getdate(),'".$nik."','".$periode."','"+this.sg1.cells(2,i)+"','".$request->tanggal."',"+i+",'"+this.sg1.cells(5,i)+"','C',"+nilaiPiu+","+nilaiPiu+",'Pelunasan atas "+this.sg1.cells(2,i)+"','KBSIMP','AR','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                for ($i=0;$i < count($request->no_akru); $i++){	
+                    $nilaiPiu = floatval($request->nilai_tagihan[$i]);						
+                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$i.",'".$request->akun_piutang[$i]."','C',".$nilaiPiu.",".$nilaiPiu.",'Pelunasan atas ".$request->no_kartu[$i]."','KBSIMP','AR','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
                     
-                    $ins = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis) values "+
-                    "('"+this.e_nb.getText()+"','"+this.sg1.cells(2,i)+"','"+this.sg1.cells(1,i)+"','"+this.sg1.cells(5,i)+"',"+nilaiPiu+",'"+this.app._lokasi+"','D','".$periode."','SIMPTUNAI','"+this.cb_agg.getText()+"','SIMP')");						
+                    $ins = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis) values 
+                    ('".$no_bukti."','".$request->no_kartu[$i]."','".$request->no_akru[$i]."','".$request->akun_piutang[$i]."',".$nilaiPiu.",'".$kode_lokasi."','D','".$periode."','SIMPTUNAI','".$request->no_agg."','SIMP')");						
                 }	
 
                 DB::connection($this->db)->commit();
