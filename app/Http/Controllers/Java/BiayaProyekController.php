@@ -143,12 +143,20 @@ class BiayaProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select a.no_proyek, a.no_rab, (a.nilai_anggaran - c.anggaran_dipake) as sisa_anggaran from java_rab_m a
-            inner join java_proyek b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
-            inner join (select SUM(ab.nilai) as anggaran_dipake, ab.kode_lokasi, ab.no_rab from java_beban as ab
-            group by ab.kode_lokasi, ab.no_rab) c
-            on a.no_rab=c.no_rab and a.kode_lokasi = c.kode_lokasi 
-            where a.kode_lokasi='".$kode_lokasi."' and b.kode_cust = '$request->kode_cust' $filter";
+            $sql= "select a.no_proyek,isnull(c.nilai,0)-isnull(d.nilai,0) as saldo
+            from java_proyek a
+            left join (select b.no_proyek,b.kode_lokasi,sum(a.jumlah*a.harga) as nilai
+                        from java_rab_d a
+                        inner join java_rab_m b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi='".$kode_lokasi."'
+                        group by b.no_proyek,b.kode_lokasi
+                        )c on a.no_proyek=c.no_proyek and a.kode_lokasi=c.kode_lokasi
+            left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
+                        from java_beban  a
+                        where a.kode_lokasi='".$kode_lokasi."'
+                        group by a.no_proyek,a.kode_lokasi
+                        )d on a.no_proyek=d.no_proyek and a.kode_lokasi=d.kode_lokasi 
+            where a.kode_lokasi='".$kode_lokasi."' and a.kode_cust = '$request->kode_cust'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
