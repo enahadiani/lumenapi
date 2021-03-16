@@ -553,7 +553,7 @@ class PembayaranController extends Controller
             $sql5 = " select a.no_kwitansi, a.tgl_bayar, a.no_reg, a.paket, a.jadwal, round(a.nilai_p,4) as nilai_p, a.nilai_t,nilai_m, a.total_bayar as total_idr 
             from dgw_pembayaran a 
             inner join trans_m b on a.no_kb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.posted='F' and b.form='KBREG' and a.no_kwitansi <> '$no_bukti' ";
+            where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.form in ('KBREG','KBGROUP') and a.no_kwitansi <> '$no_bukti' ";
             $res5 = DB::connection($this->sql)->select( $sql5);
             $res5 = json_decode(json_encode($res5),true);
 
@@ -694,7 +694,7 @@ class PembayaranController extends Controller
             $sql4 = " select a.no_kwitansi, a.tgl_bayar, a.no_reg, a.paket, a.jadwal, round(a.nilai_p,4) as nilai_p, a.nilai_t,a.nilai_m, a.total_bayar as total_idr 
             from dgw_pembayaran a 
             inner join trans_m b on a.no_kb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.posted='F' and b.form='KBREG' ";
+            where b.kode_lokasi='".$kode_lokasi."' and a.no_reg='$id' and b.form in ('KBREG','KBGROUP')  ";
             $res4 = DB::connection($this->sql)->select( $sql4);
             $res4 = json_decode(json_encode($res4),true);
 
