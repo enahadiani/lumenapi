@@ -44,7 +44,7 @@ class AnggotaController extends Controller
                 }else{
                     $filter = " and a.no_agg='$request->no_agg' ";
                 }
-                $sql= "select a.no_agg,a.kode_lokasi,a.nama,a.tgl_lahir,a.alamat,a.no_tel,a.bank,a.cabang,a.no_rek,a.nama_rek,a.flag_aktif,a.id_lain,a.email,a.provinsi,a.kota,a.kecamatan,a.kode_pos 
+                $sql= "select a.no_agg,a.kode_lokasi,a.nama,a.tgl_lahir,a.alamat,a.no_tel,a.bank,a.cabang,a.no_rek,a.nama_rek,a.flag_aktif,a.id_lain,a.email,a.provinsi,a.kota,a.kecamatan,a.kode_pos,a.tgl_input 
                 from kop_agg a 
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{

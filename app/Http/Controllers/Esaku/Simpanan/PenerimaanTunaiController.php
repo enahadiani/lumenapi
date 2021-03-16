@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class PenerimaanNonAkruController extends Controller
+class PenerimaanTunaiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -160,9 +160,9 @@ class PenerimaanNonAkruController extends Controller
             }
 
             $sql="
-            select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.nilai1,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input 
+            select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input 
             from trans_m a 
-            where a.kode_lokasi='".$kode_lokasi."' and a.posted='F' and a.form='BTLBILL' ";
+            where a.kode_lokasi='".$kode_lokasi."' and a.form = 'KBSIMP' and a.posted ='F' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -227,7 +227,7 @@ class PenerimaanNonAkruController extends Controller
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
 
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-RSM".substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
 
             $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
             if(count($getPP) > 0){
@@ -240,38 +240,36 @@ class PenerimaanNonAkruController extends Controller
 
             if($cek['status']){
 
-                $idx = 0; $total =0;
-                for ($i=0;$i < count($request->no_kartu);$i++){						
-                    //selisih antara nilai_bill - nilai_bayar, bisa dilunasi sebagai reverse jurnal (modul diisi BTLBILL--> supaya tidak dihitung sbg total angsuran)
-                    $nilai = floatval($request->nilai[$i]) - floatval($request->angsuran[$i]);
-                    
-                    $ins2[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_simpanan[$i]."','D',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','APSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
-                    $idx++;
-                    
-                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_kartu[$i]."','".$request->tanggal."',".$idx.",'".$request->akun_piutang[$i]."','C',".$nilai.",".$nilai.",'".$request->keterangan."','BTLBILL','ARSIMP','IDR',1,'".$kode_lokasi."','-','-','-','-','-','-','-','-')");
-                    $idx++;
-                    
-                    $ins4[$i] = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg) values ('".$no_bukti."','".$request->no_kartu[$i]."','".$request->no_akru[$i]."','".$request->akun_piutang[$i]."',".$nilai.",'".$kode_lokasi."','D','".$periode."','BTLBILL','".$request->no_agg."')");	
-                    
-                    $total += $nilai;
-                }		
-                
-                if($total > 0){
+                $akunKB = $request->akun_kasbank;
+				if ($akunKB == "") $akunKB = "-"; 	
 
-                    $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$kode_lokasi."','".$periode."','KP','BTLBILL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($total).",0,0,'-','-','-','-','-','-','-','-','-')");
-                    
-                    DB::connection($this->db)->commit();
-                    $success['status'] = true;
-                    $success['kode'] = $no_bukti;
-                    $success['message'] = "Data Reverse Akru Simpanan berhasil disimpan";
+                $total = floatval($request->nilai_bayar)+floatval($request->nilai_deposit);
+				$ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBSIMP','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".$total.",".floatval($request->nilai_bayar).",".floatval($request->nilai_deposit).",'-','-','-','".$akunKB."','-','-','".$request->no_agg."','".$request->jenis."','-')");
                 
-                }else{
-
-                    DB::connection($this->db)->rollback();
-                    $success['status'] = false;
-                    $success['kode'] = "-";
-                    $success['message'] = "Transaksi tidak valid. Nilai pembatalan akru tidak boleh kurang/sama dgn 0.";
+                if (floatval($request->nilai_bayar) != 0) {					
+                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',98,'".$request->akun_kas."','D',".floatval($request->nilai_bayar).",".floatval($request->nilai_bayar).",'".$request->keterangan."','KBSIMP','KB','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
                 }
+
+                if (floatval($request->nilai_deposit) != 0) {					
+                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',99,'".$akunCD."','D',".floatval($request->nilai_deposit).",".floatval($request->nilai_deposit).",'".$request->keterangan."','KBSIMP','CD','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+
+                    $ins = DB::connection($this->db)->insert("insert into kop_cd_d (no_bukti,kode_lokasi,no_agg,periode,nilai,kode_akun,dc,modul,no_ref1) values ('".$no_bukti."','".$kode_lokasi."','".$request->no_agg."','".$periode."',".floatval($request->nilai_deposit).",'".$akunCD."','C','KBSIMP','-')");								
+                }
+
+                for ($i=0;$i < count($request->no_akru); $i++){
+                    $nilaiPiu = floatval(this.sg1.cells(7,i));							
+                    $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('"+this.e_nb.getText()+"','"+this.app._lokasi+"',getdate(),'".$nik."','".$periode."','"+this.sg1.cells(2,i)+"','".$request->tanggal."',"+i+",'"+this.sg1.cells(5,i)+"','C',"+nilaiPiu+","+nilaiPiu+",'Pelunasan atas "+this.sg1.cells(2,i)+"','KBSIMP','AR','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+                    
+                    $ins = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis) values "+
+                    "('"+this.e_nb.getText()+"','"+this.sg1.cells(2,i)+"','"+this.sg1.cells(1,i)+"','"+this.sg1.cells(5,i)+"',"+nilaiPiu+",'"+this.app._lokasi+"','D','".$periode."','SIMPTUNAI','"+this.cb_agg.getText()+"','SIMP')");						
+                }	
+
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['kode'] = $no_bukti;
+                $success['message'] = "Data Reverse Akru Simpanan berhasil disimpan";
+
+                
             }else{
 
                 DB::connection($this->db)->rollback();
@@ -599,7 +597,7 @@ class PenerimaanNonAkruController extends Controller
     {
         $this->validate($request,[
             'no_bukti' => 'required',
-            'no_simp' => 'required'
+            'no_agg' => 'required'
         ]);
 
         try {
@@ -609,23 +607,24 @@ class PenerimaanNonAkruController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select a.tanggal,a.keterangan, b.no_simp,c.no_agg 
-            from trans_m a inner join kop_simpangs_d b on a.no_bukti=b.no_angs and a.kode_lokasi=b.kode_lokasi 							 
-                inner join kop_simp_m c on b.no_simp=c.no_simp and c.kode_lokasi=b.kode_lokasi 
+            $strSQL = "select * 
+            from trans_m a 
                 where a.no_bukti = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."'";	
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
 
-            $strSQL2 = "select a.no_simp,a.jenis,b.nilai,b.akun_piutang,b.akun_titip,b.periode,b.no_bill,c.keterangan as ket,isnull(d.bayar,0) as bayar 
+            $strSQL2 = "select b.no_bill,a.no_simp,a.jenis,e.nama,b.akun_piutang,b.periode,b.nilai-isnull(d.bayar,0) as saldo 
             from  kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp  and a.kode_lokasi=b.kode_lokasi 
-            inner join trans_m c on b.no_bill=c.no_bukti and b.kode_lokasi=c.kode_lokasi 
-            inner join kop_simpangs_d dd on b.no_simp=dd.no_simp and b.no_bill=dd.no_bill and b.kode_lokasi=dd.kode_lokasi 
-            left outer join   
+                inner join trans_m c on b.no_bill=c.no_bukti and b.kode_lokasi=c.kode_lokasi 
+                inner join kop_simp_param e on a.kode_param=e.kode_param and a.kode_lokasi=e.kode_lokasi 
+                inner join kop_simpangs_d dd on b.no_simp=dd.no_simp and b.no_bill=dd.no_bill and b.kode_lokasi=dd.kode_lokasi 
+                left outer join   
                 (select y.no_simp, y.no_bill, y.kode_lokasi, sum(case dc when 'D' then y.nilai else -y.nilai end) as bayar 
-                from kop_simpangs_d y inner join trans_m x on y.no_angs=x.no_bukti and y.kode_lokasi=x.kode_lokasi 
-                where y.no_angs<>'".$request->no_bukti."' and y.no_simp = '".$request->no_simp."' and y.kode_lokasi='".$kode_lokasi."'                 
-                group by y.no_simp, y.no_bill, y.kode_lokasi) d on b.no_simp=d.no_simp and b.no_bill=d.no_bill and b.kode_lokasi=d.kode_lokasi 							 
-            where dd.no_angs='".$request->no_bukti."' and a.no_simp = '".$request->no_simp."' and a.kode_lokasi= '".$kode_lokasi."' order by a.no_simp,b.periode"; 
+                           from kop_simpangs_d y inner join trans_m x on y.no_angs=x.no_bukti and y.kode_lokasi=x.kode_lokasi 
+                           where y.no_angs<>'".$request->no_bukti."' and y.no_agg = '".$request->no_agg."' and y.kode_lokasi='".$kode_lokasi."' 
+                           group by y.no_simp, y.no_bill, y.kode_lokasi
+                ) d on b.no_simp=d.no_simp and b.no_bill=d.no_bill and b.kode_lokasi=d.kode_lokasi 
+            where  dd.no_angs='".$request->no_bukti."' and dd.kode_lokasi= '".$kode_lokasi."' order by a.no_simp,b.periode"; 
             
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
