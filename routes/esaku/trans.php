@@ -254,6 +254,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('reverse-akru-simp-nokartu','Esaku\Simpanan\ReverseAkruController@getNoKartu');
     $router->get('reverse-akru-simp-listakru','Esaku\Simpanan\ReverseAkruController@getDaftarAkru');
 
+    // PENERIMAAN SIMPANAN
+    $router->get('terima-simp','Esaku\Simpanan\PenerimaanTunaiController@index');
+    $router->get('terima-simp-detail','Esaku\Simpanan\PenerimaanTunaiController@show');
+    $router->post('terima-simp','Esaku\Simpanan\PenerimaanTunaiController@store');
+    $router->put('terima-simp','Esaku\Simpanan\PenerimaanTunaiController@update');
+    $router->delete('terima-simp','Esaku\Simpanan\PenerimaanTunaiController@destroy');
+    $router->get('terima-simp-akunkas','Esaku\Simpanan\PenerimaanTunaiController@getAkunKas');
+    $router->get('terima-simp-tagihan','Esaku\Simpanan\PenerimaanTunaiController@getTagihan');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
