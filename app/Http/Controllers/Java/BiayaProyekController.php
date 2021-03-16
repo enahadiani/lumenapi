@@ -143,7 +143,7 @@ class BiayaProyekController extends Controller {
                 $filter = "";
             }
 
-            $sql= "select a.no_proyek,isnull(c.nilai,0)-isnull(d.nilai,0) as saldo
+            $sql= "select a.no_proyek,a.keterangan,isnull(c.nilai,0)-isnull(d.nilai,0) as saldo
             from java_proyek a
             left join (select b.no_proyek,b.kode_lokasi,sum(a.jumlah*a.harga) as nilai
                         from java_rab_d a
