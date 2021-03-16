@@ -228,10 +228,12 @@ class BayarController extends Controller
                     $tmp = explode("|",$item_details[0]['name']);
                     $kode_param = $tmp[0];
                     $periode_bill = $tmp[1];
-                    // $kode_pp = $tmp[2];
-                    // $nik = $tmp[3];
 
-                    // $kode_lokasi = substr($item_details[0]['id'],0,2);
+                    $tmp2 = explode("|",$request->user_id);
+                    $nik = $tmp2[0];
+                    $kode_pp = $tmp2[1];
+
+                    $kode_lokasi = substr($item_details[0]['id'],0,2);
 
                     $ins = DB::connection($this->db)->insert("insert into sis_mid_bayar (no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,kode_lokasi,nik_user,tgl_input,kode_pp,periode_bill,kode_param) values ('$orderId','$nik','".$item_details[0]['id']."','".floatval($trans_det['gross_amount'])."','Pembayaran via midtrans','process','$snap_token','$kode_lokasi','$nik',getdate(),'$kode_pp','".$periode_bill."','".$kode_param."')");
 
