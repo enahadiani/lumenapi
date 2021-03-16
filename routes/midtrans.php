@@ -56,10 +56,9 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
 
     
     $router->get('sis-midtrans-status','Midtrans\BayarController@getStatusTransaksi');
-    
+    $router->post('sis-midtrans/charge','Midtrans\BayarController@getSnapToken');
 });
 
-$router->post('sis-midtrans/charge','Midtrans\BayarController@getSnapToken');
 $router->put('sis-midtrans/{no_bukti}/{sts_bayar}','Midtrans\BayarController@ubahStatus');
 $router->put('donasi/{no_bukti}/{sts_bayar}','Midtrans\DonasiController@ubahStatus');
 $router->get('sis-midtrans-status2','Midtrans\BayarController@getStatusTransaksi');
