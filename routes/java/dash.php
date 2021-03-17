@@ -22,6 +22,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     
     $router->get('beban-unpaid','Java\DashboardController@getBebanUnpaid');
     $router->get('total-project','Java\DashboardController@getTotalProject');
+    $router->get('anggaran-project','Java\DashboardController@getAnggaranProject');
+    $router->get('tempo-project','Java\DashboardController@getTempoProject');
 
 });
 
