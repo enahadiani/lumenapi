@@ -5592,7 +5592,7 @@ class DashboardController extends Controller
             sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as real,case sum(n1) when 0 then 0 else (sum(n4)/sum(n1))*100 end as persen  
             from dash_grafik_d a
             left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_grafik='GR44' and a.kode_fs='FS4'
+            $where and a.kode_grafik='GR44' 
             group by a.kode_neraca,b.nama
             ";
             $rs = DB::connection($this->db)->select($sql);
