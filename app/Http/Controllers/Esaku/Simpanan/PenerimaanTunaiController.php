@@ -419,7 +419,7 @@ class PenerimaanTunaiController extends Controller
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['kode'] = $no_bukti;
-                $success['message'] = "Data Penerimaan Simpanan berhasil disimpan";
+                $success['message'] = "Data Penerimaan Simpanan berhasil diubah";
 
                 
             }else{
