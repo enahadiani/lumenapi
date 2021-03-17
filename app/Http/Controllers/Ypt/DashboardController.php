@@ -3902,7 +3902,7 @@ class DashboardController extends Controller
                 array_push($ctg,$tahun);
                 array_push($ctg2,'Pendapatan '.$tahun);
                 array_push($ctg2,'Beban '.$tahun);
-                // array_push($ctg2,'SHU '.$tahun);
+                array_push($ctg2,'SHU '.$tahun);
                 // array_push($ctg2,'OR '.$tahun);
                 $tahun++;
             }
@@ -3930,7 +3930,7 @@ class DashboardController extends Controller
                     left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
                     left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
                     left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
-                    where a.kode_lokasi='11'  and x.kode_klp='K07' and x.nama not in ('SHU','OR')
+                    where a.kode_lokasi='11'  and x.kode_klp='K07' and x.nama not in ('OR')
                     group by a.kode_grafik,x.nama");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
