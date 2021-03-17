@@ -159,13 +159,14 @@ class KartuSimpController extends Controller
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['kode'] = $no_bukti;
+            $success['no_bukti'] = $no_bukti;
             $success['message'] = "Data Kartu Simpanan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
+            $success['no_bukti'] = "-";
             $success['message'] = "Data Kartu Simpanan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
