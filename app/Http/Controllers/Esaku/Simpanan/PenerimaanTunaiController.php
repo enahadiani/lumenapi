@@ -254,7 +254,7 @@ class PenerimaanTunaiController extends Controller
 				if ($akunKB == "") $akunKB = "-"; 	
 
                 $total = floatval($request->nilai_bayar)+floatval($request->nilai_deposit);
-				$ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBSIMP','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".$total.",".floatval($request->nilai_bayar).",".floatval($request->nilai_deposit).",'-','-','-','".$akunKB."','-','-','".$request->no_agg."','".$request->jenis."','-')");
+				$ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBSIMP','F','0','0','".$kode_pp."','".$request->tanggal."','$request->no_dokumen','".$request->keterangan."','IDR',1,".$total.",".floatval($request->nilai_bayar).",".floatval($request->nilai_deposit).",'-','-','-','".$akunKB."','-','-','".$request->no_agg."','".$request->jenis."','-')");
                 
                 if (floatval($request->nilai_bayar) != 0) {					
                     $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',98,'".$request->akun_kas."','D',".floatval($request->nilai_bayar).",".floatval($request->nilai_bayar).",'".$request->keterangan."','KBSIMP','KB','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
@@ -361,7 +361,7 @@ class PenerimaanTunaiController extends Controller
             ->where('no_angs', $no_bukti)
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('kode_cd_d')
+            $del4 = DB::connection($this->db)->table('kop_cd_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
@@ -419,7 +419,7 @@ class PenerimaanTunaiController extends Controller
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['kode'] = $no_bukti;
-                $success['message'] = "Data Penerimaan Simpanan berhasil disimpan";
+                $success['message'] = "Data Penerimaan Simpanan berhasil diubah";
 
                 
             }else{
@@ -475,7 +475,7 @@ class PenerimaanTunaiController extends Controller
             ->where('no_angs', $no_bukti)
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('kode_cd_d')
+            $del4 = DB::connection($this->db)->table('kop_cd_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
