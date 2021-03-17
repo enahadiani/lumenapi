@@ -44,8 +44,10 @@ class JenisController extends Controller
                 }else{
                     $filter = " and a.kode_param='$request->kode_param' ";
                 }
-                $sql= "select a.kode_param,a.nama,a.kode_lokasi,a.akun_piutang,a.akun_titip,a.jenis,a.nilai,a.p_bunga,a.nu 
+                $sql= "select a.kode_param,a.nama,a.kode_lokasi,a.akun_piutang,a.akun_titip,a.jenis,a.nilai,a.p_bunga,a.nu,b.nama as nama_akunpiutang,c.nama as nama_akuntitip 
                 from kop_simp_param a 
+                inner join masakun b on a.akun_piutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                inner join masakun c on a.akun_titip=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select a.kode_param,a.nama,a.akun_piutang,a.akun_titip,a.jenis,a.nilai,a.p_bunga,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.tgl_input from kop_simp_param a where a.kode_lokasi= '".$kode_lokasi."'";

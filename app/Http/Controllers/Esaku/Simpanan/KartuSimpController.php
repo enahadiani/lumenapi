@@ -80,8 +80,9 @@ class KartuSimpController extends Controller
                 }else{
                     $filter = " and a.no_simp='$request->no_simp' ";
                 }
-                $sql= "select a.no_simp,a.kode_lokasi,a.no_agg,a.kode_param,a.jenis,a.nilai,a.p_bunga,a.tgl_tagih,a.status_bayar,a.periode_gen,a.flag_aktif,a.nik_user,a.tgl_input,a.periode_bunga
+                $sql= "select a.no_simp,a.kode_lokasi,a.no_agg,a.kode_param,a.jenis,a.nilai,a.p_bunga,a.tgl_tagih,a.status_bayar,a.periode_gen,a.flag_aktif,a.nik_user,a.tgl_input,a.periode_bunga,b.nama as nama_anggota
                 from kop_simp_m a 
+                inner join kop_agg b on a.no_agg=b.no_agg and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
 
