@@ -55,7 +55,9 @@ class LapInternal2Controller extends Controller
 
             $sql="select a.no_reg,a.kode_lokasi,a.no_peserta,a.no_paket,a.no_jadwal, convert(varchar,b.tgl_berangkat,103)  as tgl_berangkat,c.nama as nama_paket,c.jenis,e.nama as nama_room,f.nama_agen as agen,datediff(year,d.tgl_lahir,getdate()) as usia,
             d.nama,d.jk,d.tempat,convert(varchar,d.tgl_lahir,103) as tgl_lahir,''''+d.id_peserta as id_peserta,d.alamat,d.hp,d.nopass,convert(varchar,d.issued,103) as issued,convert(varchar,d.ex_pass,103) as ex_pass,d.kantor_mig,d.ibu,d.ayah,
-            d.pendidikan,h.nama as pekerjaan,d.status,a.brkt_dgn,convert(varchar,b.tgl_datang,103) as tgl_aktual,'-' as kakek,g.nama_marketing
+            d.pendidikan,h.nama as pekerjaan,d.status,a.brkt_dgn,convert(varchar,b.tgl_datang,103) as tgl_aktual,'-' as kakek,g.nama_marketing,
+            isnull(i.no_gambar,'-') as dok_ktp,isnull(j.no_gambar,'-') as dok_ak,isnull(k.no_gambar,'-') as dok_ps,
+			isnull(l.no_gambar,'-') as dok_kk,isnull(m.no_gambar,'-') as dok_sn,isnull(n.no_gambar,'-') as dok_pf
             from dgw_reg a
             inner join dgw_jadwal b on a.no_paket=b.no_paket and a.no_jadwal=b.no_jadwal and a.kode_lokasi=b.kode_lokasi
             inner join dgw_paket c on a.no_paket=c.no_paket and a.kode_lokasi=c.kode_lokasi 
@@ -64,6 +66,12 @@ class LapInternal2Controller extends Controller
             inner join dgw_agent f on a.no_agen=f.no_agen and a.kode_lokasi=f.kode_lokasi
             inner join dgw_marketing g on a.no_marketing=g.no_marketing and a.kode_lokasi=g.kode_lokasi
             inner join dgw_pekerjaan h on d.pekerjaan=h.id_pekerjaan and d.kode_lokasi=h.kode_lokasi
+            left join dgw_scan i on a.no_reg=i.no_bukti and a.kode_lokasi=i.kode_lokasi and i.modul='KTP'
+            left join dgw_scan j on a.no_reg=j.no_bukti and a.kode_lokasi=j.kode_lokasi and j.modul='AK'
+            left join dgw_scan k on a.no_reg=k.no_bukti and a.kode_lokasi=k.kode_lokasi and k.modul='PS'
+            left join dgw_scan l on a.no_reg=l.no_bukti and a.kode_lokasi=l.kode_lokasi and k.modul='KK'
+            left join dgw_scan m on a.no_reg=m.no_bukti and a.kode_lokasi=m.kode_lokasi and m.modul='SN'
+            left join dgw_scan n on a.no_reg=n.no_bukti and a.kode_lokasi=n.kode_lokasi and n.modul='PF'
             $where ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
