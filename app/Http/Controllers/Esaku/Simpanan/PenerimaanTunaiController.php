@@ -361,7 +361,7 @@ class PenerimaanTunaiController extends Controller
             ->where('no_angs', $no_bukti)
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('kode_cd_d')
+            $del4 = DB::connection($this->db)->table('kop_cd_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
@@ -475,7 +475,7 @@ class PenerimaanTunaiController extends Controller
             ->where('no_angs', $no_bukti)
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('kode_cd_d')
+            $del4 = DB::connection($this->db)->table('kop_cd_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
