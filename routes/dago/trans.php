@@ -58,6 +58,14 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('pembayaran-preview','Dago\PembayaranController@getPreview');
     $router->get('pembayaran-kurs','Dago\PembayaranController@getKurs');
 
+    //Closing Jadwal
+    $router->get('closing-jadwal-reg','Dago\ClosingJadwalController@getRegistrasi');
+    $router->get('closing-jadwal','Dago\ClosingJadwalController@index');
+    $router->post('closing-jadwal','Dago\ClosingJadwalController@store');
+    $router->get('closing-jadwal-detail','Dago\ClosingJadwalController@show');
+    $router->put('closing-jadwal','Dago\ClosingJadwalController@update');
+    $router->delete('closing-jadwal','Dago\ClosingJadwalController@destroy');
+
     //NON CASH
     $router->get('noncash','Dago\PembayaranNonCashController@getRegistrasi');
     $router->post('noncash','Dago\PembayaranNonCashController@store');
