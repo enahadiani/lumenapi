@@ -673,6 +673,13 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/java-dash'
+], function ($router) {
+    require __DIR__.'/../routes/java/dash.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/esaku-auth'
 ], function ($router) {
     require __DIR__.'/../routes/esaku/auth.php';
