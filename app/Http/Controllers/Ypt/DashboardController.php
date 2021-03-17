@@ -1585,6 +1585,15 @@ class DashboardController extends Controller
             }
             $success['colors'] = $color;
 
+            $get = DB::connection($this->db)->select("select nama, case when nama like 'Fakultas%' then 'Jurusan' else 'PP' end as nama2 from bidang where kode_bidang='$kode_bidang' ");
+            if(count($get) >0){
+                $success['nama_bidang'] = $get[0]->nama;
+                $success['nama_pp'] = $get[0]->nama2;
+            }else{
+                $success['nama_bidang'] = "-";
+                $success['nama_pp'] = "-";
+            }
+
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
@@ -2104,6 +2113,14 @@ class DashboardController extends Controller
             }
             $success['colors'] = $color;
 
+            $get = DB::connection($this->db)->select("select nama, case when nama like 'Fakultas%' then 'Jurusan' else 'PP' end as nama2 from bidang where kode_bidang='$kode_bidang' ");
+            if(count($get) >0){
+                $success['nama_bidang'] = $get[0]->nama;
+                $success['nama_pp'] = $get[0]->nama2;
+            }else{
+                $success['nama_bidang'] = "-";
+                $success['nama_pp'] = "-";
+            }
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
