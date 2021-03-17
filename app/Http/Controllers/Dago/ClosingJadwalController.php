@@ -321,7 +321,7 @@ class ClosingJadwalController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required'
+            'no_bukti' => 'required',
         ]);
         try {
             
@@ -330,13 +330,17 @@ class ClosingJadwalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.*,convert(varchar,tgl_berangkat,103) as tgl_jadwal 
-            from dgw_closing_d a inner join dgw_jadwal b on a.no_jadwal=b.no_jadwal and a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi
+            $sql = "select a.*,convert(varchar,tgl_berangkat,103) as tgl_jadwal,c.nama as nama_paket 
+            from dgw_closing_d a 
+            inner join dgw_jadwal b on a.no_jadwal=b.no_jadwal and a.no_paket=b.no_paket and a.kode_lokasi=b.kode_lokasi
+            inner join dgw_paket c on a.no_paket=c.no_paket and a.kode_lokasi=c.kode_lokasi
             where a.no_closing = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $res2 = DB::connection($this->db)->select("select 
+            $kurs = $res[0]['kurs'];
+
+            $sql = "select 
             a.no_reg,b.no_peserta+' - '+b.nama as nama, f.kode_akun as akun_titip,f.akun_piutang,f.akun_pdpt, 
             
             (a.harga+a.harga_room) as harga_paket,isnull(d.biaya_tambah,0)-a.diskon as biaya_tambah, isnull(h.biaya_dok,0) as biaya_dok, 						
@@ -347,7 +351,7 @@ class ClosingJadwalController extends Controller
             
             isnull(e.bayar_p_idr,0) as bayar_p_idr, 
             isnull(e.bayar_p_idr,0) + isnull(e.bayar_t,0) as  tot_bayaridr, 
-            (case when ((a.harga+a.harga_room) - isnull(e.bayar_p,0) <> 0) then (  ((a.harga+a.harga_room) - isnull(e.bayar_p,0)) * ".$request->kurs."  ) else 0 end) 
+            (case when ((a.harga+a.harga_room) - isnull(e.bayar_p,0) <> 0) then (  ((a.harga+a.harga_room) - isnull(e.bayar_p,0)) * ".floatval($kurs)."  ) else 0 end) 
             + (isnull(d.biaya_tambah,0) - a.diskon - isnull(e.bayar_t,0)) 
             + (isnull(h.biaya_dok,0) - isnull(e.bayar_m,0)) 
             as tot_saldo_idr
@@ -373,7 +377,8 @@ class ClosingJadwalController extends Controller
             from dgw_pembayaran where kode_lokasi ='".$kode_lokasi."' 
             group by kode_lokasi,no_reg 						 
             ) e on a.no_reg=e.no_reg and a.kode_lokasi=e.kode_lokasi 
-            where c.kode_lokasi ='".$kode_lokasi."' and c.no_closing='".$request->no_bukti."'");
+            where c.kode_lokasi ='".$kode_lokasi."' and c.no_closing='".$request->no_bukti."'";
+            $res2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -391,6 +396,7 @@ class ClosingJadwalController extends Controller
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
+            $success['sql'] = $sql;
             $success['status'] = "FAILED";
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
@@ -448,8 +454,10 @@ class ClosingJadwalController extends Controller
 
             $get = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('AKUNT','AKUND') and kode_lokasi = '".$kode_lokasi."'");
             if(count($get) > 0){
-                if ($get[0]->kode_spro == "AKUNT") $akunTambah = $get[0]->flag;
-                if ($get[0]->kode_spro == "AKUND") $akunDokumen = $get[0]->flag;
+                foreach($get as $row){
+                    if ($row->kode_spro == "AKUNT") $akunTambah = $row->flag;
+                    if ($row->kode_spro == "AKUND") $akunDokumen = $row->flag;
+                }
             }else{
                 $akunTambah = "-";
                 $akunDokumen = "-";
@@ -464,7 +472,7 @@ class ClosingJadwalController extends Controller
 		
                 for ($i=0;$i < count($request->no_reg);$i++){
 
-                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',".$i.",'".$request->akun_titip[$i]."','D',",floatval($request->bayar_paket[$i]),",",floatval($request->bayar_paket[$i]),",'".$request->keterangan."','MI','TITIP','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',".$i.",'".$request->akun_titip[$i]."','D',".floatval($request->bayar_paket[$i]).",".floatval($request->bayar_paket[$i]).",'".$request->keterangan."','MI','TITIP','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");	
                     
                     if (floatval($request->total_saldo[$i]) != 0) {		
                         $ins4[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_reg[$i]."','".$request->tanggal."',".$i.",'".$request->akun_piutang[$i]."','D',".floatval($request->total_saldo[$i]).",".floatval($request->total_saldo[$i]).",'".$request->keterangan."','MI','PIUTANG','IDR',1,'".$request->kode_pp."','-','-','-','-','-','-','-','-')");									
