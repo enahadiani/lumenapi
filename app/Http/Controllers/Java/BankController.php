@@ -31,11 +31,11 @@ class BankController extends Controller {
                 }else{
                     $filter = " and kode_bank='$request->kode_bank' ";
                 }
-                $sql= "select kode_bank, nama, no_rek
+                $sql= "select kode_bank, nama, isnull(no_rek, '-') as no_rek
                 from java_bank where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
             }else{
-                $sql = "select kode_bank,nama,no_rek,
+                $sql = "select kode_bank,nama,isnull(no_rek, '-') as no_rek,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_bank
                 where kode_lokasi= '$kode_lokasi'";
             }
