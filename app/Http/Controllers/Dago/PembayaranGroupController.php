@@ -387,7 +387,7 @@ class PembayaranGroupController extends Controller
                 
                 }
 
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."'");
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,status_closing) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,status_closing from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."'");
 
                 if (intval($request->nilai_tambahan[$i]) != 0 ) {
 
@@ -578,7 +578,7 @@ class PembayaranGroupController extends Controller
                 
                 }
 
-                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."'");
+                $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,status_closing) select no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,status_closing from dgw_pembayaran_d_tmp where nik_user='$request->nik_user' and kode_lokasi='$kode_lokasi' and no_kwitansi='$request->no_bukti' and no_reg='".$request->no_reg[$i]."'");
 
                 if (intval($request->nilai_tambahan[$i]) != 0 ) {
 
