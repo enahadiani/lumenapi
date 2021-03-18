@@ -1277,11 +1277,11 @@ class LapInternal2Controller extends Controller
                 }
             }
 
-            // if($request->input('tgl_awal') !="" && $request->input('tgl_akhir') !="")
-            // {
-                // $filter .=" and a.tanggal between '".$request->input('tgl_awal')."' and '".$request->input('tgl_akhir')."' ";
-            // }
-
+            $reslok = DB::connection($this->sql)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
 
             $sql="select a.no_bukti,a.keterangan,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,
                         a.nik1,a.nik2,b.nama as nama1,c.nama as nama2
@@ -1294,32 +1294,19 @@ class LapInternal2Controller extends Controller
           
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
-                $resdata = array();
-                $no_bukti = "";
-                $i=0;
-                foreach($rs as $row){
-                    
-                    $resdata[]=(array)$row;
-                    if($i == 0){
-                        $no_bukti .= "'$row->no_bukti'";
-                    }else{
-                        
-                        $no_bukti .= ","."'$row->no_bukti'";
-                    }
-                    $i++;
-                }
-    
-                $sql2="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
+                for($i=0;$i < count($res); $i++){
+                    $sql2="select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.kode_pp,a.kode_akun,b.nama as nama_akun,a.no_dokumen,a.modul, 
                     case when a.dc='D' then a.nilai else 0 end as debet,
-                    case when a.dc='C' then a.nilai else 0 end as kredit 
+                    case when a.dc='C' then a.nilai else 0 end as kredit,c.nama as nama_pp
                     from trans_j a 
                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                    $where and a.no_bukti in ($no_bukti) order by a.no_bukti,a.nu ";
-                $res2 = DB::connection($this->sql)->select($sql2);
-                $res2 = json_decode(json_encode($res2),true);
+                    inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 
+                    $where and a.no_bukti ='".$res[$i]['no_bukti']."' order by a.no_bukti,a.nu ";
+                    $res2 = DB::connection($this->sql)->select($sql2);
+                    $res[$i]['detail'] = json_decode(json_encode($res2),true);
+                }
                 
-                $success['detail_jurnal'] = $res2;
+                $success['data'] = $res;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     

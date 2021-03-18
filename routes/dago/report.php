@@ -38,6 +38,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->get('filter2-status','Dago\FilterController@getFilter2Status');
     $router->get('filter2-terima','Dago\FilterController@getFilter2Terima');
     $router->get('filter2-periode-bayar','Dago\FilterController@getFilter2PeriodeBayar');
+    $router->get('filter2-nobukti','Dago\FilterController@getFilter2NoBukti');
 
 
     //Pihak ketiga
