@@ -361,7 +361,7 @@ class ClosingJadwalController extends Controller
             (case when ((a.harga+a.harga_room) - isnull(e.bayar_p,0) <> 0) then (  ((a.harga+a.harga_room) - isnull(e.bayar_p,0)) * ".floatval($kurs)."  ) else 0 end) 
             + (isnull(d.biaya_tambah,0) - a.diskon - isnull(e.bayar_t,0)) 
             + (isnull(h.biaya_dok,0) - isnull(e.bayar_m,0)) 
-            as tot_saldo_idr
+            as tot_saldo_idr,(a.harga+a.harga_room) * ".floatval($kurs)." as pdpt_paket_idr 
             from dgw_reg a  
             inner join dgw_jadwal c on a.no_paket=c.no_paket and a.no_jadwal=c.no_jadwal and a.kode_lokasi=c.kode_lokasi 
             inner join dgw_peserta b on a.no_peserta=b.no_peserta and a.kode_lokasi =b.kode_lokasi 
