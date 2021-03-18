@@ -35,6 +35,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('vendor','Java\VendorController@update');
     $router->delete('vendor','Java\VendorController@destroy');
 
+    // Bank
+    $router->get('bank','Java\BankController@index');
+    $router->post('bank','Java\BankController@store');
+    $router->put('bank','Java\BankController@update');
+    $router->delete('bank','Java\BankController@destroy');
+
 });
 
 
