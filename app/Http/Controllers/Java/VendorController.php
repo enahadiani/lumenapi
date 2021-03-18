@@ -172,7 +172,7 @@ class VendorController extends Controller
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['kode'] = $request->kode_vendor;
+                $success['kode'] = $kode_vendor;
                 $success['message'] = "Data Vendor berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
