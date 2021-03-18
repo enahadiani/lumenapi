@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use App\Imports\PenerimaanImport;
+use App\Exports\PenerimaanExport;
 
 class PenerimaanUploadController extends Controller
 {
@@ -122,32 +126,38 @@ class PenerimaanUploadController extends Controller
         return $thn."".$bln;
     }
 
-    public function generateNo(Request $request) {
-        $this->validate($request, [    
-            'tanggal' => 'required'       
-        ]);
-        
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }	
-
-            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-RSM".substr($periode,2,4).".", "0001");
-
-            $success['status'] = true;
-            $success['no_bukti'] = $no_bukti;
-            $success['message'] = "Success!";
-            return response()->json($success, $this->successStatus);     
-            
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['no_bukti'] = "-";
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }        
+    public function doHitungAR($dataJU) {
+        $row = array();
+        $dtJurnal = array();
+		$nemu = false;
+		$ix=0; 
+        $dtJrnl = 0;
+		for ($i=0;$i < count($dataJU);$i++){
+			$line = $dataJU[$i];
+			if (floatval($line['lunas']) != 0){
+				$kdAkun = $line['akun_piutang'];				
+				$nemu = false;
+				$ix = 0;
+				for ($j=0;$j < count($dtJurnal); $j++){		
+				  if ($kdAkun == $dtJurnal[$j]['kode_akun']){
+					$nemu = true;
+					$row = $dtJurnal[$j];
+					$ix = $j;
+					break;
+				  }
+				}
+				if (!$nemu){
+					
+					$row["kode_akun"] = $kdAkun;
+					$row["nilai"] = floatval($line['lunas']);
+					$dtJrnl++;
+                    $dtJurnal[$dtJrnl] = $row;						
+				}
+				else $dtJurnal[$ix]['nilai'] = $row["nilai"] + floatval($line['lunas']);
+			}
+		}
+		$gridAR = $dtJurnal;
+        return $gridAR;
     }
 
     /**
@@ -232,18 +242,6 @@ class PenerimaanUploadController extends Controller
         
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Fs $Fs)
-    {
-        //
-    }
-
     public function getAkunKasTitip(Request $request)
     {
         try {
@@ -301,7 +299,7 @@ class PenerimaanUploadController extends Controller
     public function getTagihan(Request $request)
     {
         $this->validate($request,[
-            'no_agg' => 'required'
+            'tanggal' => 'required'
         ]);
 
         try {
@@ -310,6 +308,8 @@ class PenerimaanUploadController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
 
             $strSQL = "select f.no_agg,f.nama as nama_agg,b.no_bill,a.no_simp,a.jenis,e.nama,b.akun_piutang,b.periode,b.nilai-isnull(d.bayar,0) as saldo,0 as lunas
             from  kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp  and a.kode_lokasi=b.kode_lokasi and b.modul <> 'BSIMP' 
@@ -325,12 +325,6 @@ class PenerimaanUploadController extends Controller
             $res = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($res),true);
 
-            $no_bukti = (isset($request->no_bukti) ? $request->no_bukti : '-');
-            $strSQL2 = "select isnull(sum(case dc when 'D' then nilai else -nilai end),0) as saldo_cd from kop_cd_d where no_bukti <> '".$no_bukti."' and no_agg='$request->no_agg' and  kode_lokasi='$kode_lokasi'"; 
-            $res2 = DB::connection($this->db)->select($strSQL2);
-            $res2 = json_decode(json_encode($res2),true);
-            $success['cd_d'] = $res2;
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -350,62 +344,79 @@ class PenerimaanUploadController extends Controller
         
     }
 
-    public function show(Request $request)
+    public function importExcel(Request $request)
     {
-        $this->validate($request,[
-            'no_bukti' => 'required',
-            'no_agg' => 'required'
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xls,xlsx',
+            'nik_user' => 'required'
         ]);
 
+        DB::connection($this->db)->beginTransaction();
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $strSQL = "select * 
-            from trans_m a 
-                where a.no_bukti = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."'";	
-            $rs = DB::connection($this->db)->select($strSQL);
-            $res = json_decode(json_encode($rs),true);
-
-            $strSQL2 = "select b.no_bill,a.no_simp,a.jenis,e.nama,b.akun_piutang,b.periode,b.nilai-isnull(d.bayar,0) as saldo 
-            from  kop_simp_m a inner join kop_simp_d b on a.no_simp=b.no_simp  and a.kode_lokasi=b.kode_lokasi 
-                inner join trans_m c on b.no_bill=c.no_bukti and b.kode_lokasi=c.kode_lokasi 
-                inner join kop_simp_param e on a.kode_param=e.kode_param and a.kode_lokasi=e.kode_lokasi 
-                inner join kop_simpangs_d dd on b.no_simp=dd.no_simp and b.no_bill=dd.no_bill and b.kode_lokasi=dd.kode_lokasi 
-                left outer join   
-                (select y.no_simp, y.no_bill, y.kode_lokasi, sum(case dc when 'D' then y.nilai else -y.nilai end) as bayar 
-                           from kop_simpangs_d y inner join trans_m x on y.no_angs=x.no_bukti and y.kode_lokasi=x.kode_lokasi 
-                           where y.no_angs<>'".$request->no_bukti."' and y.no_agg = '".$request->no_agg."' and y.kode_lokasi='".$kode_lokasi."' 
-                           group by y.no_simp, y.no_bill, y.kode_lokasi
-                ) d on b.no_simp=d.no_simp and b.no_bill=d.no_bill and b.kode_lokasi=d.kode_lokasi 
-            where  dd.no_angs='".$request->no_bukti."' and dd.kode_lokasi= '".$kode_lokasi."' order by a.no_simp,b.periode"; 
             
-            $rs2 = DB::connection($this->db)->select($strSQL2);
-            $res2 = json_decode(json_encode($rs2),true);
+            $del1 = DB::connection($this->db)->table('kop_bayar_tmp')->where('kode_lokasi', $kode_lokasi)->where('nik_user', $request->nik_user)->delete();
 
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            // menangkap file excel
+            $file = $request->file('file');
+    
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
 
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['detail'] = $res2;
-                $success['message'] = "Success!";     
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $dt = Excel::toArray(new PenerimaanImport($request->nik_user),$nama_file);
+            $excel = $dt[0];
+            $x = array();
+            $status_validate = true;
+            $no=1;
+            foreach($excel as $row){
+                if($row[0] != ""){
+                    $ket = $this->validateAgg(strval($row[0]),$kode_lokasi);
+                    if($ket != ""){
+                        $sts = 0;
+                        $status_validate = false;
+                    }else{
+                        $sts = 1;
+                    }
+                    $ins[$i] = DB::connection($this->db)->insert("insert into kode_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi) values ('".$row[0]."','".$row[1]."','$nik',getdate(),'$kode_lokasi')
+                    ");
+                    $no++;
+                }
             }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['detail'] = [];
-                $success['status'] = false;
+            
+            DB::connection($this->db)->commit();
+            Storage::disk('local')->delete($nama_file);
+            if($status_validate){
+                $msg = "File berhasil diupload!";
+            }else{
+                $msg = "Ada error!";
             }
+            
+            $success['status'] = true;
+            $success['validate'] = $status_validate;
+            $success['message'] = $msg;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
         
     }
+
+    public function export(Request $request) 
+    {
+        $nik_user = $request->nik_user;
+        $kode_lokasi = $request->kode_lokasi;
+        $nik = $request->nik;
+        date_default_timezone_set("Asia/Bangkok");
+        return Excel::download(new PenerimaanExport($nik_user,$kode_lokasi), 'Penerimaan_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+    }
+
 
 }

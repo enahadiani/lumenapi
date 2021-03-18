@@ -300,12 +300,12 @@ class ClosingJadwalController extends Controller
                         
                 DB::connection($this->db)->commit();
                 $success['status'] = "SUCCESS";
-                $success['no_kwitansi'] = $no_bukti;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Closing berhasil disimpan. No Bukti:".$no_bukti;
             }else{
                 
                 $success['status'] = "FAILED";
-                $success['no_kwitansi'] = "-";
+                $success['no_bukti'] = "-";
                 $success['message'] = $cek["message"];
             }
             
@@ -496,12 +496,12 @@ class ClosingJadwalController extends Controller
                         
                 DB::connection($this->db)->commit();
                 $success['status'] = "SUCCESS";
-                $success['no_kwitansi'] = $no_bukti;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Closing Jadwal berhasil diubah. No Bukti:".$no_bukti;
             }else{
                 
                 $success['status'] = "FAILED";
-                $success['no_kwitansi'] = "-";
+                $success['no_bukti'] = "-";
                 $success['message'] = $cek["message"];
             }
             
