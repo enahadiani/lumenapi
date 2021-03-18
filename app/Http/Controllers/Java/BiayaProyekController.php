@@ -199,6 +199,17 @@ class BiayaProyekController extends Controller {
                 b.nama as nama_vendor, c.nama as nama_customer, a.no_rab, a.no_proyek
                 from java_beban a inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
                 inner join java_cust c on a.kode_cust=c.kode_cust and a.kode_lokasi=c.kode_lokasi
+                left join (select b.no_proyek,b.kode_lokasi,sum(a.jumlah*a.harga) as nilai
+                        from java_rab_d a
+                        inner join java_rab_m b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi='".$kode_lokasi."'
+                        group by b.no_proyek,b.kode_lokasi
+                        )d on a.no_proyek=d.no_proyek and a.kode_lokasi=d.kode_lokasi
+                left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
+                        from java_beban  a
+                        where a.kode_lokasi='".$kode_lokasi."'
+                        group by a.no_proyek,a.kode_lokasi
+                        )e on a.no_proyek=e.no_proyek and a.kode_lokasi=e.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter";
             }else{
                 $sql = "select no_bukti, no_proyek, keterangan, nilai, status as status_bayar, no_rab,
