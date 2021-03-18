@@ -268,7 +268,7 @@ class ClosingJadwalController extends Controller
 
             if($cek['status']){
                 
-                $no_bukti = $this->generateKode("trans_m", "no_bukti", 'CLJ/'.substr($periode,2,4).".", "0001");
+                $no_bukti = $this->generateKode("trans_m", "no_bukti", 'CLJ/'.substr($periode,2,4)."/", "0001");
 
                 $ins1 = DB::connection($this->db)->insert("insert into dgw_closing_d (no_closing,kode_lokasi,no_paket,no_jadwal,tanggal,keterangan,kode_pp,modul,periode,kode_curr,kurs,nilai,tgl_input,nik_user) values  ('".$no_bukti."','".$kode_lokasi."','".$request->no_paket."','".$request->no_jadwal."','".$request->tanggal."','".$request->keterangan."','".$request->kode_pp."','CLOSING','".$periode."','".$request->kode_curr."',".floatval($request->kurs).",".floatval($request->nilai_pdpt).",getdate(),'".$nik."')");
 
