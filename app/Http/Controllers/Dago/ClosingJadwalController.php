@@ -117,9 +117,16 @@ class ClosingJadwalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.no_closing as no_bukti,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.nilai as total 
-            from dgw_closing_d a inner join trans_m b on a.no_closing=b.no_bukti and a.kode_lokasi=b.kode_lokasi 					 					 
-            where a.kode_lokasi='".$kode_lokasi."' and b.posted ='F' and b.form='CLOSING' 
+            $res = DB::connection($this->db)->select("select a.no_closing as no_bukti,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.nilai as total,isnull(c.status_closing,'-') as closing 
+            from dgw_closing_d a 
+            inner join trans_m b on a.no_closing=b.no_bukti and a.kode_lokasi=b.kode_lokasi 	
+            left join (select a.no_jadwal,a.no_paket,a.kode_lokasi,c.status_closing 
+                       from dgw_reg a 
+                        left join dgw_pembayaran_d c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi 
+                        where c.status_closing='closing' 
+                        group by a.no_jadwal,a.no_paket,a.kode_lokasi,c.status_closing 
+                        ) c on a.no_jadwal=c.no_jadwal and a.no_paket=c.no_paket and a.kode_lokasi=c.kode_lokasi 				 					 
+            where a.kode_lokasi='$kode_lokasi' and b.posted ='F' and b.form='CLOSING' 
             order by a.tanggal ");
             $res = json_decode(json_encode($res),true);
             
@@ -293,12 +300,12 @@ class ClosingJadwalController extends Controller
                         
                 DB::connection($this->db)->commit();
                 $success['status'] = "SUCCESS";
-                $success['no_kwitansi'] = $no_bukti;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Closing berhasil disimpan. No Bukti:".$no_bukti;
             }else{
                 
                 $success['status'] = "FAILED";
-                $success['no_kwitansi'] = "-";
+                $success['no_bukti'] = "-";
                 $success['message'] = $cek["message"];
             }
             
@@ -489,12 +496,12 @@ class ClosingJadwalController extends Controller
                         
                 DB::connection($this->db)->commit();
                 $success['status'] = "SUCCESS";
-                $success['no_kwitansi'] = $no_bukti;
+                $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data Closing Jadwal berhasil diubah. No Bukti:".$no_bukti;
             }else{
                 
                 $success['status'] = "FAILED";
-                $success['no_kwitansi'] = "-";
+                $success['no_bukti'] = "-";
                 $success['message'] = $cek["message"];
             }
             

@@ -223,6 +223,21 @@ class PembayaranNonCashController extends Controller
                     }
                 }	
 
+                // cek closing
+                $ckClose = DB::connection($this->sql)->select("select isnull(d.no_closing,'-') as no_closing
+                from dgw_reg b 
+                left join dgw_jadwal d on b.no_paket=d.no_paket and b.no_jadwal=d.no_jadwal and b.kode_lokasi=d.kode_lokasi 
+                where b.no_reg='$request->no_reg' and b.kode_lokasi='$kode_lokasi' ");
+                if(count($ckClose) > 0){
+                    if($ckClose[0]->no_closing != "-"){
+                        $stsClose = 'closing';
+                    }else{
+                        $stsClose = '-';
+                    }
+                }else{
+                    $stsClose = '-';
+                }
+
                 $no_bukti = $this->generateKode("dgw_pembayaran", "no_kwitansi", $kode_lokasi.'-TT'.substr($periode,2,4).".", "0001");
                 $no_kb = $this->generateKode("trans_m", "no_bukti", $kode_lokasi.'-JU'.substr($periode,2,4).".", "0001");
                 $bayarPaketIDR = floatval($request->bayar_paket)*floatval($request->kurs);
@@ -309,7 +324,7 @@ class PembayaranNonCashController extends Controller
                                 }
                             }
         
-                            $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai) values(?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,$request->no_reg,$biaya[$i]['kode_biaya'],$biaya[$i]['jenis_biaya'],$biaya[$i]['bayar']));
+                            $insdet[$i] =  DB::connection($this->sql)->insert("insert into dgw_pembayaran_d (no_kwitansi,kode_lokasi,no_reg,kode_biaya,jenis,nilai,status_closing) values(?, ?, ?, ?, ?, ?, ?) ", array($no_bukti,$kode_lokasi,$request->no_reg,$biaya[$i]['kode_biaya'],$biaya[$i]['jenis_biaya'],$biaya[$i]['bayar'],$stsClose));
                         } 
                     }	
                     $nu =2;
