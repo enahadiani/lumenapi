@@ -36,7 +36,7 @@ class BankController extends Controller {
 
             }else{
                 $sql = "select kode_bank,nama,no_rek,
-                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_cust
+                case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_bank
                 where kode_lokasi= '$kode_lokasi'";
             }
 
