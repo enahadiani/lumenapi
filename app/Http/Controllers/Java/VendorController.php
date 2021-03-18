@@ -147,7 +147,7 @@ class VendorController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $kode_vendor = $this->generateKode('java_vendor', 'kode_vendor', $kode_lokasi."-VP".".", '00001');
+            $kode_vendor = $this->generateKode('java_vendor', 'kode_vendor', "SUPP", '0001');
 
             $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
             kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
