@@ -125,7 +125,7 @@ class VendorController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required',
+            // 'kode_vendor' => 'required',
             'nama' => 'required',
             'no_telp' => 'required',
             'email' => 'required',
