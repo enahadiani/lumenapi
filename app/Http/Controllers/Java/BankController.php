@@ -32,7 +32,7 @@ class BankController extends Controller {
                     $filter = " and kode_bank='$request->kode_bank' ";
                 }
                 $sql= "select kode_bank, nama, isnull(no_rek, '-') as no_rek
-                from java_bank where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                from java_bank where kode_lokasi='".$kode_lokasi."' $filter ";
 
             }else{
                 $sql = "select kode_bank,nama,isnull(no_rek, '-') as no_rek,
