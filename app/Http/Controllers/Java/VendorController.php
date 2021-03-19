@@ -18,6 +18,14 @@ class VendorController extends Controller
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
+    public function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->sql)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
     public function isUnik($isi,$kode_lokasi){
         
         $auth = DB::connection($this->sql)->select("select kode_vendor from java_vendor where kode_vendor ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
@@ -117,7 +125,7 @@ class VendorController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_vendor' => 'required',
+            // 'kode_vendor' => 'required',
             'nama' => 'required',
             'no_telp' => 'required',
             'email' => 'required',
@@ -139,10 +147,11 @@ class VendorController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_vendor,$kode_lokasi)){
+            $kode_vendor = $this->generateKode('java_vendor', 'kode_vendor', "SUPP", '0001');
+
             $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
             kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
-            values('$request->kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
+            values('$kode_vendor', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
             '$request->kode_pos', '$request->provinsi', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
             '$request->email_pic', '$request->akun_hutang', getdate(), '$kode_lokasi', '$request->provinsi_name', '$request->kota_name', '$request->kecamatan_name')";
                 
@@ -156,21 +165,15 @@ class VendorController extends Controller
 
                     for($i=0;$i<count($request->no_rek);$i++) {
                         $insertDetail = "insert into java_vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                        values ('$request->kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
+                        values ('$kode_vendor', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
                         DB::connection($this->sql)->insert($insertDetail);
                     }
                 }
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
-                $success['kode'] = $request->kode_vendor;
+                $success['kode'] = $kode_vendor;
                 $success['message'] = "Data Vendor berhasil disimpan";
-            }else{
-                $success['status'] = false;
-                $success['kode'] = "-";
-                $success['jenis'] = "duplicate";
-                $success['message'] = "Error : Duplicate entry. No Vendor sudah ada di database!";
-            }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
