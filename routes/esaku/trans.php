@@ -266,7 +266,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     // PENERIMAAN SIMPANAN PGAJI UPLOAD
     $router->get('terima-simp-upload-akunkas','Esaku\Simpanan\PenerimaanUploadController@getAkunKasTitip');
     $router->get('terima-simp-upload-tagihan','Esaku\Simpanan\PenerimaanUploadController@getTagihan');
-    $router->post('terima-simp-upload-import','Esaku\Simpanan\PenerimaanController@importExcel');
+    $router->post('terima-simp-upload-import','Esaku\Simpanan\PenerimaanUploadController@importExcel');
     $router->get('terima-simp-upload-tmp','Esaku\Simpanan\PenerimaanController@getTmp');
     $router->post('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@store');
 
