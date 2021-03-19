@@ -398,7 +398,7 @@ class PenerimaanUploadController extends Controller
                     }else{
                         $sts = 1;
                     }
-                    $ins[$i] = DB::connection($this->db)->insert("insert into kode_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi,sts_upload,ket_upload,nu) values ('".$row[0]."','".$row[1]."','$nik',getdate(),'$kode_lokasi','$sts','$ket',$no)
+                    $ins[$i] = DB::connection($this->db)->insert("insert into kop_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi,sts_upload,ket_upload,nu) values ('".$row[0]."','".$row[1]."','$nik',getdate(),'$kode_lokasi','$sts','$ket',$no)
                     ");
                     $no++;
                 }
