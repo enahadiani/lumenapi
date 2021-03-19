@@ -319,9 +319,9 @@ class PenerimaanUploadController extends Controller
                 left outer join 
                     (select y.no_simp, y.no_bill, y.kode_lokasi, sum(case dc when 'D' then y.nilai else -y.nilai end) as bayar 
                     from kop_simpangs_d y inner join trans_m x on y.no_angs=x.no_bukti and y.kode_lokasi=x.kode_lokasi 
-                    where y.periode<='".$request->periode."' and y.kode_lokasi='".$kode_lokasi."' and y.modul <> 'BSIMP' 
+                    where y.periode<='".$periode."' and y.kode_lokasi='".$kode_lokasi."' and y.modul <> 'BSIMP' 
                     group by y.no_simp, y.no_bill, y.kode_lokasi) d on b.no_simp=d.no_simp and b.no_bill=d.no_bill and b.kode_lokasi=d.kode_lokasi
-            where a.status_bayar = 'PGAJI' and b.periode<='".$request->periode."' and b.nilai-isnull(d.bayar,0)>0 and a.kode_lokasi= '".$kode_lokasi."' order by f.no_agg,e.nu"; //and d.bayar is null <--- sudah bayar pun selisihnya bisa di lunasi sbg pembatalan
+            where a.status_bayar = 'PGAJI' and b.periode<='".$periode."' and b.nilai-isnull(d.bayar,0)>0 and a.kode_lokasi= '".$kode_lokasi."' order by f.no_agg,e.nu"; //and d.bayar is null <--- sudah bayar pun selisihnya bisa di lunasi sbg pembatalan
             $res = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($res),true);
 
