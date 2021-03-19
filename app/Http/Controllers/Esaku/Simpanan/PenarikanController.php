@@ -211,10 +211,10 @@ class PenarikanController extends Controller
 
             if($cek['status']){
 
-                $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBAMBIL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($request->total_penarikan).",0,0,'-','-','-','".$request->akun_kas."','-','-','".$request->no_agg."','BK','-')");
+                $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBAMBIL','F','0','0','".$kode_pp."','".$request->tanggal."','$request->no_dokumen','".$request->keterangan."','IDR',1,".floatval($request->total_penarikan).",0,0,'-','-','-','".$request->akun_kas."','-','-','".$request->no_agg."','BK','-')");
 
 				$kasIDR = floatval($request->total_penarikan);					
-				$ins2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',0,'".$request->akun_kas."','C',".$kasIDR.",".$kasIDR.",'".$request->keterangan."','KBAMBIL','KB','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+				$ins2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','$request->no_dokumen','".$request->tanggal."',0,'".$request->akun_kas."','C',".$kasIDR.",".$kasIDR.",'".$request->keterangan."','KBAMBIL','KB','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
                 
                 for ($i=0;$i < count($request->no_kartu);$i++){
                     $nilaiTitip = floatval($request->nilai[$i]);
@@ -328,10 +328,10 @@ class PenarikanController extends Controller
 
             if($cek['status']){
 
-                $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBAMBIL','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($request->total_penarikan).",0,0,'-','-','-','".$request->akun_kas."','-','-','".$request->no_agg."','BK','-')");
+                $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','KBAMBIL','F','0','0','".$kode_pp."','".$request->tanggal."','$request->no_dokumen','".$request->keterangan."','IDR',1,".floatval($request->total_penarikan).",0,0,'-','-','-','".$request->akun_kas."','-','-','".$request->no_agg."','BK','-')");
 
 				$kasIDR = floatval($request->total_penarikan);					
-				$ins2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',0,'".$request->akun_kas."','C',".$kasIDR.",".$kasIDR.",'".$request->keterangan."','KBAMBIL','KB','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+				$ins2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','$request->no_dokumen','".$request->tanggal."',0,'".$request->akun_kas."','C',".$kasIDR.",".$kasIDR.",'".$request->keterangan."','KBAMBIL','KB','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
                 
                 for ($i=0;$i < count($request->no_kartu);$i++){
                     $nilaiTitip = floatval($request->nilai[$i]);
@@ -450,7 +450,7 @@ class PenarikanController extends Controller
                 $filter.= "";
             }
 
-            $sql="select a.kode_akun, a.nama from masakun where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            $sql="select a.kode_akun, a.nama from masakun a where a.kode_lokasi='".$kode_lokasi."' $filter ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
