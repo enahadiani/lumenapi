@@ -263,6 +263,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('terima-simp-akunkas','Esaku\Simpanan\PenerimaanTunaiController@getAkunKas');
     $router->get('terima-simp-tagihan','Esaku\Simpanan\PenerimaanTunaiController@getTagihan');
 
+    // PENERIMAAN SIMPANAN PGAJI UPLOAD
+    $router->get('terima-simp-upload-akunkas','Esaku\Simpanan\PenerimaanUploadController@getAkunKasTitip');
+    $router->get('terima-simp-upload-tagihan','Esaku\Simpanan\PenerimaanUploadController@getTagihan');
+    $router->post('terima-simp-upload-import','Esaku\Simpanan\PenerimaanController@importExcel');
+    $router->get('terima-simp-upload-tmp','Esaku\Simpanan\PenerimaanController@getTmp');
+    $router->post('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@store');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
@@ -279,6 +286,7 @@ $router->get('export', 'Esaku\Keuangan\JurnalController@export');
 $router->get('sawal-export', 'Esaku\Keuangan\SawalController@export');
 $router->get('jurnal-upload-export', 'Esaku\Keuangan\JurnalUploadController@export');
 $router->get('akun-export', 'Esaku\Keuangan\AkunController@export');
+$router->get('terima-simp-upload-export', 'Esaku\Simpanan\PenerimaanUploadController@export');
 
 
 

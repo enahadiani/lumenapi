@@ -344,6 +344,22 @@ class PenerimaanUploadController extends Controller
         
     }
 
+    public function validateAgg($no_agg,$kode_lokasi){
+        $keterangan = "";
+        $auth = DB::connection($this->db)->select("select no_agg from kop_agg where no_agg='$no_agg' and kode_lokasi='$kode_lokasi'
+        ");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            $keterangan .= "";
+        }else{
+            $keterangan .= "No Anggota $no_agg tidak valid. ";
+        }
+
+        return $keterangan;
+
+    }
+
+
     public function importExcel(Request $request)
     {
         $this->validate($request, [
@@ -382,7 +398,7 @@ class PenerimaanUploadController extends Controller
                     }else{
                         $sts = 1;
                     }
-                    $ins[$i] = DB::connection($this->db)->insert("insert into kode_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi) values ('".$row[0]."','".$row[1]."','$nik',getdate(),'$kode_lokasi')
+                    $ins[$i] = DB::connection($this->db)->insert("insert into kode_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi,sts_upload,ket_upload,nu) values ('".$row[0]."','".$row[1]."','$nik',getdate(),'$kode_lokasi','$sts','$ket',$no)
                     ");
                     $no++;
                 }
@@ -416,6 +432,48 @@ class PenerimaanUploadController extends Controller
         $nik = $request->nik;
         date_default_timezone_set("Asia/Bangkok");
         return Excel::download(new PenerimaanExport($nik_user,$kode_lokasi), 'Penerimaan_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+    }
+
+    public function getTmp(Request $request)
+    {
+        
+        $this->validate($request, [
+            'nik_user' => 'required'
+        ]);
+
+        $nik_user = $request->nik_user;
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "select a.no_agg.b.nama,a.nilai_bayar,a.nu 
+            from kop_bayar_tmp a
+            left join kop_agg b on a.no_agg=b.no_agg and a.kode_lokasi=b.kode_lokasi
+            where a.nik_user = '".$nik_user."'
+            order by a.nu";
+            $res = DB::connection($this->db)->select($sql);
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 
 
