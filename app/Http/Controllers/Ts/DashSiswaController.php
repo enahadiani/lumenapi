@@ -801,7 +801,7 @@ class DashSiswaController extends Controller
                 $filter_top .="";
             }
 
-            $res = DB::connection($this->db)->select("select $filter_top a.*,case modul when 'BILL' then 'Tagihan' when 'KB' then 'Pembayaran' when 'PDD' then 'Auto Bayar' end as jenis from (
+            $sql = "select $filter_top a.*,case modul when 'BILL' then 'Tagihan' when 'KB' then 'Pembayaran' when 'PDD' then 'Auto Bayar' when 'KBMID' then 'Pembayaran Midtrans' end as jenis from (
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,
                 'BILL' as modul, isnull(a.tagihan,0) as total,a.id_bank
                 from (select x.kode_lokasi,x.no_bill,sum(x.nilai) as tagihan, '-' as id_bank
@@ -831,10 +831,20 @@ class DashSiswaController extends Controller
                     where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0  $filter_rekon
 					group by x.kode_lokasi,x.no_rekon,x.id_bank
                 )a
-                inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
+                inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi
+                union all
+                select a.no_bukti,a.kode_lokasi,b.tgl_input,convert(varchar(10),b.tgl_input,103) as tgl,
+                'KBMID' as modul, isnull(a.tagihan,0) as total,a.id_bank
+                from (select x.kode_lokasi,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
+                    from sis_mid_bayar_d x 
+                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
+                    group by x.kode_lokasi,x.no_bukti )a 
+                inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
+                and b.status = 'pending'
             ) a
             $filter_jenis
-            order by a.tanggal desc ");
+            order by a.tanggal desc";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['rows'] = count($res);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -952,7 +962,7 @@ class DashSiswaController extends Controller
             }
 
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.tgl,a.tanggal,a.id_bank,a.total,case modul when 'BILL' then 'Tagihan' when 'KB' then 'Pembayaran' when 'PDD' then 'Auto Bayar' end as jenis from (
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.tgl,a.tanggal,a.id_bank,a.total,case modul when 'BILL' then 'Tagihan' when 'KB' then 'Pembayaran' when 'PDD' then 'Auto Bayar' when 'KBMID' then 'Pembayaran Midtrans' end as jenis from (
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,
                 'BILL' as modul, isnull(a.tagihan,0) as total,a.id_bank
                 from (select x.kode_lokasi,x.no_bill,sum(x.nilai) as tagihan, '-' as id_bank
@@ -983,6 +993,15 @@ class DashSiswaController extends Controller
 					group by x.kode_lokasi,x.no_rekon,x.id_bank
                 )a
                 inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi 
+                union all
+                select a.no_bukti,a.kode_lokasi,b.tgl_input,convert(varchar(10),b.tgl_input,103) as tgl,
+                'KBMID' as modul, isnull(a.tagihan,0) as total,a.id_bank
+                from (select x.kode_lokasi,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
+                    from sis_mid_bayar_d x 
+                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
+                    group by x.kode_lokasi,x.no_bukti )a 
+                inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
+                and b.status = 'pending'
             ) a
             where a.no_bukti = '$request->no_bukti'
             order by a.tanggal desc ");
@@ -1014,6 +1033,13 @@ class DashSiswaController extends Controller
                             inner join sis_bill_m c on x.no_bill=c.no_bill and x.kode_lokasi=c.kode_lokasi 
                             where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
                             group by x.kode_param,x.no_rekon,x.no_bill,c.tanggal
+                        union all
+                        select x.kode_param,x.no_bukti,x.no_bill,b.tgl_input,sum(x.nilai) as nilai
+                                from sis_mid_bayar_d x 
+								inner join sis_mid_bayar b on x.no_bill=b.no_bill and x.kode_lokasi=b.kode_lokasi 
+                                inner join sis_siswa y on b.nis=y.nis and b.kode_lokasi=y.kode_lokasi and b.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '$kode_lokasi' and b.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                group by x.kode_param,x.no_bukti,x.no_bill,b.tgl_input 
                     ) a
                     where a.no_bukti='".$res[$i]['no_bukti']."'
                     order by a.no_bukti,a.kode_param
