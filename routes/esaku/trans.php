@@ -263,6 +263,25 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('terima-simp-akunkas','Esaku\Simpanan\PenerimaanTunaiController@getAkunKas');
     $router->get('terima-simp-tagihan','Esaku\Simpanan\PenerimaanTunaiController@getTagihan');
 
+    // PENERIMAAN SIMPANAN PGAJI UPLOAD
+    $router->get('terima-simp-upload-akunkas','Esaku\Simpanan\PenerimaanUploadController@getAkunKasTitip');
+    $router->get('terima-simp-upload-tagihan','Esaku\Simpanan\PenerimaanUploadController@getTagihan');
+    $router->post('terima-simp-upload-import','Esaku\Simpanan\PenerimaanUploadController@importExcel');
+    $router->get('terima-simp-upload-tmp','Esaku\Simpanan\PenerimaanUploadController@getTmp');
+    $router->post('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@store');
+
+    $router->get('terima-simp-upload-nobukti','Esaku\Simpanan\PenerimaanUploadController@getNoBukti');$router->get('terima-simp-upload-loadhapus','Esaku\Simpanan\PenerimaanUploadController@loadDataHapus');
+    $router->delete('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@destroy');
+
+    // PENARIKAN SIMPANAN
+    $router->get('tarik-simp','Esaku\Simpanan\PenarikanController@index');
+    $router->get('tarik-simp-detail','Esaku\Simpanan\PenarikanController@show');
+    $router->post('tarik-simp','Esaku\Simpanan\PenarikanController@store');
+    $router->put('tarik-simp','Esaku\Simpanan\PenarikanController@update');
+    $router->delete('tarik-simp','Esaku\Simpanan\PenarikanController@destroy');
+    $router->get('tarik-simp-akunkas','Esaku\Simpanan\PenarikanController@getAkunKas');
+    $router->get('tarik-simp-simpanan','Esaku\Simpanan\PenarikanController@getSimpanan');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
@@ -279,6 +298,7 @@ $router->get('export', 'Esaku\Keuangan\JurnalController@export');
 $router->get('sawal-export', 'Esaku\Keuangan\SawalController@export');
 $router->get('jurnal-upload-export', 'Esaku\Keuangan\JurnalUploadController@export');
 $router->get('akun-export', 'Esaku\Keuangan\AkunController@export');
+$router->get('terima-simp-upload-export', 'Esaku\Simpanan\PenerimaanUploadController@export');
 
 
 

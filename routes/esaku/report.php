@@ -110,6 +110,25 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-buku-kb','Esaku\KasBank\LaporanKasBankController@getBukuKas');
     $router->get('lap-saldo-kb','Esaku\KasBank\LaporanKasBankController@getSaldoKB');
 
+    // SIMPANAN
+    
+    $router->get('filter-simp-periode','Esaku\Simpanan\FilterController@getFilterPeriode');
+    $router->get('filter-simp-anggota','Esaku\Simpanan\FilterController@getFilterAnggota');
+    $router->get('filter-simp-nokartu','Esaku\Simpanan\FilterController@getFilterNoKartu');
+    $router->get('filter-simp-noakru','Esaku\Simpanan\FilterController@getFilterNoAkru');
+    $router->get('filter-simp-nobayar','Esaku\Simpanan\FilterController@getFilterNoBayar');
+    $router->get('filter-simp-nobatal','Esaku\Simpanan\FilterController@getFilterNoBatal');
+
+    $router->get('lap-simp-anggota','Esaku\Simpanan\LaporanController@getAnggota');
+    $router->get('lap-simp-simpanan','Esaku\Simpanan\LaporanController@getSimpanan');
+    $router->get('lap-simp-saldo','Esaku\Simpanan\LaporanController@getSaldoSimpanan');
+    $router->get('lap-simp-akru','Esaku\Simpanan\LaporanController@getAkruSimpanan');
+    $router->get('lap-simp-bayar','Esaku\Simpanan\LaporanController@getBayarSimpanan');
+    $router->get('lap-simp-batal','Esaku\Simpanan\LaporanController@getBatalSimpanan');
+    $router->get('lap-simp-rekap','Esaku\Simpanan\LaporanController@getRekapSimpanan');
+
+    
+
 });
 
 
