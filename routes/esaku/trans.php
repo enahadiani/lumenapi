@@ -273,6 +273,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('terima-simp-upload-nobukti','Esaku\Simpanan\PenerimaanController@getNoBukti');$router->get('terima-simp-upload-loadhapus','Esaku\Simpanan\PenerimaanController@loadDataHapus');
     $router->delete('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@destroy');
 
+    // PENARIKAN SIMPANAN
+    $router->get('tarik-simp','Esaku\Simpanan\PenarikanController@index');
+    $router->get('tarik-simp-detail','Esaku\Simpanan\PenarikanController@show');
+    $router->post('tarik-simp','Esaku\Simpanan\PenarikanController@store');
+    $router->put('tarik-simp','Esaku\Simpanan\PenarikanController@update');
+    $router->delete('tarik-simp','Esaku\Simpanan\PenarikanController@destroy');
+    $router->get('tarik-simp-akunkas','Esaku\Simpanan\PenarikanController@getAkunKas');
+    $router->get('tarik-simp-simpanan','Esaku\Simpanan\PenarikanController@getSimpanan');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
