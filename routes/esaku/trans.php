@@ -267,10 +267,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('terima-simp-upload-akunkas','Esaku\Simpanan\PenerimaanUploadController@getAkunKasTitip');
     $router->get('terima-simp-upload-tagihan','Esaku\Simpanan\PenerimaanUploadController@getTagihan');
     $router->post('terima-simp-upload-import','Esaku\Simpanan\PenerimaanUploadController@importExcel');
-    $router->get('terima-simp-upload-tmp','Esaku\Simpanan\PenerimaanController@getTmp');
+    $router->get('terima-simp-upload-tmp','Esaku\Simpanan\PenerimaanUploadController@getTmp');
     $router->post('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@store');
 
-    $router->get('terima-simp-upload-nobukti','Esaku\Simpanan\PenerimaanController@getNoBukti');$router->get('terima-simp-upload-loadhapus','Esaku\Simpanan\PenerimaanController@loadDataHapus');
+    $router->get('terima-simp-upload-nobukti','Esaku\Simpanan\PenerimaanUploadController@getNoBukti');$router->get('terima-simp-upload-loadhapus','Esaku\Simpanan\PenerimaanController@loadDataHapus');
     $router->delete('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@destroy');
 
     // PENARIKAN SIMPANAN

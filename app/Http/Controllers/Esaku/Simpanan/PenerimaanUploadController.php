@@ -398,7 +398,7 @@ class PenerimaanUploadController extends Controller
                     }else{
                         $sts = 1;
                     }
-                    $ins[$i] = DB::connection($this->db)->insert("insert into kop_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi,sts_upload,ket_upload,nu) values ('".$row[0]."','".$row[1]."','$nik',getdate(),'$kode_lokasi','$sts','$ket',$no)
+                    $ins[] = DB::connection($this->db)->insert("insert into kop_bayar_tmp (no_agg,nilai_bayar,nik_user,tgl_input,kode_lokasi,sts_upload,ket_upload,nu) values ('".$row[0]."','".$row[2]."','$request->nik_user',getdate(),'$kode_lokasi','$sts','$ket',$no)
                     ");
                     $no++;
                 }
@@ -456,7 +456,7 @@ class PenerimaanUploadController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.no_agg.b.nama,a.nilai_bayar,a.nu 
+            $sql = "select a.no_agg,b.nama,a.nilai_bayar,a.nu 
             from kop_bayar_tmp a
             left join kop_agg b on a.no_agg=b.no_agg and a.kode_lokasi=b.kode_lokasi
             where a.nik_user = '".$nik_user."'
