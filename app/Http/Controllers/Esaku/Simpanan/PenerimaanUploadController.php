@@ -427,12 +427,20 @@ class PenerimaanUploadController extends Controller
 
     public function export(Request $request) 
     {
-        $nik_user = $request->nik_user;
-        $kode_lokasi = $request->kode_lokasi;
-        $nik = $request->nik;
+        $this->validate($request, [
+            'nik_user' => 'required',
+            'type' => 'required'
+        ]);
+
         date_default_timezone_set("Asia/Bangkok");
-        return Excel::download(new PenerimaanExport($nik_user,$kode_lokasi), 'Penerimaan_'.$nik.'_'.$kode_lokasi.'_'.date('dmy').'_'.date('Hi').'.xlsx');
+        if(isset($request->type) && $request->type == "template"){
+            return Excel::download(new PenerimaanExport($request->nik_user,$request->type), 'Penerimaan_'.$request->nik_user.'.xlsx');
+        }else{
+            return Excel::download(new PenerimaanExport($request->nik_user,$request->type), 'Penerimaan_'.$request->nik_user.'.xlsx');
+        }
     }
+
+    
 
     public function getTmp(Request $request)
     {

@@ -23,10 +23,9 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class PenerimaanExport implements FromCollection, WithHeadings, WithColumnFormatting, WithEvents
 {
-    public function __construct($nik_user,$periode,$type)
+    public function __construct($nik_user,$type)
     {
         $this->nik_user = $nik_user;
-        $this->periode = $periode;
         $this->type = $type;
     }
 
