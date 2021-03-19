@@ -131,27 +131,30 @@ class PenerimaanUploadController extends Controller
         $dtJurnal = array();
 		$nemu = false;
 		$ix=0; 
-        $dtJrnl = 0;
+        $y = 0;
 		for ($i=0;$i < count($dataJU);$i++){
 			$line = $dataJU[$i];
 			if (floatval($line['lunas']) != 0){
 				$kdAkun = $line['akun_piutang'];				
 				$nemu = false;
 				$ix = 0;
-				for ($j=0;$j < count($dtJurnal); $j++){		
-				  if ($kdAkun == $dtJurnal[$j]['kode_akun']){
-					$nemu = true;
-					$row = $dtJurnal[$j];
-					$ix = $j;
-					break;
-				  }
+				for ($j=0;$j < count($dtJurnal); $j++){	
+                    if(isset($dtJurnal[$j]['kode_akun'])){
+
+                        if ($kdAkun == $dtJurnal[$j]['kode_akun']){
+                          $nemu = true;
+                          $row = $dtJurnal[$j];
+                          $ix = $j;
+                          break;
+                        }
+                    }	
 				}
 				if (!$nemu){
 					
 					$row["kode_akun"] = $kdAkun;
 					$row["nilai"] = floatval($line['lunas']);
-					$dtJrnl++;
-                    $dtJurnal[$dtJrnl] = $row;						
+                    $dtJurnal[$y] = $row;				
+					$y++;
 				}
 				else $dtJurnal[$ix]['nilai'] = $row["nilai"] + floatval($line['lunas']);
 			}
@@ -171,16 +174,16 @@ class PenerimaanUploadController extends Controller
         $this->validate($request, [
             'tanggal' => 'required|date_format:Y-m-d',
             'keterangan' => 'required|max:100',
-            'nilai_deposit' => 'required',
-            'nilai_bayar' => 'required',
-            'no_dokumen' => 'required',
+            'nilai_rekon' => 'required',
             'akun_kas' => 'required',
-            'no_agg' => 'required',
             'jenis' => 'required|in:MI,BM',
-            'nilai_tagihan' => 'required|array',
-            'akun_piutang' => 'required|array',
-            'no_akru' => 'required|array',
-            'no_kartu' => 'required|array'
+            'detail' => 'required|array',
+            'detail.*.no_agg' => 'required',
+            'detail.*.nilai_tagihan' => 'required',
+            'detail.*.akun_piutang' => 'required',
+            'detail.*.no_akru' => 'required',
+            'detail.*.no_kartu' => 'required',
+            'detail.*.lunas' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -196,25 +199,31 @@ class PenerimaanUploadController extends Controller
 
             $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-STP".substr($periode,2,4).".", "0001");
 
+            $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+            if(count($getPP) > 0){
+                $kode_pp = $getPP[0]->kode_pp;
+            }else{
+                $kode_pp = "-";
+            }	
+
             $cek = $this->doCekPeriode2('KP',$status_admin,$periode);
 
             if($cek['status']){
 
-                $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','LOAD','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($request->total_tagihan).",0,0,'-','-','-','".$request->akun_kastitip."','-','-','$nik','-','-')");
+                $ins1 = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','KP','LOAD','F','0','0','".$kode_pp."','".$request->tanggal."','-','".$request->keterangan."','IDR',1,".floatval($request->nilai_rekon).",0,0,'-','-','-','".$request->akun_kastitip."','-','-','$nik','-','-')");
 					
-				$ins2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',0,'".$request->akun_kastitip."','D',".floatval($request->total_tagihan).",".floatval($request->total_tagihan).",'".$request->keterangan."','LOAD','TTP','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
+				$ins2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',0,'".$request->akun_kastitip."','D',".floatval($request->nilai_rekon).",".floatval($request->nilai_rekon).",'".$request->keterangan."','LOAD','TTP','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
 					
-				$gridAR = $this->doHitungAR($request->detail_tagihan);
-				
+				$gridAR = $this->doHitungAR($request->detail);
                 for ($i=0; $i < count($gridAR); $i++){
                     $line = $gridAR[$i];
                     $ins3[$i] = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-','".$request->tanggal."',".$i.",'".$line['kode_akun']."','C',".floatval($line['nilai']).",".floatval($line['nilai']).",'".$request->keterangan."','LOAD','PIUT','IDR',1,'".$kode_pp."','-','-','-','-','-','-','-','-')");
                 }											
                 
-                for ($i=0;$i < count($request->detail_tagihan); $i++){
-                    $line = $request->detail_tagihan[$i];
+                for ($i=0;$i < count($request->detail); $i++){
+                    $line = $request->detail[$i];
                     if (floatval($line['lunas']) != 0){
-                        $ins = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis) values ('".$no_bukti."','".$line['no_simp']."','".$line['no_bill']."','".$line['akun_piutang']."',".floatval($line['lunas']).",'".$kode_lokasi."','D','".$periode."','LOAD','".$line['no_agg']."','SIMP')");
+                        $ins = DB::connection($this->db)->insert("insert into kop_simpangs_d (no_angs,no_simp,no_bill,akun_piutang,nilai,kode_lokasi,dc,periode,modul,no_agg,jenis) values ('".$no_bukti."','".$line['no_kartu']."','".$line['no_akru']."','".$line['akun_piutang']."',".floatval($line['lunas']).",'".$kode_lokasi."','D','".$periode."','LOAD','".$line['no_agg']."','SIMP')");
                     }
                 }		
 
