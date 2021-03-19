@@ -270,6 +270,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('terima-simp-upload-tmp','Esaku\Simpanan\PenerimaanController@getTmp');
     $router->post('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@store');
 
+    $router->get('terima-simp-upload-nobukti','Esaku\Simpanan\PenerimaanController@getNoBukti');$router->get('terima-simp-upload-loadhapus','Esaku\Simpanan\PenerimaanController@loadDataHapus');
+    $router->delete('terima-simp-upload','Esaku\Simpanan\PenerimaanUploadController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    

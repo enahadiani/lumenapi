@@ -92,9 +92,9 @@ class PenerimaanTunaiController extends Controller
                 if(count($get) > 0){
                     $per_awal = $this->namaPeriode($get[0]->per_awal);
                     $per_akhir = $this->namaPeriode($get[0]->per_akhir);
-                    $msg = "Transaksi tidak dapat disimpan karena tanggal di periode tersebut di tutup. Periode Aktif ".$per_awal." s/d ".$per_akhir;
+                    $msg = "Transaksi tidak dapat dieksekusi karena tanggal di periode tersebut di tutup. Periode Aktif ".$per_awal." s/d ".$per_akhir;
                 }else{
-                    $msg = "Transaksi tidak dapat disimpan karena periode aktif modul $modul belum disetting.";
+                    $msg = "Transaksi tidak dapat dieksekusi karena periode aktif modul $modul belum disetting.";
                 }
             }
         } catch (\Throwable $e) {		
@@ -448,7 +448,8 @@ class PenerimaanTunaiController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required'
+            'no_bukti' => 'required',
+            'tanggal' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -456,33 +457,42 @@ class PenerimaanTunaiController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $request->status_admin;
             }
             
             $no_bukti = $request->no_bukti;
-            
-            $del = DB::connection($this->db)->table('trans_m')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
-            ->delete();
-            
-            $del2 = DB::connection($this->db)->table('trans_j')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
-            ->delete();
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $cek = $this->doCekPeriode2('KP',$status_admin,$periode);
 
-            $del3 = DB::connection($this->db)->table('kop_simpangs_d')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_angs', $no_bukti)
-            ->delete();
+            if($cek['status']){
 
-            $del4 = DB::connection($this->db)->table('kop_cd_d')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
-            ->delete();
+                $del = DB::connection($this->db)->table('trans_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+                
+                $del2 = DB::connection($this->db)->table('trans_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
 
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Penerimaan Simpanan berhasil dihapus";
+                $del3 = DB::connection($this->db)->table('kop_simpangs_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_angs', $no_bukti)
+                ->delete();
+
+                $del4 = DB::connection($this->db)->table('kop_cd_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Penerimaan Simpanan berhasil dihapus";
+            }else{
+                $success['status'] = false;
+                $success['message'] = $cek["message"];
+            }
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {

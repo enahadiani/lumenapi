@@ -96,9 +96,9 @@ class PenerimaanUploadController extends Controller
                 if(count($get) > 0){
                     $per_awal = $this->namaPeriode($get[0]->per_awal);
                     $per_akhir = $this->namaPeriode($get[0]->per_akhir);
-                    $msg = "Transaksi tidak dapat disimpan karena tanggal di periode tersebut di tutup. Periode Aktif ".$per_awal." s/d ".$per_akhir;
+                    $msg = "Transaksi tidak dapat dieksekusi karena tanggal di periode tersebut di tutup. Periode Aktif ".$per_awal." s/d ".$per_akhir;
                 }else{
-                    $msg = "Transaksi tidak dapat disimpan karena periode aktif modul $modul belum disetting.";
+                    $msg = "Transaksi tidak dapat dieksekusi karena periode aktif modul $modul belum disetting.";
                 }
             }
         } catch (\Throwable $e) {		
@@ -475,6 +475,167 @@ class PenerimaanUploadController extends Controller
         }
         
     }
+
+    public function getNoBukti(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $filter = "";
+            if(isset($request->tanggal)){
+                if($request->tanggal != ""){
+                    $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+                    $filter.= " and periode ='$periode'  ";
+                }else{
+                    $filter.= "";
+                }
+            }else{
+                $filter.= "";
+            }
+
+            if(isset($request->no_bukti)){
+                if($request->no_bukti != ""){
+                    $filter.= " and no_bukti ='$request->no_bukti'  ";
+                }else{
+                    $filter.= "";
+                }
+            }else{
+                $filter.= "";
+            }
+			
+            
+            $sql="select no_bukti, keterangan from trans_m where form = 'LOAD' and posted='F' and kode_lokasi='".$kode_lokasi."' $filter ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function loadDataHapus(Request $request)
+    {
+        $this->validate($request,[
+            'no_bukti' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $filter = "";
+
+            if(isset($request->no_bukti)){
+                if($request->no_bukti != ""){
+                    $filter.= " and no_bukti ='$request->no_bukti'  ";
+                }else{
+                    $filter.= "";
+                }
+            }else{
+                $filter.= "";
+            }
+			
+            
+            $sql="select a.tanggal,a.keterangan,a.periode,a.no_ref1,a.nik1 as nik_app,a.nilai1 
+            from trans_m a 
+            where kode_lokasi='".$kode_lokasi."' $filter ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'tanggal' => 'required'
+        ]);
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+            
+            $no_bukti = $request->no_bukti;
+            
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $cek = $this->doCekPeriode2('KP',$status_admin,$periode);
+
+            if($cek['status']){
+
+                $del = DB::connection($this->db)->table('trans_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+                
+                $del2 = DB::connection($this->db)->table('trans_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+
+                $del3 = DB::connection($this->db)->table('kop_simpangs_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_angs', $no_bukti)
+                ->delete();
+
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Penerimaan Simpanan berhasil dihapus";
+            }else{
+                $success['status'] = false;
+                $success['message'] = $cek["message"];
+            }
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Penerimaan Simpanan gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
 
 
 }
