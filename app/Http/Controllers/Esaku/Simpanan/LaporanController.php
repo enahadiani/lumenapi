@@ -137,14 +137,14 @@ class LaporanController extends Controller
                     convert(varchar,b.tanggal,103) as tgl,convert(varchar,d.tanggal,103) as tgl_bayar,d.modul
                     from kop_simp_d a
                     inner join kop_simpbill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi
-                    left join (select a.no_angs,a.no_bill, a.no_simp,
+                    left join (select a.no_angs,a.kode_lokasi,a.no_bill, a.no_simp,
                                     sum(case when substring(a.akun_piutang,1,1)='1' then a.nilai else 0 end) as pokok,
                                     sum(case when substring(a.akun_piutang,1,1)<>'1' then a.nilai else 0 end) as bunga
                                 from kop_simpangs_d a
-                                where a.kode_lokasi='01'
-                                group by a.no_angs,a.no_bill, a.no_simp
+                                where a.kode_lokasi='$kode_lokasi'
+                                group by a.no_angs,a.kode_lokasi,a.no_bill, a.no_simp
                             )c on a.no_simp=c.no_simp and a.no_bill=c.no_bill 
-                    inner join trans_m d on c.no_angs=d.no_angs and c.kode_lokasi=d.kode_lokasi
+                    inner join trans_m d on c.no_angs=d.no_bukti and c.kode_lokasi=d.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.no_simp='".$res[$i]['no_simp']."' 
                     order by b.tanggal";
                     $res2 = DB::connection($this->db)->select($sql2);
