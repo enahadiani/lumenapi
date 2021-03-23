@@ -266,7 +266,7 @@ class BiayaProyekController extends Controller {
             $tanggal = $request->tanggal;
             $periode = substr($tanggal,0,4).substr($tanggal,5,2);
             $per = substr($periode, 2, 4);
-            $no_bukti = $this->generateKode('java_beban', 'no_bukti', $kode_lokasi."-BYP$per".".", '00001');
+            $no_bukti = $this->generateKode('java_beban', 'no_bukti', $kode_lokasi."-BBN$per".".", '00001');
 
             if($this->isUnikDokumen($request->no_dokumen, $kode_lokasi)) {
                 $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
