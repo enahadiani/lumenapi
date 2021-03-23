@@ -167,6 +167,7 @@ class ProyekController extends Controller {
     }
 
     public function store(Request $request) {
+        DB::connection($this->sql)->beginTransaction();
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -184,20 +185,40 @@ class ProyekController extends Controller {
                 'nilai' => 'required',
                 'ppn' => 'required',
                 'status_ppn' => 'required',
-                'periode' => 'required'
+                'periode' => 'required',
+                'file' => 'file|max:2048'
             ]);
 
             if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
-                $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, tgl_input)
+                $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
                 values ('$request->no_proyek', '$kode_lokasi', '$request->keterangan', '$request->kode_cust', '$request->no_kontrak',
-                '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate())";
+                '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', '$request->status', getdate())";
 
                 DB::connection($this->sql)->insert($insert);
 
+                if($request->hasfile('file')){
+                    $file = $request->file('file');
+                    
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    // $picName = uniqid() . '_' . $picName;
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('java/'.$foto)){
+                        Storage::disk('s3')->delete('java/'.$foto);
+                    }
+                    Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+
+                    $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                    values ('$request->no_proyek', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+
+                    DB::connection($this->sql)->insert($insertFile);
+                }
+
+                DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['kode'] = $request->no_proyek;
                 $success['message'] = "Data Proyek berhasil disimpan";
             } else {
+                DB::connection($this->sql)->rollback();
                 $success['status'] = false;
                 $success['kode'] = "-";
                 $success['jenis'] = "duplicate";
@@ -206,6 +227,7 @@ class ProyekController extends Controller {
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
@@ -230,7 +252,8 @@ class ProyekController extends Controller {
                 'nilai' => 'required',
                 'ppn' => 'required',
                 'status_ppn' => 'required',
-                'periode' => 'required'
+                'periode' => 'required',
+                'file' => 'file|max:2048'
             ]);
 
             DB::connection($this->sql)->beginTransaction();
@@ -240,11 +263,28 @@ class ProyekController extends Controller {
             ->where('no_proyek', $request->no_proyek)
             ->delete();
 
-            $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, tgl_input)
+            $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
             values ('$request->no_proyek', '$kode_lokasi', '$request->keterangan', '$request->kode_cust', '$request->no_kontrak',
-            '$request->tgl_selesai', '$request->tgl_mulai', '$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', getdate())";
+            '$request->tgl_selesai', '$request->tgl_mulai','$request->nilai', '$request->ppn', '$request->status_ppn', '$request->periode', '$request->status', getdate())";
 
             DB::connection($this->sql)->insert($insert);
+
+            if($request->hasfile('file')){
+                $file = $request->file('file');
+                    
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    // $picName = uniqid() . '_' . $picName;
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('java/'.$foto)){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+
+                $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                values ('$request->no_proyek', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+
+                DB::connection($this->sql)->insert($insertFile);
+            }
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
