@@ -393,7 +393,7 @@ class SppdController extends Controller
                                 $sql2 = DB::connection('sqlsrvypt')->insert($sql);
                                 //$success['tmp1']=$sql;
                                 $datad=$request->input("AJU");
-                                $datarek=$request->input("REK")[0];
+                                $datarek=$request->input("REK");
                                 $nu=1;
                                 for ($i=0;$i < count($datad);$i++){
                                     
@@ -417,11 +417,21 @@ class SppdController extends Controller
                                     $insAjud3 = DB::connection('sqlsrvypt')->insert($sql);
                                     //$success['tmp5']=$sql;
     
-                                    $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek['bank']."','".$datarek['no_rekening']."','".$datarek['nama']."','-',".$datad[$i]['total_biaya'].",'".$datad[$i]['nip']."',0,'".$no_agenda."-".$nu."')";
-                                    $sql3 = DB::connection('sqlsrvypt')->insert($sql);
-                                    //$success['tmp6']=$sql;
+                                   
                                     $nu++;
                                 }	
+
+                                if(count($datarek) > 0){
+
+                                    for ($i=0;$i < count($datarek);$i++){
+    
+                                        $nip = (isset($datad[$i]['nip']) ? $datad[$i]['nip'] : $datad[0]['nip']);
+                                        $total_biaya = (isset($datad[$i]['total_biaya']) ? $datad[$i]['total_biaya'] : $datad[0]['total_biaya'] );
+                                        $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek[$i]['bank']."','".$datarek[$i]['no_rekening']."','".$datarek[$i]['nama']."','-',".$total_biaya.",'".$nip."',0,'".$no_agenda."-".$nu."')";
+                                        $sql3 = DB::connection('sqlsrvypt')->insert($sql);
+                                        //$success['tmp6']=$sql;
+                                    }
+                                }
                                 
                                 // $sql4 = "update a set a.bank=b.bank,a.no_rek=b.no_rek,a.nama_rek=b.nama_rek,a.bank_trans=b.cabang 
                                 // from it_aju_rek a inner join karyawan b on a.keterangan=b.nik and a.kode_lokasi=b.kode_lokasi 
