@@ -1164,7 +1164,7 @@ class MobileController extends Controller
             from sis_nilai_m a 
             inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
-            order by a.kode_kd desc";
+            order by a.kode_kd";
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
