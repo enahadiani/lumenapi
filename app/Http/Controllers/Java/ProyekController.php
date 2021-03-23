@@ -186,7 +186,7 @@ class ProyekController extends Controller {
                 'ppn' => 'required',
                 'status_ppn' => 'required',
                 'periode' => 'required',
-                'file' => 'file|max:2048'
+                'file' => 'mimes:jpeg,png|max:2048'
             ]);
 
             if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
@@ -253,7 +253,7 @@ class ProyekController extends Controller {
                 'ppn' => 'required',
                 'status_ppn' => 'required',
                 'periode' => 'required',
-                'file' => 'file|max:2048'
+                'file' => 'mimes:jpeg,png|max:2048'
             ]);
 
             DB::connection($this->sql)->beginTransaction();
