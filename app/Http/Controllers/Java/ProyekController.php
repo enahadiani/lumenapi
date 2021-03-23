@@ -287,8 +287,6 @@ class ProyekController extends Controller {
                     Storage::disk('s3')->delete('java/'.$foto);
                 }
                 Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));   
-            }else{
-                $foto="-";
             }
 
             $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)

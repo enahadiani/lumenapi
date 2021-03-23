@@ -120,8 +120,25 @@ class RabProyekController extends Controller {
             $no_rab = $this->generateKode('java_rab_m', 'no_rab', $kode_lokasi."-AGR$per".".", '00001');
 
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
+            values ('$no_rab', '$kode_lokasi', '".$request->no_proyek."', '$tanggal', getdate(), '".$request->nilai_anggaran."')";
             DB::connection($this->sql)->insert($insertM);
+
+            if($request->hasfile('file')){
+                $file = $request->file('file');
+                    
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('java/'.$foto)){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+
+                $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                values ('".$request->no_proyek."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+
+                DB::connection($this->sql)->insert($insertFile);
+            }
 
             if(!empty($request->input('nomor'))) {
                 $jumlah = $request->input('jumlah');
@@ -181,8 +198,33 @@ class RabProyekController extends Controller {
             ->where('no_rab', $no_rab)
             ->delete();
 
+            if($request->hasfile('file')){
+
+                $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
+                $res = DB::connection($this->sql)->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_dok'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('java/'.$foto);
+                    }
+                }else{
+                    $foto = "-";
+                }
+                
+                $file = $request->file('file');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('java/'.$foto)){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));   
+            }
+
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '$request->no_proyek', '$tanggal', getdate(), '$request->nilai_anggaran')";
+            values ('$no_rab', '$kode_lokasi', '".$request->no_proyek."', '$tanggal', getdate(), '".$request->nilai_anggaran."')";
             DB::connection($this->sql)->insert($insertM);
 
             if(!empty($request->input('nomor'))) {
@@ -227,6 +269,23 @@ class RabProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             $no_rab = $request->no_rab;
+            
+            $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){
+                $foto = $res[0]['file_dok'];
+                if($foto != ""){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+            }
+
+            DB::connection($this->sql)->table('java_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_rab)
+            ->delete();
+
             DB::connection($this->sql)->table('java_rab_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_rab', $no_rab)
