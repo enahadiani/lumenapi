@@ -329,6 +329,7 @@ class ProyekController extends Controller {
     }
 
     public function destroy(Request $request) {
+        DB::connection($this->sql)->beginTransaction();
         try {
             $this->validate($request, [
                 'no_proyek' => 'required'
@@ -339,16 +340,34 @@ class ProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){
+                $foto = $res[0]['file_dok'];
+                if($foto != ""){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+            }
+
+            DB::connection($this->sql)->table('java_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $request->no_proyek)
+            ->delete();
+
             DB::connection($this->sql)->table('java_proyek')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_proyek', $request->no_proyek)
             ->delete();
 
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Proyek berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
