@@ -137,8 +137,11 @@ class ProyekController extends Controller {
                     $filter = " and a.no_proyek='$request->no_proyek' ";
                 }
                 $sql= "select a.no_proyek, a.keterangan, a.kode_cust, a.no_kontrak, a.tgl_mulai, convert(varchar(10), a.tgl_selesai, 120) as tgl_selesai, a.nilai, a.ppn, a.status_ppn,
-                b.nama as nama 
-                from java_proyek a inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                b.nama as nama, c.file_dok 
+                from java_proyek a 
+                inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
+                left join java_dok c on a.no_proyek=c.no_bukti and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select no_proyek, no_kontrak, convert(varchar(10), tgl_selesai, 120) as tgl_selesai, nilai,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_proyek
