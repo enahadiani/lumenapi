@@ -266,12 +266,12 @@ class ProyekController extends Controller {
 
             if($request->hasfile('file')){
 
-                $sql = "select file_dok as file from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
+                $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
                 $res = DB::connection($this->sql)->select($sql);
                 $res = json_decode(json_encode($res),true);
 
                 if(count($res) > 0){
-                    $foto = $res[0]['file'];
+                    $foto = $res[0]['file_dok'];
                     if($foto != ""){
                         Storage::disk('s3')->delete('java/'.$foto);
                     }
