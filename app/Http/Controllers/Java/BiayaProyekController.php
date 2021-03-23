@@ -292,10 +292,12 @@ class BiayaProyekController extends Controller {
                     DB::connection($this->sql)->insert($insertFile);
                 }
 
+                DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['kode'] = $no_bukti;
                 $success['message'] = "Data Biaya Proyek berhasil disimpan";
             } else {
+                DB::connection($this->sql)->rollback();
                 $success['status'] = false;
                 $success['kode'] = "-";
                 $success['jenis'] = "duplicate";
@@ -304,6 +306,7 @@ class BiayaProyekController extends Controller {
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
