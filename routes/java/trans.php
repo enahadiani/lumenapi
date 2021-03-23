@@ -43,19 +43,19 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Biaya Proyek
     $router->get('biaya-proyek','Java\BiayaProyekController@index');
     $router->post('biaya-proyek','Java\BiayaProyekController@store');
-    $router->put('biaya-proyek','Java\BiayaProyekController@update');
+    $router->post('biaya-proyek-ubah','Java\BiayaProyekController@update');
     $router->delete('biaya-proyek','Java\BiayaProyekController@destroy');
 
     //Tagihan Proyek
     $router->get('tagihan-proyek','Java\TagihanProyekController@index');
     $router->post('tagihan-proyek','Java\TagihanProyekController@store');
-    $router->put('tagihan-proyek','Java\TagihanProyekController@update');
+    $router->post('tagihan-proyek-ubah','Java\TagihanProyekController@update');
     $router->delete('tagihan-proyek','Java\TagihanProyekController@destroy');
 
     //Pembayaran Proyek
     $router->get('bayar-proyek','Java\PembayaranProyekController@index');
     $router->post('bayar-proyek','Java\PembayaranProyekController@store');
-    $router->put('bayar-proyek','Java\PembayaranProyekController@update');
+    $router->post('bayar-proyek-ubah','Java\PembayaranProyekController@update');
     $router->delete('bayar-proyek','Java\PembayaranProyekController@destroy');
 
 });

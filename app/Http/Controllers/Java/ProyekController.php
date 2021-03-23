@@ -264,31 +264,6 @@ class ProyekController extends Controller {
             ->where('no_proyek', $request->no_proyek)
             ->delete();
 
-            if($request->hasfile('file')){
-
-                $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
-                $res = DB::connection($this->sql)->select($sql);
-                $res = json_decode(json_encode($res),true);
-
-                if(count($res) > 0){
-                    $foto = $res[0]['file_dok'];
-                    if($foto != ""){
-                        Storage::disk('s3')->delete('java/'.$foto);
-                    }
-                }else{
-                    $foto = "-";
-                }
-                
-                $file = $request->file('file');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('java/'.$foto)){
-                    Storage::disk('s3')->delete('java/'.$foto);
-                }
-                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));   
-            }
-
             $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
             values ('".$request->no_proyek."', '".$kode_lokasi."', '".$request->keterangan."', '".$request->kode_cust."', '".$request->no_kontrak."',
             '".$request->tgl_selesai."', '".$request->tgl_mulai."','".$request->nilai."', '".$request->ppn."', '".$request->status_ppn."', '".$request->periode."', '".$request->status."', getdate())";
@@ -305,6 +280,11 @@ class ProyekController extends Controller {
                     Storage::disk('s3')->delete('java/'.$foto);
                 }
                 Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                
+                DB::connection($this->sql)->table('java_dok')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $request->no_proyek)
+                ->delete();
 
                 $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
                 values ('".$request->no_proyek."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";

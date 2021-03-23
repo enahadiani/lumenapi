@@ -135,7 +135,7 @@ class RabProyekController extends Controller {
                 Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
 
                 $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                values ('".$request->no_proyek."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+                values ('".$no_rab."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
 
                 DB::connection($this->sql)->insert($insertFile);
             }
@@ -198,29 +198,26 @@ class RabProyekController extends Controller {
             ->where('no_rab', $no_rab)
             ->delete();
 
-            if($request->hasfile('file')){
-
-                $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
-                $res = DB::connection($this->sql)->select($sql);
-                $res = json_decode(json_encode($res),true);
-
-                if(count($res) > 0){
-                    $foto = $res[0]['file_dok'];
-                    if($foto != ""){
-                        Storage::disk('s3')->delete('java/'.$foto);
-                    }
-                }else{
-                    $foto = "-";
-                }
-                
+            if($request->hasfile('file')) {
                 $file = $request->file('file');
-                
+                    
                 $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
                 $foto = $nama_foto;
                 if(Storage::disk('s3')->exists('java/'.$foto)){
                     Storage::disk('s3')->delete('java/'.$foto);
                 }
-                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));   
+                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+
+                DB::connection($this->sql)->table('java_dok')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_rab)
+                ->delete();
+
+                $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                values ('".$no_rab."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+
+                DB::connection($this->sql)->insert($insertFile);
             }
 
             $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
@@ -270,7 +267,7 @@ class RabProyekController extends Controller {
             }
             $no_rab = $request->no_rab;
             
-            $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_proyek."'";
+            $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$no_rab."'";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 

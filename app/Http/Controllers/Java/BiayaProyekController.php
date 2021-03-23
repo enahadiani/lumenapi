@@ -254,6 +254,7 @@ class BiayaProyekController extends Controller {
             'no_rab' => 'required'
         ]);
 
+        DB::connection($this->sql)->beginTransaction();
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -268,10 +269,27 @@ class BiayaProyekController extends Controller {
 
             if($this->isUnikDokumen($request->no_dokumen, $kode_lokasi)) {
                 $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
-                values ('$no_bukti', '$kode_lokasi', '$request->tanggal', '$request->keterangan', '$request->no_dokumen',
-                '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', '$request->no_rab', getdate())";
+                values ('$no_bukti', '$kode_lokasi', '".$request->tanggal."', '".$request->keterangan."', '".$request->no_dokumen."',
+                '".$request->kode_vendor."', '".$request->nilai."','".$request->status."', '".$request->no_proyek."', '".$request->kode_cust."', '".$request->no_rab."', getdate())";
 
                 DB::connection($this->sql)->insert($insert);
+
+                if($request->hasfile('file')){
+                    $file = $request->file('file');
+                        
+                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                    // $picName = uniqid() . '_' . $picName;
+                    $foto = $nama_foto;
+                    if(Storage::disk('s3')->exists('java/'.$foto)){
+                        Storage::disk('s3')->delete('java/'.$foto);
+                    }
+                    Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+
+                    $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                    values ('".$request->no_proyek."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+
+                    DB::connection($this->sql)->insert($insertFile);
+                }
 
                 $success['status'] = true;
                 $success['kode'] = $no_bukti;
@@ -325,11 +343,44 @@ class BiayaProyekController extends Controller {
 
             DB::connection($this->sql)->insert($insert);
 
+            if($request->hasfile('file')){
+
+                $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$no_bukti."'";
+                $res = DB::connection($this->sql)->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $foto = $res[0]['file_dok'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('java/'.$foto);
+                    }
+                }
+                
+                $file = $request->file('file');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('java/'.$foto)){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                
+                DB::connection($this->sql)->table('java_dok')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+
+                $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                values ('".$no_bukti."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
+
+                DB::connection($this->sql)->insert($insertFile);
+            }
+
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['kode'] = $no_bukti;
             $success['message'] = "Data Biaya Proyek berhasil disimpan";
             
-            DB::connection($this->sql)->commit();
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
@@ -340,6 +391,7 @@ class BiayaProyekController extends Controller {
     }
 
     public function destroy(Request $request) {
+        DB::connection($this->sql)->beginTransaction();
         try {
             $this->validate($request, [
                 'no_bukti' => 'required'
@@ -350,16 +402,34 @@ class BiayaProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$request->no_bukti."'";
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){
+                $foto = $res[0]['file_dok'];
+                if($foto != ""){
+                    Storage::disk('s3')->delete('java/'.$foto);
+                }
+            }
+
+            DB::connection($this->sql)->table('java_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $request->no_bukti)
+            ->delete();
+
             DB::connection($this->sql)->table('java_beban')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->delete();
 
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Biaya Proyek berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
