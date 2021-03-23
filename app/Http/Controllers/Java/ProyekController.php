@@ -167,6 +167,19 @@ class ProyekController extends Controller {
     }
 
     public function store(Request $request) {
+        $this->validate($request, [
+            'no_proyek' => 'required',
+            'no_kontrak' => 'required',
+            'keterangan' => 'required',
+            'kode_cust' => 'required',
+            'tgl_mulai' => 'required',
+            'tgl_selesai' => 'required',
+            'nilai' => 'required',
+            'ppn' => 'required',
+            'status_ppn' => 'required',
+            'periode' => 'required',
+            'file' => 'mimes:jpeg,png|max:2048'
+        ]);
         DB::connection($this->sql)->beginTransaction();
         try {
             
@@ -174,20 +187,6 @@ class ProyekController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $this->validate($request, [
-                'no_proyek' => 'required',
-                'no_kontrak' => 'required',
-                'keterangan' => 'required',
-                'kode_cust' => 'required',
-                'tgl_mulai' => 'required',
-                'tgl_selesai' => 'required',
-                'nilai' => 'required',
-                'ppn' => 'required',
-                'status_ppn' => 'required',
-                'periode' => 'required',
-                'file' => 'mimes:jpeg,png|max:2048'
-            ]);
 
             if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
                 $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
@@ -235,28 +234,26 @@ class ProyekController extends Controller {
     }
 
     public function update(Request $request) {
+        $this->validate($request, [
+            'no_proyek' => 'required',
+            'no_kontrak' => 'required',
+            'keterangan' => 'required',
+            'kode_cust' => 'required',
+            'tgl_mulai' => 'required',
+            'tgl_selesai' => 'required',
+            'nilai' => 'required',
+            'ppn' => 'required',
+            'status_ppn' => 'required',
+            'periode' => 'required',
+            'file' => 'mimes:jpeg,png|max:2048'
+        ]);
+        DB::connection($this->sql)->beginTransaction();
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $this->validate($request, [
-                'no_proyek' => 'required',
-                'no_kontrak' => 'required',
-                'keterangan' => 'required',
-                'kode_cust' => 'required',
-                'tgl_mulai' => 'required',
-                'tgl_selesai' => 'required',
-                'nilai' => 'required',
-                'ppn' => 'required',
-                'status_ppn' => 'required',
-                'periode' => 'required',
-                'file' => 'mimes:jpeg,png|max:2048'
-            ]);
-
-            DB::connection($this->sql)->beginTransaction();
             
             DB::connection($this->sql)->table('java_proyek')
             ->where('kode_lokasi', $kode_lokasi)
