@@ -90,7 +90,7 @@ class DashboardController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.no_kontrak, convert(varchar,tgl_selesai,103) as tgl_selesai,b.nama as nama_cust,
+            $sql = "select a.no_proyek, convert(varchar,tgl_selesai,103) as tgl_selesai,b.nama as nama_cust,
             isnull(c.nilai,0) as rab,isnull(d.nilai,0) as beban, isnull(e.nilai,0) as tagihan,isnull(f.nilai,0) as bayar, 
             a.nilai as nilai_proyek
             from java_proyek a
