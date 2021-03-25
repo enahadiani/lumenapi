@@ -813,7 +813,7 @@ class DashSiswaController extends Controller
                 union all 
                 select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
                 convert(varchar(10),b.tanggal,103) as tgl,'PDD' as modul,isnull(a.bayar,0) as bayar,a.id_bank,'success' as status,'-' as snap_token
-                from (select x.kode_lokasi,x.no_rekon,sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar,'-' as id_bank
+                from (select x.kode_lokasi,x.no_rekon,sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar, x.id_bank
                     from sis_rekon_d x 
 					inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
 					inner join sis_bill_d z on x.no_bill=z.no_bill and x.kode_lokasi=z.kode_lokasi and x.kode_pp=z.kode_pp and x.periode_bill=z.periode and x.nis=z.nis and x.kode_param=z.kode_param 
