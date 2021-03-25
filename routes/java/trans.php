@@ -27,6 +27,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('tagihan-proyek-cbbl','Java\TagihanProyekController@getProyek');
     $router->get('tagihan-bayar-cbbl','Java\PembayaranProyekController@getTagihan');
     $router->get('bank-bayar-cbbl','Java\PembayaranProyekController@getBank');
+    $router->get('file-jenis-cbbl','Java\FilterController@getJenisUpload');
 
     //Proyek
     $router->get('proyek','Java\ProyekController@index');
