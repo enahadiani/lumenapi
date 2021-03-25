@@ -22,7 +22,7 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-			$sql="select distinct a.periode
+			$sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama
             from periode a
             where a.kode_lokasi='$kode_lokasi'
             order by a.periode desc";
