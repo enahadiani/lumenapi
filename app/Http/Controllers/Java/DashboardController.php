@@ -11,68 +11,6 @@ class DashboardController extends Controller {
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
-    public function getTempoProject(Request $request) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $sql = "";
-
-            $res = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
-
-    public function getAnggaranProject(Request $request) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $sql = "";
-
-            $res = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
-
     public function getPeriode()
     {
         try {
@@ -100,6 +38,44 @@ class DashboardController extends Controller {
             }
             return response()->json($success, $this->successStatus);
 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getProfitDashboard(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "select isnull(sum(a.nilai), 0) as nilai_proyek, isnull(sum(b.nilai), 0) as nilai_beban from java_proyek a
+            left join (select a.no_proyek,a.kode_lokasi, sum(a.nilai) as nilai
+            from java_beban a
+            where a.kode_lokasi='04'
+            group by a.no_proyek,a.kode_lokasi
+            ) b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
+            where format(a.tgl_mulai, 'MM') = '".$request->query('bulan')."' 
+            and year(a.tgl_mulai) = '".$request->query('tahun')."'";
+
+            $res = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+            
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
