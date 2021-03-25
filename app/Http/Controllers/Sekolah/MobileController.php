@@ -1597,5 +1597,56 @@ class MobileController extends Controller
         }
     }
 
+    public function getJumlahReadMobile(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            $get = DB::connection($this->db)->select("select kode_kelas from sis_siswa where nis='$nik' ");
+            if(count($get) > 0){
+                $kode_kelas = $get[0]->kode_kelas;
+            }else{
+                $kode_kelas = "-";
+            }
+            
+			$sql = "select a.kode_matpel,'Guru '+c.nama as nama,a.judul,convert(varchar,a.tgl_input,103) as tanggal,a.no_bukti,d.file_dok,e.sts_read_mob,a.tipe,a.nik_user,f.nama as nama_guru,f.foto,a.nis,a.kode_kelas,a.tgl_input
+            from sis_pesan_m a
+            inner join sis_pesan_d e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and e.nik='$nik'
+            inner join (select a.kode_matpel,a.kode_lokasi,a.kode_pp,max(tgl_input) as tgl_input
+                        from sis_pesan_m a
+						inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik'
+						where a.tipe in ('info','nilai')
+                        group by  a.kode_matpel,a.kode_lokasi,a.kode_pp) b on a.kode_matpel=b.kode_matpel and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.tgl_input=b.tgl_input
+            left join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            left join sis_pesan_dok d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and d.no_urut=0
+            inner join (select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from sis_guru a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+						union all 
+						select a.nik,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.foto,'-') as foto from karyawan a
+                        left join sis_hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+						where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp') f on a.nik_user=f.nik and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
+            where a.tipe in ('info','nilai') and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and (a.kode_kelas='$kode_kelas' or a.nis='$nik') and e.sts_read_mob = '0'
+			order by a.no_bukti desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+            $success['status'] = true;
+            $success['jum'] = count($res);
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
 
 }

@@ -803,7 +803,7 @@ class DashSiswaController extends Controller
 
             $sql = "select $filter_top a.*,case modul when 'BILL' then 'Tagihan' when 'KB' then 'Pembayaran' when 'PDD' then 'Auto Bayar' when 'KBMID' then 'Pembayaran Midtrans' end as jenis from (
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,
-                'BILL' as modul, isnull(a.tagihan,0) as total,a.id_bank
+                'BILL' as modul, isnull(a.tagihan,0) as total,a.id_bank,'success' as status,'-' as snap_token
                 from (select x.kode_lokasi,x.no_bill,sum(x.nilai) as tagihan, '-' as id_bank
 						from sis_bill_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
@@ -812,8 +812,8 @@ class DashSiswaController extends Controller
                 inner join sis_bill_m b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi 
                 union all 
                 select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
-                convert(varchar(10),b.tanggal,103) as tgl,'PDD' as modul,isnull(a.bayar,0) as bayar,a.id_bank
-                from (select x.kode_lokasi,x.no_rekon,sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar,'-' as id_bank
+                convert(varchar(10),b.tanggal,103) as tgl,'PDD' as modul,isnull(a.bayar,0) as bayar,a.id_bank,'success' as status,'-' as snap_token
+                from (select x.kode_lokasi,x.no_rekon,sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar, x.id_bank
                     from sis_rekon_d x 
 					inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
 					inner join sis_bill_d z on x.no_bill=z.no_bill and x.kode_lokasi=z.kode_lokasi and x.kode_pp=z.kode_pp and x.periode_bill=z.periode and x.nis=z.nis and x.kode_param=z.kode_param 
@@ -823,7 +823,7 @@ class DashSiswaController extends Controller
                 inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi 
                 union all 
                 select a.no_rekon as no_bukti,a.kode_lokasi,b.tanggal,
-                convert(varchar(10),b.tanggal,103) as tgl,'KB' as modul, isnull(a.bayar,0) as bayar, a.id_bank 
+                convert(varchar(10),b.tanggal,103) as tgl,'KB' as modul, isnull(a.bayar,0) as bayar, a.id_bank,'success' as status,'-' as snap_token
                 from (select x.kode_lokasi,x.no_rekon,
 					sum(case when x.modul <>'BTLREKON' then x.nilai else 0 end) as bayar,x.id_bank
                     from sis_rekon_d x inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
@@ -834,7 +834,7 @@ class DashSiswaController extends Controller
                 inner join kas_m b on a.no_rekon=b.no_kas and a.kode_lokasi=b.kode_lokasi
                 union all
                 select a.no_bukti,a.kode_lokasi,b.tgl_input,convert(varchar(10),b.tgl_input,103) as tgl,
-                'KBMID' as modul, isnull(a.tagihan,0) as total,a.id_bank
+                'KBMID' as modul, isnull(a.tagihan,0) as total,a.id_bank,b.status,b.snap_token
                 from (select x.kode_lokasi,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
                     from sis_mid_bayar_d x 
                     where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
