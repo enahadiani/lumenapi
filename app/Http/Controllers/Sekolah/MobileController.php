@@ -1529,7 +1529,11 @@ class MobileController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,DATALENGTH(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+convert(varchar,file_dok) as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' ")),true);
+                    $res[$i]['file_dok'] = json_decode(json_encode(DB::connection($this->db)->select("select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,DATALENGTH(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+convert(varchar,file_dok) as url from sis_pesan_dok where no_bukti='".$res[$i]['no_bukti']."' 
+                    union all
+                    select SUBSTRING(file_dok,CHARINDEX('_',file_dok)+1,DATALENGTH(file_dok)) as nama, '".url('api/mobile-sekolah/storage')."/'+convert(varchar,file_dok) as url
+                    from sis_nilai_dok where no_bukti='".$res[$i]['ref1']."' and nis='".$nik."'
+                    ")),true);
                 }
                 $success['status'] = true;
                 $success['data_guru'] = $res2;
