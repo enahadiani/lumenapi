@@ -23,6 +23,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('project-dashboard','Java\DashboardController@getProjectDashboard');
     $router->get('profit-dashboard','Java\DashboardController@getProfitDashboard');
     $router->get('project-aktif','Java\DashboardController@getProjectAktif');
+    $router->get('project-detail-supplier','Java\DashboardController@getDetailPembayaranSupplier');
+    $router->get('project-detail-customer','Java\DashboardController@getDetailPembayaranCustomer');
 });
 
 
