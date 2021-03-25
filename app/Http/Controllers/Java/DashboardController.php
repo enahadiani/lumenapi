@@ -52,9 +52,9 @@ class DashboardController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select convert(varchar,tanggal,103) as tanggal, no_dokumen, keterangan, b.nama, a.status from java_beban a
-            inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
-            where a.no_proyek = '".$request->query('proyek')."' and a.kode_lokasi = '$kode_lokasi'";
+            $sql = "select convert(varchar,a.tanggal,103) as tanggal, b.no_dokumen, a.keterangan
+            from java_bayar a inner join java_bayar_detail b on a.no_bayar=b.no_bayar and a.kode_lokasi=b.kode_lokasi
+            where a.kode_cust = '".$request->query('customer')."' and a.kode_lokasi = '$kode_lokasi'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
