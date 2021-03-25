@@ -5749,7 +5749,7 @@ class DashboardController extends Controller
                 }
             }
             
-			$sql="select no_bukti,convert(varchar,tanggal,103) as tgl,keterangan,link,flag_aktif,nik_user from dash_video
+			$sql="select no_bukti,convert(varchar,tanggal,103) as tgl,keterangan,link,flag_aktif,nik_user from dash_video where flag_aktif='1' and kode_lokasi='$kode_lokasi'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
