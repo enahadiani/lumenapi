@@ -128,6 +128,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     $router->get('ms-aset','Ypt\DashboardController@getMSAset');
     $router->get('ms-hutang','Ypt\DashboardController@getMSHutang');
+    $router->get('video-list','Ypt\DashboardController@getListVideo');
 
 
 });
