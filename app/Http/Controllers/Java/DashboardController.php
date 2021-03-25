@@ -117,7 +117,7 @@ class DashboardController extends Controller {
             where a.kode_lokasi='04'
             group by b.no_proyek,a.kode_lokasi
             )f on a.no_proyek=f.no_proyek and a.kode_lokasi=f.kode_lokasi
-            where a.flag_aktif = '0' and format(a.tgl_mulai, 'MM') = '".$request->query('bulan')."' 
+            where a.flag_aktif = '1' and format(a.tgl_mulai, 'MM') = '".$request->query('bulan')."' 
             and year(a.tgl_mulai) = '".$request->query('tahun')."'";
 
             $res = DB::connection($this->sql)->select($sql);
