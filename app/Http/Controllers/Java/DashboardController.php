@@ -86,7 +86,7 @@ class DashboardController extends Controller {
             }
 
             $sql = "select convert(varchar,tanggal,103) as tanggal, no_dokumen, keterangan, b.nama, a.status from java_beban a
-            inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
+            inner join java_vendor b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
             where a.no_proyek = '".$request->query('proyek')."' and a.kode_lokasi = '$kode_lokasi'";
 
             $res = DB::connection($this->sql)->select($sql);
