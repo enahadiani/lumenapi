@@ -6619,6 +6619,855 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    // DRILLDOWN MANAGEMENT SYSTEM 
+
+    public function getMSCapai(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $row =  DB::connection($this->db)->select("
+            select a.kode_grafik,a.nama,sum(b.n2*-1) as rka, sum(b.n1*-1) as real,sum(case when (b.n2*-1)-isnull(b.n1*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n1*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n1*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n1*-1,0)) end) as tidak_tercapai
+            from dash_grafik_m a
+            inner join dash_grafik_d c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            $where and a.kode_grafik in ($kode_grafik)
+            group by a.kode_grafik,a.nama
+            order by a.kode_grafik
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
+                }
+                $success['rka'] = $rka;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getMSCapaiKlp(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,sum(b.n4*-1) as real, sum(b.n8*-1) as rka,sum(case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n8*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n8*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai
+                from dash_grafik_d a
+                inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                $where and a.kode_grafik ='$kode_grafik' 
+            group by a.kode_neraca,b.nama
+            order by a.kode_neraca
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                $ctg = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
+                    array_push($ctg,$row[$i]['nama']);
+                }
+                $success['rka'] = $rka;
+                $success['ctg'] = $ctg;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['ctg'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function dataDrillFakultas(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->form) && $request->form != ""){
+                $filter_tahun = " where tahun = '".substr($request->periode[1],0,4)."' ";
+                $filter_nol = " and (isnull(b.thn1,0)<>0) ";
+            }else{
+                $filter_tahun = "";
+                $filter_nol = " and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) ";
+            }
+
+            $bulan = substr($request->periode[1],4,2);
+            if(substr($request->kode_neraca,0,2) == "GR"){
+                $kode_neraca = "select kode_neraca from dash_grafik_d where kode_grafik='$request->kode_grafik' and kode_lokasi='$kode_lokasi' ";
+            }else{
+                $kode_neraca = "'".$request->kode_neraca."'";
+            }
+            $sql="SELECT
+            tahun
+            FROM
+            (
+                SELECT TOP 6 * from (
+                select distinct substring(periode,1,4) as tahun
+                FROM exs_neraca_pp 
+                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca in ($kode_neraca)
+                ) a
+                ORDER BY tahun DESC
+            ) SQ
+            $filter_tahun
+            ORDER BY tahun ASC ";           
+			$rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            $sumcase = "";
+            $kolom ="";
+            $ctg = array();
+            if(count($rs)> 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    $sumcase .= " , sum(case when a.periode='".$rs[$x]['tahun']."".$bulan."' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) as thn$i ";
+                    $kolom .=",isnull(b.thn$i,0) as thn$i";
+
+                    array_push($ctg,substr($rs[$x]['tahun'],2,2));
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D04");
+            $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
+
+			$sql="select a.kode_bidang,a.nama $kolom
+            from bidang a 
+            left join (select c.kode_bidang,a.kode_lokasi $sumcase
+                        from exs_neraca_pp a
+                        inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca)
+                        group by c.kode_bidang,a.kode_lokasi
+                        )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' 
+            and a.nama like 'Fakultas%'
+            --and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) 
+            order by a.kode_bidang";
+            $success['sql'] = $sql;
+            $row =  DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["thn$x"]),"kode_bidang"=>$row[$i]["kode_bidang"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+                $success['row'] = $row;
+                $success['dt'] = $dt;
+                // $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color"=> $color[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function dataDrillDirektorat(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $bulan = substr($request->periode[1],4,2);
+            if(isset($request->form) && $request->form != ""){
+                $filter_tahun = " where tahun = '".substr($request->periode[1],0,4)."' ";
+                $filter_nol = " and (isnull(b.thn1,0)<>0) ";
+                
+            }else{
+                $filter_tahun = "";
+                $filter_nol = " and (isnull(b.thn1,0)<>0 or isnull(b.thn2,0)<>0 or isnull(b.thn3,0)<>0 or isnull(b.thn4,0)<>0 or isnull(b.thn5,0)<>0 or isnull(b.thn6,0)<>0) ";
+            }
+
+            if(substr($request->kode_neraca,0,2) == "GR"){
+                $kode_neraca = "select kode_neraca from dash_grafik_d where kode_grafik='$request->kode_grafik' and kode_lokasi='$kode_lokasi' ";
+            }else{
+                $kode_neraca = "'".$request->kode_neraca."'";
+            }
+
+            $sql="SELECT
+            tahun
+            FROM
+            (
+                SELECT TOP 6 * from (
+                select distinct substring(periode,1,4) as tahun
+                FROM exs_neraca_pp 
+                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca in ($kode_neraca)
+                ) a
+                ORDER BY tahun DESC
+            ) SQ
+            $filter_tahun
+            ORDER BY tahun ASC ";           
+			$rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            $sumcase = "";
+            $kolom ="";
+            $ctg = array();
+            if(count($rs)> 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    $sumcase .= " , sum(case when a.periode='".$rs[$x]['tahun']."".$bulan."' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) as thn$i ";
+                    $kolom .=",isnull(b.thn$i,0) as thn$i";
+
+                    array_push($ctg,substr($rs[$x]['tahun'],2,2));
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            
+            $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D04");
+            $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
+
+			$sql="select a.kode_bidang,a.nama $kolom
+            from bidang a 
+            left join (select c.kode_bidang,a.kode_lokasi $sumcase
+                        from exs_neraca_pp a
+                        inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca)
+                        group by c.kode_bidang,a.kode_lokasi
+                        )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and (isnull(b.thn1,0)<>0) and a.kode_bidang not like '5%'
+            order by a.kode_bidang";
+            $success['sql'] = $sql;
+            $row =  DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){
+                        $dt[$i][]=array("y"=>floatval($row[$i]["thn$x"]),"kode_bidang"=>$row[$i]["kode_bidang"],"tahun"=>$ctg[$c]);
+                        $c++;          
+                    }
+                }
+                $success['row'] = $row;
+                $success['dt'] = $dt;
+                // $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color"=> $color[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function detailDrillFakultas(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            if(substr($request->kode_neraca,0,2) == "GR"){
+                $kode_neraca = "select kode_neraca from dash_grafik_d where kode_grafik='$request->kode_grafik' and kode_lokasi='$kode_lokasi' ";
+            }else{
+                $kode_neraca = "'".$request->kode_neraca."'";
+            }
+            $tahun= substr($request->periode[1],0,4);
+            $periode = $request->periode[1];
+            $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D04");
+            $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
+
+            $sql=" select a.kode_bidang,a.nama,
+            isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
+            case when isnull(b.n2,0)<>0 then (isnull(b.n4,4)/isnull(b.n2,0))*100 else 0 end as capai
+            from bidang a 
+            left join (select c.kode_bidang,a.kode_lokasi,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as n2,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5
+                        from exs_neraca_pp a
+                        inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca) and a.periode = '$periode'
+                        group by c.kode_bidang,a.kode_lokasi
+                        )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
+            and a.nama like 'Fakultas%'
+            order by a.kode_bidang
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $row;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function detailDrillDirektorat(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            if(substr($request->kode_neraca,0,2) == "GR"){
+                $kode_neraca = "select kode_neraca from dash_grafik_d where kode_grafik='$request->kode_grafik' and kode_lokasi='$kode_lokasi' ";
+            }else{
+                $kode_neraca = "'".$request->kode_neraca."'";
+            }
+            $tahun= substr($request->periode[1],0,4);
+            $periode = $request->periode[1];
+            $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D04");
+            $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
+
+            $sql=" select a.kode_bidang,a.nama,
+            isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
+            case when isnull(b.n2,0)<>0 then (isnull(b.n4,4)/isnull(b.n2,0))*100 else 0 end as capai
+            from bidang a 
+            left join (select c.kode_bidang,a.kode_lokasi,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as n2,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5
+                        from exs_neraca_pp a
+                        inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca) and a.periode = '$periode'
+                        group by c.kode_bidang,a.kode_lokasi
+                        )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
+            and a.kode_bidang not like '5%'
+            order by a.kode_bidang
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $row;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function dataDrillPP(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $bulan = substr($request->periode[1],4,2);
+            if(substr($request->kode_neraca,0,2) == "GR"){
+                $kode_neraca = "select kode_neraca from dash_grafik_d where kode_grafik='$request->kode_neraca' and kode_lokasi='$kode_lokasi' ";
+            }else{
+                $kode_neraca = "'".$request->kode_neraca."'";
+            }
+            $kode_bidang = $request->kode_bidang;
+
+            $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D04");
+            $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
+
+            if(isset($request->form) && $request->form != ""){
+                $filter_tahun = " where tahun = '".substr($request->periode[1],0,4)."' ";
+            }else{
+                $filter_tahun = "";
+                
+            }
+
+			$sql="SELECT
+            tahun
+            FROM
+            (
+                SELECT TOP 6 * from (
+                select distinct substring(periode,1,4) as tahun
+                FROM exs_neraca_pp 
+                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca in ($kode_neraca)
+                ) a
+                ORDER BY tahun DESC
+            ) SQ
+            $filter_tahun
+            ORDER BY tahun ASC  ";
+            $success['sqlthn'] = $sql;
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs),true);
+            $sumcase = "";
+            $kolom ="";
+            $ctg = array();
+            if(count($rs)> 0){
+                $i=1;
+                for($x=0;$x<count($rs);$x++){
+                    $sumcase .= " , sum(case when a.periode='".$rs[$x]['tahun']."".$bulan."' then (case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) else 0 end) as thn$i ";
+                    $kolom .=",isnull(b.thn$i,0) as thn$i";
+
+                    array_push($ctg,$rs[$x]['tahun']);
+                    $i++;
+                }
+            }
+            $success['ctg']=$ctg;
+            $sql="select a.kode_bidang,a.nama $kolom
+            from pp a 
+            left join (select c.kode_pp,a.kode_lokasi $sumcase
+                        from exs_neraca_pp a
+                        inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='D04' and b.kode_neraca in ($kode_neraca) and c.kode_bidang='$kode_bidang'
+                        group by c.kode_pp,a.kode_lokasi
+                        )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.thn1,0)<>0
+            order by a.kode_pp";
+            $row =  DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+            $success['colors'] = $color;
+
+            $get = DB::connection($this->db)->select("select nama, case when nama like 'Fakultas%' then 'Jurusan' else 'PP' end as nama2 from bidang where kode_bidang='$kode_bidang' ");
+            if(count($get) >0){
+                $success['nama_bidang'] = $get[0]->nama;
+                $success['nama_pp'] = $get[0]->nama2;
+            }else{
+                $success['nama_bidang'] = "-";
+                $success['nama_pp'] = "-";
+            }
+
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                for($i=0;$i<count($row);$i++){
+                    $dt[$i] = array();
+                    $c=0;
+                    for($x=1;$x<=count($ctg);$x++){ 
+                        $dt[$i][]=array("y"=>floatval($row[$i]["thn$x"]));
+                        $c++;     
+                    }
+                }
+
+                // $color = array('#E5FE42','#007AFF','#4CD964','#FF9500');
+                for($i=0;$i<count($row);$i++){
+
+                    $success["series"][$i]= array(
+                        "name"=> $row[$i]['nama'], "data"=>$dt[$i], "color" => $color[$i]
+                    );
+                }
+
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function detailDrillPP(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+			if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            $tahun = $request->tahun;
+            $periode = $request->periode[1];
+            $bulan = substr($periode,4,2);
+            if(substr($request->kode_neraca,0,2) == "GR"){
+                $kode_neraca = "select kode_neraca from dash_grafik_d where kode_grafik='$request->kode_neraca' and kode_lokasi='$kode_lokasi' ";
+            }else{
+                $kode_neraca = "'".$request->kode_neraca."'";
+            }
+            $kode_bidang = $request->kode_bidang;
+            $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
+            $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
+
+			$sql="select a.kode_pp,a.nama,
+            isnull(b.n2,0) as n2,isnull(b.n4,0) as n4,isnull(b.n5,0) as n5,
+            case when isnull(b.n2,0)<>0 then (isnull(b.n4,0)/isnull(b.n2,0))*100 else 0 end as capai
+            from pp a 
+            left join (select c.kode_pp,a.kode_lokasi,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as n2,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+                            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5
+                        from exs_neraca_pp a
+                        inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='D04' and b.kode_neraca in ($kode_neraca) and c.kode_bidang='$kode_bidang' and a.periode = '".$tahun.$bulan."'
+                        group by c.kode_pp,a.kode_lokasi
+                    )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and isnull(b.n2,0)<>0
+            order by a.kode_bidang
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $success['data'] = $row;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getMSPiutang(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+
+            $sql="select a.kode_neraca,b.nama, sum(case when b.jenis_akun='Pendapatan' then -b.n1 else b.n1 end) as rka,
+            sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as real,case sum(n1) when 0 then 0 else (sum(n4)/sum(n1))*100 end as persen  
+            from dash_grafik_d a
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_grafik='$request->kode_grafik' 
+            group by a.kode_neraca,b.nama
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            $success['colors'] = $color;
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                $ctg = array();
+                for($i=0;$i<count($row);$i++){
+
+                    $selisih = floatval($row[$i]['real']) - floatval($row[$i]['rka']);
+                    if($selisih > 0){
+                        $lebih = $selisih; 
+                        $kurang = 0;
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if($selisih == 0){
+                        $lebih = 0;
+                        $kurang = 0;
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        
+                        $lebih = 0;
+                        $kurang = $selisih * -1;
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
+                    $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                    array_push($ctg,$row[$i]['nama']);
+
+                }
+                $success['categories'] = $ctg;
+                $success['rka'] = $rka;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['categories'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 
     
