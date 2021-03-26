@@ -801,7 +801,6 @@ class DashSiswaController extends Controller
                 $filter_top .="";
             }
 
-            $filter_jenis = "";
             if(isset($request->status) && $request->status != ""){
                 if($request->status == "all"){
                     $filter_jenis .="";
