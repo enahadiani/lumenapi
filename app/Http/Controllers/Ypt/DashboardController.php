@@ -4839,7 +4839,7 @@ class DashboardController extends Controller
     }
 
 
-    public function getBeban5Tahun(Request $request){
+    public function getBeban5TahunBackup(Request $request){
         try {
             
             
@@ -4955,7 +4955,112 @@ class DashboardController extends Controller
         }
     }
 
-    public function getBeban5TahunSDM(Request $request){
+    public function getBeban5Tahun(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $ctg = array();
+            $tahun = intval(substr($request->periode[1],0,4))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
+            }
+            $success['ctg'] = $ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select a.kode_grafik,x.nama,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -b.n1 else b.n1 end),0) as rka1, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end),0) as real1,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n1 else c.n1 end),0) as rka2, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n4 else c.n4 end),0) as real2,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -d.n1 else d.n1 end),0) as rka3, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -d.n4 else d.n4 end),0) as real3,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -e.n1 else e.n1 end),0) as rka4, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -e.n4 else e.n4 end),0) as real4,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -f.n1 else f.n1 end),0) as rka5, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -f.n4 else f.n4 end),0) as real5,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -g.n1 else g.n1 end),0) as rka6, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -g.n4 else g.n4 end),0) as real6
+            from dash_grafik_d a
+            inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and x.kode_grafik='GR19' 
+            group by a.kode_grafik,x.nama
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                for($i=0;$i<count($row);$i++){
+
+                    for($j=1; $j <= 6 ;$j++){
+
+                        $selisih = floatval($row[$i]['real'.$j]) - floatval($row[$i]['rka'.$j]);
+                        if($selisih > 0){
+                            $lebih = $selisih; 
+                            $kurang = 0;
+                            $r = floatval($row[$i]['rka'.$j])/1000000000;
+                        }else if($selisih == 0){
+                            $lebih = 0;
+                            $kurang = 0;
+                            $r = $row[$i]['real'.$j]/1000000000;
+                        }else{
+                            
+                            $lebih = 0;
+                            $kurang = $selisih * -1;
+                            $r = $row[$i]['real'.$j]/1000000000;
+                        }
+    
+                        $rka[] = array("y"=>floatval($row[$i]['rka'.$j])/1000000000,"nlabel"=>floatval($row[$i]['rka'.$j])/1000000000);
+                        $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
+                        $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
+                        $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                    }
+
+                }
+                $success['rka'] = $rka;
+                $success['categories'] = $ctg;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['categories'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBeban5TahunSDMBackup(Request $request){
         try {
             
             
@@ -5064,6 +5169,111 @@ class DashboardController extends Controller
                 
                 return response()->json(['success'=>$success], $this->successStatus);
             }        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBeban5TahunSDM(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $ctg = array();
+            $tahun = intval(substr($request->periode[1],0,4))-5;
+            for($x=0;$x < 6;$x++){
+                array_push($ctg,$tahun);
+                $tahun++;
+            }
+            $success['ctg'] = $ctg;
+                        
+            $row =  DB::connection($this->db)->select("
+            select a.kode_grafik,x.nama,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -b.n1 else b.n1 end),0) as rka1, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end),0) as real1,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n1 else c.n1 end),0) as rka2, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n4 else c.n4 end),0) as real2,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -d.n1 else d.n1 end),0) as rka3, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -d.n4 else d.n4 end),0) as real3,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -e.n1 else e.n1 end),0) as rka4, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -e.n4 else e.n4 end),0) as real4,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -f.n1 else f.n1 end),0) as rka5, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -f.n4 else f.n4 end),0) as real5,
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -g.n1 else g.n1 end),0) as rka6, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -g.n4 else g.n4 end),0) as real6
+            from dash_grafik_d a
+            inner join dash_grafik_m x on a.kode_grafik=x.kode_grafik and a.kode_lokasi=x.kode_lokasi
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
+            left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
+            left join exs_neraca d on a.kode_neraca=d.kode_neraca and a.kode_fs=d.kode_fs and a.kode_lokasi=d.kode_lokasi and d.periode='".$ctg[2]."12'
+            left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
+            left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
+            left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
+            where a.kode_lokasi='$kode_lokasi'  and x.kode_grafik='GR20' 
+            group by a.kode_grafik,x.nama
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                for($i=0;$i<count($row);$i++){
+
+                    for($j=1; $j <= 6 ;$j++){
+
+                        $selisih = floatval($row[$i]['real'.$j]) - floatval($row[$i]['rka'.$j]);
+                        if($selisih > 0){
+                            $lebih = $selisih; 
+                            $kurang = 0;
+                            $r = floatval($row[$i]['rka'.$j])/1000000000;
+                        }else if($selisih == 0){
+                            $lebih = 0;
+                            $kurang = 0;
+                            $r = $row[$i]['real'.$j]/1000000000;
+                        }else{
+                            
+                            $lebih = 0;
+                            $kurang = $selisih * -1;
+                            $r = $row[$i]['real'.$j]/1000000000;
+                        }
+    
+                        $rka[] = array("y"=>floatval($row[$i]['rka'.$j])/1000000000,"nlabel"=>floatval($row[$i]['rka'.$j])/1000000000);
+                        $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
+                        $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
+                        $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                    }
+
+                }
+                $success['rka'] = $rka;
+                $success['categories'] = $ctg;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['categories'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
