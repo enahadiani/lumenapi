@@ -374,7 +374,8 @@ class ProyekController extends Controller {
         try {
             $this->validate($request, [
                 'no_bukti' => 'required',
-                'file' => 'required'
+                'file' => 'required',
+                'kode_jenis' => 'required',
             ]);
 
             if($data =  Auth::guard($this->guard)->user()){
@@ -390,6 +391,7 @@ class ProyekController extends Controller {
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('file_dok', $request->file)
+            ->where('jenis', $request->kode_jenis)
             ->delete();
 
             DB::connection($this->sql)->commit();
