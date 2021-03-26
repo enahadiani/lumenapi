@@ -369,6 +369,41 @@ class ProyekController extends Controller {
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function deleteFile(Request $request) {
+        try {
+            $this->validate($request, [
+                'no_bukti' => 'required',
+                'file' => 'required'
+            ]);
+
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(Storage::disk('s3')->exists('java/'.$request->file)){
+                Storage::disk('s3')->delete('java/'.$request->file);
+            }
+
+            DB::connection($this->sql)->table('java_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $request->no_bukti)
+            ->where('file_dok', $request->file)
+            ->delete();
+
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['message'] = "File dokumen berhasil dihapus";
+            
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }
 
 ?>
