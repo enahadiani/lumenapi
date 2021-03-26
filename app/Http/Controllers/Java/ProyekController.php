@@ -142,6 +142,13 @@ class ProyekController extends Controller {
                 inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi 
                 left join java_dok c on a.no_proyek=c.no_bukti and a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
+
+                $file = "select a.file_dok, a.no_urut, a.nama, a.jenis, b.nama
+                from java_dok a inner join java_jenis b on a.jenis=b.kode_jenis and a.kode_lokasi=b,kode_lokasi
+                where a.no_bukti = '$request->no_proyek'";
+                $file = DB::connection($this->sql)->select($file);
+                $file = json_decode(json_encode($file),true);
+                $success['file'] = $file;
             }else{
                 $sql = "select no_proyek, no_kontrak, convert(varchar(10), tgl_selesai, 120) as tgl_selesai, nilai,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_proyek
