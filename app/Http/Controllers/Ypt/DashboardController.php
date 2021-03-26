@@ -6162,7 +6162,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function getMSAset(Request $request){
+    public function getMSAsetBackup(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -6244,7 +6244,120 @@ class DashboardController extends Controller
         }
     }
 
-    public function getMSHutang(Request $request){
+    public function getMSAset(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+
+            $sql="select a.kode_neraca,b.nama, sum(case when b.jenis_akun='Pendapatan' then -b.n1 else b.n1 end) as rka,
+            sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end) as real,case sum(n1) when 0 then 0 else (sum(n4)/sum(n1))*100 end as persen  
+            from dash_grafik_d a
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_grafik='GR44' 
+            group by a.kode_neraca,b.nama
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            $success['colors'] = $color;
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                $ctg = array();
+                for($i=0;$i<count($row);$i++){
+
+                    $selisih = floatval($row[$i]['real']) - floatval($row[$i]['rka']);
+                    if($selisih > 0){
+                        $lebih = $selisih; 
+                        $kurang = 0;
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if($selisih == 0){
+                        $lebih = 0;
+                        $kurang = 0;
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        
+                        $lebih = 0;
+                        $kurang = $selisih * -1;
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
+                    $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                    array_push($ctg,$row[$i]['nama']);
+
+                }
+                $success['categories'] = $ctg;
+                $success['rka'] = $rka;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['categories'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getMSHutangBackup(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -6326,6 +6439,121 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function getMSHutang(Request $request){
+        $periode= $request->input('periode');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+
+            $sql="select a.kode_neraca,b.nama, sum(case when b.modul='P' then -b.n1 else b.n1 end) as rka,
+            sum(case when b.modul='P' then -b.n4 else b.n4 end) as real,case sum(n1) when 0 then 0 else (sum(n4)/sum(n1))*100 end as persen  
+            from dash_grafik_d a
+            left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            $where and a.kode_grafik='GR45' and a.kode_fs='FS4' 
+            group by a.kode_neraca,b.nama
+            having sum(b.n4) <> 0
+            ";
+            $row = DB::connection($this->db)->select($sql);
+            $row = json_decode(json_encode($row),true);
+            
+            $success['colors'] = $color;
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                $ctg = array();
+                for($i=0;$i<count($row);$i++){
+
+                    $selisih = floatval($row[$i]['real']) - floatval($row[$i]['rka']);
+                    if($selisih > 0){
+                        $lebih = $selisih; 
+                        $kurang = 0;
+                        $r = floatval($row[$i]['rka'])/1000000000;
+                    }else if($selisih == 0){
+                        $lebih = 0;
+                        $kurang = 0;
+                        $r = $row[$i]['real']/1000000000;
+                    }else{
+                        
+                        $lebih = 0;
+                        $kurang = $selisih * -1;
+                        $r = $row[$i]['real']/1000000000;
+                    }
+                    
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
+                    $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                    array_push($ctg,$row[$i]['nama']);
+
+                }
+                $success['categories'] = $ctg;
+                $success['rka'] = $rka;
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['categories'] = [];
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 
     public function getListVideo(Request $request){
         // $kode_lokasi= $request->input('kode_lokasi');
