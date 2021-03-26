@@ -731,15 +731,15 @@ class DashSiswaController extends Controller
                 $kode_pp= $data->kode_pp;
             }
 
-            $filter_jenis = "";
+            $filter_jenis = "where a.kode_lokasi='$kode_lokasi' ";
             if(isset($request->jenis) && $request->jenis != ""){
                 if($request->jenis == "all"){
                     $filter_jenis .="";
                 }else{  
                     if($request->jenis == "tagihan"){
-                        $jenis = " where a.modul = 'BILL' ";
+                        $jenis = " and a.modul = 'BILL' ";
                     }else{
-                        $jenis = " where a.modul <> 'BILL' ";
+                        $jenis = " and a.modul <> 'BILL' ";
                     }
                     $filter_jenis .= $jenis;
                 }
@@ -801,15 +801,15 @@ class DashSiswaController extends Controller
                 $filter_top .="";
             }
 
-            $filter_status = "";
+            $filter_jenis = "";
             if(isset($request->status) && $request->status != ""){
                 if($request->status == "all"){
-                    $filter_status .="";
+                    $filter_jenis .="";
                 }else{  
-                    $filter_status .=" and a.status='$request->status' ";
+                    $filter_jenis .=" and a.status='$request->status' ";
                 }
             }else{
-                $filter_status .="";
+                $filter_jenis .="";
             }
 
 
@@ -853,7 +853,7 @@ class DashSiswaController extends Controller
                     group by x.kode_lokasi,x.no_bukti )a 
                 inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
             ) a
-            $filter_jenis $filter_status
+            $filter_jenis
             order by a.tanggal desc";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
