@@ -357,9 +357,11 @@ class ProyekController extends Controller {
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){
-                $foto = $res[0]['file_dok'];
-                if($foto != ""){
-                    Storage::disk('s3')->delete('java/'.$foto);
+                for($i=0;$i<count($res);$i++) {
+                    $foto = $res[$i]['file_dok'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('java/'.$foto);
+                    }
                 }
             }
 
