@@ -818,7 +818,7 @@ class DashSiswaController extends Controller
 					inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
 					inner join sis_bill_d z on x.no_bill=z.no_bill and x.kode_lokasi=z.kode_lokasi and x.kode_pp=z.kode_pp and x.periode_bill=z.periode and x.nis=z.nis and x.kode_param=z.kode_param 
                     where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_rekon
-					group by x.kode_lokasi,x.no_rekon
+					group by x.kode_lokasi,x.no_rekon,x.id_bank
                     )a 
                 inner join sis_rekon_m b on a.no_rekon=b.no_rekon and a.kode_lokasi=b.kode_lokasi 
                 union all 
