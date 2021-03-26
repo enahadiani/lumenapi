@@ -237,6 +237,83 @@ class ProyekController extends Controller {
         }
     }
 
+    public function storeTest(Request $request) {
+        $this->validate($request, [
+            'no_proyek' => 'required',
+            'no_kontrak' => 'required',
+            'keterangan' => 'required',
+            'kode_cust' => 'required',
+            'tgl_mulai' => 'required',
+            'tgl_selesai' => 'required',
+            'nilai' => 'required',
+            'ppn' => 'required',
+            'status_ppn' => 'required',
+            'periode' => 'required',
+        ]);
+        DB::connection($this->sql)->beginTransaction();
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
+                $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
+                values ('".$request->no_proyek."', '".$kode_lokasi."', '".$request->keterangan."', '".$request->kode_cust."', '".$request->no_kontrak."',
+                '".$request->tgl_selesai."', '".$request->tgl_mulai."','".$request->nilai."', '".$request->ppn."', '".$request->status_ppn."', '".$request->periode."', '".$request->status."', getdate())";
+
+                DB::connection($this->sql)->insert($insert);
+
+                $arr_foto = array();
+                $arr_jenis = array();
+                $arr_no_urut = array();
+                $arr_nama_dok = array();
+                $cek = $request->file;
+
+                if(!empty($cek)) {
+                    if(count($request->file) > 0) {
+                        if(isset($request->file('file')[$i])){ 
+                            $file = $request->file('file')[$i];
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                            $arr_jenis[] = $request->jenis[$i];
+                            $arr_no_urut[] = $request->no_dok[$i];
+                            $arr_nama_dok[] = $request->nama_dok[$i];
+                        }
+                    }
+                    if(count($arr_no_urut) > 0){
+                        for($i=0; $i<count($arr_no_urut);$i++){
+                            $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                            values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
+                            DB::connection($this->sql)->insert($insertFile); 
+                        }
+                    }
+                }
+                
+                DB::connection($this->sql)->commit();
+                $success['status'] = true;
+                $success['kode'] = $request->no_proyek;
+                $success['message'] = "Data Proyek berhasil disimpan";
+            } else {
+                DB::connection($this->sql)->rollback();
+                $success['status'] = false;
+                $success['kode'] = "-";
+                $success['jenis'] = "duplicate";
+                $success['message'] = "Error : Duplicate entry. No Proyek atau No Kontrak sudah ada di database!";
+            }
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function update(Request $request) {
         $this->validate($request, [
             'no_proyek' => 'required',
