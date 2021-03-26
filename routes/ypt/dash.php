@@ -130,6 +130,18 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ms-hutang','Ypt\DashboardController@getMSHutang');
     $router->get('video-list','Ypt\DashboardController@getListVideo');
 
+    // DETAIL MANAGEMENT SYSTEM
+    
+    $router->get('ms-piutang','Ypt\DashboardController@getMSPiutang');
+    $router->get('drill-fakultas', 'Ypt\DashboardController@dataDrillFakultas');
+    $router->get('detail-drill-fakultas', 'Ypt\DashboardController@detailDrillFakultas');
+    
+    $router->get('drill-direktorat', 'Ypt\DashboardController@dataDrillDirektorat');
+    $router->get('detail-drill-direktorat', 'Ypt\DashboardController@detailDrillDirektorat');
+    
+    $router->get('drill-pp', 'Ypt\DashboardController@dataDrillPP');
+    $router->get('detail-drill-pp', 'Ypt\DashboardController@detailDrillPP');
+
 
 });
 
