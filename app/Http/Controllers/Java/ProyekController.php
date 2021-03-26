@@ -374,7 +374,7 @@ class ProyekController extends Controller {
         try {
             $this->validate($request, [
                 'no_bukti' => 'required',
-                'file' => 'required',
+                'fileName' => 'required',
                 'kode_jenis' => 'required',
             ]);
 
@@ -390,7 +390,7 @@ class ProyekController extends Controller {
             DB::connection($this->sql)->table('java_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
-            ->where('file_dok', $request->file)
+            ->where('file_dok', $request->fileName)
             ->where('jenis', $request->kode_jenis)
             ->delete();
 
