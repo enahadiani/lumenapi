@@ -267,7 +267,6 @@ class ProyekController extends Controller {
             'ppn' => 'required',
             'status_ppn' => 'required',
             'periode' => 'required',
-            'file' => 'mimes:jpeg,png|max:2048'
         ]);
         DB::connection($this->sql)->beginTransaction();
         try {
@@ -288,26 +287,43 @@ class ProyekController extends Controller {
 
             DB::connection($this->sql)->insert($insert);
 
-            if($request->hasfile('file')) {
-                $file = $request->file('file');
-                    
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                // $picName = uniqid() . '_' . $picName;
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('java/'.$foto)){
-                    Storage::disk('s3')->delete('java/'.$foto);
+            if(count($request->jenis) > 0) { 
+                for($i=0;$i<count($request->jenis);$i++){ 
+                    if(isset($request->file('file')[$i])){ 
+                        $file = $request->file('file')[$i];
+                        if($request->nama_file_seb[$i] != "-"){
+                            //kalo ada hapus yang lama
+                            Storage::disk('s3')->delete('java/'.$request->nama_file_seb[$i]);
+                        }
+                        $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                        $foto = $nama_foto;
+                        if(Storage::disk('s3')->exists('java/'.$foto)){
+                            Storage::disk('s3')->delete('java/'.$foto);
+                        }
+                        Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                        $arr_foto[] = $foto;
+                        $arr_jenis[] = $request->jenis[$i];
+                        $arr_no_urut[] = $request->no_urut[$i];
+                        $arr_nama_dok[] = $request->nama_dok[$i];
+                    } else {
+                        $arr_foto[] = $request->nama_file_seb[$i];
+                        $arr_jenis[] = $request->jenis[$i];
+                        $arr_no_urut[] = $request->no_urut[$i];
+                        $arr_nama_dok[] = $request->nama_dok[$i];
+                    }
                 }
-                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
-                
                 DB::connection($this->sql)->table('java_dok')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_proyek)
                 ->delete();
-
-                $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                values ('".$request->no_proyek."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
-
-                DB::connection($this->sql)->insert($insertFile);
+                
+                if(count($arr_no_urut) > 0){
+                    for($i=0; $i<count($arr_no_urut);$i++){
+                        $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                        values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
+                        DB::connection($this->sql)->insert($insertFile); 
+                    }
+                }
             }
             
             DB::connection($this->sql)->commit();
