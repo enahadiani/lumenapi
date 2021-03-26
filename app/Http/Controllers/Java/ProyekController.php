@@ -302,34 +302,40 @@ class ProyekController extends Controller {
                                 Storage::disk('s3')->delete('java/'.$request->nama_file_seb[$i]);
                             }
                             $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                            $foto = $nama_foto;
-                            if(Storage::disk('s3')->exists('java/'.$foto)){
-                                Storage::disk('s3')->delete('java/'.$foto);
-                            }
-                            Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
-                            $arr_foto[] = $foto;
-                            $arr_jenis[] = $request->jenis[$i];
-                            $arr_no_urut[] = $request->no_urut[$i];
-                            $arr_nama_dok[] = $request->nama_dok[$i];
+                            echo "<pre>";
+                            var_dump($nama_foto);
+                            echo "</pre>";
+                            // $foto = $nama_foto;
+                            // if(Storage::disk('s3')->exists('java/'.$foto)){
+                            //     Storage::disk('s3')->delete('java/'.$foto);
+                            // }
+                            // Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                            // $arr_foto[] = $foto;
+                            // $arr_jenis[] = $request->jenis[$i];
+                            // $arr_no_urut[] = $request->no_urut[$i];
+                            // $arr_nama_dok[] = $request->nama_dok[$i];
                         } else {
-                            $arr_foto[] = $request->nama_file_seb[$i];
-                            $arr_jenis[] = $request->jenis[$i];
-                            $arr_no_urut[] = $request->no_urut[$i];
-                            $arr_nama_dok[] = $request->nama_dok[$i];
+                            echo "<pre>";
+                            var_dump($request->nama_file_seb[$i]);
+                            echo "</pre>";
+                            // $arr_foto[] = $request->nama_file_seb[$i];
+                            // $arr_jenis[] = $request->jenis[$i];
+                            // $arr_no_urut[] = $request->no_urut[$i];
+                            // $arr_nama_dok[] = $request->nama_dok[$i];
                         }
                     }
-                    DB::connection($this->sql)->table('java_dok')
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->where('no_bukti', $request->no_proyek)
-                    ->delete();
+                    // DB::connection($this->sql)->table('java_dok')
+                    // ->where('kode_lokasi', $kode_lokasi)
+                    // ->where('no_bukti', $request->no_proyek)
+                    // ->delete();
                     
-                    if(count($arr_no_urut) > 0){
-                        for($i=0; $i<count($arr_no_urut);$i++){
-                            $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
-                        }
-                    }
+                    // if(count($arr_no_urut) > 0){
+                    //     for($i=0; $i<count($arr_no_urut);$i++){
+                    //         $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                    //         values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
+                    //         DB::connection($this->sql)->insert($insertFile); 
+                    //     }
+                    // }
                 }
             }
             
