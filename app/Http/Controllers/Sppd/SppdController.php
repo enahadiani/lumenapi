@@ -395,6 +395,7 @@ class SppdController extends Controller
                                 $datad=$request->input("AJU");
                                 $datarek=$request->input("REK");
                                 $nu=1;
+                                $total_d=0;
                                 for ($i=0;$i < count($datad);$i++){
                                     
                                     //$no_spj = $this->generateKode("tu_pdaju_m", "no_spj", $kode_lokasi."-PJ".substr($datam[0]['periode'],2,4).".", "0001");
@@ -417,19 +418,30 @@ class SppdController extends Controller
                                     $insAjud3 = DB::connection('sqlsrvypt')->insert($sql);
                                     //$success['tmp5']=$sql;
     
-                                   
+                                    $total_d= $total_d + floatval($datad[$i]['total_biaya']);
                                     $nu++;
                                 }	
 
                                 if(count($datarek) > 0){
+                                    if(count($datarek) == 1){
+                                        $nu=1; 
+                                        $nip = (isset($datad[0]['nip']) ? $datad[0]['nip'] : '-');
+                                        $total_biaya = $total_d;
 
-                                    for ($i=0;$i < count($datarek);$i++){
-    
-                                        $nip = (isset($datad[$i]['nip']) ? $datad[$i]['nip'] : $datad[0]['nip']);
-                                        $total_biaya = (isset($datad[$i]['total_biaya']) ? $datad[$i]['total_biaya'] : $datad[0]['total_biaya'] );
-                                        $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek[$i]['bank']."','".$datarek[$i]['no_rekening']."','".$datarek[$i]['nama']."','-',".$total_biaya.",'".$nip."',0,'".$no_agenda."-".$nu."')";
+                                        $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek[0]['bank']."','".$datarek[0]['no_rekening']."','".$datarek[0]['nama']."','-',".$total_biaya.",'".$nip."',0,'".$no_agenda."-".$nu."')";
+
                                         $sql3 = DB::connection('sqlsrvypt')->insert($sql);
-                                        //$success['tmp6']=$sql;
+                                    }else{
+                                        $nu = 1;
+                                        for ($i=0;$i < count($datarek);$i++){
+        
+                                            $nip = (isset($datad[$i]['nip']) ? $datad[$i]['nip'] : $datad[0]['nip']);
+                                            $total_biaya = (isset($datad[$i]['total_biaya']) ? $datad[$i]['total_biaya'] : $datad[0]['total_biaya'] );
+                                            $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek[$i]['bank']."','".$datarek[$i]['no_rekening']."','".$datarek[$i]['nama']."','-',".$total_biaya.",'".$nip."',0,'".$no_agenda."-".$nu."')";
+                                            $sql3 = DB::connection('sqlsrvypt')->insert($sql);
+                                            //$success['tmp6']=$sql;
+                                            $nu++;
+                                        }
                                     }
                                 }
                                 
