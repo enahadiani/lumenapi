@@ -801,6 +801,18 @@ class DashSiswaController extends Controller
                 $filter_top .="";
             }
 
+            $filter_status = "";
+            if(isset($request->status) && $request->status != ""){
+                if($request->status == "all"){
+                    $filter_status .="";
+                }else{  
+                    $filter_status .=" and a.status='$request->status' ";
+                }
+            }else{
+                $filter_status .="";
+            }
+
+
             $sql = "select $filter_top a.*,case modul when 'BILL' then 'Tagihan' when 'KB' then 'Pembayaran' when 'PDD' then 'Auto Bayar' when 'KBMID' then 'Pembayaran Midtrans' end as jenis from (
                 select a.no_bill as no_bukti,a.kode_lokasi,b.tanggal,convert(varchar(10),b.tanggal,103) as tgl,
                 'BILL' as modul, isnull(a.tagihan,0) as total,a.id_bank,'success' as status,'-' as snap_token
@@ -840,9 +852,8 @@ class DashSiswaController extends Controller
                     where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
                     group by x.kode_lokasi,x.no_bukti )a 
                 inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
-                and b.status = 'pending'
             ) a
-            $filter_jenis
+            $filter_jenis $filter_status
             order by a.tanggal desc";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
