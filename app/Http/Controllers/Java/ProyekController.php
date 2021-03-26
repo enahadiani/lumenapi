@@ -273,15 +273,17 @@ class ProyekController extends Controller {
 
                 if(!empty($cek)) {
                     if(count($request->file) > 0) {
-                        if(isset($request->file('file')[$i])){ 
-                            $file = $request->file('file')[$i];
-                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                            $foto = $nama_foto;
-                            Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
-                            $arr_foto[] = $foto;
-                            $arr_jenis[] = $request->jenis[$i];
-                            $arr_no_urut[] = $request->no_dok[$i];
-                            $arr_nama_dok[] = $request->nama_dok[$i];
+                        for($i=0;$i<count($request->jenis);$i++){ 
+                            if(isset($request->file('file')[$i])){ 
+                                $file = $request->file('file')[$i];
+                                $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                $foto = $nama_foto;
+                                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                                $arr_foto[] = $foto;
+                                $arr_jenis[] = $request->jenis[$i];
+                                $arr_no_urut[] = $request->no_dok[$i];
+                                $arr_nama_dok[] = $request->nama_dok[$i];
+                            }
                         }
                     }
                     if(count($arr_no_urut) > 0){
