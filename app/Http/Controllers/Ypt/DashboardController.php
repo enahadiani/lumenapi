@@ -3492,7 +3492,8 @@ class DashboardController extends Controller
     public function msPengembanganRKA(Request $request){
         try {
             
-            
+            $kode_grafik = $request->kode_grafik;
+            $nama = $request->nama;
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
@@ -3539,7 +3540,7 @@ class DashboardController extends Controller
             inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-            $where and a.kode_grafik='GR07'  
+            $where and a.kode_grafik='$kode_grafik'  
             group by d.kode_fakultas,a.kode_lokasi          
                     )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
@@ -3564,7 +3565,7 @@ class DashboardController extends Controller
                 }
                 $success['ctg'] = $ctg;
                 $success["series"][0]= array(
-                    "name"=> 'Pengembangan',"colorByPoint" => false,"data"=>$dt
+                    "name"=> $nama,"colorByPoint" => false,"data"=>$dt
                 );
                 $success['status'] = true;
                 $success['message'] = "Success!";
@@ -3589,7 +3590,8 @@ class DashboardController extends Controller
         $periode= $request->input('periode');
         try {
             
-            
+            $kode_grafik = $request->kode_grafik;
+            $nama = $request->nama;
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
@@ -3634,7 +3636,7 @@ class DashboardController extends Controller
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
 			inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
-            $where and a.kode_grafik='GR07'  
+            $where and a.kode_grafik='$kode_grafik'  
             group by e.kode_rektor,a.kode_lokasi          
                     )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
@@ -3658,7 +3660,7 @@ class DashboardController extends Controller
                 }
                 $success['ctg'] = $ctg;
                 $success["series"][0]= array(
-                    "name"=> 'Pengembangan',"colorByPoint" => false,"data"=>$dt
+                    "name"=> $nama,"colorByPoint" => false,"data"=>$dt
                 );
                 $success['status'] = true;
                 $success['message'] = "Success!";
@@ -3682,7 +3684,8 @@ class DashboardController extends Controller
     public function msPengembanganKomposisi(Request $request){
         try {
             
-            
+            $kode_grafik = $request->kode_grafik;
+            $nama = $request->nama;
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
@@ -3721,11 +3724,17 @@ class DashboardController extends Controller
                 }
             }
             
+            if($kode_grafik == "GR07"){
+                $kd_grafik = "('GR25','GR26','GR27','GR28')";
+            }else{
+                $kd_grafik = "()";
+            }
+
             $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n8) as gar
             from dash_grafik_d a
             inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            $where and c.jenis='Posting' and a.kode_grafik in ('GR25','GR26','GR27','GR28')
+            $where and c.jenis='Posting' and a.kode_grafik in $kd_grafik
             group by a.kode_lokasi,a.kode_grafik,c.nama
             ";
             $rs = DB::connection($this->db)->select($sql);
