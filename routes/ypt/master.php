@@ -73,6 +73,13 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->put('fs','Ypt\FSController@update');
     $router->delete('fs','Ypt\FSController@destroy'); 
 
+    //Video
+    
+    $router->get('video','Ypt\VideoController@index');
+    $router->post('video','Ypt\VideoController@store');
+    $router->put('video','Ypt\VideoController@update');
+    $router->delete('video','Ypt\VideoController@destroy');
+
 });
 
 
