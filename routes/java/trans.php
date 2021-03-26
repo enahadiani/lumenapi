@@ -34,6 +34,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('proyek','Java\ProyekController@store');
     $router->post('proyek-ubah','Java\ProyekController@update');
     $router->delete('proyek','Java\ProyekController@destroy');
+    $router->delete('proyek-file','Java\ProyekController@deleteFile');
 
     // Anggaran Proyek
     $router->get('rab-proyek','Java\RabProyekController@index');
