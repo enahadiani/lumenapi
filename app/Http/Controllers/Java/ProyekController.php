@@ -296,7 +296,9 @@ class ProyekController extends Controller {
                 if(count($request->file) > 0) { 
                     for($i=0;$i<count($request->jenis);$i++){
                         $file = $request->file('file')[$i];
+                        echo "<pre>";
                         var_dump($file->getClientOriginalName());
+                        echo "</pre>";
                         // if(isset($request->file('file')[$i])){ 
                         //     $file = $request->file('file')[$i];
                         //     if($request->nama_file_seb[$i] != "-"){
