@@ -155,7 +155,7 @@ class RabProyekController extends Controller {
                 if(count($arr_no_urut) > 0){
                     for($i=0; $i<count($arr_no_urut);$i++){
                         $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                        values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
+                        values ('".$no_rab."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
                         DB::connection($this->sql)->insert($insertFile); 
                     }
                 }
