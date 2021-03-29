@@ -294,28 +294,31 @@ class ProyekController extends Controller {
             
             if(!empty($cek)) {
                 if(count($request->file) > 0) { 
-                    for($i=0;$i<count($request->jenis);$i++){ 
-                        if(isset($request->file('file')[$i])){ 
+                    for($i=0;$i<count($request->jenis);$i++){
+                        if(isset($request->file('file')[$i])){  
                             $file = $request->file('file')[$i];
+                            $fileName = $file->getClientOriginalName();
                             if($request->nama_file_seb[$i] != "-"){
                                 //kalo ada hapus yang lama
                                 Storage::disk('s3')->delete('java/'.$request->nama_file_seb[$i]);
                             }
-                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                            $foto = $nama_foto;
-                            if(Storage::disk('s3')->exists('java/'.$foto)){
-                                Storage::disk('s3')->delete('java/'.$foto);
+                            if($fileName == 'empty.jpg') {
+                                $arr_foto[] = $request->nama_file_seb[$i];
+                                $arr_jenis[] = $request->jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                                $arr_nama_dok[] = $request->nama_dok[$i];
+                            } else {
+                                $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                $foto = $nama_foto;
+                                if(Storage::disk('s3')->exists('java/'.$foto)){
+                                    Storage::disk('s3')->delete('java/'.$foto);
+                                }
+                                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                                $arr_foto[] = $foto;
+                                $arr_jenis[] = $request->jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                                $arr_nama_dok[] = $foto;
                             }
-                            Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
-                            $arr_foto[] = $foto;
-                            $arr_jenis[] = $request->jenis[$i];
-                            $arr_no_urut[] = $request->no_urut[$i];
-                            $arr_nama_dok[] = $foto;
-                        } else {
-                            $arr_foto[] = $request->nama_file_seb[$i];
-                            $arr_jenis[] = $request->jenis[$i];
-                            $arr_no_urut[] = $request->no_urut[$i];
-                            $arr_nama_dok[] = $request->nama_dok[$i];
                         }
                     }
                     DB::connection($this->sql)->table('java_dok')

@@ -214,6 +214,13 @@ class BiayaProyekController extends Controller {
                         group by a.no_proyek,a.kode_lokasi
                         )e on a.no_proyek=e.no_proyek and a.kode_lokasi=e.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter";
+
+                $file = "select a.file_dok, a.no_urut, a.nama, a.jenis, b.nama
+                from java_dok a inner join java_jenis b on a.jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti = '$request->no_bukti'";
+                $file = DB::connection($this->sql)->select($file);
+                $file = json_decode(json_encode($file),true);
+                $success['file'] = $file;
             }else{
                 $sql = "select no_bukti, no_proyek, keterangan, nilai, status as status_bayar, no_rab,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status from java_beban
@@ -275,21 +282,34 @@ class BiayaProyekController extends Controller {
 
                 DB::connection($this->sql)->insert($insert);
 
-                if($request->hasfile('file')){
-                    $file = $request->file('file');
-                        
-                    $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                    // $picName = uniqid() . '_' . $picName;
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('java/'.$foto)){
-                        Storage::disk('s3')->delete('java/'.$foto);
+                $arr_foto = array();
+                $arr_jenis = array();
+                $arr_no_urut = array();
+                $arr_nama_dok = array();
+                $cek = $request->file;
+
+                if(!empty($cek)) {
+                    if(count($request->file) > 0) {
+                        for($i=0;$i<count($request->jenis);$i++){ 
+                            if(isset($request->file('file')[$i])){ 
+                                $file = $request->file('file')[$i];
+                                $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                $foto = $nama_foto;
+                                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                                $arr_foto[] = $foto;
+                                $arr_jenis[] = $request->jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                                $arr_nama_dok[] = $request->nama_dok[$i];
+                            }
+                        }
                     }
-                    Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
-
-                    $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                    values ('".$request->no_proyek."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
-
-                    DB::connection($this->sql)->insert($insertFile);
+                    if(count($arr_no_urut) > 0){
+                        for($i=0; $i<count($arr_no_urut);$i++){
+                            $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                            values ('".$no_bukti."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
+                            DB::connection($this->sql)->insert($insertFile); 
+                        }
+                    }
                 }
 
                 DB::connection($this->sql)->commit();
@@ -335,6 +355,11 @@ class BiayaProyekController extends Controller {
             }
 
             $no_bukti = $request->no_bukti;
+            $arr_foto = array();
+            $arr_jenis = array();
+            $arr_no_urut = array();
+            $arr_nama_dok = array();
+            $cek = $request->file;
 
             DB::connection($this->sql)->table('java_beban')
             ->where('kode_lokasi', $kode_lokasi)
@@ -347,37 +372,48 @@ class BiayaProyekController extends Controller {
 
             DB::connection($this->sql)->insert($insert);
 
-            if($request->hasfile('file')){
-
-                $sql = "select file_dok from java_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='".$no_bukti."'";
-                $res = DB::connection($this->sql)->select($sql);
-                $res = json_decode(json_encode($res),true);
-
-                if(count($res) > 0){
-                    $foto = $res[0]['file_dok'];
-                    if($foto != ""){
-                        Storage::disk('s3')->delete('java/'.$foto);
+            if(!empty($cek)) {
+                if(count($request->file) > 0) { 
+                    for($i=0;$i<count($request->jenis);$i++){ 
+                        if(isset($request->file('file')[$i])){ 
+                            $file = $request->file('file')[$i];
+                            $fileName = $file->getClientOriginalName();
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('java/'.$request->nama_file_seb[$i]);
+                            }
+                            if($fileName == 'empty.jpg') {
+                                $arr_foto[] = $request->nama_file_seb[$i];
+                                $arr_jenis[] = $request->jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                                $arr_nama_dok[] = $request->nama_dok[$i];
+                            } else {
+                                $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                $foto = $nama_foto;
+                                if(Storage::disk('s3')->exists('java/'.$foto)){
+                                    Storage::disk('s3')->delete('java/'.$foto);
+                                }
+                                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
+                                $arr_foto[] = $foto;
+                                $arr_jenis[] = $request->jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                                $arr_nama_dok[] = $foto;
+                            }
+                        }
+                    }
+                    DB::connection($this->sql)->table('java_dok')
+                    ->where('kode_lokasi', $kode_lokasi)
+                    ->where('no_bukti', $no_bukti)
+                    ->delete();
+                    
+                    if(count($arr_no_urut) > 0){
+                        for($i=0; $i<count($arr_no_urut);$i++){
+                            $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
+                            values ('".$no_bukti."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
+                            DB::connection($this->sql)->insert($insertFile); 
+                        }
                     }
                 }
-                
-                $file = $request->file('file');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('java/'.$foto)){
-                    Storage::disk('s3')->delete('java/'.$foto);
-                }
-                Storage::disk('s3')->put('java/'.$foto,file_get_contents($file));
-                
-                DB::connection($this->sql)->table('java_dok')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $no_bukti)
-                ->delete();
-
-                $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                values ('".$no_bukti."', '$kode_lokasi', '$foto', '-', '$foto', 'KWI')";
-
-                DB::connection($this->sql)->insert($insertFile);
             }
 
             DB::connection($this->sql)->commit();
@@ -411,9 +447,11 @@ class BiayaProyekController extends Controller {
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){
-                $foto = $res[0]['file_dok'];
-                if($foto != ""){
-                    Storage::disk('s3')->delete('java/'.$foto);
+                for($i=0;$i<count($res);$i++) {
+                    $foto = $res[$i]['file_dok'];
+                    if($foto != ""){
+                        Storage::disk('s3')->delete('java/'.$foto);
+                    }
                 }
             }
 
