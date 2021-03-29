@@ -7514,7 +7514,7 @@ class DashboardController extends Controller
                 inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                 inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                 inner join dash_grafik_d d on b.kode_akun=d.kode_neraca and b.kode_lokasi=d.kode_lokasi
-                $where and b.kode_fs='FS4' and a.nik_user='tes' and d.kode_grafik='$request->kode_grafik' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0)
+                $where and b.kode_fs='FS4' and a.nik_user='$request->nik_user' and d.kode_grafik='$request->kode_grafik' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0) 
                 ");
                 $rs = json_decode(json_encode($rs),true);
             }else{
