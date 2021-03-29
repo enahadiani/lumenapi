@@ -6200,6 +6200,104 @@ class DashboardController extends Controller
         }
     }
 
+    public function getMSKasBank(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+
+            $success['colors'] = $color;
+            $get = DB::connection($this->db)->select("select a.kode_neraca,b.nama 
+			from dash_grafik_d a 
+			inner join dash_grafik_m b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
+            where a.kode_grafik='$request->kode_grafik' and a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' ");
+            if(count($get) > 0){
+                $kode_neraca = $get[0]->kode_neraca;
+                $nama = $get[0]->nama;
+                $sqlex="exec sp_glma_trail_tmp 'FS4','$kode_neraca','$kode_lokasi','$kode_lokasi','$kode_lokasi','".$request->periode[1]."','$request->nik_user'";
+                $res = DB::connection($this->db)->update($sqlex);
+    
+                $rs = DB::connection($this->db)->select("
+                select a.kode_akun,c.nama,a.kode_lokasi,a.so_akhir as real
+                from glma_tmp a
+                inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+                inner join dash_grafik_d d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi
+                $where and b.kode_fs='FS4' and a.nik_user='$request->nik_user' and d.kode_grafik='$request->kode_grafik' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0)
+                ");
+                $rs = json_decode(json_encode($rs),true);
+            }else{
+                $rs = array();
+            }
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $dt = array();
+                $ctg= array();
+                $x=0;
+                for($i=0;$i<count($rs);$i++){
+                    if(!isset($color[$i])){
+                        $x = 0;
+                    }
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['real']),"color"=> $color[$x]);
+                    array_push($ctg,$rs[$i]['nama']);  
+                    $x++;  
+                }
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> $nama,"colorByPoint" => false,"data"=>$dt
+                );
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['ctg'] = array();
+                $success["series"] = array();
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getSHUDetail(Request $request){
         try {
             
@@ -6265,7 +6363,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function getMSAsetBackup(Request $request){
+    public function getMSAset(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -6347,7 +6445,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function getMSAset(Request $request){
+    public function getMSAsetBackup(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -6460,7 +6558,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function getMSHutangBackup(Request $request){
+    public function getMSHutang(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -6543,7 +6641,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function getMSHutang(Request $request){
+    public function getMSHutangBackup(Request $request){
         $periode= $request->input('periode');
         try {
             
@@ -7272,17 +7370,15 @@ class DashboardController extends Controller
     }
 
     public function getMSPiutang(Request $request){
-        $periode= $request->input('periode');
         try {
-            
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+
             $col_array = array('periode');
-            $db_col_name = array('b.periode');
+            $db_col_name = array('a.periode');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -7307,74 +7403,66 @@ class DashboardController extends Controller
                     }
                 }
             }
+
             $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
             if($request->mode == "dark"){
                 $color = $this->dark_color;
             }
 
-            $sql="select a.kode_grafik,a.nama,
-            case when a.dc='D' then b.n1 else b.n1*-1 end as real,
-            case when a.dc='D' then b.n2 else b.n2*-1 end as rka
-            from dash_grafik_m a
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
-            $where and a.kode_klp='K06' and a.kode_grafik='$request->kode_grafik'
-            ";
-            $row = DB::connection($this->db)->select($sql);
-            $row = json_decode(json_encode($row),true);
-            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
-                $rka = array();
-                $real = array();
-                $melampaui = array();
-                $tdkcapai = array();
-                $ctg = array();
-                for($i=0;$i<count($row);$i++){
-
-                    $selisih = floatval($row[$i]['real']) - floatval($row[$i]['rka']);
-                    if($selisih > 0){
-                        $lebih = $selisih; 
-                        $kurang = 0;
-                        $r = floatval($row[$i]['rka'])/1000000000;
-                    }else if($selisih == 0){
-                        $lebih = 0;
-                        $kurang = 0;
-                        $r = $row[$i]['real']/1000000000;
-                    }else{
-                        
-                        $lebih = 0;
-                        $kurang = $selisih * -1;
-                        $r = $row[$i]['real']/1000000000;
+            $success['colors'] = $color;
+            $get = DB::connection($this->db)->select("
+			select distinct a.kode_neraca
+			from relakun a 
+			where a.kode_akun in (
+				select a.kode_neraca from dash_grafik_d a where a.kode_grafik='$request->kode_grafik' and a.kode_lokasi='$kode_lokasi'
+			) and a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4'
+            ");
+            if(count($get) > 0){
+                $kode_neraca = $get[0]->kode_neraca;
+                $nama = $request->nama;
+                $sqlex="exec sp_glma_trail_tmp 'FS4','$kode_neraca','$kode_lokasi','$kode_lokasi','$kode_lokasi','".$request->periode[1]."','$request->nik_user'";
+                $res = DB::connection($this->db)->update($sqlex);
+    
+                $rs = DB::connection($this->db)->select("
+                select a.kode_akun,c.nama,a.kode_lokasi,a.so_akhir as real
+                from glma_tmp a
+                inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+                inner join dash_grafik_d d on b.kode_akun=d.kode_neraca and b.kode_lokasi=d.kode_lokasi
+                $where and b.kode_fs='FS4' and a.nik_user='tes' and d.kode_grafik='$request->kode_grafik' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0)
+                ");
+                $rs = json_decode(json_encode($rs),true);
+            }else{
+                $rs = array();
+            }
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $dt = array();
+                $ctg= array();
+                $x=0;
+                for($i=0;$i<count($rs);$i++){
+                    if(!isset($color[$i])){
+                        $x = 0;
                     }
-                    
-                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000000,"nlabel"=>floatval($row[$i]['rka'])/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik'],'name'=>$row[$i]['nama']);
-                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik'],'name'=>$row[$i]['nama']);
-                    $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik'],'name'=>$row[$i]['nama']);
-                    $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik'],'name'=>$row[$i]['nama']);
-                    array_push($ctg,$row[$i]['nama']);
-
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['real']),"color"=> $color[$x]);
+                    array_push($ctg,$rs[$i]['nama']);  
+                    $x++;  
                 }
-                $success['categories'] = $ctg;
-                $success['rka'] = $rka;
-                $success['actual'] = $real;
-                $success['melampaui'] = $melampaui;
-                $success['tdkcapai'] = $tdkcapai;
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> $nama,"colorByPoint" => false,"data"=>$dt
+                );
                 $success['status'] = true;
-                $success['message'] = "Success!";
-                
-                return response()->json(['success'=>$success], $this->successStatus);     
+                $success['message'] = "Success!";    
             }
             else{
-                
-                $success['categories'] = [];
-                $success['rka'] = [];
-                $success['real'] = [];
-                $success['melampaui'] = [];
-                $success['tdkcapai'] = [];
-                $success['message'] = "Data Kosong!";
-                $success['series'] = [];
+                $success['ctg'] = array();
+                $success["series"] = array();
                 $success['status'] = true;
-                
-                return response()->json(['success'=>$success], $this->successStatus);
+                $success['message'] = "Data Kosong!";
+            
             }
+            return response()->json(['success'=>$success], $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
