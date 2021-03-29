@@ -182,10 +182,66 @@ class JuspoApprovalController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $no_bukti = $request->input('no_aju');
+            $get= DB::connection($this->db)->select("select no_juskeb from apv_juspo_m where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+            if(count($get) > 0){
+                $no_aju = $get[0]->no_juskeb;
+            }else{
+                $no_aju = "-";
+            }
             $nik_buat = "";
             $nik_app1 = "";
             $token_player = array();
             $token_player2 = array();
+
+            $arr_foto = array();
+            $arr_nama = array();
+            $arr_nik = array();
+            $arr_foto2 = array();
+            $arr_nama2 = array();
+            $arr_jenis_dok = array();
+            $i=0;
+            $cek = $request->file;
+            //cek upload file tidak kosong
+            if(!empty($cek)){
+                
+                if(count($request->nama_file) > 0){
+                    //looping berdasarkan nama dok
+                    for($i=0;$i<count($request->nama_file);$i++){
+                        //cek row i ada file atau tidak
+                        if(isset($request->file('file')[$i])){
+                            $file = $request->file('file')[$i];
+                            
+                            //kalo ada cek nama sebelumnya ada atau -
+                            if($request->nama_file_seb[$i] != "-"){
+                                //kalo ada hapus yang lama
+                                Storage::disk('s3')->delete('apv/'.$request->nama_file_seb[$i]);
+                            }
+                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                            $foto = $nama_foto;
+                            if(Storage::disk('s3')->exists('apv/'.$foto)){
+                                Storage::disk('s3')->delete('apv/'.$foto);
+                            }
+                            Storage::disk('s3')->put('apv/'.$foto,file_get_contents($file));
+                            $arr_foto[] = $foto;
+                        }else{
+                            $arr_foto[] = $request->nama_file_seb[$i];
+                        }     
+                        $arr_nama[] = $request->input('nama_file')[$i];
+                        $arr_nik[] = ($request->input('nik_input')[$i] == "-" || $request->input('nik_input')[$i] == "" ? $nik_user : $request->input('nik_input')[$i]);
+                        $arr_nama2[] = count($request->nama_file).'|'.$i.'|'.isset($request->file('file')[$i]);
+                        $arr_jenis_dok[] = $request->input('jenis_dok')[$i];
+                    }
+                    
+                    $del3 = DB::connection($this->db)->table('apv_juskeb_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_aju)->where('jenis', 'APP')->delete();
+                }
+            }
+
+            if(count($arr_nama) > 0){
+                for($i=0; $i<count($arr_nama);$i++){
+                    
+                    $ins3[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_dok (kode_lokasi,no_bukti,nama,no_urut,file_dok,jenis,nik_input) values (?, ?, ?, ?, ?, ?, ?) ", [$kode_lokasi,$no_aju,$arr_nama[$i],$i,$arr_foto[$i],'APP',$arr_nik[$i]]); 
+                }
+            }
 
             $ins = DB::connection($this->db)->insert('insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, ?, ?, ?, ?)', [$no_bukti,$kode_lokasi,$request->input('keterangan'),$request->input('tanggal'),$request->input('no_urut'),$request->input('status'),'JP']);
 
@@ -463,6 +519,11 @@ class JuspoApprovalController extends Controller
             $res6 = DB::connection($this->db)->select($sql6);
             $res6 = json_decode(json_encode($res6),true);
 
+            
+            $sql7="select a.no_bukti,a.nama,a.file_dok,a.jenis,a.nik_input from apv_juskeb_dok a inner join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.no_bukti='$no_aju' and a.jenis='APP' order by a.no_urut";
+            $res7 = DB::connection($this->db)->select($sql7);
+            $res7 = json_decode(json_encode($res7),true);
+
             // $sql4="select a.no_bukti,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,g.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tgl,isnull(f.foto,'-') as foto   
             // from apv_juspo_m a
             // inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
@@ -516,6 +577,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data_total'] = $res5;
                 $success['data_dokumen'] = $res3;
                 $success['data_dokumen2'] = $res6;
+                $success['data_dokumen3'] = $res7;
                 $success['data_histori'] = $res4;
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
@@ -527,6 +589,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
                 $success['data_total'] = [];
                 $success['data_dokumen'] = [];
                 $success['data_dokumen2'] = [];
+                $success['data_dokumen3'] = [];
                 $success['data_histori'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus); 
@@ -653,5 +716,53 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function destroyDok(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'nama_file'=>'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }		
+            
+            
+            if(Storage::disk('s3')->exists('apv/'.$request->nama_file)){
+                Storage::disk('s3')->delete('apv/'.$request->nama_file);
+            }
+
+            $get = DB::connection($this->db)->select(" select * from apv_juskeb_dok where no_bukti='$request->no_bukti' and file_dok ='$request->nama_file' and jenis='APP' and nik_input ='$nik' and kode_lokasi='$kode_lokasi' ");
+            if(count($get) > 0){
+
+                $del = DB::connection($this->db)->table('apv_juskeb_dok')
+                ->where('no_bukti', $request->no_bukti)    
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('file_dok', $request->nama_file)
+                ->where('jenis', 'APP')
+                ->where('nik_input', $nik)
+                ->delete();
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Dokumen ".$request->no_dokumen." berhasil dihapus";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Dokumen ".$request->no_dokumen." gagal dihapus";
+            }
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Dokumen ".$request->no_dokumen." dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
 
 }

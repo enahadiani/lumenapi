@@ -169,6 +169,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->put('juspo_app/{no_aju}','Apv\JuspoApprovalController@update');
     $router->delete('juspo_app/{no_aju}','Apv\JuspoApprovalController@destroy');
     $router->get('juspo_app_preview/{no_bukti}/{id}','Apv\JuspoApprovalController@getPreview');
+    $router->delete('juspo_app_dok','Apv\JuspoApprovalController@destroyDok');
 
     //Dashboard
     $router->get('dash_databox','Apv\DashboardController@getDataBox');
