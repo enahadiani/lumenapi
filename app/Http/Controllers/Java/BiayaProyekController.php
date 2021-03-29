@@ -400,7 +400,7 @@ class BiayaProyekController extends Controller {
                     }
                     DB::connection($this->sql)->table('java_dok')
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->where('no_bukti', $request->no_proyek)
+                    ->where('no_bukti', $no_bukti)
                     ->delete();
                     
                     if(count($arr_no_urut) > 0){
