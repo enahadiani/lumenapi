@@ -168,7 +168,10 @@ class JuspoApprovalController extends Controller
             'no_aju' => 'required|max:20',
             'status' => 'required|max:1',
             'keterangan' => 'required|max:150',
-            'no_urut' => 'required'
+            'no_urut' => 'required',
+            'nama_dok'=>'array',
+            'file.*'=>'file|max:10240',
+            'jenis_dok'=>'array',
         ]);
 
         DB::connection($this->db)->beginTransaction();
