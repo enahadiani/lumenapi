@@ -310,7 +310,7 @@ class ProyekController extends Controller {
                             $arr_foto[] = $foto;
                             $arr_jenis[] = $request->jenis[$i];
                             $arr_no_urut[] = $request->no_urut[$i];
-                            $arr_nama_dok[] = $request->nama_dok[$i];
+                            $arr_nama_dok[] = $foto;
                         } else {
                             $arr_foto[] = $request->nama_file_seb[$i];
                             $arr_jenis[] = $request->jenis[$i];
