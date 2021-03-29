@@ -6298,6 +6298,91 @@ class DashboardController extends Controller
         }
     }
 
+    public function getMSModal(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where b.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            if($request->mode == "dark"){
+                $color = $this->dark_color;
+            }
+
+            $success['colors'] = $color;
+            $rs = DB::connection($this->db)->select("
+            select b.kode_neraca,b.nama, sum(case when b.modul='P' then -b.n1 else b.n1 end) as rka,
+            sum(case when b.modul='P' then -b.n4 else b.n4 end) as real,case sum(n1) when 0 then 0 else (sum(n4)/sum(n1))*100 end as persen  
+			from exs_neraca b
+			$where and b.kode_neraca in ('31','32','33') and b.kode_fs='FS4' 
+            group by b.kode_neraca,b.nama
+            having sum(b.n4) <> 0
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            
+            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
+                $dt = array();
+                $ctg= array();
+                $x=0;
+                for($i=0;$i<count($rs);$i++){
+                    if(!isset($color[$i])){
+                        $x = 0;
+                    }
+                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['real']),"color"=> $color[$x]);
+                    array_push($ctg,$rs[$i]['nama']);  
+                    $x++;  
+                }
+                $success['ctg'] = $ctg;
+                $success["series"][0]= array(
+                    "name"=> $request->nama,"colorByPoint" => false,"data"=>$dt
+                );
+                $success['status'] = true;
+                $success['message'] = "Success!";    
+            }
+            else{
+                $success['ctg'] = array();
+                $success["series"] = array();
+                $success['status'] = true;
+                $success['message'] = "Data Kosong!";
+            
+            }
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getSHUDetail(Request $request){
         try {
             
