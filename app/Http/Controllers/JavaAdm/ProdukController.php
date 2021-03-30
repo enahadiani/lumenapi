@@ -117,7 +117,7 @@ class ProdukController extends Controller {
                         }
                     }
                 }
-                if(count($arr_no_urut) > 0){
+                if(count($arr_nama_foto) > 0){
                     for($i=0; $i<count($arr_nama_foto);$i++){
                         $insertFile = "insert into javaadmin_produk_foto(id_produk, kode_lokasi, path_foto, nama_foto)
                         values ('".$id_produk."', '".$kode_lokasi."', '".$arr_foto[$i]."', '".$arr_nama_foto[$i]."')";
@@ -199,7 +199,7 @@ class ProdukController extends Controller {
                     ->where('id_produk', $request->id_produk)
                     ->delete();
                     
-                    if(count($arr_no_urut) > 0){
+                    if(count($arr_nama_foto) > 0){
                         for($i=0; $i<count($arr_nama_foto);$i++){
                             $insertFile = "insert into javaadmin_produk_foto(id_produk, kode_lokasi, path_foto, nama_foto)
                             values ('".$request->id_produk."', '$kode_lokasi', '".$arr_foto[$i]."','".$arr_nama_foto[$i]."')";
