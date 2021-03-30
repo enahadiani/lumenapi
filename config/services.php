@@ -32,6 +32,11 @@ return [
         'isProduction'  => env('MIDTRANS_IS_PRODUCTION', false),
         'isSanitized'   => env('MIDTRANS_IS_SANITIZED', true),
         'is3ds'         => env('MIDTRANS_IS_3DS', true),                
+    ],
+    'gcm' => [
+        // Midtrans server key
+        'api_tarbak'     => env('GCM_APIKEY_TARBAK'),
+        'api_ts'     => env('GCM_APIKEY_TS')                
     ]
 
 ];
