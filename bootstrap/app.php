@@ -714,4 +714,19 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/esaku/dash.php';
 });
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admjava-auth'
+], function ($router) {
+    require __DIR__.'/../routes/admjava/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/admjava-content'
+], function ($router) {
+    require __DIR__.'/../routes/admjava/content.php';
+});
+
 return $app;
