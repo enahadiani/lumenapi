@@ -39,7 +39,7 @@ class PesanController extends Controller
 	    //------------------------------
 		global $apiKey;
 		// $apiKey = "AIzaSyARBIGBtlVHp2JlhS3HRaP4IPysLBYwXg8";
-		$apiKey = "AAAA4JtbSzE:APA91bF36NB-yjsRsIGdm2qIfBg2FIeG-is4vgvPMUie6KYPofQtVIw_f9IYqS9VK94RXlk8glxtcLChRjZc9zQzHSkeu1JlQ7GfmtIuHcnLi-ZxW4J_eyt3cJgF1dQOBsyALQPhApw5";
+		$apiKey = config('services.gcm.api_ts');
 	    //------------------------------
 	    // Define URL to GCM endpoint
 	    //------------------------------
