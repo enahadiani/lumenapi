@@ -70,6 +70,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
 
     $router->get('periode','Ts\DashSiswaController@getPeriode');
     $router->get('detail-trans','Ts\DashSiswaController@getDetailTransaksi');
+    $router->get('notif-mobile','Ts\PesanController@getNotif');
     
     $router->post('generate-priority','Ts\DashSiswaController@generatePriority');
     
