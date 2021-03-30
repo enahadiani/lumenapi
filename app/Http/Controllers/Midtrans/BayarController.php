@@ -315,7 +315,7 @@ class BayarController extends Controller
                 $kode_pp= $data->kode_pp;
             }
 
-            $res = DB::connection($this->db)->select("select no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,tgl_input from sis_mid_bayar where kode_lokasi='$kode_lokasi' and nis='$nik' and kode_pp='$kode_pp'	 
+            $res = DB::connection($this->db)->select("select no_bukti,nis,no_bill,nilai,keterangan,status,snap_token,tgl_input from sis_mid_bayar where kode_lokasi='$kode_lokasi' and nis='$nik' and kode_pp='$kode_pp' order by no_bukti desc	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -496,7 +496,7 @@ class BayarController extends Controller
         }
     }
 
-    public function ubahStatus($no_bukti,$sts_bayar)
+    public function ubahStatus(Request $request,$no_bukti,$sts_bayar)
     {
         DB::connection($this->db)->beginTransaction();
         
@@ -506,23 +506,24 @@ class BayarController extends Controller
             ->where('no_bukti', $no_bukti)      
             ->update(['status' => $sts_bayar]);
 
+            $get = DB::connection($this->db)->select("
+            select a.no_bukti,a.nis,a.nilai,a.kode_pp,a.kode_lokasi,a.tgl_input,case when a.status='process' then dbo.fnNamaTanggal2(DATEADD(day, 1, getdate()),2) else dbo.fnNamaTanggal2(DATEADD(day, 1, a.tgl_input),2) end as tgl_expired,a.status from sis_mid_bayar a
+            where a.no_bukti = '$no_bukti' 
+            ");
+            $nilai = $get[0]->nilai;
+            $nis = $get[0]->nis;
+            $kode_pp = $get[0]->kode_pp;
+            $kode_lokasi = $get[0]->kode_lokasi;
+            $tgl_expired = $get[0]->tgl_expired;
+
+            $judul = "-";
+            $pesan = "-";
             if($sts_bayar == "success"){
 
                 
-                $get = DB::connection($this->db)->select("
-                select a.no_bukti,a.nis,a.nilai,a.kode_pp,a.kode_lokasi from sis_mid_bayar a
-                where a.no_bukti = '$no_bukti' 
-                ");
                 if(count($get) > 0){
 
                     // $akun_piu = $get[0]->akun_piutang;
-                    $nilai = $get[0]->nilai;
-                    $nis = $get[0]->nis;
-                    // $no_bill = $get[0]->no_bill;
-                    // $kode_param = $get[0]->kode_param;
-                    // $periode_bill = $get[0]->periode_bill;
-                    $kode_pp = $get[0]->kode_pp;
-                    $kode_lokasi = $get[0]->kode_lokasi;
 
                     $periode = date('Ym');
                     $no_kb = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-BM".substr($periode,2,4), "0001");
@@ -553,11 +554,46 @@ class BayarController extends Controller
                         }
                     }
                 }
-
+                $judul = "Pembayaran untuk transaksi $no_bukti berhasil";
+                $pesan = "Pembayaran senilai $nilai untuk transaksi $no_bukti telah berhasil.";
+            }else if($sts_bayar == "expired"){
+                $judul = "Pembayaran untuk transaksi $no_bukti sudah tidak berlaku";
+                $pesan = "Transaksi $no_bukti telah dibatalkan karena pembayaran tidak diterima dalam jangka waktu yang sudah ditentukan.";
+            }else if($sts_bayar == "pending"){
+                $judul = "Segera lakukan pembayaran";
+                $pesan = "Transaki $no_bukti senilai $nilai menunggu pelunasan anda. Batas waktu maksimal pembayaran sampai $tgl_expired ";
+            }else if($sts_bayar == "cancel"){
+                $judul = "Pembayaran transaksi $no_bukti dibatalkan";
+                $pesan = "Transaksi $no_bukti telah dibatalkan oleh penerima. ";
+            }else if($sts_bayar == "failed"){
+                $judul = "Pembayaran transaksi $no_bukti gagal";
+                $pesan = "Pembayaran transaksi $no_bukti senilai $nilai gagal dilakukan. ";
+            }else{
+                $judul = "Segera selesaikan proses pembayaran transaksi $no_bukti";
+                $pesan = "Selesaikan proses pembayaran transaksi $no_bukti senilai $nilai untuk melanjutkan pembayaran.";
             }
-            
+
+            if($judul != "-"){
+
+                $request->request->add([
+                    'kode_lokasi' => $kode_lokasi,
+                    'nik' => 'midtrans',
+                    'jenis' => 'Siswa',
+                    'judul' => $judul,
+                    'kode_pp' => $kode_pp,
+                    'kontak' => $nis,
+                    'pesan' => $pesan,
+                    'kode_matpel' => '-'
+                ]);
+    
+                $kirim_pesan = app('App\Http\Controllers\Ts\PesanController')->store($request);
+                $kirim_pesan = json_decode(json_encode($kirim_pesan),true);
+                Log::info('Status Notif after update midtrans status: ');
+                Log::info($kirim_pesan['original']);
+            }
+
             DB::connection($this->db)->commit();
-            // KIRIM NOTIF
+        
             $success['status'] = true;
             $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
