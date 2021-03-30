@@ -46,7 +46,7 @@ class ProdukController extends Controller {
                 $file = "select a.path_foto, a.nama_foto
                 from javaadmin_produk_foto a 
                 inner join javaadmin_produk b on a.id_produk=b.id_produk and a.kode_lokasi=b.kode_lokasi
-                where a.id_produk = '$request->kode_produk'";
+                where b.id_produk = '$request->kode_produk'";
                 $file = DB::connection($this->sql)->select($file);
                 $file = json_decode(json_encode($file),true);
                 $success['file'] = $file;
