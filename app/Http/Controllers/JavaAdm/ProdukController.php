@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Java;
+namespace App\Http\Controllers\JavaAdm;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -52,7 +52,7 @@ class ProdukController extends Controller {
                 $success['file'] = $file;
 
             }else{
-                $sql = "select id_produk, nama_produk
+                $sql = "select id_produk, nama_produk,
                 case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status 
                 from javaadmin_produk
                 where kode_lokasi= '$kode_lokasi'";
