@@ -245,6 +245,7 @@ class BayarController extends Controller
                     }
                     
                     DB::connection($this->db)->commit();
+                    // Kirim Notif
                     $result['status'] = true;
                     $result['message'] = "Data Pembayaran berhasil disimpan";    
                 } catch (\Throwable $e) {
@@ -447,6 +448,7 @@ class BayarController extends Controller
             }
             
             DB::connection($this->db)->commit();
+            // KIRIM NOTIF
             $success['status'] = true;
             $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     
@@ -555,6 +557,7 @@ class BayarController extends Controller
             }
             
             DB::connection($this->db)->commit();
+            // KIRIM NOTIF
             $success['status'] = true;
             $success['message'] = "Data Pembayaran berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus);     

@@ -1046,7 +1046,7 @@ class DashSiswaController extends Controller
                         union all
                         select x.kode_param,x.no_bukti,x.no_bill,b.tgl_input,sum(x.nilai) as nilai
                                 from sis_mid_bayar_d x 
-								inner join sis_mid_bayar b on x.no_bill=b.no_bill and x.kode_lokasi=b.kode_lokasi 
+								inner join sis_mid_bayar b on x.no_bukti=b.no_bukti and x.no_bill=b.no_bill and x.kode_lokasi=b.kode_lokasi 
                                 inner join sis_siswa y on b.nis=y.nis and b.kode_lokasi=y.kode_lokasi and b.kode_pp=y.kode_pp
                                 where x.kode_lokasi = '$kode_lokasi' and b.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
                                 group by x.kode_param,x.no_bukti,x.no_bill,b.tgl_input 
