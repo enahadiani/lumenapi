@@ -1179,5 +1179,46 @@ class PesanController extends Controller
         }
     }
 
+    public function getNotif(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+			$sql = "select dbo.fnNamaTanggal2(a.tgl_input,2) as tanggal,a.judul,a.pesan,isnull(c.file_dok,'-') as file_dok,b.sts_read_mob,a.no_bukti,a.ref1 as no_midtrans,e.snap_token,a.ref2 as status_midtrans
+            from sis_pesan_m a
+            inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
+            left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
+            where b.nik='$nik' and a.tipe='notif' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+            inner join sis_mid_bayar e on a.ref1=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            order by a.tgl_input desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
 
 }

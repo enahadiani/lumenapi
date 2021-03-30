@@ -583,7 +583,9 @@ class BayarController extends Controller
                     'kode_pp' => $kode_pp,
                     'kontak' => $nis,
                     'pesan' => $pesan,
-                    'kode_matpel' => '-'
+                    'kode_matpel' => '-',
+                    'ref1' => $no_bukti,
+                    'ref2' => $sts_bayar
                 ]);
     
                 $kirim_pesan = app('App\Http\Controllers\Ts\PesanController')->store($request);
