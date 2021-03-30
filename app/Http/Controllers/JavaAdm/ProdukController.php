@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Java;
+namespace App\Http\Controllers\JavaAdm;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
