@@ -34,7 +34,7 @@ class ProdukController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_bank)){
+            if(isset($request->kode_produk)){
                 if($request->kode_produk == "all"){
                     $filter = "";
                 }else{
