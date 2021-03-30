@@ -241,6 +241,9 @@ class PesanController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik = $request->nik;
+                $kode_lokasi = $request->kode_lokasi;
             }
             
             $per = date('ym');
