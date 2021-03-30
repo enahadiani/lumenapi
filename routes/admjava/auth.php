@@ -34,10 +34,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('s3')->exists('java/'.$filename)) {
+    if (!Storage::disk('s3')->exists('webjava/'.$filename)) {
         abort(404);
     }
-    return Storage::disk('s3')->response('java/'.$filename); 
+    return Storage::disk('s3')->response('webjava/'.$filename); 
 });
 
 
