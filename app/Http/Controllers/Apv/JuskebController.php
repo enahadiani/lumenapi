@@ -169,6 +169,41 @@ class JuskebController extends Controller
         
     }
 
+    public function getDokumen(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select no_bukti,nama,jenis,'".url('api/apv/storage')."/'+file_dok as url from apv_juskeb_dok
+            where no_bukti='$request->no_bukti' and kode_lokasi='$kode_lokasi'
+            order by no_bukti,no_urut,jenis
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 
     public function getJuskebFinish()
     {

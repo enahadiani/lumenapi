@@ -131,6 +131,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     $router->get('juskeb_history/{no_bukti}','Apv\JuskebController@getHistory');
     $router->get('juskeb_preview/{no_bukti}','Apv\JuskebController@getPreview');
     $router->get('juskeb_preview2/{no_bukti}','Apv\JuskebController@getPreview2');
+    $router->get('juskeb-dok','Apv\JuskebController@getDokumen');
 
     // Verifikasi
     $router->get('verifikasi','Apv\VerifikasiController@index');
