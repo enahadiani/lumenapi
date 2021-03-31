@@ -326,6 +326,8 @@ class PesanController extends Controller
                 $key = array(
                     'no_bukti' => $no_bukti,
                     'kode_matpel' => $kode_matpel,
+                    'snap_token' => $ref3,
+                    'status' => $ref2,
                     'nik' => $nik
                 );
             }else if($tipe == "info"){
@@ -333,12 +335,16 @@ class PesanController extends Controller
                 $key = array(
                     'no_bukti' => $no_bukti,
                     'kode_matpel' => $kode_matpel,
+                    'snap_token' => $ref3,
+                    'status' => $ref2,
                     'nik' => $nik
                 );
             }else{
                 $click_action = "detail_matpel";
                 $key = array(
                     'kode_matpel' => $kode_matpel,
+                    'snap_token' => $ref3,
+                    'status' => $ref2,
                     'nik' => $nik
                 );
             }
