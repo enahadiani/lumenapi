@@ -41,7 +41,7 @@ class ProjectController extends Controller {
                     $filter = " and id_project='$request->kode_project' ";
                 }
                 $sql= "select id_project, nama_project, keterangan
-                from javaadmin_produk where kode_lokasi='".$kode_lokasi."' $filter ";
+                from javaadmin_project where kode_lokasi='".$kode_lokasi."' $filter ";
 
                 $file = "select a.path_foto, a.nama_foto
                 from javaadmin_project_foto a 
@@ -128,7 +128,7 @@ class ProjectController extends Controller {
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $id_produk;
+            $success['kode'] = $id_project;
             $success['message'] = "Data Project berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
@@ -211,7 +211,7 @@ class ProjectController extends Controller {
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->id_produk;
+            $success['kode'] = $request->id_project;
             $success['message'] = "Data Project berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
