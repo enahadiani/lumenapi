@@ -562,7 +562,7 @@ class BayarController extends Controller
                 $pesan = "Transaksi $no_bukti telah dibatalkan karena pembayaran tidak diterima dalam jangka waktu yang sudah ditentukan.";
             }else if($sts_bayar == "pending"){
                 $judul = "Segera lakukan pembayaran";
-                $pesan = "Transaki $no_bukti senilai $nilai menunggu pelunasan anda. Batas waktu maksimal pembayaran sampai $tgl_expired ";
+                $pesan = "Transaksi $no_bukti senilai $nilai menunggu pelunasan anda. Batas waktu maksimal pembayaran sampai $tgl_expired ";
             }else if($sts_bayar == "cancel"){
                 $judul = "Pembayaran transaksi $no_bukti dibatalkan";
                 $pesan = "Transaksi $no_bukti telah dibatalkan oleh penerima. ";

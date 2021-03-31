@@ -73,5 +73,11 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('notif-mobile','Ts\PesanController@getNotif');
     
     $router->post('generate-priority','Ts\DashSiswaController@generatePriority');
+
+    $router->get('notif-billing-periode','Ts\NotifBillingController@getPeriode');
+    $router->get('notif-billing-nobill','Ts\NotifBillingController@getNoBill');
+    $router->get('notif-billing','Ts\NotifBillingController@index');
+    $router->post('notif-billing','Ts\NotifBillingController@store');
+    $router->delete('notif-billing','Ts\NotifBillingController@destroy');
     
 });
