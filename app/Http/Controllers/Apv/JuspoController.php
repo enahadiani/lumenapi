@@ -101,7 +101,7 @@ class JuspoController extends Controller
                     inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.status='1'
                     )b on a.no_bukti=b.no_bukti 
-            where a.kode_lokasi='".$kode_lokasi."' and a.nik_buat='$nik_user' and a.progress not in ('R','A')
+            where a.kode_lokasi='".$kode_lokasi."' and a.nik_buat='$nik_user' and a.progress = 'S'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -137,13 +137,13 @@ class JuspoController extends Controller
             $sql = "select a.no_bukti,a.no_dokumen,a.kode_pp,case isnull(b.nilai,0) when 0 then a.nilai else isnull(b.nilai,0) end as nilai,convert(varchar,a.waktu,103) as waktu,a.kegiatan,a.progress,case isnull(b.progress,'-')  when 'R' then 'REVISI' when 'A' then 'Approval Pusat 1' else isnull(y.nama_jab,'-') end as status,isnull(b.no_bukti,'-') as id,p.nama as nama_pp,a.pemakai as pic
             from apv_juskeb_m a
             inner join apv_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi 
-            left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi and b.progress <> 'S'
+            left join apv_juspo_m b on a.no_bukti=b.no_juskeb and a.kode_lokasi=b.kode_lokasi
             left join (select a.no_bukti,b.nama as nama_jab
                                 from apv_flow a
                                 inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )y on b.no_bukti=y.no_bukti
-            where (a.kode_lokasi='$kode_lokasi' and a.progress='S') --and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
+            where (a.kode_lokasi='$kode_lokasi' and a.progress='S')  and b.progress <> 'S' --and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
             ";
             $res = DB::connection($this->db)->select($sql);
 
