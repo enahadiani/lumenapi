@@ -69,7 +69,7 @@ class AdminTsController extends Controller
                 inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
                 inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
                 inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
-                inner join m_form e on a.path_view=e.kode_form 
+                left join m_form e on a.path_view=e.kode_form 
                 where a.nik='$nik' 
                 ");
             }
