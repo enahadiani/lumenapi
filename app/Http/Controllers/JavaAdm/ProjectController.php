@@ -128,7 +128,7 @@ class ProjectController extends Controller {
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $id_produk;
+            $success['kode'] = $id_project;
             $success['message'] = "Data Project berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
@@ -211,7 +211,7 @@ class ProjectController extends Controller {
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->id_produk;
+            $success['kode'] = $request->id_project;
             $success['message'] = "Data Project berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
