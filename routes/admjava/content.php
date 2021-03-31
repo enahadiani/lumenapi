@@ -23,6 +23,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('produk-ubah','JavaAdm\ProdukController@update');
     $router->delete('produk','JavaAdm\ProdukController@destroy');
 
+    //Project
+    $router->get('project','JavaAdm\ProjectController@index');
+    $router->post('project','JavaAdm\ProjectController@store');
+    $router->post('project-ubah','JavaAdm\ProjectController@update');
+    $router->delete('project','JavaAdm\ProjectController@destroy');
+
 });
 
 
