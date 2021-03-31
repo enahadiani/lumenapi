@@ -34,7 +34,7 @@ class ProdukController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($request->kode_bank)){
+            if(isset($request->kode_produk)){
                 if($request->kode_produk == "all"){
                     $filter = "";
                 }else{
@@ -46,7 +46,7 @@ class ProdukController extends Controller {
                 $file = "select a.path_foto, a.nama_foto
                 from javaadmin_produk_foto a 
                 inner join javaadmin_produk b on a.id_produk=b.id_produk and a.kode_lokasi=b.kode_lokasi
-                where a.id_produk = '$request->kode_produk'";
+                where b.id_produk = '$request->kode_produk'";
                 $file = DB::connection($this->sql)->select($file);
                 $file = json_decode(json_encode($file),true);
                 $success['file'] = $file;
@@ -117,8 +117,8 @@ class ProdukController extends Controller {
                         }
                     }
                 }
-                if(count($arr_no_urut) > 0){
-                    for($i=0; $i<count($arr_no_urut);$i++){
+                if(count($arr_nama_foto) > 0){
+                    for($i=0; $i<count($arr_nama_foto);$i++){
                         $insertFile = "insert into javaadmin_produk_foto(id_produk, kode_lokasi, path_foto, nama_foto)
                         values ('".$id_produk."', '".$kode_lokasi."', '".$arr_foto[$i]."', '".$arr_nama_foto[$i]."')";
                         DB::connection($this->sql)->insert($insertFile); 
@@ -199,8 +199,8 @@ class ProdukController extends Controller {
                     ->where('id_produk', $request->id_produk)
                     ->delete();
                     
-                    if(count($arr_no_urut) > 0){
-                        for($i=0; $i<count($arr_no_urut);$i++){
+                    if(count($arr_nama_foto) > 0){
+                        for($i=0; $i<count($arr_nama_foto);$i++){
                             $insertFile = "insert into javaadmin_produk_foto(id_produk, kode_lokasi, path_foto, nama_foto)
                             values ('".$request->id_produk."', '$kode_lokasi', '".$arr_foto[$i]."','".$arr_nama_foto[$i]."')";
                             DB::connection($this->sql)->insert($insertFile); 
