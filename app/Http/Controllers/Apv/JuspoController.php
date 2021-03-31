@@ -101,7 +101,7 @@ class JuspoController extends Controller
                     inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.status='1'
                     )b on a.no_bukti=b.no_bukti 
-            where a.kode_lokasi='".$kode_lokasi."' and a.progress = 'S' --and a.nik_buat='$nik_user'
+            where a.kode_lokasi='".$kode_lokasi."' and a.nik_buat='$nik_user' and a.progress not in ('R','A')
             ");
             $res = json_decode(json_encode($res),true);
             
