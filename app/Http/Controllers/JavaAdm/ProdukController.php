@@ -211,7 +211,7 @@ class ProdukController extends Controller {
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $request->id_oroduk;
+            $success['kode'] = $request->id_produk;
             $success['message'] = "Data Produk berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
