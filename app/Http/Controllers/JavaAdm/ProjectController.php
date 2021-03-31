@@ -41,7 +41,7 @@ class ProjectController extends Controller {
                     $filter = " and id_project='$request->kode_project' ";
                 }
                 $sql= "select id_project, nama_project, keterangan
-                from javaadmin_produk where kode_lokasi='".$kode_lokasi."' $filter ";
+                from javaadmin_project where kode_lokasi='".$kode_lokasi."' $filter ";
 
                 $file = "select a.path_foto, a.nama_foto
                 from javaadmin_project_foto a 
