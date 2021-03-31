@@ -287,7 +287,7 @@ class PesanController extends Controller
                 $nis = $request->kontak;
                 $kode_kelas = '-';
                 $sql = "select a.nik,c.id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
             }
@@ -295,7 +295,7 @@ class PesanController extends Controller
                 $nis = '-';
                 $kode_kelas = $request->kontak;
                 $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
             }
@@ -303,12 +303,12 @@ class PesanController extends Controller
                 $nis = "-";
                 $kode_kelas = "-";
                 $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' 
                 union all
                 select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
-                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 where a.kode_pp='$request->kode_pp' ";
             }
@@ -326,6 +326,8 @@ class PesanController extends Controller
                 $key = array(
                     'no_bukti' => $no_bukti,
                     'kode_matpel' => $kode_matpel,
+                    'snap_token' => $ref3,
+                    'status' => $ref2,
                     'nik' => $nik
                 );
             }else if($tipe == "info"){
@@ -333,12 +335,16 @@ class PesanController extends Controller
                 $key = array(
                     'no_bukti' => $no_bukti,
                     'kode_matpel' => $kode_matpel,
+                    'snap_token' => $ref3,
+                    'status' => $ref2,
                     'nik' => $nik
                 );
             }else{
                 $click_action = "detail_matpel";
                 $key = array(
                     'kode_matpel' => $kode_matpel,
+                    'snap_token' => $ref3,
+                    'status' => $ref2,
                     'nik' => $nik
                 );
             }
@@ -562,7 +568,7 @@ class PesanController extends Controller
                 $nis = $request->kontak;
                 $kode_kelas = '-';
                 $sql = "select a.nik,c.id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
                 where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
             }
@@ -570,7 +576,7 @@ class PesanController extends Controller
                 $nis = '-';
                 $kode_kelas = $request->kontak;
                 $sql = "select a.nik,c.id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
                 where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
             }
@@ -578,12 +584,12 @@ class PesanController extends Controller
                 $nis = "-";
                 $kode_kelas = "-";
                 $sql = "select a.nik,c.id_device from sis_hakakses a
-                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
                 where a.kode_pp='$request->kode_pp' 
                 union all
                 select a.nik,c.id_device from sis_hakakses a
-                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
+                inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
                 left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
                 where a.kode_pp='$request->kode_pp' ";
             }
@@ -1197,7 +1203,7 @@ class PesanController extends Controller
             inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
             inner join sis_mid_bayar e on a.ref1=e.no_bukti and a.kode_lokasi=e.kode_lokasi
-			where b.nik='$nik' and a.tipe='notif' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
+			where b.nik='$nik' and a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             order by a.tgl_input desc
 			";
 			$res = DB::connection($this->db)->select($sql);

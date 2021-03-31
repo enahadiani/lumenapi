@@ -507,7 +507,7 @@ class BayarController extends Controller
             ->update(['status' => $sts_bayar]);
 
             $get = DB::connection($this->db)->select("
-            select a.no_bukti,a.nis,a.nilai,a.kode_pp,a.kode_lokasi,a.tgl_input,case when a.status='process' then dbo.fnNamaTanggal2(DATEADD(day, 1, getdate()),2) else dbo.fnNamaTanggal2(DATEADD(day, 1, a.tgl_input),2) end as tgl_expired,a.status from sis_mid_bayar a
+            select a.no_bukti,a.nis,a.nilai,a.kode_pp,a.kode_lokasi,a.tgl_input,case when a.status='process' then dbo.fnNamaTanggal2(DATEADD(day, 1, getdate()),2) else dbo.fnNamaTanggal2(DATEADD(day, 1, a.tgl_input),2) end as tgl_expired,a.status,a.snap_token from sis_mid_bayar a
             where a.no_bukti = '$no_bukti' 
             ");
             $nilai = $get[0]->nilai;
@@ -515,6 +515,7 @@ class BayarController extends Controller
             $kode_pp = $get[0]->kode_pp;
             $kode_lokasi = $get[0]->kode_lokasi;
             $tgl_expired = $get[0]->tgl_expired;
+            $snap_token = $get[0]->snap_token;
 
             $judul = "-";
             $pesan = "-";
@@ -585,7 +586,8 @@ class BayarController extends Controller
                     'pesan' => $pesan,
                     'kode_matpel' => '-',
                     'ref1' => $no_bukti,
-                    'ref2' => $sts_bayar
+                    'ref2' => $sts_bayar,
+                    'ref3' => $snap_token
                 ]);
     
                 $kirim_pesan = app('App\Http\Controllers\Ts\PesanController')->store($request);
