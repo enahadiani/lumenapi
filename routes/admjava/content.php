@@ -29,6 +29,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('project-ubah','JavaAdm\ProjectController@update');
     $router->delete('project','JavaAdm\ProjectController@destroy');
 
+    // Profile
+    $router->post('profile','JavaAdm\ProfileController@store');
+    $router->get('profile','JavaAdm\ProfileController@index');
+
 });
 
 
