@@ -143,7 +143,7 @@ class JuspoController extends Controller
                                 inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )y on b.no_bukti=y.no_bukti
-            where (a.kode_lokasi='$kode_lokasi' and a.progress='S')  and b.progress <> 'S' --and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
+            where (a.kode_lokasi='$kode_lokasi' and a.progress='S')  and isnull(b.progress,'-') <> 'S' --and (isnull(b.no_bukti,'-') = '-' OR b.progress in ('R','A','Z'))
             ";
             $res = DB::connection($this->db)->select($sql);
 
