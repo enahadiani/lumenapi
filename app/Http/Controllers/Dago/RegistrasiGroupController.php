@@ -107,10 +107,19 @@ class RegistrasiGroupController extends Controller
                     if($group[$i]['status_reg'] == "0"){
 
                         $no_reg = $temp[0]."/".$temp[1]."/".sprintf("%04s",$id);
+
+                        $get = DB::connection($this->sql)->select("select brkt_dgn, hubungan from dgw_peserta where no_peserta='".$group[$i]['no_peserta']."' and kode_lokasi='$kode_lokasi' ");
+                        if(count($get) > 0){
+                            $brkt_dgn = $get[0]->brkt_dgn;
+                            $hubungan = $get[0]->hubungan;
+                        }else{
+                            $brkt_dgn = '-';
+                            $hubungan = '-';
+                        }
         
                         $ins[$i] = DB::connection($this->sql)->insert("insert into dgw_group_d(no_reg,no_peserta,no_reg_ref,kode_lokasi) values (?, ?, ?, ?)", array($request->no_reg,$group[$i]['no_peserta'],$no_reg,$kode_lokasi));	
 
-                        $ins2[$i] = DB::connection($this->sql)->update("insert into dgw_reg (no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon,tgl_daftar) select '$no_reg' as no_reg,getdate(),'".$group[$i]['no_peserta']."' as no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,'0' as flag_group,brkt_dgn,hubungan,referal,ket_diskon,'$request->tgl_terima' as tgl_daftar from dgw_reg where no_reg = '".$request->no_reg."' and kode_lokasi='".$kode_lokasi."' ");	
+                        $ins2[$i] = DB::connection($this->sql)->update("insert into dgw_reg (no_reg,tgl_input,no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,flag_group,brkt_dgn,hubungan,referal,ket_diskon,tgl_daftar) select '$no_reg' as no_reg,getdate(),'".$group[$i]['no_peserta']."' as no_peserta,no_paket,no_jadwal,no_agen,no_type,harga_room,info,kode_lokasi,no_quota,harga,uk_pakaian,no_marketing,kode_harga,periode,jenis,no_fee,no_peserta_ref,kode_pp,diskon,'0' as flag_group,'$brkt_dgn' as brkt_dgn,'$brkt_dgn' as hubungan,referal,ket_diskon,'$request->tgl_terima' as tgl_daftar from dgw_reg where no_reg = '".$request->no_reg."' and kode_lokasi='".$kode_lokasi."' ");	
 
                         $ins3[$i] = DB::connection($this->sql)->update("insert into dgw_reg_dok (no_dok,no_reg,ket,kode_lokasi,tgl_terima) 
                         select a.no_dok,'$no_reg' as no_reg,a.ket,a.kode_lokasi,'2099-12-31' from dgw_reg_dok a where a.no_reg='".$request->no_reg."' and a.kode_lokasi='$kode_lokasi'" );
