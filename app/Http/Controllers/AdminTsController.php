@@ -55,15 +55,15 @@ class AdminTsController extends Controller
                 where a.nik='$nik' 
                 ");
             }else{
+                // select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
+                // from sis_hakakses a 
+                // inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
+                // inner join sis_guru c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
+                // inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
+                // inner join m_form e on a.path_view=e.kode_form 
+                // where a.nik='$nik' 
+                // union all
                 $user = DB::connection($this->db)->select("
-                select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
-                from sis_hakakses a 
-                inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
-                inner join sis_guru c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
-                inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
-                inner join m_form e on a.path_view=e.kode_form 
-                where a.nik='$nik' 
-                union all
                 select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
                 from sis_hakakses a 
                 inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
