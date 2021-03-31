@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
+use Log;
 
 class NotifBillingController extends Controller
 {
@@ -314,9 +315,12 @@ class NotifBillingController extends Controller
             $success['message'] = $msg;
             $success['arr_id'] = $arr_id;
             $success['arr_pesan'] = $arr_pesan;
+            $jml = count($arr_id);
+            Log::info('Jumlah Notif Billing:'.$jml);
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
+            Log::error('Error Notif Billing:'.$e);
             $success['status'] = false;
             $success['message'] = "Data Pesan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
