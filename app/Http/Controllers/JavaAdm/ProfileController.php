@@ -92,7 +92,7 @@ class ProfileController extends Controller {
                 }
                 Storage::disk('s3')->put('webjava/'.$foto,file_get_contents($file));
             }else{
-                $getFoto = DB::connection($this->db)->select("select top 1 path_foto from javaadmin_profil_perusahaan where kode_lokasi = '$kode_lokasi'");
+                $getFoto = DB::connection($this->sql)->select("select top 1 path_foto from javaadmin_profil_perusahaan where kode_lokasi = '$kode_lokasi'");
                 $res = json_decode(json_encode($getFoto),true);
 
                 if($res[0]['path_foto'] == null) {
@@ -112,8 +112,8 @@ class ProfileController extends Controller {
                 }
             }
 
-            DB::connection($this->db)->table('javaadmin_profil_perusahaan')->where('kode_lokasi', $kode_lokasi)->delete();
-            DB::connection($this->db)->table('javaadmin_profil_perusahaan_detail')->where('kode_lokasi', $kode_lokasi)->delete();
+            DB::connection($this->sql)->table('javaadmin_profil_perusahaan')->where('kode_lokasi', $kode_lokasi)->delete();
+            DB::connection($this->sql)->table('javaadmin_profil_perusahaan_detail')->where('kode_lokasi', $kode_lokasi)->delete();
 
             $insert = "insert into javaadmin_profil_perusahaan 
             (id_perusahaan, nama_perusahaan, koordinat, kode_lokasi, path_foto, visi, alamat, deskripsi, no_telp, email, 
