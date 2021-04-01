@@ -1229,5 +1229,146 @@ class PesanController extends Controller
         }
     }
 
+    public function getSiswa(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            if(isset($request->nis)){
+                if($request->nis != ""){
+                    $filter = " and a.nis='$request->nis' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+            
+			$sql = "select a.nis,a.nama,a.kode_kelas 
+            from sis_siswa a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif='1' $filter
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function getKelas(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+            if(isset($request->kode_kelas)){
+                if($request->kode_kelas != ""){
+                    $filter = " and a.kode_kelas='$request->kode_kelas' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+			$sql = "select a.kode_kelas,a.nama 
+            from sis_kelas a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif='1' $filter
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function getPP(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+            if(isset($request->kode_pp)){
+                if($request->kode_pp != ""){
+                    $filter = " and a.kode_pp='$request->kode_pp' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+			$sql = "select a.kode_pp,a.nama 
+            from pp a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif='1' $filter
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
 
 }

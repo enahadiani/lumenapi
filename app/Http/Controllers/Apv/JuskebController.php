@@ -178,8 +178,24 @@ class JuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if(strpos($request->no_bukti, "APP") || substr($request->no_bukti,0,3) == "APP"){
+
+                $get =  DB::connection($this->db)->select("select no_juskeb from apv_juspo_m
+                where no_bukti='$request->no_bukti' and kode_lokasi='$kode_lokasi'
+                ");
+                if(count($get) > 0){
+                    $no_bukti = $get[0]->no_juskeb;
+                }else{
+                    $no_bukti = "-";
+                }
+            }else{
+                $no_bukti = $request->no_bukti;
+            }
+            $success['cek'] = strpos($request->no_bukti, "APP");
+
+            $success['no_bukti'] = $no_bukti;
             $res = DB::connection($this->db)->select("select no_bukti,nama,jenis,'".url('api/apv/storage')."/'+file_dok as url from apv_juskeb_dok
-            where no_bukti='$request->no_bukti' and kode_lokasi='$kode_lokasi'
+            where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi'
             order by no_bukti,no_urut,jenis
             ");
             $res = json_decode(json_encode($res),true);
