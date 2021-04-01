@@ -170,7 +170,7 @@ class TeamController extends Controller {
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
-            $success['kode'] = $id_team;
+            $success['kode'] = $request->id_team;
             $success['message'] = "Data Team berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
