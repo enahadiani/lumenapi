@@ -95,6 +95,8 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->post('notif-umum-ubah','Ts\PesanController@update');
     $router->delete('notif-umum','Ts\PesanController@destroy');
     $router->delete('notif-umum-dok','Ts\PesanController@deleteDokumen');
+
+    $router->put('update-status-read', 'Ts\PesanController@updateStatusReadMobile');
     
     
 });

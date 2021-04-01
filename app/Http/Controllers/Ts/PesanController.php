@@ -1370,5 +1370,33 @@ class PesanController extends Controller
         }
     }
 
+    public function updateStatusReadMobile(Request $request)
+	{
+		if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $kode_pp = $data->kode_pp;
+		}
+
+		$this->validate($request,[
+            'no_pesan' => 'required|max:300'
+		]);
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			$upd = DB::connection($this->db)->insert("update sis_pesan_d set sts_read_mob = '1' where no_bukti='$request->no_pesan' and nik='$nik' and kode_lokasi='$kode_lokasi' ");
+
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = "Sukses";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
 
 }
