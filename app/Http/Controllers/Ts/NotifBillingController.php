@@ -289,7 +289,7 @@ class NotifBillingController extends Controller
                         'click_action' => $click_action,
                         'key' => $key
                     );
-                    $res = $this->gcm($arr_id[$i],$payload);
+                    $res = $this->gcm(array($arr_id[$i]),$payload);
                     $hasil= json_decode($res,true);
                     $success['hasil'][$i] = $hasil;
                     if(isset($hasil['success'])){
