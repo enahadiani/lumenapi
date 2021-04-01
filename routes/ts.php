@@ -85,5 +85,14 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('notif-pembayaran','Ts\NotifPembayaranController@index');
     $router->post('notif-pembayaran','Ts\NotifPembayaranController@store');
     $router->delete('notif-pembayaran','Ts\NotifPembayaranController@destroy');
+
+    
+    $router->get('notif-umum','Ts\PesanController@index');
+    $router->get('notif-umum-detail','Ts\PesanController@show');
+    $router->post('notif-umum','Ts\PesanController@store');
+    $router->post('notif-umum-ubah','Ts\PesanController@update');
+    $router->delete('notif-umum','Ts\PesanController@destroy');
+    $router->delete('notif-umum-dok','Ts\PesanController@deleteDokumen');
+    
     
 });
