@@ -285,23 +285,23 @@ class NotifBillingController extends Controller
                 for($i=0;count($arr_id);$i++){
                     $payload = array(
                         'title' => $request->judul,
-                        'message' => 'Tagihan anda sebesar '.$ck[$i]['nilai'],
+                        'message' => $arr_pesan[$i],
                         'click_action' => $click_action,
                         'key' => $key
                     );
-                    $res = $this->gcm($arr_id,$payload);
+                    $res = $this->gcm($arr_id[$i],$payload);
                     $hasil= json_decode($res,true);
                     $success['hasil'][$i] = $hasil;
                     if(isset($hasil['success'])){
                         if($hasil['failure'] > 0){
                             $sts_n = 0;
-                            $msg_n = "Notif gagal dikirim";
+                            $msg_n = "Notif gagal dikirim ke".$arr_id[$i];
                         }else{
-                            $msg_n = "Notif berhasil dikirim";
+                            $msg_n = "Notif berhasil dikirim ke".$arr_id[$i];
                             $sts_n = 1;
                         }
                     }else{
-                        $msg_n = "Notif gagal dikirim";
+                        $msg_n = "Notif gagal dikirim".$arr_id[$i];
                     }
                     $msg_notif[$i] = $msg_n;
                 }
@@ -366,13 +366,13 @@ class NotifBillingController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Pesan berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pesan gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
