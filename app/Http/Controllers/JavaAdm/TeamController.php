@@ -158,7 +158,7 @@ class TeamController extends Controller {
             }
             
             $insert= "insert into javaadmin_team(id_team, nama_team, jabatan_team, deskripsi, path_foto, kode_lokasi, tgl_input)
-            values('".$id_team."', '".$request->nama_team."', '".$request->jabatan_team."', '".$request->deskripsi_team."', 
+            values('".$request->id_team."', '".$request->nama_team."', '".$request->jabatan_team."', '".$request->deskripsi_team."', 
             '".$foto."', '$kode_lokasi', getdate())";
 
             DB::connection($this->sql)->table('javaadmin_team')
