@@ -1202,7 +1202,7 @@ class PesanController extends Controller
             from sis_pesan_m a
             inner join sis_pesan_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik='$nik'
             left join sis_pesan_dok c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.no_urut=0
-            inner join sis_mid_bayar e on a.ref1=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            left join sis_mid_bayar e on a.ref1=e.no_bukti and a.kode_lokasi=e.kode_lokasi
 			where b.nik='$nik' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             order by a.tgl_input desc
 			";
