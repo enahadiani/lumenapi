@@ -185,7 +185,7 @@ class PesanController extends Controller
             $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case jenis when 'Semua' then '-' when 'Kelas' then a.kode_kelas when 'Siswa' then a.nis end as kontak,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp,a.tipe,a.kode_matpel,isnull(b.nama,'-') as nama_matpel 
             from sis_pesan_m a
             left join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik' $filter");
+            where a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik' and a.jenis not in ('Billing','Pembayaran') $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
