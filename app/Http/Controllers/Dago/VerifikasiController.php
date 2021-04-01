@@ -630,11 +630,22 @@ class VerifikasiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $nk = DB::connection($this->sql)->select("select a.no_kwitansi from dgw_pembayaran a inner join dgw_ver_m b on a.no_kb=b.no_kwitansi and a.kode_lokasi=b.kode_lokasi where b.no_ver='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' ");
+            $nk = DB::connection($this->sql)->select("select a.no_kwitansi,a.no_kb,c.modul from dgw_pembayaran a 
+            inner join trans_m c on a.no_kb=c.no_bukti and a.kode_lokasi=c.kode_lokasi
+            inner join dgw_ver_m b on a.no_kb=b.no_kwitansi and a.kode_lokasi=b.kode_lokasi where b.no_ver='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' ");
             if (count($nk) > 0){
                 $no_kwitansi = $nk[0]->no_kwitansi;
+                $modul = $nk[0]->modul;
+                if($modul == "KB"){
+                    $modul_update = "KBB";
+                }else if($modul == "MI"){
+                    $modul_update = "MII";
+                }
+                $no_kb = $nk[0]->no_kb;
             }else{
                 $no_kwitansi = "-";
+                $modul = "-";
+                $no_kb = "-";
             }
             $success['no_kwitansi'] = $no_kwitansi;
            
@@ -649,6 +660,10 @@ class VerifikasiController extends Controller
                 ->delete();	
 
             $upd = DB::connection($this->sql)->update("update dgw_pembayaran set flag_ver='0' where no_kwitansi='$no_kwitansi' and kode_lokasi='$kode_lokasi' ");	
+
+            $upd2 = DB::connection($this->sql)->update("update trans_m set modul='$modul_update' where no_bukti='$no_kb' and kode_lokasi='$kode_lokasi' ");	
+
+            $upd3 = DB::connection($this->sql)->update("update trans_j set modul='$modul_update' where no_bukti='$no_kb' and kode_lokasi='$kode_lokasi' ");	
 
             $success['status'] = true;
             $success['message'] = "Data Verifikasi berhasil dihapus ";
