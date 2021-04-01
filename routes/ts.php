@@ -79,5 +79,11 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('notif-billing','Ts\NotifBillingController@index');
     $router->post('notif-billing','Ts\NotifBillingController@store');
     $router->delete('notif-billing','Ts\NotifBillingController@destroy');
+
+    $router->get('notif-pembayaran-periode','Ts\NotifPembayaranController@getPeriode');
+    $router->get('notif-pembayaran-norekon','Ts\NotifPembayaranController@getNoRekon');
+    $router->get('notif-pembayaran','Ts\NotifPembayaranController@index');
+    $router->post('notif-pembayaran','Ts\NotifPembayaranController@store');
+    $router->delete('notif-pembayaran','Ts\NotifPembayaranController@destroy');
     
 });
