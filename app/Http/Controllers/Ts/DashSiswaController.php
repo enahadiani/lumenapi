@@ -1011,7 +1011,6 @@ class DashSiswaController extends Controller
                     where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
                     group by x.kode_lokasi,x.no_bukti )a 
                 inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
-                and b.status = 'pending'
             ) a
             where a.no_bukti = '$request->no_bukti'
             order by a.tanggal desc ");

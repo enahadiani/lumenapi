@@ -185,7 +185,7 @@ class PesanController extends Controller
             $res = DB::connection($this->db)->select("select a.no_bukti,a.jenis,a.judul,a.pesan,a.tgl_input, case jenis when 'Semua' then '-' when 'Kelas' then a.kode_kelas when 'Siswa' then a.nis end as kontak,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,a.kode_pp,a.tipe,a.kode_matpel,isnull(b.nama,'-') as nama_matpel 
             from sis_pesan_m a
             left join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik' $filter");
+            where a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik' and a.jenis not in ('Billing','Pembayaran') $filter");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1205,6 +1205,147 @@ class PesanController extends Controller
             inner join sis_mid_bayar e on a.ref1=e.no_bukti and a.kode_lokasi=e.kode_lokasi
 			where b.nik='$nik' and a.tipe='info' and a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp'
             order by a.tgl_input desc
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function getSiswa(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+
+            if(isset($request->nis)){
+                if($request->nis != ""){
+                    $filter = " and a.nis='$request->nis' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+            
+			$sql = "select a.nis,a.nama,a.kode_kelas 
+            from sis_siswa a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif='1' $filter
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function getKelas(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+            if(isset($request->kode_kelas)){
+                if($request->kode_kelas != ""){
+                    $filter = " and a.kode_kelas='$request->kode_kelas' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+			$sql = "select a.kode_kelas,a.nama 
+            from sis_kelas a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif='1' $filter
+			";
+			$res = DB::connection($this->db)->select($sql);
+			$res = json_decode(json_encode($res),true);
+			if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['status'] = false;
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+            }
+            $success['status'] = true;
+            $success['message'] = "Sukses ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function getPP(Request $request){
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+            $kode_pp = $auth->kode_pp;
+		}
+		
+        try{
+            
+            if(isset($request->kode_pp)){
+                if($request->kode_pp != ""){
+                    $filter = " and a.kode_pp='$request->kode_pp' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+			$sql = "select a.kode_pp,a.nama 
+            from pp a 
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$kode_pp' and a.flag_aktif='1' $filter
 			";
 			$res = DB::connection($this->db)->select($sql);
 			$res = json_decode(json_encode($res),true);
