@@ -50,6 +50,8 @@ class AktapController extends Controller
             'no_bukti' => 'required'
         ]);
 
+        
+        DB::connection($this->db)->beginTransaction();
         try {
 
             if($rs =  Auth::guard($this->guard)->user()){

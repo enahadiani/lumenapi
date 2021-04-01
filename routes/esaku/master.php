@@ -78,11 +78,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('cust-ol','Esaku\Inventori\CustomerOLController@update');
     $router->delete('cust-ol','Esaku\Inventori\CustomerOLController@destroy');
 
-    //Data Kelompok Barang
-    $router->get('klp-barang','Esaku\Inventori\KlpBarangController@index');
-    $router->post('klp-barang','Esaku\Inventori\KlpBarangController@store');
-    $router->put('klp-barang','Esaku\Inventori\KlpBarangController@update');
-    $router->delete('klp-barang','Esaku\Inventori\KlpBarangController@destroy');
+   
 
     //ADMIN SETTING
     //Menu
@@ -220,6 +216,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('fa-klpakun','Esaku\Aktap\FaKlpAkunController@store');
     $router->put('fa-klpakun','Esaku\Aktap\FaKlpAkunController@update');
     $router->delete('fa-klpakun','Esaku\Aktap\FaKlpAkunController@destroy');
+
+    //Data Kelompok Barang
+    $router->get('klp-barang','Esaku\Aktap\KlpBarangController@index');
+    $router->post('klp-barang','Esaku\Aktap\KlpBarangController@store');
+    $router->put('klp-barang','Esaku\Aktap\KlpBarangController@update');
+    $router->delete('klp-barang','Esaku\Aktap\KlpBarangController@destroy');
 
     // KAS BANK
     //Master Ref Trans

@@ -166,7 +166,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('aktap','Esaku\Aktap\AktapController@store');
 
     //Data Penyusutan
-    $router->get('susut-drk','Esaku\Aktap\PenyusutanController@getDRK');
+    $router->get('susut-hitung','Esaku\Aktap\PenyusutanController@hitungPenyusutan');
     $router->post('susut','Esaku\Aktap\PenyusutanController@store');
 
     // KASBANK
