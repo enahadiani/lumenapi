@@ -118,16 +118,16 @@ class ProfileController extends Controller {
             $insert = "insert into javaadmin_profil_perusahaan 
             (id_perusahaan, nama_perusahaan, koordinat, kode_lokasi, path_foto, visi, alamat, deskripsi, no_telp, email, 
             link_wa, no_fax) values 
-            ('".$request->kode."','".$request->nama."','".$request->koordinat."','".$kode_lokasi."','".$foto."',
-            '".$request->visi."','".$request->alamat."','".$request->deskripsi."','".$request->telp."', 
-            '".$request->email."', '".$request->wa."', '".$request->fax."')";
+            ('".$request->id_perusahaan."','".$request->nama_perusahaan."','".$request->koordinat."','".$kode_lokasi."','".$foto."',
+            '".$request->visi."','".$request->alamat."','".$request->deskripsi."','".$request->no_telp."', 
+            '".$request->email."', '".$request->wa."', '".$request->no_fax."')";
 
             DB::connection($this->sql)->insert($insert);
 
             if(count($arr_no_urut) > 0) {
                 for($i=0;$i<count($arr_no_urut);$i++) {
                     $detail = "insert into javaadmin_profil_perusahaan_detail (kode_lokasi, id_perusahaan, misi, no_urut) 
-                    values ('".$kode_lokasi."', '".$request->kode."', '".$arr_misi[$i]."', '".$arr_no_urut[$i]."')";
+                    values ('".$kode_lokasi."', '".$request->id_perusahaan."', '".$arr_misi[$i]."', '".$arr_no_urut[$i]."')";
                     DB::connection($this->sql)->insert($detail);
                 }
             }
