@@ -281,31 +281,31 @@ class NotifBillingController extends Controller
             
             DB::connection($this->db)->commit();
 
-            if(count($arr_id) > 0){
-                for($i=0;count($arr_id);$i++){
-                    $payload = array(
-                        'title' => $request->judul,
-                        'message' => $arr_pesan[$i],
-                        'click_action' => $click_action,
-                        'key' => $key
-                    );
-                    $res = $this->gcm($arr_id[$i],$payload);
-                    $hasil= json_decode($res,true);
-                    $success['hasil'][$i] = $hasil;
-                    if(isset($hasil['success'])){
-                        if($hasil['failure'] > 0){
-                            $sts_n = 0;
-                            $msg_n = "Notif gagal dikirim ke".$arr_id[$i];
-                        }else{
-                            $msg_n = "Notif berhasil dikirim ke".$arr_id[$i];
-                            $sts_n = 1;
-                        }
-                    }else{
-                        $msg_n = "Notif gagal dikirim".$arr_id[$i];
-                    }
-                    $msg_notif[$i] = $msg_n;
-                }
-            }
+            // if(count($arr_id) > 0){
+            //     for($i=0;count($arr_id);$i++){
+            //         $payload = array(
+            //             'title' => $request->judul,
+            //             'message' => $arr_pesan[$i],
+            //             'click_action' => $click_action,
+            //             'key' => $key
+            //         );
+            //         $res = $this->gcm($arr_id[$i],$payload);
+            //         $hasil= json_decode($res,true);
+            //         $success['hasil'][$i] = $hasil;
+            //         if(isset($hasil['success'])){
+            //             if($hasil['failure'] > 0){
+            //                 $sts_n = 0;
+            //                 $msg_n = "Notif gagal dikirim ke".$arr_id[$i];
+            //             }else{
+            //                 $msg_n = "Notif berhasil dikirim ke".$arr_id[$i];
+            //                 $sts_n = 1;
+            //             }
+            //         }else{
+            //             $msg_n = "Notif gagal dikirim".$arr_id[$i];
+            //         }
+            //         $msg_notif[$i] = $msg_n;
+            //     }
+            // }
             
             $sts = true;
             $msg = "Data Pesan berhasil disimpan. ";
