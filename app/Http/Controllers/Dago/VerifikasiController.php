@@ -133,7 +133,7 @@ class VerifikasiController extends Controller
             inner join trans_m b on a.no_kb=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             inner join dgw_reg c on a.no_reg=c.no_reg and a.kode_lokasi=c.kode_lokasi
             inner join dgw_peserta d on c.no_peserta=d.no_peserta and c.kode_lokasi=d.kode_lokasi
-            where b.kode_lokasi='".$kode_lokasi."' and b.posted= and b.form='KBREG' and a.flag_ver ='0' ");
+            where b.kode_lokasi='".$kode_lokasi."' and b.posted='F' and b.form='KBREG' and a.flag_ver ='0' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
