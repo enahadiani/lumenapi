@@ -33,6 +33,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('profile','JavaAdm\ProfileController@store');
     $router->get('profile','JavaAdm\ProfileController@index');
 
+    //Team
+    $router->get('team','JavaAdm\TeamController@index');
+    $router->post('team','JavaAdm\TeamController@store');
+    $router->post('team-ubah','JavaAdm\TeamController@update');
+    $router->delete('team','JavaAdm\TeamController@destroy');
+
 });
 
 
