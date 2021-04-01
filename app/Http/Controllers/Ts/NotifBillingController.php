@@ -263,7 +263,7 @@ class NotifBillingController extends Controller
             if(count($ck) > 0){
                 for($i=0;$i<count($ck);$i++){
                     if(!isset($nik[$ck[$i]['nik']])){
-                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik,pesan,ref1,ref2,ref3) values ('$no_bukti','$kode_lokasi','$kode_pp','0','0','".$ck[$i]['id_device']."','".$ck[$i]['nik']."','Tagihan anda sebesar ".$ck[$i]['nilai']."','".$request->no_bill."','".$request->periode."','-') ");
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik,pesan,ref1,ref2,ref3) values ('$no_bukti','$kode_lokasi','$kode_pp','0','0','".$ck[$i]['id_device']."','".$ck[$i]['nik']."','Tagihan anda sebesar ".number_format($ck[$i]['nilai'],0,",",".")."','".$request->no_bill."','".$request->periode."','-') ");
                     }
                     
                     if($ck[$i]['id_device'] != "-"){
@@ -272,7 +272,7 @@ class NotifBillingController extends Controller
                         {
                             array_push($arr_nis,$ck[$i]['nik']);
                         }
-                        array_push($arr_pesan,'Tagihan anda sebesar '.$ck[$i]['nilai']);
+                        array_push($arr_pesan,'Tagihan anda sebesar '.number_format($ck[$i]['nilai'],0,",","."));
                     }
                     
                     $nik[$ck[$i]['nik']] = $ck[$i]['nik'];
@@ -281,31 +281,31 @@ class NotifBillingController extends Controller
             
             DB::connection($this->db)->commit();
 
-            // if(count($arr_id) > 0){
-            //     for($i=0;count($arr_id);$i++){
-            //         $payload = array(
-            //             'title' => $request->judul,
-            //             'message' => $arr_pesan[$i],
-            //             'click_action' => $click_action,
-            //             'key' => $key
-            //         );
-            //         $res = $this->gcm($arr_id[$i],$payload);
-            //         $hasil= json_decode($res,true);
-            //         $success['hasil'][$i] = $hasil;
-            //         if(isset($hasil['success'])){
-            //             if($hasil['failure'] > 0){
-            //                 $sts_n = 0;
-            //                 $msg_n = "Notif gagal dikirim ke".$arr_id[$i];
-            //             }else{
-            //                 $msg_n = "Notif berhasil dikirim ke".$arr_id[$i];
-            //                 $sts_n = 1;
-            //             }
-            //         }else{
-            //             $msg_n = "Notif gagal dikirim".$arr_id[$i];
-            //         }
-            //         $msg_notif[$i] = $msg_n;
-            //     }
-            // }
+            if(count($arr_id) > 0){
+                for($i=0;$i < count($arr_id);$i++){
+                    $payload = array(
+                        'title' => $request->judul,
+                        'message' => $arr_pesan[$i],
+                        'click_action' => $click_action,
+                        'key' => $key
+                    );
+                    $res = $this->gcm(array($arr_id[$i]),$payload);
+                    $hasil= json_decode($res,true);
+                    $success['hasil'][$i] = $hasil;
+                    if(isset($hasil['success'])){
+                        if($hasil['failure'] > 0){
+                            $sts_n = 0;
+                            $msg_n = "Notif gagal dikirim ke".$arr_nis[$i];
+                        }else{
+                            $msg_n = "Notif berhasil dikirim ke".$arr_nis[$i];
+                            $sts_n = 1;
+                        }
+                    }else{
+                        $msg_n = "Notif gagal dikirim ke".$arr_nis[$i];
+                    }
+                    $msg_notif[$i] = $msg_n;
+                }
+            }
             
             $sts = true;
             $msg = "Data Pesan berhasil disimpan. ";

@@ -556,22 +556,22 @@ class BayarController extends Controller
                     }
                 }
                 $judul = "Pembayaran untuk transaksi $no_bukti berhasil";
-                $pesan = "Pembayaran senilai $nilai untuk transaksi $no_bukti telah berhasil.";
+                $pesan = "Pembayaran senilai ".number_format($nilai,0,",",".")." untuk transaksi $no_bukti telah berhasil.";
             }else if($sts_bayar == "expired"){
                 $judul = "Pembayaran untuk transaksi $no_bukti sudah tidak berlaku";
                 $pesan = "Transaksi $no_bukti telah dibatalkan karena pembayaran tidak diterima dalam jangka waktu yang sudah ditentukan.";
             }else if($sts_bayar == "pending"){
                 $judul = "Segera lakukan pembayaran";
-                $pesan = "Transaksi $no_bukti senilai $nilai menunggu pelunasan anda. Batas waktu maksimal pembayaran sampai $tgl_expired ";
+                $pesan = "Transaksi $no_bukti senilai ".number_format($nilai,0,",",".")." menunggu pelunasan anda. Batas waktu maksimal pembayaran sampai $tgl_expired ";
             }else if($sts_bayar == "cancel"){
                 $judul = "Pembayaran transaksi $no_bukti dibatalkan";
                 $pesan = "Transaksi $no_bukti telah dibatalkan oleh penerima. ";
             }else if($sts_bayar == "failed"){
                 $judul = "Pembayaran transaksi $no_bukti gagal";
-                $pesan = "Pembayaran transaksi $no_bukti senilai $nilai gagal dilakukan. ";
+                $pesan = "Pembayaran transaksi $no_bukti senilai ".number_format($nilai,0,",",".")." gagal dilakukan. ";
             }else{
                 $judul = "Segera selesaikan proses pembayaran transaksi $no_bukti";
-                $pesan = "Selesaikan proses pembayaran transaksi $no_bukti senilai $nilai untuk melanjutkan pembayaran.";
+                $pesan = "Selesaikan proses pembayaran transaksi $no_bukti senilai ".number_format($nilai,0,",",".")." untuk melanjutkan pembayaran.";
             }
 
             if($judul != "-"){
