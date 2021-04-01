@@ -263,7 +263,7 @@ class NotifPembayaranController extends Controller
             if(count($ck) > 0){
                 for($i=0;$i<count($ck);$i++){
                     if(!isset($nik[$ck[$i]['nik']])){
-                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik,pesan,ref1,ref2,ref3) values ('$no_bukti','$kode_lokasi','$kode_pp','0','0','".$ck[$i]['id_device']."','".$ck[$i]['nik']."','Tagihan anda sebesar ".number_format($ck[$i]['nilai'],0,",",".")."','".$request->no_rekon."','".$request->periode."','-') ");
+                        $ins2[$i] = DB::connection($this->db)->insert("insert into sis_pesan_d(no_bukti,kode_lokasi,kode_pp,sts_read,sts_read_mob,id_device,nik,pesan,ref1,ref2,ref3) values ('$no_bukti','$kode_lokasi','$kode_pp','0','0','".$ck[$i]['id_device']."','".$ck[$i]['nik']."','Pembayaran anda sebesar ".number_format($ck[$i]['nilai'],0,",",".")."','".$request->no_rekon."','".$request->periode."','-') ");
                     }
                     
                     if($ck[$i]['id_device'] != "-"){
@@ -272,7 +272,7 @@ class NotifPembayaranController extends Controller
                         {
                             array_push($arr_nis,$ck[$i]['nik']);
                         }
-                        array_push($arr_pesan,'Tagihan anda sebesar '.number_format($ck[$i]['nilai'],0,",","."));
+                        array_push($arr_pesan,'Pembayaran anda sebesar '.number_format($ck[$i]['nilai'],0,",","."));
                     }
                     
                     $nik[$ck[$i]['nik']] = $ck[$i]['nik'];
