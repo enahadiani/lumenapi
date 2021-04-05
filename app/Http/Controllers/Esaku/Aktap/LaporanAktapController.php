@@ -246,11 +246,11 @@ class LaporanAktapController extends Controller
             }
 
             if($request->kode_pp[0] == "Range"){
-               $filter_pp = " and a.kode_pp between '".$request->kode_pp[1]."' and '".$request->kode_pp[2]."' ";
+               $filterpp = " and a.kode_pp between '".$request->kode_pp[1]."' and '".$request->kode_pp[2]."' ";
             }else if ($request->kode_pp[0] == "="){
-               $filter_pp = " and a.kode_pp = '".$request->kode_pp[1]."' ";
+               $filterpp = " and a.kode_pp = '".$request->kode_pp[1]."' ";
             }else{
-               $filter_pp = "";
+               $filterpp = "";
             }
             $periode=$request->input('periode')[1];
             $periode_susut=$request->input('periode_susut')[1];
