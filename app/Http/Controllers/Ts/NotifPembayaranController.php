@@ -239,8 +239,18 @@ class NotifPembayaranController extends Controller
                          from sis_rekon_d a 
                          group by a.no_rekon,a.nis,a.kode_pp,a.kode_lokasi
                         ) b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and b.no_rekon='$request->no_rekon' ";
+            left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.flag_aktif='1'
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and b.no_rekon='$request->no_rekon'  
+            union all
+            select a.nik,isnull(c.id_device,'-') as id_device,b.nilai
+            from sis_hakakses a
+            inner join ( select a.no_bukti,a.nis,a.kode_pp,a.kode_lokasi,sum(a.nilai) as nilai
+                         from sis_cd_d a 
+                         group by a.no_bukti,a.nis,a.kode_pp,a.kode_lokasi
+                        ) b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and c.flag_aktif='1'
+            where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and b.no_bukti='$request->no_rekon' 
+            ";
             $ck = DB::connection($this->db)->select($sql);
             $ck = json_decode(json_encode($ck),true);
          

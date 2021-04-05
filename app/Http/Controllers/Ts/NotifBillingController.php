@@ -239,7 +239,7 @@ class NotifBillingController extends Controller
                          from sis_bill_d a 
                          group by a.no_bill,a.nis,a.kode_pp,a.kode_lokasi
                         ) b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and and c.flag_aktif='1'
             where a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' and b.no_bill='$request->no_bill' ";
             $ck = DB::connection($this->db)->select($sql);
             $ck = json_decode(json_encode($ck),true);
