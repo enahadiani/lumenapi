@@ -268,10 +268,10 @@ class NotifPembayaranController extends Controller
                     
                     if($ck[$i]['id_device'] != "-"){
                         array_push($arr_id,$ck[$i]['id_device']);
-                        if (!in_array($ck[$i]['nik'], $arr_nis))
-                        {
+                        // if (!in_array($ck[$i]['nik'], $arr_nis))
+                        // {
                             array_push($arr_nis,$ck[$i]['nik']);
-                        }
+                        // }
                         array_push($arr_pesan,'Pembayaran anda sebesar '.number_format($ck[$i]['nilai'],0,",","."));
                     }
                     

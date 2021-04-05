@@ -38,6 +38,28 @@ class PenyusutanController extends Controller
         return $periode;
     }
 
+    function namaPeriode($periode){
+        $bulan = substr($periode,4,2);
+        $tahun = substr($periode,0,4);
+        switch ($bulan){
+            case 1 : case '1' : case '01': $bulan = "Januari"; break;
+            case 2 : case '2' : case '02': $bulan = "Februari"; break;
+            case 3 : case '3' : case '03': $bulan = "Maret"; break;
+            case 4 : case '4' : case '04': $bulan = "April"; break;
+            case 5 : case '5' : case '05': $bulan = "Mei"; break;
+            case 6 : case '6' : case '06': $bulan = "Juni"; break;
+            case 7 : case '7' : case '07': $bulan = "Juli"; break;
+            case 8 : case '8' : case '08': $bulan = "Agustus"; break;
+            case 9 : case '9' : case '09': $bulan = "September"; break;
+            case 10 : case '10' : case '10': $bulan = "Oktober"; break;
+            case 11 : case '11' : case '11': $bulan = "November"; break;
+            case 12 : case '12' : case '12': $bulan = "Desember"; break;
+            default: $bulan = null;
+        }
+    
+        return $bulan.' '.$tahun;
+    }
+
     
     function nextNPeriode($periode, $n) 
     {
@@ -205,7 +227,7 @@ class PenyusutanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $periode = substr($request->periode,0,4);
+            $periode = $request->periode;
             $sql = "select b.akun_bp,x.nama as nama_bp,b.akun_deprs,y.nama as nama_deprs,a.kode_pp_susut,c.nama as nama_pp, 
 
             sum(case when (zz.nilai-a.nilai_residu-a.akum_nilai-isnull(d.tot_susut,0)) > ceiling((zz.nilai-isnull(a.akum_nilai,0))/a.umur) 
@@ -233,7 +255,6 @@ class PenyusutanController extends Controller
             order by b.akun_bp";		
             $res = DB::connection($this->db)->select($sql);	
             $res= json_decode(json_encode($res),true);
-            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;

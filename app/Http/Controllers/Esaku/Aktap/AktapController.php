@@ -71,13 +71,13 @@ class AktapController extends Controller
             $periode = substr($request->tgl_perolehan,0,4).substr($request->tgl_perolehan,5,2);
             $msg = "";
             if (intval($peraktif) < intval($periode)) {
-                if ($pernext == "1"){
-                    $msg .= "Periode transaksi melebihi periode aktif sistem.[".$peraktif."]". "Data akan disimpan?";
-                    $sts = true;
-                }else {
+                // if ($pernext == "1"){
+                //     $msg .= "Periode transaksi melebihi periode aktif sistem.[".$peraktif."]". "Data akan disimpan?";
+                //     $sts = true;
+                // }else {
                     $msg .= "Periode transaksi tidak valid.Periode transaksi tidak boleh melebihi periode aktif sistem.[".$peraktif."]";
                     $sts = false;
-                }
+                // }
             }else{
                 $sts = true;
             }
@@ -146,6 +146,48 @@ class AktapController extends Controller
             	 inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi 
             	 inner join masakun c on b.kode_akun=c.kode_akun and c.kode_lokasi = '$kode_lokasi'
             where a.kode_lokasi='$kode_lokasi' $filter ");	
+            $res= json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPP(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->kode_pp) && $request->kode_pp != ""){
+                $filter .= " and a.kode_pp = '$request->kode_pp'  ";
+            }else{
+                $filter .= "";
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_pp, a.nama 
+            from pp a
+            where a.flag_aktif ='1'
+            and a.kode_lokasi='$kode_lokasi' $filter ");	
             $res= json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

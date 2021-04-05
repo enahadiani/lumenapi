@@ -39,6 +39,7 @@ class KlpBarangController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $filter = "";
             if(isset($request->kode_klpfa)){
                 if($request->kode_klpfa == "all"){
                     $filter = "";
@@ -52,7 +53,6 @@ class KlpBarangController extends Controller
                 ";
             }
             else {
-                $filter = "";
                 if(isset($request->jenis)){
                     $filter .= " and a.jenis='".$request->jenis."' ";
                 }else{

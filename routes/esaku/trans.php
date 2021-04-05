@@ -162,6 +162,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     // AKTAP
     //Data Aktiva Tetap
+    $router->get('aktap-pp','Esaku\Aktap\AktapController@getPP');
     $router->get('aktap-klpakun','Esaku\Aktap\AktapController@getKlpAkun');
     $router->post('aktap','Esaku\Aktap\AktapController@store');
 
