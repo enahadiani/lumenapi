@@ -360,6 +360,28 @@ class AuthController extends Controller
         return $this->respondWithToken($token,'ts');
     }
 
+    public function logoutTs(Request $request)
+    {
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'id_device' => 'required|string',
+        ]);
+
+        DB::connection('sqlsrvyptkug')->beginTransaction();
+        try{
+            
+            $ins = DB::connection('sqlsrvyptkug')->update("delete from users_device where nik='$request->nik' and id_device='$request->id_device' ");
+
+            $success['status'] = true;
+            $success['message'] = "Logout berhasil";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
     public function loginDago(Request $request)
     {
           //validate incoming request 

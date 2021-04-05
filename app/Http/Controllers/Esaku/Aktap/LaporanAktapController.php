@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LaporanNrcLajur;
 
-class LaporanController extends Controller
+class LaporanAktapController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -50,6 +50,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -94,7 +96,6 @@ class LaporanController extends Controller
                                     )g on a.no_fa=g.no_fa and a.kode_lokasi=g.kode_lokasi    
                     $where
             order by a.kode_akun,a.tgl_perolehan ";
-         
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
@@ -149,6 +150,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -251,6 +254,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -386,6 +391,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -490,6 +497,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -602,6 +611,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -714,6 +725,8 @@ class LaporanController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }

@@ -35,6 +35,9 @@ $router->get('storage/{filename}', function ($filename)
 
 $router->group(['middleware' => 'auth:ts'], function () use ($router) {
 
+    
+    $router->post('logout', 'AuthController@logoutTs');
+
     $router->get('profile', 'AdminTsController@profile');
     $router->get('users/{id}', 'AdminTsController@singleUser');
     $router->get('users', 'AdminTsController@allUsers');
