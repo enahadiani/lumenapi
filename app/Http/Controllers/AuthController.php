@@ -372,10 +372,12 @@ class AuthController extends Controller
             
             $ins = DB::connection('sqlsrvyptkug')->update("delete from users_device where nik='$request->nik' and id_device='$request->id_device' ");
 
+            DB::connection('sqlsrvyptkug')->commit();
             $success['status'] = true;
             $success['message'] = "Logout berhasil";
             return response()->json($success, 200);
         } catch (\Throwable $e) {
+            DB::connection('sqlsrvyptkug')->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
