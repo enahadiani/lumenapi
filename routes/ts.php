@@ -20,6 +20,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('hash-pass-costum-top/{db}/{table}/{kode_pp}/{top}', 'AuthController@hashPasswordCostumTop');
     $router->get('hash-pass-costum/{db}/{table}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
+    $router->post('logout', 'AuthController@logoutTs');
 
 });
 
@@ -34,9 +35,6 @@ $router->get('storage/{filename}', function ($filename)
 
 
 $router->group(['middleware' => 'auth:ts'], function () use ($router) {
-
-    
-    $router->post('logout', 'AuthController@logoutTs');
 
     $router->get('profile', 'AdminTsController@profile');
     $router->get('users/{id}', 'AdminTsController@singleUser');
