@@ -383,9 +383,9 @@ class LaporanAktapController extends Controller
             }
 
             if($request->jenis[0] == "Range"){
-               $filter_jenis = " where a.jenis between '".$request->jenis[1]."' and '".$request->jenis[2]."' ";
+               $filter_jenis = " where j.jenis between '".$request->jenis[1]."' and '".$request->jenis[2]."' ";
             }else if ($request->jenis[0] == "="){
-               $filter_jenis = " where a.jenis = '".$request->jenis[1]."' ";
+               $filter_jenis = " where j.jenis = '".$request->jenis[1]."' ";
             }else{
                $filter_jenis = "";
             }
@@ -460,8 +460,8 @@ class LaporanAktapController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','no_fasusut');
-            $db_col_name = array('a.periode','a.no_fasusut');
+            $col_array = array('periode','no_bukti');
+            $db_col_name = array('a.periode','a.no_bukti');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -489,63 +489,45 @@ class LaporanAktapController extends Controller
             }
             $periode=$request->input('periode')[1];
             $periode_susut=$request->input('periode_susut')[1];
-            $sql="select a.no_fasusut as no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.kode_akun,b.nama,a.kode_pp,a.kode_drk,a.keterangan, 
+            $sql="select a.no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.kode_akun,b.nama,a.kode_pp,a.kode_drk,a.keterangan, 
             case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit 
-            from fasusut_j a  
-            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi $where 
-            order by a.periode,a.no_fasusut,a.dc desc ";
+            from trans_j a  
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi $where and a.modul='AT'
+            order by a.periode,a.no_bukti,a.dc desc ";
 
             if($request->format[1] == "Memo Jurnal"){
-                $sql="select a.no_fasusut,a.no_dokumen,a.kode_lokasi,a.periode,a.tanggal,convert(varchar,a.tanggal,103) as tanggal1,a.keterangan,a.kode_lokasi,a.nik_buat,a.nik_setuju,b.nama as nama_buat,c.nama as nama_setuju,d.kota
-                from fasusut_m a
+                $sql="select a.no_bukti,a.no_dokumen,a.kode_lokasi,a.periode,a.tanggal,convert(varchar,a.tanggal,103) as tanggal1,a.keterangan,a.kode_lokasi,a.nik_user,a.nik2,b.nama as nama_buat,c.nama as nama_setuju,d.kota
+                from trans_m a
                 inner join lokasi d on a.kode_lokasi=d.kode_lokasi
-                left join karyawan b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
-                left join karyawan c on a.nik_setuju=c.nik and a.kode_lokasi=c.kode_lokasi 
-                $where ";
+                left join karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+                left join karyawan c on a.nik2=c.nik and a.kode_lokasi=c.kode_lokasi 
+                $where and a.modul='AT' ";
             }
          
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
-
-            $nb = "";
-            $resdata = array();
-            $i=0;
-            if($request->format[1] == "Memp Jurnal"){
-
-                foreach($rs as $row){
-    
-                    $resdata[]=(array)$row;
-                    if($i == 0){
-                        $nb .= "'$row->no_fasusut'";
-                    }else{
-    
-                        $nb .= ","."'$row->no_fasusut'";
-                    }
-                    $i++;
-                }
-    
-                if($nb == ""){
-                    $filter_nb = "";
-                }else{
-                    $filter_nb = " and no_fasusut in ('$row->no_fasusut') ";
-                }
-                $sql2=" select a.kode_akun,b.nama,a.keterangan,a.kode_pp,a.kode_drk,case dc when 'D' then nilai else 0 end as debet,case dc when 'C' then nilai else 0 end as kredit  
-                from fasusut_j a
-                inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi='$row->kode_lokasi' $filter_nb
-                order by a.dc desc 
-                " ;
-                $res2 = DB::connection($this->sql)->select($sql2);
-                $res2 = json_decode(json_encode($res2),true);
-            }else{
-                $res2 = array();
-            }
             
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                
+                
+                if($request->format[1] == "Memo Jurnal"){
+                    
+                    for($i=0;$i < count($res);$i++){
+                        
+                        $sql2=" select a.kode_akun,b.nama,a.keterangan,a.kode_pp,a.kode_drk,case dc when 'D' then nilai else 0 end as debet,case dc when 'C' then nilai else 0 end as kredit  
+                        from trans_j a
+                        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi='".$res[$i]['kode_lokasi']."' and a.modul='AT' and a.no_bukti in ('".$res[$i]['no_bukti']."')
+                        order by a.dc desc 
+                        " ;
+                        $res2 = DB::connection($this->sql)->select($sql2);
+                        $res[$i]['detail'] = json_decode(json_encode($res2),true);
+                        
+                    }
+                }
+                            
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
@@ -554,7 +536,6 @@ class LaporanAktapController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
