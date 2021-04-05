@@ -175,6 +175,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('susutcpt-load','Esaku\Aktap\PercepatanController@loadDataAktap');
     $router->post('susutcpt','Esaku\Aktap\PercepatanController@store');
 
+    // Penghapusan
+    $router->get('hapus-aktap','Esaku\Aktap\PenghapusanController@index');
+    $router->get('hapus-aktap-detail','Esaku\Aktap\PenghapusanController@show');
+    $router->post('hapus-aktap','Esaku\Aktap\PenghapusanController@store');
+    $router->put('hapus-aktap-ubah','Esaku\Aktap\PenghapusanController@update');
+    $router->delete('hapus-aktap','Esaku\Aktap\PenghapusanController@destroy');
+    $router->get('hapus-aktap-aktap','Esaku\Aktap\PenghapusanController@getAktap');
+    $router->get('hapus-aktap-akun','Esaku\Aktap\PenghapusanController@getAkunBeban');
+    $router->get('hapus-aktap-load','Esaku\Aktap\PenghapusanController@loadData');
+
     // KASBANK
     //PEMASUKAN PENGELUARAN PINBOOK
     $router->get('kbdual','Esaku\KasBank\KasBankDualController@index');
