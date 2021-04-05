@@ -158,52 +158,39 @@ class LaporanAktapController extends Controller
             $periode=$request->input('periode')[1];
             $periode_susut=$request->input('periode_susut')[1];
             $sql = "select a.kode_lokasi,a.no_fa,a.nama,a.nilai,a.kode_klpakun,b.nama as nama_klp,a.periode,a.kode_pp,c.nama as nama_pp,
-            convert(a.tgl_perolehan,103) as tgl_perolehan,b.kode_akun,b.akun_bp,b.akun_deprs,d.nama as nama_akun,e.nama as nama_bp,f.nama as nama_deprs 
+            convert(varchar,a.tgl_perolehan,103) as tgl_perolehan,b.kode_akun,b.akun_bp,b.akun_deprs,d.nama as nama_akun,e.nama as nama_bp,f.nama as nama_deprs 
             from fa_asset a 
             inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi 
             inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             inner join masakun d on b.kode_akun=d.kode_akun and b.kode_lokasi=d.kode_lokasi
             inner join masakun e on b.akun_bp=e.kode_akun and b.kode_lokasi=e.kode_lokasi
-            inner join masakun f on b.akun_deprs=f.kode_akun and b.kode_lokasi=f.kode_lokasi";
+            inner join masakun f on b.akun_deprs=f.kode_akun and b.kode_lokasi=f.kode_lokasi
+            $where ";
          
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
-            $nb = "";
-            $resdata = array();
-            $i=0;
-            foreach($rs as $row){
-
-                $resdata[]=(array)$row;
-                if($i == 0){
-                    $nb .= "'$row->no_fa'";
-                }else{
-
-                    $nb .= ","."'$row->no_fa'";
-                }
-                $i++;
-            }
-
-            if($nb == ""){
-                $filter_nb = "";
-            }else{
-                $filter_nb = " and no_fa in ('$row->no_fa') ";
-            }
             
-            $sql2="select no_fasusut,periode,akun_bp,akun_ap,
-            case dc when 'D' then nilai else 0 end as debet,
-            case dc when 'C' then nilai else 0 end as kredit,nilai
-            from fasusut_d
-            where kode_lokasi='$row->kode_lokasi' and periode<='$periode_susut' $filter_nb
-            order by periode
-            " ;
-            $res2 = DB::connection($this->sql)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
+                $nb = "";
+                $resdata = array();
+                $i=0;
+                for($i=0;$i < count($res); $i++){
+    
+                    $sql2="select no_fasusut,periode,akun_bp,akun_ap,
+                    case dc when 'D' then nilai else 0 end as debet,
+                    case dc when 'C' then nilai else 0 end as kredit,nilai
+                    from fasusut_d
+                    where kode_lokasi='".$res[$i]['kode_lokasi']."' and periode<='$periode_susut' and no_fa in ('".$res[$i]['no_fa']."')
+                    order by periode
+                    " ;
+                    $res2 = DB::connection($this->sql)->select($sql2);
+                    $res[$i]['detail'] = json_decode(json_encode($res2),true);
+                    $i++;
+                }
+                
                 $success['data'] = $res;
-                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
@@ -212,8 +199,6 @@ class LaporanAktapController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data_detail'] = [];
-                $success['sql'] = $sql;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
