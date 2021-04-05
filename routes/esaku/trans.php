@@ -170,6 +170,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('susut-hitung','Esaku\Aktap\PenyusutanController@hitungPenyusutan');
     $router->post('susut','Esaku\Aktap\PenyusutanController@store');
 
+    //Data Percepatan
+    $router->get('susutcpt-noaktap','Esaku\Aktap\PercepatanController@getNoAktap');
+    $router->get('susutcpt-load','Esaku\Aktap\PercepatanController@loadDataAktap');
+    $router->post('susutcpt','Esaku\Aktap\PercepatanController@store');
+
     // KASBANK
     //PEMASUKAN PENGELUARAN PINBOOK
     $router->get('kbdual','Esaku\KasBank\KasBankDualController@index');
