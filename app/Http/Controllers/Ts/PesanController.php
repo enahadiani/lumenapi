@@ -288,29 +288,29 @@ class PesanController extends Controller
                 $kode_kelas = '-';
                 $sql = "select a.nik,c.id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
-                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                where a.kode_pp='$request->kode_pp' and b.nis='$nis' ";
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' and c.flag_aktif='1' and b.nis='$nis' ";
             }
             else if($request->jenis == "Kelas"){
                 $nis = '-';
                 $kode_kelas = $request->kontak;
                 $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
-                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                where a.kode_pp='$request->kode_pp' and b.kode_kelas='$kode_kelas' ";
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' and c.flag_aktif='1' and b.kode_kelas='$kode_kelas' ";
             }
             else{
                 $nis = "-";
                 $kode_kelas = "-";
                 $sql = "select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
                 inner join sis_siswa b on a.nik = b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
-                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                where a.kode_pp='$request->kode_pp' 
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' and c.flag_aktif='1' 
                 union all
                 select a.nik,isnull(c.id_device,'-') as id_device from sis_hakakses a
                 inner join sis_guru b on a.nik = b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp 
-                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-                where a.kode_pp='$request->kode_pp' ";
+                left join users_device c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
+                where a.kode_pp='$request->kode_pp' and c.flag_aktif='1' ";
             }
             
             $ref1 = (isset($request->ref1) && $request->ref1 != "" ? $request->ref1 : '-');

@@ -347,11 +347,11 @@ class AuthController extends Controller
                 if(count($get) > 0){
                     if($get[0]->jum == 0){
                         $ins = DB::connection('sqlsrvyptkug')->insert("insert into users_device (
-                            id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
+                            id_device,nik,nu,kode_lokasi,kode_pp,tgl_input,flag_aktif) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate(),'1') ");
                     }
                 }else{
                     $ins = DB::connection('sqlsrvyptkug')->insert("insert into users_device (
-                        id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate()) ");
+                        id_device,nik,nu,kode_lokasi,kode_pp,tgl_input,flag_aktif) values('$request->id_device','$request->nik',$nu,'$kode_lokasi','$kode_pp',getdate(),'1') ");
                 }
 
             }
@@ -370,7 +370,7 @@ class AuthController extends Controller
         DB::connection('sqlsrvyptkug')->beginTransaction();
         try{
             
-            $ins = DB::connection('sqlsrvyptkug')->update("delete from users_device where nik='$request->nik' and id_device='$request->id_device' ");
+            $ins = DB::connection('sqlsrvyptkug')->update("update users_device set flag_aktif='0' where nik='$request->nik' and id_device='$request->id_device' ");
 
             DB::connection('sqlsrvyptkug')->commit();
             $success['status'] = true;
