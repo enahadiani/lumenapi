@@ -82,7 +82,6 @@ class AnggaranExport2 implements FromCollection, WithHeadings
                    [
                        'kode_akun',
                        'kode_pp',
-                       'kode_drk',
                        'n1',
                        'n2',
                        'n3',
