@@ -394,41 +394,33 @@ class PenghapusanController extends Controller
             
             if($cek['status']){
                 
-                if(floatval($request->nilai) <= 0){
-                    DB::connection($this->db)->rollback();
-                    $msg = "Transaksi tidak valid. Nilai penyusutan tidak boleh nol atau kurang";
-                    $sts = false;
-                    $success['no_bukti'] = '-';
-                }else{
-                    $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-        
-                    $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-        
-                    $del3 = DB::connection($this->db)->table('fawoapp_d')->where('kode_lokasi', $kode_lokasi)->where('no_woapp', $no_bukti)->delete();
-                    
-                    $upd = DB::connection($this->db)->update("update fa_asset set progress = '2' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
-
-    
-                    $ins = DB::connection($this->db)->update("update fa_asset set progress = 'W' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
-
-					$ins = DB::connection($this->db)->insert("insert into fawoapp_d(no_woapp,kode_lokasi,no_fa,periode,nilai,nilai_ap,kode_akun,akun_ap,kode_pp,kode_drk,akun_beban) values ('".$no_bukti."','".$kode_lokasi."','".$request->no_fa."','".$periode."',".floatval($request->harga_perolehan).",".floatval($request->total_susut).",'".$request->kode_akun."','".$request->akun_deprs."','".$request->kode_ppsusut."','-','".$request->akun_beban."')");					
-					
-					$ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','AT','WO','F','-','-','".$request->kode_ppsusut."','".$request->tanggal."','".$request->no_dokumen."','".$request->keterangan."','IDR',1,".floatval($request->harga_perolehan).",".floatval($request->total_susut).",0,'".$nik."','-','-','".$request->no_fa."','-','-','".$request->akun_beban."','-','-')");
-
-					$beban = floatval($request->nilai_residu) + floatval($request->nilai_buku);
-					$ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_beban."','D',".$beban.",".$beban.",'".$request->keterangan."','AT','BEBAN','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','-','-','-')");		
-
-					$ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',1,'".$request->akun_deprs."','D',".floatval($request->total_susut).",".floatval($request->total_susut).",'".$request->keterangan."','AT','AP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','".$request->no_fa."','-','-')");
-                            					
-					$ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',2,'".$request->kode_akun."','C',".floatval($request->harga_perolehan).",".floatval($request->harga_perolehan).",'".$request->keterangan."','AT','AKTAP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','".$request->no_fa."','-','-')");	
-
-                    DB::connection($this->db)->commit();
-    
-                    $msg = "Data Penyusutan berhasil disimpan.";
-                    $sts = true;
-                    $success['no_bukti'] = $no_bukti;
-                }
-
+                $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                
+                $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                
+                $del3 = DB::connection($this->db)->table('fawoapp_d')->where('kode_lokasi', $kode_lokasi)->where('no_woapp', $no_bukti)->delete();
+                
+                $upd = DB::connection($this->db)->update("update fa_asset set progress = '2' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                
+                
+                $ins = DB::connection($this->db)->update("update fa_asset set progress = 'W' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                
+                $ins = DB::connection($this->db)->insert("insert into fawoapp_d(no_woapp,kode_lokasi,no_fa,periode,nilai,nilai_ap,kode_akun,akun_ap,kode_pp,kode_drk,akun_beban) values ('".$no_bukti."','".$kode_lokasi."','".$request->no_fa."','".$periode."',".floatval($request->harga_perolehan).",".floatval($request->total_susut).",'".$request->kode_akun."','".$request->akun_deprs."','".$request->kode_ppsusut."','-','".$request->akun_beban."')");					
+                
+                $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','AT','WO','F','-','-','".$request->kode_ppsusut."','".$request->tanggal."','".$request->no_dokumen."','".$request->keterangan."','IDR',1,".floatval($request->harga_perolehan).",".floatval($request->total_susut).",0,'".$nik."','-','-','".$request->no_fa."','-','-','".$request->akun_beban."','-','-')");
+                
+                $beban = floatval($request->nilai_residu) + floatval($request->nilai_buku);
+                $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',0,'".$request->akun_beban."','D',".$beban.",".$beban.",'".$request->keterangan."','AT','BEBAN','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','-','-','-')");		
+                
+                $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',1,'".$request->akun_deprs."','D',".floatval($request->total_susut).",".floatval($request->total_susut).",'".$request->keterangan."','AT','AP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','".$request->no_fa."','-','-')");
+                
+                $ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','".$request->no_dokumen."','".$request->tanggal."',2,'".$request->kode_akun."','C',".floatval($request->harga_perolehan).",".floatval($request->harga_perolehan).",'".$request->keterangan."','AT','AKTAP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','".$request->no_fa."','-','-')");	
+                
+                DB::connection($this->db)->commit();
+                
+                $msg = "Data Penyusutan berhasil diubah.";
+                $sts = true;
+                $success['no_bukti'] = $no_bukti;
             }else{
                 
                 DB::connection($this->db)->rollback();
@@ -452,7 +444,7 @@ class PenghapusanController extends Controller
     {
         $this->validate($request, [
             'no_bukti' => 'required',
-            'tanggal' => 'required'
+            'periode' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -465,32 +457,33 @@ class PenghapusanController extends Controller
             }
 
             
-            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $periode = $request->periode;
+            $no_bukti = $request->no_bukti;
             $cek = $this->doCekPeriode2('AT',$status_admin,$periode);
             
             if($cek['status']){
                 
-                if(floatval($request->nilai) <= 0){
-                    DB::connection($this->db)->rollback();
-                    $msg = "Transaksi tidak valid. Nilai penyusutan tidak boleh nol atau kurang";
-                    $sts = false;
-                    $success['no_bukti'] = '-';
-                }else{
-                    
+                    $get = DB::connection($this->db)->select("select no_ref1 as no_fa from trans_m where kode_lokasi='$kode_lokasi' and no_bukti='$no_bukti' ");
+                    if(count($get) > 0){
+                        $no_fa = $get[0]->no_fa;
+                    }else{
+                        $no_fa = '-';
+                    }
+
                     $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
         
                     $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
         
                     $del3 = DB::connection($this->db)->table('fawoapp_d')->where('kode_lokasi', $kode_lokasi)->where('no_woapp', $no_bukti)->delete();
                     
-                    $upd = DB::connection($this->db)->update("update fa_asset set progress = '2' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                    $upd = DB::connection($this->db)->update("update fa_asset set progress = '2' where no_fa='".$no_fa."' and kode_lokasi='".$kode_lokasi."'");
                     
                     DB::connection($this->db)->commit();
     
                     $msg = "Data Penyusutan berhasil dihapus.";
                     $sts = true;
                     $success['no_bukti'] = $no_bukti;
-                }
+                    $success['no_fa'] = $no_fa;
 
             }else{
                 

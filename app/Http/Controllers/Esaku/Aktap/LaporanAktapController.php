@@ -555,8 +555,8 @@ class LaporanAktapController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','no_woapp');
-            $db_col_name = array('a.periode','a.no_woapp');
+            $col_array = array('periode','no_bukti');
+            $db_col_name = array('a.periode','a.no_bukti');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -584,64 +584,42 @@ class LaporanAktapController extends Controller
             }
             $periode=$request->input('periode')[1];
             $periode_susut=$request->input('periode_susut')[1];
-            $sql="select a.no_woapp as no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.kode_akun,b.nama,a.kode_pp,a.kode_drk,a.keterangan, 
+            $sql="select a.no_bukti,a.no_dokumen,convert(varchar,a.tanggal,103) as tanggal,a.kode_akun,b.nama,a.kode_pp,a.kode_drk,a.keterangan, 
             case when a.dc='D' then a.nilai else 0 end as debet,case when a.dc='C' then a.nilai else 0 end as kredit 
-            from fawoapp_j a  
+            from trans_j a  
+            inner join fawoapp_d c on a.no_bukti=c.no_woapp and a.kode_lokasi=c.kode_lokasi
             inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
             $where
-            order by a.periode,a.no_woapp,a.dc desc";
+            order by a.periode,a.no_bukti,a.dc desc";
+            // $success['req'] = $request->all();
 
             if($request->format[1] == "Memo Jurnal"){
-                $sql="select a.no_woapp,a.no_dokumen,a.kode_lokasi,a.periode,a.tanggal,convert(varchar,a.tanggal,103) as tanggal1,a.keterangan,a.kode_lokasi,
-                a.nik_buat,a.nik_setuju,b.nama as nama_buat,c.nama as nama_setuju,d.kota
-                from fawoapp_m a
+                $sql="select a.no_bukti,a.no_dokumen,a.kode_lokasi,a.periode,a.tanggal,convert(varchar,a.tanggal,103) as tanggal1,a.keterangan,a.kode_lokasi,
+                a.nik_user,a.nik2,b.nama as nama_buat,c.nama as nama_setuju,d.kota
+                from trans_m a
                 inner join lokasi d on a.kode_lokasi=d.kode_lokasi
-                left join karyawan b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
-                left join karyawan c on a.nik_setuju=c.nik and a.kode_lokasi=c.kode_lokasi $where ";
+                left join karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+                left join karyawan c on a.nik2=c.nik and a.kode_lokasi=c.kode_lokasi $where and a.modul='AT' and a.form='WO' ";
             }
          
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
-            $nb = "";
-            $resdata = array();
-            $i=0;
-            if($request->format[1] == "Memp Jurnal"){
-
-                foreach($rs as $row){
-    
-                    $resdata[]=(array)$row;
-                    if($i == 0){
-                        $nb .= "'$row->no_woapp'";
-                    }else{
-    
-                        $nb .= ","."'$row->no_woapp'";
-                    }
-                    $i++;
-                }
-    
-                if($nb == ""){
-                    $filter_nb = "";
-                }else{
-                    $filter_nb = " and no_woapp in ('$row->no_woapp') ";
-                }
-                $sql2="select a.kode_akun,b.nama,a.keterangan,a.kode_pp,a.kode_drk,case dc when 'D' then nilai else 0 end as debet,case dc when 'C' then nilai else 0 end as kredit  
-                from fawoapp_j a
-                inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' $filter_nb
-                order by a.dc desc
-                " ;
-                $res2 = DB::connection($this->sql)->select($sql2);
-                $res2 = json_decode(json_encode($res2),true);
-            }else{
-                $res2 = array();
-            }
-            
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                if($request->format[1] == "Memo Jurnal"){
+                    for($i=0;$i < count($res);$i++){
+                        $sql2="select a.kode_akun,b.nama,a.keterangan,a.kode_pp,a.kode_drk,case dc when 'D' then nilai else 0 end as debet,case dc when 'C' then nilai else 0 end as kredit  
+                        from trans_j a
+                        inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.no_bukti ='".$res[$i]['no_bukti']."' 
+                        order by a.dc desc
+                        " ;
+                        $res2 = DB::connection($this->sql)->select($sql2);
+                        $res[$i]['detail'] = json_decode(json_encode($res2),true);
+                    }
+                }
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
@@ -650,7 +628,6 @@ class LaporanAktapController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data_detail'] = [];
                 $success['sql'] = $sql;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
@@ -661,6 +638,7 @@ class LaporanAktapController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
     function getSaldoAktapBln(Request $request){
         try {
             
@@ -669,8 +647,8 @@ class LaporanAktapController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('tahun','kode_klpakun','periode');
-            $db_col_name = array("substring(a.periode,1,4)",'a.kode_klpakun','a.periode');
+            $col_array = array('kode_klpakun');
+            $db_col_name = array('a.kode_klpakun');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -698,11 +676,11 @@ class LaporanAktapController extends Controller
             }
 
             if($request->kode_pp[0] == "Range"){
-               $filter_pp = " where a.kode_pp between '".$request->kode_pp[1]."' and '".$request->kode_pp[2]."' ";
+               $filterpp = " where a.kode_pp between '".$request->kode_pp[1]."' and '".$request->kode_pp[2]."' ";
             }else if ($request->kode_pp[0] == "="){
-               $filter_pp = " where a.kode_pp = '".$request->kode_pp[1]."' ";
+               $filterpp = " where a.kode_pp = '".$request->kode_pp[1]."' ";
             }else{
-               $filter_pp = "";
+               $filterpp = "";
             }
             $periode=$request->input('periode')[1];
             $periode_susut=$request->input('periode_susut')[1];
@@ -771,7 +749,7 @@ class LaporanAktapController extends Controller
                         where a.kode_lokasi='$kode_lokasi' and b.periode='$periode' and a.progress not in ('K','P') and a.jenis<>'I' $filterpp
                         group by a.kode_klpakun,a.kode_lokasi
                         )ff on a.kode_klpakun=ff.kode_klpakun and a.kode_lokasi=ff.kode_lokasi	
-            $this->filter  
+            $where  
             order by a.kode_klpakun ";
          
             $rs = DB::connection($this->sql)->select($sql);
