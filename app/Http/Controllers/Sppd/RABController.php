@@ -421,7 +421,7 @@ class RABController extends Controller
             // SAVE LOG TO DB
             $log = print_r($request->all(), true); 
             $save_log = DB::connection($this->db)->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
-            values ('$no_bukti','$kode_lokasi',getdate(),$nik,'".$log."') ");
+            values ('$no_bukti','$kode_lokasi',getdate(),'$nik','".$log."') ");
             // END SAVE
 
             $detail_proyek = $this->getDetailProyek($datam['kode_proyek'],$no_bukti);

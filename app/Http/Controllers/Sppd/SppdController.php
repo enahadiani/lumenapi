@@ -349,7 +349,7 @@ class SppdController extends Controller
                 // SAVE LOG TO DB
                 $log = print_r($request->all(), true); 
                 $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
-                values ('$no_agenda','$kode_lokasi',getdate(),$nik,'".$log."') ");
+                values ('$no_agenda','$kode_lokasi',getdate(),'$nik','".$log."') ");
                 // END SAVE
     
                 $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
