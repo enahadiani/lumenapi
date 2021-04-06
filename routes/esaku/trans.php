@@ -181,7 +181,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('hapus-aktap','Esaku\Aktap\PenghapusanController@store');
     $router->put('hapus-aktap-ubah','Esaku\Aktap\PenghapusanController@update');
     $router->delete('hapus-aktap','Esaku\Aktap\PenghapusanController@destroy');
-    $router->get('hapus-aktap-aktap','Esaku\Aktap\PenghapusanController@getAktap');
+    $router->get('hapus-aktap-noaktap','Esaku\Aktap\PenghapusanController@getAktap');
     $router->get('hapus-aktap-akun','Esaku\Aktap\PenghapusanController@getAkunBeban');
     $router->get('hapus-aktap-load','Esaku\Aktap\PenghapusanController@loadData');
 

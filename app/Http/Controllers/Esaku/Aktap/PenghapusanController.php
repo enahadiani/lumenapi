@@ -319,7 +319,7 @@ class PenghapusanController extends Controller
         
     }
 
-    public function loadDataAktap(Request $request)
+    public function loadData(Request $request)
     {
         $this->validate($request,[
             'periode' => 'required',
@@ -515,6 +515,44 @@ class PenghapusanController extends Controller
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     
+    }
+
+    public function show(Request $request)
+    {
+        $this->validate($request,[
+            'no_bukti' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $filter = " and no_bukti='$request->no_bukti' ";
+            
+            $sql = "select no_bukti,no_dokumen,keterangan,no_ref1 as no_fa,tanggal,param1 as akun_beban from trans_m where kode_lokasi='".$kode_lokasi."' $filter";		
+            $res = DB::connection($this->db)->select($sql);	
+            $res= json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 }
 

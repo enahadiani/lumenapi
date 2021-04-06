@@ -228,6 +228,7 @@ class JuspoController extends Controller
                 $del2 = DB::connection($this->db)->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                 $del3 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
+
             }else{
                 
                 // $no_bukti = $this->generateKode("apv_juspo_m", "no_bukti", "APP-", "0001");
@@ -239,6 +240,8 @@ class JuspoController extends Controller
                 $tahun = substr($request->tanggal,0,4);
                 $no_dokumen = $this->generateKode2("apv_juspo_m", "no_dokumen", $format, "00001", $format2,$tahun,$kode_lokasi);
             }
+
+            $del4 = DB::connection($this->db)->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $request->input('no_aju'))->delete();
 
             $inshis = DB::connection($this->db)->insert("insert into apv_juspo_his (no_juspo,keterangan,status,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->keterangan','$request->status','$kode_lokasi','$nik_user',getdate())");
 
@@ -316,11 +319,16 @@ class JuspoController extends Controller
             $ppn = $request->input('ppn');
             $grand_total = $request->input('grand_total');
 
+            $total=0;
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
                     $ins2[$i] = DB::connection($this->db)->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                    $insj_d[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                    $total+=floatval($grand_total[$i]);
                 }
             }
+
+            $upd_juskeb = DB::connection($this->db)->update("update apv_juskeb_m set nilai=".$total." where no_bukti='".$request->input('no_aju')."' and kode_lokasi='$kode_lokasi' ");
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
@@ -721,6 +729,8 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             $del2 = DB::connection($this->db)->table('apv_juspo_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del3 = DB::connection($this->db)->table('apv_flow')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
 
+            $del4 = DB::connection($this->db)->table('apv_juskeb_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $request->input('no_aju'))->delete();
+
             $inshis = DB::connection($this->db)->insert("insert into apv_juspo_his (no_juspo,keterangan,status,kode_lokasi,nik_user,tgl_input) values ('$no_bukti','$request->keterangan','$request->status','$kode_lokasi','$nik_user',getdate())");
 
             $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('$no_bukti','$kode_lokasi','$request->keterangan',getdate(),-1,'$request->status','PO') ");
@@ -752,11 +762,18 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             $ppn = $request->input('ppn');
             $grand_total = $request->input('grand_total');
 
+            $total=0;
             if(count($barang) > 0){
                 for($i=0; $i<count($barang);$i++){
                     $ins2[$i] = DB::connection($this->db)->insert("insert into apv_juspo_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+
+                    $insj_d[$i] = DB::connection($this->db)->insert("insert into apv_juskeb_d (kode_lokasi,no_bukti,barang,barang_klp,harga,jumlah,no_urut,nilai,ppn,grand_total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($kode_lokasi,$no_bukti,$barang[$i],$barang_klp[$i],$harga[$i],$qty[$i],$i,$subtotal[$i],$ppn[$i],$grand_total[$i]));
+                    
+                    $total+=floatval($grand_total[$i]);
                 }
             }
+
+            $upd_juskeb = DB::connection($this->db)->update("update apv_juskeb_m set nilai=".$total." where no_bukti='".$request->input('no_aju')."' and kode_lokasi='$kode_lokasi' ");
 
             if(count($arr_nama) > 0){
                 for($i=0; $i<count($arr_nama);$i++){
