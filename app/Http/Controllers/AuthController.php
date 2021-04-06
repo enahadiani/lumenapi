@@ -363,14 +363,19 @@ class AuthController extends Controller
     public function logoutTs(Request $request)
     {
         $this->validate($request, [
-            'nik' => 'required|string',
             'id_device' => 'required|string',
         ]);
 
         DB::connection('sqlsrvyptkug')->beginTransaction();
         try{
             
-            $ins = DB::connection('sqlsrvyptkug')->update("update users_device set flag_aktif='0' where nik='$request->nik' and id_device='$request->id_device' ");
+            if(isset($request->nik) && $request->nik != ""){
+                
+                $ins = DB::connection('sqlsrvyptkug')->update("update users_device set flag_aktif='0' where nik='$request->nik' and id_device='$request->id_device' ");
+            }else{
+                $ins = DB::connection('sqlsrvyptkug')->update("update users_device set flag_aktif='0' where id_device='$request->id_device' ");
+
+            }
 
             DB::connection('sqlsrvyptkug')->commit();
             $success['status'] = true;

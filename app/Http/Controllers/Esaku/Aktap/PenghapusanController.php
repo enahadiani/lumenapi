@@ -192,12 +192,7 @@ class PenghapusanController extends Controller
 
             if($cek['status']){
 
-                if(floatval($request->nilai) <= 0){
-                    DB::connection($this->db)->rollback();
-                    $msg = "Transaksi tidak valid. Nilai penyusutan tidak boleh nol atau kurang";
-                    $sts = false;
-                    $success['no_bukti'] = '-';
-                }else{
+                
 
                     $no_bukti = $this->generateKode("trans_m", "no_bukti", "WO/".substr($periode,2, 4)."/", "0001");
     
@@ -219,7 +214,6 @@ class PenghapusanController extends Controller
                     $msg = "Data Penyusutan berhasil disimpan.";
                     $sts = true;
                     $success['no_bukti'] = $no_bukti;
-                }
 
             }else{
                 
