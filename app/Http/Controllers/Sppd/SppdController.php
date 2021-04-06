@@ -345,6 +345,12 @@ class SppdController extends Controller
     
                 $no_agenda = $this->generateKode("it_aju_m", "no_aju", $kode_lokasi."-".substr($datam[0]['periode'],2,2).".", "00001");
                 $no_bukti = $this->generateKode("tu_pdapp_m", "no_app", $kode_lokasi."-PDA".substr($datam[0]['periode'],2,4).".", "0001");
+
+                // SAVE LOG TO DB
+                $log = print_r($request->all(), true); 
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
+                values ('$no_agenda','$kode_lokasi',getdate(),$nik,'".$log."') ");
+                // END SAVE
     
                 $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
                 $res = json_decode(json_encode($res),true);
@@ -716,6 +722,31 @@ class SppdController extends Controller
         $cekB = json_decode(json_encode($this->cekBudget($request)),true);
         $dtbugdet = $cekB['original'];
         dump($dtbugdet["saldo_budget"]);
+    }
+
+    public function tes_store(Request $request){
+
+		DB::connection('sqlsrvyptkug')->beginTransaction();
+        try{
+            if($data =  Auth::guard('ypt')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_agenda = $this->generateKode("sppd_log", "no_bukti", $kode_lokasi."-".substr("202104",2,2).".", "00001");
+            $log = print_r($request->all(), true); 
+            DB::connection('sqlsrvyptkug')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
+            values ('$no_agenda','$kode_lokasi',getdate(),$nik,'".$log."') ");
+            DB::connection('sqlsrvyptkug')->commit();
+
+            $success['message'] = "OK";
+            $success['status'] = true;
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvyptkug')->rollback();
+            $success['message'] = $e;
+            $success['status'] = false;
+            return response()->json($success, 500);
+        }
     }
 
 }

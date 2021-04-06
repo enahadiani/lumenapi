@@ -61,6 +61,7 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
 
     
     $router->post('cek', 'Sppd\SppdController@cek');
+    $router->post('tes-store', 'Sppd\SppdController@tes_store');
 
     // RAB
     $router->get('rab-cust', 'Sppd\RABController@getCust');
