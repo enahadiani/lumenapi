@@ -235,16 +235,17 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('anggaran','Esaku\Anggaran\AnggaranController@store');  
 
     // RRA AJU
-    $router->get('rra-agg-drk','Esaku\Anggaran\PengajuanRRAController@getDRK'); 
     $router->get('rra-agg-saldo','Esaku\Anggaran\PengajuanRRAController@getSaldo'); 
-    $router->get('rra-agg','Esaku\Anggaran\PengajuanRRAController@index');          
+    $router->get('rra-agg','Esaku\Anggaran\PengajuanRRAController@index');    
+    $router->get('rra-agg-detail','Esaku\Anggaran\PengajuanRRAController@show');          
     $router->post('rra-agg','Esaku\Anggaran\PengajuanRRAController@store'); 
     $router->put('rra-agg','Esaku\Anggaran\PengajuanRRAController@update');    
     $router->delete('rra-agg','Esaku\Anggaran\PengajuanRRAController@destroy'); 
     $router->get('rra-nik-app','Esaku\Anggaran\PengajuanRRAController@getNIKApp'); 
     $router->get('rra-pp-terima','Esaku\Anggaran\PengajuanRRAController@getPPTerima');
     $router->get('rra-akun-terima','Esaku\Anggaran\PengajuanRRAController@getAkunTerima');
-    $router->get('rra-drk-terima','Esaku\Anggaran\PengajuanRRAController@getDRKTerima'); 
+    $router->get('rra-mta','Esaku\Anggaran\PengajuanRRAController@getAkun');
+    $router->get('rra-pp','Esaku\Anggaran\PengajuanRRAController@getPP');
 
     $router->post('send-whatsapp','Esaku\Setting\WAController@sendMessage'); 
     $router->get('msg-whatsapp','Esaku\Setting\WAController@Messages'); 
