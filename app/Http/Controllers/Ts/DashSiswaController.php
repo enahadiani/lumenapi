@@ -748,24 +748,31 @@ class DashSiswaController extends Controller
             }
 
             $filter_bill = "";
+            $filter_midtrans = "";
             if(isset($request->kode_sem) && $request->kode_sem != ""){
                 if($request->kode_sem == "all"){
                     $filter_bill .="";
+                    $filter_midtrans .="";
                 }else{  
                     $filter_bill .=" and x.kode_sem='$request->kode_sem' ";
+                    $filter_midtrans .=" and y.kode_sem='$request->kode_sem' ";
                 }
             }else{
                 $filter_bill .="";
+                $filter_midtrans .="";
             }
 
             if(isset($request->kode_ta) && $request->kode_ta != ""){
                 if($request->kode_ta == "all"){
                     $filter_bill .="";
+                    $filter_midtrans .="";
                 }else{  
                     $filter_bill .=" and x.kode_ta='$request->kode_ta' ";
+                    $filter_midtrans .=" and y.kode_ta='$request->kode_ta' ";
                 }
             }else{
                 $filter_bill .="";
+                $filter_midtrans .="";
             }
 
 
@@ -848,12 +855,14 @@ class DashSiswaController extends Controller
                 'KBMID' as modul, isnull(a.tagihan,0) as total,a.id_bank,b.status,b.snap_token
                 from (select x.kode_lokasi,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
                     from sis_mid_bayar_d x 
-                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
+                    inner join sis_bill_d y on x.no_bill=y.no_bill and x.kode_pp=y.kode_pp and x.kode_lokasi=y.kode_lokasi
+                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_midtrans 
                     group by x.kode_lokasi,x.no_bukti )a 
                 inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
             ) a
             $filter_jenis
             order by a.tanggal desc";
+            // $success['sql'] = $sql;
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['rows'] = count($res);
