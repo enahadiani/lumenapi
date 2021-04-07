@@ -313,7 +313,7 @@ class AktapController extends Controller
                 $status_admin=$rs->status_admin;
             }
 
-            $ins2[$i] = DB::connection($this->db)->update("update fa_asset set nama='".$request->nama."',no_seri='".$request->no_seri."',merk='".$request->merk."',tipe='".$request->tipe."',nilai_residu=".floatval($request->nilai_residu).",kode_pp='".$request->kode_pp."',kode_pp_susut='".$request->kode_pp_susut."' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+            $update = DB::connection($this->db)->update("update fa_asset set nama='".$request->nama."',no_seri='".$request->no_seri."',merk='".$request->merk."',tipe='".$request->tipe."',nilai_residu=".floatval($request->nilai_residu).",kode_pp='".$request->kode_pp."',kode_pp_susut='".$request->kode_pp_susut."' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
             
             $sts = true;
             $msg = "Data Aktiva Tetap berhasil diubah. ";  
