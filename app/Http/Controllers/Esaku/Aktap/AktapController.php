@@ -349,8 +349,19 @@ class AktapController extends Controller
 
             $get = DB::connection($this->db)->select("select isnull(count(*),0)  as jml from fasusut_d where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
             if (count($get) > 0){
-                $msg = "Transaksi tidak valid. Sudah pernah disusutkan, data tidak bisa dihapus.";
-                $sts = false;
+                if(intval($get[0]->jml) > 0){
+
+                    $msg = "Transaksi tidak valid. Sudah pernah disusutkan, data tidak bisa dihapus.";
+                    $sts = false;
+                }else{
+                    $del1 = DB::connection($this->db)->update("delete from fa_asset where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                    $del2 = DB::connection($this->db)->update("delete from fa_nilai where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                    
+                    $sts = true;
+                    $msg = "Data Aktiva Tetap berhasil dihapus. ";  
+                    DB::connection($this->db)->commit();
+
+                }
             }else{
                 $del1 = DB::connection($this->db)->update("delete from fa_asset where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
                 $del2 = DB::connection($this->db)->update("delete from fa_nilai where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
