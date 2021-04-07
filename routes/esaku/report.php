@@ -18,35 +18,35 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Filter Laporan
-    $router->get('filter-periode','Esaku\Inventori\FilterController@getFilterPeriode');
-    $router->get('filter-nik','Esaku\Inventori\FilterController@getFilterNIK');
-    $router->get('filter-tanggal','Esaku\Inventori\FilterController@getFilterTanggal');
-    $router->get('filter-bukti','Esaku\Inventori\FilterController@getFilterNoBukti');
-    $router->get('filter-barang','Esaku\Inventori\FilterController@getFilterBarang');
-    $router->get('filter-periode-close','Esaku\Inventori\FilterController@getFilterPeriodeClose');
-    $router->get('filter-nik-close','Esaku\Inventori\FilterController@getFilterNIKClose');
-    $router->get('filter-bukti-close','Esaku\Inventori\FilterController@getFilterNoBuktiClose');
-    $router->get('filter-periode-pmb','Esaku\Inventori\FilterController@getFilterPeriodePmb');
-    $router->get('filter-nik-pmb','Esaku\Inventori\FilterController@getFilterNIKPmb');
-    $router->get('filter-bukti-pmb','Esaku\Inventori\FilterController@getFilterNoBuktiPmb');
-    $router->get('filter-periode-retur','Esaku\Inventori\FilterController@getFilterPeriodeRetur');
-    $router->get('filter-nik-retur','Esaku\Inventori\FilterController@getFilterNIKRetur');
-    $router->get('filter-bukti-retur','Esaku\Inventori\FilterController@getFilterNoBuktiRetur');
-    $router->get('filter-akun','Esaku\Inventori\FilterController@getFilterAkun');
-    $router->get('filter-periode-keu','Esaku\Inventori\FilterController@getFilterPeriodeKeuangan');
-    $router->get('filter-fs','Esaku\Inventori\FilterController@getFilterFS');
-    $router->get('filter-level','Esaku\Inventori\FilterController@getFilterLevel');
-    $router->get('filter-format','Esaku\Inventori\FilterController@getFilterFormat');
-    $router->get('filter-sumju','Esaku\Inventori\FilterController@getFilterYaTidak');
-    $router->get('filter-modul','Esaku\Inventori\FilterController@getFilterModul');
-    $router->get('filter-bukti-jurnal','Esaku\Inventori\FilterController@getFilterBuktiJurnal');
-    $router->get('filter-mutasi','Esaku\Inventori\FilterController@getFilterYaTidak');
-    $router->get('filter-gudang','Esaku\Inventori\FilterController@getFilterGudang');
-    $router->get('filter-barang-klp','Esaku\Inventori\FilterController@getFilterKlpBarang');
-    $router->get('filter-tahun-keu','Esaku\Inventori\FilterController@getFilterTahun');
-    $router->get('filter-bukti-mutasi','Esaku\Inventori\FilterController@getFilterBuktiMutasi');
-    $router->get('filter-bukti-kontrol-mutasi','Esaku\Inventori\FilterController@getFilterBuktiKontrolMutasi');
-    $router->get('filter-pp-keu','Esaku\Inventori\FilterController@getFilterPP');
+    $router->get('filter-periode','Esaku\Keuangan\FilterController@getFilterPeriode');
+    $router->get('filter-nik','Esaku\Keuangan\FilterController@getFilterNIK');
+    $router->get('filter-tanggal','Esaku\Keuangan\FilterController@getFilterTanggal');
+    $router->get('filter-bukti','Esaku\Keuangan\FilterController@getFilterNoBukti');
+    $router->get('filter-barang','Esaku\Keuangan\FilterController@getFilterBarang');
+    $router->get('filter-periode-close','Esaku\Keuangan\FilterController@getFilterPeriodeClose');
+    $router->get('filter-nik-close','Esaku\Keuangan\FilterController@getFilterNIKClose');
+    $router->get('filter-bukti-close','Esaku\Keuangan\FilterController@getFilterNoBuktiClose');
+    $router->get('filter-periode-pmb','Esaku\Keuangan\FilterController@getFilterPeriodePmb');
+    $router->get('filter-nik-pmb','Esaku\Keuangan\FilterController@getFilterNIKPmb');
+    $router->get('filter-bukti-pmb','Esaku\Keuangan\FilterController@getFilterNoBuktiPmb');
+    $router->get('filter-periode-retur','Esaku\Keuangan\FilterController@getFilterPeriodeRetur');
+    $router->get('filter-nik-retur','Esaku\Keuangan\FilterController@getFilterNIKRetur');
+    $router->get('filter-bukti-retur','Esaku\Keuangan\FilterController@getFilterNoBuktiRetur');
+    $router->get('filter-akun','Esaku\Keuangan\FilterController@getFilterAkun');
+    $router->get('filter-periode-keu','Esaku\Keuangan\FilterController@getFilterPeriodeKeuangan');
+    $router->get('filter-fs','Esaku\Keuangan\FilterController@getFilterFS');
+    $router->get('filter-level','Esaku\Keuangan\FilterController@getFilterLevel');
+    $router->get('filter-format','Esaku\Keuangan\FilterController@getFilterFormat');
+    $router->get('filter-sumju','Esaku\Keuangan\FilterController@getFilterYaTidak');
+    $router->get('filter-modul','Esaku\Keuangan\FilterController@getFilterModul');
+    $router->get('filter-bukti-jurnal','Esaku\Keuangan\FilterController@getFilterBuktiJurnal');
+    $router->get('filter-mutasi','Esaku\Keuangan\FilterController@getFilterYaTidak');
+    $router->get('filter-gudang','Esaku\Keuangan\FilterController@getFilterGudang');
+    $router->get('filter-barang-klp','Esaku\Keuangan\FilterController@getFilterKlpBarang');
+    $router->get('filter-tahun-keu','Esaku\Keuangan\FilterController@getFilterTahun');
+    $router->get('filter-bukti-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiMutasi');
+    $router->get('filter-bukti-kontrol-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiKontrolMutasi');
+    $router->get('filter-pp-keu','Esaku\Keuangan\FilterController@getFilterPP');
 
     //Laporan
     $router->get('lap-barang','Esaku\Inventori\LaporanController@getReportBarang');
@@ -126,6 +126,19 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-simp-bayar','Esaku\Simpanan\LaporanController@getBayarSimpanan');
     $router->get('lap-simp-batal','Esaku\Simpanan\LaporanController@getBatalSimpanan');
     $router->get('lap-simp-rekap','Esaku\Simpanan\LaporanController@getRekapSimpanan');
+
+    //ANGGARAN
+    $router->get('filter-agg-tahun','Esaku\Anggaran\FilterController@getFilterTahun');
+    $router->get('filter-agg-akun','Esaku\Anggaran\FilterController@getFilterAkun');
+    $router->get('filter-agg-pp','Esaku\Anggaran\FilterController@getFilterPP');
+    $router->get('filter-agg-jenis','Esaku\Anggaran\FilterController@getFilterJenis');
+    $router->get('filter-agg-periodik','Esaku\Anggaran\FilterController@getFilterPeriodikLap');
+    $router->get('filter-agg-status','Esaku\Anggaran\FilterController@getFilterStatusAgg');
+
+    $router->get('lap-agg-anggaran','Esaku\Anggaran\LaporanController@getAnggaran');
+
+    
+
 
     
 
