@@ -210,5 +210,169 @@ class AktapController extends Controller
         
     }
 
+    public function getAktap(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select no_fa, nama from fa_asset where jenis='A' and kode_lokasi='".$kode_lokasi."' ");
+            $res= json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function show(Request $request)
+    {
+        $this->validate($request,[
+            'no_fa' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.periode,a.periode_susut,convert(varchar,a.tgl_perolehan,103) as tgl_perolehan,a.nama,a.no_seri,a.merk,a.tipe,a.nilai_residu,a.kode_pp,a.kode_pp_susut 
+            ,c.kode_klpfa+'-'+c.nama as klpfa,d.kode_klpakun+'-'+d.nama as klpakun,d.kode_akun+'-'+e.nama as akun, a.umur,a.persen,a.catatan 
+            ,zz.nilai as holeh, isnull(b.susut,0) as susut 
+            from fa_asset a 
+                    inner join (select no_fa,sum(case dc when 'D' then nilai else -nilai end) as nilai 
+                                from fa_nilai where kode_lokasi='".$kode_lokasi."' 
+                            group by kode_lokasi,no_fa) zz on a.no_fa=zz.no_fa  
+                    inner join fa_klp c on a.kode_klpfa=c.kode_klpfa and a.kode_lokasi=c.kode_lokasi 
+                    inner join fa_klpakun d on a.kode_klpakun=d.kode_klpakun and a.kode_lokasi=d.kode_lokasi 
+                    inner join masakun e on d.kode_akun=e.kode_akun and d.kode_lokasi=e.kode_lokasi 
+                    left join (select no_fa,sum(case dc when 'D' then nilai else -nilai end) as susut 
+                            from fasusut_d where kode_lokasi ='".$kode_lokasi."' 
+                            group by no_fa) b on a.no_fa=b.no_fa
+            where a.no_fa='".$request->no_fa."' and a.kode_lokasi='".$kode_lokasi."' ");
+            $res= json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'no_fa' => 'required',
+            'nama' => 'required',
+            'no_seri' => 'required',
+            'merk' => 'required',
+            'tipe' => 'required',
+            'nilai_residu' => 'required',
+            'kode_pp' => 'required',
+            'kode_pp_susut' => 'required',
+        ]);
+
+        
+        DB::connection($this->db)->beginTransaction();
+        try {
+
+            if($rs =  Auth::guard($this->guard)->user()){
+                $nik= $rs->nik;
+                $kode_lokasi= $rs->kode_lokasi;
+                $status_admin=$rs->status_admin;
+            }
+
+            $ins2[$i] = DB::connection($this->db)->update("update fa_asset set nama='".$request->nama."',no_seri='".$request->no_seri."',merk='".$request->merk."',tipe='".$request->tipe."',nilai_residu=".floatval($request->nilai_residu).",kode_pp='".$request->kode_pp."',kode_pp_susut='".$request->kode_pp_susut."' where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+            
+            $sts = true;
+            $msg = "Data Aktiva Tetap berhasil diubah. ";  
+            $success['no_fa'] = $nbfa2;
+            DB::connection($this->db)->commit();
+            
+            $success['status'] = $sts;
+            $success['message'] = $msg;
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Aktiva Tetap gagal diubah ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    
+    }
+
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_fa' => 'required'
+        ]);
+
+        
+        DB::connection($this->db)->beginTransaction();
+        try {
+
+            if($rs =  Auth::guard($this->guard)->user()){
+                $nik= $rs->nik;
+                $kode_lokasi= $rs->kode_lokasi;
+                $status_admin=$rs->status_admin;
+            }
+
+            $get = DB::connection($this->db)->select("select isnull(count(*),0)  as jml from fasusut_d where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+            if (count($get) > 0){
+                $msg = "Transaksi tidak valid. Sudah pernah disusutkan, data tidak bisa dihapus.";
+                $sts = false;
+            }else{
+                $del1 = DB::connection($this->db)->update("delete from fa_asset where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                $del2 = DB::connection($this->db)->update("delete from fa_nilai where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                
+                $sts = true;
+                $msg = "Data Aktiva Tetap berhasil dihapus. ";  
+                DB::connection($this->db)->commit();
+            }	
+
+            $success['status'] = $sts;
+            $success['message'] = $msg;
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Aktiva Tetap gagal dihapus ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    
+    }
+
+
 }
 

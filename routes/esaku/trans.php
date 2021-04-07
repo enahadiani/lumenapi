@@ -165,6 +165,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('aktap-pp','Esaku\Aktap\AktapController@getPP');
     $router->get('aktap-klpakun','Esaku\Aktap\AktapController@getKlpAkun');
     $router->post('aktap','Esaku\Aktap\AktapController@store');
+    
+    $router->get('aktap','Esaku\Aktap\AktapController@getAktap');
+    $router->get('aktap-detail','Esaku\Aktap\AktapController@show');
+    $router->put('aktap','Esaku\Aktap\AktapController@update');
+    $router->delete('aktap','Esaku\Aktap\AktapController@destroy');
 
     //Data Penyusutan
     $router->get('susut-hitung','Esaku\Aktap\PenyusutanController@hitungPenyusutan');
