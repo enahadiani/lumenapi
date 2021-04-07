@@ -136,6 +136,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-agg-status','Esaku\Anggaran\FilterController@getFilterStatusAgg');
 
     $router->get('lap-agg-anggaran','Esaku\Anggaran\LaporanController@getAnggaran');
+    $router->get('lap-agg-real','Esaku\Anggaran\LaporanController@getRealAnggaran');
 
     
 

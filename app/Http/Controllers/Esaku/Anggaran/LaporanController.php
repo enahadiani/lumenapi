@@ -18,7 +18,7 @@ class LaporanController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'toko';
-    public $sql = 'tokoaws';
+    public $db = 'tokoaws';
 
     function getAnggaran(Request $request){
         try {
@@ -28,8 +28,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('tahun','kode_akun','kode_pp','no_fa','kode_pp','catatan');
-            $db_col_name = array('substring(x.periode,1,4)','x.kode_akun','x.kode_pp','x.no_fa','x.kode_pp','x.catatan');
+            $col_array = array('tahun','kode_akun','kode_pp');
+            $db_col_name = array('substring(x.periode,1,4)','x.kode_akun','x.kode_pp');
             $where = "where x.kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -147,7 +147,83 @@ class LaporanController extends Controller
                     order by a.kode_akun,a.kode_pp";
 			}
            
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']=[];
+                $success['status'] = true;
+                $success["auth_status"] = 2;    
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getRealAnggaran(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('tahun','kode_akun','kode_pp');
+            $db_col_name = array('substring(periode,1,4)','kode_akun','kode_pp');
+            $where = "where kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }
+                }
+            }
+            
+            if (isset($request->periodik) && $request->periodik[1]=="Triwulan")
+            {
+                if (isset($request->realisasi) && $request->realisasi[1]=="Anggaran")
+                {
+                    $sql = "exec sp_agg_real_bulan_pp '".$kode_lokasi."','".$request->jenis[1]."','".$request->tahun[1]."','".$request->nik_user."'";
+                }
+                else
+                {
+                    $sql = "exec sp_agg_real_bulan_pp_gl '".$kode_lokasi."','".$request->jenis[1]."','".$request->tahun[1]."','".$request->nik_user."'";
+                }
+                
+            }
+            $exec = DB::connection($this->db)->getPdo()->exec($sql);
+
+            $sql2 = "select *,substring(periode,1,4) as tahun from glma_drk_tmp $where and nik_user='$request->nik_user' order by kode_akun";
+			
+            $res = DB::connection($this->db)->select($sql2);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
