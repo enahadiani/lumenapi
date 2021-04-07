@@ -317,7 +317,6 @@ class AktapController extends Controller
             
             $sts = true;
             $msg = "Data Aktiva Tetap berhasil diubah. ";  
-            $success['no_fa'] = $nbfa2;
             DB::connection($this->db)->commit();
             
             $success['status'] = $sts;
