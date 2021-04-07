@@ -430,7 +430,7 @@ class LaporanController extends Controller
                     case jenis_akun when  'Pendapatan' then -n4 else n4 end as n4,
                     case jenis_akun when  'Pendapatan' then -n5 else n5 end as n5,
                     case jenis_akun when  'Pendapatan' then -n6 else n6 end as n6,
-                    case jenis_akun when  'Pendapatan' then -n7 else n7 end as n7
+                    case jenis_akun when  'Pendapatan' then -n7 else n7 end as n7,
                     case jenis_akun when  'Pendapatan' then -n8 else n8 end as n8,
                     case jenis_akun when  'Pendapatan' then -n9 else n9 end as n9,
 					case jenis_akun when  'Pendapatan' then -n10 else n10 end as n10,
