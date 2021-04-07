@@ -372,6 +372,107 @@ class FilterController extends Controller
         }
     }
 
+    function getFilterJenisAgg(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+            $res =  array(
+                0 => array('kode' => "Original"),
+                1 => array('kode' => "RRA"),
+                2 => array('kode' => "Reseting")
+            );
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterJenisRRA(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+            $where = "where kode_lokasi='$kode_lokasi'";
+        
+            $sql ="select distinct(sts_pdrk) as sts_pdrk from rra_pdrk_m 
+            $where order by sts_pdrk";
+            
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterModulRRA(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+            $where = "where kode_lokasi='$kode_lokasi'";
+        
+            $sql ="select distinct(modul) as modul from rra_app_m 
+            $where order by modul";
+            
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 
 

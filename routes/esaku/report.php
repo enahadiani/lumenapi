@@ -135,10 +135,21 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-agg-periodik','Esaku\Anggaran\FilterController@getFilterPeriodikLap');
     $router->get('filter-agg-status','Esaku\Anggaran\FilterController@getFilterStatusAgg');
     $router->get('filter-agg-periode','Esaku\Anggaran\FilterController@getFilterPeriode');
+    $router->get('filter-agg-jenisagg','Esaku\Anggaran\FilterController@getFilterJenisAgg');
+    $router->get('filter-agg-jenisrra','Esaku\Anggaran\FilterController@getFilterJenisRRA');
+    $router->get('filter-agg-modul','Esaku\Anggaran\FilterController@getFilterModul');
 
     $router->get('lap-agg-anggaran','Esaku\Anggaran\LaporanController@getAnggaran');
     $router->get('lap-agg-real','Esaku\Anggaran\LaporanController@getRealAnggaran');
     $router->get('lap-agg-capai','Esaku\Anggaran\LaporanController@getCapaiAnggaran');
+    $router->get('lap-agg-kartu','Esaku\Anggaran\LaporanController@getKartuAnggaran');
+    $router->get('lap-agg-labarugi','Esaku\Anggaran\LaporanController@getLabaRugiAgg');
+    $router->get('lap-agg-labarugi-detail','Esaku\Anggaran\LaporanController@getLabaRugiAggDetail');
+    $router->get('lap-agg-labarugi-unit','Esaku\Anggaran\LaporanController@getLabaRugiAggUnit');
+    $router->get('lap-agg-labarugi-unit-detail','Esaku\Anggaran\LaporanController@getLabaRugiAggUnitDetail');
+    $router->get('lap-agg-aju-rra','Esaku\Anggaran\LaporanController@getPengajuanRRA');
+    $router->get('lap-agg-app-rra','Esaku\Anggaran\LaporanController@getApprovalRRA');
+    $router->get('lap-agg-posisi-rra','Esaku\Anggaran\LaporanController@getPosisiRRA');
 
     
 
