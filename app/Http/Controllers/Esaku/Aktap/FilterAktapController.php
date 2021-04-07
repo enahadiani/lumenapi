@@ -197,6 +197,8 @@ class FilterAktapController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
@@ -354,12 +356,14 @@ class FilterAktapController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
 
-            $sql="select distinct a.no_fasusut,a.keterangan from fasusut_m a
-            $where ";
+            $sql="select distinct a.no_bukti,a.keterangan from trans_m a
+            $where and a.modul='AT' and a.form <> 'WO' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -410,12 +414,14 @@ class FilterAktapController extends Controller
                             }
                         }
                         $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                     }
                 }
             }
 
-            $sql="select a.no_woapp,a.keterangan from fawoapp_m a
-            $where ";
+            $sql="select a.no_bukti,a.keterangan from trans_m a
+            $where and a.form='WO' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

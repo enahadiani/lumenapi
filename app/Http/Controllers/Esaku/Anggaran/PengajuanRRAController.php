@@ -305,6 +305,47 @@ class PengajuanRRAController extends Controller
         }	
     }
 
+    public function doLoadCtt($no_pdrk,$kode_lokasi)
+    {
+        try {
+            
+
+            $sql = "select distinct convert(varchar,a.tanggal,103) as tgl,tanggal 
+            from rra_app_m a inner join rra_app_d b on a.no_app=b.no_app and a.kode_lokasi=b.kode_lokasi 
+            where b.no_bukti='".$no_pdrk."' and b.kode_lokasi='".$kode_lokasi."' 
+            order by convert(varchar,a.tanggal,103) desc";
+			$res = DB::connection($this->db)->select($sql);						
+            $res= json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                for($i=0;$i<count($res);$i++){
+                    $sql2 = "select b.catatan,a.no_app, convert(varchar,a.tanggal,103) as tgl,tanggal, convert(varchar,a.tgl_input,108) as jam,a.nik_user
+                    from rra_app_m a inner join rra_app_d b on a.no_app=b.no_app and a.kode_lokasi=b.kode_lokasi
+                    where b.no_bukti='".$no_pdrk."' and a.tanggal='".$res[$i]['tanggal']."' and a.kode_lokasi='".$kode_lokasi."'
+                    order by a.tanggal desc,convert(varchar,a.tgl_input,108) desc ";					
+                    $res2 = DB::connection($this->db)->select($sql2);						
+                    $res[$i]['detail']= json_decode(json_encode($res2),true);
+                }
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = $res;
+                $success['status'] = false;
+                return $success;     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data'] = [];
+                $success['status'] = false;
+                return $success;
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return $success;
+        }
+        
+    }
+
     public function show(Request $request)
     {
         $this->validate($request,[
@@ -332,13 +373,17 @@ class PengajuanRRAController extends Controller
             $res3 = DB::connection($this->db)->select("select substring(a.periode,5,2) as bulan,a.kode_pp,a.kode_akun,a.nilai 
             from rra_pdrk_d a 
             where a.no_pdrk='$request->no_bukti' and a.dc ='D' ");
+
             $res3= json_decode(json_encode($res3),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['detail_penerima'] = $res3;
                 $success['detail_pemberi'] = $res2;
+                $res4 = $this->doLoadCtt($request->no_bukti,$kode_lokasi);
+                $success['catatan'] = $res4['data'];
                 $success['message'] = "Success!";
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
@@ -347,6 +392,7 @@ class PengajuanRRAController extends Controller
                 $success['data'] = [];
                 $success['detail_penerima'] = [];
                 $success['detail_pemberi'] = [];
+                $success['catatan'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }

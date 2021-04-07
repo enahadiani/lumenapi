@@ -247,6 +247,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('rra-mta','Esaku\Anggaran\PengajuanRRAController@getAkun');
     $router->get('rra-pp','Esaku\Anggaran\PengajuanRRAController@getPP');
 
+    $router->get('rra-app-aju','Esaku\Anggaran\ApprovalController@getAju');
+    $router->get('rra-app-ajudet','Esaku\Anggaran\ApprovalController@getAjuDet');
+    $router->post('rra-app','Esaku\Anggaran\ApprovalController@store');
+
     $router->post('send-whatsapp','Esaku\Setting\WAController@sendMessage'); 
     $router->get('msg-whatsapp','Esaku\Setting\WAController@Messages'); 
     $router->post('pooling','Esaku\Setting\WAController@storePooling'); 
