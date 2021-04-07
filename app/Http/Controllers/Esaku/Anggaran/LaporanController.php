@@ -247,4 +247,83 @@ class LaporanController extends Controller
         }
     }
 
+    function getCapaiAnggaran(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_akun','kode_pp');
+            $db_col_name = array('a.periode','a.kode_akun','a.kode_pp');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }
+                }
+            }
+            
+            if (isset($request->realisasi) && $request->realisasi[1]=="Anggaran")
+            {
+                $sql = "exec sp_agg_pakai_pp '".$kode_lokasi."','".$request->jenis[1]."','".$request->periode[1]."','".$request->nik_user."'";
+            }
+            else
+            {
+                $sql = "exec sp_agg_pakai_pp_gl '".$kode_lokasi."','".$request->jenis[1]."','".$request->periode[1]."','".$request->nik_user."'";
+            }
+
+            $exec = DB::connection($this->db)->getPdo()->exec($sql);
+
+            $sql2 = "select  a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, a.nama_akun, a.nama_pp, a.nama_drk, a.periode, substring(a.periode,1,4) as tahun,
+            n1,n2,n3,
+            case when b.jenis='Pendapatan' then -n4 else n4 end as n4,
+            case when b.jenis='Pendapatan' then -n5 else n5 end as n5
+            from glma_drk_tmp a 
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            $where and a.nik_user='$request->nik_user' order by a.kode_akun";
+			
+            $res = DB::connection($this->db)->select($sql2);
+            $res = json_decode(json_encode($res),true);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data']=[];
+                $success['status'] = true;
+                $success["auth_status"] = 2;    
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
