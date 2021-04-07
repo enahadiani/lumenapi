@@ -553,7 +553,7 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql2="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_pp,
+            $sql="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_pp,
             case a.jenis_akun when 'Pendapatan' then -a.n1 else a.n1 end as n1, 
             case a.jenis_akun when 'Pendapatan' then -a.n2 else a.n2 end as n2, 
             case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
@@ -571,13 +571,12 @@ class LaporanController extends Controller
             from exs_neraca_pp a
             $where and a.modul='L' and a.level_lap<=$lev
             order by a.rowindex";
-            $res2 = DB::connection($this->db)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
