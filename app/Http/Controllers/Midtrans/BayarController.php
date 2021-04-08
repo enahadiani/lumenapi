@@ -594,6 +594,7 @@ class BayarController extends Controller
                 $kirim_pesan = json_decode(json_encode($kirim_pesan),true);
                 Log::info('Status Notif after update midtrans status: ');
                 Log::info($kirim_pesan['original']);
+                Log::info($request->all());
             }
 
             DB::connection($this->db)->commit();
