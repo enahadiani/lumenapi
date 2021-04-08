@@ -324,6 +324,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('piu-akru','Esaku\Piutang\PengakuanController@update');
     $router->delete('piu-akru','Esaku\Piutang\PengakuanController@destroy');
 
+    $router->get('piu-lunas-multi-akunkb','Esaku\Piutang\PelunasanMultiController@getAkunKasBank');
+    $router->get('piu-lunas-multi-pp','Esaku\Piutang\PelunasanMultiController@getPP');
+    $router->get('piu-lunas-multi-akun','Esaku\Piutang\PelunasanMultiController@getAkun');
+    $router->get('piu-lunas-multi-load','Esaku\Piutang\PelunasanMultiController@loadPiutang');
+    $router->get('piu-lunas-multi','Esaku\Piutang\PelunasanMultiController@index');
+    $router->get('piu-lunas-multi-detail','Esaku\Piutang\PelunasanMultiController@show');
+    $router->post('piu-lunas-multi','Esaku\Piutang\PelunasanMultiController@store');
+    $router->put('piu-lunas-multi','Esaku\Piutang\PelunasanMultiController@update');
+    $router->delete('piu-lunas-multi','Esaku\Piutang\PelunasanMultiController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
