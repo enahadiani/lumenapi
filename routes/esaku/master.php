@@ -250,6 +250,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('kartu-simpanan','Esaku\Simpanan\KartuSimpController@update');
     $router->delete('kartu-simpanan','Esaku\Simpanan\KartuSimpController@destroy');
 
+    // PIUTANG
+    $router->get('piu-cust','Esaku\Piutang\CustomerController@index');
+    $router->post('piu-cust','Esaku\Piutang\CustomerController@store');
+    $router->put('piu-cust','Esaku\Piutang\CustomerController@update');
+    $router->delete('piu-cust','Esaku\Piutang\CustomerController@destroy');
+    $router->get('piu-cust-akun','Esaku\Piutang\CustomerController@getAkun');
+
 
 });
 

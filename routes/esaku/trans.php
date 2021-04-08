@@ -313,6 +313,17 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('tarik-simp-akunkas','Esaku\Simpanan\PenarikanController@getAkunKas');
     $router->get('tarik-simp-simpanan','Esaku\Simpanan\PenarikanController@getSimpanan');
 
+    // PIUTANG
+    $router->get('piu-akru-nikapp','Esaku\Piutang\PengakuanController@getNIKApp');
+    $router->get('piu-akru-akunpiu','Esaku\Piutang\PengakuanController@getAkunPiutang');
+    $router->get('piu-akru-pp','Esaku\Piutang\PengakuanController@getPP');
+    $router->get('piu-akru-akun','Esaku\Piutang\PengakuanController@getAkun');
+    $router->get('piu-akru','Esaku\Piutang\PengakuanController@index');
+    $router->get('piu-akru-detail','Esaku\Piutang\PengakuanController@show');
+    $router->post('piu-akru','Esaku\Piutang\PengakuanController@store');
+    $router->put('piu-akru','Esaku\Piutang\PengakuanController@update');
+    $router->delete('piu-akru','Esaku\Piutang\PengakuanController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    

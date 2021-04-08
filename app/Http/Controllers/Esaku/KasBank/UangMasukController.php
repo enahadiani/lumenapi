@@ -232,6 +232,7 @@ class UangMasukController extends Controller
             'kode_pp' => 'required|array'
         ]);
 
+        DB::connection($this->db)->beginTransaction();
         try {
 
             if($rs =  Auth::guard($this->guard)->user()){
@@ -245,7 +246,6 @@ class UangMasukController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $kode_pp = $res[0]['kode_pp'];
-            DB::connection($this->db)->beginTransaction();
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BM".substr($periode,2,4).".", "0001");
@@ -297,7 +297,7 @@ class UangMasukController extends Controller
                 return response()->json(['success'=>$success], $this->successStatus); 
             }
         } catch (\Throwable $e) {
-            // DB::connection($this->db)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Uang Masuk gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
@@ -328,6 +328,7 @@ class UangMasukController extends Controller
             'kode_pp' => 'required|array'
         ]);
 
+        DB::connection($this->db)->beginTransaction();
         try {
 
             if($rs =  Auth::guard($this->guard)->user()){
@@ -342,7 +343,6 @@ class UangMasukController extends Controller
             $res = json_decode(json_encode($res),true);
             $no_bukti = $request->no_bukti;
             $kode_pp = $res[0]['kode_pp'];
-            DB::connection($this->db)->beginTransaction();
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $cek = $this->doCekPeriode2('KB',$status_admin,$periode);
