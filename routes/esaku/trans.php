@@ -179,6 +179,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('susutcpt-noaktap','Esaku\Aktap\PercepatanController@getNoAktap');
     $router->get('susutcpt-load','Esaku\Aktap\PercepatanController@loadDataAktap');
     $router->post('susutcpt','Esaku\Aktap\PercepatanController@store');
+    
+    //Data Pembatalan
+    $router->get('susut-batal-noaktap','Esaku\Aktap\PembatalanController@getNoAktap');
+    $router->get('susut-batal-load','Esaku\Aktap\PembatalanController@loadDataAktap');
+    $router->post('susut-batal','Esaku\Aktap\PembatalanController@store');
 
     // Penghapusan
     $router->get('hapus-aktap','Esaku\Aktap\PenghapusanController@index');

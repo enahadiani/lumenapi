@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class PercepatanController extends Controller
+class PembatalanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -131,15 +131,15 @@ class PercepatanController extends Controller
             'tanggal' => 'required',
             'keterangan' => 'required',
             'no_fa' => 'required',
-            'umur' => 'required',
-            'nilai' => 'required',
+            'total_susut' => 'required',
+            'nilai_batal' => 'required',
             'kode_pp' => 'required',
-            'akun_bp' => 'required',
             'akun_deprs' => 'required',
-            'kode_ppsusut' => 'required',
-            'kode_akun' => 'required',
+            'akun_bp' => 'required',
             'harga_perolehan' => 'required',
-            'nilai_buku' => 'required'
+            'umur' => 'required',
+            'kode_pp_susut' => 'required',
+            'kode_akun' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -156,36 +156,36 @@ class PercepatanController extends Controller
 
             if($cek['status']){
 
-                if(floatval($request->nilai) <= 0){
+                if(floatval($request->nilai_batal) <= 0){
                     DB::connection($this->db)->rollback();
-                    $msg = "Transaksi tidak valid. Nilai penyusutan tidak boleh nol atau kurang";
+                    $msg = "Transaksi tidak valid. Nilai pembatalan penyusutan tidak boleh nol atau kurang";
                     $sts = false;
                     $success['no_bukti'] = '-';
                 }else{
-                    if(floatval($request->nilai) > floatval($request->nilai_buku)){
+                    if(floatval($request->nilai_batal) > floatval($request->total_susut)){
                         DB::connection($this->db)->rollback();
-                        $msg = "Transaksi tidak valid. Nilai penyusutan tidak boleh melebihi nilai buku";
+                        $msg = "Transaksi tidak valid. Nilai pembatalan tidak boleh melebihi total penyusutan";
                         $sts = false;
                         $success['no_bukti'] = '-';
                     }else{
 
 
-                        $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-CSU".substr($periode,2, 4).".", "0001");
+                        $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-BSU".substr($periode,2, 4).".", "0001");
         
-                        $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','$kode_lokasi',getdate(),'".$nik."','$periode','AT','SUSUTCPT','F','-','-','$request->kode_pp','$request->tanggal','-','$request->keterangan','IDR',1,".floatval($request->nilai).",0,0,'$nik','-','-','-','-','-','-','-','-')");
+                        $ins = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','$kode_lokasi',getdate(),'".$nik."','$periode','AT','SUSUTREV','F','-','-','$request->kode_pp','$request->tanggal','-','$request->keterangan','IDR',1,".floatval($request->nilai_batal).",0,0,'$nik','-','-','-','-','-','-','-','-')");
         
-                        $ins2 = DB::connection($this->db)->insert("insert into trans_j(no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','$kode_lokasi',getdate(),'$nik','".$periode."','-','".$request->tanggal."',0,".$request->akun_bp.",'D',".floatval($request->nilai).",".floatval($request->nilai).",'".$request->keterangan."','AT','BP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','-','-','-')");
+                        $ins2 = DB::connection($this->db)->insert("insert into trans_j(no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','$kode_lokasi',getdate(),'$nik','".$periode."','-','".$request->tanggal."',0,".$request->akun_deprs.",'D',".floatval($request->nilai_batal).",".floatval($request->nilai_batal).",'".$request->keterangan."','AT','AP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','-','-','-')");
         
-                        $ins3 = DB::connection($this->db)->insert("insert into trans_j(no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','$kode_lokasi',getdate(),'$nik','".$periode."','-','".$request->tanggal."',1,".$request->akun_deprs.",'C',".floatval($request->nilai).",".floatval($request->nilai).",'".$request->keterangan."','AT','AP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','-','-','-')");
+                        $ins3 = DB::connection($this->db)->insert("insert into trans_j(no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$no_bukti."','$kode_lokasi',getdate(),'$nik','".$periode."','-','".$request->tanggal."',1,".$request->akun_bp.",'C',".floatval($request->nilai_batal).",".floatval($request->nilai_batal).",'".$request->keterangan."','AT','BP','IDR',1,'".$request->kode_ppsusut."','-','-','-','-','-','-','-','-')");
         
-                        //hanya yg flag_susutnya == 1 yg bisa susut (tanah flag_susutny == 0 / gak boleh susut)		
-                        $sqlins5 = "insert into fasusut_d(no_fasusut,no_fa,periode,nilai,kode_lokasi,akun_bp,akun_ap,kode_akun,kode_pp,kode_drk,dc,no_del,nilai_aset,umur) values ('$no_bukti','$request->no_fa','$periode','".floatval($request->nilai)."','$kode_lokasi','$request->akun_bp','$request->akun_deprs','$request->kode_akun','$request->kode_ppsusut','-','D','-','".floatval($request->harga_perolehan)."','".$request->umur."')";
+                       
+                        $sqlins5 = "insert into fasusut_d(no_fasusut,no_fa,periode,nilai,kode_lokasi,akun_bp,akun_ap,kode_akun,kode_pp,kode_drk,dc,no_del,nilai_aset,umur) values ('$no_bukti','$request->no_fa','$periode','".floatval($request->nilai_batal)."','$kode_lokasi','$request->akun_bp','$request->akun_deprs','$request->kode_akun','$request->kode_ppsusut','-','C','-','".floatval($request->harga_perolehan)."','".$request->umur."')";
                         $ins5 = DB::connection($this->db)->insert($sqlins5); 
         
                         
                         DB::connection($this->db)->commit();
         
-                        $msg = "Data Percepatan berhasil disimpan.";
+                        $msg = "Data Pembatalan berhasil disimpan.";
                         $sts = true;
                         $success['no_bukti'] = $no_bukti;
                     }
@@ -205,7 +205,7 @@ class PercepatanController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Percepatan gagal disimpan ".$e;
+            $success['message'] = "Data Pembatalan gagal disimpan ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     
@@ -225,15 +225,16 @@ class PercepatanController extends Controller
 
             $periode = $request->periode;
             $sql = "select a.no_fa, a.nama from fa_asset a 
-            inner join fa_klpakun c on a.kode_klpakun=c.kode_klpakun and a.kode_lokasi=c.kode_lokasi and c.flag_susut='1' 								
-                inner join (select kode_lokasi,no_fa,sum(case dc when 'D' then nilai else -nilai end) as nilai 
-                        from fa_nilai where periode<='".$periode."' and kode_lokasi='".$kode_lokasi."' 
-                               group by kode_lokasi,no_fa) zz on a.no_fa=zz.no_fa and a.kode_lokasi=zz.kode_lokasi 							  
+            	  	  inner join fa_klpakun c on a.kode_klpakun=c.kode_klpakun and a.kode_lokasi=c.kode_lokasi and c.flag_susut='1' 								
 
-                left join (select no_fa,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as tot_susut 
-                            from fasusut_d 
-                            group by no_fa,kode_lokasi) b on a.no_fa=b.no_fa and a.kode_lokasi=b.kode_lokasi 
-            where a.progress in ('2') and zz.nilai-a.nilai_residu > isnull(tot_susut,0) and a.kode_lokasi='$kode_lokasi' ";		
+                   inner join (select kode_lokasi,no_fa,sum(case dc when 'D' then nilai else -nilai end) as nilai 
+                               from fa_nilai where periode<='".$periode."' and kode_lokasi='".$kode_lokasi."' 
+            					  group by kode_lokasi,no_fa) zz on a.no_fa=zz.no_fa and a.kode_lokasi=zz.kode_lokasi 							  
+
+                   inner join (select no_fa,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as tot_susut 
+            	                  from fasusut_d group by no_fa,kode_lokasi) b on a.no_fa=b.no_fa and a.kode_lokasi=b.kode_lokasi 
+
+            where a.progress ='2' and zz.nilai-a.nilai_residu > isnull(tot_susut,0) and a.kode_lokasi='".$kode_lokasi."' ";		
             $res = DB::connection($this->db)->select($sql);	
             $res= json_decode(json_encode($res),true);
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
