@@ -853,12 +853,13 @@ class DashSiswaController extends Controller
                 union all
                 select a.no_bukti,a.kode_lokasi,b.tgl_input,convert(varchar(10),b.tgl_input,103) as tgl,
                 'KBMID' as modul, isnull(a.tagihan,0) as total,a.id_bank,b.status,b.snap_token
-                from (select x.kode_lokasi,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
+                from (select x.kode_lokasi,x.kode_pp,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
                     from sis_mid_bayar_d x 
-                    inner join sis_bill_d y on x.no_bill=y.no_bill and x.kode_pp=y.kode_pp and x.kode_lokasi=y.kode_lokasi
-                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_midtrans 
-                    group by x.kode_lokasi,x.no_bukti )a 
-                inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
+					inner join sis_mid_bayar m on x.no_bukti=m.no_bukti and x.kode_pp=m.kode_pp and x.kode_lokasi=m.kode_lokasi
+                    inner join sis_bill_d y on x.no_bill=y.no_bill and x.kode_pp=y.kode_pp and x.kode_lokasi=y.kode_lokasi and m.nis=y.nis
+                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_midtrans
+                    group by x.kode_lokasi,x.kode_pp,x.no_bukti )a 
+                inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nis='$nik' 
             ) a
             $filter_jenis
             order by a.tanggal desc";
