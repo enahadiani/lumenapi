@@ -3176,7 +3176,7 @@ class DashboardController extends Controller
             }
 
             $col_array = array('periode');
-            $db_col_name = array('b.periode');
+            $db_col_name = array('c.periode');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -3204,10 +3204,11 @@ class DashboardController extends Controller
 
             
             $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(b.n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
+            select a.kode_grafik,a.nama,sum(case when a.dc='C' then -c.n4 else c.n4 end) as real,sum(case when a.dc='C' then -c.n2 else c.n2 end) as rka,case sum(c.n2) when 0 then 0 else (sum(c.n4)/sum(c.n2))*100 end as persen  
             from dash_grafik_m a
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            $where and a.kode_klp='K01'
+            inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs
+            $where and a.kode_klp='K01' and b.kode_fs='FS4'
             group by a.kode_grafik,a.nama
             ");
             $rs = json_decode(json_encode($rs),true);
