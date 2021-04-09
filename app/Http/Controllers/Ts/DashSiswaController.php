@@ -89,6 +89,62 @@ class DashSiswaController extends Controller
         
     // }
 
+    public function getPP(Request $request)
+    {
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->kode_pp)){
+                if($request->kode_pp != "" ){
+
+                    $filter = " and a.kode_pp='$request->kode_pp' ";
+                }else{
+                    $filter = "";
+                }
+            }else{
+                $filter = "";
+            }
+
+            if(isset($request->nis)){
+                if($request->nis != "" ){
+
+                    $filter .= " and b.nik='$request->nis' ";
+                }else{
+                    $filter .= "";
+                }
+            }else{
+                $filter .= "";
+            }
+
+
+            $res = DB::connection($this->db)->select("SELECT a.kode_pp,a.nama from sis_sekolah a left join sis_hakakses b on a.kode_pp = b.kode_pp where a.kode_lokasi = '12' $filter order by a.kode_pp	 
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json(['success'=>$success], $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getKartuPiutang(Request $request)
     {
         try {

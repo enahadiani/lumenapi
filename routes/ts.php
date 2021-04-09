@@ -57,6 +57,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     //Tahun Ajaran
     $router->get('pp','Ts\TahunAjaranController@getPP');
     $router->get('tahun-ajaran-all','Ts\TahunAjaranController@index');
+    $router->get('pp-list','Ts\DashSiswaController@getPP');
     
     $router->get('kartu-piutang','Ts\DashSiswaController@getKartuPiutang');
     $router->get('kartu-piutang-detail','Ts\DashSiswaController@getKartuPiutangDetail');
