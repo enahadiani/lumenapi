@@ -23,12 +23,19 @@ class DashboardController extends Controller
             }
             
 			$sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama
-            from periode a
+            from dash_grafik_lap a
             where a.kode_lokasi='$kode_lokasi'
             order by a.periode desc";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $sql="select max(a.periode) as periode,dbo.fnNamaBulan(max(a.periode)) as nama
+            from dash_grafik_lap a
+            where a.kode_lokasi='$kode_lokasi'";
+			$res2 = DB::connection($this->db)->select($sql);
+            $res2 = json_decode(json_encode($res2),true);
 			
+            $success['periode_max'] = $res2[0]['periode'];
             if(count($res) > 0){ 
                 $success['data'] = $res;
                 $success['status'] = true;
