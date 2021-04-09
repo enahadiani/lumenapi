@@ -457,12 +457,13 @@ class AdminTsController extends Controller
             }
             if($status_login == "S"){
 
-                $res = DB::connection($this->db)->select("select tmp_lahir,tgl_lahir,jk,agama,email from sis_siswa where nis='$nik' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'");
+                $res = DB::connection($this->db)->select("select tmp_lahir,tgl_lahir,jk,agama,email,hp_siswa from sis_siswa where nis='$nik' and kode_lokasi='$kode_lokasi' and kode_pp='$kode_pp'");
                 $tmp_lahir = $res[0]->tmp_lahir;
                 $tgl_lahir = $res[0]->tgl_lahir;
                 $jk = $res[0]->jk;
                 $agama = $res[0]->agama;
                 $email = $res[0]->email;
+                $hp_siswa = $res[0]->hp_siswa;
     
                 if(isset($request->tmp_lahir)){
                     $tmp_lahir = $request->tmp_lahir;
@@ -494,6 +495,13 @@ class AdminTsController extends Controller
                     $email = $email;
                 }
     
+                
+                if(isset($request->no_telp)){
+                    $hp_siswa = $request->no_telp;
+                }else{
+                    $hp_siswa = $hp_siswa;
+                }
+    
                 $update = DB::connection($this->db)->table('sis_siswa')
                 ->where('nis',$nik)
                 ->where('kode_pp',$kode_pp)
@@ -503,7 +511,8 @@ class AdminTsController extends Controller
                     'tgl_lahir' => $tgl_lahir,
                     'jk' => $request->jk,
                     'agama' => $agama,
-                    'email' => $email
+                    'email' => $email,
+                    'hp_siswa' => $hp_siswa
                 ]);
                 
                 if($update){
