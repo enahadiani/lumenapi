@@ -48,6 +48,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->post('update-password', 'AdminTsController@updatePassword');
     $router->post('update-foto', 'AdminTsController@updatePhoto');
     $router->post('update-background', 'AdminTsController@updateBackground');
+    $router->post('update-profile-siswa', 'AdminTsController@updateDataPribadi');
     
     $router->post('notif-pusher', 'Ts\NotifController@sendPusher');
     $router->get('notif-pusher', 'Ts\NotifController@getNotifPusher');
