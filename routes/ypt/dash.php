@@ -112,6 +112,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('beban-5tahun','Ypt\DashboardController@getBeban5Tahun');
     $router->get('beban-5tahun-sdm','Ypt\DashboardController@getBeban5TahunSDM');
+    $router->get('beban-5tahun-non-sdm','Ypt\DashboardController@getBeban5TahunNonSDM');
     $router->get('beban-5tahun-komposisi','Ypt\DashboardController@getBeban5TahunKomposisi');
     $router->get('beban-5tahun-growth','Ypt\DashboardController@getBeban5TahunGrowth');
 
