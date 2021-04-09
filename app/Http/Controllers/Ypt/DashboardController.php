@@ -7713,7 +7713,7 @@ class DashboardController extends Controller
 			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
 			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
 			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
-			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi  and e.periode='$Qu'
+			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$Qu'
 			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K01'
             ");
             $rs = json_decode(json_encode($rs),true);
@@ -7731,7 +7731,7 @@ class DashboardController extends Controller
 			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
 			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
 			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
-			left join dash_note e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi 
+			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$Qu'
 			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K16'
             ");
             $rs2 = json_decode(json_encode($rs2),true);
