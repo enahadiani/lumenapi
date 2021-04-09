@@ -21,6 +21,8 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get('hash-pass-costum/{db}/{table}/{kode_pp}', 'AuthController@hashPasswordCostum');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     $router->post('logout', 'AuthController@logoutTs');
+    
+    $router->get('pp-list','Ts\DashSiswaController@getPP');
 
 });
 
@@ -57,7 +59,6 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     //Tahun Ajaran
     $router->get('pp','Ts\TahunAjaranController@getPP');
     $router->get('tahun-ajaran-all','Ts\TahunAjaranController@index');
-    $router->get('pp-list','Ts\DashSiswaController@getPP');
     
     $router->get('kartu-piutang','Ts\DashSiswaController@getKartuPiutang');
     $router->get('kartu-piutang-detail','Ts\DashSiswaController@getKartuPiutangDetail');

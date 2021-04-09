@@ -326,9 +326,14 @@ class AuthController extends Controller
         $this->validate($request, [
             'nik' => 'required|string',
             'password' => 'required|string',
+            'kode_pp' => 'string'
         ]);
 
-        $credentials = $request->only(['nik', 'password']);
+        if(isset($request->kode_pp)){
+            $credentials = $request->only(['nik', 'password','kode_pp']);
+        }else{
+            $credentials = $request->only(['nik', 'password']);
+        }
 
         if (! $token = Auth::guard('ts')->setTTL(10080)->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
