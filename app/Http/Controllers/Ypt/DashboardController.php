@@ -7608,7 +7608,7 @@ class DashboardController extends Controller
 			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
 			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
 			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
-			left join dash_note e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi 
+			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi  and e.periode='$Qu'
 			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K01'
             ");
             $rs = json_decode(json_encode($rs),true);
@@ -7640,6 +7640,45 @@ class DashboardController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
+    }
+
+    public function updateNoteTarget(Request $request)
+    {
+        $this->validate($request, [
+            'keterangan' => 'required',
+            'kode_grafik' => 'required',
+            'periode' => 'required',
+            'nama' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $del = DB::connection($this->db)->table('dash_note')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_grafik', $request->kode_grafik)
+            ->where('periode', $request->periode)
+            ->delete();
+
+            $ins = DB::connection($this->db)->insert("insert into dash_note(kode_grafik,kode_lokasi,nama,keterangan,periode) values ('$request->kode_grafik','$kode_lokasi','$request->nama','$request->keterangan','$request->periode') ");
+            
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['keterangan'] = $request->keterangan;
+            $success['message'] = "Note target berhasil diubah";
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['kode'] = "-";
+            $success['message'] = "Note target gagal diubah ".$e;
+            return response()->json($success, $this->successStatus); 
+        }	
     }
     
 

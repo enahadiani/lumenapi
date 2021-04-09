@@ -146,6 +146,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     
     $router->get('financial-target', 'Ypt\DashboardController@getTarget');
+    $router->post('note', 'Ypt\DashboardController@updateNoteTarget');
 
 
 });
