@@ -144,6 +144,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('drill-pp', 'Ypt\DashboardController@dataDrillPP');
     $router->get('detail-drill-pp', 'Ypt\DashboardController@detailDrillPP');
 
+    
+    $router->get('financial-target', 'Ypt\DashboardController@getTarget');
+
 
 });
 

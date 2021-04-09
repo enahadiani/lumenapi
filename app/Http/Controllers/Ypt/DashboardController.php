@@ -7554,6 +7554,93 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    // DASH FINANCIAL
+
+    public function getTarget(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $periode = $request->periode[1];
+            $tahun = substr($periode,0,4);
+            $tahunLalu = intval($tahun) - 1;
+            switch(substr($periode,4,2)){
+                case 1 : case '1' : case '01': 
+                case 2 : case '2' : case '02':
+                case 3 : case '3' : case '03': 
+                    $Qu = $tahun."03"; 
+                    $QuLalu = $tahunLalu."03"; 
+                    break;
+                case 4 : case '4' : case '04': 
+                case 5 : case '5' : case '05': 
+                case 6 : case '6' : case '06': 
+                    $Qu = $tahun."06"; 
+                    $QuLalu = $tahunLalu."06"; 
+                    break;
+                case 7 : case '7' : case '07': 
+                case 8 : case '8' : case '08': 
+                case 9 : case '9' : case '09': 
+                    $Qu = $tahun."09"; 
+                    $QuLalu = $tahunLalu."09"; 
+                    break;
+                case 10 : case '10' : case '10': 
+                case 11 : case '11' : case '11': 
+                case 12 : case '12' : case '12': 
+                    $Qu = $tahun."12"; 
+                    $QuLalu = $tahunLalu."12";  
+                    break;
+            }
+           
+
+            $rs = DB::connection($this->db)->select("
+            select a.kode_grafik,a.nama,e.keterangan,e.nama as nama_target,
+				  case when a.dc='C' then -c.n1 else c.n1 end as rka_thn,
+				  case when a.dc='C' then -c.n2 else c.n2 end as rka_sd,
+				  case when a.dc='C' then -c.n4 else c.n4 end as realisasi,
+				  case when a.dc='C' then -d.n4 else d.n4 end as realisasi_lalu,
+				  case isnull(c.n2,0) when 0 then 0 else (c.n4/c.n2)*100 end as persen,
+				  case isnull(c.n4,0) when 0 then 0 else ((c.n4 - isnull(d.n4,0))/isnull(d.n4,0))*100 end as yoy
+			from dash_grafik_m a
+			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
+			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
+			left join dash_note e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi 
+			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K01'
+            ");
+            $rs = json_decode(json_encode($rs),true);
+            $success['data'] = (count($rs) > 0 ? $rs : []);
+
+            $rs2 = DB::connection($this->db)->select("
+            select a.kode_grafik,a.nama,e.keterangan,e.nama as nama_target,
+				  case when a.dc='C' then -c.n1 else c.n1 end as rka_thn,
+				  case when a.dc='C' then -c.n2 else c.n2 end as rka_sd,
+				  case when a.dc='C' then -c.n4 else c.n4 end as realisasi,
+				  case when a.dc='C' then -d.n4 else d.n4 end as realisasi_lalu,
+				  case isnull(c.n2,0) when 0 then 0 else (c.n4/c.n2)*100 end as persen,
+				  case isnull(c.n4,0) when 0 then 0 else ((c.n4 - isnull(d.n4,0))/isnull(d.n4,0))*100 end as yoy
+			from dash_grafik_m a
+			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
+			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
+			left join dash_note e on a.kode_grafik=e.kode_grafik and a.kode_lokasi=e.kode_lokasi 
+			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K16'
+            ");
+            $rs2 = json_decode(json_encode($rs2),true);
+            $success['data2'] = (count($rs2) > 0 ? $rs2 : []);
+            
+            $success['status'] = true;
+            $success['message'] = "Success!";    
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 
     
