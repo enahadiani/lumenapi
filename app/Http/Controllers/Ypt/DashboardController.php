@@ -2919,13 +2919,13 @@ class DashboardController extends Controller
             }
             
             $komponen = DB::connection($this->db)->select("select a.kode_neraca,a.nama,b.nu,
-            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
-            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as n4,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
-            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
+            sum(case when a.n2<>0 then (a.n6/a.n2)*100 else 0 end) as capai
             from exs_neraca a
             inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_fs='FS3' and b.kode_grafik='GR29' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS3' and b.kode_grafik='GR29' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
             group by a.kode_neraca,a.nama,b.nu
             order by b.nu
             ");
@@ -2977,8 +2977,7 @@ class DashboardController extends Controller
             }
             $success['ctg'] = $ctg;
                         
-            $sql = "
-            select 'RKA' as nama,b.n1,c.n1 as n2,d.n1 as n3,e.n1 as n4,f.n1 as n5,g.n1 as n6
+            $sql = "select 'RKA' as nama,b.n2,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
             from dash_grafik_d a
             left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
             left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
@@ -2988,7 +2987,7 @@ class DashboardController extends Controller
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
             where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR30'
             union all
-            select 'Actual' as nama,b.n4 as n1,c.n4 as n2,d.n4 as n3,e.n4 as n4,f.n4 as n5,g.n4 as n6
+            select 'Actual' as nama,b.n6 as n1,c.n6 as n2,d.n6 as n3,e.n6 as n4,f.n6 as n5,g.n6 as n6
             from dash_grafik_d a
             left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
             left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
@@ -2998,7 +2997,13 @@ class DashboardController extends Controller
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
             where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR30'
             union all
-            select 'On Progress' as nama,case when b.n1 <> 0 then b.n4/b.n1 else 0 end as n1,case when c.n1 <> 0 then c.n4/c.n1 else 0 end as n2,case when d.n1 <> 0 then d.n4/d.n1 else 0 end as n3,case when e.n1 <> 0 then e.n4/e.n1 else 0 end as n4,case when f.n1 <> 0 then f.n4/f.n1 else 0 end as n5,case when g.n1 <> 0 then g.n4/g.n1 else 0 end as n6
+            select 'On Progress' as nama,
+                case when b.n2 <> 0 then b.n6/b.n2 else 0 end as n1,
+                case when c.n2 <> 0 then c.n6/c.n2 else 0 end as n2,
+                case when d.n2 <> 0 then d.n6/d.n2 else 0 end as n3,
+                case when e.n2 <> 0 then e.n6/e.n2 else 0 end as n4,
+                case when f.n2 <> 0 then f.n6/f.n2 else 0 end as n5,
+                case when g.n2 <> 0 then g.n6/g.n2 else 0 end as n6
             from dash_grafik_d a
             left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
             left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
@@ -3010,7 +3015,7 @@ class DashboardController extends Controller
             ";
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
-            $success['row'] = $sql;
+            //$success['sql'] = $sql;
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($row);$i++){
@@ -3109,13 +3114,13 @@ class DashboardController extends Controller
 
             $rs = DB::connection($this->db)->select("
             select a.kode_neraca,a.nama,b.nu,
-            sum(case when a.jenis_akun='Pendapatan' then -a.n1 else a.n1 end) as n1,
-            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as n4,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as n1,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as n4,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
-            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as on_progress
+            sum(case when a.n2<>0 then (a.n6/a.n2)*100 else 0 end) as on_progress
             from exs_neraca a
             inner join dash_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            $where and a.kode_fs='FS3' and b.kode_grafik='GR29' and (a.n1<>0 or a.n4<>0 or a.n5<>0)
+            $where and a.kode_fs='FS3' and b.kode_grafik='GR29' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
             group by a.kode_neraca,a.nama,b.nu
             order by b.nu
             ");
@@ -3516,6 +3521,7 @@ class DashboardController extends Controller
             }
             $success['total'] = $total;
             $success['total2'] = $total2;
+            $success['sql'] = $sql;
             $rs = json_decode(json_encode($rs),true);
             
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
@@ -3544,7 +3550,12 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            $periode = $request->periode[1];
+            $tahun = substr($periode,0,4);
+            $bulan = substr($periode,4,2);
+            $tahunLalu = intval($tahun)-1;
+            $periodeLalu = $tahunLalu.$bulan;
+            /*
             $col_array = array('periode');
             $db_col_name = array('b.periode');
             $where = "where a.kode_lokasi='$kode_lokasi'";
@@ -3571,14 +3582,21 @@ class DashboardController extends Controller
                     }
                 }
             }
-
-            $rs = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,sum(b.n1) as real,sum(n2) as rka,case sum(n2) when 0 then 0 else (sum(n1)/sum(n2))*100 end as persen  
+            */
+            $sql="select a.kode_grafik,a.nama,isnull(b.n1,0) as real,isnull(b.n2,0) as rka,
+                    case b.n2 when 0 then 0 else (b.n1/b.n2)*100 end as persen 
             from dash_grafik_m a
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            $where and a.kode_klp='K12'
-            group by a.kode_grafik,a.nama
-            ");
+            left join (select a.kode_grafik,a.kode_lokasi, 
+                                sum(case when a.dc='C' then -c.n6 else c.n6 end) as n1, 
+                                sum(case when a.dc='C' then -c.n2 else c.n2 end) as n2
+                        from dash_grafik_m a 
+                        inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
+                        left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs 
+                        where a.kode_lokasi='$kode_lokasi'  and a.kode_klp='K12' and c.periode='$periode' 
+                        group by a.kode_grafik,a.kode_lokasi
+                    )b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K12'";
+            $rs = DB::connection($this->db)->select($sql);
             $total =0; $total_rka=0;
             foreach($rs as $row){
                 $total+=floatval($row->real);
@@ -3587,7 +3605,7 @@ class DashboardController extends Controller
             $success['total_real'] = $total;
             $success['total_rka'] = $total_rka;
             $rs = json_decode(json_encode($rs),true);
-            
+            $success['sql'] = $sql;
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 $success['data'] = $rs;
                 $success['status'] = true;
