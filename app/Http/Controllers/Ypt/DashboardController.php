@@ -2977,7 +2977,7 @@ class DashboardController extends Controller
             }
             $success['ctg'] = $ctg;
                         
-            $sql = "select 'RKA' as nama,b.n2,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
+            $sql = "select 'RKA' as nama,b.n2 as n1,c.n2 as n2,d.n2 as n3,e.n2 as n4,f.n2 as n5,g.n2 as n6
             from dash_grafik_d a
             left join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and b.periode='".$ctg[0]."12'
             left join exs_neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and c.periode='".$ctg[1]."12'
