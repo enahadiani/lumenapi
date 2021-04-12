@@ -5917,6 +5917,7 @@ class DashboardController extends Controller
             order by a.kode_grafik
             ");
             $row = json_decode(json_encode($row),true);
+            $ctg = array('TF','NTF');
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 $rka = array();
@@ -5935,8 +5936,11 @@ class DashboardController extends Controller
                     $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
                     $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
                     $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"key"=>$row[$i]['kode_grafik'],"key2"=>$row[$i]['kode_grafik']);
+                    $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
+                    $ctg[$i].="|".$acv;
                 }
                 $success['rka'] = $rka;
+                $success['ctg'] = $ctg;
                 $success['actual'] = $real;
                 $success['melampaui'] = $melampaui;
                 $success['tdkcapai'] = $tdkcapai;
@@ -5949,6 +5953,7 @@ class DashboardController extends Controller
                 
                 $success['rka'] = [];
                 $success['real'] = [];
+                $success['ctg'] = $ctg;
                 $success['melampaui'] = [];
                 $success['tdkcapai'] = [];
                 $success['message'] = "Data Kosong!";
@@ -6027,7 +6032,8 @@ class DashboardController extends Controller
                     $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
                     $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
                     $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
-                    array_push($ctg,$row[$i]['nama']);
+                    $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
+                    array_push($ctg,$row[$i]['nama']."|".$acv);
                 }
                 $success['rka'] = $rka;
                 $success['ctg'] = $ctg;
@@ -6105,6 +6111,7 @@ class DashboardController extends Controller
             order by a.kode_grafik
             ");
             $row = json_decode(json_encode($row),true);
+            $ctg = array();
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 $rka = array();
@@ -6123,8 +6130,11 @@ class DashboardController extends Controller
                     $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000,"key"=>$row[$i]['kode_neraca'],"key2"=>$row[$i]['kode_grafik']);
                     $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000,"key"=>$row[$i]['kode_neraca'],"key2"=>$row[$i]['kode_grafik']);
                     $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"key"=>$row[$i]['kode_neraca'],"key2"=>$row[$i]['kode_grafik']);
+                    $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
+                    array_push($ctg,'Beban '.$row[$i]['nama']."|".$acv);
                 }
                 $success['rka'] = $rka;
+                $success['ctg'] = $ctg;
                 $success['actual'] = $real;
                 $success['melampaui'] = $melampaui;
                 $success['tdkcapai'] = $tdkcapai;
@@ -6136,6 +6146,7 @@ class DashboardController extends Controller
             else{
                 
                 $success['rka'] = [];
+                $success['ctg'] = $ctg;
                 $success['real'] = [];
                 $success['melampaui'] = [];
                 $success['tdkcapai'] = [];
@@ -6215,7 +6226,8 @@ class DashboardController extends Controller
                     $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000000);
                     $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
                     $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
-                    array_push($ctg,$row[$i]['nama']);
+                    $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
+                    array_push($ctg,$row[$i]['nama']."|".$acv);
                 }
                 $success['rka'] = $rka;
                 $success['ctg'] = $ctg;
