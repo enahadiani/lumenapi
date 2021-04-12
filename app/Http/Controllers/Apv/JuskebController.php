@@ -1071,7 +1071,7 @@ select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'APPRO
             inner join apv_karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi
 			left join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and e.modul <> 'PO' and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and f.no_juskeb='$no_bukti'
-			order by urut,nu
+			order by nu,urut
             ";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
