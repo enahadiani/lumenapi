@@ -105,6 +105,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('laba-rugi-5tahun','Ypt\DashboardController@getLabaRugi5Tahun');
     $router->get('pend-5tahun','Ypt\DashboardController@getPend5Tahun');
+    $router->get('pend-5tahun-yoy','Ypt\DashboardController@getPend5TahunYoY');
     $router->get('pend-5tahun-tf','Ypt\DashboardController@getPend5TahunTF');
     $router->get('pend-5tahun-ntf','Ypt\DashboardController@getPend5TahunNTF');
     $router->get('pend-5tahun-komposisi','Ypt\DashboardController@getPend5TahunKomposisi');
