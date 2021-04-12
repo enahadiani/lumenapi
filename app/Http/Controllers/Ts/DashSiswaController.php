@@ -1253,4 +1253,41 @@ class DashSiswaController extends Controller
         } 
     }
 
+
+    public function getTransaksiPending(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+
+            $filter = "where a.kode_lokasi='$kode_lokasi' ";
+            
+            $sql = "select a.no_bukti,a.snap_token,a.status from sis_mid_bayar a $filter and a.status='pending' and a.nis='$nik' ";
+            // $success['sql'] = $sql;
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $success['rows'] = count($res);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 }
