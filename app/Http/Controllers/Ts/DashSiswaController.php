@@ -122,7 +122,7 @@ class DashSiswaController extends Controller
             }
 
 
-            $res = DB::connection($this->db)->select("SELECT a.kode_pp,a.nama from sis_sekolah a left join sis_hakakses b on a.kode_pp = b.kode_pp where a.kode_lokasi = '12' $filter order by a.kode_pp	 
+            $res = DB::connection($this->db)->select("SELECT distinct a.kode_pp,a.nama from sis_sekolah a left join sis_hakakses b on a.kode_pp = b.kode_pp where a.kode_lokasi = '12' $filter order by a.kode_pp	 
             ");
             $res = json_decode(json_encode($res),true);
             
