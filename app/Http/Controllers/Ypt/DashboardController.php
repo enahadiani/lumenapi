@@ -6414,13 +6414,14 @@ class DashboardController extends Controller
             }
 
             $success['colors'] = $color;
-            $get = DB::connection($this->db)->select("select a.kode_neraca,b.nama 
+            $get = DB::connection($this->db)->select("select a.kode_neraca,b.nama,a.kode_fs
 			from dash_grafik_d a 
 			inner join dash_grafik_m b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
-            where a.kode_grafik='$request->kode_grafik' and a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS1' ");
+            where a.kode_grafik='$request->kode_grafik' and a.kode_lokasi='$kode_lokasi'  ");
             if(count($get) > 0){
                 $kode_neraca = $get[0]->kode_neraca;
                 $nama = $get[0]->nama;
+                $kode_fs = $get[0]->kode_fs;
                 //$sqlex="exec sp_glma_trail_tmp 'FS1','$kode_neraca','$kode_lokasi','$kode_lokasi','$kode_lokasi','".$request->periode[1]."','$request->nik_user'";
                 //$res = DB::connection($this->db)->update($sqlex);
     
@@ -6430,7 +6431,7 @@ class DashboardController extends Controller
                 inner join relakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                 inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi
                 inner join dash_grafik_d d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi
-                $where and b.kode_fs='FS1' and d.kode_grafik='$request->kode_grafik' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0)
+                $where and b.kode_fs='$kode_fs' and d.kode_grafik='$request->kode_grafik' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0)
                 ");
                 $rs = json_decode(json_encode($rs),true);
             }else{
