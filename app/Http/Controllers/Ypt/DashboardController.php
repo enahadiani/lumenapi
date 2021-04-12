@@ -1291,10 +1291,12 @@ class DashboardController extends Controller
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
 
-            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
-            if($request->mode == "dark"){
-                $color = $this->dark_color;
-            }
+            // $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            // if($request->mode == "dark"){
+            //     $color = $this->dark_color;
+            // }
+
+            $color = array('#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66');
             $success['colors'] = $color;
 
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -1848,10 +1850,11 @@ class DashboardController extends Controller
             
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
-            $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
-            if($request->mode == "dark"){
-                $color = $this->dark_color;
-            }
+            // $color = array('#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d','#ad1d3e','#511dad','#30ad1d','#a31dad','#1dada8','#611dad','#1d78ad','#ad9b1d','#1dad6e','#ad571d');
+            // if($request->mode == "dark"){
+            //     $color = $this->dark_color;
+            // }
+            $color = array('#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66','#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66');
             $success['colors'] = $color;
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 

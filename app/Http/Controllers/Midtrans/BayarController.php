@@ -317,6 +317,43 @@ class BayarController extends Controller
         } 
     }
 
+    public function cancelTransaksi(Request $request){
+        $this->validate($request, [
+            'order_id' => 'required'
+        ]);
+        try { 
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+
+            $client = new Client();
+
+            $url = ( !config('services.midtrans.isProduction') ? 'https://api.sandbox.midtrans.com/v2/' : 'https://api.midtrans.com/v2/');
+
+            $response = $client->request('POST',  $url.$request->order_id.'/cancel',[
+                'headers' => [
+                    'Authorization' => 'Basic '.base64_encode(config('services.midtrans.serverKey')),
+                    'Accept'     => 'application/json',
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+
+            if ($response->getStatusCode() == 200 || $response->getStatusCode() == 201) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                $result = json_decode($response_data,true);
+            }
+            return response()->json($result, 200);
+        } catch (BadResponseException $ex) {
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $result['status'] = false;
+            $result['message'] = $res;
+            return response()->json($result, 200);
+        } 
+    }
+
     public function index()
     {
         try {
