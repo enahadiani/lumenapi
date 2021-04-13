@@ -191,7 +191,9 @@ class DashSiswaController extends Controller
             order by tgl_input");
             $res = json_decode(json_encode($rs),true);
 
-            
+            $rslok = DB::connection($this->db)->select("select a.kode_pp,a.nama,a.alamat,a.alamat2 from sis_sekolah a where a.kode_pp = '$kode_pp' and a.kode_lokasi='$kode_lokasi' ");
+            $reslok = json_decode(json_encode($rslok),true);
+            $success['lokasi'] = $reslok;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 for($i=0;$i<count($res);$i++){
                     $res[$i]['detail'] = json_decode(json_encode(DB::connection($this->db)->select("select a.* from (select a.no_bill, isnull(b.nilai,0) as nilai,b.kode_param,a.tgl_input
@@ -411,6 +413,10 @@ class DashSiswaController extends Controller
                 order by tgl_input");
             $res = json_decode(json_encode($rs),true);
             
+            
+            $rslok = DB::connection($this->db)->select("select a.kode_pp,a.nama,a.alamat,a.alamat2 from sis_sekolah a where a.kode_pp = '$kode_pp' and a.kode_lokasi='$kode_lokasi' ");
+            $reslok = json_decode(json_encode($rslok),true);
+            $success['lokasi'] = $reslok;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 for($i=0;$i< count($res); $i++){
