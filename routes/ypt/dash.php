@@ -117,10 +117,15 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('pend-5tahun-growth-yoy','Ypt\DashboardController@getPend5TahunGrowthYoY');
     
     $router->get('beban-5tahun','Ypt\DashboardController@getBeban5Tahun');
+    $router->get('beban-5tahun-yoy','Ypt\DashboardController@getBeban5TahunYoY');
     $router->get('beban-5tahun-sdm','Ypt\DashboardController@getBeban5TahunSDM');
+    $router->get('beban-5tahun-sdm-yoy','Ypt\DashboardController@getBeban5TahunSDMYoY');
     $router->get('beban-5tahun-non-sdm','Ypt\DashboardController@getBeban5TahunNonSDM');
+    $router->get('beban-5tahun-non-sdm-yoy','Ypt\DashboardController@getBeban5TahunNonSDMYoY');
     $router->get('beban-5tahun-komposisi','Ypt\DashboardController@getBeban5TahunKomposisi');
+    $router->get('beban-5tahun-komposisi-yoy','Ypt\DashboardController@getBeban5TahunKomposisiYoY');
     $router->get('beban-5tahun-growth','Ypt\DashboardController@getBeban5TahunGrowth');
+    $router->get('beban-5tahun-growth-yoy','Ypt\DashboardController@getBeban5TahunGrowthYoY');
 
     $router->get('shu-5tahun','Ypt\DashboardController@getSHU5Tahun');
     $router->get('shu-5tahun-yoy','Ypt\DashboardController@getSHU5TahunYoY');
