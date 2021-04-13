@@ -183,7 +183,7 @@ class RAB21Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_pp,convert(varchar,a.tgl_admin,103) as tgl_admin,a.nama,b.akun_bdd,a.nilai_or - isnull(c.beban,0) as saldo_or 
+            $sql = "select a.kode_pp,a.tgl_admin,a.nama,b.akun_bdd,a.nilai_or - isnull(c.beban,0) as saldo_or 
             from prb_proyek a 			             
                inner join prb_proyek_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 			            						 
                left join ( 			             
