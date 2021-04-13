@@ -3586,12 +3586,13 @@ class DashboardController extends Controller
                 }
             }
             */
-            $sql="select a.kode_grafik,a.nama,isnull(b.n1,0) as real,isnull(b.n2,0) as rka,
+            $sql="select a.kode_grafik,a.nama,isnull(b.n1,0) as real_sd,isnull(b.n2,0) as rka_sd,isnull(b.n1,0) as rka_tahun,
                     case b.n2 when 0 then 0 else (b.n1/b.n2)*100 end as persen 
             from dash_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi, 
-                                sum(case when a.dc='C' then -c.n6 else c.n6 end) as n1, 
-                                sum(case when a.dc='C' then -c.n2 else c.n2 end) as n2
+                                sum(case when a.dc='C' then -c.n6 else c.n6 end) as n6, 
+                                sum(case when a.dc='C' then -c.n2 else c.n2 end) as n2,
+                                sum(case when a.dc='C' then -c.n1 else c.n1 end) as n1
                         from dash_grafik_m a 
                         inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
                         left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs 
