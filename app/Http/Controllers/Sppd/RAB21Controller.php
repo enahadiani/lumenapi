@@ -91,7 +91,7 @@ class RAB21Controller extends Controller
             }
 			
 
-            $res = DB::connection($this->db)->select("select kode_proyek, nama from prb_proyek where versi = 'NTF21' and substring(convert(varchar,tgl_mulai,112),1,6) <= '".$periode."' and progress in ('1','2') and modul='PROYEK' and pp_rab='".$kode_pp."' and flag_aktif='1' and kode_lokasi='$kode_lokasi' $filter
+            $res = DB::connection($this->db)->select("select kode_proyek, nama from prb_proyek where versi = 'NTF21' and substring(convert(varchar,tgl_mulai,112),1,6) <= '".$request->periode."' and progress in ('1','2') and modul='PROYEK' and pp_rab='".$request->kode_pp."' and flag_aktif='1' and kode_lokasi='$kode_lokasi' $filter
             ");
             $res = json_decode(json_encode($res),true);
             
