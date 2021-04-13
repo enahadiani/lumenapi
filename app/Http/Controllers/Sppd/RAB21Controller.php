@@ -405,7 +405,7 @@ class RAB21Controller extends Controller
                                         $ins2 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akun_beban."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D','IDR',1,".$nilaiBeban.",".$nilaiBeban.",'".$ppKelola."','-','".$kode_lokasi."','NTF19','BEBAN','".$periode."','".$nik."',getdate(),'-')");		
 
                                         if($datam['status_pajak'] != "NON"){
-                                            if($datam['status)pajak'] == "P21"){
+                                            if($datam['status_pajak'] == "P21"){
                                                 $akunPajak = $akunPPH21;
                                             }
                                             else{
