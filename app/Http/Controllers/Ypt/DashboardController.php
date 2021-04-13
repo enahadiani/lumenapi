@@ -3601,15 +3601,17 @@ class DashboardController extends Controller
                     )b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K12'";
             $rs = DB::connection($this->db)->select($sql);
-            $total =0; $total_rka=0;
+            $total_rka_thn =0; $total_rka_sd=0; $total_real_sd=0;
             foreach($rs as $row){
-                $total+=floatval($row->real);
-                $total_rka+=floatval($row->rka);
+                $total_real_sd+=floatval($row->real_sd);
+                $total_rka_sd+=floatval($row->rka_sd);
+                $total_rka_thn+=floatval($row->rka_tahun);
             }
-            $success['total_real'] = $total;
-            $success['total_rka'] = $total_rka;
+            $success['total_real'] = $total_real_sd;
+            $success['total_rka_thn'] = $total_rka_thn;
+            $success['total_rka_sd'] = $total_rka_sd;
             $rs = json_decode(json_encode($rs),true);
-            $success['sql'] = $sql;
+            // $success['sql'] = $sql;
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
                 $success['data'] = $rs;
                 $success['status'] = true;
