@@ -496,7 +496,7 @@ class RAB21Controller extends Controller
                     $del3 = DB::connection($this->db)->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_bukti)->delete();
 
                     $del4 = DB::connection($this->db)->table('angg_r')->where('kode_lokasi', $kode_lokasi)
-                    ->where('modul', 'PRBEBAN')
+                    ->where('modul', 'NTF19')
                     ->where('no_bukti', $no_bukti)->delete();
 
                     $del5 = DB::connection($this->db)->table('prb_prbeban_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti' ,$no_bukti)->delete();
