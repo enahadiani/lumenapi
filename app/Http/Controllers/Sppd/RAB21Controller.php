@@ -144,8 +144,8 @@ class RAB21Controller extends Controller
                inner join prb_proyek_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 			            						 
                left join ( 			             
             			select kode_proyek,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as beban 
-            			from prb_prbeban_d where kode_lokasi='".$kode_lokasi."' and 
-            			--no_bukti <> '".$request->no_bukti."' 
+            			from prb_prbeban_d where kode_lokasi='".$kode_lokasi."' 
+                        --and no_bukti <> '".$request->no_bukti."' 
             			group by kode_proyek,kode_lokasi 			             
                ) c on a.kode_proyek=c.kode_proyek and a.kode_lokasi=c.kode_lokasi 		
             where a.kode_proyek = '".$request->kode_proyek."' and a.kode_lokasi='$kode_lokasi' $filter
