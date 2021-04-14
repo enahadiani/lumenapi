@@ -2413,7 +2413,7 @@ class DashboardController extends Controller
                             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and a.kode_fs=e.kode_fs and e.periode='".$ctg[3]."12'
                             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and a.kode_fs=f.kode_fs and f.periode='".$ctg[4]."12'
                             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and a.kode_fs=g.kode_fs and g.periode='".$ctg[5]."12'
-                            where a.kode_lokasi='$kode_lokasi' and x.kode_grafik in ('GR01','GR02','GR03','GR20')
+                            where a.kode_lokasi='$kode_lokasi' and x.kode_grafik in ('GR01','GR02','GR03','GR23')
             order by x.kode_grafik ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -2495,7 +2495,7 @@ class DashboardController extends Controller
                       left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and a.kode_fs=f.kode_fs and f.periode='".$ctg2[4]."12'
                       left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and a.kode_fs=g.kode_fs and g.periode='".$ctg2[5]."12'
                       left join exs_neraca h on a.kode_neraca=h.kode_neraca and a.kode_lokasi=h.kode_lokasi and a.kode_fs=h.kode_fs and h.periode='".$ctg2[6]."12'
-                      where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR01','GR02','GR03','GR20') 
+                      where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik in ('GR01','GR02','GR03','GR23') 
                       order by a.kode_grafik ");
 
             $row = json_decode(json_encode($row),true);
@@ -2577,7 +2577,7 @@ class DashboardController extends Controller
                       left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg2[4]."12'
                       left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg2[5]."12'
                       left join exs_neraca h on a.kode_neraca=h.kode_neraca and a.kode_fs=h.kode_fs and a.kode_lokasi=h.kode_lokasi and h.periode='".$ctg2[6]."12'
-                      where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR01','GR02','GR03','GR20')");
+                      where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR01','GR02','GR03','GR23')");
 
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -5965,7 +5965,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR23'
             union all
             select 'Actual' as nama,sum(b.n4) as n1,sum(c.n4) as n2,sum(d.n4) as n3,sum(e.n4) as n4,sum(f.n4) as n5,sum(g.n4) as n6
             from dash_grafik_d a
@@ -5975,7 +5975,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR23'
             union all
             select 'Capaian' as nama,
             case when sum(b.n2) <> 0 then sum(b.n4)/sum(b.n2) else 0 end as n1,
@@ -5991,7 +5991,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR23'
             ");
             $row = json_decode(json_encode($row),true);
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
@@ -6093,7 +6093,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12'
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12'
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12'
-            where a.kode_lokasi='$kode_lokasi'  and x.kode_grafik='GR20' 
+            where a.kode_lokasi='$kode_lokasi'  and x.kode_grafik='GR23' 
             group by a.kode_grafik,x.nama
             ");
             $row = json_decode(json_encode($row),true);
@@ -6201,7 +6201,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_fs=e.kode_fs and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."$bulan'
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_fs=f.kode_fs and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."$bulan'
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_fs=g.kode_fs and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."$bulan'
-            where a.kode_lokasi='$kode_lokasi'  and x.kode_grafik='GR20' 
+            where a.kode_lokasi='$kode_lokasi'  and x.kode_grafik='GR23' 
             group by a.kode_grafik,x.nama
             ");
             $row = json_decode(json_encode($row),true);
@@ -6511,7 +6511,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR23'
             group by a.kode_grafik,x.nama
             union all
             select a.kode_grafik, x.nama,sum(b.n4) as n1,sum(c.n4) as n2,sum(d.n4) as n3,sum(e.n4) as n4,sum(f.n4) as n5,sum(g.n4) as n6
@@ -6601,7 +6601,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."$bulan' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."$bulan' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."$bulan' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR20'
+            where a.kode_lokasi='$kode_lokasi'  and a.kode_grafik='GR23'
             group by a.kode_grafik,x.nama
             union all
             select a.kode_grafik, x.nama,sum(b.n4) as n1,sum(c.n4) as n2,sum(d.n4) as n3,sum(e.n4) as n4,sum(f.n4) as n5,sum(g.n4) as n6
@@ -6690,7 +6690,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."12' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."12' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."12' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR16','GR19','GR20','GR22')
+            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR16','GR19','GR23','GR22')
             group by a.kode_grafik,x.nama
             order by a.kode_grafik
             ");
@@ -6769,7 +6769,7 @@ class DashboardController extends Controller
             left join exs_neraca e on a.kode_neraca=e.kode_neraca and a.kode_lokasi=e.kode_lokasi and e.periode='".$ctg[3]."$bulan' and a.kode_fs=e.kode_fs
             left join exs_neraca f on a.kode_neraca=f.kode_neraca and a.kode_lokasi=f.kode_lokasi and f.periode='".$ctg[4]."$bulan' and a.kode_fs=f.kode_fs
             left join exs_neraca g on a.kode_neraca=g.kode_neraca and a.kode_lokasi=g.kode_lokasi and g.periode='".$ctg[5]."$bulan' and a.kode_fs=g.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR16','GR19','GR20','GR22')
+            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR16','GR19','GR23','GR22')
             group by a.kode_grafik,x.nama
             order by a.kode_grafik
             ");
