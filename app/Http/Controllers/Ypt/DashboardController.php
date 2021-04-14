@@ -3264,7 +3264,7 @@ class DashboardController extends Controller
                  inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
                  left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$periode' 
                  left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$periodeLalu' 
-                 where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K02'
+                 where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K02'
                  group by a.kode_grafik,a.kode_lokasi
                )b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
      where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K02' ";
