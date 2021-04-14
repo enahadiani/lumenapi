@@ -4405,7 +4405,6 @@ class DashboardController extends Controller
                 array_push($ctg,$tahun);
                 $tahun++;
             }
-            $success['ctg'] = $ctg;
                         
             $row =  DB::connection($this->db)->select("
             select a.kode_grafik,x.nama,
@@ -4463,6 +4462,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -4569,6 +4570,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -4790,6 +4793,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -4896,6 +4901,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -5117,6 +5124,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -5223,6 +5232,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
