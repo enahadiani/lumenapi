@@ -7187,12 +7187,11 @@ class DashboardController extends Controller
             }
 
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,sum(b.n2*-1) as rka, sum(b.n1*-1) as real,sum(case when (b.n2*-1)-isnull(b.n1*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n1*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n1*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n1*-1,0)) end) as tidak_tercapai
-            from dash_grafik_m a
-            inner join dash_grafik_d c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            left join dash_grafik_lap b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            $where and a.kode_grafik in ('GR17','GR18') 
-            group by a.kode_grafik,a.nama
+            select a.kode_grafik,a.nama,sum(b.n2*-1) as rka, sum(b.n4*-1) as real,sum(case when (b.n2*-1)-isnull(b.n4*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai from dash_grafik_m a
+			inner join dash_grafik_d c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+            left join exs_neraca b on c.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and c.kode_fs=b.kode_fs
+			$where and a.kode_grafik in ('GR17','GR18')  and a.kode_lokasi='$kode_lokasi' 
+			group by a.kode_grafik,a.nama
             order by a.kode_grafik
             ");
             $row = json_decode(json_encode($row),true);
@@ -7284,7 +7283,7 @@ class DashboardController extends Controller
                 }
             }
 
-            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,sum(b.n4*-1) as real, sum(b.n8*-1) as rka,sum(case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n8*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n8*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n8*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai
+            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,sum(b.n4*-1) as real, sum(b.n2*-1) as rka,sum(case when (b.n2*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n2*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                 $where and a.kode_grafik ='GR18' 
