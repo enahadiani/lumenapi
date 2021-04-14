@@ -3381,7 +3381,7 @@ class DashboardController extends Controller
                 }
             }
             */
-            $sql="select a.kode_grafik,a.nama,isnull(b.n1,0) as real,isnull(b.n2,0) as rka,
+            $sql="select a.kode_grafik,case a.nama when 'Beban' then 'Total Beban Opr & Non Opr' else a.nama end as nama,isnull(b.n1,0) as real,isnull(b.n2,0) as rka,
                     case b.n2 when 0 then 0 else (b.n1/b.n2)*100 end as persen 
             from dash_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi,
@@ -3390,17 +3390,18 @@ class DashboardController extends Controller
                         from dash_grafik_d a
                         inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.periode='$periode'  and c.kode_klp='K03'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.periode='$periode'  --and c.kode_klp='K03'
                         group by a.kode_grafik,a.kode_lokasi
                         union
                         select a.kode_grafik,a.kode_lokasi,sum(b.n4) as n1,sum(b.n2) as n2
                         from dash_grafik_d a
                         inner join exs_glma_gar b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_akun
                         inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi 
-                        where a.kode_lokasi='$kode_lokasi' and b.periode='$periode' and c.kode_klp='K03'
+                        where a.kode_lokasi='$kode_lokasi' and b.periode='$periode' 
+                        --and c.kode_klp='K03'
                         group by a.kode_grafik,a.kode_lokasi
                         )b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K03'";
+            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR02','GR23','GR07') ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
             
