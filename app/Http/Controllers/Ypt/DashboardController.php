@@ -8983,25 +8983,34 @@ class DashboardController extends Controller
 			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K01'
             ");
             $rs = json_decode(json_encode($rs),true);
-            $success['data'] = (count($rs) > 0 ? $rs : []);
-
-            $rs2 = DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,e.keterangan,e.nama as nama_target,
-				  case when a.dc='C' then -c.n1 else c.n1 end as rka_thn,
-				  case when a.dc='C' then -c.n2 else c.n2 end as rka_sd,
-				  case when a.dc='C' then -c.n4 else c.n4 end as realisasi,
-				  case when a.dc='C' then -d.n4 else d.n4 end as realisasi_lalu,
-				  case isnull(c.n2,0) when 0 then 0 else (c.n4/c.n2)*100 end as persen,
-				  case isnull(c.n4,0) when 0 then 0 else ((c.n4 - isnull(d.n4,0))/isnull(d.n4,0))*100 end as yoy
-			from dash_grafik_m a
-			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
-			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
-			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$Qu'
-			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K16'
-            ");
-            $rs2 = json_decode(json_encode($rs2),true);
-            $success['data2'] = (count($rs2) > 0 ? $rs2 : []);
+            
+            if(count($rs) > 0){
+                $success['data'] = (count($rs) > 0 ? $rs : []);
+                $rka_thn = floatval($rs[1]['rka_thn'])/floatval($rs[0]['rka_thn']);
+                $rka_sd = floatval($rs[1]['rka_sd'])/floatval($rs[0]['rka_sd']);
+                $realisasi = floatval($rs[1]['realisasi'])/floatval($rs[0]['realisasi']);
+                $realisasi_lalu = floatval($rs[1]['realisasi_lalu'])/floatval($rs[0]['realisasi_lalu']);
+                $rs2 = DB::connection($this->db)->select("
+                select a.kode_grafik,a.nama,e.keterangan,e.nama as nama_target,
+                      $rka_thn * 100 as rka_thn,
+                      $rka_sd * 100 as rka_sd,
+                      $realisasi * 100 as realisasi,
+                      $realisasi_lalu * 100 as realisasi_lalu,
+                      case isnull(c.n2,0) when 0 then 0 else (c.n4/c.n2)*100 end as persen,
+                      case isnull(c.n4,0) when 0 then 0 else ((c.n4 - isnull(d.n4,0))/isnull(d.n4,0))*100 end as yoy
+                from dash_grafik_m a
+                inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+                left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
+                left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
+                left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$Qu'
+                where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K16'
+                ");
+                $rs2 = json_decode(json_encode($rs2),true);
+                $success['data2'] = (count($rs2) > 0 ? $rs2 : []);
+            }else{
+                $success['data'] = [];
+                $success['data2'] = [];
+            }
             
             $success['status'] = true;
             $success['message'] = "Success!";    
