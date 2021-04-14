@@ -1803,7 +1803,17 @@ class DashboardController extends Controller
             }
             
             $bulan = substr($request->periode[1],4,2);
-            $kode_neraca = $request->kode_neraca;
+            $tmp = explode(",",$request->kode_neraca);
+            $kode_neraca = "";
+            for($x=0;$x<count($tmp);$x++){
+                if($x == 0){
+                    $kode_neraca .= "'".$tmp[$x]."'";
+                }else{
+                    
+                    $kode_neraca .= ","."'".$tmp[$x]."'";
+                }
+            }
+
 			$sql="SELECT
             tahun
             FROM
@@ -1811,7 +1821,7 @@ class DashboardController extends Controller
                 SELECT TOP 6 * from (
                 select distinct substring(periode,1,4) as tahun
                 FROM exs_neraca_pp 
-                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca='$kode_neraca'
+                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca in ($kode_neraca)
                 ) a
                 ORDER BY tahun DESC
             ) SQ
@@ -1841,12 +1851,12 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca)
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.nama like 'Fakultas%'
             order by a.kode_bidang";
-            $success['sql'] = $sql;
+            // $success['sql'] = $sql;
             
             $row =  DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($row),true);
@@ -1905,7 +1915,16 @@ class DashboardController extends Controller
             }
             
             $bulan = substr($request->periode[1],4,2);
-            $kode_neraca = $request->kode_neraca;
+            $tmp = explode(",",$request->kode_neraca);
+            $kode_neraca = "";
+            for($x=0;$x<count($tmp);$x++){
+                if($x == 0){
+                    $kode_neraca .= "'".$tmp[$x]."'";
+                }else{
+                    
+                    $kode_neraca .= ","."'".$tmp[$x]."'";
+                }
+            }
             if(isset($request->form) && $request->form != ""){
                 if($request->form == "fDashMSBeban"){
 
@@ -1926,7 +1945,7 @@ class DashboardController extends Controller
                 SELECT TOP 6 * from (
                 select distinct substring(periode,1,4) as tahun
                 FROM exs_neraca_pp 
-                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca='$kode_neraca'
+                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca in ($kode_neraca)
                 ) a
                 ORDER BY tahun DESC
             ) SQ
@@ -1957,7 +1976,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca)
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.kode_bidang not like '5%'
@@ -2017,7 +2036,16 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $kode_neraca = $request->kode_neraca;
+            $tmp = explode(",",$request->kode_neraca);
+            $kode_neraca = "";
+            for($x=0;$x<count($tmp);$x++){
+                if($x == 0){
+                    $kode_neraca .= "'".$tmp[$x]."'";
+                }else{
+                    
+                    $kode_neraca .= ","."'".$tmp[$x]."'";
+                }
+            }
             $tahun= substr($request->periode[1],0,4);
             $periode = $request->periode[1];
             $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
@@ -2034,7 +2062,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode = '$periode'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca) and a.periode = '$periode'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
@@ -2073,7 +2101,16 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $kode_neraca = $request->kode_neraca;
+            $tmp = explode(",",$request->kode_neraca);
+            $kode_neraca = "";
+            for($x=0;$x<count($tmp);$x++){
+                if($x == 0){
+                    $kode_neraca .= "'".$tmp[$x]."'";
+                }else{
+                    
+                    $kode_neraca .= ","."'".$tmp[$x]."'";
+                }
+            }
             $tahun= substr($request->periode[1],0,4);
             $periode = $request->periode[1];
             
@@ -2091,7 +2128,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and a.periode = '$periode'
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca) and a.periode = '$periode'
                         group by c.kode_bidang,a.kode_lokasi
                         )b on a.kode_bidang=b.kode_bidang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' --and isnull(b.n2,0)<>0 
@@ -2133,7 +2170,16 @@ class DashboardController extends Controller
             }
             
             $bulan = substr($request->periode[1],4,2);
-            $kode_neraca = $request->kode_neraca;
+            $tmp = explode(",",$request->kode_neraca);
+            $kode_neraca = "";
+            for($x=0;$x<count($tmp);$x++){
+                if($x == 0){
+                    $kode_neraca .= "'".$tmp[$x]."'";
+                }else{
+                    
+                    $kode_neraca .= ","."'".$tmp[$x]."'";
+                }
+            }
             $kode_bidang = $request->kode_bidang;
 
             $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
@@ -2160,7 +2206,7 @@ class DashboardController extends Controller
                 SELECT TOP 6 * from (
                 select distinct substring(periode,1,4) as tahun
                 FROM exs_neraca_pp 
-                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca='$kode_neraca'
+                WHERE kode_lokasi='$kode_lokasi' and kode_fs='FS4' and kode_neraca in ($kode_neraca)
                 ) a
                 ORDER BY tahun DESC
             ) SQ
@@ -2188,7 +2234,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and c.kode_bidang='$kode_bidang' 
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca) and c.kode_bidang='$kode_bidang' 
                         group by c.kode_pp,a.kode_lokasi
                         )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.thn1,0)<>0 --and a.kode_bidang like '5%'
@@ -2262,7 +2308,16 @@ class DashboardController extends Controller
             $tahun = $request->tahun;
             $periode = $request->periode[1];
             $bulan = substr($periode,4,2);
-            $kode_neraca = $request->kode_neraca;
+            $tmp = explode(",",$request->kode_neraca);
+            $kode_neraca = "";
+            for($x=0;$x<count($tmp);$x++){
+                if($x == 0){
+                    $kode_neraca .= "'".$tmp[$x]."'";
+                }else{
+                    
+                    $kode_neraca .= ","."'".$tmp[$x]."'";
+                }
+            }
             $kode_bidang = $request->kode_bidang;
             $kode_grafik = ($request->kode_grafik != "" ? $request->kode_grafik : "D06");
             $tbl = ($request->kode_grafik != "" ? "dash_grafik_d" : "db_grafik_d");
@@ -2277,7 +2332,7 @@ class DashboardController extends Controller
                         from exs_neraca_pp a
                         inner join $tbl b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                         inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca='$kode_neraca' and c.kode_bidang='$kode_bidang' and a.periode = '".$tahun.$bulan."' 
+                        where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS4' and b.kode_grafik='$kode_grafik' and b.kode_neraca in ($kode_neraca) and c.kode_bidang='$kode_bidang' and a.periode = '".$tahun.$bulan."' 
                         group by c.kode_pp,a.kode_lokasi
                     )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and isnull(b.n4,0)<>0 --and a.kode_bidang like '5%'
@@ -7380,12 +7435,12 @@ class DashboardController extends Controller
             }
 
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,c.kode_neraca,sum(b.n2) as rka, sum(b.n4) as real,sum(case when (b.n2)-isnull(b.n4,0) < 0 then abs((b.n2)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n2)-isnull((b.n4),0) < 0 then 0 else abs((b.n2)-isnull(b.n4,0)) end) as tidak_tercapai
+            select a.kode_grafik,a.nama,dbo.fnGetDashNeraca(a.kode_grafik,a.kode_lokasi) as kode_neraca,sum(b.n2) as rka, sum(b.n4) as real,sum(case when (b.n2)-isnull(b.n4,0) < 0 then abs((b.n2)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n2)-isnull((b.n4),0) < 0 then 0 else abs((b.n2)-isnull(b.n4,0)) end) as tidak_tercapai
             from dash_grafik_m a
 			inner join dash_grafik_d c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             left join exs_neraca b on c.kode_neraca=b.kode_neraca and c.kode_fs=b.kode_fs and c.kode_lokasi=b.kode_lokasi
-            $where and a.kode_grafik in ('GR08','GR09')
-            group by a.kode_grafik,a.nama,c.kode_neraca
+            $where and a.kode_grafik in ('GR24','GR23')
+            group by a.kode_grafik,a.nama,dbo.fnGetDashNeraca(a.kode_grafik,a.kode_lokasi)
             order by a.kode_grafik
             ");
             $row = json_decode(json_encode($row),true);
@@ -7409,7 +7464,7 @@ class DashboardController extends Controller
                     $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000,"key"=>$row[$i]['kode_neraca'],"key2"=>$row[$i]['kode_grafik']);
                     $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"key"=>$row[$i]['kode_neraca'],"key2"=>$row[$i]['kode_grafik']);
                     $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
-                    array_push($ctg,'Beban '.$row[$i]['nama']."|".$acv);
+                    array_push($ctg,$row[$i]['nama']."|".$acv);
                 }
                 $success['rka'] = $rka;
                 $success['ctg'] = $ctg;
@@ -7477,7 +7532,7 @@ class DashboardController extends Controller
                 }
             }
             $row =  DB::connection($this->db)->select("
-                select a.kode_neraca,b.nama,sum(b.n8) as rka, sum(b.n4) as real,sum(case when (b.n8)-isnull((b.n4),0) < 0 then abs((b.n8)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n8)-isnull((b.n4),0) < 0 then 0 else abs((b.n8)-isnull(b.n4,0)) end) as tidak_tercapai
+                select a.kode_neraca,b.nama,sum(b.n2) as rka, sum(b.n4) as real,sum(case when (b.n2)-isnull((b.n4),0) < 0 then abs((b.n2)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n2)-isnull((b.n4),0) < 0 then 0 else abs((b.n2)-isnull(b.n4,0)) end) as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                 $where and a.kode_grafik='GR24'
