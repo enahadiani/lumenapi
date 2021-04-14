@@ -4075,7 +4075,6 @@ class DashboardController extends Controller
                 $tahun++;
             }
             $success['ctg2'] = $ctg;
-            $success['categories'] = $ctg2;
                   
             $row = DB::connection($this->db)->select("select a.kode_grafik,x.nama,
             sum(case when b.jenis_akun='Pendapatan' then -b.n1 else b.n1 end) as rka1, 
@@ -4133,11 +4132,15 @@ class DashboardController extends Controller
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
                         // array_push($ctg,$row[$i]['nama']);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg2[$j-1].="|".$acv;
                     }
 
                 }
                 $success['rka'] = $rka;
                 // $success['categories'] = $ctg;
+                
+                $success['categories'] = $ctg2;
                 $success['actual'] = $real;
                 $success['melampaui'] = $melampaui;
                 $success['tdkcapai'] = $tdkcapai;
@@ -4189,7 +4192,7 @@ class DashboardController extends Controller
                 $tahun++;
             }
             $success['ctg2'] = $ctg;
-            $success['categories'] = $ctg2;
+            // $success['categories'] = $ctg2;
                   
             $row = DB::connection($this->db)->select("select a.kode_grafik,x.nama,
             sum(case when b.jenis_akun='Pendapatan' then -b.n2 else b.n2 end) as rka1, 
@@ -4222,6 +4225,7 @@ class DashboardController extends Controller
                 $melampaui = array();
                 $tdkcapai = array();
                 $ctg = array();
+                $c=0;
                 for($i=0;$i<count($row);$i++){
 
                     for($j=1; $j <= 6 ;$j++){
@@ -4247,11 +4251,14 @@ class DashboardController extends Controller
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
                         // array_push($ctg,$row[$i]['nama']);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg2[$c].="|".$acv;
+                        $c++;
                     }
 
                 }
                 $success['rka'] = $rka;
-                // $success['categories'] = $ctg;
+                $success['categories'] = $ctg2;
                 $success['actual'] = $real;
                 $success['melampaui'] = $melampaui;
                 $success['tdkcapai'] = $tdkcapai;
@@ -5790,6 +5797,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -5896,6 +5905,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -6116,6 +6127,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -6222,6 +6235,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -6327,6 +6342,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -6433,6 +6450,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -6990,6 +7009,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
@@ -7094,6 +7115,8 @@ class DashboardController extends Controller
                         $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real'.$j]/1000000000);
                         $melampaui[] = array("y"=>floatval($lebih)/1000000000,"nlabel"=>floatval($lebih)/1000000000);
                         $tdkcapai[] = array("y"=>floatval($kurang)/1000000000,"nlabel"=>floatval($kurang)/1000000000);
+                        $acv = (floatval($row[$i]['rka'.$j]) != 0 ? round(floatval($row[$i]['real'.$j])/floatval($row[$i]['rka'.$j])*100,2) : 0);
+                        $ctg[$j-1].="|".$acv;
                     }
 
                 }
