@@ -3401,7 +3401,8 @@ class DashboardController extends Controller
                         --and c.kode_klp='K03'
                         group by a.kode_grafik,a.kode_lokasi
                         )b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR02','GR23','GR07') ";
+            where a.kode_lokasi='$kode_lokasi' and a.kode_grafik in ('GR02','GR23','GR07') 
+            order by a.kode_grafik desc";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
             
@@ -3733,7 +3734,7 @@ class DashboardController extends Controller
             
             $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
             from aka_fakultas a
-            left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n8) as gar
+            left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
             from dash_grafik_d a
             inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
@@ -3828,7 +3829,7 @@ class DashboardController extends Controller
 
             $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
             from rektor a
-            left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n8) as gar
+            left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
             from dash_grafik_d a
             inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
@@ -3928,7 +3929,7 @@ class DashboardController extends Controller
                 $kd_grafik = "()";
             }
 
-            $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n8) as gar
+            $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
             from dash_grafik_d a
             inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
