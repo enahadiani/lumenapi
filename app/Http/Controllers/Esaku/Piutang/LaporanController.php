@@ -335,7 +335,7 @@ class LaporanController extends Controller
                     where a.no_bukti='".$res[$i]['no_piutang']."' and a.kode_lokasi='".$res[$i]['kode_lokasi']."'
                     order by a.nu ";
                     $res2 = DB::connection($this->db)->select($sql2);
-                    $res[$i]['detail'] = json_decode(json_encode($res),true);
+                    $res[$i]['detail'] = json_decode(json_encode($res2),true);
                 }
                 
                 $success['status'] = true;
@@ -392,7 +392,7 @@ class LaporanController extends Controller
                     where a.no_bukti='".$res[$i]['no_bukti']."' and a.kode_lokasi='".$res[$i]['kode_lokasi']."'
                     order by a.nu ";
                     $res2 = DB::connection($this->db)->select($sql2);
-                    $res[$i]['detail'] = json_decode(json_encode($res),true);
+                    $res[$i]['detail'] = json_decode(json_encode($res2),true);
                 }
                 
                 $success['status'] = true;
