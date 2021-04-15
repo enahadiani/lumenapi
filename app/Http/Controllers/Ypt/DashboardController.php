@@ -3735,12 +3735,22 @@ class DashboardController extends Controller
             $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
             from aka_fakultas a
             left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
-            from dash_grafik_d a
-            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-            $where and a.kode_grafik='$kode_grafik'  
-            group by d.kode_fakultas,a.kode_lokasi          
+                        from dash_grafik_d a
+                        inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                        inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                        inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                        $where and a.kode_grafik='$kode_grafik'  
+                        group by d.kode_fakultas,a.kode_lokasi   
+                        union all
+                        select d.kode_fakultas,a.kode_lokasi,
+                                sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
+                                sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
+                        from dash_grafik_d a
+                        inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+						inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                        inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                        $where and a.kode_grafik='$kode_grafik'
+                        group by d.kode_fakultas,a.kode_lokasi              
                     )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
             order by a.kode_fakultas
@@ -3858,13 +3868,24 @@ class DashboardController extends Controller
             $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
             from rektor a
             left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
-            from dash_grafik_d a
-            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-			inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
-            $where and a.kode_grafik='$kode_grafik'  
-            group by e.kode_rektor,a.kode_lokasi          
+                        from dash_grafik_d a
+                        inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                        inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                        inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                        inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                        $where and a.kode_grafik='$kode_grafik'  
+                        group by e.kode_rektor,a.kode_lokasi 
+                        union all
+                        select e.kode_rektor,a.kode_lokasi,
+                                sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
+                                sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
+                        from dash_grafik_d a
+                        inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                        inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                        inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                        inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                        $where and a.kode_grafik='$kode_grafik'
+                        group by e.kode_rektor,a.kode_lokasi         
                     )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
             ";
@@ -3969,7 +3990,7 @@ class DashboardController extends Controller
             if($kode_grafik == "GR07"){
                 $kd_grafik = "('GR25','GR26','GR27','GR28')";
             }else{
-                $kd_grafik = "()";
+                $kd_grafik = "('$kode_grafik')";
             }
 
             $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
@@ -3977,6 +3998,13 @@ class DashboardController extends Controller
             inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
             inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             $where and c.jenis='Posting' and a.kode_grafik in $kd_grafik
+            group by a.kode_lokasi,a.kode_grafik,c.nama
+            union all
+            select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
+            from dash_grafik_d a
+            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+            $where and a.kode_grafik in $kd_grafik
             group by a.kode_lokasi,a.kode_grafik,c.nama
             ";
             $rs = DB::connection($this->db)->select($sql);
@@ -4001,10 +4029,10 @@ class DashboardController extends Controller
                 $success["series_real"][0]= array(
                     "name"=> 'Komposisi Realisasi',"data"=>$dt2
                 );
-                $dt[0] = array('','');
-                $success['data'] = $dt;
-                $dt2[0] = array('','');
-                $success['data2'] = $dt2;
+                // $dt[0] = array('','');
+                // $success['data'] = $dt;
+                // $dt2[0] = array('','');
+                // $success['data2'] = $dt2;
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
