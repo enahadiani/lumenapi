@@ -260,7 +260,7 @@ class LaporanController extends Controller
             }else{
                 $filta = " and b.tanggal <='$tgl_aging' ";
             }
-            $sql = "select a.kode_lokasi,a.keterangan,a.no_dokumen,a.no_piutang,date_format(a.tanggal,'%d/%m/%Y') as tgl,b.nama as nama_cust,a.nilai+a.nilai_ppn as tagihan,
+            $sql = "select a.kode_lokasi,a.keterangan,a.no_dokumen,a.no_piutang,convert(varchar,a.tanggal,103) as tgl,b.nama as nama_cust,a.nilai+a.nilai_ppn as tagihan,
             case when datediff(day,a.tanggal,'$tgl_aging')<=30 then a.nilai+a.nilai_ppn else 0 end as aging1,
             case when datediff(day,a.tanggal,'$tgl_aging') between 31 and 60 then a.nilai+a.nilai_ppn else 0 end as aging2,
             case when datediff(day,a.tanggal,'$tgl_aging') between 61 and 90 then a.nilai+a.nilai_ppn else 0 end as aging3,
@@ -333,7 +333,7 @@ class LaporanController extends Controller
                     from trans_j a
                     inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$res[$i]['no_piutang']."' and a.kode_lokasi='".$res[$i]['kode_lokasi']."'
-                    order by a.nu' ";
+                    order by a.nu ";
                     $res2 = DB::connection($this->db)->select($sql2);
                     $res[$i]['detail'] = json_decode(json_encode($res),true);
                 }
