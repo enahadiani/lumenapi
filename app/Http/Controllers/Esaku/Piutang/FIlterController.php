@@ -115,7 +115,7 @@ class FilterController extends Controller
             }
 
             $col_array = array('periode','kode_cust');
-            $db_col_name = array('a.periode','a.kode_cust');
+            $db_col_name = array('a.periode','a.param1');
             $where = "where kode_lokasi='$kode_lokasi'";
             $this_in = "";
 
@@ -151,7 +151,7 @@ class FilterController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $where = "where kode_lokasi='$kode_lokasi' and b.kode_flag='003'";
+            $where = "where a.kode_lokasi='$kode_lokasi' and b.kode_flag='003'";
             $sql ="select a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi $where ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
