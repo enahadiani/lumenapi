@@ -152,6 +152,24 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-agg-posisi-rra','Esaku\Anggaran\LaporanController@getPosisiRRA');
 
     
+    // LAPORAN PIUTANG
+    //ANGGARAN
+    $router->get('filter-piu-periode','Esaku\Piutang\FilterController@getFilterPeriode');
+    $router->get('filter-piu-akun','Esaku\Piutang\FilterController@getFilterAkunPiutang');
+    $router->get('filter-piu-cust','Esaku\Piutang\FilterController@getFilterCustomer');
+    $router->get('filter-piu-nopiutang','Esaku\Piutang\FilterController@getFilterNoPiutang');
+    $router->get('filter-piu-nobayar','Esaku\Piutang\FilterController@getFilterNoJurnal');
+
+    $router->get('lap-piu-cust','Esaku\Piutang\LaporanController@getCustomer');
+    $router->get('lap-piu-pengakuan','Esaku\Piutang\LaporanController@getPengakuan');
+    $router->get('lap-piu-saldo','Esaku\Piutang\LaporanController@getSaldo');
+    $router->get('lap-piu-kartu','Esaku\Piutang\LaporanController@getKartuPiutang');
+    $router->get('lap-piu-aging','Esaku\Piutang\LaporanController@getAging');
+    $router->get('lap-piu-jurnalakru','Esaku\Piutang\LaporanController@getPiutangJurnal');
+    $router->get('lap-piu-jurnalbayar','Esaku\Piutang\LaporanController@getPiutangKas');
+
+    
+
 
 
     
