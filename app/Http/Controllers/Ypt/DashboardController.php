@@ -3732,7 +3732,7 @@ class DashboardController extends Controller
             // Warna per fakultas
             $color = array('#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66');
             
-            $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
+            $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
             from aka_fakultas a
             left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
             from dash_grafik_d a
@@ -3746,34 +3746,49 @@ class DashboardController extends Controller
             order by a.kode_fakultas
             ";
             $rs = DB::connection($this->db)->select($sql);
-            $rs = json_decode(json_encode($rs),true);
+            $row = json_decode(json_encode($rs),true);
             
             $success['colors'] = $color;
-            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
-                
-                // $dt = array();
-                // for($i=0;$i<count($rs);$i++){
-                //     $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
-                // }
-                // $dt[0] = array('','',array('role'=>'style'));
-                $dt = array();
-                $ctg= array();
-                for($i=0;$i<count($rs);$i++){
-                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['n2']),"color"=> $color[$i]);
-                    array_push($ctg,$rs[$i]['nama']);    
+            $ctg = array();
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka'])/1000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real']/1000000;
+                    }else{
+                        $r = $row[$i]['real']/1000000;
+                    }
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000,"nlabel"=>floatval($row[$i]['rka'])/1000000,"key"=>$row[$i]['kode_fakultas'],"key2"=>$row[$i]['kode_fakultas']);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000,"key"=>$row[$i]['kode_fakultas'],"key2"=>$row[$i]['kode_fakultas']);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000,"key"=>$row[$i]['kode_fakultas'],"key2"=>$row[$i]['kode_fakultas']);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000,"key"=>$row[$i]['kode_fakultas'],"key2"=>$row[$i]['kode_fakultas']);
+                    $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
+                    array_push($ctg, $row[$i]['nama']."|".$acv);
                 }
+                $success['rka'] = $rka;
                 $success['ctg'] = $ctg;
-                $success["series"][0]= array(
-                    "name"=> $nama,"colorByPoint" => false,"data"=>$dt
-                );
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
+                
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['ctg'] = $ctg;
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
+                $success['series'] = [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
@@ -3827,7 +3842,20 @@ class DashboardController extends Controller
                 $color = $this->dark_color;
             }
 
-            $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
+            // $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as n1,isnull(b.gar,0) as n2
+            // from rektor a
+            // left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
+            // from dash_grafik_d a
+            // inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            // inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+            // inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+			// inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+            // $where and a.kode_grafik='$kode_grafik'  
+            // group by e.kode_rektor,a.kode_lokasi          
+            //         )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
+            // where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
+            // ";
+            $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
             from rektor a
             left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
             from dash_grafik_d a
@@ -3841,34 +3869,49 @@ class DashboardController extends Controller
             where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
             ";
             $rs = DB::connection($this->db)->select($sql);
-            $rs = json_decode(json_encode($rs),true);
+            $row = json_decode(json_encode($rs),true);
             
             $success['colors'] = $color;
-            if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
-                
-                // $dt = array();
-                // for($i=0;$i<count($rs);$i++){
-                //     $dt[$i]= array($rs[$i]['nama'],floatval($rs[$i]['nilai']),$color[$i]);
-                // }
-                // $dt[0] = array('','',array('role'=>'style'));
-                $dt = array();
-                $ctg= array();
-                for($i=0;$i<count($rs);$i++){
-                    $dt[] = array("name"=>$rs[$i]['nama'], "y" => floatval($rs[$i]['n2']),"color"=> $color[$i]);
-                    array_push($ctg,$rs[$i]['nama']);    
+            $ctg = array();
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+                $rka = array();
+                $real = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka'])/1000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real']/1000000;
+                    }else{
+                        $r = $row[$i]['real']/1000000;
+                    }
+                    $rka[] = array("y"=>floatval($row[$i]['rka'])/1000000,"nlabel"=>floatval($row[$i]['rka'])/1000000,"key"=>$row[$i]['kode_rektor'],"key2"=>$row[$i]['kode_rektor']);
+                    $real[] = array("y"=>$r,"nlabel"=>$row[$i]['real']/1000000,"key"=>$row[$i]['kode_rektor'],"key2"=>$row[$i]['kode_rektor']);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000,"key"=>$row[$i]['kode_rektor'],"key2"=>$row[$i]['kode_rektor']);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000,"key"=>$row[$i]['kode_rektor'],"key2"=>$row[$i]['kode_rektor']);
+                    $acv = (floatval($row[$i]['rka']) != 0 ? round(floatval($row[$i]['real'])/floatval($row[$i]['rka'])*100,2) : 0);
+                    array_push($ctg, $row[$i]['nama']."|".$acv);
                 }
+                $success['rka'] = $rka;
                 $success['ctg'] = $ctg;
-                $success["series"][0]= array(
-                    "name"=> $nama,"colorByPoint" => false,"data"=>$dt
-                );
+                $success['actual'] = $real;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
                 $success['status'] = true;
                 $success['message'] = "Success!";
                 
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
+                
+                $success['rka'] = [];
+                $success['real'] = [];
+                $success['ctg'] = $ctg;
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
+                $success['series'] = [];
                 $success['status'] = true;
                 
                 return response()->json(['success'=>$success], $this->successStatus);
