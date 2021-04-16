@@ -3764,29 +3764,67 @@ class DashboardController extends Controller
             // Warna per fakultas
             $color = array('#2200FF','#FFCD2F','#38995a','#27D1E6','#E225FF','#FE732F','#28DA66');
             
-            $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
-            from aka_fakultas a
-            left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
-                        from dash_grafik_d a
-                        inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                        inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-                        inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-                        $where and a.kode_grafik='$kode_grafik'  
-                        group by d.kode_fakultas,a.kode_lokasi   
-                        union all
-                        select d.kode_fakultas,a.kode_lokasi,
-                                sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
-                                sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
-                        from dash_grafik_d a
-                        inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-						inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-                        inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-                        $where and a.kode_grafik='$kode_grafik'
-                        group by d.kode_fakultas,a.kode_lokasi              
-                    )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
-            order by a.kode_fakultas
-            ";
+            if($kode_grafik == "GRXX"){
+                // NON SDM & Pengembangan
+                $sql = "select a.kode_fakultas,a.nama,isnull(sum(b.nilai),0) as real,isnull(sum(b.gar),0) as rka,case when isnull(sum(b.gar),0)-isnull(sum(b.nilai),0) < 0 then abs(isnull(sum(b.gar),0)-isnull(sum(b.nilai),0)) else 0 end as melampaui,  case when isnull(sum(b.gar),0)-isnull(sum(b.nilai),0) < 0 then 0 else abs(isnull(sum(b.gar),0)-isnull(sum(b.nilai),0)) end as tidak_tercapai 
+                from aka_fakultas a
+                left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4)*-1 as nilai,sum(b.n2)*-1 as gar
+                            from dash_grafik_d a
+                            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            $where and a.kode_grafik='GR07'  
+                            group by d.kode_fakultas,a.kode_lokasi   
+                            union all
+                            select d.kode_fakultas,a.kode_lokasi,
+                                    sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
+                                    sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
+                            from dash_grafik_d a
+                            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            $where and a.kode_grafik in ('GR02')  
+                            group by d.kode_fakultas,a.kode_lokasi
+                            union all      
+                            select d.kode_fakultas,a.kode_lokasi,
+                                    sum(case when c.dc='C' then -b.n4 else b.n4 end)*-1 as n1,
+                                    sum(case when c.dc='C' then -b.n2 else b.n2 end)*-1 as n2
+                            from dash_grafik_d a
+                            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            $where and a.kode_grafik in ('GR23')  
+                            group by d.kode_fakultas,a.kode_lokasi              
+                        )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
+                group by a.kode_fakultas,a.nama
+                order by a.kode_fakultas ";
+            }else{
+
+                $sql="select a.kode_fakultas,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
+                from aka_fakultas a
+                left join (select d.kode_fakultas,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
+                            from dash_grafik_d a
+                            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            $where and a.kode_grafik='$kode_grafik'  
+                            group by d.kode_fakultas,a.kode_lokasi   
+                            union all
+                            select d.kode_fakultas,a.kode_lokasi,
+                                    sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
+                                    sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
+                            from dash_grafik_d a
+                            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp_fakultas d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            $where and a.kode_grafik='$kode_grafik'
+                            group by d.kode_fakultas,a.kode_lokasi              
+                        )b on a.kode_fakultas=b.kode_fakultas and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0)
+                order by a.kode_fakultas
+                ";
+            }
             $rs = DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($rs),true);
             
@@ -3897,30 +3935,72 @@ class DashboardController extends Controller
             //         )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
             // where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
             // ";
-            $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
-            from rektor a
-            left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
-                        from dash_grafik_d a
-                        inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                        inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-                        inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-                        inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
-                        $where and a.kode_grafik='$kode_grafik'  
-                        group by e.kode_rektor,a.kode_lokasi 
-                        union all
-                        select e.kode_rektor,a.kode_lokasi,
-                                sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
-                                sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
-                        from dash_grafik_d a
-                        inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-                        inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-                        inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
-                        inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
-                        $where and a.kode_grafik='$kode_grafik'
-                        group by e.kode_rektor,a.kode_lokasi         
-                    )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
-            ";
+            if($kode_grafik == "GRXX"){
+                // NON SDM & Pengembangan
+                $sql="select a.kode_rektor,a.nama,isnull(sum(b.nilai),0) as real,isnull(sum(b.gar),0) as rka,case when isnull(sum(b.gar),0)-isnull(sum(b.nilai),0) < 0 then abs(isnull(sum(b.gar),0)-isnull(sum(b.nilai),0)) else 0 end as melampaui,  case when isnull(sum(b.gar),0)-isnull(sum(b.nilai),0) < 0 then 0 else abs(isnull(sum(b.gar),0)-isnull(sum(b.nilai),0)) end as tidak_tercapai 
+                from rektor a
+                left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4)*-1 as nilai,sum(b.n2)*-1 as gar
+                            from dash_grafik_d a
+                            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                            $where and a.kode_grafik='GR07'  
+                            group by e.kode_rektor,a.kode_lokasi 
+                            union all
+                            select e.kode_rektor,a.kode_lokasi,
+                                    sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
+                                    sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
+                            from dash_grafik_d a
+                            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                            $where and a.kode_grafik='GR02'  
+                            group by e.kode_rektor,a.kode_lokasi  
+                            union all
+                            select e.kode_rektor,a.kode_lokasi,
+                                    sum(case when c.dc='C' then -b.n4 else b.n4 end)*-1 as n1,
+                                    sum(case when c.dc='C' then -b.n2 else b.n2 end)*-1 as n2
+                            from dash_grafik_d a
+                            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                            $where and a.kode_grafik='GR23'  
+                            group by e.kode_rektor,a.kode_lokasi         
+                        )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_rektor <> 5
+                group by a.kode_rektor,a.nama
+                having (isnull(sum(b.nilai),0)<>0 or isnull(sum(b.gar),0)<>0) 
+                ";
+            }else{
+
+                $sql="select a.kode_rektor,a.nama,isnull(b.nilai,0) as real,isnull(b.gar,0) as rka,case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then abs(isnull(b.gar,0)-isnull(b.nilai,0)) else 0 end as melampaui,  case when isnull(b.gar,0)-isnull(b.nilai,0) < 0 then 0 else abs(isnull(b.gar,0)-isnull(b.nilai,0)) end as tidak_tercapai 
+                from rektor a
+                left join (select e.kode_rektor,a.kode_lokasi,sum(b.n4) as nilai,sum(b.n2) as gar
+                            from dash_grafik_d a
+                            inner join exs_glma_gar_pp b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                            $where and a.kode_grafik='$kode_grafik'  
+                            group by e.kode_rektor,a.kode_lokasi 
+                            union all
+                            select e.kode_rektor,a.kode_lokasi,
+                                    sum(case when c.dc='C' then -b.n4 else b.n4 end) as n1,
+                                    sum(case when c.dc='C' then -b.n2 else b.n2 end) as n2
+                            from dash_grafik_d a
+                            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                            inner join pp d on b.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi
+                            inner join exs_bidang e on d.kode_bidang=e.kode_bidang and d.kode_lokasi=e.kode_lokasi
+                            $where and a.kode_grafik='$kode_grafik'
+                            group by e.kode_rektor,a.kode_lokasi         
+                        )b on a.kode_rektor=b.kode_rektor and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and (isnull(b.nilai,0)<>0 or isnull(b.gar,0)<>0) and a.kode_rektor <> 5
+                ";
+            }
             $rs = DB::connection($this->db)->select($sql);
             $row = json_decode(json_encode($rs),true);
             
@@ -4030,7 +4110,32 @@ class DashboardController extends Controller
                 ";
             }else if($kode_grafik == "GRXX"){
                 $kd_grafik = "('$kode_grafik')";
-                $sql = "";
+                $sql = "select 'GRXX' as kode_grafik,'NON SDM & Pengembangan' as nama, sum(a.nilai) as nilai, sum(a.gar) as gar 
+				from (
+                    select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4)*-1 as nilai,sum(b.n2)*-1 as gar
+                    from dash_grafik_d a
+                    inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                    inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                    $where and c.jenis='Posting' and a.kode_grafik in ('GR25','GR26','GR27','GR28')
+                    group by a.kode_lokasi,a.kode_grafik,c.nama
+                    union all
+                    select a.kode_lokasi,a.kode_grafik,e.nama,sum(b.n4)*-1 as nilai,sum(b.n2)*-1 as gar
+                    from dash_grafik_d a
+                    inner join relakun d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and d.kode_fs='FS2'
+                    inner join masakun e on d.kode_akun=e.kode_akun and d.kode_lokasi=e.kode_lokasi
+                    inner join exs_glma_gar b on d.kode_akun=b.kode_akun and d.kode_lokasi=b.kode_lokasi 
+                    inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                    $where and a.kode_grafik in ('GR23')
+                    group by a.kode_lokasi,a.kode_grafik,e.nama
+                    having sum(b.n4) <> 0 or sum(b.n2) <> 0
+                    union all
+                    select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
+                    from dash_grafik_d a
+                    inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                    inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                    $where and a.kode_grafik in ('GR02')
+                    group by a.kode_lokasi,a.kode_grafik,c.nama
+				) a";
             }else if($kode_grafik == "GR23"){
                 $kd_grafik = "('$kode_grafik')";
                 $sql = "select a.kode_lokasi,a.kode_grafik,e.nama,sum(b.n4) as nilai,sum(b.n2) as gar
