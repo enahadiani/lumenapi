@@ -4147,6 +4147,13 @@ class DashboardController extends Controller
                 $where and a.kode_grafik in $kd_grafik
                 group by a.kode_lokasi,a.kode_grafik,e.nama
                 having sum(b.n4) <> 0 or sum(b.n2) <> 0 ";
+            }else if($kode_grafik == "GR02"){
+                $sql = "select a.kode_lokasi,a.kode_grafik,b.kode_neraca,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
+                from dash_grafik_d a
+                inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                $where and a.kode_grafik in ('GR50','GR51')
+                group by a.kode_lokasi,a.kode_grafik,b.kode_neraca,c.nama";
             }else{
                 $kd_grafik = "('$kode_grafik')";
                 $sql = "select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
