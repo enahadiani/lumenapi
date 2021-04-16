@@ -7315,7 +7315,12 @@ class DashboardController extends Controller
             }
 
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,sum(b.n2*-1) as rka, sum(b.n4*-1) as real,sum(case when (b.n2*-1)-isnull(b.n4*-1,0) < 0 then abs((b.n2*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai from dash_grafik_m a
+            select a.kode_grafik,a.nama,
+            sum(b.n2*-1) as rka, 
+            sum(b.n4*-1) as real,
+            case when sum(b.n2*-1)-isnull(sum(b.n4*-1),0) < 0 then abs(sum(b.n2*-1)-isnull(sum(b.n4*-1),0)) else 0 end as melampaui,  
+            case when sum(b.n2*-1)-isnull(sum(b.n4*-1),0) < 0 then 0 else abs(sum(b.n2*-1)-isnull(sum(b.n4*-1),0)) end as tidak_tercapai
+            from dash_grafik_m a
 			inner join dash_grafik_d c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             left join exs_neraca b on c.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and c.kode_fs=b.kode_fs
 			$where and a.kode_grafik in ('GR17','GR18')  and a.kode_lokasi='$kode_lokasi' 
@@ -7411,7 +7416,11 @@ class DashboardController extends Controller
                 }
             }
 
-            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,sum(b.n4*-1) as real, sum(b.n2*-1) as rka,sum(case when (b.n2*-1)-isnull((b.n4*-1),0) < 0 then abs((b.n2*-1)-isnull(b.n4*-1,0)) else 0 end) as melampaui,  sum(case when (b.n2*-1)-isnull((b.n4*-1),0) < 0 then 0 else abs((b.n2*-1)-isnull(b.n4*-1,0)) end) as tidak_tercapai
+            $row =  DB::connection($this->db)->select("select a.kode_neraca,b.nama,
+            sum(b.n2*-1) as rka, 
+            sum(b.n4*-1) as real,
+            case when sum(b.n2*-1)-isnull(sum(b.n4*-1),0) < 0 then abs(sum(b.n2*-1)-isnull(sum(b.n4*-1),0)) else 0 end as melampaui,  
+            case when sum(b.n2*-1)-isnull(sum(b.n4*-1),0) < 0 then 0 else abs(sum(b.n2*-1)-isnull(sum(b.n4*-1),0)) end as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                 $where and a.kode_grafik ='GR18' 
@@ -7508,7 +7517,10 @@ class DashboardController extends Controller
             }
 
             $row =  DB::connection($this->db)->select("
-            select a.kode_grafik,a.nama,dbo.fnGetDashNeraca(a.kode_grafik,a.kode_lokasi) as kode_neraca,sum(b.n2) as rka, sum(b.n4) as real,sum(case when (b.n2)-isnull(b.n4,0) < 0 then abs((b.n2)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n2)-isnull((b.n4),0) < 0 then 0 else abs((b.n2)-isnull(b.n4,0)) end) as tidak_tercapai
+            select a.kode_grafik,a.nama,dbo.fnGetDashNeraca(a.kode_grafik,a.kode_lokasi) as kode_neraca, sum(b.n2) as rka, 
+            sum(b.n4) as real,
+            case when sum(b.n2)-isnull(sum(b.n4),0) < 0 then abs(sum(b.n2)-isnull(sum(b.n4),0)) else 0 end as melampaui,  
+            case when sum(b.n2)-isnull(sum(b.n4),0) < 0 then 0 else abs(sum(b.n2)-isnull(sum(b.n4),0)) end as tidak_tercapai
             from dash_grafik_m a
 			inner join dash_grafik_d c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
             left join exs_neraca b on c.kode_neraca=b.kode_neraca and c.kode_fs=b.kode_fs and c.kode_lokasi=b.kode_lokasi
@@ -7605,7 +7617,11 @@ class DashboardController extends Controller
                 }
             }
             $row =  DB::connection($this->db)->select("
-                select a.kode_neraca,b.nama,sum(b.n2) as rka, sum(b.n4) as real,sum(case when (b.n2)-isnull((b.n4),0) < 0 then abs((b.n2)-isnull(b.n4,0)) else 0 end) as melampaui,  sum(case when (b.n2)-isnull((b.n4),0) < 0 then 0 else abs((b.n2)-isnull(b.n4,0)) end) as tidak_tercapai
+                select a.kode_neraca,b.nama,
+                sum(b.n2) as rka, 
+                sum(b.n4) as real,
+                case when sum(b.n2)-isnull(sum(b.n4),0) < 0 then abs(sum(b.n2)-isnull(sum(b.n4),0)) else 0 end as melampaui,  
+                case when sum(b.n2)-isnull(sum(b.n4),0) < 0 then 0 else abs(sum(b.n2)-isnull(sum(b.n4),0)) end as tidak_tercapai
                 from dash_grafik_d a
                 inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                 $where and a.kode_grafik='GR24'
