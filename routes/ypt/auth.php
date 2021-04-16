@@ -41,6 +41,14 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('s3')->response('ypt/'.$filename); 
 });
 
+$router->get('storage2/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('telu/'.$filename)) {
+        abort(404);
+    }
+    return Storage::disk('s3')->response('telu/'.$filename); 
+});
+
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
