@@ -4021,24 +4021,37 @@ class DashboardController extends Controller
             
             if($kode_grafik == "GR07"){
                 $kd_grafik = "('GR25','GR26','GR27','GR28')";
+                $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
+                from dash_grafik_d a
+                inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                $where and c.jenis='Posting' and a.kode_grafik in $kd_grafik
+                group by a.kode_lokasi,a.kode_grafik,c.nama
+                ";
+            }else if($kode_grafik == "GRXX"){
+                $kd_grafik = "('$kode_grafik')";
+                $sql = "";
+            }else if($kode_grafik == "GR23"){
+                $kd_grafik = "('$kode_grafik')";
+                $sql = "select a.kode_lokasi,a.kode_grafik,e.nama,sum(b.n4) as nilai,sum(b.n2) as gar
+                from dash_grafik_d a
+                inner join relakun d on a.kode_neraca=d.kode_neraca and a.kode_lokasi=d.kode_lokasi and d.kode_fs='FS2'
+                inner join masakun e on d.kode_akun=e.kode_akun and d.kode_lokasi=e.kode_lokasi
+                inner join exs_glma_gar b on d.kode_akun=b.kode_akun and d.kode_lokasi=b.kode_lokasi 
+                inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                $where and a.kode_grafik in $kd_grafik
+                group by a.kode_lokasi,a.kode_grafik,e.nama
+                having sum(b.n4) <> 0 or sum(b.n2) <> 0 ";
             }else{
                 $kd_grafik = "('$kode_grafik')";
+                $sql = "select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
+                from dash_grafik_d a
+                inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                $where and a.kode_grafik in $kd_grafik
+                group by a.kode_lokasi,a.kode_grafik,c.nama";
             }
 
-            $sql="select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
-            from dash_grafik_d a
-            inner join exs_glma_gar b on a.kode_neraca=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            $where and c.jenis='Posting' and a.kode_grafik in $kd_grafik
-            group by a.kode_lokasi,a.kode_grafik,c.nama
-            union all
-            select a.kode_lokasi,a.kode_grafik,c.nama,sum(b.n4) as nilai,sum(b.n2) as gar
-            from dash_grafik_d a
-            inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            inner join dash_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
-            $where and a.kode_grafik in $kd_grafik
-            group by a.kode_lokasi,a.kode_grafik,c.nama
-            ";
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs),true);
             
