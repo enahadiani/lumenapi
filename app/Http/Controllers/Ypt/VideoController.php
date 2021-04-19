@@ -41,7 +41,7 @@ class VideoController extends Controller
                 }else{
                     $filter = "where no_bukti='$request->no_bukti' ";
                 }
-                $sql= "select no_bukti,keterangan,link,convert(varchar,tanggal,103) as tanggal,flag_aktif from dash_video  $filter";
+                $sql= "select no_bukti,keterangan,link,convert(varchar,tanggal,103) as tanggal,flag_aktif,flag_rektor from dash_video  $filter";
             }else{
                 $sql = "select no_bukti,keterangan,link,convert(varchar,tanggal,103) as tanggal,flag_aktif from dash_video ";
             }
@@ -90,7 +90,8 @@ class VideoController extends Controller
             'tanggal' => 'required',
             'keterangan' => 'required',
             'link' => 'required',
-            'flag_aktif' => 'required'
+            'flag_aktif' => 'required',
+            'flag_rektor' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -102,7 +103,7 @@ class VideoController extends Controller
             }
 
             $no_bukti = $this->generateKode("dash_video", "no_bukti", "VID".substr($request->tanggal,0,2), "001");
-            $ins = DB::connection($this->db)->insert("insert into dash_video(no_bukti,tanggal,keterangan,link,flag_aktif,nik_user,kode_lokasi) values ('".$no_bukti."','".$request->tanggal."','".$request->keterangan."','".$request->link."','".$request->flag_aktif."','".$nik."','$kode_lokasi') ");
+            $ins = DB::connection($this->db)->insert("insert into dash_video(no_bukti,tanggal,keterangan,link,flag_aktif,nik_user,kode_lokasi,flag_rektor) values ('".$no_bukti."','".$request->tanggal."','".$request->keterangan."','".$request->link."','".$request->flag_aktif."','".$nik."','$kode_lokasi','$request->flag_rektor') ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -146,7 +147,8 @@ class VideoController extends Controller
             'tanggal' => 'required',
             'keterangan' => 'required',
             'link' => 'required',
-            'flag_aktif' => 'required'
+            'flag_aktif' => 'required',
+            'flag_rektor' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -161,7 +163,7 @@ class VideoController extends Controller
             ->where('no_bukti', $request->no_bukti)
             ->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into dash_video(no_bukti,tanggal,keterangan,link,flag_aktif,nik_user,kode_lokasi) values ('".$request->no_bukti."','".$request->tanggal."','".$request->keterangan."','".$request->link."','".$request->flag_aktif."','".$nik."','$kode_lokasi') ");
+            $ins = DB::connection($this->db)->insert("insert into dash_video(no_bukti,tanggal,keterangan,link,flag_aktif,nik_user,kode_lokasi,flag_rektor) values ('".$request->no_bukti."','".$request->tanggal."','".$request->keterangan."','".$request->link."','".$request->flag_aktif."','".$nik."','$kode_lokasi','$request->flag_rektor') ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
