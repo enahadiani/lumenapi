@@ -8635,6 +8635,7 @@ class DashboardController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
             }
 
             $col_array = array('periode');
@@ -8664,7 +8665,12 @@ class DashboardController extends Controller
                 }
             }
             
-			$sql="select no_bukti,convert(varchar,tanggal,103) as tgl,keterangan,link,flag_aktif,nik_user from dash_video where flag_aktif='1' and kode_lokasi='$kode_lokasi'
+            if($status_admin == "R"){
+                $filter_rektor = " and flag_rektor ='1' ";
+            }else{
+                $filter_rektor = "";
+            }
+			$sql="select no_bukti,convert(varchar,tanggal,103) as tgl,keterangan,link,flag_aktif,nik_user from dash_video where flag_aktif='1' and kode_lokasi='$kode_lokasi' $filter_rektor
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
