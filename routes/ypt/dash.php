@@ -90,6 +90,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('komponen-investasi','Ypt\DashboardController@komponenInvestasi');
     $router->get('rka-real-investasi','Ypt\DashboardController@rkaVSRealInvestasi');
     $router->get('penyerapan-investasi','Ypt\DashboardController@penyerapanInvestasi');
+    $router->get('penyerapan-investasi-tahun','Ypt\DashboardController@penyerapanInvestasiTahun');
 
     // Management System
     $router->get('profit-loss','Ypt\DashboardController@profitLoss');

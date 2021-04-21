@@ -9518,7 +9518,7 @@ class DashboardController extends Controller
                 }
             }
 
-            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.nama,isnull(b.n6,0) as real_sd,isnull(b.n2,0) as rka_sd,isnull(b.n1,0) as rka_thn,case when (isnull(b.n1,0)-isnull(b.n6,0)) < 0 then isnull(b.n1,0)-isnull(b.n6,0) else 0 end as melampaui,case when abs(isnull(b.n1,0)-isnull(b.n6,0)) > 0 then isnull(b.n1,0)-isnull(b.n6,0) else 0 end as tidak_tercapai
+            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.nama,isnull(b.n6,0) as real_sd,isnull(b.n2,0) as rka_sd,case when (isnull(b.n2,0)-isnull(b.n6,0)) < 0 then isnull(b.n2,0)-isnull(b.n6,0) else 0 end as melampaui,case when abs(isnull(b.n2,0)-isnull(b.n6,0)) > 0 then isnull(b.n2,0)-isnull(b.n6,0) else 0 end as tidak_tercapai
             from dash_grafik_m a
             left join (select a.kode_grafik,a.kode_lokasi, 
                                 sum(case when a.dc='C' then -c.n6 else c.n6 end) as n6, 
@@ -9536,6 +9536,108 @@ class DashboardController extends Controller
             if(count($row) > 0){ //mengecek apakah data kosong atau tidak
 
                 $rka_sd = array();
+                $real_sd = array();
+                $melampaui = array();
+                $tdkcapai = array();
+                $ctg = array();
+                for($i=0;$i<count($row);$i++){
+                    if(floatval($row[$i]['melampaui']) > 0){
+                        $r = floatval($row[$i]['rka_sd'])/1000000000;
+                    }else if(floatval($row[$i]['tidak_tercapai']) > 0){
+                        $r = $row[$i]['real_sd']/1000000000;
+                    }else{
+                        $r = $row[$i]['real_sd']/1000000000;
+                    }
+                    $rka_sd[] = array("y"=>floatval($row[$i]['rka_sd'])/1000000000,"nlabel"=>floatval($row[$i]['rka_sd'])/1000000000);
+                    $real_sd[] = array("y"=>$r,"nlabel"=>$row[$i]['real_sd']/1000000000);
+                    $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
+                    $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
+                    $acv = (floatval($row[$i]['rka_sd']) != 0 ? round(floatval($row[$i]['real_sd'])/floatval($row[$i]['rka_sd'])*100,2) : 0);
+                    array_push($ctg,$row[$i]['nama']."|".$acv);
+                }
+                $success['rka_sd'] = $rka_sd;
+                $success['ctg'] = $ctg;
+                $success['real_sd'] = $real_sd;
+                $success['melampaui'] = $melampaui;
+                $success['tdkcapai'] = $tdkcapai;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['rka_sd'] = [];
+                $success['ctg'] = [];
+                $success['real_sd'] = [];
+                $success['melampaui'] = [];
+                $success['tdkcapai'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['series'] = [];
+                $success['status'] = true;
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function penyerapanInvestasiTahun(Request $request){
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('c.periode');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $row =  DB::connection($this->db)->select("select a.kode_grafik,a.nama,isnull(b.n1,0) as rka_thn,isnull(b.n6,0) as real_sd,case when (isnull(b.n1,0)-isnull(b.n6,0)) < 0 then isnull(b.n1,0)-isnull(b.n6,0) else 0 end as melampaui,case when abs(isnull(b.n1,0)-isnull(b.n6,0)) > 0 then isnull(b.n1,0)-isnull(b.n6,0) else 0 end as tidak_tercapai
+            from dash_grafik_m a
+            left join (select a.kode_grafik,a.kode_lokasi, 
+                                sum(case when a.dc='C' then -c.n6 else c.n6 end) as n6, 
+                                sum(case when a.dc='C' then -c.n2 else c.n2 end) as n2,
+                                sum(case when a.dc='C' then -c.n1 else c.n1 end) as n1
+                        from dash_grafik_m a 
+                        inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi 
+                        left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs 
+                        $where  and a.kode_klp='K12' 
+                        group by a.kode_grafik,a.kode_lokasi
+                    )b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.kode_klp='K12'
+            ");
+            $row = json_decode(json_encode($row),true);
+            if(count($row) > 0){ //mengecek apakah data kosong atau tidak
+
                 $rka_thn = array();
                 $real_sd = array();
                 $melampaui = array();
@@ -9552,13 +9654,11 @@ class DashboardController extends Controller
                     $rka_thn[] = array("y"=>floatval($row[$i]['rka_thn'])/1000000000,"nlabel"=>floatval($row[$i]['rka_thn'])/1000000000);
                     $real_sd[] = array("y"=>$r,"nlabel"=>$row[$i]['real_sd']/1000000000);
                     $melampaui[] = array("y"=>floatval($row[$i]['melampaui'])/1000000000,"nlabel"=>floatval($row[$i]['melampaui'])/1000000000);
-                    $rka_sd[] = array("y"=>floatval($row[$i]['rka_sd'])/1000000000,"nlabel"=>floatval($row[$i]['rka_sd'])/1000000000);
                     $tdkcapai[] = array("y"=>floatval($row[$i]['tidak_tercapai'])/1000000000,"nlabel"=>floatval($row[$i]['tidak_tercapai'])/1000000000);
-                    $acv = (floatval($row[$i]['rka_sd']) != 0 ? round(floatval($row[$i]['real_sd'])/floatval($row[$i]['rka_sd'])*100,2) : 0);
+                    $acv = (floatval($row[$i]['rka_thn']) != 0 ? round(floatval($row[$i]['real_sd'])/floatval($row[$i]['rka_thn'])*100,2) : 0);
                     array_push($ctg,$row[$i]['nama']."|".$acv);
                 }
                 $success['rka_thn'] = $rka_thn;
-                $success['rka_sd'] = $rka_sd;
                 $success['ctg'] = $ctg;
                 $success['real_sd'] = $real_sd;
                 $success['melampaui'] = $melampaui;
@@ -9571,7 +9671,6 @@ class DashboardController extends Controller
             else{
                 
                 $success['rka_thn'] = [];
-                $success['rka_sd'] = [];
                 $success['ctg'] = [];
                 $success['real_sd'] = [];
                 $success['melampaui'] = [];
