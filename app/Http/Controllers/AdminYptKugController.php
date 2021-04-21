@@ -376,4 +376,45 @@ class AdminYptKugController extends Controller
         }
     }
 
+    
+    public function updateDataPribadi(Request $request)
+    {  
+        try {
+            if($data =  Auth::guard('yptkug')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_login = $data->status_login;
+            }
+            $res = DB::connection('sqlsrvyptkug')->select("select email from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+            $email = $res[0]->email;
+
+            if(isset($request->email)){
+                $email = $request->email;
+            }else{
+                $email = $email;
+            }
+
+            $update = DB::connection('sqlsrvyptkug')->table('karyawan')
+            ->where('nik',$nik)
+            ->where('kode_lokasi',$kode_lokasi)
+            ->update([
+                'email' => $email
+            ]);
+            
+            if($update){
+                $success['status'] = true;
+                $success['message'] = "Data Pribadi berhasil diubah";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data Pribadi gagal diubah";
+            }
+           
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Data Pribadi gagal diubah ".$e;
+            return response()->json($success, 200); 
+        }	
+    }
+
 }
