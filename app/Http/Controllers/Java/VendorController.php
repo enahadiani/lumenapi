@@ -43,14 +43,48 @@ class VendorController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
         
-        $auth = DB::connection($this->sql)->select("select kode_vendor from java_vendor where kode_vendor ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_vendor from java_vendor where nama ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
-        if(count($auth) > 0){
-            $success['status'] = false;   
+        if(count($auth) == 0){
+            $success['status'] = true;   
         }else{
-            $success['status'] = true;
+            $success['status'] = false;
         }
         return response()->json($success, $this->successStatus);
+    }
+
+    public function saveFastVendor(Request $request) {
+        $this->validate($request, [
+            'nama' => 'required',
+        ]);
+
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $kode_vendor = $this->generateKode('java_vendor', 'kode_vendor', "SUPP", '0001');
+
+            $insertVend = "insert into java_vendor(kode_vendor, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
+            kota, negara, pic, no_telp_pic, email_pic, akun_hutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
+            values('$kode_vendor', '$request->nama', '-', '-', '-',
+            '-', '-', '-', '-', '-', '-', '-',
+            '-', '-', getdate(), '$kode_lokasi', '-', '-', '-')";
+                
+            DB::connection($this->sql)->insert($insertVend);
+                
+            $success['status'] = true;
+            $success['kode'] = $kode_vendor;
+            $success['nama'] = $request->nama;
+            $success['message'] = "Data Vendor berhasil disimpan";
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Vendor gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }	
     }
 
     public function index(Request $request)
@@ -179,7 +213,7 @@ class VendorController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Customer gagal disimpan ".$e;
+            $success['message'] = "Data Vendor gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
     }
