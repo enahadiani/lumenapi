@@ -43,7 +43,7 @@ class VendorController extends Controller
             $kode_lokasi= $data->kode_lokasi;
         }
         
-        $auth = DB::connection($this->sql)->select("select kode_vendor from java_vendor where nama ='".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_vendor from java_vendor where nama ='".$request->query('kode')."' or kode_vendor = '".$request->query('kode')."' and kode_lokasi='".$kode_lokasi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) == 0){
             $success['status'] = true;   
