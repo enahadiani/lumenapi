@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LaporanNrcLajur;
 
-class LaporanController extends Controller
+class LaporanAktapController extends Controller
 {
     /**
      * Display a listing of the resource.

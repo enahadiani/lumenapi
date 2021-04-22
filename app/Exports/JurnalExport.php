@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class KasBankExport implements FromCollection, WithHeadings
+class JurnalExport implements FromCollection, WithHeadings
 {
     public function __construct($nik_user,$kode_lokasi)
     {

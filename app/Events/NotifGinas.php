@@ -7,7 +7,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class NotifToko extends Event implements ShouldBroadcast
+class NotifGinas extends Event implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admGinas;
+namespace App\Http\Controllers\AdmGinas;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
