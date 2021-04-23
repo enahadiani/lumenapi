@@ -344,8 +344,9 @@ class AdminTokoController extends Controller
         try{
 
            DB::connection($this->db)->beginTransaction();
-           
-           $insert =  DB::connection($this->db)->insert("insert into esaku_error_log (kode_form,kode_lokasi,nik_user,tgl_input,datalog) values ('$request->kode_form','$kode_lokasi','$nik',getdate(),'$request->error') ");
+           $error = str_replace( array( '\'', '"',',' , ';', '<', '>' ), ' ', $request->error);
+      
+           $insert =  DB::connection($this->db)->insert("insert into esaku_error_log (kode_form,kode_lokasi,nik_user,tgl_input,datalog) values ('$request->kode_form','$kode_lokasi','$nik',getdate(),'$error') ");
            
            if($insert){ //mengecek apakah data kosong atau tidak
                 DB::connection($this->db)->commit();
