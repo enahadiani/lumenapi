@@ -111,7 +111,8 @@ class PengajuanRRAController extends Controller
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
-
+            $no_bukti = $this->generateKode("anggaran_m", "no_agg", $kode_lokasi."-RRA".substr($periode,2,4).".", "0001");
+            
             if (floatval($request->nilai_terima) != floatval($request->donor)) {
                 $msg = "Transaksi tidak valid. Total Terima dan Pemberi tidak sama.";
                 $sts = false;						
@@ -126,8 +127,7 @@ class PengajuanRRAController extends Controller
                         $sts = false;
                     }else{
 
-                        $no_bukti = $this->generateKode("anggaran_m", "no_agg", $kode_lokasi."-RRA".substr($periode,2,4).".", "0001");
-            
+                        
                         $ins = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values ('$no_bukti','$kode_lokasi','$request->no_dokumen','$request->tanggal','$request->deskripsi','".substr($request->periode,0,4)."','IDR',".intval($request->donor).",getdate(),'".$nik."','T','-','".$nik."','".$request->nik_app."','RR')");	
                             
                         $ins2 = DB::connection($this->db)->insert("insert into rra_pdrk_m(no_pdrk,kode_lokasi,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,nik_app1,nik_app2,nik_app3,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values ('".$no_bukti."','".$kode_lokasi."','".$request->deskripsi."','".$request->kode_pp_aktif."','-','-','".$request->tanggal."','".$periode."','".$nik."','".$nik."','".$request->nik_app."','".$request->nik_app."','RRR','-','".$nik."',getdate(),'0','MULTI')");
