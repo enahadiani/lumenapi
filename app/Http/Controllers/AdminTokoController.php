@@ -331,6 +331,45 @@ class AdminTokoController extends Controller
         }
     }
 
+    public function reportError(Request $request){
+        $this->validate($request,[
+            'error' => 'required',
+            'kode_form' => 'required'
+        ]);
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+
+        try{
+
+           DB::connection($this->db)->beginTransaction();
+           
+           $insert =  DB::connection($this->db)->insert("insert into esaku_error_log (kode_form,kode_lokasi,nik_user,tgl_input,datalog) values ('$request->kode_form','$kode_lokasi','$nik',getdate(),'$request->error') ");
+           
+           if($insert){ //mengecek apakah data kosong atau tidak
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Error berhasil disimpan";
+                return response()->json($success, 200);     
+            }
+            else{
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['message'] = "Data Error gagal diubah";
+                return response()->json($success, 200);
+            }
+        }catch (\Throwable $e) {
+            
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+
+       
+    }
+
     public function searchFormList(Request $request){
         // $this->validate($request,[
         //     'cari' => 'required'
