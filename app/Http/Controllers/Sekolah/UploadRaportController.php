@@ -525,19 +525,13 @@ class UploadRaportController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }		
             
-            $del = DB::connection($this->db)->table('sis_nilai_m')
+            $del = DB::connection($this->db)->table('sis_raport_dok_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
             ->delete();
 
-            $del2 = DB::connection($this->db)->table('sis_nilai')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $request->no_bukti)
-            ->where('kode_pp', $request->kode_pp)
-            ->delete();
-
-            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
+            $sql3="select no_bukti,file_dok from sis_raport_dok_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp'  order by no_urut";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -547,7 +541,7 @@ class UploadRaportController extends Controller
                 }
             }
 
-            $del3 = DB::connection($this->db)->table('sis_nilai_dok')
+            $del3 = DB::connection($this->db)->table('sis_raport_dok_d')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_bukti)
             ->where('kode_pp', $request->kode_pp)
@@ -555,13 +549,13 @@ class UploadRaportController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Penilaian berhasil dihapus";
+            $success['message'] = "Data Raport berhasil dihapus";
             
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penilaian gagal dihapus ".$e;
+            $success['message'] = "Data Raport gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
@@ -605,7 +599,7 @@ class UploadRaportController extends Controller
                 $orderby = " a.nama ";
             }            
 
-            $sql = "select a.nis,a.nis2,a.nama,isnull(c.file_dok,'-') as fileaddres
+            $sql = "select a.nis,a.nis2,a.nama as nama_siswa,isnull(c.file_dok,'-') as fileaddres
             from sis_siswa a 
             left join (select a.file_dok,a.nis,a.kode_pp,a.kode_lokasi,b.kode_kelas,b.kode_ta,b.kode_sem
 					from sis_raport_dok_d a
@@ -652,23 +646,13 @@ class UploadRaportController extends Controller
             $no_bukti = $request->no_bukti;
             $kode_pp = $request->kode_pp;
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_jenis,a.kode_matpel,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas,f.nama as nama_jenis,g.nama as nama_matpel,isnull(j.jumlah,0)+1 as jumlah,h.nama as nama_kd,a.kode_kd,a.pelaksanaan,a.flag_kelas
-            from sis_nilai_m a
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.kode_ta,a.kode_kelas,a.kode_sem,a.kode_pp,b.nama as nama_pp,c.nama as nama_ta,d.nama as nama_kelas
+            from sis_raport_dok_m a
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 left join sis_ta c on a.kode_ta=c.kode_ta and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
                 inner join (select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'reguler' as flag_kelas,a.kode_tingkat
                             from sis_kelas a 
-                            union all
-                            select a.kode_kelas,a.kode_lokasi,a.kode_pp,a.nama,'khusus' as flag_kelas,a.kode_tingkat
-                            from sis_kelas_khusus a
-                ) d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.flag_kelas=d.flag_kelas
-                left join sis_jenisnilai f on a.kode_jenis=f.kode_jenis and a.kode_lokasi=f.kode_lokasi and a.kode_pp=f.kode_pp
-                left join sis_matpel g on a.kode_matpel=g.kode_matpel and a.kode_lokasi=g.kode_lokasi and a.kode_pp=g.kode_pp
-                left join sis_kd h on a.kode_kd=h.kode_kd and a.kode_lokasi=h.kode_lokasi and a.kode_pp=h.kode_pp and a.kode_matpel=h.kode_matpel and a.kode_sem=h.kode_sem and d.kode_tingkat=h.kode_tingkat
-                left join ( select kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi,COUNT(*) as jumlah from sis_nilai_m 
-                    where no_bukti <> '$no_bukti'
-                    group by kode_pp,kode_ta,kode_kelas,kode_sem,kode_matpel,kode_jenis,kode_lokasi
-                    ) j on a.kode_ta=j.kode_ta and a.kode_lokasi=j.kode_lokasi and a.kode_pp=j.kode_pp and a.kode_jenis=j.kode_jenis and a.kode_sem=j.kode_sem and a.kode_matpel=j.kode_matpel and a.kode_kelas=j.kode_kelas
+                ) d on a.kode_kelas=d.kode_kelas and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
             where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  ");
             $res = json_decode(json_encode($res),true);
 
@@ -679,14 +663,13 @@ class UploadRaportController extends Controller
             if(count($cek) > 0){
                 $orderby = " b.no_urut ";
             }else{
-                $orderby = " b.nama ";
+                $orderby = " a.nama ";
             }
 
-            $sql2="select a.no_bukti,a.nis,b.nis2,c.nama,isnull(c.file_dok,'-') as fileaddres,b.nama as nama_siswa,a.nilai
-            from sis_nilai a 
-            inner join sis_siswa b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.flag_aktif=1
-            left join sis_nilai_dok c on a.no_bukti=c.no_bukti and a.nis=c.nis and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and a.kode_pp='$kode_pp' order by $orderby ";
+            $sql2="select b.no_bukti,a.nis,a.nis2,isnull(b.file_dok,'-') as fileaddres,a.nama as nama_siswa
+            from sis_siswa a 
+            left join sis_raport_dok_d b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_lokasi='$kode_lokasi' and b.no_bukti='$no_bukti' and a.kode_pp='$kode_pp'  and a.flag_aktif=1 order by $orderby ";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             
@@ -715,7 +698,9 @@ class UploadRaportController extends Controller
     {
         $this->validate($request, [
             'kode_pp' => 'required|max:10',
-            'no_bukti' => 'required|max:20'
+            'kode_ta' => 'required',
+            'kode_kelas' => 'required',
+            'kode_sem' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -725,7 +710,16 @@ class UploadRaportController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $no_bukti = $request->no_bukti;
+            date_default_timezone_set("Asia/Jakarta");
+            $per = date('ym');
+            if(isset($request->no_bukti) && $request->no_bukti != ""){
+                $status_simpan = 0;
+                $no_bukti = $request->no_bukti;
+            }else{
+                
+                $status_simpan = 1;
+                $no_bukti = $this->generateKode("sis_raport_dok_m", "no_bukti", $kode_lokasi."-RPT".$per.".", "001");
+            }
             $kode_pp = $request->kode_pp;
             $arr_foto = array();
             $arr_nis = array();
@@ -756,15 +750,24 @@ class UploadRaportController extends Controller
                         }else if($request->nama_file_seb[$i] != "-"){
                             $arr_foto[] = $request->nama_file_seb[$i];
                             $arr_nis[] = $request->nis[$i];
+                        } else {
+                            $arr_foto[] = "-";
+                            $arr_nis[] = $request->nis[$i];
                         }     
                     }
                     
-                    $del3 = DB::connection($this->db)->table('sis_nilai_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                    if($status_simpan == 0){
+
+                        $del4 = DB::connection($this->db)->table('sis_raport_dok_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                        $del3 = DB::connection($this->db)->table('sis_raport_dok_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                    }
                 }
+
+                $ins = DB::connection($this->db)->insert("insert into sis_raport_dok_m (no_bukti,kode_lokasi,kode_pp,kode_ta,kode_sem,kode_kelas,tgl_input,nik_user,progress) values ('$no_bukti','$kode_lokasi','".$kode_pp."','".$request->kode_ta."','$request->kode_sem','$request->kode_kelas',getdate(),'$nik_user',1) ");
 
                 if(count($arr_nis) > 0){
                     for($i=0; $i<count($arr_nis);$i++){
-                        $ins3[$i] = DB::connection($this->db)->insert("insert into sis_nilai_dok (no_bukti,kode_lokasi,file_dok,no_urut,nama,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','-','$kode_pp','".$arr_nis[$i]."') "); 
+                        $ins3[$i] = DB::connection($this->db)->insert("insert into sis_raport_dok_d (no_bukti,kode_lokasi,file_dok,no_urut,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','$kode_pp','".$arr_nis[$i]."') "); 
                     }
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
@@ -773,20 +776,22 @@ class UploadRaportController extends Controller
                     $success['nis'] = $request->nis;
                 }
                 else{
+                    DB::connection($this->db)->rollback();
                     $success['status'] = true;
-                    $success['message'] = "Data Dokumen berhasil gagal diupload. Dokumen file tidak valid. (2)";
+                    $success['message'] = "Data Dokumen gagal diupload. Dokumen file tidak valid. (2)";
                     $success['no_bukti'] = $no_bukti;
                 }
             }else{
+                DB::connection($this->db)->rollback();
                 $success['status'] = true;
-                $success['message'] = "Data Dokumen berhasil gagal diupload. Dokumen file tidak valid. (3)";
+                $success['message'] = "Data Dokumen gagal diupload. Dokumen file tidak valid. (3)";
                 $success['no_bukti'] = $no_bukti;
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Dokumenn gagal diupload ".$e;
+            $success['message'] = "Data Dokumen gagal diupload ".$e;
             return response()->json(['success'=>$success], $this->successStatus); 
         }	
     }
@@ -806,7 +811,7 @@ class UploadRaportController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }		
 
-            $sql3="select no_bukti,nama,file_dok from sis_nilai_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and nis='$request->nis' ";
+            $sql3="select no_bukti,file_dok from sis_raport_dok_d where kode_lokasi='".$kode_lokasi."' and no_bukti='$request->no_bukti' and kode_pp='$request->kode_pp' and nis='$request->nis' ";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -816,7 +821,7 @@ class UploadRaportController extends Controller
                     Storage::disk('s3')->delete('sekolah/'.$res3[$i]['file_dok']);
                 }
 
-                $del3 = DB::connection($this->db)->table('sis_nilai_dok')
+                $del3 = DB::connection($this->db)->table('sis_raport_dok_d')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_bukti', $request->no_bukti)
                 ->where('kode_pp', $request->kode_pp)
@@ -824,17 +829,17 @@ class UploadRaportController extends Controller
                 ->delete();
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Dokumen Penilaian berhasil dihapus";
+                $success['message'] = "Data Dokumen Raport berhasil dihapus";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Data Dokumen Penilaian gagal dihapus.";
+                $success['message'] = "Data Dokumen Raport gagal dihapus.";
             }
 
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Dokumen Penilaian gagal dihapus ".$e;
+            $success['message'] = "Data Dokumen Raport gagal dihapus ".$e;
             
             return response()->json(['success'=>$success], $this->successStatus); 
         }	

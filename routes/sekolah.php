@@ -317,6 +317,11 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     // UPLOAD RAPORT
     $router->get('raport-dok-all','Sekolah\UploadRaportController@index');
     $router->get('raport-dok-siswa','Sekolah\UploadRaportController@loadSiswa');
+    $router->post('raport-dok-siswa','Sekolah\UploadRaportController@storeDokumen');
+    $router->post('raport-dok-siswa-edit','Sekolah\UploadRaportController@updateDokumen');
+    $router->get('raport-dok-siswa-edit','Sekolah\UploadRaportController@showDokUpload');
+    $router->delete('raport-dok-siswa','Sekolah\UploadRaportController@destroy');
+    $router->delete('raport-dok-siswa-nis','Sekolah\UploadRaportController@deleteDokumen');
     
     
 });
