@@ -19,15 +19,15 @@ class UploadRaportController extends Controller
     public $guard = "siswa";
     public $db = "sqlsrvtarbak";
 
-    public function isUnik($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas){
+    public function isUnik($kode_lokasi,$kode_pp,$kode_ta,$kode_kelas,$kode_sem){
         
         $auth = DB::connection($this->db)->select("select no_bukti from sis_raport_dok_m where kode_ta='$kode_ta' and kode_kelas='$kode_kelas' and kode_sem='$kode_sem' and kode_lokasi='".$kode_lokasi."'  and kode_pp='".$kode_pp."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
-            $data['status']=false;
+            $data['status']=true;
             $data['res'] = $auth;
         }else{
-            $data['status']=true;
+            $data['status']=false;
             $data['res'] = [];
         }
 
@@ -594,17 +594,17 @@ class UploadRaportController extends Controller
             where a.kode_lokasi='".$kode_lokasi."' $filter ");
             $cek = json_decode(json_encode($cek),true);
             if(count($cek) > 0){
-                $orderby = " a.no_urut ";
+                $orderby = " c.no_urut ";
             }else{
                 $orderby = " a.nama ";
             }            
 
             $sql = "select a.nis,a.nis2,a.nama as nama_siswa,isnull(c.file_dok,'-') as fileaddres
             from sis_siswa a 
-            left join (select a.file_dok,a.nis,a.kode_pp,a.kode_lokasi,b.kode_kelas,b.kode_ta,b.kode_sem
+            left join (select a.file_dok,a.nis,a.kode_pp,a.kode_lokasi,b.kode_kelas,b.kode_ta,b.kode_sem,a.no_urut
 					from sis_raport_dok_d a
 					inner join sis_raport_dok_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-			) c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_kelas=c.kode_kelas
+			) c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_kelas=c.kode_kelas and a.nis=c.nis
             and c.kode_ta='$request->kode_ta' and c.kode_sem='$request->kode_sem'  
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$request->kode_pp' 
             and a.kode_kelas='$request->kode_kelas' 
@@ -712,80 +712,98 @@ class UploadRaportController extends Controller
             }
             date_default_timezone_set("Asia/Jakarta");
             $per = date('ym');
+            $kode_pp = $request->kode_pp;
             if(isset($request->no_bukti) && $request->no_bukti != ""){
                 $status_simpan = 0;
                 $no_bukti = $request->no_bukti;
+                
+                $sts_dup = false;
             }else{
                 
                 $status_simpan = 1;
                 $no_bukti = $this->generateKode("sis_raport_dok_m", "no_bukti", $kode_lokasi."-RPT".$per.".", "001");
+                $cek_dup = $this->isUnik($kode_lokasi,$kode_pp,$request->kode_ta,$request->kode_kelas,$request->kode_sem);
+
+                if($cek_dup['status']){
+                    $sts_dup = true;
+                }else{
+                    $sts_dup = false;
+                }
             }
-            $kode_pp = $request->kode_pp;
-            $arr_foto = array();
-            $arr_nis = array();
-            $i=0;
-            $cek = $request->file;
-            //cek upload file tidak kosong
-            if(!empty($cek)){
-                
-                if(count($request->nama_file_seb) > 0){
-                    //looping berdasarkan nama dok
-                    for($i=0;$i<count($request->nama_file_seb);$i++){
-                        //cek row i ada file atau tidak
-                        if(isset($request->file('file')[$i])){
-                            $file = $request->file('file')[$i];
-                            //kalo ada cek nama sebelumnya ada atau -
-                            if($request->nama_file_seb[$i] != "-"){
-                                //kalo ada hapus yang lama
-                                Storage::disk('s3')->delete('sekolah/'.$request->nama_file_seb[$i]);
-                            }
-                            $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                            $foto = $nama_foto;
-                            if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                                Storage::disk('s3')->delete('sekolah/'.$foto);
-                            }
-                            Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
-                            $arr_foto[] = $foto;
-                            $arr_nis[] = $request->nis[$i];
-                        }else if($request->nama_file_seb[$i] != "-"){
-                            $arr_foto[] = $request->nama_file_seb[$i];
-                            $arr_nis[] = $request->nis[$i];
-                        } else {
-                            $arr_foto[] = "-";
-                            $arr_nis[] = $request->nis[$i];
-                        }     
-                    }
+
+            if($sts_dup){
+                $success['no_bukti'] = $no_bukti;
+                $success['jenis'] = 'duplicate';
+                $success['status'] = false;
+                $success['message'] = "Error : Duplicate entry. Dokumen Raport untuk kelas $request->kode_kelas tahun ajaran $request->kode_ta semester $request->kode_sem sudah ada didatabase";
+            }else{
+
+                $arr_foto = array();
+                $arr_nis = array();
+                $i=0;
+                $cek = $request->file;
+                //cek upload file tidak kosong
+                if(!empty($cek)){
                     
-                    if($status_simpan == 0){
-
-                        $del4 = DB::connection($this->db)->table('sis_raport_dok_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
-                        $del3 = DB::connection($this->db)->table('sis_raport_dok_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                    if(count($request->nama_file_seb) > 0){
+                        //looping berdasarkan nama dok
+                        for($i=0;$i<count($request->nama_file_seb);$i++){
+                            //cek row i ada file atau tidak
+                            if(isset($request->file('file')[$i])){
+                                $file = $request->file('file')[$i];
+                                //kalo ada cek nama sebelumnya ada atau -
+                                if($request->nama_file_seb[$i] != "-"){
+                                    //kalo ada hapus yang lama
+                                    Storage::disk('s3')->delete('sekolah/'.$request->nama_file_seb[$i]);
+                                }
+                                $nama_foto = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                $foto = $nama_foto;
+                                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
+                                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                                }
+                                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                                $arr_foto[] = $foto;
+                                $arr_nis[] = $request->nis[$i];
+                            }else if($request->nama_file_seb[$i] != "-"){
+                                $arr_foto[] = $request->nama_file_seb[$i];
+                                $arr_nis[] = $request->nis[$i];
+                            } else {
+                                $arr_foto[] = "-";
+                                $arr_nis[] = $request->nis[$i];
+                            }     
+                        }
+                        
+                        if($status_simpan == 0){
+    
+                            $del4 = DB::connection($this->db)->table('sis_raport_dok_d')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                            $del3 = DB::connection($this->db)->table('sis_raport_dok_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->where('kode_pp', $kode_pp)->delete();
+                        }
                     }
-                }
-
-                $ins = DB::connection($this->db)->insert("insert into sis_raport_dok_m (no_bukti,kode_lokasi,kode_pp,kode_ta,kode_sem,kode_kelas,tgl_input,nik_user,progress) values ('$no_bukti','$kode_lokasi','".$kode_pp."','".$request->kode_ta."','$request->kode_sem','$request->kode_kelas',getdate(),'$nik_user',1) ");
-
-                if(count($arr_nis) > 0){
-                    for($i=0; $i<count($arr_nis);$i++){
-                        $ins3[$i] = DB::connection($this->db)->insert("insert into sis_raport_dok_d (no_bukti,kode_lokasi,file_dok,no_urut,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','$kode_pp','".$arr_nis[$i]."') "); 
+    
+                    $ins = DB::connection($this->db)->insert("insert into sis_raport_dok_m (no_bukti,kode_lokasi,kode_pp,kode_ta,kode_sem,kode_kelas,tgl_input,nik_user,progress) values ('$no_bukti','$kode_lokasi','".$kode_pp."','".$request->kode_ta."','$request->kode_sem','$request->kode_kelas',getdate(),'$nik_user',1) ");
+    
+                    if(count($arr_nis) > 0){
+                        for($i=0; $i<count($arr_nis);$i++){
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into sis_raport_dok_d (no_bukti,kode_lokasi,file_dok,no_urut,kode_pp,nis) values ('$no_bukti','$kode_lokasi','".$arr_foto[$i]."','".$i."','$kode_pp','".$arr_nis[$i]."') "); 
+                        }
+                        DB::connection($this->db)->commit();
+                        $success['status'] = true;
+                        $success['message'] = "Data Dokumen berhasil diupload.";
+                        $success['no_bukti'] = $no_bukti;
+                        $success['nis'] = $request->nis;
                     }
-                    DB::connection($this->db)->commit();
-                    $success['status'] = true;
-                    $success['message'] = "Data Dokumen berhasil diupload.";
-                    $success['no_bukti'] = $no_bukti;
-                    $success['nis'] = $request->nis;
-                }
-                else{
+                    else{
+                        DB::connection($this->db)->rollback();
+                        $success['status'] = true;
+                        $success['message'] = "Data Dokumen gagal diupload. Dokumen file tidak valid. (2)";
+                        $success['no_bukti'] = $no_bukti;
+                    }
+                }else{
                     DB::connection($this->db)->rollback();
                     $success['status'] = true;
-                    $success['message'] = "Data Dokumen gagal diupload. Dokumen file tidak valid. (2)";
+                    $success['message'] = "Data Dokumen gagal diupload. Dokumen file tidak valid. (3)";
                     $success['no_bukti'] = $no_bukti;
                 }
-            }else{
-                DB::connection($this->db)->rollback();
-                $success['status'] = true;
-                $success['message'] = "Data Dokumen gagal diupload. Dokumen file tidak valid. (3)";
-                $success['no_bukti'] = $no_bukti;
             }
             return response()->json(['success'=>$success], $this->successStatus);     
         } catch (\Throwable $e) {
