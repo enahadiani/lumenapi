@@ -9407,10 +9407,10 @@ class DashboardController extends Controller
             
             if(count($rs) > 0){
                 $success['data'] = (count($rs) > 0 ? $rs : []);
-                $rka_thn = floatval($rs[1]['rka_thn'])/floatval($rs[0]['rka_thn']);
-                $rka_sd = floatval($rs[1]['rka_sd'])/floatval($rs[0]['rka_sd']);
-                $realisasi = floatval($rs[1]['realisasi'])/floatval($rs[0]['realisasi']);
-                $realisasi_lalu = floatval($rs[1]['realisasi_lalu'])/floatval($rs[0]['realisasi_lalu']);
+                $rka_thn = (floatval($rs[0]['rka_thn']) != 0 ? floatval($rs[1]['rka_thn'])/floatval($rs[0]['rka_thn']) : 0);
+                $rka_sd = (floatval($rs[0]['rka_sd']) != 0 ? floatval($rs[1]['rka_sd'])/floatval($rs[0]['rka_sd']) : 0);
+                $realisasi = (floatval($rs[0]['realisasi']) != 0 ? floatval($rs[1]['realisasi'])/floatval($rs[0]['realisasi']) : 0);
+                $realisasi_lalu = (floatval($rs[0]['realisasi_lalu']) != 0 ? floatval($rs[1]['realisasi_lalu'])/floatval($rs[0]['realisasi_lalu']) : 0);
                 $rs2 = DB::connection($this->db)->select("
                 select a.kode_grafik,a.nama,e.keterangan,e.nama as nama_target,
                       $rka_thn * 100 as rka_thn,
