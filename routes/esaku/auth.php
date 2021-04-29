@@ -64,6 +64,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('search-form', 'AdminTokoController@searchForm');
     $router->get('search-form-list', 'AdminTokoController@searchFormList');
 
+    $router->post('report-error', 'AdminTokoController@reportError');
+
 });
 
 

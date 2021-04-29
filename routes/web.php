@@ -72,6 +72,7 @@ $router->post('validasi-file', function (Request $request) {
         'file' => 'required|mimes:docx,doc,xls,xlsx,pdf'
     ]);
 });
+
 $router->post('import-csv', function (Request $request) {
    
     if($request->hasfile('file')){
@@ -144,6 +145,52 @@ $router->post('import-csv', function (Request $request) {
     }
 
 });
+
+$router->post('tes-csv', function (Request $request) {
+   
+    if($request->hasfile('file')){
+        $file = $request->file('file');
+        
+        $nama_foto = uniqid()."_".$file->getClientOriginalName();
+        // $picName = uniqid() . '_' . $picName;
+        $foto = $nama_foto;
+        Storage::disk('local')->put($foto,file_get_contents($file));
+        $file = fopen(Storage::disk('local')->path($foto), "r");
+        $all_data = array();
+        $header_data = array();
+        $column = array('kode_menu','nama_menu','kode_klp','nu','rowindex');
+        $i=0;
+        while ( ($data = fgetcsv($file, 1000, ",")) !==FALSE )
+        {
+            if($i >= 1){
+                $row_data = array();
+
+                for($a=0;$a< 5;$a++){
+                    
+                    if(isset($data[$a])){
+                        $row_data[$column[$a]] = trim($data[$a]);
+                    }
+                }
+                $all_data[] = $row_data;
+            }
+            $i++;
+        }
+        fclose($file);
+        Storage::disk('local')->delete($foto);
+        $success['header_data'] = $header_data;
+        $success['trans_data'] = $all_data;
+        $success['status'] = true;
+        return response()->json($success, 200);
+    }else{
+        
+        $success['data'] = [];
+        $success['status'] = false;
+        return response()->json($success, 200);
+    }
+
+});
+
+
 
 
 
