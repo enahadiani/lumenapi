@@ -183,7 +183,7 @@ class DashboardController extends Controller {
             where a.kode_lokasi='11'
             group by b.no_proyek,a.kode_lokasi
             )f on a.no_proyek=f.no_proyek and a.kode_lokasi=f.kode_lokasi
-            where a.flag_aktif = '1' and a.nilai<>0 and isnull(c.nilai,0)<>0 and isnull(d.nilai,0)<>0";
+            where a.flag_aktif = '0' and a.nilai<>0 and isnull(c.nilai,0)<>0 and isnull(d.nilai,0)<>0";
             // and format(a.tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(a.tgl_mulai) = '".$request->query('tahun')."'
             // $sql = "select a.no_kontrak, convert(varchar,tgl_selesai,103) as tgl_selesai,b.nama as nama_cust,
             // isnull(c.nilai,0) as rab,isnull(d.nilai,0) as beban, isnull(e.nilai,0) as tagihan,isnull(f.nilai,0) as bayar, 
