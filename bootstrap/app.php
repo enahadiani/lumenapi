@@ -643,6 +643,14 @@ $app->router->group([
     require __DIR__.'/../routes/siaga/auth.php';
 });
 
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/siaga-trans'
+], function ($router) {
+    require __DIR__.'/../routes/siaga/trans.php';
+});
+
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/java-auth'
