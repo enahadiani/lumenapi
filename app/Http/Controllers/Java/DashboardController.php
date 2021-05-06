@@ -117,15 +117,14 @@ class DashboardController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            // format(a.tanggal, 'MM') = '".$request->query('bulan')."' and year(a.tanggal) = '".$request->query('tahun')."
             $sql = "select isnull(sum(a.nilai), 0) as nilai_proyek, isnull(sum(b.nilai), 0) as nilai_beban from java_proyek a
             left join (select a.no_proyek,a.kode_lokasi, sum(a.nilai) as nilai
             from java_beban a
-            where a.kode_lokasi='04' and format(a.tanggal, 'MM') = '".$request->query('bulan')."' and year(a.tanggal) = '".$request->query('tahun')."'
+            where a.kode_lokasi='11' and year(a.tanggal) = '2021'
             group by a.no_proyek,a.kode_lokasi
             ) b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
-            where format(a.tgl_mulai, 'MM') = '".$request->query('bulan')."' 
-            and year(a.tgl_mulai) = '".$request->query('tahun')."'";
+            where year(a.tgl_mulai) = '2021'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -164,26 +163,27 @@ class DashboardController extends Controller {
             left join (select b.no_proyek,b.kode_lokasi,sum(a.jumlah*a.harga) as nilai
             from java_rab_d a
             inner join java_rab_m b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='04'
+            where a.kode_lokasi='11'
             group by b.no_proyek,b.kode_lokasi
             )c on a.no_proyek=c.no_proyek and a.kode_lokasi=b.kode_lokasi
             left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
             from java_beban  a
-            where a.kode_lokasi='04'
+            where a.kode_lokasi='11'
             group by a.no_proyek,a.kode_lokasi
             )d on a.no_proyek=d.no_proyek and a.kode_lokasi=d.kode_lokasi
             left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
             from java_tagihan  a
-            where a.kode_lokasi='04'
+            where a.kode_lokasi='11'
             group by a.no_proyek,a.kode_lokasi
             )e on a.no_proyek=e.no_proyek and a.kode_lokasi=e.kode_lokasi
             left join (select b.no_proyek,a.kode_lokasi,sum(a.nilai_bayar) as nilai
             from java_bayar_detail a
             inner join java_tagihan b on a.no_tagihan=b.no_tagihan and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='04'
+            where a.kode_lokasi='11'
             group by b.no_proyek,a.kode_lokasi
             )f on a.no_proyek=f.no_proyek and a.kode_lokasi=f.kode_lokasi
-            where a.flag_aktif = '1' and a.nilai<>0 and isnull(c.nilai,0)<>0 and isnull(d.nilai,0)<>0";
+            where a.flag_aktif = '0'";
+            //  and a.nilai<>0 and isnull(c.nilai,0)<>0 and isnull(d.nilai,0)<>0
             // and format(a.tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(a.tgl_mulai) = '".$request->query('tahun')."'
             // $sql = "select a.no_kontrak, convert(varchar,tgl_selesai,103) as tgl_selesai,b.nama as nama_cust,
             // isnull(c.nilai,0) as rab,isnull(d.nilai,0) as beban, isnull(e.nilai,0) as tagihan,isnull(f.nilai,0) as bayar, 
@@ -243,12 +243,12 @@ class DashboardController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
+            // and format(tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(tgl_mulai) = '".$request->query('tahun')."'
             $sql = "select count(no_proyek) as jumlah_proyek, 
-            (select count(no_proyek) from java_proyek where flag_aktif = '1' and format(tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(tgl_mulai) = '".$request->query('tahun')."') as proyek_selesai, 
-            (select count(no_proyek) from java_proyek where flag_aktif = '0' and format(tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(tgl_mulai) = '".$request->query('tahun')."') as proyek_berjalan 
+            (select count(no_proyek) from java_proyek where flag_aktif = '1' and year(tgl_mulai) = '2021') as proyek_selesai, 
+            (select count(no_proyek) from java_proyek where flag_aktif = '0' and year(tgl_mulai) = '2021') as proyek_berjalan 
             from java_proyek
-            where format(tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(tgl_mulai) = '".$request->query('tahun')."'";
+            where year(tgl_mulai) = '2021'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);

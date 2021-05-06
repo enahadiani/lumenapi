@@ -367,8 +367,8 @@ class BiayaProyekController extends Controller {
             ->delete();
 
             $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
-            values ('$no_bukti', '$kode_lokasi', '$request->tanggal', '$request->keterangan', '$request->no_dokumen',
-            '$request->kode_vendor', '$request->nilai','$request->status', '$request->no_proyek', '$request->kode_cust', '$request->no_rab', getdate())";
+            values ('$no_bukti', '$kode_lokasi', '".$request->tanggal."', '".$request->keterangan."', '".$request->no_dokumen."',
+            '".$request->kode_vendor."', '".$request->nilai."','".$request->status."', '".$request->no_proyek."', '".$request->kode_cust."', '".$request->no_rab."', getdate())";
 
             DB::connection($this->sql)->insert($insert);
 
