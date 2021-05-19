@@ -22,15 +22,15 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-			$sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama
-            from dash_grafik_lap a
+			$sql="select  a.periode,dbo.fnNamaBulan(a.periode) as nama
+            from exs_periode a
             where a.kode_lokasi='$kode_lokasi'
             order by a.periode desc";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql="select max(a.periode) as periode,dbo.fnNamaBulan(max(a.periode)) as nama
-            from dash_grafik_lap a
+            from exs_periode a
             where a.kode_lokasi='$kode_lokasi'";
 			$res2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
