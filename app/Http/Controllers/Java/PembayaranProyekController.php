@@ -158,7 +158,8 @@ class PembayaranProyekController extends Controller {
             'nomor' => 'required|array',
             'no_tagihan' => 'required|array',
             'no_dokumen' => 'required|array',
-            'nilai_bayar' => 'required|array'
+            'nilai_bayar' => 'required|array',
+            'nilai_tagihan' => 'required|array'
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -181,14 +182,15 @@ class PembayaranProyekController extends Controller {
             DB::connection($this->sql)->insert($insertM);
 
             $nilai_bayar  = $request->input('nilai_bayar');
+            $nilai_tagihan  = $request->input('nilai_tagihan');
             $nomor  = $request->input('nomor');
             $no_tagihan = $request->input('no_tagihan');
             $no_dokumen = $request->input('no_dokumen');
 
             for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_bayar_detail (no_bayar, kode_lokasi, no, no_tagihan, nilai_bayar, no_dokumen)
+                $insertD = "insert into java_bayar_detail (no_bayar, kode_lokasi, no, no_tagihan, nilai_bayar, no_dokumen, nilai_tagihan)
                 values ('$no_bayar', '$kode_lokasi', '".$nomor[$i]."', '".$no_tagihan[$i]."', 
-                '".$nilai_bayar[$i]."', '".$no_dokumen[$i]."')";
+                '".$nilai_bayar[$i]."', '".$no_dokumen[$i]."', '".$nilai_tagihan[$i]."')";
 
                 DB::connection($this->sql)->insert($insertD);
             }
@@ -281,14 +283,15 @@ class PembayaranProyekController extends Controller {
             DB::connection($this->sql)->insert($insertM);
 
             $nilai_bayar  = $request->input('nilai_bayar');
+            $nilai_tagihan  = $request->input('nilai_tagihan');
             $nomor  = $request->input('nomor');
             $no_tagihan = $request->input('no_tagihan');
             $no_dokumen = $request->input('no_dokumen');
 
             for($i=0;$i<count($request->nomor);$i++) {
-                $insertD = "insert into java_bayar_detail (no_bayar, kode_lokasi, no, no_tagihan, nilai_bayar, no_dokumen)
+                $insertD = "insert into java_bayar_detail (no_bayar, kode_lokasi, no, no_tagihan, nilai_bayar, no_dokumen, nilai_tagihan)
                 values ('$no_bayar', '$kode_lokasi', '".$nomor[$i]."', '".$no_tagihan[$i]."', 
-                '".$nilai_bayar[$i]."', '".$no_dokumen[$i]."')";
+                '".$nilai_bayar[$i]."', '".$no_dokumen[$i]."', '".$nilai_tagihan[$i]."')";
 
                 DB::connection($this->sql)->insert($insertD);
             }
