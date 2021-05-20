@@ -105,7 +105,7 @@ class PembayaranProyekController extends Controller {
                 inner join java_bank c on a.kode_bank=c.kode_bank and a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' $filter ";
                 
-                $detail = "select no, no_tagihan, nilai_bayar, no_dokumen 
+                $detail = "select no, no_tagihan, nilai_bayar, no_dokumen, nilai_tagihan 
                 from java_bayar_detail where kode_lokasi = '$kode_lokasi' and no_bayar = '$request->no_bayar'";
                 
                 $det = DB::connection($this->sql)->select($detail);
