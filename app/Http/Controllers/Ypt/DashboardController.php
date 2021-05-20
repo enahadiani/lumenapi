@@ -22,15 +22,15 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-			$sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama
-            from dash_grafik_lap a
+			$sql="select  a.periode,dbo.fnNamaBulan(a.periode) as nama
+            from exs_periode a
             where a.kode_lokasi='$kode_lokasi'
             order by a.periode desc";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $sql="select max(a.periode) as periode,dbo.fnNamaBulan(max(a.periode)) as nama
-            from dash_grafik_lap a
+            from exs_periode a
             where a.kode_lokasi='$kode_lokasi'";
 			$res2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
@@ -9360,32 +9360,34 @@ class DashboardController extends Controller
             $periode = $request->periode[1];
             $tahun = substr($periode,0,4);
             $tahunLalu = intval($tahun) - 1;
-            switch(substr($periode,4,2)){
-                case 1 : case '1' : case '01': 
-                case 2 : case '2' : case '02':
-                case 3 : case '3' : case '03': 
-                    $Qu = $tahun."03"; 
-                    $QuLalu = $tahunLalu."03"; 
-                    break;
-                case 4 : case '4' : case '04': 
-                case 5 : case '5' : case '05': 
-                case 6 : case '6' : case '06': 
-                    $Qu = $tahun."06"; 
-                    $QuLalu = $tahunLalu."06"; 
-                    break;
-                case 7 : case '7' : case '07': 
-                case 8 : case '8' : case '08': 
-                case 9 : case '9' : case '09': 
-                    $Qu = $tahun."09"; 
-                    $QuLalu = $tahunLalu."09"; 
-                    break;
-                case 10 : case '10' : case '10': 
-                case 11 : case '11' : case '11': 
-                case 12 : case '12' : case '12': 
-                    $Qu = $tahun."15"; 
-                    $QuLalu = $tahunLalu."15";  
-                    break;
-            }
+            $bulan = substr($periode,4,2);
+            $periodeLalu = $tahunLalu.$bulan;
+            // switch(substr($periode,4,2)){
+            //     case 1 : case '1' : case '01': 
+            //     case 2 : case '2' : case '02':
+            //     case 3 : case '3' : case '03': 
+            //         $Qu = $tahun."03"; 
+            //         $QuLalu = $tahunLalu."03"; 
+            //         break;
+            //     case 4 : case '4' : case '04': 
+            //     case 5 : case '5' : case '05': 
+            //     case 6 : case '6' : case '06': 
+            //         $Qu = $tahun."06"; 
+            //         $QuLalu = $tahunLalu."06"; 
+            //         break;
+            //     case 7 : case '7' : case '07': 
+            //     case 8 : case '8' : case '08': 
+            //     case 9 : case '9' : case '09': 
+            //         $Qu = $tahun."09"; 
+            //         $QuLalu = $tahunLalu."09"; 
+            //         break;
+            //     case 10 : case '10' : case '10': 
+            //     case 11 : case '11' : case '11': 
+            //     case 12 : case '12' : case '12': 
+            //         $Qu = $tahun."15"; 
+            //         $QuLalu = $tahunLalu."15";  
+            //         break;
+            // }
            
 
             $rs = DB::connection($this->db)->select("
@@ -9398,9 +9400,9 @@ class DashboardController extends Controller
 				  case isnull(c.n4,0) when 0 then 0 else ((c.n4 - isnull(d.n4,0))/isnull(d.n4,0))*100 end as yoy
 			from dash_grafik_m a
 			inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
-			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
-			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$Qu'
+			left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$periode' 
+			left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$periodeLalu'
+			left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$periode'
 			where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K01'
             ");
             $rs = json_decode(json_encode($rs),true);
@@ -9421,9 +9423,9 @@ class DashboardController extends Controller
                       case isnull(c.n4,0) when 0 then 0 else ((c.n4 - isnull(d.n4,0))/isnull(d.n4,0))*100 end as yoy
                 from dash_grafik_m a
                 inner join dash_grafik_d b on a.kode_grafik=b.kode_grafik and a.kode_lokasi=b.kode_lokasi
-                left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$Qu' 
-                left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$QuLalu'
-                left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$Qu'
+                left join exs_neraca c on b.kode_neraca=c.kode_neraca and b.kode_lokasi=c.kode_lokasi and b.kode_fs=c.kode_fs and c.periode='$periode' 
+                left join exs_neraca d on b.kode_neraca=d.kode_neraca and b.kode_lokasi=d.kode_lokasi and b.kode_fs=d.kode_fs and d.periode='$periodeLalu'
+                left join dash_note e on b.kode_grafik=e.kode_grafik and b.kode_lokasi=e.kode_lokasi and e.periode='$periode'
                 where a.kode_lokasi='$kode_lokasi' and b.kode_fs='FS4' and a.kode_klp='K16'
                 ");
                 $rs2 = json_decode(json_encode($rs2),true);
