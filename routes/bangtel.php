@@ -66,6 +66,10 @@ $router->group(['middleware' => 'auth:bangtel'], function () use ($router) {
 
     $router->post('report-error', 'AdminBangtelController@reportError');
 
+    $router->get('periode', 'Bangtel\DashboardController@getPeriode');
+    $router->get('pp', 'Bangtel\DashboardController@getPP');
+    $router->get('project-box', 'Bangtel\DashboardController@getBoxProject');
+
 });
 
 
