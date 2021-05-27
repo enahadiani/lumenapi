@@ -16,6 +16,7 @@ use  App\AdminRtrw;
 use  App\AdminWarga;
 use  App\AdminSilo;
 use  App\AdminAset;
+use  App\AdminBangtel;
 
 class AuthController extends Controller
 {
@@ -427,6 +428,23 @@ class AuthController extends Controller
         return $this->respondWithToken($token,'toko');
     }
 
+    public function loginBangtel(Request $request)
+    {
+          //validate incoming request 
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (! $token = Auth::guard('bangtel')->setTTL(720)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token,'bangtel');
+    }
+
     public function loginSiaga(Request $request)
     {
           //validate incoming request 
@@ -674,6 +692,31 @@ class AuthController extends Controller
             return response()->json($success, 200);
         } catch (\Throwable $e) {
             DB::connection('sqlsrv')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Hash Password gagal disimpan ".$e;
+            return response()->json($success, 200);
+        }	
+
+    }
+
+    public function hashPasswordBangtel(){
+        $users = AdminBangtel::all();
+        DB::connection('dbbangtelindo')->beginTransaction();
+        
+        try {
+            DB::connection('dbbangtelindo')->table('hakakses')->orderBy('nik')->chunk(100, function ($users) {
+                foreach ($users as $user) {
+                    DB::connection('dbbangtelindo')->table('hakakses')
+                        ->where('nik', $user->nik)
+                        ->update(['password' => app('hash')->make($user->pass)]);
+                }
+            });
+            DB::connection('dbbangtelindo')->commit();
+            $success['status'] = true;
+            $success['message'] = "Hash Password berhasil disimpan ";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('dbbangtelindo')->rollback();
             $success['status'] = false;
             $success['message'] = "Hash Password gagal disimpan ".$e;
             return response()->json($success, 200);

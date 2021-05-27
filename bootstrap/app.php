@@ -737,4 +737,11 @@ $app->router->group([
     require __DIR__.'/../routes/admjava/content.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/bangtel'
+], function ($router) {
+    require __DIR__.'/../routes/bangtel.php';
+});
+
 return $app;

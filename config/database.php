@@ -188,6 +188,16 @@ return [
             'password' => env('DB_PASSWORD15', ''),
             'charset' => 'utf8',
             'prefix' => '',
+        ],
+        'dbbangtelindo' => [
+            'driver' => env('DB_CONNECTION18','sqlsrv'),
+            'host' => env('DB_HOST18', 'localhost'),
+            'port' => env('DB_PORT18', '1433'),
+            'database' => env('DB_DATABASE18', 'forge'),
+            'username' => env('DB_USERNAME18', 'forge'),
+            'password' => env('DB_PASSWORD18', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
         ]
     
     ],
