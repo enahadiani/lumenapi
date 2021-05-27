@@ -51,6 +51,7 @@ $router->group(['middleware' => 'auth:user'], function () use ($router) {
     $router->get('users/{id}', 'UserController@singleUser');
     $router->get('users', 'UserController@allUsers');
     $router->get('cekPayload', 'UserController@cekPayload');
+    $router->get('menu/{kode_klp}', 'UserController@getMenu');
 
     $router->get('aju', function () {
         if($data =  Auth::guard('user')->user()){
