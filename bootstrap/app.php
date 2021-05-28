@@ -744,4 +744,42 @@ $app->router->group([
     require __DIR__.'/../routes/bangtel.php';
 });
 
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simlog-auth'
+], function ($router) {
+    require __DIR__.'/../routes/simlog/auth.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simlog-master'
+], function ($router) {
+    require __DIR__.'/../routes/simlog/master.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simlog-trans'
+], function ($router) {
+    require __DIR__.'/../routes/simlog/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simlog-report'
+], function ($router) {
+    require __DIR__.'/../routes/simlog/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simlog-dash'
+], function ($router) {
+    require __DIR__.'/../routes/simlog/dash.php';
+});
+
 return $app;
