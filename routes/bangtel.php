@@ -69,6 +69,10 @@ $router->group(['middleware' => 'auth:bangtel'], function () use ($router) {
     $router->get('periode', 'Bangtel\DashboardController@getPeriode');
     $router->get('pp', 'Bangtel\DashboardController@getPP');
     $router->get('project-box', 'Bangtel\DashboardController@getBoxProject');
+    $router->get('pdpt-box', 'Bangtel\DashboardController@getBoxPendapatan');
+    $router->get('beban-box', 'Bangtel\DashboardController@getBoxBeban');
+    $router->get('profit-box', 'Bangtel\DashboardController@getBoxProfit');
+    $router->get('project-aktif', 'Bangtel\DashboardController@getProjectAktif');
 
 });
 
