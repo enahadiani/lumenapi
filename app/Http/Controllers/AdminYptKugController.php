@@ -69,7 +69,7 @@ class AdminYptKugController extends Controller
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok,
-			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_tel as no_telp,'-' as jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password,isnull(c.background,'-') as background
+			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_tel as no_telp,'-' as jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password,isnull(c.background,'-') as background,c.kode_vendor
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join vendor c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
