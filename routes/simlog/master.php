@@ -60,6 +60,13 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->put('unit','Ypt\UnitController@update');
     $router->delete('unit','Ypt\UnitController@destroy');
 
+    //Vendor
+    $router->get('vendor','Simlog\VendorController@index');
+    $router->post('vendor','Simlog\VendorController@store');
+    $router->put('vendor','Simlog\VendorController@update');
+    $router->delete('vendor','Simlog\VendorController@destroy');
+    $router->get('vendor-akun','Simlog\VendorController@getAkun');
+
 });
 
 

@@ -33,7 +33,7 @@ $router->get('storage/{filename}', function ($filename)
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
-    $router->get('profile', 'AdminYptKugController@profile');
+    $router->get('profile', 'AdminYptKugController@profile_simlog');
     $router->get('users/{id}', 'AdminYptKugController@singleUser');
     $router->get('users', 'AdminYptKugController@allUsers');
     $router->get('cekPayload', 'AdminYptKugController@cekPayload');

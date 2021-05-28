@@ -62,6 +62,41 @@ class AdminYptKugController extends Controller
         }
     }
 
+    public function profile_simlog()
+    {
+        if($data =  Auth::guard('yptkug')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+
+            $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok,
+			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_tel as no_telp,'-' as jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password,isnull(c.background,'-') as background
+            from hakakses a 
+            inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
+            left join vendor c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
+            left join m_form e on a.path_view=e.kode_form 
+            where a.nik= '$nik' 
+            ");
+            $user = json_decode(json_encode($user),true);
+            
+            if(count($user) > 0){ //mengecek apakah data kosong atau tidak
+                $periode = DB::connection('sqlsrvyptkug')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                ");
+                $periode = json_decode(json_encode($periode),true);
+
+                $fs = DB::connection('sqlsrvyptkug')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                ");
+                $fs = json_decode(json_encode($fs),true);
+
+                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs], 200);
+            }
+            else{
+                return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+            }
+        }else{
+            return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
+        }
+    }
+
     /**
      * Get all User.
      *
