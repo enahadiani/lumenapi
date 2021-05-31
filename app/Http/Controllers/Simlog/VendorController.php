@@ -44,8 +44,11 @@ class VendorController extends Controller
                 }else{
                     $filter = " and a.kode_vendor='$request->kode_vendor' ";
                 }
-                $sql= "select a.kode_vendor,a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_hutang,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pictel,b.nama as nama_akun 
-                from vendor a left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                $sql= "select a.kode_vendor,a.nama,a.alamat,a.no_tel,a.no_fax,a.email,a.npwp,a.alamat2,a.pic,a.akun_hutang,a.bank,a.cabang,a.no_rek,a.nama_rek,a.no_pictel,a.bank_trans,a.spek,a.penilaian,a.jenis,b.nama as nama_akun,a.kode_klpvendor,c.nama as nama_klp 
+                from vendor a 
+                left join masakun b on a.akun_hutang=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+                left join vendor_klp c on a.kode_klpvendor=c.kode_klpvendor and a.kode_lokasi=c.kode_lokasi 
+                where a.kode_lokasi='".$kode_lokasi."' $filter ";
             }else{
                 $sql = "select kode_vendor,nama,alamat,no_tel,no_fax,email,npwp,alamat2,pic,akun_hutang,bank,cabang,no_rek,nama_rek,no_pictel,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from vendor where kode_lokasi= '".$kode_lokasi."'";
             }
