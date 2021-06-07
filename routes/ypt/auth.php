@@ -51,10 +51,10 @@ $router->get('storage2/{filename}', function ($filename)
 
 $router->get('storage-tmp/{filename}', function ($filename)
 {
-    if (!Storage::disk('s3')->exists('telu/tmp/'.$filename)) {
+    if (!Storage::disk('s3')->exists('telu/tmp_dok/'.$filename)) {
         abort(404);
     }
-    return Storage::disk('s3')->response('telu/tmp/'.$filename); 
+    return Storage::disk('s3')->response('telu/tmp_dok/'.$filename); 
 });
 
 
