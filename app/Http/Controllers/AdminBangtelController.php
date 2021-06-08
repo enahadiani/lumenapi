@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
-use  App\AdminYpt;
+use  App\AdminBangtel;
 use Illuminate\Support\Facades\Storage; 
 
-class AdminYptKugController extends Controller
+class AdminBangtelController extends Controller
 {
      /**
      * Instantiate a new UserController instance.
@@ -26,14 +26,16 @@ class AdminYptKugController extends Controller
      *
      * @return Response
      */
+    public $db = 'dbbangtelindo';
+    public $guard = 'bangtel';
     public function profile()
     {
-        if($data =  Auth::guard('yptkug')->user()){
+        if($data =  Auth::guard($this->guard)->user()){
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password,isnull(c.background,'-') as background
+            $user = DB::connection($this->db)->select("select a.kode_klp_menu, a.nik, a.nama, a.pass, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,isnull(c.background,'-') as background,isnull(c.email,'-') as email,c.no_telp,c.jabatan,c.no_hp
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -44,46 +46,11 @@ class AdminYptKugController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrvyptkug')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                $periode = DB::connection($this->db)->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);
 
-                $fs = DB::connection('sqlsrvyptkug')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
-                ");
-                $fs = json_decode(json_encode($fs),true);
-
-                return response()->json(['user' => $user,'periode' => $periode, 'kode_fs'=>$fs], 200);
-            }
-            else{
-                return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
-            }
-        }else{
-            return response()->json(['user' => [],'periode' => [], 'kode_fs'=>[]], 200);
-        }
-    }
-
-    public function profile_simlog()
-    {
-        if($data =  Auth::guard('yptkug')->user()){
-            $nik= $data->nik;
-            $kode_lokasi= $data->kode_lokasi;
-
-            $user = DB::connection('sqlsrvyptkug')->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok,
-			b.kode_lokkonsol, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_tel as no_telp,'-' as jabatan,a.flag_menu,isnull(c.email,'-') as email,a.pass as password,isnull(c.background,'-') as background,c.kode_vendor
-            from hakakses a 
-            inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
-            left join vendor c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
-            left join m_form e on a.path_view=e.kode_form 
-            where a.nik= '$nik' 
-            ");
-            $user = json_decode(json_encode($user),true);
-            
-            if(count($user) > 0){ //mengecek apakah data kosong atau tidak
-                $periode = DB::connection('sqlsrvyptkug')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
-                ");
-                $periode = json_decode(json_encode($periode),true);
-
-                $fs = DB::connection('sqlsrvyptkug')->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
+                $fs = DB::connection($this->db)->select("select kode_fs from fs where kode_lokasi='$kode_lokasi'
                 ");
                 $fs = json_decode(json_encode($fs),true);
 
@@ -104,7 +71,7 @@ class AdminYptKugController extends Controller
      */
     public function allUsers()
     {
-         return response()->json(['users' =>  AdminYptKug::all()], 200);
+         return response()->json(['users' =>  AdminBangtel::all()], 200);
     }
 
     /**
@@ -115,7 +82,7 @@ class AdminYptKugController extends Controller
     public function singleUser($id)
     {
         try {
-            $user = AdminYptKug::findOrFail($id);
+            $user = AdminBangtel::findOrFail($id);
 
             return response()->json(['user' => $user], 200);
 
@@ -127,11 +94,12 @@ class AdminYptKugController extends Controller
     }
 
     public function cekPayload(){
-        $payload = Auth::guard('yptkug')->payload();
+        $payload = Auth::guard($this->guard)->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
     }
 
+    
     public function updatePassword(Request $request){
         $this->validate($request,[
             'password_lama' => 'required',
@@ -139,42 +107,42 @@ class AdminYptKugController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('yptkug')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            DB::connection('sqlsrvyptkug')->beginTransaction();
+            DB::connection($this->db)->beginTransaction();
 
-            $cek =  DB::connection('sqlsrvyptkug')->select("select pass from hakakses where nik='$nik' and pass='$request->password_lama' ");
+            $cek =  DB::connection($this->db)->select("select pass from hakakses where nik='$nik' and pass='$request->password_lama' ");
             if(count($cek) > 0){
 
-                $upd =  DB::connection('sqlsrvyptkug')->table('hakakses')
+                $upd =  DB::connection($this->db)->table('hakakses')
                 ->where('nik', $nik)
                 ->where('pass', $request->password_lama)
                 ->update(['pass' => $request->password_baru, 'password' => app('hash')->make($request->password_baru)]);
                 
                 if($upd){ //mengecek apakah data kosong atau tidak
-                    DB::connection('sqlsrvyptkug')->commit();
+                    DB::connection($this->db)->commit();
                     $success['status'] = true;
-                    $success['message'] = "Password berhasil diubah";
+                    $success['message'] = "Password berhasil diubah. Harap login ulang untuk memperbarui data sesi.";
                     return response()->json($success, 200);     
                 }
                 else{
-                    DB::connection('sqlsrvyptkug')->rollback();
+                    DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['message'] = "Password gagal diubah";
                     return response()->json($success, 200);
                 }
             }else{
-                DB::connection('sqlsrvyptkug')->rollback();
+                DB::connection($this->db)->rollback();
                 $success['status'] = false;
                 $success['message'] = "Password lama tidak valid";
                 return response()->json($success, 200);
             }
         }catch (\Throwable $e) {
             
-            DB::connection('sqlsrvyptkug')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
@@ -187,24 +155,24 @@ class AdminYptKugController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('yptkug')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            DB::connection('sqlsrvyptkug')->beginTransaction();
+            DB::connection($this->db)->beginTransaction();
 
             if($request->hasfile('foto')){
 
                 $sql = "select foto as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
                 ";
-                $res = DB::connection('sqlsrvyptkug')->select($sql);
+                $res = DB::connection($this->db)->select($sql);
                 $res = json_decode(json_encode($res),true);
 
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('telu/'.$foto);
+                        Storage::disk('s3')->delete('toko/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -214,29 +182,29 @@ class AdminYptKugController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('telu/'.$foto)){
-                    Storage::disk('s3')->delete('telu/'.$foto);
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
                 }
-                Storage::disk('s3')->put('telu/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
                 
             }else{
 
                 $foto="-";
             }
 
-            $upd =  DB::connection('sqlsrvyptkug')->table('karyawan')
+            $upd =  DB::connection($this->db)->table('karyawan')
             ->where('nik', $nik)
             ->update(['foto' => $foto]);
             
             if($upd){ //mengecek apakah data kosong atau tidak
-                DB::connection('sqlsrvyptkug')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['foto'] = $foto;
-                $success['message'] = "Foto berhasil diubah";
+                $success['message'] = "Foto berhasil diubah. Harap login ulang untuk memperbarui data sesi.";
                 return response()->json($success, 200);     
             }
             else{
-                DB::connection('sqlsrvyptkug')->rollback();
+                DB::connection($this->db)->rollback();
                 $success['status'] = false;
                 $success['foto'] = "-";
                 $success['message'] = "Foto gagal diubah";
@@ -244,7 +212,7 @@ class AdminYptKugController extends Controller
             }
         } catch (\Throwable $e) {
             
-            DB::connection('sqlsrvyptkug')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
@@ -257,24 +225,24 @@ class AdminYptKugController extends Controller
         ]);
         try {
             
-            if($data =  Auth::guard('yptkug')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            DB::connection('sqlsrvyptkug')->beginTransaction();
+            DB::connection($this->db)->beginTransaction();
 
             if($request->hasfile('foto')){
 
                 $sql = "select background as file_gambar from karyawan where kode_lokasi='".$kode_lokasi."' and nik='$nik' 
                 ";
-                $res = DB::connection('sqlsrvyptkug')->select($sql);
+                $res = DB::connection($this->db)->select($sql);
                 $res = json_decode(json_encode($res),true);
 
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('telu/'.$foto);
+                        Storage::disk('s3')->delete('toko/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -284,29 +252,29 @@ class AdminYptKugController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('telu/'.$foto)){
-                    Storage::disk('s3')->delete('telu/'.$foto);
+                if(Storage::disk('s3')->exists('toko/'.$foto)){
+                    Storage::disk('s3')->delete('toko/'.$foto);
                 }
-                Storage::disk('s3')->put('telu/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('toko/'.$foto,file_get_contents($file));
                 
             }else{
 
                 $foto="-";
             }
 
-            $upd =  DB::connection('sqlsrvyptkug')->table('karyawan')
+            $upd =  DB::connection($this->db)->table('karyawan')
             ->where('nik', $nik)
             ->update(['background' => $foto]);
             
             if($upd){ //mengecek apakah data kosong atau tidak
-                DB::connection('sqlsrvyptkug')->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['foto'] = $foto;
-                $success['message'] = "Background berhasil diubah";
+                $success['message'] = "Background berhasil diubah. Harap login ulang untuk memperbarui data sesi.";
                 return response()->json($success, 200);     
             }
             else{
-                DB::connection('sqlsrvyptkug')->rollback();
+                DB::connection($this->db)->rollback();
                 $success['status'] = false;
                 $success['foto'] = "-";
                 $success['message'] = "Background gagal diubah";
@@ -314,7 +282,7 @@ class AdminYptKugController extends Controller
             }
         } catch (\Throwable $e) {
             
-            DB::connection('sqlsrvyptkug')->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
@@ -326,7 +294,7 @@ class AdminYptKugController extends Controller
             'cari' => 'required'
         ]);
         try {
-            if($data =  Auth::guard('yptkug')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -334,11 +302,11 @@ class AdminYptKugController extends Controller
                 $kode_lokasi= '';
             }
 
-            $rs = DB::connection('sqlsrvyptkug')->select(" select distinct a.kode_form as id,a.nama,c.form 
+            $rs = DB::connection($this->db)->select(" select distinct a.kode_form as id,a.nama,c.form 
             from menu a
             inner join m_form c on a.kode_form=c.kode_form
             inner join hakakses b on a.kode_klp=b.kode_klp_menu
-            where b.nik='$nik' and a.kode_form<>'-' and a.nama like '%$request->cari%' 
+            where b.nik='$nik' and a.kode_form<>'-' and a.nama = '$request->cari' 
             ");
             $rs = json_decode(json_encode($rs),true);
             if(count($rs) > 0){ //mengecek apakah data kosong atau tidak
@@ -363,12 +331,52 @@ class AdminYptKugController extends Controller
         }
     }
 
+    public function reportError(Request $request){
+        $this->validate($request,[
+            'error' => 'required',
+            'kode_form' => 'required'
+        ]);
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+
+        try{
+
+           DB::connection($this->db)->beginTransaction();
+           $error = str_replace( array( '\'', '"',',' , ';', '<', '>' ), ' ', $request->error);
+      
+           $insert =  DB::connection($this->db)->insert("insert into esaku_error_log (kode_form,kode_lokasi,nik,tgl_input,datalog) values ('$request->kode_form','$kode_lokasi','$nik',getdate(),'$error') ");
+           
+           if($insert){ //mengecek apakah data kosong atau tidak
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Error berhasil disimpan";
+                return response()->json($success, 200);     
+            }
+            else{
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['message'] = "Data Error gagal diubah";
+                return response()->json($success, 200);
+            }
+        }catch (\Throwable $e) {
+            
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+
+       
+    }
+
     public function searchFormList(Request $request){
         // $this->validate($request,[
         //     'cari' => 'required'
         // ]);
         try {
-            if($data =  Auth::guard('yptkug')->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }else{
@@ -382,7 +390,7 @@ class AdminYptKugController extends Controller
                 $filter = " ";
             }
 
-            $rs = DB::connection('sqlsrvyptkug')->select(" select distinct a.kode_form as id,a.nama,c.form 
+            $rs = DB::connection($this->db)->select(" select distinct a.kode_form as id,a.nama,c.form 
             from menu a
             inner join m_form c on a.kode_form=c.kode_form
             inner join hakakses b on a.kode_klp=b.kode_klp_menu
@@ -409,47 +417,6 @@ class AdminYptKugController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, 200);
         }
-    }
-
-    
-    public function updateDataPribadi(Request $request)
-    {  
-        try {
-            if($data =  Auth::guard('yptkug')->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $status_login = $data->status_login;
-            }
-            $res = DB::connection('sqlsrvyptkug')->select("select email from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
-            $email = $res[0]->email;
-
-            if(isset($request->email)){
-                $email = $request->email;
-            }else{
-                $email = $email;
-            }
-
-            $update = DB::connection('sqlsrvyptkug')->table('karyawan')
-            ->where('nik',$nik)
-            ->where('kode_lokasi',$kode_lokasi)
-            ->update([
-                'email' => $email
-            ]);
-            
-            if($update){
-                $success['status'] = true;
-                $success['message'] = "Data Pribadi berhasil diubah";
-            }else{
-                $success['status'] = false;
-                $success['message'] = "Data Pribadi gagal diubah";
-            }
-           
-            return response()->json($success, 200);     
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Data Pribadi gagal diubah ".$e;
-            return response()->json($success, 200); 
-        }	
     }
 
 }

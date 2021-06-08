@@ -21,16 +21,6 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginYptKug');
     $router->get('hash_pass', 'AuthController@hashPasswordYptKug');
     $router->get('hash_pass_nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
-	$router->get('db3', function () {
-        
-        $sql = DB::connection('sqlsrvyptkug')->select("select * from hakakses ");
-        $row = json_decode(json_encode($sql),true);
-        
-        $result = response()->json(['success'=>$row], 200);    
-        
-        return $result;
-        
-    });
 });
 
 $router->get('storage/{filename}', function ($filename)
@@ -41,26 +31,9 @@ $router->get('storage/{filename}', function ($filename)
     return Storage::disk('s3')->response('ypt/'.$filename); 
 });
 
-$router->get('storage2/{filename}', function ($filename)
-{
-    if (!Storage::disk('s3')->exists('telu/'.$filename)) {
-        abort(404);
-    }
-    return Storage::disk('s3')->response('telu/'.$filename); 
-});
-
-$router->get('storage-tmp/{filename}', function ($filename)
-{
-    if (!Storage::disk('s3')->exists('telu/tmp_dok/'.$filename)) {
-        abort(404);
-    }
-    return Storage::disk('s3')->response('telu/tmp_dok/'.$filename); 
-});
-
-
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
-    $router->get('profile', 'AdminYptKugController@profile');
+    $router->get('profile', 'AdminYptKugController@profile_simlog');
     $router->get('users/{id}', 'AdminYptKugController@singleUser');
     $router->get('users', 'AdminYptKugController@allUsers');
     $router->get('cekPayload', 'AdminYptKugController@cekPayload');
@@ -71,15 +44,11 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('update-profile', 'AdminYptKugController@updateDataPribadi');
 
     //Menu
-    $router->get('upload', 'UploadController@upload');
-    $router->post('upload', 'UploadController@proses_upload');
-    $router->get('upload/{file}', 'UploadController@show');
-    $router->get('menu/{kode_klp}', 'Dashboard\DashboardController@getMenu');
-    $router->get('menu2/{kode_klp}', 'Dashboard\DashboardController@getMenu2');
+    $router->get('menu/{kode_klp}', 'Simlog\MenuController@show');
     
-    $router->post('notif-pusher', 'Ypt\NotifController@sendPusher');
-    $router->get('notif-pusher', 'Ypt\NotifController@getNotifPusher');
-    $router->put('notif-update-status', 'Ypt\NotifController@updateStatusRead');
+    $router->post('notif-pusher', 'Simlog\NotifController@sendPusher');
+    $router->get('notif-pusher', 'Simlog\NotifController@getNotifPusher');
+    $router->put('notif-update-status', 'Simlog\NotifController@updateStatusRead');
 
     $router->post('search-form', 'AdminYptKugController@searchForm');
     $router->get('search-form-list', 'AdminYptKugController@searchFormList');

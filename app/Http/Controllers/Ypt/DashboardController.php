@@ -9689,6 +9689,96 @@ class DashboardController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function getListBerita(Request $request){
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+            // $col_array = array('periode');
+            // $db_col_name = array('a.periode');
+            // $where = "where a.kode_lokasi='$kode_lokasi'";
+            // $this_in = "";
+            // for($i = 0; $i<count($col_array); $i++){
+            //     if(ISSET($request->input($col_array[$i])[0])){
+            //         if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+            //             $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+            //         }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+            //             $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+            //         }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+            //             $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+            //         }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+            //             $tmp = explode(",",$request->input($col_array[$i])[1]);
+            //             for($x=0;$x<count($tmp);$x++){
+            //                 if($x == 0){
+            //                     $this_in .= "'".$tmp[$x]."'";
+            //                 }else{
+            
+            //                     $this_in .= ","."'".$tmp[$x]."'";
+            //                 }
+            //             }
+            //             $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+            //         }
+            //     }
+            // }
+            
+            $filter = "";
+            if(isset($request->kode_kategori) && $request->kode_kategori != ""){
+                $filter .= " and a.kode_kategori ='$request->kode_kategori' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->no_konten) && $request->no_konten != ""){
+                $filter .= " and a.no_konten ='$request->no_konten' ";
+            }else{
+                $filter .= "";
+            }
+
+			$sql="select a.no_konten, convert(varchar, a.tanggal, 103) as tanggal, a.judul, a.isi as keterangan, a.file_gambar,a.kode_kategori,a.tag,a.flag_aktif,b.nama as nama_kategori,c.nama as nama_buat 
+            from dash_konten a 
+            inner join dash_konten_ktg b on a.kode_kategori=b.kode_ktg and a.kode_lokasi=b.kode_lokasi
+            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."' and a.flag_aktif=1 $filter
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                if(isset($request->no_konten) && $request->no_konten != ""){
+                    $sql="select *
+                    from dash_konten_dok a 
+                    where a.kode_lokasi='".$kode_lokasi."' and a.no_bukti='$request->no_konten'
+                    ";
+                    $res = DB::connection($this->db)->select($sql);
+                    $success['data2'] = json_decode(json_encode($res),true);
+                }
+                $success['message'] = "Success!";
+                
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 
     

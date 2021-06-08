@@ -17,11 +17,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
-    //tanggal server
-    $router->get('getTglServer','Ypt\FilterController@getTglServer');     
-    //periode input
-    $router->get('getPerInput','Ypt\FilterController@getPerInput');     
-
+    
     //ADMIN
     //Menu
     $router->get('menu','Ypt\MenuController@index');
@@ -64,35 +60,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->put('unit','Ypt\UnitController@update');
     $router->delete('unit','Ypt\UnitController@destroy');
 
-    
-    //fs
-    $router->get('listFSAktif','Ypt\FSController@listFSAktif');         
-    $router->get('cariFSAktif','Ypt\FSController@cariFSAktif');
-    $router->get('fs','Ypt\FSController@index');
-    $router->post('fs','Ypt\FSController@store');
-    $router->put('fs','Ypt\FSController@update');
-    $router->delete('fs','Ypt\FSController@destroy'); 
-
-    //Video
-    
-    $router->get('video','Ypt\VideoController@index');
-    $router->post('video','Ypt\VideoController@store');
-    $router->put('video','Ypt\VideoController@update');
-    $router->delete('video','Ypt\VideoController@destroy');
-
-    
-    $router->get('konten','Ypt\KontenController@index');
-    $router->get('konten-edit','Ypt\KontenController@show');
-    $router->post('konten','Ypt\KontenController@store');
-    $router->post('konten-edit','Ypt\KontenController@update');
-    $router->delete('konten','Ypt\KontenController@destroy');
-
-    $router->get('dok-jenis','Ypt\KontenController@getJenis');
-    $router->post('konten-dok','Ypt\KontenController@storeDokTmp');
-    $router->delete('konten-dok','Ypt\KontenController@destroyDok');
-    $router->delete('konten-dok-tmp','Ypt\KontenController@destroyDokTmp');
-    
-    $router->get('kategori-konten','Ypt\KontenController@getKonten');
+    //Vendor
+    $router->get('vendor','Simlog\VendorController@index');
+    $router->post('vendor','Simlog\VendorController@store');
+    $router->put('vendor','Simlog\VendorController@update');
+    $router->delete('vendor','Simlog\VendorController@destroy');
+    $router->get('vendor-akun','Simlog\VendorController@getAkun');
 
 });
 

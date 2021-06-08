@@ -86,6 +86,10 @@ return [
         'siaga' => [
             'driver' => 'jwt',
             'provider' => 'siaga',
+        ],
+        'bangtel' => [
+            'driver' => 'jwt',
+            'provider' => 'bangtel',
         ]
     ],
 
@@ -165,6 +169,10 @@ return [
         'siaga' => [
             'driver' => 'eloquent',
             'model' => \App\AdminSiaga::class
+        ],
+        'bangtel' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminBangtel::class
         ]
     ]
 ];
