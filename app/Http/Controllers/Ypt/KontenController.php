@@ -52,9 +52,9 @@ class KontenController extends Controller
                 }
                 $sql= "select a.no_konten, convert(varchar, a.tanggal, 103) as tanggal, a.judul, a.isi as keterangan, a.file_gambar,a.kode_kategori,a.tag,a.flag_aktif,b.nama as nama_kategori from dash_konten a 
                 inner join dash_konten_ktg b on a.kode_kategori=b.kode_ktg and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi='".$kode_lokasi."'  $filter ";
+                where a.kode_lokasi='".$kode_lokasi."'  $filter  ";
 
-                $sql2 = "select * from dash_konten_dok a where a.no_bukti='$request->no_konten' ";
+                $sql2 = "select * from dash_konten_dok a where a.no_bukti='$request->no_konten' order by a.no_urut ";
             }else{
                 $sql = "select no_konten, judul, flag_aktif,convert(varchar, tanggal, 103) as tanggal from dash_konten 
                 where kode_lokasi='".$kode_lokasi."'
@@ -583,6 +583,12 @@ class KontenController extends Controller
             }
 
             $del = DB::connection($this->db)->table('dash_konten_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti) 
+            ->where('no_urut', $no_urut)
+            ->delete();
+
+            $del2 = DB::connection($this->db)->table('dash_konten_dok_tmp')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti) 
             ->where('no_urut', $no_urut)
