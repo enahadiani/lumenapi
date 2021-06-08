@@ -158,6 +158,15 @@ class KontenController extends Controller
                 }
                 $i++;
             }
+
+            if(isset($request->kode_jenis)){
+                for($i=0; $i < count($request->kode_jenis); $i++){
+                    if($request->kode_jenis[$i] == "DK03"){
+                        $ins3[] = DB::connection($this->db)->insert("insert into dash_konten_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values ('$no_bukti','$kode_lokasi','".$request->nama_file[$i]."','".$request->nama_dok[$i]."','".$request->no_urut[$i]."','".$request->kode_jenis[$i]."') ");
+                    }
+                
+                }
+            }
             
             $del =  DB::connection($this->db)->table('dash_konten_dok_tmp')
             ->where('no_bukti', $no_bukti)
@@ -280,6 +289,18 @@ class KontenController extends Controller
                 }
                 $i++;
             }
+
+            if(isset($request->kode_jenis)){
+                for($i=0; $i < count($request->kode_jenis); $i++){
+                    if($request->kode_jenis[$i] == "DK03"){
+                        $ins3[] = DB::connection($this->db)->insert("insert into dash_konten_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values ('$request->no_konten','$kode_lokasi','".$request->nama_file[$i]."','".$request->nama_dok[$i]."','".$request->no_urut[$i]."','".$request->kode_jenis[$i]."') ");
+                    }
+                
+                }
+            }
+
+            $success['kode_jenis'] = $request->kode_jenis;
+            $success['nama_file'] = $request->nama_file;
             
             $del =  DB::connection($this->db)->table('dash_konten_dok_tmp')
             ->where('no_bukti', $request->no_konten)
@@ -568,7 +589,9 @@ class KontenController extends Controller
             ->delete();
 
             if($file != ""){
-                Storage::disk('s3')->delete('telu/'.$file);
+                if(Storage::disk('s3')->exists('telu/'.$file)){
+                    Storage::disk('s3')->delete('telu/'.$file);
+                }
             }
 
             DB::connection($this->db)->commit();
@@ -608,7 +631,9 @@ class KontenController extends Controller
             if(count($res) > 0){
                 $foto = $res[0]['file_gambar'];
                 if($foto != ""){
-                    Storage::disk('s3')->delete('telu/tmp_dok/'.$foto);
+                    if(Storage::disk('s3')->exists('telu/tmp_dok'.$foto)){
+                        Storage::disk('s3')->delete('telu/'.$foto);
+                    }
                 }
             }else{
                 $foto = "-";
