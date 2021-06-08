@@ -43,7 +43,7 @@ class KontenController extends Controller
                     ->where('kode_lokasi', $kode_lokasi)
                     ->delete();
     
-                    $ins2 = DB::connection($this->db)->insert("insert into dash_konten_dok_tmp (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis,nik_user) select a.no_bukti,a.kode_lokasi,a.file_dok,a.nama,a.no_urut,a.kode_jenis,'$request->nik_user' from dash_konten_dok a where a.no_bukti='$request->no_konten' and kode_lokasi='$kode_lokasi' ");
+                    $ins2 = DB::connection($this->db)->insert("insert into dash_konten_dok_tmp (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis,nik_user) select a.no_bukti,a.kode_lokasi,a.file_dok,a.nama,a.no_urut,a.kode_jenis,'$request->nik_user' from dash_konten_dok a where a.no_bukti='$request->no_konten' and a.kode_lokasi='$kode_lokasi' and a.kode_jenis <> 'DK03' ");
                 }
                 if($request->no_konten == "all"){
                     $filter = "";
