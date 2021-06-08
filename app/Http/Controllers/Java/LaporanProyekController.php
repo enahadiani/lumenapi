@@ -19,8 +19,8 @@ class LaporanProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('no_proyek', 'kode_cust');
-            $db_col_name = array('a.no_proyek', 'a.kode_cust');
+            $col_array = array('no_proyek', 'kode_cust', 'status');
+            $db_col_name = array('a.no_proyek', 'a.kode_cust', 'd.status');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -55,10 +55,10 @@ class LaporanProyekController extends Controller {
             where a.kode_lokasi='11'
             group by b.no_proyek,b.kode_lokasi
             )c on a.no_proyek=c.no_proyek and a.kode_lokasi=b.kode_lokasi
-            left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
+            left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai, a.status
             from java_beban  a
             where a.kode_lokasi='11'
-            group by a.no_proyek,a.kode_lokasi
+            group by a.no_proyek,a.kode_lokasi,a.status
             )d on a.no_proyek=d.no_proyek and a.kode_lokasi=d.kode_lokasi
             left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
             from java_tagihan  a
