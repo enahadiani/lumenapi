@@ -374,6 +374,10 @@ class KontenController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
+            $del3 = DB::connection($this->db)->table('dash_konten_dok_tmp')
+            ->where('no_bukti', $request->no_konten)
+            ->where('kode_lokasi', $kode_lokasi)
+            ->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
