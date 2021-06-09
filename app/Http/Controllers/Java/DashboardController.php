@@ -121,10 +121,9 @@ class DashboardController extends Controller {
             $sql = "select isnull(sum(a.nilai), 0) as nilai_proyek, isnull(sum(b.nilai), 0) as nilai_beban from java_proyek a
             left join (select a.no_proyek,a.kode_lokasi, sum(a.nilai) as nilai
             from java_beban a
-            where a.kode_lokasi='11' and year(a.tanggal) = '2021'
+            where a.kode_lokasi='11'
             group by a.no_proyek,a.kode_lokasi
-            ) b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi
-            where year(a.tgl_mulai) = '2021'";
+            ) b on a.no_proyek=b.no_proyek and a.kode_lokasi=b.kode_lokasi";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
