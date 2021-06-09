@@ -43,7 +43,7 @@ class KontenController extends Controller
                     ->where('kode_lokasi', $kode_lokasi)
                     ->delete();
     
-                    $ins2 = DB::connection($this->db)->insert("insert into dash_konten_dok_tmp (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis,nik_user) select a.no_bukti,a.kode_lokasi,a.file_dok,a.nama,a.no_urut,a.kode_jenis,'$request->nik_user' from dash_konten_dok a where a.no_bukti='$request->no_konten' and kode_lokasi='$kode_lokasi' ");
+                    $ins2 = DB::connection($this->db)->insert("insert into dash_konten_dok_tmp (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis,nik_user) select a.no_bukti,a.kode_lokasi,a.file_dok,a.nama,a.no_urut,a.kode_jenis,'$request->nik_user' from dash_konten_dok a where a.no_bukti='$request->no_konten' and a.kode_lokasi='$kode_lokasi' and a.kode_jenis <> 'DK03' ");
                 }
                 if($request->no_konten == "all"){
                     $filter = "";
@@ -52,9 +52,9 @@ class KontenController extends Controller
                 }
                 $sql= "select a.no_konten, convert(varchar, a.tanggal, 103) as tanggal, a.judul, a.isi as keterangan, a.file_gambar,a.kode_kategori,a.tag,a.flag_aktif,b.nama as nama_kategori from dash_konten a 
                 inner join dash_konten_ktg b on a.kode_kategori=b.kode_ktg and a.kode_lokasi=b.kode_lokasi
-                where a.kode_lokasi='".$kode_lokasi."'  $filter ";
+                where a.kode_lokasi='".$kode_lokasi."'  $filter  ";
 
-                $sql2 = "select * from dash_konten_dok a where a.no_bukti='$request->no_konten' ";
+                $sql2 = "select * from dash_konten_dok a where a.no_bukti='$request->no_konten' order by a.no_urut ";
             }else{
                 $sql = "select no_konten, judul, flag_aktif,convert(varchar, tanggal, 103) as tanggal from dash_konten 
                 where kode_lokasi='".$kode_lokasi."'
@@ -157,6 +157,15 @@ class KontenController extends Controller
                     Storage::disk('s3')->move('telu/tmp_dok/'.$row->file_dok, 'telu/'.$row->file_dok);
                 }
                 $i++;
+            }
+
+            if(isset($request->kode_jenis)){
+                for($i=0; $i < count($request->kode_jenis); $i++){
+                    if($request->kode_jenis[$i] == "DK03"){
+                        $ins3[] = DB::connection($this->db)->insert("insert into dash_konten_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values ('$no_bukti','$kode_lokasi','".$request->nama_file[$i]."','".$request->nama_dok[$i]."','".$request->no_urut[$i]."','".$request->kode_jenis[$i]."') ");
+                    }
+                
+                }
             }
             
             $del =  DB::connection($this->db)->table('dash_konten_dok_tmp')
@@ -280,6 +289,18 @@ class KontenController extends Controller
                 }
                 $i++;
             }
+
+            if(isset($request->kode_jenis)){
+                for($i=0; $i < count($request->kode_jenis); $i++){
+                    if($request->kode_jenis[$i] == "DK03"){
+                        $ins3[] = DB::connection($this->db)->insert("insert into dash_konten_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values ('$request->no_konten','$kode_lokasi','".$request->nama_file[$i]."','".$request->nama_dok[$i]."','".$request->no_urut[$i]."','".$request->kode_jenis[$i]."') ");
+                    }
+                
+                }
+            }
+
+            $success['kode_jenis'] = $request->kode_jenis;
+            $success['nama_file'] = $request->nama_file;
             
             $del =  DB::connection($this->db)->table('dash_konten_dok_tmp')
             ->where('no_bukti', $request->no_konten)
@@ -353,6 +374,10 @@ class KontenController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
+            $del3 = DB::connection($this->db)->table('dash_konten_dok_tmp')
+            ->where('no_bukti', $request->no_konten)
+            ->where('kode_lokasi', $kode_lokasi)
+            ->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -567,8 +592,16 @@ class KontenController extends Controller
             ->where('no_urut', $no_urut)
             ->delete();
 
+            $del2 = DB::connection($this->db)->table('dash_konten_dok_tmp')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti) 
+            ->where('no_urut', $no_urut)
+            ->delete();
+
             if($file != ""){
-                Storage::disk('s3')->delete('telu/'.$file);
+                if(Storage::disk('s3')->exists('telu/'.$file)){
+                    Storage::disk('s3')->delete('telu/'.$file);
+                }
             }
 
             DB::connection($this->db)->commit();
@@ -608,7 +641,9 @@ class KontenController extends Controller
             if(count($res) > 0){
                 $foto = $res[0]['file_gambar'];
                 if($foto != ""){
-                    Storage::disk('s3')->delete('telu/tmp_dok/'.$foto);
+                    if(Storage::disk('s3')->exists('telu/tmp_dok'.$foto)){
+                        Storage::disk('s3')->delete('telu/'.$foto);
+                    }
                 }
             }else{
                 $foto = "-";
