@@ -245,10 +245,9 @@ class DashboardController extends Controller {
             }
             // and format(tgl_mulai, 'MM') = '".$request->query('bulan')."' and year(tgl_mulai) = '".$request->query('tahun')."'
             $sql = "select count(no_proyek) as jumlah_proyek, 
-            (select count(no_proyek) from java_proyek where flag_aktif = '1' and year(tgl_mulai) = '2021') as proyek_selesai, 
-            (select count(no_proyek) from java_proyek where flag_aktif = '0' and year(tgl_mulai) = '2021') as proyek_berjalan 
-            from java_proyek
-            where year(tgl_mulai) = '2021'";
+            (select count(no_proyek) from java_proyek where flag_aktif = '1') as proyek_selesai, 
+            (select count(no_proyek) from java_proyek where flag_aktif = '0') as proyek_berjalan 
+            from java_proyek";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
