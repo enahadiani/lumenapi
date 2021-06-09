@@ -252,6 +252,7 @@ class DashboardController extends Controller {
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['sql'] = $sql;
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";     
