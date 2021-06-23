@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class DinasController extends Controller
+class SanksiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class DinasController extends Controller
 
     public function isUnik($isi){
         
-        $auth = DB::connection($this->db)->select("select no_sk from hr_sk where no_sk ='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select no_sk from hr_sanksi where no_sk ='".$isi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,15 +38,17 @@ class DinasController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->no_sk)){
-                if($request->no_sk == "all"){
+            if(isset($request->nu)){
+                if($request->nu == "all"){
                     $filter = "";
                 }else{
-                    $filter = "where no_sk='$request->no_sk' ";
+                    $filter = "and nu='$request->nu' ";
                 }
-                $sql= "select no_sk,nama,convert(varchar,tgl_sk,103) as tgl_sk from hr_sk  $filter";
+                $sql= "select nama,convert(varchar,tanggal,103) as tgl,jenis from hr_sanksi
+                where kode_lokasi='$kode_lokasi' and nik='$nik' $filter";
             }else{
-                $sql = "select no_sk,nama,convert(varchar,tgl_sk,103) as tgl_sk from hr_sk ";
+                $sql = "select nama,convert(varchar,tanggal,103) as tgl,jenis from hr_sanksi
+                where kode_lokasi='$kode_lokasi' and nik='$nik' ";
             }
 
             $res = DB::connection($this->db)->select($sql);
@@ -90,9 +92,9 @@ class DinasController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'no_sk' => 'required',
+            'jenis' => 'required',
             'nama' => 'required',
-            'tgl_sk' => 'required'
+            'tanggal' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -102,32 +104,27 @@ class DinasController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->no_sk)){
-                $sqlnu= "select max(nu) as nu from hr_sk where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
-                $rsnu=DB::connection($this->db)->select($sqlnu);
+            $sqlnu= "select max(nu) as nu from hr_sanksi where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
+            $rsnu=DB::connection($this->db)->select($sqlnu);
 
-                if(count($rsnu) > 0){
-                    $nu = $rsnu[0]->nu + 1;
-                }else{
-                    $nu = 0;
-                }
-
-                $ins = DB::connection($this->db)->insert("insert into hr_sk(no_sk,nama,tgl_sk,nu,kode_lokasi,nik) values ('".$request->no_sk."','".$request->nama."','".$request->tgl_sk."','".$nu."','$kode_lokasi','$nik') ");
-                
-                DB::connection($this->db)->commit();
-                $success['status'] = true;
-                $success['message'] = "Data Dinas berhasil disimpan";
+            if(count($rsnu) > 0){
+                $nu = $rsnu[0]->nu + 1;
             }else{
-                $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. NO SK sudah ada di database!";
+                $nu = 0;
             }
-            $success['kode'] = $request->no_sk;
+
+            $ins = DB::connection($this->db)->insert("insert into hr_sanksi(jenis,nama,tanggal,nu,kode_lokasi,nik) values ('".$request->jenis."','".$request->nama."','".$request->tanggal."','".$nu."','$kode_lokasi','$nik') ");
+            
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['kode'] = $request->nik;
+            $success['message'] = "Data Sanksi berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Dinas gagal disimpan ".$e;
+            $success['message'] = "Data Sanksi gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -156,9 +153,10 @@ class DinasController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_sk' => 'required',
+            'jenis' => 'required',
             'nama' => 'required',
-            'tgl_sk' => 'required'
+            'tanggal' => 'required',
+            'nu' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -169,7 +167,7 @@ class DinasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sqlnu= "select nu from hr_sk where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
+            $sqlnu= "select nu from hr_sanksi where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
             $rsnu=DB::connection($this->db)->select($sqlnu);
             
             if(count($rsnu) > 0){
@@ -178,22 +176,22 @@ class DinasController extends Controller
                 $nu = 0;
             }
                 
-            $del = DB::connection($this->db)->table('hr_sk')
-                ->where('no_sk', $request->no_sk)
-                ->where('nik', $nik)
+            $del = DB::connection($this->db)->table('hr_sanksi')
+                ->where('nik', $request->nik)
+                ->where('nu', $request->nu)
                 ->delete();
-                
-            $ins = DB::connection($this->db)->insert("insert into hr_sk(no_sk,nama,tgl_sk,nu,kode_lokasi,nik) values ('".$request->no_sk."','".$request->nama."','".$request->tgl_sk."','".$nu."','$kode_lokasi','$nik') ");
+
+            $ins = DB::connection($this->db)->insert("insert into hr_sanksi(jenis,nama,tanggal,nu,kode_lokasi,nik) values ('".$request->jenis."','".$request->nama."','".$request->tanggal."','".$nu."','$kode_lokasi','$nik') ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Dinas berhasil diubah";
+            $success['message'] = "Data Sanksi berhasil diubah";
             $success['kode'] = $request->no_sk;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Dinas gagal diubah ".$e;
+            $success['message'] = "Data Sanksi gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -217,20 +215,20 @@ class DinasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_sk')
+            $del = DB::connection($this->db)->table('hr_sanksi')
             ->where('no_sk', $request->no_sk)
             ->where('nik', $nik)
             ->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Dinas berhasil dihapus";
+            $success['message'] = "Data Sanksi berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Dinas gagal dihapus ".$e;
+            $success['message'] = "Data Sanksi gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

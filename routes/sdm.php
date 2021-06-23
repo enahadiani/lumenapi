@@ -85,6 +85,23 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('pelatihan','Sdm\PelatihanController@store');
     $router->post('pelatihan-edit','Sdm\PelatihanController@update');
     $router->delete('pelatihan','Sdm\PelatihanController@destroy');
+    
+    $router->get('pendidikan','Sdm\PendidikanController@index');
+    $router->get('pendidikan-edit','Sdm\PendidikanController@show');
+    $router->post('pendidikan','Sdm\PendidikanController@store');
+    $router->post('pendidikan-edit','Sdm\PendidikanController@update');
+    $router->delete('pendidikan','Sdm\PendidikanController@destroy');
+    
+    $router->get('penghargaan','Sdm\PenghargaanController@index');
+    $router->get('penghargaan-edit','Sdm\PenghargaanController@show');
+    $router->post('penghargaan','Sdm\PenghargaanController@store');
+    $router->post('penghargaan-edit','Sdm\PenghargaanController@update');
+    $router->delete('penghargaan','Sdm\PenghargaanController@destroy');
+    
+    $router->get('sanksi','Sdm\SanksiController@index');
+    $router->post('sanksi','Sdm\SanksiController@store');
+    $router->put('sanksi','Sdm\SanksiController@update');
+    $router->delete('sanksi','Sdm\SanksiController@destroy');
 
     
 
