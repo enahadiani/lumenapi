@@ -20,13 +20,13 @@ class AdminTarbakController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
 
-            $user = DB::connection($this->db)->select("select a.kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
+            $user = DB::connection($this->db)->select("select a.kode_menu_lab as kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
 			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
             left join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi 
-            left join m_form e on a.path_view=e.kode_form 
+            left join m_form e on a.menu_mobile=e.kode_form 
             where a.nik= '$nik' 
             ");
             $user = json_decode(json_encode($user),true);
@@ -198,7 +198,7 @@ class AdminTarbakController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                        Storage::disk('s3')->delete('tarbak/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -208,10 +208,10 @@ class AdminTarbakController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                if(Storage::disk('s3')->exists('tarbak/'.$foto)){
+                    Storage::disk('s3')->delete('tarbak/'.$foto);
                 }
-                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('tarbak/'.$foto,file_get_contents($file));
                 
             }else{
 
@@ -268,7 +268,7 @@ class AdminTarbakController extends Controller
                 if(count($res) > 0){
                     $foto = $res[0]['file_gambar'];
                     if($foto != ""){
-                        Storage::disk('s3')->delete('sekolah/'.$foto);
+                        Storage::disk('s3')->delete('tarbak/'.$foto);
                     }
                 }else{
                     $foto = "-";
@@ -278,10 +278,10 @@ class AdminTarbakController extends Controller
                 
                 $nama_foto = uniqid()."_".str_replace(' ','_',$file->getClientOriginalName());
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sekolah/'.$foto)){
-                    Storage::disk('s3')->delete('sekolah/'.$foto);
+                if(Storage::disk('s3')->exists('tarbak/'.$foto)){
+                    Storage::disk('s3')->delete('tarbak/'.$foto);
                 }
-                Storage::disk('s3')->put('sekolah/'.$foto,file_get_contents($file));
+                Storage::disk('s3')->put('tarbak/'.$foto,file_get_contents($file));
                 
             }else{
 

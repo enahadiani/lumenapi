@@ -782,4 +782,11 @@ $app->router->group([
     require __DIR__.'/../routes/simlog/dash.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sdm'
+], function ($router) {
+    require __DIR__.'/../routes/sdm.php';
+});
+
 return $app;
