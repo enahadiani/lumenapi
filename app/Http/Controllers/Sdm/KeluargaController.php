@@ -28,7 +28,7 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select nama,case when jk = 'P' then 'Perempuan' else 'Laki-laki' end as jk,case when status_kes = 'Y' then 'Ya' else 'Tidak' end as status_kes,case when jenis = 'I' then 'Istri' when jenis= 'A' then 'Anak' else 'Suami' end as jenis,tempat,convert(varchar,tgl_lahir,103) as tgl from hr_keluarga where kode_lokasi='".$kode_lokasi."' and nik='$nik'
+            $res = DB::connection($this->sql)->select("select nama,case when jk = 'P' then 'Perempuan' else 'Laki-laki' end as jk,case when status_kes = 'Y' then 'Ya' else 'Tidak' end as status_kes,case when substring(jenis,1,1) = 'I' then 'Istri' when substring(jenis,1,1)= 'A' then 'Anak' else 'Suami' end as jenis,tempat,convert(varchar,tgl_lahir,103) as tgl from hr_keluarga where kode_lokasi='".$kode_lokasi."' and nik='$nik'
             ");
             $res = json_decode(json_encode($res),true);
             
