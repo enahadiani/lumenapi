@@ -80,6 +80,12 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('pp','Sdm\KepegawaianController@getPP');
     $router->get('loker','Sdm\KepegawaianController@getLoker');
 
+    $router->get('pelatihan','Sdm\PelatihanController@index');
+    $router->get('pelatihan-edit','Sdm\PelatihanController@show');
+    $router->post('pelatihan','Sdm\PelatihanController@store');
+    $router->post('pelatihan-edit','Sdm\PelatihanController@update');
+    $router->delete('pelatihan','Sdm\PelatihanController@destroy');
+
     
 
 });
