@@ -71,6 +71,15 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->post('keluarga-edit','Sdm\KeluargaController@update');
     $router->delete('keluarga','Sdm\KeluargaController@destroy');
 
+    $router->get('kepegawaian','Sdm\KepegawaianController@index');
+    $router->post('kepegawaian-edit','Sdm\KepegawaianController@update');
+    $router->get('sdm','Sdm\KepegawaianController@getSDM');
+    $router->get('jabatan','Sdm\KepegawaianController@getJabatan');
+    $router->get('golongan','Sdm\KepegawaianController@getGolongan');
+    $router->get('unit','Sdm\KepegawaianController@getUnit');
+    $router->get('pp','Sdm\KepegawaianController@getPP');
+    $router->get('loker','Sdm\KepegawaianController@getLoker');
+
     
 
 });

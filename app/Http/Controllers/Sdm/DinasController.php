@@ -17,11 +17,11 @@ class DinasController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'tarbak';
-    public $sql = 'sqlsrvtarbak';
+    public $db = 'sqlsrvtarbak';
 
     public function isUnik($isi){
         
-        $auth = DB::connection($this->sql)->select("select no_sk from hr_sk where no_sk ='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select no_sk from hr_sk where no_sk ='".$isi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -49,7 +49,7 @@ class DinasController extends Controller
                 $sql = "select no_sk,nama,convert(varchar,tgl_sk,103) as tgl_sk from hr_sk ";
             }
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -95,7 +95,7 @@ class DinasController extends Controller
             'tgl_sk' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -104,7 +104,7 @@ class DinasController extends Controller
             }
             if($this->isUnik($request->no_sk)){
                 $sqlnu= "select max(nu) as nu from hr_sk where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
-                $rsnu=DB::connection($this->sql)->select($sqlnu);
+                $rsnu=DB::connection($this->db)->select($sqlnu);
 
                 if(count($rsnu) > 0){
                     $nu = $rsnu[0]->nu + 1;
@@ -112,9 +112,9 @@ class DinasController extends Controller
                     $nu = 0;
                 }
 
-                $ins = DB::connection($this->sql)->insert("insert into hr_sk(no_sk,nama,tgl_sk,nu,kode_lokasi) values ('".$request->no_sk."','".$request->nama."','".$request->tgl_sk."','".$nu."','$kode_lokasi') ");
+                $ins = DB::connection($this->db)->insert("insert into hr_sk(no_sk,nama,tgl_sk,nu,kode_lokasi) values ('".$request->no_sk."','".$request->nama."','".$request->tgl_sk."','".$nu."','$kode_lokasi') ");
                 
-                DB::connection($this->sql)->commit();
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Dinas berhasil disimpan";
             }else{
@@ -125,7 +125,7 @@ class DinasController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Dinas gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -161,7 +161,7 @@ class DinasController extends Controller
             'tgl_sk' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -170,7 +170,7 @@ class DinasController extends Controller
             }
 
             $sqlnu= "select nu from hr_sk where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
-            $rsnu=DB::connection($this->sql)->select($sqlnu);
+            $rsnu=DB::connection($this->db)->select($sqlnu);
             
             if(count($rsnu) > 0){
                 $nu = $rsnu[0]->nu;
@@ -178,19 +178,19 @@ class DinasController extends Controller
                 $nu = 0;
             }
                 
-            $del = DB::connection($this->sql)->table('hr_sk')
+            $del = DB::connection($this->db)->table('hr_sk')
                 ->where('no_sk', $request->no_sk)
                 ->delete();
                 
-            $ins = DB::connection($this->sql)->insert("insert into hr_sk(no_sk,nama,tgl_sk,nu,kode_lokasi) values ('".$request->no_sk."','".$request->nama."','".$request->tgl_sk."','".$nu."','$kode_lokasi') ");
+            $ins = DB::connection($this->db)->insert("insert into hr_sk(no_sk,nama,tgl_sk,nu,kode_lokasi) values ('".$request->no_sk."','".$request->nama."','".$request->tgl_sk."','".$nu."','$kode_lokasi') ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Dinas berhasil diubah";
             $success['kode'] = $request->no_sk;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Dinas gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -208,7 +208,7 @@ class DinasController extends Controller
         $this->validate($request, [
             'no_sk' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -216,17 +216,17 @@ class DinasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('hr_sk')
+            $del = DB::connection($this->db)->table('hr_sk')
             ->where('no_sk', $request->no_sk)
             ->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Dinas berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Dinas gagal dihapus ".$e;
             

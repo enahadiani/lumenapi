@@ -16,7 +16,7 @@ class KeluargaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200; 
-    public $sql = 'sqlsrvtarbak';
+    public $db = 'sqlsrvtarbak';
     public $guard = 'tarbak';
 
     public function index(Request $request)
@@ -28,7 +28,7 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->sql)->select("select nama,case when jk = 'P' then 'Perempuan' else 'Laki-laki' end as jk,case when status_kes = 'Y' then 'Ya' else 'Tidak' end as status_kes,case when substring(jenis,1,1) = 'I' then 'Istri' when substring(jenis,1,1)= 'A' then 'Anak' else 'Suami' end as jenis,tempat,convert(varchar,tgl_lahir,103) as tgl from hr_keluarga where kode_lokasi='".$kode_lokasi."' and nik='$nik'
+            $res = DB::connection($this->db)->select("select nama,case when jk = 'P' then 'Perempuan' else 'Laki-laki' end as jk,case when status_kes = 'Y' then 'Ya' else 'Tidak' end as status_kes,case when substring(jenis,1,1) = 'I' then 'Istri' when substring(jenis,1,1)= 'A' then 'Anak' else 'Suami' end as jenis,tempat,convert(varchar,tgl_lahir,103) as tgl from hr_keluarga where kode_lokasi='".$kode_lokasi."' and nik='$nik'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -81,7 +81,7 @@ class KeluargaController extends Controller
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -105,7 +105,7 @@ class KeluargaController extends Controller
             }
             
             $sqlnu= "select max(nu) as nu from hr_keluarga where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
-            $rsnu=DB::connection($this->sql)->select($sqlnu);
+            $rsnu=DB::connection($this->db)->select($sqlnu);
 
             if(count($rsnu) > 0){
                 $nu = $rsnu[0]->nu + 1;
@@ -113,15 +113,15 @@ class KeluargaController extends Controller
                 $nu = 0;
             }
 
-            $ins = DB::connection($this->sql)->insert("insert into hr_keluarga(nik,kode_lokasi,nu,jenis,nama,jk,tempat,tgl_lahir,status_kes,foto) values ('".$request->nik."','".$kode_lokasi."',".$nu.",'".$request->jenis."','".$request->nama."','".$request->jk."','".$request->tempat."','".$request->tgl_lahir."','".$request->status_kes."','".$foto."') ");
+            $ins = DB::connection($this->db)->insert("insert into hr_keluarga(nik,kode_lokasi,nu,jenis,nama,jk,tempat,tgl_lahir,status_kes,foto) values ('".$request->nik."','".$kode_lokasi."',".$nu.",'".$request->jenis."','".$request->nama."','".$request->jk."','".$request->tempat."','".$request->tgl_lahir."','".$request->status_kes."','".$foto."') ");
             
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->nik;
             $success['message'] = "Data Keluarga berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Keluarga gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -153,7 +153,7 @@ class KeluargaController extends Controller
 
             $sql = "select nik,kode_lokasi,nu,jenis,nama,jk,tempat,tgl_lahir,status_kes,case when foto != '-' then '".$url."/'+foto else '-' end as foto from hr_keluarga where kode_lokasi='".$kode_lokasi."' and nik='$nik' and nu='$request->nu'
             ";
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -209,7 +209,7 @@ class KeluargaController extends Controller
         ]);
 
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -221,7 +221,7 @@ class KeluargaController extends Controller
 
                 $sql = "select foto as file_gambar from hr_keluarga where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' and nu='$request->nu'
                 ";
-                $res = DB::connection($this->sql)->select($sql);
+                $res = DB::connection($this->db)->select($sql);
                 $res = json_decode(json_encode($res),true);
 
                 if(count($res) > 0){
@@ -247,17 +247,17 @@ class KeluargaController extends Controller
                 $foto="-";
             }
             
-            $del = DB::connection($this->sql)->table('hr_keluarga')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->where('nu', $request->nu)->delete();
+            $del = DB::connection($this->db)->table('hr_keluarga')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->where('nu', $request->nu)->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into hr_keluarga(nik,kode_lokasi,nu,jenis,nama,jk,tempat,tgl_lahir,status_kes,foto) values ('".$request->nik."','".$kode_lokasi."',".$nu.",'".$request->jenis."','".$request->nama."','".$request->jk."','".$request->tempat."','".$request->tgl_lahir."','".$request->status_kes."','".$foto."') ");
+            $ins = DB::connection($this->db)->insert("insert into hr_keluarga(nik,kode_lokasi,nu,jenis,nama,jk,tempat,tgl_lahir,status_kes,foto) values ('".$request->nik."','".$kode_lokasi."',".$nu.",'".$request->jenis."','".$request->nama."','".$request->jk."','".$request->tempat."','".$request->tgl_lahir."','".$request->status_kes."','".$foto."') ");
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->nik;
             $success['message'] = "Data Keluarga berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Keluarga gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -275,7 +275,7 @@ class KeluargaController extends Controller
         $this->validate($request,[
             'nu' => 'required'
         ]);
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -283,15 +283,15 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->sql)->table('hr_keluarga')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->where('nu', $request->nu)->delete();
+            $del = DB::connection($this->db)->table('hr_keluarga')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->where('nu', $request->nu)->delete();
 
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Keluarga berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Keluarga gagal dihapus ".$e;
             
