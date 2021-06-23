@@ -26,11 +26,11 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->get('storage/{filename}', function ($filename)
 {
-    if (!Storage::disk('s3')->exists('tarbak/'.$filename)) {
+    if (!Storage::disk('s3')->exists('sdm/'.$filename)) {
         $success['message'] = 'Dokumen tidak tersedia!';
         $success['status'] = false;
     }
-    return Storage::disk('s3')->response('tarbak/'.$filename); 
+    return Storage::disk('s3')->response('sdm/'.$filename); 
 });
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
@@ -58,6 +58,18 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->get('profesi', 'Sdm\DataPribadiController@getProfesi');
     $router->get('strata', 'Sdm\DataPribadiController@getStrata');
     $router->get('status-pajak', 'Sdm\DataPribadiController@getStatusPajak');
+    $router->post('data-pribadi-edit', 'Sdm\DataPribadiController@update');
+
+    $router->get('dinas','Sdm\DinasController@index');
+    $router->post('dinas','Sdm\DinasController@store');
+    $router->put('dinas','Sdm\DinasController@update');
+    $router->delete('dinas','Sdm\DinasController@destroy');
+
+    $router->get('keluarga','Sdm\KeluargaController@index');
+    $router->get('keluarga-edit','Sdm\KeluargaController@show');
+    $router->post('keluarga','Sdm\KeluargaController@store');
+    $router->post('keluarga-edit','Sdm\KeluargaController@update');
+    $router->delete('keluarga','Sdm\KeluargaController@destroy');
 
     
 
