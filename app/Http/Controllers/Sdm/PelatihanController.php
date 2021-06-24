@@ -17,7 +17,7 @@ class PelatihanController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'toko';
-    public $db = 'dbtoko';
+    public $db = 'tokoaws';
 
     public function isUnik($isi){
         

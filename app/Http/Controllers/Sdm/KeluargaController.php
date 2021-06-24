@@ -17,7 +17,7 @@ class KeluargaController extends Controller
      */
     public $successStatus = 200; 
     public $guard = 'toko';
-    public $db = 'dbtoko';
+    public $db = 'tokoaws';
 
     public function index(Request $request)
     {
