@@ -16,8 +16,8 @@ class KeluargaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200; 
-    public $db = 'sqlsrvtarbak';
-    public $guard = 'tarbak';
+    public $guard = 'toko';
+    public $db = 'dbtoko';
 
     public function index(Request $request)
     {

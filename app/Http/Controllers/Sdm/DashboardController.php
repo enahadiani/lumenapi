@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
 	public $successStatus = 200;
-    public $guard = 'tarbak';
-    public $db = 'sqlsrvtarbak';
+    public $guard = 'toko';
+    public $db = 'dbtoko';
 
     public function getDataBox(Request $request){
         try {

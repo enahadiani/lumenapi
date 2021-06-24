@@ -35,22 +35,22 @@ $router->get('storage/{filename}', function ($filename)
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     
-    $router->post('login', 'AuthController@loginTarbak');
-    $router->get('hash-pass', 'AuthController@hashPasswordTarbak');
+    $router->post('login', 'AuthController@loginToko');
+    $router->get('hash-pass', 'AuthController@hashPasswordToko');
     $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
     
 });
 
-$router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
+$router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
-    $router->get('profile', 'AdminTarbakController@profile');
-    $router->get('users/{id}', 'AdminTarbakController@singleUser');
-    $router->get('users', 'AdminTarbakController@allUsers');
-    $router->get('cekPayload', 'AdminTarbakController@cekPayload');
+    $router->get('profile', 'AdminTokoController@profile');
+    $router->get('users/{id}', 'AdminTokoController@singleUser');
+    $router->get('users', 'AdminTokoController@allUsers');
+    $router->get('cekPayload', 'AdminTokoController@cekPayload');
     
-    $router->post('update-password', 'AdminTarbakController@updatePassword');
-    $router->post('update-foto', 'AdminTarbakController@updatePhoto');
-    $router->post('update-background', 'AdminTarbakController@updateBackground');
+    $router->post('update-password', 'AdminTokoController@updatePassword');
+    $router->post('update-foto', 'AdminTokoController@updatePhoto');
+    $router->post('update-background', 'AdminTokoController@updateBackground');
 
     $router->get('menu/{kode_klp}', 'Sdm\MenuController@show');
     $router->get('data-pribadi', 'Sdm\DataPribadiController@index');

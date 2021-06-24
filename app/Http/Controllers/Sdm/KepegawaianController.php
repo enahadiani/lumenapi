@@ -16,8 +16,8 @@ class KepegawaianController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'tarbak';
-    public $db = 'sqlsrvtarbak';
+    public $guard = 'toko';
+    public $db = 'dbtoko';
 
     public function isUnik($isi){
         

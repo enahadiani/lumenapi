@@ -11,8 +11,8 @@ use App\Menu;
 class DataPribadiController extends Controller
 {
 	public $successStatus = 200;
-    public $guard = 'tarbak';
-    public $db = 'sqlsrvtarbak';
+    public $guard = 'toko';
+    public $db = 'dbtoko';
 
     public function index(Request $request){
         try {
