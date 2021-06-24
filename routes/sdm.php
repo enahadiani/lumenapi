@@ -103,6 +103,9 @@ $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     $router->put('sanksi','Sdm\SanksiController@update');
     $router->delete('sanksi','Sdm\SanksiController@destroy');
 
+    $router->get('dash-box','Sdm\DashboardController@getDataBox');
+    $router->get('dash-chart','Sdm\DashboardController@getChart');
+
     
 
 });
