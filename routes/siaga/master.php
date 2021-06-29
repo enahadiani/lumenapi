@@ -53,6 +53,11 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
      $router->delete('hakakses/{nik}','Siaga\HakaksesController@destroy');
      $router->get('form','Siaga\HakaksesController@getForm');
      $router->get('menu','Siaga\HakaksesController@getMenu');
+
+    $router->get('filter-pp','Siaga\FilterController@getFilterPP');
+    $router->get('filter-kota','Siaga\FilterController@getFilterKota');
+    $router->get('filter-nobukti','Siaga\FilterController@getFilterNoBukti');
+    $router->get('filter-nodokumen','Siaga\FilterController@getFilterNoDokumen');
  
 });
 
