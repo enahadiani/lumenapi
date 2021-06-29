@@ -238,7 +238,7 @@ class Approval2Controller extends Controller
                     $upd3 =  DB::connection($this->db)->table('gr_pb_m')
                     ->where('no_pb', $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['progress' => '0']);
+                    ->update(['progress' => '1']);
 
                     $psn = "Approver terakhir";
                 }
