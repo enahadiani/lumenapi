@@ -53,7 +53,7 @@ class Approval2Controller extends Controller
             }
 
             $get = DB::connection($this->db)->select("select a.kode_jab
-            from karyawan a
+            from apv_karyawan a
             where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             ");
             $get = json_decode(json_encode($get),true);
