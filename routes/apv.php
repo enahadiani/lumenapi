@@ -175,6 +175,7 @@ $router->group(['middleware' => 'auth:silo'], function () use ($router) {
     //Dashboard
     $router->get('dash_databox','Apv\DashboardController@getDataBox');
     $router->get('dash_posisi','Apv\DashboardController@getPosisi');
+    $router->get('dash-approval','Apv\DashboardControllerV2@getDataApproval');
     
     $router->get('dash_cek','Apv\DashboardController@cek');
     $router->post('notif_register','Apv\NotifikasiController@register');
