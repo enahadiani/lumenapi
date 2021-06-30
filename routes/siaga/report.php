@@ -17,9 +17,14 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
-     //Master Karyawan
-     
- 
+    $router->get('filter-pp','Siaga\FilterController@getFilterPP');
+    $router->get('filter-periode','Siaga\FilterController@getFilterPeriode');
+    $router->get('filter-nobukti','Siaga\FilterController@getFilterNoBukti');
+
+    $router->get('lap-posisi','Siaga\LaporanController@getPosisi');
+    $router->get('lap-history-app','Siaga\LaporanController@getHistoryApp');
+    $router->get('lap-aju-form','Siaga\LaporanController@getAjuForm');
+
 });
 
 
