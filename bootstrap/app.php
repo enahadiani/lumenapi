@@ -643,6 +643,20 @@ $app->router->group([
     require __DIR__.'/../routes/siaga/auth.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/siaga-master'
+], function ($router) {
+    require __DIR__.'/../routes/siaga/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/siaga-report'
+], function ($router) {
+    require __DIR__.'/../routes/siaga/report.php';
+});
+
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
