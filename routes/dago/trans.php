@@ -33,6 +33,7 @@ $router->group(['middleware' => 'auth:dago'], function () use ($router) {
     $router->put('registrasi','Dago\RegistrasiController@update');
     $router->delete('registrasi','Dago\RegistrasiController@destroy');
     $router->get('jadwal-detail','Dago\JadwalController@show');
+    $router->get('jadwal-detail2','Dago\JadwalController@showJadwal');
     $router->get('biaya-tambahan','Dago\RegistrasiController@getBiayaTambahan');
     $router->get('biaya-dokumen','Dago\RegistrasiController@getBiayaDokumen');
     $router->get('pp','Dago\RegistrasiController@getPP');
