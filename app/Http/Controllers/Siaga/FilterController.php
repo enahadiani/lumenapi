@@ -116,7 +116,7 @@ class FilterController extends Controller
                 }
             }
 
-            $success['where'] = $where;
+            // $success['where'] = $where;
             $sql="select a.no_pb as no_bukti,a.keterangan from gr_pb_m a $where ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
