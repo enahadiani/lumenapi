@@ -102,5 +102,8 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
 
     $router->put('update-status-read', 'Ts\PesanController@updateStatusReadMobile');
     
+    $router->post('create-mandiri-bill','Ts\BayarMandiriController@store');
+    $router->get('list-mandiri-bill','Ts\BayarMandiriController@index');
+    
     
 });
