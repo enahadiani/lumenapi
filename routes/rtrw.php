@@ -194,6 +194,12 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->put('provinsi','Rtrw\ProvinsiController@update');
     $router->delete('provinsi','Rtrw\ProvinsiController@destroy');
 
+    //Kota
+    $router->get('kota','Rtrw\KotaController@index');
+    $router->post('kota','Rtrw\KotaController@store');
+    $router->put('kota','Rtrw\KotaController@update');
+    $router->delete('kota','Rtrw\KotaController@destroy');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
