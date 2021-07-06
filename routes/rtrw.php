@@ -200,6 +200,17 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->put('kota','Rtrw\KotaController@update');
     $router->delete('kota','Rtrw\KotaController@destroy');
 
+    //Camat
+    $router->get('camat','Rtrw\CamatController@index');
+    $router->post('camat','Rtrw\CamatController@store');
+    $router->put('camat','Rtrw\CamatController@update');
+    $router->delete('camat','Rtrw\CamatController@destroy');
+    //Desa
+    $router->get('desa','Rtrw\DesaController@index');
+    $router->post('desa','Rtrw\DesaController@store');
+    $router->put('desa','Rtrw\DesaController@update');
+    $router->delete('desa','Rtrw\DesaController@destroy');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
