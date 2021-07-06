@@ -32,7 +32,7 @@ class AdminRtrwController extends Controller
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection('sqlsrvrtrw')->select("select a.kode_menu_lab as kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.kode_rumah
+			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.kode_rumah,a.kode_klp_menu as kode_menu
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
@@ -94,5 +94,32 @@ class AdminRtrwController extends Controller
         $payload = Auth::guard('rtrw')->payload();
         // $payload->toArray();
         return response()->json(['payload' => $payload], 200);
+    }
+
+    public function getMenu($kode_klp)
+    {
+        try {
+
+            $menu = DB::connection('sqlsrvrtrw')->select("select a.*,b.form from menu a left join m_form b on a.kode_form=b.kode_form where a.kode_klp = '$kode_klp' order by kode_klp, rowindex ");
+            $menu = json_decode(json_encode($menu),true);
+            
+            if(count($menu) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $menu;
+                $success['message'] = "Success!";
+                
+                return response()->json($success, 200);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['status'] = true;
+                
+                return response()->json($success, 200);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
     }
 }

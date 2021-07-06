@@ -63,6 +63,7 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
 
     $router->get('menu', 'Rtrw\RtrwController@getMenu');
     $router->get('menu2', 'Rtrw\RtrwController@getMenu2');
+    $router->get('menu-web/{kode_klp}', 'AdminRtrwController@getMenu');
     $router->get('filter_tahun', 'Rtrw\RtrwController@getTahun');
     $router->get('filter_bulan', 'Rtrw\RtrwController@getBulan');
     $router->get('filter_tahun_bill', 'Rtrw\RtrwController@getTahunBill');
@@ -184,6 +185,14 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('upload-warga','Rtrw\WargaController@uploadWarga');
     
     $router->post('upload-bukti-bayar', 'Rtrw\RtrwController@uploadBuktiBayar');
+
+    
+    
+    //Provinsi
+    $router->get('provinsi','Rtrw\ProvinsiController@index');
+    $router->post('provinsi','Rtrw\ProvinsiController@store');
+    $router->put('provinsi','Rtrw\ProvinsiController@update');
+    $router->delete('provinsi','Rtrw\ProvinsiController@destroy');
 
 });
 
