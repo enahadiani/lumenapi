@@ -161,7 +161,7 @@ class RtController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $url = url('api/rtrw-auth/storage');
+            $url = url('api/rtrw/storage');
 
             $sql = "select a.kode_pp as kode_rt,a.kode_lokasi+' - '+b.rw as kode_rw,a.nama,case when a.logo != '-' then '".$url."/'+a.logo else '-' end as logo
             from pp a 

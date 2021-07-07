@@ -164,7 +164,7 @@ class RwController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $url = url('api/rtrw-auth/storage');
+            $url = url('api/rtrw/storage');
 
             $sql = "
             select a.kode_lokasi,a.nama,a.rw as kode_rw,case when logo != '-' then '".$url."/'+logo else '-' end as logo,a.kode_desa,b.nama as nama_desa,b.kode_camat,c.kode_kota,d.kode_prop,c.nama as nama_camat,d.nama as nama_kota,e.nama as nama_prop
