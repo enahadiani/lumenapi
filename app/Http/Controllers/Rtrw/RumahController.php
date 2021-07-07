@@ -56,18 +56,22 @@ class RumahController extends Controller
 
             if(isset($request->kode_rumah)){
                 if($request->kode_rumah != "" || $request->kode_rumah != "all"){
-                    $filter .= "";
-                }else{
                     $filter .= " and a.kode_rumah='$request->kode_rumah' ";
+                }else{
+                    $filter .= "";
                 }
             }else{
                 $filter .= "";
             }
             
-            $sql= "select a.kode_rumah,a.kode_lokasi,a.rt,a.rw,a.blok,a.status_huni from rt_rumah a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            $sql= "select a.kode_rumah,a.keterangan as tipe,a.kode_lokasi,a.rt,a.kode_lokasi as rw,a.blok,a.status_huni,b.nama as nama_pp 
+            from rt_rumah a 
+            left join pp b on a.rt=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."' $filter ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            $success['rumah'] = $sql;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -107,6 +111,7 @@ class RumahController extends Controller
         $this->validate($request, [
             'kode_rumah' => 'required',
             'rt' => 'required',
+            'tipe' => 'required',
             'rw' => 'required',
             'blok' => 'required',
             'status_huni' => 'required'
@@ -124,7 +129,7 @@ class RumahController extends Controller
             }
             if($this->isUnik($request->kode_rumah,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert('insert into rt_rumah(kode_rumah,kode_lokasi,rt,rw,blok,status_huni) values (?, ?, ?, ?, ?, ?)', array($request->kode_rumah,$kode_lokasi,$request->rt,$request->rw,$request->blok,$request->status_huni));
+                $ins = DB::connection($this->sql)->insert('insert into rt_rumah(kode_rumah,kode_lokasi,rt,rw,blok,status_huni,keterangan) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_rumah,$kode_lokasi,$request->rt,$request->rw,$request->blok,$request->status_huni,$request->tipe));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -181,6 +186,7 @@ class RumahController extends Controller
             'rt' => 'required',
             'rw' => 'required',
             'blok' => 'required',
+            'tipe' => 'required',
             'status_huni' => 'required'
         ]);
 
@@ -200,7 +206,7 @@ class RumahController extends Controller
             ->where('kode_rumah', $request->kode_rumah)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert('insert into rt_rumah(kode_rumah,kode_lokasi,rt,rw,blok,status_huni) values (?, ?, ?, ?, ?, ?)', array($request->kode_rumah,$kode_lokasi,$request->rt,$request->rw,$request->blok,$request->status_huni));
+            $ins = DB::connection($this->sql)->insert('insert into rt_rumah(kode_rumah,kode_lokasi,rt,rw,blok,status_huni,keterangan) values (?, ?, ?, ?, ?, ?, ?)', array($request->kode_rumah,$kode_lokasi,$request->rt,$request->rw,$request->blok,$request->status_huni,$request->tipe));
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
