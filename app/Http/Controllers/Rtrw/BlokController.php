@@ -63,7 +63,11 @@ class BlokController extends Controller
             }else{
                 $filter .= "";
             }
-            $sql= "select a.blok,a.kode_lokasi,a.kode_pp from rt_blok a where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            $sql= "select a.blok,a.kode_lokasi,a.kode_pp,a.kode_lokasi+' - '+isnull(b.rw,'-') as kode_rw,c.nama as nama_pp 
+            from rt_blok a 
+            left join lokasi b on a.kode_lokasi=b.kode_lokasi
+            left join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='".$kode_lokasi."' $filter ";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
