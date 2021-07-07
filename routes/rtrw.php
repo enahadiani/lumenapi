@@ -209,7 +209,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('desa','Rtrw\DesaController@index');
     $router->post('desa','Rtrw\DesaController@store');
     $router->put('desa','Rtrw\DesaController@update');
-    $router->delete('desa','Rtrw\DesaController@destroy');
+    $router->delete('desa','Rtrw\DesaController@destroy');    
+    //RW
+    $router->get('rw','Rtrw\RwController@index');
+    $router->post('rw','Rtrw\RwController@store');
+    $router->get('rw-detail','Rtrw\RwController@show');
+    $router->post('rw-ubah','Rtrw\RwController@update');
+    $router->delete('rw','Rtrw\RwController@destroy');
 
 });
 
