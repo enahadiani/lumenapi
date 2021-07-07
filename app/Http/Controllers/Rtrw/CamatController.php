@@ -38,21 +38,18 @@ class CamatController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->kode_camat)){
-                if($request->kode_camat == "all"){
-                    $filter = "";
-                }else{
-                    $filter = "where kode_camat='$request->kode_camat' ";
-                }
-                $sql= "select a.kode_camat,a.nama,a.kode_kota,b.nama as nama_kota 
-                from rt_camat a
-                inner join rt_kota b on a.kode_kota=b.kode_kota   
-                $filter";
-            }else{
-                $sql = "select a.kode_camat,a.nama,a.kode_kota,b.nama as nama_kota 
-                from rt_camat a
-                inner join rt_kota b on a.kode_kota=b.kode_kota  ";
+            $filter = "where a.kode_camat like '%' ";
+            if(isset($request->kode_camat) && $request->kode_camat != ""){
+                $filter .= "and a.kode_camat='$request->kode_camat' ";
             }
+
+            if(isset($request->kode_kota) && $request->kode_kota != ""){
+                $filter .= "and a.kode_kota='$request->kode_kota' ";
+            }
+            $sql= "select a.kode_camat,a.nama,a.kode_kota,b.nama as nama_kota 
+            from rt_camat a
+            inner join rt_kota b on a.kode_kota=b.kode_kota   
+            $filter";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);

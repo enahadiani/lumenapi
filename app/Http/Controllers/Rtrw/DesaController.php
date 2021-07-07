@@ -38,22 +38,20 @@ class DesaController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->kode_desa)){
-                if($request->kode_desa == "all"){
-                    $filter = "";
-                }else{
-                    $filter = "where kode_desa='$request->kode_desa' ";
-                }
-                $sql= "select a.kode_desa,a.nama,a.kode_camat,b.nama as nama_camat 
-                from rt_desa a
-                inner join rt_camat b on a.kode_camat=b.kode_camat   
-                $filter";
-            }else{
-                $sql = "select a.kode_desa,a.nama,a.kode_camat,b.nama as nama_camat 
-                from rt_desa a
-                inner join rt_camat b on a.kode_camat=b.kode_camat  ";
+
+            $filter = "where a.kode_desa like '%' ";
+            if(isset($request->kode_desa) && $request->kode_desa != ""){
+                $filter .= "and a.kode_desa='$request->kode_desa' ";
+            }
+            if(isset($request->kode_camat) && $request->kode_camat != ""){
+                $filter .= "and a.kode_camat='$request->kode_camat' ";
             }
 
+            
+            $sql= "select a.kode_desa,a.nama,a.kode_camat,b.nama as nama_camat 
+            from rt_desa a
+            inner join rt_camat b on a.kode_camat=b.kode_camat   
+            $filter";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             

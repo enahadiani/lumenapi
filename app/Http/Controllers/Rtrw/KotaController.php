@@ -38,22 +38,21 @@ class KotaController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->kode_kota)){
-                if($request->kode_kota == "all"){
-                    $filter = "";
-                }else{
-                    $filter = "where kode_kota='$request->kode_kota' ";
-                }
-                $sql= "select a.kode_kota,a.nama,a.kode_prop,b.nama as nama_prop 
-                from rt_kota a
-                inner join rt_prop b on a.kode_prop=b.kode_prop   
-                $filter";
-            }else{
-                $sql = "select a.kode_kota,a.nama,a.kode_prop,b.nama as nama_prop 
-                from rt_kota a
-                inner join rt_prop b on a.kode_prop=b.kode_prop  ";
+
+            $filter = "where a.kode_kota like '%' ";
+            if(isset($request->kode_kota) && $request->kode_kota != ""){
+                $filter .= "and a.kode_kota='$request->kode_kota' ";
             }
 
+            if(isset($request->kode_prop) && $request->kode_prop != ""){
+                $filter .= "and a.kode_prop='$request->kode_prop' ";
+            }
+            $success['filter'] = $filter;
+            
+            $sql = "select a.kode_kota,a.nama,a.kode_prop,b.nama as nama_prop 
+            from rt_kota a
+            inner join rt_prop b on a.kode_prop=b.kode_prop  
+            $filter ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
