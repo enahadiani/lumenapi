@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class RwController extends Controller
+class RtController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -39,7 +39,7 @@ class RwController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             
@@ -48,12 +48,9 @@ class RwController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_lokasi,a.nama,a.rw as kode_rw,a.logo,a.kode_desa,b.nama as nama_desa,b.kode_camat,c.kode_kota,d.kode_prop,c.nama as nama_camat,d.nama as nama_kota,e.nama as nama_prop 
-            from lokasi a 
-            left join rt_desa b on a.kode_desa=b.kode_desa 
-            left join rt_camat c on b.kode_camat=c.kode_camat
-            left join rt_kota d on c.kode_kota=d.kode_kota
-            left join rt_prop e on d.kode_prop=e.kode_prop
+            $res = DB::connection($this->db)->select("select a.kode_pp as kode_rt,a.kode_lokasi+' - '+b.rw as kode_rw,a.nama,a.logo
+            from pp a 
+            left join lokasi b on a.kode_lokasi=b.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi'
             ");
             $res = json_decode(json_encode($res),true);
@@ -97,10 +94,9 @@ class RwController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_lokasi' => 'required',
-            'nama' => 'required',
             'kode_rw' => 'required',
-            'kode_desa' => 'required',
+            'nama' => 'required',
+            'kode_rt' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -127,18 +123,19 @@ class RwController extends Controller
                 $foto="-";
             }
 
-            
-            $ins = DB::connection($this->db)->insert("insert into lokasi(kode_lokasi,nama,rw,kode_desa,logo) values ('".$request->kode_lokasi."','".$request->nama."','".$request->kode_rw."','".$request->kode_desa."','".$foto."') ");
+            $tmp = explode(" - ",$request->kode_rw);
+
+            $ins = DB::connection($this->db)->insert("insert into pp(kode_lokasi,nama,kode_pp,logo,level_spasi,rowindex) values ('".$tmp[0]."','".$request->nama."','".$request->kode_rt."','".$foto."',0,0) ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->nik;
-            $success['message'] = "Data RW berhasil disimpan";
+            $success['message'] = "Data RT berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data RW gagal disimpan ".$e;
+            $success['message'] = "Data RT gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -154,7 +151,7 @@ class RwController extends Controller
     public function show(Request $request)
     {
         $this->validate($request,[
-            'kode_lokasi' => 'required'
+            'kode_rt' => 'required'
         ]);
         try {
             
@@ -166,14 +163,10 @@ class RwController extends Controller
 
             $url = url('api/rtrw-auth/storage');
 
-            $sql = "
-            select a.kode_lokasi,a.nama,a.rw as kode_rw,case when logo != '-' then '".$url."/'+logo else '-' end as logo,a.kode_desa,b.nama as nama_desa,b.kode_camat,c.kode_kota,d.kode_prop,c.nama as nama_camat,d.nama as nama_kota,e.nama as nama_prop
-            from lokasi a 
-            left join rt_desa b on a.kode_desa=b.kode_desa 
-            left join rt_camat c on b.kode_camat=c.kode_camat
-            left join rt_kota d on c.kode_kota=d.kode_kota
-            left join rt_prop e on d.kode_prop=e.kode_prop
-            where kode_lokasi='".$request->kode_lokasi."' 
+            $sql = "select a.kode_pp as kode_rt,a.kode_lokasi+' - '+b.rw as kode_rw,a.nama,case when a.logo != '-' then '".$url."/'+a.logo else '-' end as logo
+            from pp a 
+            left join lokasi b on a.kode_lokasi=b.kode_lokasi 
+            where a.kode_pp='$request->kode_rt' and a.kode_lokasi='$kode_lokasi'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -219,10 +212,9 @@ class RwController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_lokasi' => 'required',
-            'nama' => 'required',
             'kode_rw' => 'required',
-            'kode_desa' => 'required',
+            'nama' => 'required',
+            'kode_rt' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -237,7 +229,7 @@ class RwController extends Controller
 
             if($request->hasfile('file_gambar')){
 
-                $sql = "select logo as file_gambar from lokasi where kode_lokasi='".$request->kode_lokasi."' 
+                $sql = "select logo as file_gambar from pp where kode_pp='".$request->kode_rt."' 
                 ";
                 $res = DB::connection($this->db)->select($sql);
                 $res = json_decode(json_encode($res),true);
@@ -266,18 +258,18 @@ class RwController extends Controller
             }
             
             // $del = DB::connection($this->db)->table('lokasi')->where('kode_lokasi', $request->kode_lokasi)->delete();
-
-            $ins = DB::connection($this->db)->update("update lokasi set nama='".$request->nama."',rw='".$request->kode_rw."',kode_desa ='".$request->kode_desa."',logo='".$foto."' where kode_lokasi='".$request->kode_lokasi."' ");
+            $tmp = explode(" - ",$request->kode_rw);
+            $ins = DB::connection($this->db)->update("update pp set nama='".$request->nama."',logo='".$foto."' where kode_lokasi='".$tmp[0]."' and kode_pp='".$request->kode_rt."' ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['kode'] = $request->nik;
-            $success['message'] = "Data RW berhasil diubah";
+            $success['message'] = "Data RT berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data RW gagal diubah ".$e;
+            $success['message'] = "Data RT gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -291,7 +283,7 @@ class RwController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request,[
-            'kode_lokasi' => 'required'
+            'kode_rt' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -301,17 +293,17 @@ class RwController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('lokasi')->where('kode_lokasi', $request->kode_lokasi)->delete();
+            $del = DB::connection($this->db)->table('pp')->where('kode_pp', $request->kode_rt)->where('kode_lokasi', $kode_lokasi)->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data RW berhasil dihapus";
+            $success['message'] = "Data RT berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data RW gagal dihapus ".$e;
+            $success['message'] = "Data RT gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

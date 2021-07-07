@@ -216,6 +216,12 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('rw-detail','Rtrw\RwController@show');
     $router->post('rw-ubah','Rtrw\RwController@update');
     $router->delete('rw','Rtrw\RwController@destroy');
+    //RT
+    $router->get('rt','Rtrw\RtController@index');
+    $router->post('rt','Rtrw\RtController@store');
+    $router->get('rt-detail','Rtrw\RtController@show');
+    $router->post('rt-ubah','Rtrw\RtController@update');
+    $router->delete('rt','Rtrw\RtController@destroy');
 
 });
 

@@ -32,7 +32,7 @@ class AdminRtrwController extends Controller
             $kode_lokasi= $data->kode_lokasi;
 
             $user = DB::connection('sqlsrvrtrw')->select("select a.kode_menu_lab as kode_klp_menu, a.nik, a.nama, a.status_admin, a.klp_akses, a.kode_lokasi,b.nama as nmlok, c.kode_pp,d.nama as nama_pp,
-			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.kode_rumah,a.kode_klp_menu as kode_menu
+			b.kode_lokkonsol,d.kode_bidang, c.foto,isnull(e.form,'-') as path_view,b.logo,c.no_telp,c.jabatan,a.kode_rumah,a.kode_klp_menu as kode_menu,b.rw
             from hakakses a 
             inner join lokasi b on b.kode_lokasi = a.kode_lokasi 
             left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
