@@ -223,6 +223,11 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('rt-ubah','Rtrw\RtController@update');
     $router->delete('rt','Rtrw\RtController@destroy');
 
+    //Master Warga Detail
+    $router->get('mawar','Rtrw\WargaDetailController@index');
+    $router->get('mawar-detail','Rtrw\WargaDetailController@show');
+    $router->put('mawar','Rtrw\WargaDetailController@store');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
