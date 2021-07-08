@@ -54,7 +54,7 @@ class RwController extends Controller
             left join rt_camat c on b.kode_camat=c.kode_camat
             left join rt_kota d on c.kode_kota=d.kode_kota
             left join rt_prop e on d.kode_prop=e.kode_prop
-            where a.kode_lokasi='$kode_lokasi'
+            
             ");
             $res = json_decode(json_encode($res),true);
             
