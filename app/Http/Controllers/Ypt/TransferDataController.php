@@ -63,8 +63,8 @@ class TransferDataController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $exec1 = DB::connection($this->sql)->update("exec sp_exs_proses '$kode_lokasi','$request->periode','$request->kode_fs'");
+            set_time_limit(300);
+            $exec1 = DB::connection($this->sql)->getPdo()->exec("exec sp_exs_proses '$kode_lokasi','$request->periode','$request->kode_fs'");
             // $exec2 = DB::connection($this->sql)->update("exec sp_exs_proses_trans '$kode_lokasi','$request->periode'");
             // $exec3 = DB::connection($this->sql)->update("exec sp_exs_proses_lap '$kode_lokasi','$request->periode','$request->kode_fs' ");
 
