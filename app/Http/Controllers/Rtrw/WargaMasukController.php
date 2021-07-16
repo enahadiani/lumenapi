@@ -42,7 +42,7 @@ class WargaMasukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_blok,no_rumah,nama,no_urut,alias,tgl_masuk,no_bukti,sts_masuk from rt_warga_d where kode_lokasi='$kode_lokasi' and sts_masuk in ('DATANG','LAHIR')
+            $res = DB::connection($this->db)->select("select kode_blok,no_rumah,nama,no_urut,alias,tgl_masuk,no_bukti,sts_masuk from rt_warga_d where kode_lokasi='$kode_lokasi' and sts_masuk in ('DATANG','LAHIR') and flag_aktif=1
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -166,7 +166,7 @@ class WargaMasukController extends Controller
             $per = substr($request->tgl_masuk,8,2).substr($request->tgl_masuk,3,2);
             $id_warga = $this->generateKode("rt_warga_d", "no_bukti", $kode_lokasi.'-IN'.$per.".", "0001");
 
-            $res = DB::connection($this->db)->select("select no_urut from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' and kode_pp='$request->kode_rt' ");
+            $res = DB::connection($this->db)->select("select max(no_urut) as no_urut from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' and kode_pp='$request->kode_rt' ");
             if(count($res) > 0){
                 $no_urut = intval($res[0]->no_urut) + 1;
             }else{
@@ -181,7 +181,7 @@ class WargaMasukController extends Controller
                 $password = "-";
             }
             
-            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password') ");
+            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2') ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -242,6 +242,48 @@ class WargaMasukController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function showDetList(Request $request)
+    {
+        $this->validate($request,[
+            'no_rumah' => 'required',
+            'kode_blok' => 'required'
+        ]);
+        try {
+            
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "
+            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,foto,no_urut
+            from rt_warga_d  
+            where no_rumah='$request->no_rumah' and kode_blok='$request->kode_blok' and kode_lokasi='$kode_lokasi' and flag_aktif <> '3'
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -333,9 +375,9 @@ class WargaMasukController extends Controller
             }
 
             $id_warga = $request->id_warga;
-            $res = DB::connection($this->db)->select("select no_urut from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' and kode_pp='$request->kode_rt' ");
+            $res = DB::connection($this->db)->select("select no_urut from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' and kode_pp='$request->kode_rt' and no_bukti='$request->id_warga' ");
             if(count($res) > 0){
-                $no_urut = intval($res[0]->no_urut) + 1;
+                $no_urut = intval($res[0]->no_urut);
             }else{
                 $no_urut = 1;
             }
@@ -351,7 +393,7 @@ class WargaMasukController extends Controller
 
             $del = DB::connection($this->db)->table('rt_warga_d')->where('no_bukti', $request->id_warga)->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password') ");
+            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2') ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -385,7 +427,9 @@ class WargaMasukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('rt_warga_d')->where('no_bukti', $request->id_warga)->delete();
+            $update = DB::connection($this->db)->update("update rt_warga_d 
+            set flag_aktif='3' 
+            where no_bukti='$request->id_warga' and kode_lokasi='$kode_lokasi' ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -396,6 +440,43 @@ class WargaMasukController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Warga Masuk gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $this->validate($request,[
+            'no_rumah' => 'required',
+            'kode_blok' => 'required'
+        ]);
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $del = DB::connection($this->db)->table('rt_warga_d')
+            ->where('no_rumah', $request->no_rumah)
+            ->where('kode_blok', $request->kode_blok)
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('flag_aktif', '3')
+            ->delete();
+
+            $update = DB::connection($this->db)->update("update rt_warga_d set flag_aktif='1' where flag_aktif='2' and kode_blok='$request->kode_blok' and no_rumah='$request->no_rumah' and kode_lokasi='$kode_lokasi' ");
+
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Warga Masuk berhasil disimpan";
+            
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Warga Masuk gagal disimpan ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
