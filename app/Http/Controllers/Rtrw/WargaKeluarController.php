@@ -42,7 +42,7 @@ class WargaKeluarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_blok,no_rumah,nama,no_urut,alias,tgl_keluar,no_bukti,sts_masuk as sts_keluar from rt_warga_d where kode_lokasi='$kode_lokasi' and sts_keluar in ('PINDAH','MENINGGAL') and flag_aktif=1
+            $res = DB::connection($this->db)->select("select no_bukti_keluar,kode_blok,no_rumah,nama,no_urut,alias,tgl_keluar,no_bukti,ket_keluar,dok_keluar,sts_keluar from rt_warga_d where kode_lokasi='$kode_lokasi' and sts_keluar in ('PINDAH','MENINGGAL') and flag_aktif=1
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -79,7 +79,7 @@ class WargaKeluarController extends Controller
             }
 
             $per = substr($request->tgl_keluar,8,2).substr($request->tgl_keluar,3,2);
-            $id_warga = $this->generateKode("rt_warga_d", "no_bukti", $kode_lokasi.'-OUT'.$per.".", "0001");
+            $id_warga = $this->generateKode("rt_warga_d", "no_bukti_keluar", $kode_lokasi.'-OUT'.$per.".", "0001");
 
             
             $success['status'] = true;
@@ -172,7 +172,7 @@ class WargaKeluarController extends Controller
             $url = url('api/rtrw/storage');
 
             $sql = "
-            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,case when foto != '-' then '".$url."/'+foto else '-' end as foto
+            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,case when foto != '-' then '".$url."/'+foto else '-' end as foto,ket_keluar,dok_keluar,sts_keluar,convert(varchar,tgl_keluar,103) as tgl_keluar
             from rt_warga_d a 
             where no_bukti_keluar='".$request->no_bukti_keluar."' 
             ";
@@ -228,7 +228,7 @@ class WargaKeluarController extends Controller
 
             $id_warga = $request->id_warga;
            
-            $update = DB::connection($this->db)->update("update rt_warga_d set no_bukti_keluar='$no_bukti_keluar',sts_keluar='$request->sts_keluar',tgl_keluar='".$this->reverseDate($request->tgl_keluar,"/","-")."',dok_keluar='$request->dok_keluar',ket_keluar='$request->keterangan' where no_bukti_keluar='$request->no_bukti_keluar' and kode_lokasi='$kode_lokasi' ");
+            $update = DB::connection($this->db)->update("update rt_warga_d set sts_keluar='$request->sts_keluar',tgl_keluar='".$this->reverseDate($request->tgl_keluar,"/","-")."',dok_keluar='$request->dok_keluar',ket_keluar='$request->keterangan' where no_bukti_keluar='$request->no_bukti_keluar' and kode_lokasi='$kode_lokasi' ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;

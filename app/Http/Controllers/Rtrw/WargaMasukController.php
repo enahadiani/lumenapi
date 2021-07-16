@@ -147,6 +147,7 @@ class WargaMasukController extends Controller
             'tgl_masuk' => 'required',
             'sts_masuk' => 'required',
             'kode_rt' => 'required',
+            'alamat_asal' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -191,7 +192,7 @@ class WargaMasukController extends Controller
                 $password = "-";
             }
             
-            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2') ");
+            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif,alamat_asal) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2','$request->alamat_asal') ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -342,6 +343,7 @@ class WargaMasukController extends Controller
             'tgl_masuk' => 'required',
             'sts_masuk' => 'required',
             'kode_rt' => 'required',
+            'alamat_asal' => 'required',
             'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
@@ -403,7 +405,7 @@ class WargaMasukController extends Controller
 
             $del = DB::connection($this->db)->table('rt_warga_d')->where('no_bukti', $request->id_warga)->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2') ");
+            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif,alamat_asal) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2','$request->alamat_asal') ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
