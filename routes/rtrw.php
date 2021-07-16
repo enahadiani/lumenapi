@@ -238,6 +238,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('warga-masuk-ubahstatus','Rtrw\WargaMasukController@updateStatus');
     $router->delete('warga-masuk','Rtrw\WargaMasukController@destroy');
 
+    //Master Warga Keluar
+    $router->get('generate-idwarga-keluar','Rtrw\WargaKeluarController@generateIDWarga');
+    $router->get('warga-keluar','Rtrw\WargaKeluarController@index');
+    $router->get('warga-keluar-detail','Rtrw\WargaKeluarController@show');
+    $router->post('warga-keluar','Rtrw\WargaKeluarController@store');
+    $router->post('warga-keluar-ubah','Rtrw\WargaKeluarController@update');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {

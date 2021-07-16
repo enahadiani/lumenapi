@@ -33,7 +33,7 @@ class WargaMasukController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             
@@ -42,7 +42,17 @@ class WargaMasukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_blok,no_rumah,nama,no_urut,alias,tgl_masuk,no_bukti,sts_masuk from rt_warga_d where kode_lokasi='$kode_lokasi' and sts_masuk in ('DATANG','LAHIR') and flag_aktif=1
+            if(isset($request->kode_pp)){
+                if($request->kode_pp != ""){
+
+                    $filter = " and a.kode_pp='$request->kode_pp' ";
+                }
+                $filter = "";
+            }else{
+                $filter = "";
+            }
+
+            $res = DB::connection($this->db)->select("select kode_blok,no_rumah,nama,no_urut,alias,tgl_masuk,no_bukti,sts_masuk,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir from rt_warga_d where kode_lokasi='$kode_lokasi' $filter and sts_masuk in ('DATANG','LAHIR') and isnull(sts_keluar,'-') = '-' and flag_aktif=1
             ");
             $res = json_decode(json_encode($res),true);
             
