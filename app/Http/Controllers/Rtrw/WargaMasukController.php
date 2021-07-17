@@ -174,6 +174,36 @@ class WargaMasukController extends Controller
                 $foto="-";
             }
 
+            if($request->hasfile('ktp')){
+                $file = $request->file('ktp');
+                
+                $nama_ktp = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $ktp = $nama_ktp;
+                if(Storage::disk('s3')->exists('rtrw/'.$ktp)){
+                    Storage::disk('s3')->delete('rtrw/'.$ktp);
+                }
+                Storage::disk('s3')->put('rtrw/'.$ktp,file_get_contents($file));
+            }else{
+
+                $ktp="-";
+            }
+
+            if($request->hasfile('kk')){
+                $file = $request->file('kk');
+                
+                $nama_kk = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $kk = $nama_kk;
+                if(Storage::disk('s3')->exists('rtrw/'.$kk)){
+                    Storage::disk('s3')->delete('rtrw/'.$kk);
+                }
+                Storage::disk('s3')->put('rtrw/'.$kk,file_get_contents($file));
+            }else{
+
+                $kk="-";
+            }
+
             $per = substr($request->tgl_masuk,8,2).substr($request->tgl_masuk,3,2);
             $id_warga = $this->generateKode("rt_warga_d", "no_bukti", $kode_lokasi.'-IN'.$per.".", "0001");
 
@@ -192,7 +222,7 @@ class WargaMasukController extends Controller
                 $password = "-";
             }
             
-            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif,alamat_asal) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2','$request->alamat_asal') ");
+            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif,alamat_asal,ktp,kk) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2','$request->alamat_asal','$ktp','$kk') ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -231,7 +261,7 @@ class WargaMasukController extends Controller
             $url = url('api/rtrw/storage');
 
             $sql = "
-            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,case when foto != '-' then '".$url."/'+foto else '-' end as foto
+            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,ktp,kk,case when foto != '-' then '".$url."/'+foto else '-' end as foto
             from rt_warga_d a 
             where no_bukti='".$request->id_warga."' 
             ";
@@ -273,9 +303,9 @@ class WargaMasukController extends Controller
             }
 
             $sql = "
-            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,foto,no_urut
+            select kode_blok,no_bukti as id_warga,no_rumah,nama,alias,nik,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir,kode_agama as agama,kode_goldar as goldar,kode_didik as pendidikan,kode_kerja as pekerjaan,kode_sts_nikah as sts_nikah,sts_domisili,kode_sts_hub as sts_hub,no_hp,no_telp_emergency as emerg_call,ket_emergency,convert(varchar,tgl_masuk,103) as tgl_masuk,sts_masuk,kode_pp as kode_rt,kode_lokasi as kode_rw,foto,no_urut,kk,ktp
             from rt_warga_d  
-            where no_rumah='$request->no_rumah' and kode_blok='$request->kode_blok' and kode_lokasi='$kode_lokasi' and flag_aktif <> '3'
+            where no_rumah='$request->no_rumah' and kode_blok='$request->kode_blok' and kode_lokasi='$kode_lokasi' and flag_aktif <> '3' and isnull(sts_keluar,'-') = '-'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -386,6 +416,66 @@ class WargaMasukController extends Controller
                 $foto="-";
             }
 
+            if($request->hasfile('ktp')){
+
+                $sql = "select ktp as ktp from rt_warga_d where no_bukti='".$request->id_warga."' 
+                ";
+                $res = DB::connection($this->db)->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $ktp = $res[0]['ktp'];
+                    if($ktp != ""){
+                        Storage::disk('s3')->delete('rtrw/'.$ktp);
+                    }
+                }else{
+                    $ktp = "-";
+                }
+                
+                $file = $request->file('ktp');
+                
+                $nama_ktp = uniqid()."_".$file->getClientOriginalName();
+                $ktp = $nama_ktp;
+                if(Storage::disk('s3')->exists('rtrw/'.$ktp)){
+                    Storage::disk('s3')->delete('rtrw/'.$ktp);
+                }
+                Storage::disk('s3')->put('rtrw/'.$ktp,file_get_contents($file));
+                
+            }else{
+
+                $ktp="-";
+            }
+
+            if($request->hasfile('kk')){
+
+                $sql = "select kk as kk from rt_warga_d where no_bukti='".$request->id_warga."' 
+                ";
+                $res = DB::connection($this->db)->select($sql);
+                $res = json_decode(json_encode($res),true);
+
+                if(count($res) > 0){
+                    $kk = $res[0]['kk'];
+                    if($kk != ""){
+                        Storage::disk('s3')->delete('rtrw/'.$kk);
+                    }
+                }else{
+                    $kk = "-";
+                }
+                
+                $file = $request->file('kk');
+                
+                $nama_kk = uniqid()."_".$file->getClientOriginalName();
+                $kk = $nama_kk;
+                if(Storage::disk('s3')->exists('rtrw/'.$kk)){
+                    Storage::disk('s3')->delete('rtrw/'.$kk);
+                }
+                Storage::disk('s3')->put('rtrw/'.$kk,file_get_contents($file));
+                
+            }else{
+
+                $kk="-";
+            }
+
             $id_warga = $request->id_warga;
             $res = DB::connection($this->db)->select("select no_urut from rt_warga_d where kode_lokasi='$kode_lokasi' and no_rumah='$request->no_rumah' and kode_pp='$request->kode_rt' and no_bukti='$request->id_warga' ");
             if(count($res) > 0){
@@ -405,7 +495,7 @@ class WargaMasukController extends Controller
 
             $del = DB::connection($this->db)->table('rt_warga_d')->where('no_bukti', $request->id_warga)->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif,alamat_asal) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2','$request->alamat_asal') ");
+            $ins = DB::connection($this->db)->insert("insert into rt_warga_d(kode_lokasi,no_bukti,kode_blok,no_rumah,nama,alias,nik,kode_jk,tempat_lahir,tgl_lahir,kode_agama,kode_goldar,kode_didik,kode_kerja,kode_sts_nikah,kode_sts_hub,no_hp,no_telp_emergency,ket_emergency,tgl_masuk,sts_masuk,foto,kode_pp,sts_domisili,no_urut,pass,password,flag_aktif,alamat_asal,ktp,kk) values ('".$kode_lokasi."','".$id_warga."','".$request->kode_blok."','".$request->no_rumah."','".$request->nama."','".$request->alias."','".$request->nik."','".$request->jk."','".$request->tempat_lahir."','".$this->reverseDate($request->tgl_lahir,"/","-")."','".$request->agama."','".$request->goldar."','".$request->pendidikan."','".$request->pekerjaan."','".$request->sts_nikah."','".$request->sts_hub."','".$request->no_hp."','".$request->emerg_call."','".$request->ket_emergency."','".$this->reverseDate($request->tgl_masuk,"/","-")."','".$request->sts_masuk."','$foto','$request->kode_rt','$request->sts_domisili',$no_urut,'$pass','$password','2','$request->alamat_asal','$ktp','$kk') ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
