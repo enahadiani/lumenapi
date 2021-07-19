@@ -332,7 +332,7 @@ class PejabatController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }            
 
-            $get = DB::connection($this->sql)->select("select cap_rt,ttd_rt from rt_jabat where kode_lokasi='$kode_lokasi' and kode_pp ='$request->kode_pp' ");
+            $get = DB::connection($this->db)->select("select cap_rt,ttd_rt from rt_jabat where kode_lokasi='$kode_lokasi' and kode_pp ='$request->kode_pp' ");
             if(count($get) > 0){
                 $cap_rt = $get[0]->cap_rt;
                 $ttd_rt = $get[0]->ttd_rt;
