@@ -167,7 +167,7 @@ class PejabatController extends Controller
 
             $url = url('api/rtrw/storage');
 
-            $sql = "select a.kode_lokasi,a.kode_pp,b.nama as nama_pp,a.nama_rt,a.nama_rw,a.flag_aktif,a.no_sk,a.tanggal_sk as tgl_sk,case when a.cap_rt != '-' then '".$url."/'+a.cap_rt else '-' end as cap_rt,case when a.ttd_rt != '-' then '".$url."/'+a.ttd_rt else '-' end as ttd_rt  
+            $sql = "select a.kode_lokasi,a.kode_pp,b.nama as nama_pp,a.nama_rt,a.nama_rw,a.flag_aktif,a.no_sk,a.tanggal_sk as tgl_sk,case when a.cap_rt != '-' then a.cap_rt else '-' end as cap_rt,case when a.ttd_rt != '-' then a.ttd_rt else '-' end as ttd_rt  
             from rt_jabat a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$request->kode_pp'
@@ -330,6 +330,18 @@ class PejabatController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+            }            
+
+            $get = DB::connection($this->sql)->select("select cap_rt,ttd_rt from rt_jabat where kode_lokasi='$kode_lokasi' and kode_pp ='$request->kode_pp' ");
+            if(count($get) > 0){
+                $cap_rt = $get[0]->cap_rt;
+                $ttd_rt = $get[0]->ttd_rt;
+                if($cap_rt != ""){
+                    Storage::disk('s3')->delete('rtrw/'.$cap_rt);
+                }
+                if($ttd_rt != ""){
+                    Storage::disk('s3')->delete('rtrw/'.$ttd_rt);
+                }
             }
             
             $del = DB::connection($this->db)->table('rt_jabat')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $request->kode_pp)->delete();
