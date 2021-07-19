@@ -26,6 +26,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->get('storage/{filename}', function ($filename)
 {
+    $filename = urldecode($filename);
     if (!Storage::disk('s3')->exists('rtrw/'.$filename)) {
         abort(404);
     }
