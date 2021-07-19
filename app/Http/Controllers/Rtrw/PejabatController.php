@@ -34,10 +34,17 @@ class PejabatController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            
+            if(isset($request->flag_aktif) && $request->flag_aktif != ""){
+                $filter = " and a.flag_aktif ='$request->flag_aktif' ";
+            }else{
+                $filter = "";
+            }
+
             $res = DB::connection($this->db)->select("select a.kode_lokasi,a.kode_pp,b.nama as nama_pp,a.nama_rt,a.nama_rw,a.flag_aktif,a.no_sk,a.tanggal_sk as tgl_sk,a.cap_rt,a.ttd_rt 
             from rt_jabat a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'
+            where a.kode_lokasi='$kode_lokasi' $filter
             ");
             $res = json_decode(json_encode($res),true);
             

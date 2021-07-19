@@ -253,6 +253,14 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('pejabat-ubah','Rtrw\PejabatController@update');
     $router->delete('pejabat','Rtrw\PejabatController@destroy');
 
+    //Surat Pengantar
+    $router->get('generate-nosurat','Rtrw\SuratPengantarController@generateNBukti');
+    $router->get('surat-pengantar','Rtrw\SuratPengantarController@index');
+    $router->get('surat-pengantar-detail','Rtrw\SuratPengantarController@show');
+    $router->post('surat-pengantar','Rtrw\SuratPengantarController@store');
+    $router->post('surat-pengantar-ubah','Rtrw\SuratPengantarController@update');
+    $router->delete('surat-pengantar','Rtrw\SuratPengantarController@destroy');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {

@@ -52,7 +52,10 @@ class WargaMasukController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection($this->db)->select("select kode_blok,no_rumah,nama,no_urut,alias,tgl_masuk,no_bukti,sts_masuk,kode_jk as jk,tempat_lahir,convert(varchar,tgl_lahir,103) as tgl_lahir from rt_warga_d where kode_lokasi='$kode_lokasi' $filter and sts_masuk in ('DATANG','LAHIR') and isnull(sts_keluar,'-') = '-' and flag_aktif=1
+            $res = DB::connection($this->db)->select("select a.kode_blok,a.no_rumah,a.nama,a.no_urut,a.alias,a.tgl_masuk,a.no_bukti,a.sts_masuk,a.kode_jk as jk,a.tempat_lahir,convert(varchar,a.tgl_lahir,103) as tgl_lahir,a.kode_agama as agama,a.kode_kerja as pekerjaan,a.kode_sts_nikah as sts_nikah,b.alamat 
+            from rt_warga_d a 
+            inner join rt_rumah b on a.no_rumah=b.kode_rumah and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' $filter and a.sts_masuk in ('DATANG','LAHIR') and isnull(a.sts_keluar,'-') = '-' and a.flag_aktif=1
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -90,7 +93,6 @@ class WargaMasukController extends Controller
 
             $per = substr($request->tgl_masuk,8,2).substr($request->tgl_masuk,3,2);
             $id_warga = $this->generateKode("rt_warga_d", "no_bukti", $kode_lokasi.'-IN'.$per.".", "0001");
-
             
             $success['status'] = true;
             $success['no_bukti'] = $id_warga;
