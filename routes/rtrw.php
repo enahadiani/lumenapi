@@ -245,6 +245,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('warga-keluar','Rtrw\WargaKeluarController@store');
     $router->post('warga-keluar-ubah','Rtrw\WargaKeluarController@update');
 
+    //PEJABAT RT
+    $router->get('pejabat','Rtrw\PejabatController@index');
+    $router->post('pejabat','Rtrw\PejabatController@store');
+    $router->get('pejabat-detail','Rtrw\PejabatController@show');
+    $router->post('pejabat-ubah','Rtrw\PejabatController@update');
+    $router->delete('pejabat','Rtrw\PejabatController@destroy');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
