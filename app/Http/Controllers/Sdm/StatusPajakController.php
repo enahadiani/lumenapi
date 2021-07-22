@@ -21,7 +21,7 @@ class StatusPajakController extends Controller
 
     public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_pajak from hr_pajak where kode_pajak ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
+        $auth = DB::connection($this->db)->select("SELECT kode_pajak FROM hr_pajak WHERE kode_pajak ='".$isi."' AND kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,7 +38,47 @@ class StatusPajakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_pajak, nama, nilai from hr_pajak where kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT kode_pajak, nama, nilai FROM hr_pajak WHERE kode_lokasi = '".$kode_lokasi."' ";
+			$res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json($success, $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        $this->validate($request, [
+            'kode_pajak' => 'required'
+        ]);
+
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "SELECT kode_pajak, nama, nilai, biaya_jab, jab_max 
+            FROM hr_pajak WHERE kode_pajak = '".$request->kode_pajak."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 

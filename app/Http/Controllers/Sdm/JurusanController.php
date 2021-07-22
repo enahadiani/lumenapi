@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class UnitController extends Controller
+class JurusanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class UnitController extends Controller
 
     public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("SELECT kode_unit FROM hr_unit WHERE kode_unit ='".$isi."' AND kode_lokasi = '".$kode_lokasi."'");
+        $auth = DB::connection($this->db)->select("SELECT kode_jur FROM hr_jur WHERE kode_jur ='".$isi."' AND kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,7 +38,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_unit, nama, flag_aktif FROM hr_unit WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT kode_jur, nama, flag_aktif FROM hr_jur WHERE kode_lokasi = '".$kode_lokasi."' ";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -68,7 +68,7 @@ class UnitController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required'
+            'kode_jur' => 'required'
         ]);
 
         try {
@@ -77,10 +77,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.kode_unit, a.nama, a.flag_aktif, a.kode_pp, b.nama_pp 
-            FROM hr_profesi a
-            LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
-            WHERE kode_unit = '".$request->kode_unit."' AND kode_lokasi = '".$kode_lokasi."'";
+            $sql = "SELECT kode_jur, nama, flag_aktif FROM hr_jur WHERE kode_jur = '".$request->kode_jur."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -116,10 +113,9 @@ class UnitController extends Controller
     public function save(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required',
+            'kode_jur' => 'required',
             'nama' => 'required',
-            'status' => 'required',
-            'kode_pp' => 'required'
+            'status' => 'required'
         ]);
         
         try {
@@ -127,26 +123,25 @@ class UnitController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->input('kode_unit'), $kode_lokasi)){
-                $insert = "INSERT INTO hr_unit(kode_unit, nama, flag_aktif, kode_pp, kode_lokasi) 
-                VALUES ('".$request->input('kode_unit')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$request->input('kode_pp')."',
-                '".$kode_lokasi."')";
+            if($this->isUnik($request->input('kode_jur'), $kode_lokasi)){
+                $insert = "INSERT INTO hr_jur(kode_jur, nama, flag_aktif, kode_lokasi) 
+                VALUES ('".$request->input('kode_jur')."', '".$request->input('nama')."', 
+                '".$request->input('status')."', '".$kode_lokasi."')";
 
                 DB::connection($this->db)->insert($insert);
                 
                 $success['status'] = true;
-                $success['message'] = "Data unit karyawan berhasil disimpan";
+                $success['message'] = "Data jurusan karyawan berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode unit karyawan sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode jurusan karyawan sudah ada di database!";
             }
             $success['kode'] = $request->kode_unit;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data unit karyawan gagal disimpan ".$e;
+            $success['message'] = "Data jurusan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -163,10 +158,9 @@ class UnitController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required',
+            'kode_jur' => 'required',
             'nama' => 'required',
-            'status' => 'required',
-            'kode_pp' => 'required'
+            'status' => 'required'
         ]);
         
         try {
@@ -175,19 +169,19 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_unit SET nama = '".$request->input('nama')."', 
-            flag_aktif = '".$request->input('status')."', kode_pp = '".$request->input('kode_pp')."',
-            WHERE kode_unit = '".$request->input('kode_unit')."' AND kode_lokasi = '".$kode_lokasi."'";
+            $update = "UPDATE hr_jur SET nama = '".$request->input('nama')."', 
+            flag_aktif = '".$request->input('status')."' WHERE kode_jur = '".$request->input('kode_jur')."' 
+            AND kode_lokasi = '".$kode_lokasi."'";
             
             DB::connection($this->db)->update($update);
             
             $success['status'] = true;
-            $success['message'] = "Data unit karyawan berhasil diubah";
-            $success['kode'] = $request->kode_unit;
+            $success['message'] = "Data jurusan karyawan berhasil diubah";
+            $success['kode'] = $request->kode_agama;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data unit karyawan gagal diubah ".$e;
+            $success['message'] = "Data jurusan karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -201,7 +195,7 @@ class UnitController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required'
+            'kode_jur' => 'required'
         ]);
         
         try {
@@ -210,18 +204,18 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_unit')
-            ->where('kode_unit', $request->kode_unit)
+            $del = DB::connection($this->db)->table('hr_jur')
+            ->where('kode_jur', $request->kode_jur)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
             $success['status'] = true;
-            $success['message'] = "Data unit karyawan berhasil dihapus";
+            $success['message'] = "Data jurusan karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data unit karyawan gagal dihapus ".$e;
+            $success['message'] = "Data jurusan karyawan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

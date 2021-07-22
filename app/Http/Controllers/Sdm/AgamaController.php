@@ -21,7 +21,7 @@ class AgamaController extends Controller
 
     public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_agama from hr_agama where kode_agama ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
+        $auth = DB::connection($this->db)->select("SELECT kode_agama FROM hr_agama WHERE kode_agama ='".$isi."' AND kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,7 +38,46 @@ class AgamaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_agama, nama, flag_aktif from hr_agama where kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT kode_agama, nama, flag_aktif FROM hr_agama WHERE kode_lokasi = '".$kode_lokasi."' ";
+			$res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json($success, $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        $this->validate($request, [
+            'kode_agama' => 'required'
+        ]);
+
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "SELECT kode_agama, nama, flag_aktif FROM hr_agama WHERE kode_agama = '".$request->kode_agama."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
