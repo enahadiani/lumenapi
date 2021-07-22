@@ -280,6 +280,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-jabatan-update','Sdm\JabatanController@update');
     $router->delete('sdm-jabatan','Sdm\JabatanController@destroy');
 
+    // Golongan Karyawan
+    $router->get('sdm-golongan','Sdm\GolonganController@index');
+    $router->get('sdm-golongan','Sdm\GolonganController@show');
+    $router->post('sdm-golongan','Sdm\GolonganController@save');
+    $router->post('sdm-golongan-update','Sdm\GolonganController@update');
+    $router->delete('sdm-golongan','Sdm\GolonganController@destroy');
+
 });
 
 
