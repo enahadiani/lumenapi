@@ -287,12 +287,19 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-golongan-update','Sdm\GolonganController@update');
     $router->delete('sdm-golongan','Sdm\GolonganController@destroy');
 
-    // Pajak Karyawan
-    $router->get('sdm-pajaks','Sdm\PajakController@index');
-    $router->get('sdm-pajak','Sdm\PajakController@show');
-    $router->post('sdm-pajak','Sdm\PajakController@save');
-    $router->post('sdm-pajak-update','Sdm\PajakController@update');
-    $router->delete('sdm-pajak','Sdm\PajakController@destroy');
+    // Status Pajak Karyawan
+    $router->get('sdm-pajaks','Sdm\StatusPajakController@index');
+    $router->get('sdm-pajak','Sdm\StatusPajakController@show');
+    $router->post('sdm-pajak','Sdm\StatusPajakController@save');
+    $router->post('sdm-pajak-update','Sdm\StatusPajakController@update');
+    $router->delete('sdm-pajak','Sdm\StatusPajakController@destroy');
+
+    // Unit Karyawan
+    $router->get('sdm-units','Sdm\UnitController@index');
+    $router->get('sdm-unit','Sdm\UnitController@show');
+    $router->post('sdm-unit','Sdm\UnitController@save');
+    $router->post('sdm-unit-update','Sdm\UnitController@update');
+    $router->delete('sdm-unit','Sdm\UnitController@destroy');
 
 });
 

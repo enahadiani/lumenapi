@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class PajakController extends Controller
+class StatusPajakController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -164,7 +164,6 @@ class PajakController extends Controller
         $this->validate($request, [
             'kode_pajak' => 'required'
         ]);
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -177,13 +176,11 @@ class PajakController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
-            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data pajak karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data pajak karyawan gagal dihapus ".$e;
             

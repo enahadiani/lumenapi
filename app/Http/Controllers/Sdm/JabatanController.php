@@ -158,7 +158,6 @@ class JabatanController extends Controller
         $this->validate($request, [
             'kode_jab' => 'required'
         ]);
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -171,13 +170,11 @@ class JabatanController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
-            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data jabatan karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data jabatan karyawan gagal dihapus ".$e;
             
