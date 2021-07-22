@@ -308,6 +308,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-profesi-update','Sdm\ProfesiController@update');
     $router->delete('sdm-profesi','Sdm\ProfesiController@destroy');
 
+    // Agama Karyawan
+    $router->get('sdm-agamas','Sdm\AgamaController@index');
+    $router->get('sdm-agama','Sdm\AgamaController@show');
+    $router->post('sdm-agama','Sdm\AgamaController@save');
+    $router->post('sdm-agama-update','Sdm\AgamaController@update');
+    $router->delete('sdm-agama','Sdm\AgamaController@destroy');
+
 });
 
 

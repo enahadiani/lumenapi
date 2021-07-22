@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class UnitController extends Controller
+class AgamaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class UnitController extends Controller
 
     public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_unit from hr_unit where kode_unit ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
+        $auth = DB::connection($this->db)->select("select kode_agama from hr_agama where kode_agama ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,7 +38,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_unit, nama, flag_aktif from hr_unit where kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT kode_agama, nama, flag_aktif from hr_agama where kode_lokasi = '".$kode_lokasi."' ";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -74,10 +74,9 @@ class UnitController extends Controller
     public function save(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required',
+            'kode_agama' => 'required',
             'nama' => 'required',
-            'status' => 'required',
-            'kode_pp' => 'required'
+            'status' => 'required'
         ]);
         
         try {
@@ -85,26 +84,25 @@ class UnitController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->input('kode_unit'), $kode_lokasi)){
-                $insert = "INSERT INTO hr_unit(kode_unit, nama, flag_aktif, kode_pp, kode_lokasi) 
-                VALUES ('".$request->input('kode_unit')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$request->input('kode_pp')."',
-                '".$kode_lokasi."')";
+            if($this->isUnik($request->input('kode_agama'), $kode_lokasi)){
+                $insert = "INSERT INTO hr_agama(kode_agama, nama, flag_aktif, kode_lokasi) 
+                VALUES ('".$request->input('kode_agama')."', '".$request->input('nama')."', 
+                '".$request->input('status')."', '".$kode_lokasi."')";
 
                 DB::connection($this->db)->insert($insert);
                 
                 $success['status'] = true;
-                $success['message'] = "Data unit karyawan berhasil disimpan";
+                $success['message'] = "Data agama karyawan berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode unit karyawan sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode agama karyawan sudah ada di database!";
             }
             $success['kode'] = $request->kode_unit;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data unit karyawan gagal disimpan ".$e;
+            $success['message'] = "Data agama karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -121,10 +119,9 @@ class UnitController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required',
+            'kode_agama' => 'required',
             'nama' => 'required',
-            'status' => 'required',
-            'kode_pp' => 'required'
+            'status' => 'required'
         ]);
         
         try {
@@ -133,19 +130,19 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_unit SET nama = '".$request->input('nama')."', 
-            flag_aktif = '".$request->input('status')."', kode_pp = '".$request->input('kode_pp')."',
-            WHERE kode_unit = '".$request->input('kode_unit')."' AND kode_lokasi = '".$kode_lokasi."'";
+            $update = "UPDATE hr_agama SET nama = '".$request->input('nama')."', 
+            flag_aktif = '".$request->input('status')."' WHERE kode_agama = '".$request->input('kode_agama')."' 
+            AND kode_lokasi = '".$kode_lokasi."'";
             
             DB::connection($this->db)->update($update);
             
             $success['status'] = true;
-            $success['message'] = "Data unit karyawan berhasil diubah";
-            $success['kode'] = $request->kode_unit;
+            $success['message'] = "Data agama karyawan berhasil diubah";
+            $success['kode'] = $request->kode_agama;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data unit karyawan gagal diubah ".$e;
+            $success['message'] = "Data agama karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -159,7 +156,7 @@ class UnitController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_unit' => 'required'
+            'kode_agama' => 'required'
         ]);
         
         try {
@@ -168,18 +165,18 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_unit')
-            ->where('kode_unit', $request->kode_unit)
+            $del = DB::connection($this->db)->table('hr_agama')
+            ->where('kode_agama', $request->kode_agama)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
             $success['status'] = true;
-            $success['message'] = "Data unit karyawan berhasil dihapus";
+            $success['message'] = "Data agama karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data unit karyawan gagal dihapus ".$e;
+            $success['message'] = "Data agama karyawan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
