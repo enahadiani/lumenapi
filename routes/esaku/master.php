@@ -273,7 +273,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-status-update','Sdm\StatusController@update');
     $router->delete('sdm-status','Sdm\StatusController@destroy');
 
-
+    // Jabatan Karyawan
+    $router->get('sdm-jabatan','Sdm\JabatanController@index');
+    $router->get('sdm-jabatan','Sdm\JabatanController@show');
+    $router->post('sdm-jabatan','Sdm\JabatanController@save');
+    $router->post('sdm-jabatan-update','Sdm\JabatanController@update');
+    $router->delete('sdm-jabatan','Sdm\JabatanController@destroy');
 
 });
 
