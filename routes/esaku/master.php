@@ -257,6 +257,17 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('piu-cust','Esaku\Piutang\CustomerController@destroy');
     $router->get('piu-cust-akun','Esaku\Piutang\CustomerController@getAkun');
 
+    // MODUL SDM
+    // MASTER DATA
+    // Lokasi Kerja
+    $router->get('sdm-lokers','Sdm\LokerController@index');
+    $router->get('sdm-loker','Sdm\LokerController@show');
+    $router->post('sdm-loker','Sdm\LokerController@save');
+    $router->post('sdm-loker-update','Sdm\LokerController@update');
+    $router->delete('sdm-loker','Sdm\LokerController@destroy');
+
+
+
 
 });
 
