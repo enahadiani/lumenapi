@@ -266,6 +266,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-loker-update','Sdm\LokerController@update');
     $router->delete('sdm-loker','Sdm\LokerController@destroy');
 
+    // Status Karyawan
+    $router->get('sdm-status','Sdm\StatusController@index');
+    $router->get('sdm-status','Sdm\StatusController@show');
+    $router->post('sdm-status','Sdm\StatusController@save');
+    $router->post('sdm-status-update','Sdm\StatusController@update');
+    $router->delete('sdm-status','Sdm\StatusController@destroy');
 
 
 
