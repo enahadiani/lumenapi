@@ -322,6 +322,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-jurusan-update','Sdm\JurusanController@update');
     $router->delete('sdm-jurusan','Sdm\JurusanController@destroy');
 
+    // Strata Karyawan
+    $router->get('sdm-stratas','Sdm\StrataController@index');
+    $router->get('sdm-strata','Sdm\StrataController@show');
+    $router->post('sdm-strata','Sdm\StrataController@save');
+    $router->post('sdm-strata-update','Sdm\StrataController@update');
+    $router->delete('sdm-strata','Sdm\StrataController@destroy');
+
 });
 
 
