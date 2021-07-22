@@ -19,9 +19,9 @@ class LokerController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function isUnik($isi){
+    public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_loker from hr_loker where kode_loker ='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select kode_loker from hr_loker where kode_loker ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -84,7 +84,7 @@ class LokerController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->input('kode_loker'))){
+            if($this->isUnik($request->input('kode_loker'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_loker(kode_loker, nama, flag_aktif, kode_lokasi) 
                 VALUES ('".$request->input('kode_loker')."', '".$request->input('nama')."', 
                 '".$request->input('status')."', '".$kode_lokasi."')";
@@ -134,7 +134,7 @@ class LokerController extends Controller
             flag_aktif = '".$request->input('status')."'
             WHERE kode_loker = '".$request->input('kode_loker')."' AND kode_lokasi = '".$kode_lokasi."'";
             
-            DB::connection($this->db)->insert($update);
+            DB::connection($this->db)->update($update);
             
             $success['status'] = true;
             $success['message'] = "Data lokasi kerja berhasil diubah";

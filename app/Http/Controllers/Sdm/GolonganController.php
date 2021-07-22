@@ -19,9 +19,9 @@ class GolonganController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function isUnik($isi){
+    public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_gol from hr_gol where kode_gol ='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select kode_gol from hr_gol where kode_gol ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -84,7 +84,7 @@ class GolonganController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->input('kode_gol'))){
+            if($this->isUnik($request->input('kode_gol'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_gol(kode_gol, nama, flag_aktif, kode_lokasi) 
                 VALUES ('".$request->input('kode_gol')."', '".$request->input('nama')."', 
                 '".$request->input('status')."', '".$kode_lokasi."')";
@@ -97,7 +97,7 @@ class GolonganController extends Controller
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode golongan karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_jab;
+            $success['kode'] = $request->kode_gol;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -134,11 +134,11 @@ class GolonganController extends Controller
             flag_aktif = '".$request->input('status')."'
             WHERE kode_gol = '".$request->input('kode_gol')."' AND kode_lokasi = '".$kode_lokasi."'";
             
-            DB::connection($this->db)->insert($update);
+            DB::connection($this->db)->update($update);
             
             $success['status'] = true;
             $success['message'] = "Data golongan karyawan berhasil diubah";
-            $success['kode'] = $request->kode_loker;
+            $success['kode'] = $request->kode_gol;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;

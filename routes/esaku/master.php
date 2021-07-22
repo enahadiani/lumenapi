@@ -267,25 +267,32 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('sdm-loker','Sdm\LokerController@destroy');
 
     // Status Karyawan
-    $router->get('sdm-status','Sdm\StatusController@index');
+    $router->get('sdm-statuss','Sdm\StatusController@index');
     $router->get('sdm-status','Sdm\StatusController@show');
     $router->post('sdm-status','Sdm\StatusController@save');
     $router->post('sdm-status-update','Sdm\StatusController@update');
     $router->delete('sdm-status','Sdm\StatusController@destroy');
 
     // Jabatan Karyawan
-    $router->get('sdm-jabatan','Sdm\JabatanController@index');
+    $router->get('sdm-jabatans','Sdm\JabatanController@index');
     $router->get('sdm-jabatan','Sdm\JabatanController@show');
     $router->post('sdm-jabatan','Sdm\JabatanController@save');
     $router->post('sdm-jabatan-update','Sdm\JabatanController@update');
     $router->delete('sdm-jabatan','Sdm\JabatanController@destroy');
 
     // Golongan Karyawan
-    $router->get('sdm-golongan','Sdm\GolonganController@index');
+    $router->get('sdm-golongans','Sdm\GolonganController@index');
     $router->get('sdm-golongan','Sdm\GolonganController@show');
     $router->post('sdm-golongan','Sdm\GolonganController@save');
     $router->post('sdm-golongan-update','Sdm\GolonganController@update');
     $router->delete('sdm-golongan','Sdm\GolonganController@destroy');
+
+    // Pajak Karyawan
+    $router->get('sdm-pajaks','Sdm\PajakController@index');
+    $router->get('sdm-pajak','Sdm\PajakController@show');
+    $router->post('sdm-pajak','Sdm\PajakController@save');
+    $router->post('sdm-pajak-update','Sdm\PajakController@update');
+    $router->delete('sdm-pajak','Sdm\PajakController@destroy');
 
 });
 

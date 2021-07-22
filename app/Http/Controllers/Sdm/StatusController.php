@@ -19,9 +19,9 @@ class StatusController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function isUnik($isi){
+    public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_sdm from hr_sdm where kode_sdm ='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select kode_sdm from hr_sdm where kode_sdm ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -84,7 +84,7 @@ class StatusController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->input('kode_sdm'))){
+            if($this->isUnik($request->input('kode_sdm'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_sdm(kode_sdm, nama, flag_aktif, kode_lokasi) 
                 VALUES ('".$request->input('kode_sdm')."', '".$request->input('nama')."', 
                 '".$request->input('status')."', '".$kode_lokasi."')";
@@ -134,11 +134,11 @@ class StatusController extends Controller
             flag_aktif = '".$request->input('status')."'
             WHERE kode_sdm = '".$request->input('kode_sdm')."' AND kode_lokasi = '".$kode_lokasi."'";
             
-            DB::connection($this->db)->insert($update);
+            DB::connection($this->db)->update($update);
             
             $success['status'] = true;
             $success['message'] = "Data status karyawan berhasil diubah";
-            $success['kode'] = $request->kode_loker;
+            $success['kode'] = $request->kode_sdm;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;

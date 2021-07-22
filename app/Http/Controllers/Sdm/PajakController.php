@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class JabatanController extends Controller
+class PajakController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class JabatanController extends Controller
 
     public function isUnik($isi, $kode_lokasi){
         
-        $auth = DB::connection($this->db)->select("select kode_jab from hr_jab where kode_jab ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
+        $auth = DB::connection($this->db)->select("select kode_pajak from hr_pajak where kode_pajak ='".$isi."' and kode_lokasi = '".$kode_lokasi."'");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -38,7 +38,7 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_jab, nama, flag_aktif from hr_jab where kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT kode_pajak, nama, nilai from hr_pajak where kode_lokasi = '".$kode_lokasi."' ";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -74,9 +74,11 @@ class JabatanController extends Controller
     public function save(Request $request)
     {
         $this->validate($request, [
-            'kode_jab' => 'required',
+            'kode_pajak' => 'required',
             'nama' => 'required',
-            'status' => 'required'
+            'nilai' => 'required',
+            'biaya_jab' => 'required',
+            'jab_max' => 'required'
         ]);
         
         try {
@@ -84,25 +86,26 @@ class JabatanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->input('kode_jab'), $kode_lokasi)){
-                $insert = "INSERT INTO hr_jab(kode_jab, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_jab')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+            if($this->isUnik($request->input('kode_pajak'), $kode_lokasi)){
+                $insert = "INSERT INTO hr_pajak(kode_pajak, nama, nilai, biaya_jab, jab_max, kode_lokasi) 
+                VALUES ('".$request->input('kode_pajak')."', '".$request->input('nama')."', 
+                '".$request->input('nilai')."', '".$request->input('biaya_jab')."', '".$request->input('jab_max')."',
+                '".$kode_lokasi."')";
 
                 DB::connection($this->db)->insert($insert);
                 
                 $success['status'] = true;
-                $success['message'] = "Data jabatan karyawan berhasil disimpan";
+                $success['message'] = "Data pajak karyawan berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode jabatan karyawan sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode pajak karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_jab;
+            $success['kode'] = $request->kode_pajak;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data jabatan karyawan gagal disimpan ".$e;
+            $success['message'] = "Data pajak karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -119,9 +122,11 @@ class JabatanController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_jab' => 'required',
+            'kode_pajak' => 'required',
             'nama' => 'required',
-            'status' => 'required'
+            'nilai' => 'required',
+            'biaya_jab' => 'required',
+            'jab_max' => 'required'
         ]);
         
         try {
@@ -130,19 +135,20 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_jab SET nama = '".$request->input('nama')."', 
-            flag_aktif = '".$request->input('status')."'
-            WHERE kode_jab = '".$request->input('kode_jab')."' AND kode_lokasi = '".$kode_lokasi."'";
+            $update = "UPDATE hr_pajak SET nama = '".$request->input('nama')."', 
+            nilai = '".$request->input('nilai')."', biaya_jab = '".$request->input('biaya_jab')."',
+            jab_max = '".$request->input('jab_max')."' WHERE kode_gol = '".$request->input('kode_gol')."' 
+            AND kode_lokasi = '".$kode_lokasi."'";
             
             DB::connection($this->db)->update($update);
             
             $success['status'] = true;
-            $success['message'] = "Data jabatan karyawan berhasil diubah";
-            $success['kode'] = $request->kode_jab;
+            $success['message'] = "Data pajak karyawan berhasil diubah";
+            $success['kode'] = $request->kode_pajak;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data jabatan karyawan gagal diubah ".$e;
+            $success['message'] = "Data pajak karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -156,7 +162,7 @@ class JabatanController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_jab' => 'required'
+            'kode_pajak' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -166,20 +172,20 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_jab')
-            ->where('kode_jab', $request->kode_jab)
+            $del = DB::connection($this->db)->table('hr_pajak')
+            ->where('kode_pajak', $request->kode_pajak)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data jabatan karyawan berhasil dihapus";
+            $success['message'] = "Data pajak karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data jabatan karyawan gagal dihapus ".$e;
+            $success['message'] = "Data pajak karyawan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
