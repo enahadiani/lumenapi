@@ -176,7 +176,7 @@ class UnitController extends Controller
             }
 
             $update = "UPDATE hr_unit SET nama = '".$request->input('nama')."', 
-            flag_aktif = '".$request->input('status')."', kode_pp = '".$request->input('kode_pp')."',
+            flag_aktif = '".$request->input('status')."', kode_pp = '".$request->input('kode_pp')."'
             WHERE kode_unit = '".$request->input('kode_unit')."' AND kode_lokasi = '".$kode_lokasi."'";
             
             DB::connection($this->db)->update($update);
