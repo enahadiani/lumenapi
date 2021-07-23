@@ -20,10 +20,14 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('filter-pp','Siaga\FilterController@getFilterPP');
     $router->get('filter-periode','Siaga\FilterController@getFilterPeriode');
     $router->get('filter-nobukti','Siaga\FilterController@getFilterNoBukti');
+    $router->get('filter-nobukti-spb','Siaga\FilterController@getFilterNoBuktiSPB');
 
     $router->get('lap-posisi','Siaga\LaporanController@getPosisi');
     $router->get('lap-history-app','Siaga\LaporanController@getHistoryApp');
     $router->get('lap-aju-form','Siaga\LaporanController@getAjuForm');
+    $router->get('lap-posisi-spb','Siaga\LaporanController@getPosisiSPB');
+    $router->get('lap-history-app-spb','Siaga\LaporanController@getHistoryAppSPB');
+    $router->get('lap-aju-form-spb','Siaga\LaporanController@getAjuFormSPB');
 
 });
 
