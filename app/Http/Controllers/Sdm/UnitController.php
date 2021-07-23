@@ -77,7 +77,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.kode_unit, a.nama, a.flag_aktif, a.kode_pp, b.nama_pp 
+            $sql = "SELECT a.kode_unit, a.nama, a.flag_aktif, a.kode_pp, b.nama as nama_pp 
             FROM hr_profesi a
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
             WHERE kode_unit = '".$request->kode_unit."' AND kode_lokasi = '".$kode_lokasi."'";
