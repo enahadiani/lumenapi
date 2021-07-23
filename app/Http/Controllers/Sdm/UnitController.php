@@ -78,9 +78,9 @@ class UnitController extends Controller
             }
 
             $sql = "SELECT a.kode_unit, a.nama, a.flag_aktif, a.kode_pp, b.nama as nama_pp 
-            FROM hr_profesi a
+            FROM hr_unit a
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
-            WHERE kode_unit = '".$request->kode_unit."' AND kode_lokasi = '".$kode_lokasi."'";
+            WHERE a.kode_unit = '".$request->kode_unit."' AND a.kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
