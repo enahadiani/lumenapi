@@ -136,7 +136,7 @@ class ProfesiController extends Controller
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode profesi karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_loker;
+            $success['kode'] = $request->kode_profesi;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -177,7 +177,7 @@ class ProfesiController extends Controller
             
             $success['status'] = true;
             $success['message'] = "Data profesi karyawan berhasil diubah";
-            $success['kode'] = $request->kode_loker;
+            $success['kode'] = $request->kode_profesi;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;

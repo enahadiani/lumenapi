@@ -136,7 +136,7 @@ class AgamaController extends Controller
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode agama karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_unit;
+            $success['kode'] = $request->kode_agama;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
