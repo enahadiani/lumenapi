@@ -18,7 +18,7 @@ class LaporanController extends Controller
     public $guard = 'siaga';
     public $db = 'dbsiaga';
 
-    function getPosisi(Request $request){
+    public function getPosisi(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -90,7 +90,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getHistoryApp(Request $request){
+    public function getHistoryApp(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -137,7 +137,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getAjuForm(Request $request){
+    public function getAjuForm(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -213,7 +213,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getPosisiSPB(Request $request){
+    public function getPosisiSPB(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -284,7 +284,7 @@ class LaporanController extends Controller
         }
     }
 
-    function getHistoryAppSPB(Request $request){
+    public function getHistoryAppSPB(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -310,6 +310,66 @@ class LaporanController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getAjuFormSPB(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $no_bukti = $request->no_bukti[1];
+
+            $sql="select a.no_spb,a.kode_lokasi,a.periode,a.tanggal,a.keterangan,a.kode_lokasi,f.kota,a.nilai,a.nama,a.alamat,
+            a.nik_user,b.nama as nama_user,a.nik_bdh,c.nama as nama_bdh,a.nik_ver,d.nama as nama_ver,cat_pajak,cat_bdh,
+            convert(varchar(20),a.tanggal,103) as tgl,f.kota, a.rek, a.jtran, a.bank, a.norek, a.alrek,a.no_po,a.no_dok,
+            convert(varchar(20),a.tgl_po,103) as tgl_po,convert(varchar(20),a.tgl_dok,103) as tgl_dok,isnull(e.pph,0) as pph,
+            a.nilai+isnull(e.pph,0)-isnull(g.ppn,0) as tagihan,isnull(g.ppn,0) as ppn,a.kode_curr,h.nama as nama_curr,'-' as tahun,'-' as tgl_ba,'-' as no_ba,'-' as no_ref
+            from gr_spb2_m a
+            inner join lokasi f on a.kode_lokasi=f.kode_lokasi
+            left join karyawan b on a.nik_user=b.nik and a.kode_lokasi=b.kode_lokasi
+            left join karyawan c on a.nik_bdh=c.nik and a.kode_lokasi=c.kode_lokasi
+            left join karyawan d on a.nik_ver=d.nik and a.kode_lokasi=d.kode_lokasi 
+            inner join curr h on a.kode_curr=h.kode_curr
+            left join (select b.no_spb,a.kode_lokasi,sum(a.nilai) as pph
+            from gr_beban_j a
+            inner join gr_beban_m b on a.no_beban=b.no_beban and a.kode_lokasi=b.kode_lokasi
+            where a.kode_akun='2103.03'
+            group by b.no_spb,a.kode_lokasi
+            )	e	on a.no_spb=e.no_spb and a.kode_lokasi=e.kode_lokasi
+            left join (select b.no_spb,a.kode_lokasi,sum(a.nilai) as ppn
+            from gr_beban_j a
+            inner join gr_beban_m b on a.no_beban=b.no_beban and a.kode_lokasi=b.kode_lokasi
+            where a.kode_akun='1107.07'
+            group by b.no_spb,a.kode_lokasi
+            )	g	on a.no_spb=g.no_spb and a.kode_lokasi=g.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_spb='$no_bukti'
+            order by a.no_spb
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
