@@ -136,7 +136,7 @@ class JurusanController extends Controller
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. Kode jurusan karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_unit;
+            $success['kode'] = $request->kode_jur;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -177,7 +177,7 @@ class JurusanController extends Controller
             
             $success['status'] = true;
             $success['message'] = "Data jurusan karyawan berhasil diubah";
-            $success['kode'] = $request->kode_agama;
+            $success['kode'] = $request->kode_jur;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
