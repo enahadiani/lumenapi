@@ -177,18 +177,18 @@ class StatusPajakController extends Controller
 
             $update = "UPDATE hr_pajak SET nama = '".$request->input('nama')."', 
             nilai = '".$request->input('nilai')."', biaya_jab = '".$request->input('biaya_jab')."',
-            jab_max = '".$request->input('jab_max')."' WHERE kode_gol = '".$request->input('kode_gol')."' 
+            jab_max = '".$request->input('jab_max')."' WHERE kode_pajak = '".$request->input('kode_pajak')."' 
             AND kode_lokasi = '".$kode_lokasi."'";
             
             DB::connection($this->db)->update($update);
             
             $success['status'] = true;
-            $success['message'] = "Data pajak karyawan berhasil diubah";
+            $success['message'] = "Data status pajak karyawan berhasil diubah";
             $success['kode'] = $request->kode_pajak;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data pajak karyawan gagal diubah ".$e;
+            $success['message'] = "Data status pajak karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }

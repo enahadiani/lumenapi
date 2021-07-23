@@ -77,10 +77,10 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.kode_unit, a.nama, a.flag_aktif, a.kode_pp, b.nama_pp 
-            FROM hr_profesi a
+            $sql = "SELECT a.kode_unit, a.nama, a.flag_aktif, a.kode_pp, b.nama as nama_pp 
+            FROM hr_unit a
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
-            WHERE kode_unit = '".$request->kode_unit."' AND kode_lokasi = '".$kode_lokasi."'";
+            WHERE a.kode_unit = '".$request->kode_unit."' AND a.kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -176,7 +176,7 @@ class UnitController extends Controller
             }
 
             $update = "UPDATE hr_unit SET nama = '".$request->input('nama')."', 
-            flag_aktif = '".$request->input('status')."', kode_pp = '".$request->input('kode_pp')."',
+            flag_aktif = '".$request->input('status')."', kode_pp = '".$request->input('kode_pp')."'
             WHERE kode_unit = '".$request->input('kode_unit')."' AND kode_lokasi = '".$kode_lokasi."'";
             
             DB::connection($this->db)->update($update);
