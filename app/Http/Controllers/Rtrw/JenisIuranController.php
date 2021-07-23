@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class DesaController extends Controller
+class JenisIuranController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,13 +21,18 @@ class DesaController extends Controller
 
     public function isUnik($isi){
         
-        $auth = DB::connection($this->db)->select("select kode_desa from rt_desa where kode_desa ='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select kode_jenis from rt_iuran_jenis where kode_jenis ='".$isi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
         }else{
             return true;
         }
+    }
+
+    public function reverseDate($ymd_or_dmy_date, $org_sep='-', $new_sep='-'){
+        $arr = explode($org_sep, $ymd_or_dmy_date);
+        return $arr[2].$new_sep.$arr[1].$new_sep.$arr[0];
     }
 
     public function index(Request $request)
@@ -39,18 +44,17 @@ class DesaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $filter = "where a.kode_desa like '%' ";
-            if(isset($request->kode_desa) && $request->kode_desa != ""){
-                $filter .= "and a.kode_desa='$request->kode_desa' ";
+            $filter = "where a.kode_lokasi = '$kode_lokasi' ";
+            if(isset($request->kode_jenis) && $request->kode_jenis != ""){
+                $filter .= "and a.kode_jenis='$request->kode_jenis' ";
             }
-            if(isset($request->kode_camat) && $request->kode_camat != ""){
-                $filter .= "and a.kode_camat='$request->kode_camat' ";
+            if(isset($request->jenis) && $request->jenis != ""){
+                $filter .= "and a.jenis='$request->jenis' ";
             }
 
             
-            $sql= "select a.kode_desa,a.nama,a.kode_camat,b.nama as nama_camat 
-            from rt_desa a
-            inner join rt_camat b on a.kode_camat=b.kode_camat   
+            $sql= "select a.kode_jenis,a.nama,a.jenis,a.status,convert(varchar,a.tgl_mulai,103) as tgl_mulai,convert(varchar,a.tgl_selesai,103) as tgl_selesai
+            from rt_iuran_jenis a
             $filter";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -93,9 +97,12 @@ class DesaController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_desa' => 'required',
+            'kode_jenis' => 'required',
             'nama' => 'required',
-            'kode_camat' => 'required'
+            'jenis' => 'required',
+            'status' => 'required',
+            'tgl_mulai' => 'required',
+            'tgl_selesai' => 'required' 
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -105,23 +112,23 @@ class DesaController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_desa)){
-                $ins = DB::connection($this->db)->insert("insert into rt_desa(kode_desa,nama,kode_camat) values ('".$request->kode_desa."','".$request->nama."','".$request->kode_camat."') ");
+            if($this->isUnik($request->kode_jenis)){
+                $ins = DB::connection($this->db)->insert("insert into rt_iuran_jenis(kode_jenis,nama,jenis,status,tgl_mulai,tgl_selesai,kode_lokasi) values ('".$request->kode_jenis."','".$request->nama."','".$request->jenis."','".$request->status."','".$this->reverseDate($request->tgl_mulai,'/','-')."','".$this->reverseDate($request->tgl_selesai,'/','-')."','$kode_lokasi') ");
                 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Desa berhasil disimpan";
+                $success['message'] = "Data Jenis Iuran berhasil disimpan";
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode Desa sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode Jenis Iuran sudah ada di database!";
             }
-            $success['kode'] = $request->kode_desa;
+            $success['kode'] = $request->kode_jenis;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Desa gagal disimpan ".$e;
+            $success['message'] = "Data Jenis Iuran gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -150,9 +157,12 @@ class DesaController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_desa' => 'required',
+            'kode_jenis' => 'required',
             'nama' => 'required',
-            'kode_camat' => 'required'
+            'jenis' => 'required',
+            'status' => 'required',
+            'tgl_mulai' => 'required',
+            'tgl_selesai' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -163,21 +173,22 @@ class DesaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('rt_desa')
-            ->where('kode_desa', $request->kode_desa)
+            $del = DB::connection($this->db)->table('rt_iuran_jenis')
+            ->where('kode_jenis', $request->kode_jenis)
+            ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into rt_desa(kode_desa,nama,kode_camat) values ('".$request->kode_desa."','".$request->nama."','".$request->kode_camat."') ");
-            
+            $ins = DB::connection($this->db)->insert("insert into rt_iuran_jenis(kode_jenis,nama,jenis,status,tgl_mulai,tgl_selesai,kode_lokasi) values ('".$request->kode_jenis."','".$request->nama."','".$request->jenis."','".$request->status."','".$this->reverseDate($request->tgl_mulai,'/','-')."','".$this->reverseDate($request->tgl_selesai,'/','-')."','$kode_lokasi') ");
+                
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Desa berhasil diubah";
-            $success['kode'] = $request->kode_desa;
+            $success['message'] = "Data Jenis Iuran berhasil diubah";
+            $success['kode'] = $request->kode_jenis;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Desa gagal diubah ".$e;
+            $success['message'] = "Data Jenis Iuran gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -191,7 +202,7 @@ class DesaController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_desa' => 'required'
+            'kode_jenis' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -201,19 +212,20 @@ class DesaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('rt_desa')
-            ->where('kode_desa', $request->kode_desa)
+            $del = DB::connection($this->db)->table('rt_iuran_jenis')
+            ->where('kode_jenis', $request->kode_jenis)
+            ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Desa berhasil dihapus";
+            $success['message'] = "Data Jenis Iuran berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Desa gagal dihapus ".$e;
+            $success['message'] = "Data Jenis Iuran gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
