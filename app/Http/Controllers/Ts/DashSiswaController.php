@@ -669,7 +669,7 @@ class DashSiswaController extends Controller
                         group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
 				where a.tagihan - isnull(c.bayar,0) > 0
                 ) a
-                order by a.no_bukti desc");
+                order by a.no_bukti desc,a.kode_param asc");
             $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

@@ -67,6 +67,39 @@ class BayarMandiriController extends Controller
         
     }
 
+    public function cekBill(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select *
+            from sis_mandiri_bill a
+            where a.kode_lokasi='$kode_lokasi' and a.bill_cust_id='$request->bill_cust_id' and a.status = 'WAITING' ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     
     public function store(Request $request)
     {
@@ -98,14 +131,14 @@ class BayarMandiriController extends Controller
             }
             
             $per = date('ymd');
-            $cek = DB::connection($this->db)->select("select no_bukti from sis_mandiri_bill_d where kode_lokasi='$kode_lokasi' and no_bill='$request->no_bill' and kode_param='$request->kode_param' and nis='$request->nis' ");
-            if(count($cek) > 0){
-                $no_bukti = $cek[0]->no_bukti;
-                $del = DB::connection($this->db)->delete("delete from sis_mandiri_bill where no_bukti='".$no_bukti."' ");
-                $del2 = DB::connection($this->db)->delete("delete from sis_mandiri_bill_d where no_bukti='".$no_bukti."' ");
-            }else{
+            // $cek = DB::connection($this->db)->select("select no_bukti from sis_mandiri_bill_d where kode_lokasi='$kode_lokasi' and no_bill='$request->no_bill' and kode_param='$request->kode_param' and nis='$request->nis' ");
+            // if(count($cek) > 0){
+            //     $no_bukti = $cek[0]->no_bukti;
+            //     $del = DB::connection($this->db)->delete("delete from sis_mandiri_bill where no_bukti='".$no_bukti."' ");
+            //     $del2 = DB::connection($this->db)->delete("delete from sis_mandiri_bill_d where no_bukti='".$no_bukti."' ");
+            // }else{
                 $no_bukti = $this->generateKode("sis_mandiri_bill", "no_bukti", $kode_lokasi."-MB".$per.".", "0001");
-            }
+            // }
 
             $ins = DB::connection($this->db)->insert("insert into sis_mandiri_bill (no_bukti,nilai,response_log,status,nik_user,tgl_input,kode_lokasi,kode_pp,no_rekon,sts_rekon,bill_code,bill_cust_id) values ('".$no_bukti."',".$request->nilai.",'".$request->log."','".$request->status."','$nik',getdate(),'$kode_lokasi','$request->kode_pp',NULL,NULL,'$request->bill_code','$request->bill_cust_id') ");
             
@@ -120,6 +153,72 @@ class BayarMandiriController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Bill Mandiri gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
+    }
+
+
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'bill_cust_id' => 'required',
+            'bill_code' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }else{
+                $nik = $request->nik;
+                $kode_lokasi = $request->kode_lokasi;
+            }
+            
+            
+            $ins = DB::connection($this->db)->update("update sis_mandiri_bill set status ='CANCEL' where bill_code='$request->bill_code' and bill_cust_id='$request->bill_cust_id' ");
+            
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Bill Mandiri berhasil dicancel";
+
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Bill Mandiri gagal dicancel ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $this->validate($request, [
+            'bill_cust_id' => 'required',
+            'bill_code' => 'required',
+            'bill_status' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            
+            $ins = DB::connection($this->db)->update("update sis_mandiri_bill set status ='$request->bill_status' where bill_code='$request->bill_code' and bill_cust_id='$request->bill_cust_id' and status='WAITING' ");
+            
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Bill Mandiri berhasil diubah";
+
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Bill Mandiri gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
