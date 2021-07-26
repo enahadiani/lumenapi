@@ -260,13 +260,13 @@ class KeluargaController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data karyawan berhasil diubah";
+            $success['message'] = "Data keluarga karyawan berhasil diubah";
             $success['kode'] = $request->nik;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data karyawan gagal diubah ".$e;
+            $success['message'] = "Data keluarga karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -306,12 +306,12 @@ class KeluargaController extends Controller
             ->delete();
 
             $success['status'] = true;
-            $success['message'] = "Data karyawan berhasil dihapus";
+            $success['message'] = "Data keluarga karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data karyawan gagal dihapus ".$e;
+            $success['message'] = "Data keluarga karyawan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
