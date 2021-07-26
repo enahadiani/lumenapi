@@ -88,6 +88,7 @@ class PenjualanController extends Controller
             'no_open' => 'required',
             'kode_pp' => 'required',
             'total_trans' => 'required',
+            'total_ppn' => 'required',
             'diskon' => 'required',
             'total_bayar' => 'required',
             'kode_barang' => 'required|array',
@@ -95,6 +96,7 @@ class PenjualanController extends Controller
             'harga_barang' => 'required|array',
             'diskon_barang' => 'required|array',
             'sub_barang' => 'required|array',
+            'ppn_barang' => 'required|array',
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -156,12 +158,12 @@ class PenjualanController extends Controller
                 $kodeGudang="-";
             }
 
-            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,0,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-'));		
+            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,$request->total_ppn,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-'));		
 
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
                 for($a=0; $a<count($request->kode_barang);$a++){
-                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_dloc (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a]));
+                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_dloc (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,ppn) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a],$request->ppn_barang[$a]));
                 }	
             }
                 
@@ -230,16 +232,20 @@ class PenjualanController extends Controller
             $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
-                $total_trans=$get[0]['nilai']+$get[0]['diskon'];
+                $total_trans=$get[0]['nilai']+$get[0]['diskon']-$get[0]['nilai_ppn'];
                 $total_disk=$get[0]['diskon'];
                 $total_stlh=$get[0]['nilai'];
+                $total_ppn=$get[0]['nilai_ppn'];
+                $total_stlh_ppn=floatval($total_ppn)+floatval($total_stlh);
                 $total_byr=$get[0]['tobyr'];
-                $kembalian=$get[0]['tobyr']-$get[0]['nilai'];
+                $kembalian=$get[0]['tobyr']-($get[0]['nilai']+$get[0]['nilai_ppn']);
                 $success["tgl"] = $get[0]['tanggal'];
             }else{
                 $total_trans=0;
                 $total_disk=0;
                 $total_stlh=0;
+                $total_ppn=0;
+                $total_stlh_ppn=0;
                 $total_byr=0;
                 $kembalian=0;
                 $success["tgl"] = null;
@@ -248,6 +254,8 @@ class PenjualanController extends Controller
             $success["total_trans"]=$total_trans;
             $success["total_disk"]=$total_disk;
             $success["total_stlh"]=$total_stlh;
+            $success["total_ppn"]=$total_ppn;
+            $success["total_stlh_ppn"]=$total_stlh_ppn;
             $success["total_byr"]=$total_byr;
             $success["kembalian"]=$kembalian;
 
