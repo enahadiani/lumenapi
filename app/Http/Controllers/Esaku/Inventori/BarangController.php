@@ -257,6 +257,7 @@ class BarangController extends Controller
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_barang;
             $success['message'] = "Data Barang berhasil diubah";
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
