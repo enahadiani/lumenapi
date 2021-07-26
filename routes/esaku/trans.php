@@ -353,6 +353,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-karyawan-update','Sdm\KepegawaianController@update');
     $router->delete('sdm-karyawan','Sdm\KepegawaianController@destroy');
 
+    // Keluarga
+    $router->get('sdm-keluargas','Sdm\KeluargaController@index');
+    $router->get('sdm-keluarga','Sdm\KeluargaController@show');
+    $router->post('sdm-keluarga','Sdm\KeluargaController@save');
+    $router->post('sdm-keluarga-update','Sdm\KeluargaController@update');
+    $router->delete('sdm-keluarga','Sdm\KeluargaController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
