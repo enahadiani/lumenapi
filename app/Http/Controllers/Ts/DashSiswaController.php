@@ -667,9 +667,15 @@ class DashSiswaController extends Controller
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
                         group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param) c on a.no_bill=c.no_bill and a.kode_lokasi=c.kode_lokasi and a.kode_param=c.kode_param
-				where a.tagihan - isnull(c.bayar,0) > 0
-                ) a
-                order by a.no_bukti desc");
+                left join (select x.kode_lokasi,x.no_bill,x.kode_param,sum(x.nilai) as bayar 
+                        from sis_mandiri_bill_d x 
+                        inner join sis_mandiri_bill z on x.no_bukti=z.no_bukti and x.kode_lokasi=z.kode_lokasi
+                                inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '12' and x.nis='0501819022' and x.kode_pp='YSPTE05' and x.nilai<>0 and z.status not in ('CANCEL','WAITING','FAILED')
+                                group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param ) d on a.no_bill=d.no_bill and a.kode_lokasi=d.kode_lokasi and a.kode_param=d.kode_param
+                        where (a.tagihan - isnull(c.bayar,0) - isnull(d.bayar,0) > 0)
+                        ) a
+                order by a.no_bukti desc,a.kode_param asc");
             $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak

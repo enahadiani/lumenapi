@@ -31,7 +31,10 @@ class RelakunPpController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $akun = DB::connection($this->sql)->select("select distinct kode_pp,kode_lokasi from relakun_pp where kode_lokasi='$kode_lokasi'
+            $akun = DB::connection($this->sql)->select("select distinct a.kode_pp,b.nama,a.kode_lokasi 
+            from relakun_pp a
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi'
             ");
             $akun = json_decode(json_encode($akun),true);
             
@@ -44,6 +47,7 @@ class RelakunPpController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['status'] = false;
+                $success['data'] = [];
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
