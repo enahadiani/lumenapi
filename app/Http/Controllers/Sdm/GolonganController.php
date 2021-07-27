@@ -204,7 +204,7 @@ class GolonganController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_gol')
+            DB::connection($this->db)->table('hr_gol')
             ->where('kode_gol', $request->kode_gol)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

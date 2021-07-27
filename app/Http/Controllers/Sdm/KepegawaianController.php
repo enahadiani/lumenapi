@@ -377,7 +377,7 @@ class KepegawaianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_karyawan')
+            DB::connection($this->db)->table('hr_karyawan')
             ->where('nik', $request->nik)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

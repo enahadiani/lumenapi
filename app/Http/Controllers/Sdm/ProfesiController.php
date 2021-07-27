@@ -204,7 +204,7 @@ class ProfesiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_profesi')
+            DB::connection($this->db)->table('hr_profesi')
             ->where('kode_profesi', $request->kode_profesi)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

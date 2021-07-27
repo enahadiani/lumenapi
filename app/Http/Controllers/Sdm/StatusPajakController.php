@@ -211,7 +211,7 @@ class StatusPajakController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_pajak')
+            DB::connection($this->db)->table('hr_pajak')
             ->where('kode_pajak', $request->kode_pajak)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

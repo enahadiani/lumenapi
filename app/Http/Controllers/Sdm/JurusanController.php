@@ -204,7 +204,7 @@ class JurusanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_jur')
+            DB::connection($this->db)->table('hr_jur')
             ->where('kode_jur', $request->kode_jur)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

@@ -210,7 +210,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_unit')
+            DB::connection($this->db)->table('hr_unit')
             ->where('kode_unit', $request->kode_unit)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

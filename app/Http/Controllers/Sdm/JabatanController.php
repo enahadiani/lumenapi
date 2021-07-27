@@ -204,7 +204,7 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_jab')
+            DB::connection($this->db)->table('hr_jab')
             ->where('kode_jab', $request->kode_jab)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

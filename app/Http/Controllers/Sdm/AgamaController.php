@@ -204,7 +204,7 @@ class AgamaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_agama')
+            DB::connection($this->db)->table('hr_agama')
             ->where('kode_agama', $request->kode_agama)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
