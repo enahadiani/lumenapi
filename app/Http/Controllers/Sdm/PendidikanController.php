@@ -81,7 +81,7 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nama, a.tahun, a.kode_jurusan,a.kode_strata, b.nama as nama_jur,c.nama as nama_str,
+            $sql = "SELECT a.nik, a.nama, a.tahun, a.kode_jurusan,a.kode_strata, b.nama as nama_jur,c.nama as nama_str,
             a.sertifikat   
             FROM hr_pendidikan a 
             INNER JOIN hr_jur b ON a.kode_jurusan =b.kode_jur AND a.kode_lokasi=b.kode_lokasi 

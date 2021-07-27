@@ -374,6 +374,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-dinas-update','Sdm\PendidikanController@update');
     $router->delete('sdm-dinas','Sdm\PendidikanController@destroy');
 
+    // Pelatihan
+    $router->get('sdm-pelatihans','Sdm\PelatihanController@index');
+    $router->get('sdm-pelatihan','Sdm\PelatihanController@show');
+    $router->post('sdm-pelatihan','Sdm\PelatihanController@save');
+    $router->post('sdm-pelatihan-update','Sdm\PelatihanController@update');
+    $router->delete('sdm-pelatihan','Sdm\PelatihanController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
