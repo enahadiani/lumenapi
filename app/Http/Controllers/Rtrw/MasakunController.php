@@ -31,7 +31,7 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $akun = DB::connection($this->sql)->select("select kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal from masakun where kode_lokasi='$kode_lokasi'		 
+            $akun = DB::connection($this->sql)->select("select kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar as gar,normal from masakun where kode_lokasi='$kode_lokasi'		 
             ");
             $akun = json_decode(json_encode($akun),true);
             
@@ -98,11 +98,13 @@ class MasakunController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_akun;
             $success['message'] = "Data Master akun berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
+            $success['kode'] = '-';
             $success['message'] = "Data Master akun gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
@@ -129,7 +131,7 @@ class MasakunController extends Controller
                 $nik= $data->id_satpam;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $akun = DB::connection($this->sql)->select("select kode_akun,kode_lokasi,nama,modul,jenis,kode_curr,block,status_gar,normal from masakun where kode_lokasi='$kode_lokasi' and kode_akun='$request->kode_akun'				 
+            $akun = DB::connection($this->sql)->select("select kode_akun,kode_lokasi,nama,modul,case modul when 'A' then 'AKTIVA' when 'P' then 'PASIVA' when 'L' then 'LABARUGI' else 'MODAL' end as nama_modul,jenis,kode_curr,block,status_gar as gar,normal from masakun where kode_lokasi='$kode_lokasi' and kode_akun='$request->kode_akun'				 
             ");
 
             $akun = json_decode(json_encode($akun),true);
@@ -201,11 +203,13 @@ class MasakunController extends Controller
 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
+            $success['kode'] = $request->kode_akun;
             $success['message'] = "Data Master akun berhasil diubah";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->sql)->rollback();
             $success['status'] = false;
+            $success['kode'] = '-';
             $success['message'] = "Data Master akun gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
@@ -297,7 +301,7 @@ class MasakunController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $modul = DB::connection($this->sql)->select("select kode_tipe,nama_tipe from tipe_neraca where kode_lokasi='$kode_lokasi'	 
+            $modul = DB::connection($this->sql)->select("select distinct kode_tipe,nama_tipe from tipe_neraca
             ");
             $modul = json_decode(json_encode($modul),true);
             

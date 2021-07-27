@@ -113,10 +113,10 @@ class CloseKasirController extends Controller
                 $nik= $request->nik;
             }
 
-            $sql = "select a.no_open,a.nik,a.tgl_input,a.saldo_awal,isnull(b.total,0) as total_pnj,isnull(b.diskon,0) as total_disk,convert(varchar(10),a.tgl_input,121) as tgl 
+            $sql = "select a.no_open,a.nik,a.tgl_input,a.saldo_awal,isnull(b.total,0) as total_pnj,isnull(b.diskon,0) as total_disk,isnull(b.ppn,0) as total_ppn,convert(varchar(10),a.tgl_input,121) as tgl 
             from kasir_open a 
             left join 
-            ( select a.no_open,sum(a.nilai) as total,sum(a.diskon) as diskon
+            ( select a.no_open,sum(a.nilai) as total,sum(a.diskon) as diskon,sum(a.nilai_ppn) as ppn
               from brg_jualpiu_dloc a
               where a.no_close='-' 
               group by a.no_open
@@ -127,7 +127,7 @@ class CloseKasirController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon from brg_jualpiu_dloc
+            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai+nilai_ppn as nilai,diskon from brg_jualpiu_dloc
             where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' " ;
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
@@ -177,6 +177,7 @@ class CloseKasirController extends Controller
             'kode_pp' => 'required',
             'tanggal' => 'required',
             'total_pnj' => 'required',
+            'total_ppn' => 'required',
             'total_diskon' => 'required',
         ]);
 
@@ -264,6 +265,12 @@ class CloseKasirController extends Controller
     
                         $sqld= DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
                         array($id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,1,$akunDiskon,'D',$request->total_diskon,$request->total_diskon,'Diskon Penjualan','BRGJUAL','JUALDISC','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
+                    }
+
+                    if ($request->total_ppn > 0) {
+    
+                        $sqld= DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
+                        array($id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,1,'107.003','C',$request->total_ppn,$request->total_ppn,'PPN Penjualan','BRGJUAL','JUALPPN','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
                     }
     
                     $sqlJ= DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
