@@ -137,7 +137,7 @@ class BayarMandiriController extends Controller
             }
 
             $ins = DB::connection($this->db)->update("update sis_mandiri_bill set nilai=".$request->nilai.",kode_pp='".$request->kode_pp."',response_log='".$request->log."',status='".$request->status."'
-            where no_bukti='".$request->bill_short_name."' and bill_cust_id='".$request->bill_cust_id."' and kode_lokasi='".$kode_lokasi."' ");
+            where no_bukti='".$request->bill_short_name."' and bill_cust_id='".$request->bill_cust_id."' and kode_lokasi='".$kode_lokasi."' and status='PROCESS' ");
             
             $ins2 = DB::connection($this->db)->insert("insert into sis_mandiri_bill_d (no_bukti,no_bill,nis,nilai,kode_param,kode_lokasi,kode_pp,nu,periode_bill) values ('".$request->bill_short_name."','".$request->no_bill."','".$request->nis."',".$request->nilai.",'$request->kode_param','$kode_lokasi','$request->kode_pp',1,'$request->periode_bill') ");     
 
@@ -214,7 +214,7 @@ class BayarMandiriController extends Controller
             $ins2 = DB::connection($this->db)->insert("
             insert into sis_mandiri_bayar (no_bukti,nilai,kode_lokasi,kode_pp,bill_short_name,bill_cust_id,tgl_input) select '$no_bukti',nilai,kode_lokasi,kode_pp,no_bukti,bill_cust_id,getdate() 
             from sis_mandiri_bill 
-            where no_bukti='$request->bill_short_name' and bill_cust_id='$request->bill_cust_id' and status='WAITING'
+            where no_bukti='$request->bill_short_name' and bill_cust_id='$request->bill_cust_id' and status='SUCCESS'
             ");
 
             $ins3 = DB::connection($this->db)->insert("
@@ -222,7 +222,7 @@ class BayarMandiriController extends Controller
             select '$no_bukti',a.no_bill,a.nis,a.kode_param,a.kode_pp,a.nu,a.periode_bill
             from sis_mandiri_bill_d a
             inner join sis_mandiri_bill b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            where b.no_bukti='$request->bill_short_name' and b.bill_cust_id='$request->bill_cust_id' and b.status='WAITING'
+            where b.no_bukti='$request->bill_short_name' and b.bill_cust_id='$request->bill_cust_id' and b.status='SUCCESS'
             ");
             
             DB::connection($this->db)->commit();
