@@ -360,6 +360,20 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-keluarga-update','Sdm\KeluargaController@update');
     $router->delete('sdm-keluarga','Sdm\KeluargaController@destroy');
 
+    // Kedinasan
+    $router->get('sdm-dinass','Sdm\DinasController@index');
+    $router->get('sdm-dinas','Sdm\DinasController@show');
+    $router->post('sdm-dinas','Sdm\DinasController@save');
+    $router->post('sdm-dinas-update','Sdm\DinasController@update');
+    $router->delete('sdm-dinas','Sdm\DinasController@destroy');
+
+    // Pendidikan
+    $router->get('sdm-pendidikans','Sdm\PendidikanController@index');
+    $router->get('sdm-dinas','Sdm\PendidikanController@show');
+    $router->post('sdm-dinas','Sdm\PendidikanController@save');
+    $router->post('sdm-dinas-update','Sdm\PendidikanController@update');
+    $router->delete('sdm-dinas','Sdm\PendidikanController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
