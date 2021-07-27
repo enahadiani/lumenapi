@@ -19,58 +19,112 @@ class PelatihanController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function isUnik($isi){
-        
-        $auth = DB::connection($this->db)->select("select no_sk from hr_sk where no_sk ='".$isi."' ");
-        $auth = json_decode(json_encode($auth),true);
-        if(count($auth) > 0){
-            return false;
-        }else{
-            return true;
+    public function getNU($nik, $kode_lokasi) {
+        $select= "SELECT max(nu) AS nu FROM hr_pelatihan WHERE nik='".$nik."' AND kode_lokasi='".$kode_lokasi."'";
+        $result = DB::connection($this->db)->select($select);
+        $nu = NULL;
+
+        if(count($result) > 0){
+            $nu = $result[0]->nu + 1;
+        } else {
+            $nu = 1;
         }
+
+        return $nu;
     }
 
     public function index(Request $request)
     {
         try {
-            
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $sql = "select nu,nama,panitia,convert(varchar,tgl_mulai,103) as tglm,convert(varchar,tgl_selesai,103) as tgls,setifikat from hr_pelatihan 
-            where kode_lokasi='$kode_lokasi' and nik='$nik' ";
-            $res = DB::connection($this->db)->select($sql);
+
+            $sql = "SELECT nama, panitia, convert(varchar,tgl_mulai,103) as tgl_mulai,
+            convert(varchar,tgl_selesai,103) as tgl_selesai 
+            FROM hr_pelatihan 
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' ";
+			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
+
+            if(count($res) > 0){ 
                 $success['data'] = $res;
-                $success['message'] = "Success!";     
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);     
             }
-            else{
-                $success['message'] = "Data Kosong!";
+            else{                
                 $success['data'] = [];
                 $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json($success, $this->successStatus);
             }
-            return response()->json($success, $this->successStatus);
+
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
-        
     }
 
-    public function store(Request $request)
+    public function show(Request $request)
     {
         $this->validate($request, [
-            'penyelenggara' => 'required',
+            'nu' => 'required'
+        ]);
+
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "SELECT a.nik, a.nama, a.nu, a.panitia, a.sertifikat, convert(varchar,a.tgl_mulai,103) as tgl_mulai,
+            convert(varchar,a.tgl_selesai,103) as tgl_selesai, b.nama as nama_karyawan   
+            FROM hr_pelatihan a
+            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
+			$res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json($success, $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function save(Request $request)
+    {
+        $this->validate($request, [
             'nama' => 'required',
+            'panitia' => 'required',
             'tgl_mulai' => 'required',
-            'tgl_selesai' => 'required',
-            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'tgl_selesai' => 'required'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -81,104 +135,36 @@ class PelatihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('file_gambar')){
-                $file = $request->file('file_gambar');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                // $picName = uniqid() . '_' . $picName;
+            $foto = NULL;
+            if($request->hasFile('file')) {
+                $file = $request->file('file');
+                $nama_foto = "_".$file->getClientOriginalName();
                 $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sdm/'.$foto)){
-                    Storage::disk('s3')->delete('sdm/'.$foto);
+                if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
+                    Storage::disk('s3')->delete('sdm/'.$nama_foto);
                 }
-                Storage::disk('s3')->put('sdm/'.$foto,file_get_contents($file));
-            }else{
-
-                $foto="-";
-            }
-            
-            $sqlnu= "select max(nu) as nu from hr_pelatihan where nik='$nik' and kode_lokasi='$kode_lokasi'  ";
-            $rsnu=DB::connection($this->db)->select($sqlnu);
-
-            if(count($rsnu) > 0){
-                $nu = $rsnu[0]->nu + 1;
-            }else{
-                $nu = 0;
+                Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
 
-            $sql = "insert into hr_pelatihan(nik,kode_lokasi,nu,nama,panitia,setifikat,tgl_mulai,tgl_selesai)values ('".$nik."','".$kode_lokasi."',".$nu.",'".$request->nama."','".$request->penyelenggara."','".$foto."','".$request->tgl_mulai."','".$request->tgl_selesai."')";
+            $nu = $this->getNU($nik, $kode_lokasi);
+            $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nu, nama, panitia, sertifikat, tgl_mulai,
+            tgl_selesai) 
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('nama')."',
+            '".$request->input('panitia')."', '".$foto."', '".$request->input('tgl_mulai')."',
+            '".$request->input('tgl_selesai')."')";
 
-            $ins = DB::connection($this->db)->insert($sql);
-            
-            DB::connection($this->db)->commit();
+            DB::connection($this->db)->insert($insert);
+
+            $success['kode'] = $nik;
             $success['status'] = true;
-            $success['kode'] = $request->nik;
-            $success['message'] = "Data Pelatihan berhasil disimpan";
+            $success['message'] = "Data pelatihan karyawan berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Pelatihan gagal disimpan ".$e;
+            $success['message'] = "Data pelatihan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
-        
-        
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Request $request)
-    {
-        $this->validate($request,[
-            'nu' => 'required'
-        ]);
-        try {
-            
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-            
-            $url = url('api/sdm/storage');
-            
-            $sql= "select nik,nama,nu,penyelenggara,convert(varchar,tgl_mulai,23) as tglm,convert(varchar,tgl_selesai,23) as tgls,case when foto != '-' then '".$url."/'+foto else '-' end as foto from hr_pelatihan 
-            where kode_lokasi='$kode_lokasi' and nik='$nik' and nu='$request->nu' ";
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json($success, $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Tidak ditemukan!";
-                $success['data'] = [];
-                $success['sql'] = $sql;
-                $success['status'] = false;
-                return response()->json($success, $this->successStatus); 
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Fs $Fs)
-    {
-        //
     }
 
     /**
@@ -191,66 +177,56 @@ class PelatihanController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'nu' => 'required',
-            'penyelenggara' => 'required',
             'nama' => 'required',
+            'panitia' => 'required',
             'tgl_mulai' => 'required',
             'tgl_selesai' => 'required',
-            'file_gambar' => 'file|image|mimes:jpeg,png,jpg|max:2048'
+            'nu' => 'required'
         ]);
-
-
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->hasfile('file_gambar')){
+            $select= "SELECT sertifikat FROM hr_pelatihan WHERE nik='".$nik."'
+            AND kode_lokasi='".$kode_lokasi."'
+            AND nu = '".$request->input('nu')."'";
 
-                $sql = "select foto as file_gambar from hr_pelatihan where kode_lokasi='".$kode_lokasi."' and nik='$request->nik' and nu='$request->nu'
-                ";
-                $res = DB::connection($this->db)->select($sql);
-                $res = json_decode(json_encode($res),true);
-
-                if(count($res) > 0){
-                    $foto = $res[0]['file_gambar'];
-                    if($foto != ""){
-                        Storage::disk('s3')->delete('sdm/'.$foto);
-                    }
-                }else{
-                    $foto = "-";
-                }
-                
-                $file = $request->file('file_gambar');
-                
-                $nama_foto = uniqid()."_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sdm/'.$foto)){
-                    Storage::disk('s3')->delete('sdm/'.$foto);
-                }
-                Storage::disk('s3')->put('sdm/'.$foto,file_get_contents($file));
-                
-            }else{
-
-                $foto="-";
-            }
+            $result = DB::connection($this->db)->select($select);
+            $foto = NULL;
             
-            $del = DB::connection($this->db)->table('hr_pelatihan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->where('nu', $request->nu)->delete();
+            if($request->hasFile('file')) {
+                if(count($result) > 0){
+                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->sertifikat)){
+                        Storage::disk('s3')->delete('sdm/'.$result[0]->sertifikat);
+                    }
+                }
 
-            $ins = DB::connection($this->db)->insert("insert into hr_pelatihan(nik,kode_lokasi,nu,nama,panitia,setifikat,tgl_mulai,tgl_selesai)values ('".$nik."','".$kode_lokasi."',".$nu.",'".$request->nama."','".$request->penyelenggara."','".$foto."','".$request->tgl_mulai."','".$request->tgl_selesai."')");
+                $file = $request->file('file');
+                $nama_foto = "_".$file->getClientOriginalName();
+                $foto = $nama_foto;
+                Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
+            } else {
+                $foto = $result[0]->foto;
+            }
 
-            DB::connection($this->db)->commit();
+            $update = "UPDATE hr_pelatihan SET nama = '".$request->input('nama')."', panitia = '".$request->input('panitia')."',
+            sertifikat = '".$foto."', tgl_mulai = '".$request->input('tgl_mulai')."',
+            tgl_selesai = '".$request->input('tgl_selesai')."' WHERE nik = '".$nik."'
+            AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->input('nu')."'";
+            
+            DB::connection($this->db)->update($update);
+
             $success['status'] = true;
-            $success['kode'] = $request->nik;
-            $success['message'] = "Data Pelatihan berhasil diubah";
+            $success['message'] = "Data pelatihan karyawan berhasil diubah";
+            $success['kode'] = $nik;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Pelatihan gagal diubah ".$e;
+            $success['message'] = "Data pelatihan karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -263,28 +239,39 @@ class PelatihanController extends Controller
      */
     public function destroy(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'nu' => 'required'
         ]);
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
-                $nik_user= $data->nik;
+                $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $del = DB::connection($this->db)->table('hr_pelatihan')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->where('nu', $request->nu)->delete();
 
-            DB::connection($this->db)->commit();
+            $select = "SELECT sertifikat FROM hr_pelatihan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
+            AND nu = '".$request->nu."'";
+            $foto = DB::connection($this->db)->select($select);
+
+            if(count($foto) > 0){ 
+                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->sertifikat)){
+                    Storage::disk('s3')->delete('sdm/'.$foto[0]->sertifikat);
+                }
+            }
+            
+            DB::connection($this->db)->table('hr_pelatihan')
+            ->where('nik', $nik)
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('nu', $request->nu)
+            ->delete();
+
             $success['status'] = true;
-            $success['message'] = "Data Pelatihan berhasil dihapus";
+            $success['message'] = "Data pelatihan karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Pelatihan gagal dihapus ".$e;
+            $success['message'] = "Data pelatihan karyawan gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

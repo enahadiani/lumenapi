@@ -360,6 +360,41 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-keluarga-update','Sdm\KeluargaController@update');
     $router->delete('sdm-keluarga','Sdm\KeluargaController@destroy');
 
+    // Kedinasan
+    $router->get('sdm-dinass','Sdm\DinasController@index');
+    $router->get('sdm-dinas','Sdm\DinasController@show');
+    $router->post('sdm-dinas','Sdm\DinasController@save');
+    $router->post('sdm-dinas-update','Sdm\DinasController@update');
+    $router->delete('sdm-dinas','Sdm\DinasController@destroy');
+
+    // Pendidikan
+    $router->get('sdm-pendidikans','Sdm\PendidikanController@index');
+    $router->get('sdm-dinas','Sdm\PendidikanController@show');
+    $router->post('sdm-dinas','Sdm\PendidikanController@save');
+    $router->post('sdm-dinas-update','Sdm\PendidikanController@update');
+    $router->delete('sdm-dinas','Sdm\PendidikanController@destroy');
+
+    // Pelatihan
+    $router->get('sdm-pelatihans','Sdm\PelatihanController@index');
+    $router->get('sdm-pelatihan','Sdm\PelatihanController@show');
+    $router->post('sdm-pelatihan','Sdm\PelatihanController@save');
+    $router->post('sdm-pelatihan-update','Sdm\PelatihanController@update');
+    $router->delete('sdm-pelatihan','Sdm\PelatihanController@destroy');
+
+    // Penghargaan
+    $router->get('sdm-penghargaans','Sdm\PenghargaanController@index');
+    $router->get('sdm-penghargaan','Sdm\PenghargaanController@show');
+    $router->post('sdm-penghargaan','Sdm\PenghargaanController@save');
+    $router->post('sdm-penghargaan-update','Sdm\PenghargaanController@update');
+    $router->delete('sdm-penghargaan','Sdm\PenghargaanController@destroy');
+
+    // Sanksi
+    $router->get('sdm-sanksis','Sdm\SanksiController@index');
+    $router->get('sdm-sanksi','Sdm\SanksiController@show');
+    $router->post('sdm-sanksi','Sdm\SanksiController@save');
+    $router->post('sdm-sanksi-update','Sdm\SanksiController@update');
+    $router->delete('sdm-sanksi','Sdm\SanksiController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
