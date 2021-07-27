@@ -181,8 +181,6 @@ class KeluargaController extends Controller
             $success['message'] = "Data keluarga karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
-        
-        
     }
 
     /**
@@ -300,7 +298,7 @@ class KeluargaController extends Controller
                 }
             }
             
-            $del = DB::connection($this->db)->table('hr_keluarga')
+            DB::connection($this->db)->table('hr_keluarga')
             ->where('nik', $request->nik)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

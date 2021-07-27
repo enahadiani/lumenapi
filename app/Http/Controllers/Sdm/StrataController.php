@@ -204,7 +204,7 @@ class StrataController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_strata')
+            DB::connection($this->db)->table('hr_strata')
             ->where('kode_strata', $request->kode_strata)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();

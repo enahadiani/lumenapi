@@ -204,7 +204,7 @@ class StatusController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('hr_sdm')
+            DB::connection($this->db)->table('hr_sdm')
             ->where('kode_sdm', $request->kode_sdm)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
