@@ -381,6 +381,20 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-pelatihan-update','Sdm\PelatihanController@update');
     $router->delete('sdm-pelatihan','Sdm\PelatihanController@destroy');
 
+    // Penghargaan
+    $router->get('sdm-penghargaans','Sdm\PenghargaanController@index');
+    $router->get('sdm-penghargaan','Sdm\PenghargaanController@show');
+    $router->post('sdm-penghargaan','Sdm\PenghargaanController@save');
+    $router->post('sdm-penghargaan-update','Sdm\PenghargaanController@update');
+    $router->delete('sdm-penghargaan','Sdm\PenghargaanController@destroy');
+
+    // Sanksi
+    $router->get('sdm-sanksis','Sdm\SanksiController@index');
+    $router->get('sdm-sanksi','Sdm\SanksiController@show');
+    $router->post('sdm-sanksi','Sdm\SanksiController@save');
+    $router->post('sdm-sanksi-update','Sdm\SanksiController@update');
+    $router->delete('sdm-sanksi','Sdm\SanksiController@destroy');
+
 });
 
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
