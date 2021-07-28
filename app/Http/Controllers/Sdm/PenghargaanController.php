@@ -41,9 +41,9 @@ class PenghargaanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT DISTINCT nu, nama, convert(varchar,tanggal,103) as tanggal
-            FROM hr_pelatihan
-            WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT nu, nama, convert(varchar,tanggal,103) as tanggal
+            FROM hr_penghargaan
+            WHERE kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -83,8 +83,8 @@ class PenghargaanController extends Controller
             }
 
             $sql = "SELECT nama, nu, sertifikat, convert(varchar,tanggal,103) as tanggal   
-            FROM hr_pelatihan
-            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'";
+            FROM hr_penghargaan
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
