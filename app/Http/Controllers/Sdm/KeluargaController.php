@@ -270,7 +270,7 @@ class KeluargaController extends Controller
             DB::connection($this->db)->table('hr_keluarga')
             ->where('nik', $nik)
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('nu', $nu)
+            ->where('nu', $request->nu)
             ->delete();
 
             $success['status'] = true;
