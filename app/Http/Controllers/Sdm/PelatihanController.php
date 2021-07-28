@@ -82,7 +82,7 @@ class PelatihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nik, nama, nu, panitia, sertifikat, convert(varchar,tgl_mulai,103) as tgl_mulai,
+            $sql = "SELECT nik, nama, nu, panitia, setifikat, convert(varchar,tgl_mulai,103) as tgl_mulai,
             convert(varchar,tgl_selesai,103) as tgl_selesai   
             FROM hr_pelatihan
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
@@ -145,11 +145,12 @@ class PelatihanController extends Controller
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
 
-            $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, sertifikat, tgl_mulai,
-            tgl_selesai) 
+            $nu = $this->getNU($nik,$kode_lokasi);
+            $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
+            tgl_selesai, nu) 
             VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
             '".$request->input('panitia')."', '".$foto."', '".$request->input('tgl_mulai')."',
-            '".$request->input('tgl_selesai')."')";
+            '".$request->input('tgl_selesai')."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);
 
@@ -211,7 +212,7 @@ class PelatihanController extends Controller
             }
 
             $update = "UPDATE hr_pelatihan SET nama = '".$request->input('nama')."', panitia = '".$request->input('panitia')."',
-            sertifikat = '".$foto."', tgl_mulai = '".$request->input('tgl_mulai')."',
+            setifikat = '".$foto."', tgl_mulai = '".$request->input('tgl_mulai')."',
             tgl_selesai = '".$request->input('tgl_selesai')."' WHERE nik = '".$nik."'
             AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->input('nu')."'";
             
@@ -247,13 +248,13 @@ class PelatihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select = "SELECT sertifikat FROM hr_pelatihan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
+            $select = "SELECT setifikat FROM hr_pelatihan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
             AND nu = '".$request->nu."'";
             $foto = DB::connection($this->db)->select($select);
 
             if(count($foto) > 0){ 
-                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->sertifikat)){
-                    Storage::disk('s3')->delete('sdm/'.$foto[0]->sertifikat);
+                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->setifikat)){
+                    Storage::disk('s3')->delete('sdm/'.$foto[0]->setifikat);
                 }
             }
             

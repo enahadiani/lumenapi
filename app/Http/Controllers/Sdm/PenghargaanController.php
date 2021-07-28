@@ -144,9 +144,9 @@ class PenghargaanController extends Controller
             }
 
             $nu = $this->getNU($nik, $kode_lokasi);
-            $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat) 
+            $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
             VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
-            '".$request->input('tanggal')."', '".$foto."')";
+            '".$request->input('tanggal')."', '".$foto."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);
 

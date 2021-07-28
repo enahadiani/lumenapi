@@ -85,7 +85,7 @@ class PendidikanController extends Controller
             }
 
             $sql = "SELECT a.nama, a.nu, a.tahun, a.kode_jurusan,a.kode_strata, b.nama as nama_jur,c.nama as nama_str,
-            a.sertifikat
+            a.setifikat
             FROM hr_pendidikan a 
             INNER JOIN hr_jur b ON a.kode_jurusan =b.kode_jur AND a.kode_lokasi=b.kode_lokasi 
             INNER JOIN hr_strata c ON a.kode_strata =c.kode_strata AND a.kode_lokasi=c.kode_lokasi
@@ -148,12 +148,13 @@ class PendidikanController extends Controller
                 }
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
-
-            $insert = "INSERT INTO hr_pendidikan(nik, kode_lokasi, nama, tahun, sertifikat, kode_jurusan,
-            kode_strata) 
+            
+            $nu = $this->getNU($nik,$kode_lokasi);
+            $insert = "INSERT INTO hr_pendidikan(nik, kode_lokasi, nama, tahun, setifikat, kode_jurusan,
+            kode_strata, nu) 
             VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
             '".$request->input('tahun')."','".$foto."', '".$request->input('kode_jurusan')."',
-            '".$request->input('kode_strata')."')";
+            '".$request->input('kode_strata')."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);   
             $success['kode'] = $nik;
@@ -191,7 +192,7 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select= "SELECT sertifikat FROM hr_pendidikan WHERE nik='".$nik."'
+            $select= "SELECT setifikat FROM hr_pendidikan WHERE nik='".$nik."'
             AND kode_lokasi='".$kode_lokasi."'
             AND nu = '".$request->input('nu')."'";
 
@@ -214,7 +215,7 @@ class PendidikanController extends Controller
             }
 
             $update = "UPDATE hr_pendidikan SET nama = '".$request->input('nama')."', tahun = '".$request->input('nama')."',
-            sertifikat = '".$foto."', kode_jurusan = '".$request->input('kode_jurusan')."',
+            setifikat = '".$foto."', kode_jurusan = '".$request->input('kode_jurusan')."',
             kode_strata = '".$request->input('kode_strata')."'
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->input('nu')."'";
             
@@ -249,13 +250,13 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select = "SELECT sertifikat FROM hr_pendidikan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
+            $select = "SELECT setifikat FROM hr_pendidikan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
             AND nu = '".$request->nu."'";
             $foto = DB::connection($this->db)->select($select);
 
             if(count($foto) > 0){ 
-                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->sertifikat)){
-                    Storage::disk('s3')->delete('sdm/'.$foto[0]->sertifikat);
+                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->setifikat)){
+                    Storage::disk('s3')->delete('sdm/'.$foto[0]->setifikat);
                 }
             }
             

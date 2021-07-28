@@ -130,9 +130,10 @@ class SanksiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis) 
+            $nu = $this->getNU($nik, $kode_lokasi);
+            $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis, nu) 
             VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."', 
-            '".$request->input('tanggal')."', '".$request->input('jenis')."')";
+            '".$request->input('tanggal')."', '".$request->input('jenis')."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);
 
