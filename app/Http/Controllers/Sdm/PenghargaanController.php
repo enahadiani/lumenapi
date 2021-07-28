@@ -85,7 +85,7 @@ class PenghargaanController extends Controller
 
             $sql = "SELECT nama, nu, sertifikat, convert(varchar,tanggal,103) as tanggal   
             FROM hr_pelatihan
-            WHERE nik = '".$request->nik."' AND kode_lokasi = '".$kode_lokasi."'";
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
