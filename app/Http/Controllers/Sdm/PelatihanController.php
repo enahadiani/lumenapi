@@ -82,11 +82,10 @@ class PelatihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.nu, a.panitia, a.sertifikat, convert(varchar,a.tgl_mulai,103) as tgl_mulai,
-            convert(varchar,a.tgl_selesai,103) as tgl_selesai, b.nama as nama_karyawan   
-            FROM hr_pelatihan a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
+            $sql = "SELECT nik, nama, nu, panitia, sertifikat, convert(varchar,tgl_mulai,103) as tgl_mulai,
+            convert(varchar,tgl_selesai,103) as tgl_selesai   
+            FROM hr_pelatihan
+            WHERE nik = '".$request->nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 

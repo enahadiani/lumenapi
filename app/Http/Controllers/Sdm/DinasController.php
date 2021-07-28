@@ -81,10 +81,9 @@ class DinasController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.nu, a.no_sk, a.tgl_sk, b.nama as nama_karyawan   
-            FROM hr_sk a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.nik = '".$nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
+            $sql = "SELECT nama, nu, no_sk, convert(varchar,tgl_sk,103) as tgl_sk   
+            FROM hr_sk
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 

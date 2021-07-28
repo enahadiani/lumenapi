@@ -93,11 +93,9 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.nu, a.jenis, a.jk, a.tempat, a.tgl_lahir, a.status_kes, a.foto,
-            b.nama as nama_karyawan   
-            FROM hr_keluarga a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
+            $sql = "SELECT nama, nu, jenis, jk, tempat, tgl_lahir, status_kes, foto   
+            FROM hr_keluarga
+            WHERE nik = '".$request->nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
