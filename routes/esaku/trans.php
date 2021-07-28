@@ -369,10 +369,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     // Pendidikan
     $router->get('sdm-pendidikans','Sdm\PendidikanController@index');
-    $router->get('sdm-dinas','Sdm\PendidikanController@show');
-    $router->post('sdm-dinas','Sdm\PendidikanController@save');
-    $router->post('sdm-dinas-update','Sdm\PendidikanController@update');
-    $router->delete('sdm-dinas','Sdm\PendidikanController@destroy');
+    $router->get('sdm-pendidikan','Sdm\PendidikanController@show');
+    $router->post('sdm-pendidikan','Sdm\PendidikanController@save');
+    $router->post('sdm-pendidikan-update','Sdm\PendidikanController@update');
+    $router->delete('sdm-pendidikan','Sdm\PendidikanController@destroy');
 
     // Pelatihan
     $router->get('sdm-pelatihans','Sdm\PelatihanController@index');
