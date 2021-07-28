@@ -54,7 +54,7 @@ class KeluargaController extends Controller
                 ELSE 'Tidak diketahui'
             END AS jenis_kelamin
             from hr_keluarga
-            WHERE nik = '".$nik."' AND '".$kode_lokasi."'";
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
