@@ -96,25 +96,24 @@ class KeluargaController extends Controller
             $sql = "SELECT nama, nu, jenis, jk, tempat, tgl_lahir, status_kes, foto   
             FROM hr_keluarga
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
-			var_dump($sql);
-            // $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            // if(count($res) > 0){ 
-            //     $success['data'] = $res;
-            //     $success['status'] = true;
-            //     $success['message'] = "Success!";
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
 
-            //     return response()->json($success, $this->successStatus);     
-            // }
-            // else{
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
                 
-            //     $success['data'] = [];
-            //     $success['status'] = false;
-            //     $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
                 
-            //     return response()->json($success, $this->successStatus);
-            // }
+                return response()->json($success, $this->successStatus);
+            }
 
         } catch (\Throwable $e) {
             $success['status'] = false;
