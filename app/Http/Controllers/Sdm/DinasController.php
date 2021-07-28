@@ -129,10 +129,11 @@ class DinasController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $nu = $this->getNU($nik,$kode_lokasi);
 
-            $insert = "INSERT INTO hr_sk(nik, kode_lokasi, no_sk, nama, tgl_sk) 
+            $insert = "INSERT INTO hr_sk(nik, kode_lokasi, no_sk, nama, tgl_sk, nu) 
             VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('no_sk')."', 
-            '".$request->input('nama')."', '".$request->input('tgl_sk')."')";
+            '".$request->input('nama')."', '".$request->input('tgl_sk')."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);
 
