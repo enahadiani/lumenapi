@@ -157,14 +157,11 @@ class KeluargaController extends Controller
                 }
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
-
-            $nu = $this->getNU($nik, $kode_lokasi);
                 
-            $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, nu, jenis, nama, jk, tempat, tgl_lahir, 
+            $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, jenis, nama, jk, tempat, tgl_lahir, 
             status_kes, foto) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('jenis')."', '".$request->input('nama')."',
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('jenis')."', '".$request->input('nama')."',
             '".$request->input('jk')."', '".$request->input('tempat')."', '".$request->input('tgl_lahir')."', '".$request->input('status_kes')."', '".$foto."')";
-
             DB::connection($this->db)->insert($insert);
             $success['status'] = true;
             $success['message'] = "Data keluarga karyawan berhasil disimpan";
@@ -209,7 +206,7 @@ class KeluargaController extends Controller
             AND nu = '".$request->input('nu')."'";
 
             $result = DB::connection($this->db)->select($select);
-            $foto = NULL;
+            $foto = "-";
             
             if($request->hasFile('file')) {
                 if(count($result) > 0){

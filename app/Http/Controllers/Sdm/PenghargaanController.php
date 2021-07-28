@@ -134,7 +134,7 @@ class PenghargaanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = NULL;
+            $foto = "-";
             if($request->hasFile('file')) {
                 $file = $request->file('file');
                 $nama_foto = "_".$file->getClientOriginalName();
@@ -146,8 +146,8 @@ class PenghargaanController extends Controller
             }
 
             $nu = $this->getNU($nik, $kode_lokasi);
-            $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nu, nama, tanggal, sertifikat) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('nama')."',
+            $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat) 
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
             '".$request->input('tanggal')."', '".$foto."')";
 
             DB::connection($this->db)->insert($insert);

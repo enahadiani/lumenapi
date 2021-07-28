@@ -135,7 +135,7 @@ class PelatihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = NULL;
+            $foto = "-";
             if($request->hasFile('file')) {
                 $file = $request->file('file');
                 $nama_foto = "_".$file->getClientOriginalName();
@@ -146,10 +146,9 @@ class PelatihanController extends Controller
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
 
-            $nu = $this->getNU($nik, $kode_lokasi);
-            $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nu, nama, panitia, sertifikat, tgl_mulai,
+            $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, sertifikat, tgl_mulai,
             tgl_selesai) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('nama')."',
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
             '".$request->input('panitia')."', '".$foto."', '".$request->input('tgl_mulai')."',
             '".$request->input('tgl_selesai')."')";
 
