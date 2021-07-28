@@ -41,9 +41,8 @@ class PenghargaanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT DISTINCT a.nik, a.nu, a.nama, b.nama as nama_karyawan 
-            FROM hr_pelatihan a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi 
+            $sql = "SELECT DISTINCT nu, nama, convert(varchar,tanggal,103) as tanggal
+            FROM hr_pelatihan
             WHERE kode_lokasi = '".$kode_lokasi."' ";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
