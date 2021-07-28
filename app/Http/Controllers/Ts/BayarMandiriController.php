@@ -207,23 +207,44 @@ class BayarMandiriController extends Controller
             
             $ins = DB::connection($this->db)->update("update sis_mandiri_bill set status ='$request->bill_status' where no_bukti='$request->bill_short_name' and bill_cust_id='$request->bill_cust_id' and status='WAITING' ");
             $kode_lokasi = substr($request->bill_short_name,0,2);
-            
-            $per = date('ymd');
-            $no_bukti = $this->generateKode("sis_mandiri_bayar", "no_bukti", $kode_lokasi."-BYM".$per.".", "0001");
-            
-            $ins2 = DB::connection($this->db)->insert("
-            insert into sis_mandiri_bayar (no_bukti,nilai,kode_lokasi,kode_pp,bill_short_name,bill_cust_id,tgl_input) select '$no_bukti',nilai,kode_lokasi,kode_pp,no_bukti,bill_cust_id,getdate() 
-            from sis_mandiri_bill 
-            where no_bukti='$request->bill_short_name' and bill_cust_id='$request->bill_cust_id' and status='SUCCESS'
-            ");
 
-            $ins3 = DB::connection($this->db)->insert("
-            insert into sis_mandiri_bayar_d (no_bukti,no_bill,nis,kode_param,kode_pp,nu,periode_bill) 
-            select '$no_bukti',a.no_bill,a.nis,a.kode_param,a.kode_pp,a.nu,a.periode_bill
-            from sis_mandiri_bill_d a
-            inner join sis_mandiri_bill b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
-            where b.no_bukti='$request->bill_short_name' and b.bill_cust_id='$request->bill_cust_id' and b.status='SUCCESS'
-            ");
+            if($request->bill_status == "PAID"){
+
+                $ins2 = DB::connection($this->db)->insert("INSERT INTO sis_rekon_d (no_rekon, nis, no_bill, periode, nilai, kode_lokasi, akun_titip, akun_piutang, kode_param, dc, modul, id_bank, kode_pp, nilai_cd, periode_bill) 
+                select a.no_bukti,b.nis,b.no_bill,substring(convert(varchar,getdate(),112),1,6), a.nilai,a.kode_lokasi, '2141107', '1131108', b.kode_param, 'D', 'HOST',a.bill_cust_id,a.kode_pp, 0,b.periode_bill
+                from sis_mandiri_bill a
+                inner join sis_mandiri_bill_d b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and nu=1
+                where a.no_bukti='$request->bill_short_name' and a.bill_cust_id='$request->bill_cust_id'
+                ");
+            }
+
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Bill Mandiri berhasil diubah";
+
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Bill Mandiri gagal diubah ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'bill_cust_id' => 'required',
+            'bill_short_name' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            
+            $ins = DB::connection($this->db)->update("update sis_mandiri_bill set status ='FAILED' where no_bukti='$request->bill_short_name' and bill_cust_id='$request->bill_cust_id' and status='PROCESS' ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;

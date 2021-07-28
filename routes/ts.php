@@ -105,6 +105,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->post('create-mandiri-bill','Ts\BayarMandiriController@store');
     $router->get('list-mandiri-bill','Ts\BayarMandiriController@index');
     $router->put('cancel-mandiri-bill','Ts\BayarMandiriController@update');
+    $router->delete('delete-mandiri-bill','Ts\BayarMandiriController@destroy');
     $router->get('cek-mandiri-bill','Ts\BayarMandiriController@cekBill');
     
     
