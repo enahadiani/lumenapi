@@ -120,12 +120,10 @@ class LaporanController extends Controller {
             a.cabang, a.no_rek, a.nama_rek, a.grade, a.kota, a.kode_pos, a.no_hp, a.flag_aktif, a.foto, 
             g.nama AS nama_agama,h.nama AS nama_unit,i.nama AS nama_profesi, a.kode_pajak, b.nama AS nama_pp,
             c.nama AS nama_gol,d.nama AS nama_jab,e.nama AS nama_sdm,f.nama AS nama_loker,
-			a.tempat, convert(varchar,a.tgl_lahir,103) AS tgl_lahir, a.tahun_masuk, a.npwp, a.bank, a.cabang,
-            a.no_rek, a.nama_rek,
+			a.tempat, convert(varchar,a.tgl_lahir,103) AS tgl_lahir, a.tahun_masuk,
 			CASE WHEN a.jk='L' THEN 'Laki-Laki' ELSE 'Perempuan' END AS jk,
 			a.no_sk, convert(varchar,a.tgl_sk,103) AS tgl_sk, a.gelar_depan, a.gelar_belakang,
 			convert(varchar,a.tgl_nikah,103) AS tgl_nikah, a.gol_darah, a.no_kk, a.kelurahan, a.kecamatan, a.ibu_kandung,
-			a.tempat,
 			CASE WHEN a.status_nikah='0' THEN 'Tidak' ELSE 'Ya' END AS status_nikah
 		    FROM hr_karyawan a 
 			INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi  
