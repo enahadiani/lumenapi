@@ -198,7 +198,7 @@ class PenghargaanController extends Controller
                 $foto = $nama_foto;
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             } else {
-                $foto = $result[0]->foto;
+                $foto = $result[0]->sertifikat;
             }
 
             $update = "UPDATE hr_penghargaan SET nama = '".$request->input('nama')."', tanggal = '".$request->input('tanggal')."',

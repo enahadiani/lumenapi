@@ -198,8 +198,8 @@ class PendidikanController extends Controller
             
             if($request->hasFile('file')) {
                 if(count($result) > 0){
-                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->sertifikat)){
-                        Storage::disk('s3')->delete('sdm/'.$result[0]->sertifikat);
+                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->setifikat)){
+                        Storage::disk('s3')->delete('sdm/'.$result[0]->setifikat);
                     }
                 }
 
@@ -208,7 +208,7 @@ class PendidikanController extends Controller
                 $foto = $nama_foto;
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             } else {
-                $foto = $result[0]->foto;
+                $foto = $result[0]->setifikat;
             }
 
             $update = "UPDATE hr_pendidikan SET nama = '".$request->input('nama')."', tahun = '".$request->input('nama')."',

@@ -186,7 +186,7 @@ class PelatihanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select= "SELECT sertifikat FROM hr_pelatihan WHERE nik='".$nik."'
+            $select= "SELECT setifikat FROM hr_pelatihan WHERE nik='".$nik."'
             AND kode_lokasi='".$kode_lokasi."'
             AND nu = '".$request->input('nu')."'";
 
@@ -195,8 +195,8 @@ class PelatihanController extends Controller
             
             if($request->hasFile('file')) {
                 if(count($result) > 0){
-                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->sertifikat)){
-                        Storage::disk('s3')->delete('sdm/'.$result[0]->sertifikat);
+                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->setifikat)){
+                        Storage::disk('s3')->delete('sdm/'.$result[0]->setifikat);
                     }
                 }
 
@@ -205,7 +205,7 @@ class PelatihanController extends Controller
                 $foto = $nama_foto;
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             } else {
-                $foto = $result[0]->foto;
+                $foto = $result[0]->setifikat;
             }
 
             $update = "UPDATE hr_pelatihan SET nama = '".$request->input('nama')."', panitia = '".$request->input('panitia')."',
