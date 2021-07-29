@@ -42,7 +42,7 @@ class PelatihanController extends Controller
             }
 
             $sql = "SELECT nama, panitia, convert(varchar,tgl_mulai,103) as tgl_mulai,
-            convert(varchar,tgl_selesai,103) as tgl_selesai 
+            convert(varchar,tgl_selesai,103) as tgl_selesai, nu 
             FROM hr_pelatihan 
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' ";
 			$res = DB::connection($this->db)->select($sql);
