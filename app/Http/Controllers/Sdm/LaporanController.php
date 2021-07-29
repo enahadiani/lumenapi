@@ -118,7 +118,7 @@ class LaporanController extends Controller {
 
             $sql = "SELECT a.nik, a.kode_lokasi, a.nama, a.alamat, a.no_telp, a.email, a.kode_pp, a.npwp, a.bank,
             a.cabang, a.no_rek, a.nama_rek, a.grade, a.kota, a.kode_pos, a.no_hp, a.flag_aktif, a.foto, 
-            g.nama AS nama_agama,h.nama AS nama_unit,i.nama AS nama_profesi,kode_pajak, b.nama AS nama_pp,
+            g.nama AS nama_agama,h.nama AS nama_unit,i.nama AS nama_profesi, a.kode_pajak, b.nama AS nama_pp,
             c.nama AS nama_gol,d.nama AS nama_jab,e.nama AS nama_sdm,f.nama AS nama_loker,
 			a.tempat, convert(varchar,a.tgl_lahir,103) AS tgl_lahir, a.tahun_masuk, a.npwp, a.bank, a.cabang,
             a.no_rek, a.nama_rek,
