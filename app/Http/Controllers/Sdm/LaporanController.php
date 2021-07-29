@@ -118,7 +118,7 @@ class LaporanController extends Controller {
 
             $sql = "SELECT a.nik,a.kode_lokasi,a.nama,a.no_telp,a.no_hp,a.email,a.alamat,b.nama AS nama_pp,c.nama AS nama_gol,
             d.nama AS nama_jab,e.nama AS nama_sdm,f.nama AS nama_loker,a.kode_pajak,a.kode_gol, 
-            convert(varchar,a.tgl_masuk,103) AS tgl_masuk
+            convert(varchar,a.tgl_masuk,103) AS tgl_masuk, a.foto
             FROM hr_karyawan a 
             INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi  
             INNER JOIN hr_gol c ON a.kode_gol=c.kode_gol AND a.kode_lokasi=c.kode_lokasi 
