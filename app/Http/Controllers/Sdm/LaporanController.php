@@ -116,17 +116,28 @@ class LaporanController extends Controller {
                 }
             }
 
-            $sql = "SELECT a.nik,a.kode_lokasi,a.nama,a.no_telp,a.no_hp,a.email,a.alamat,b.nama AS nama_pp,c.nama AS nama_gol,
-            d.nama AS nama_jab,e.nama AS nama_sdm,f.nama AS nama_loker,a.kode_pajak,a.kode_gol, 
-            convert(varchar,a.tgl_masuk,103) AS tgl_masuk, a.foto
-            FROM hr_karyawan a 
-            INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi  
-            INNER JOIN hr_gol c ON a.kode_gol=c.kode_gol AND a.kode_lokasi=c.kode_lokasi 
-            INNER JOIN hr_jab d ON a.kode_jab=d.kode_jab AND a.kode_lokasi=d.kode_lokasi 
-            INNER JOIN hr_sdm e ON a.kode_sdm=e.kode_sdm AND a.kode_lokasi=e.kode_lokasi 
-            INNER JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi 
+            $sql = "SELECT a.nik, a.kode_lokasi, a.nama, a.alamat, a.no_telp, a.email, a.kode_pp, a.npwp, a.bank,
+            a.cabang, a.no_rek, a.nama_rek, a.grade, a.kota, a.kode_pos, a.no_hp, a.flag_aktif, a.foto, 
+            g.nama AS nama_agama,h.nama AS nama_unit,i.nama AS nama_profesi,kode_pajak, b.nama AS nama_pp,
+            c.nama AS nama_gol,d.nama AS nama_jab,e.nama AS nama_sdm,f.nama AS nama_loker,
+			a.tempat, convert(varchar,a.tgl_lahir,103) AS tgl_lahir, a.tahun_masuk, a.npwp, a.bank, a.cabang,
+            a.no_rek, a.nama_rek,
+			CASE WHEN a.jk='L' THEN 'Laki-Laki' ELSE 'Perempuan' END AS jk,
+			a.no_sk, convert(varchar,a.tgl_sk,103) AS tgl_sk, a.gelar_depan, a.gelar_belakang,
+			convert(varchar,a.tgl_nikah,103) AS tgl_nikah, a.gol_darah, a.no_kk, a.kelurahan, a.kecamatan, a.ibu_kandung,
+			a.tempat,
+			CASE WHEN a.status_nikah='0' THEN 'Tidak' ELSE 'Ya' END AS status_nikah
+		    from hr_karyawan a 
+			inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi  
+			inner join hr_gol c on a.kode_gol=c.kode_gol and a.kode_lokasi=c.kode_lokasi 
+			inner join hr_jab d on a.kode_jab=d.kode_jab and a.kode_lokasi=d.kode_lokasi 
+			inner join hr_sdm e on a.kode_sdm=e.kode_sdm and a.kode_lokasi=e.kode_lokasi 
+			inner join hr_loker f on a.kode_loker=f.kode_loker and a.kode_lokasi=f.kode_lokasi 
+			inner join hr_agama g on a.kode_agama=g.kode_agama and a.kode_lokasi=g.kode_lokasi
+			inner join hr_unit h on a.kode_unit=h.kode_unit and a.kode_lokasi=h.kode_lokasi
+			inner join hr_profesi i on a.kode_profesi=i.kode_profesi and a.kode_lokasi=i.kode_lokasi  
             $where
-            ORDER BY a.tgl_masuk";
+            ORDER BY a.nik";
 
             $cv = DB::connection($this->sql)->select($sql);
             $cv = json_decode(json_encode($cv),true);
