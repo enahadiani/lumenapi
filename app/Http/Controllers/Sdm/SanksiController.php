@@ -153,8 +153,7 @@ class SanksiController extends Controller
         $this->validate($request, [
             'nama' => 'required',
             'tanggal' => 'required',
-            'jenis' => 'required',
-            'nu' => 'required'
+            'jenis' => 'required'
         ]);
         
         try {
