@@ -149,8 +149,14 @@ class LaporanController extends Controller {
                 $data_sanksi = array();
 
                 for($i=0;$i<count($cv);$i++) {
-                    $keluarga = "SELECT nik, kode_lokasi, nu, jenis, nama, jk, tempat,
-                    convert(varchar,tgl_lahir,103) as tgl_lahir, status_kes
+                    $keluarga = "SELECT nik, kode_lokasi, nu, nama, tempat,
+                    convert(varchar,tgl_lahir,103) as tgl_lahir, 
+                    CASE WHEN status_kes = 'Y' THEN 'Ditanggung' ELSE 'Tidak Ditanggung' END AS status_kes,
+                    CASE WHEN jk = 'L' THEN 'Laki-laki' ELSE 'Perempuan' END AS jk,
+                    CASE 
+                        WHEN jenis ='S' THEN 'Suami' 
+                        WHEN jenis ='I' THEN 'Istri' 
+                        ELSE 'Anak' END AS jenis
                     from hr_keluarga 
                     where nik = '".$cv[$i]['nik']."' AND kode_lokasi='$kode_lokasi'";
 
