@@ -171,8 +171,6 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     // LAPORAN SDM
     // KARYAWAN
     $router->get('sdm-lap-karyawan','Sdm\LaporanController@getKaryawan');
-    
-    // CV
     $router->get('sdm-lap-karyawanCv','Sdm\LaporanController@getCVKaryawan');
 
     
