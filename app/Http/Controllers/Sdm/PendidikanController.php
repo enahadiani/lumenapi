@@ -211,7 +211,7 @@ class PendidikanController extends Controller
                 $foto = $result[0]->setifikat;
             }
 
-            $update = "UPDATE hr_pendidikan SET nama = '".$request->input('nama')."', tahun = '".$request->input('nama')."',
+            $update = "UPDATE hr_pendidikan SET nama = '".$request->input('nama')."', tahun = '".$request->input('tahun')."',
             setifikat = '".$foto."', kode_jurusan = '".$request->input('kode_jurusan')."',
             kode_strata = '".$request->input('kode_strata')."'
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->input('nu')."'";
