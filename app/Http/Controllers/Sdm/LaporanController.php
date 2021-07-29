@@ -127,15 +127,15 @@ class LaporanController extends Controller {
 			convert(varchar,a.tgl_nikah,103) AS tgl_nikah, a.gol_darah, a.no_kk, a.kelurahan, a.kecamatan, a.ibu_kandung,
 			a.tempat,
 			CASE WHEN a.status_nikah='0' THEN 'Tidak' ELSE 'Ya' END AS status_nikah
-		    from hr_karyawan a 
-			inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi  
-			inner join hr_gol c on a.kode_gol=c.kode_gol and a.kode_lokasi=c.kode_lokasi 
-			inner join hr_jab d on a.kode_jab=d.kode_jab and a.kode_lokasi=d.kode_lokasi 
-			inner join hr_sdm e on a.kode_sdm=e.kode_sdm and a.kode_lokasi=e.kode_lokasi 
-			inner join hr_loker f on a.kode_loker=f.kode_loker and a.kode_lokasi=f.kode_lokasi 
-			inner join hr_agama g on a.kode_agama=g.kode_agama and a.kode_lokasi=g.kode_lokasi
-			inner join hr_unit h on a.kode_unit=h.kode_unit and a.kode_lokasi=h.kode_lokasi
-			inner join hr_profesi i on a.kode_profesi=i.kode_profesi and a.kode_lokasi=i.kode_lokasi  
+		    FROM hr_karyawan a 
+			INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi  
+			INNER JOIN hr_gol c ON a.kode_gol=c.kode_gol AND a.kode_lokasi=c.kode_lokasi 
+			INNER JOIN hr_jab d ON a.kode_jab=d.kode_jab AND a.kode_lokasi=d.kode_lokasi 
+			INNER JOIN hr_sdm e ON a.kode_sdm=e.kode_sdm AND a.kode_lokasi=e.kode_lokasi 
+			INNER JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi 
+			INNER JOIN hr_agama g ON a.kode_agama=g.kode_agama AND a.kode_lokasi=g.kode_lokasi
+			INNER JOIN hr_unit h ON a.kode_unit=h.kode_unit AND a.kode_lokasi=h.kode_lokasi
+			INNER JOIN hr_profesi i ON a.kode_profesi=i.kode_profesi AND a.kode_lokasi=i.kode_lokasi  
             $where
             ORDER BY a.nik";
 
@@ -154,7 +154,7 @@ class LaporanController extends Controller {
                     $keluarga = "SELECT nik, kode_lokasi, nu, jenis, nama, jk, tempat,
                     convert(varchar,tgl_lahir,103) as tgl_lahir, status_kes
                     from hr_keluarga 
-                    where nik = '".$cv[$i]['nik']."' and kode_lokasi='$kode_lokasi'";
+                    where nik = '".$cv[$i]['nik']."' AND kode_lokasi='$kode_lokasi'";
 
                     $resKeluarga = DB::connection($this->sql)->select($keluarga);
                     $resKeluarga = json_decode(json_encode($resKeluarga),true);
