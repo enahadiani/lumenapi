@@ -122,8 +122,6 @@ class PenghargaanController extends Controller
             'nama' => 'required',
             'tanggal' => 'required'
         ]);
-
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -154,7 +152,6 @@ class PenghargaanController extends Controller
             $success['kode'] = $nik;
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data penghargaan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 

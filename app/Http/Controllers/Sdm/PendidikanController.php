@@ -129,8 +129,6 @@ class PendidikanController extends Controller
             'kode_jurusan' => 'required',
             'kode_strata' => 'required'
         ]);
-
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -162,7 +160,6 @@ class PendidikanController extends Controller
             $success['message'] = "Data pendidikan karyawan berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data pendidikan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 

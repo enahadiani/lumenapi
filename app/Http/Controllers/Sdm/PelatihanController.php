@@ -125,8 +125,6 @@ class PelatihanController extends Controller
             'tgl_mulai' => 'required',
             'tgl_selesai' => 'required'
         ]);
-
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -159,7 +157,6 @@ class PelatihanController extends Controller
             $success['message'] = "Data pelatihan karyawan berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data pelatihan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
