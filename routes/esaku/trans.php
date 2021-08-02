@@ -360,12 +360,24 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-keluarga-update','Sdm\KeluargaController@update');
     $router->delete('sdm-keluarga','Sdm\KeluargaController@destroy');
 
+    $router->get('sdm-adm-keluargas','Sdm\KeluargaAdmController@index');
+    $router->get('sdm-adm-keluarga','Sdm\KeluargaAdmController@show');
+    $router->post('sdm-adm-keluarga','Sdm\KeluargaAdmController@save');
+    $router->post('sdm-adm-keluarga-update','Sdm\KeluargaAdmController@update');
+    $router->delete('sdm-adm-keluarga','Sdm\KeluargaAdmController@destroy');
+
     // Kedinasan
     $router->get('sdm-dinass','Sdm\DinasController@index');
     $router->get('sdm-dinas','Sdm\DinasController@show');
     $router->post('sdm-dinas','Sdm\DinasController@save');
     $router->post('sdm-dinas-update','Sdm\DinasController@update');
     $router->delete('sdm-dinas','Sdm\DinasController@destroy');
+
+    $router->get('sdm-adm-dinass','Sdm\DinasAdmController@index');
+    $router->get('sdm-adm-dinas','Sdm\DinasAdmController@show');
+    $router->post('sdm-adm-dinas','Sdm\DinasAdmController@save');
+    $router->post('sdm-adm-dinas-update','Sdm\DinasAdmController@update');
+    $router->delete('sdm-adm-dinas','Sdm\DinasAdmController@destroy');
 
     // Pendidikan
     $router->get('sdm-pendidikans','Sdm\PendidikanController@index');
@@ -374,12 +386,24 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-pendidikan-update','Sdm\PendidikanController@update');
     $router->delete('sdm-pendidikan','Sdm\PendidikanController@destroy');
 
+    $router->get('sdm-adm-pendidikans','Sdm\PendidikanAdmController@index');
+    $router->get('sdm-adm-pendidikan','Sdm\PendidikanAdmController@show');
+    $router->post('sdm-adm-pendidikan','Sdm\PendidikanAdmController@save');
+    $router->post('sdm-adm-pendidikan-update','Sdm\PendidikanAdmController@update');
+    $router->delete('sdm-adm-pendidikan','Sdm\PendidikanAdmController@destroy');
+
     // Pelatihan
     $router->get('sdm-pelatihans','Sdm\PelatihanController@index');
     $router->get('sdm-pelatihan','Sdm\PelatihanController@show');
     $router->post('sdm-pelatihan','Sdm\PelatihanController@save');
     $router->post('sdm-pelatihan-update','Sdm\PelatihanController@update');
     $router->delete('sdm-pelatihan','Sdm\PelatihanController@destroy');
+
+    $router->get('sdm-adm-pelatihans','Sdm\PelatihanAdmController@index');
+    $router->get('sdm-adm-pelatihan','Sdm\PelatihanAdmController@show');
+    $router->post('sdm-adm-pelatihan','Sdm\PelatihanAdmController@save');
+    $router->post('sdm-adm-pelatihan-update','Sdm\PelatihanAdmController@update');
+    $router->delete('sdm-adm-pelatihan','Sdm\PelatihanAdmController@destroy');
 
     // Penghargaan
     $router->get('sdm-penghargaans','Sdm\PenghargaanController@index');
@@ -388,12 +412,24 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-penghargaan-update','Sdm\PenghargaanController@update');
     $router->delete('sdm-penghargaan','Sdm\PenghargaanController@destroy');
 
+    $router->get('sdm-adm-penghargaans','Sdm\PenghargaanAdmController@index');
+    $router->get('sdm-adm-penghargaan','Sdm\PenghargaanAdmController@show');
+    $router->post('sdm-adm-penghargaan','Sdm\PenghargaanAdmController@save');
+    $router->post('sdm-adm-penghargaan-update','Sdm\PenghargaanAdmController@update');
+    $router->delete('sdm-adm-penghargaan','Sdm\PenghargaanAdmController@destroy');
+
     // Sanksi
     $router->get('sdm-sanksis','Sdm\SanksiController@index');
     $router->get('sdm-sanksi','Sdm\SanksiController@show');
     $router->post('sdm-sanksi','Sdm\SanksiController@save');
     $router->post('sdm-sanksi-update','Sdm\SanksiController@update');
     $router->delete('sdm-sanksi','Sdm\SanksiController@destroy');
+
+    $router->get('sdm-adm-sanksis','Sdm\SanksiAdmController@index');
+    $router->get('sdm-adm-sanksi','Sdm\SanksiAdmController@show');
+    $router->post('sdm-adm-sanksi','Sdm\SanksiAdmController@save');
+    $router->post('sdm-adm-sanksi-update','Sdm\SanksiAdmController@update');
+    $router->delete('sdm-adm-sanksi','Sdm\SanksiAdmController@destroy');
 
 });
 

@@ -145,7 +145,7 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = NULL;
+            $foto = "-";
             if($request->hasFile('file')) {
                 $file = $request->file('file');
                 $nama_foto = "_".$file->getClientOriginalName();
