@@ -158,7 +158,7 @@ class PendidikanAdmController extends Controller
             if($this->isUnik($request->input('nik'), $kode_lokasi)) { 
                 if(count($request->file('file')) > 0) {
                     for($j=0;$j<count($request->file('file'));$j++) {
-                        $file = $request->file('file');
+                        $file = $request->file('file')[$j];
                         $nama_foto = "_".$file->getClientOriginalName();
                             
                         if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
@@ -231,7 +231,7 @@ class PendidikanAdmController extends Controller
 
             if(count($request->file('file')) > 0) {
                 for($j=0;$j<count($request->file('file'));$j++) {
-                    $file = $request->file('file');
+                    $file = $request->file('file')[$j];
                     $nama_foto = "_".$file->getClientOriginalName();
                         
                     if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
