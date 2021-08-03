@@ -100,7 +100,7 @@ class SanksiAdmController extends Controller
             $resKaryawan = DB::connection($this->db)->select($karyawan);
             $resKaryawan = json_decode(json_encode($resKaryawan),true);
 
-            $sql = "SELECT nik, nama, convert(varchar,tanggal,103) as tanggal, jenis   
+            $sql = "SELECT nik, nama, tanggal, jenis   
             FROM hr_sanksi
             WHERE nik = '".$request->query('nik')."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);

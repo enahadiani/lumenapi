@@ -100,7 +100,7 @@ class DinasAdmController extends Controller {
             $resKaryawan = DB::connection($this->db)->select($karyawan);
             $resKaryawan = json_decode(json_encode($resKaryawan),true);
 
-            $sql = "SELECT nama, no_sk, convert(varchar,tgl_sk,103) as tgl_sk   
+            $sql = "SELECT nama, no_sk, tgl_sk   
             FROM hr_sk
             WHERE nik = '".$request->query('nik')."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);

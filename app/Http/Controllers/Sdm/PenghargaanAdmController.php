@@ -99,7 +99,7 @@ class PenghargaanAdmController extends Controller
             $resKaryawan = DB::connection($this->db)->select($karyawan);
             $resKaryawan = json_decode(json_encode($resKaryawan),true);
 
-            $sql = "SELECT nama, sertifikat, convert(varchar,tanggal,103) as tanggal   
+            $sql = "SELECT nama, sertifikat, tanggal   
             FROM hr_penghargaan
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);

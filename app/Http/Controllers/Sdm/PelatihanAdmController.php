@@ -98,8 +98,7 @@ class PelatihanAdmController extends Controller
             $resKaryawan = DB::connection($this->db)->select($karyawan);
             $resKaryawan = json_decode(json_encode($resKaryawan),true);
 
-            $sql = "SELECT nik, nama, panitia, setifikat, convert(varchar,tgl_mulai,103) as tgl_mulai,
-            convert(varchar,tgl_selesai,103) as tgl_selesai   
+            $sql = "SELECT nik, nama, panitia, setifikat, tgl_mulai, tgl_selesai   
             FROM hr_pelatihan
             WHERE nik = '".$request->query('nik')."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
