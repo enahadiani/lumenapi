@@ -51,10 +51,11 @@ class PelatihanAdmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nik, nama, panitia, convert(varchar,tgl_mulai,103) as tgl_mulai,
-            convert(varchar,tgl_selesai,103) as tgl_selesai
-            FROM hr_pelatihan 
-            WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT a.nik, b.nama, count(a.nik) as jumlah
+            FROM hr_pelatihan a
+            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'
+            GROUP BY a.nik, b.nama";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 

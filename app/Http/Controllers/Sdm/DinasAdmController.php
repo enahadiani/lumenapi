@@ -52,8 +52,11 @@ class DinasAdmController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nik, no_sk, nama, convert(varchar,tgl_sk,103) as tgl_sk 
-            FROM hr_sk WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT a.nik, b.nama, count(a.nik) as jumlah 
+            FROM hr_sk a 
+            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'
+            GROUP BY a.nik, b.nama";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 

@@ -52,8 +52,11 @@ class SanksiAdmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nama, convert(varchar,tanggal,103) as tanggal, jenis 
-            FROM hr_sanksi WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT a.nik, b.nama, count(a.nik) as jumlah 
+            FROM hr_sanksi a 
+            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'
+            GROUP BY a.nik, b.nama";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
