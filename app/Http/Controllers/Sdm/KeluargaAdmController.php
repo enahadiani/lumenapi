@@ -55,8 +55,8 @@ class KeluargaAdmController extends Controller
             $sql = "SELECT a.nik, b.nama, count(a.nik) as jumlah
             from hr_keluarga a
             INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE kode_lokasi = '".$kode_lokasi."'
-            GROUP BY nik";
+            WHERE a.kode_lokasi = '".$kode_lokasi."'
+            GROUP BY a.nik, b.nama";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
