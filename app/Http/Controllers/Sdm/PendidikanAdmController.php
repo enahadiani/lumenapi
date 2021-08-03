@@ -51,11 +51,13 @@ class PendidikanAdmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, b.nama, count(a.nik) as jumlah 
-            FROM hr_pendidikan a 
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."'
-            GROUP BY a.nik, b.nama";
+            $sql = "SELECT a.nik, a.nama, isnull(b.jum,0) AS jum
+            FROM hr_karyawan a
+            LEFT JOIN (select a.nik,a.kode_lokasi,count(*) AS jum
+			FROM hr_pendidikan a
+		    GROUP BY a.nik,a.kode_lokasi
+			) b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
