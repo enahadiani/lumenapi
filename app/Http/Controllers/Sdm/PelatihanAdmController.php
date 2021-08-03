@@ -307,7 +307,7 @@ class PelatihanAdmController extends Controller
             $foto = DB::connection($this->db)->select($select);
 
             if(count($foto) > 0){ 
-                for($i;$i<count($foto);$i++) { 
+                for($i=0;$i<count($foto);$i++) { 
                     if(Storage::disk('s3')->exists('sdm/'.$foto[$i]->setifikat)){
                         Storage::disk('s3')->delete('sdm/'.$foto[$i]->setifikat);
                     }

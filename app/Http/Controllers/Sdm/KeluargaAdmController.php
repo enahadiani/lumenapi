@@ -52,8 +52,9 @@ class KeluargaAdmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nik, count(nik) as jumlah
-            from hr_keluarga
+            $sql = "SELECT a.nik, b.nama, count(a.nik) as jumlah
+            from hr_keluarga a
+            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
             WHERE kode_lokasi = '".$kode_lokasi."'
             GROUP BY nik";
 			$res = DB::connection($this->db)->select($sql);
@@ -314,7 +315,7 @@ class KeluargaAdmController extends Controller
             $foto = DB::connection($this->db)->select($select);
 
             if(count($foto) > 0){ 
-                for($i;$i<count($foto);$i++) { 
+                for($i=0;$i<count($foto);$i++) { 
                     if(Storage::disk('s3')->exists('sdm/'.$foto[$i]->foto)){
                         Storage::disk('s3')->delete('sdm/'.$foto[$i]->foto);
                     }
