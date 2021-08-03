@@ -110,7 +110,7 @@ class PendidikanAdmController extends Controller
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            if(count($res) > 0){ 
+            if(count($resKaryawan) > 0){ 
                 $success['data'] = $resKaryawan;
                 $success['detail'] = $res;
                 $success['status'] = true;
