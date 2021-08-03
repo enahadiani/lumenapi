@@ -156,15 +156,17 @@ class PendidikanAdmController extends Controller
             }
 
             if($this->isUnik($request->input('nik'), $kode_lokasi)) { 
-                if(count($request->file('file')) > 0) {
-                    for($j=0;$j<count($request->file('file'));$j++) {
-                        $file = $request->file('file')[$j];
-                        $nama_foto = "_".$file->getClientOriginalName();
-                            
-                        if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
-                            Storage::disk('s3')->delete('sdm/'.$nama_foto);
+                if(!empty($request->file('file'))) { 
+                    if(count($request->file('file')) > 0) {
+                        for($j=0;$j<count($request->file('file'));$j++) {
+                            $file = $request->file('file')[$j];
+                            $nama_foto = "_".$file->getClientOriginalName();
+                                    
+                            if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
+                                Storage::disk('s3')->delete('sdm/'.$nama_foto);
+                            }
+                            Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));     
                         }
-                        Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));     
                     }
                 }
 
@@ -229,15 +231,17 @@ class PendidikanAdmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(count($request->file('file')) > 0) {
-                for($j=0;$j<count($request->file('file'));$j++) {
-                    $file = $request->file('file')[$j];
-                    $nama_foto = "_".$file->getClientOriginalName();
-                        
-                    if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
-                        Storage::disk('s3')->delete('sdm/'.$nama_foto);
+            if(!empty($request->file('file'))) { 
+                if(count($request->file('file')) > 0) {
+                    for($j=0;$j<count($request->file('file'));$j++) {
+                        $file = $request->file('file')[$j];
+                        $nama_foto = "_".$file->getClientOriginalName();
+                                
+                        if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
+                            Storage::disk('s3')->delete('sdm/'.$nama_foto);
+                        }
+                        Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));     
                     }
-                    Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));     
                 }
             }
 
