@@ -249,7 +249,7 @@ class PenghargaanAdmController extends Controller
                 if($isUpload[$i] === 'false') { // kalo gak upload
                     $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
                     VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$tanggal[$i]."', '".$filePrevNameName[$i]."', '".$nu."')";
+                    '".$tanggal[$i]."', '".$filePrevName[$i]."', '".$nu."')";
                 } else {
                     $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
                     VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
