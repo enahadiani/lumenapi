@@ -41,10 +41,9 @@ class PenghargaanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT DISTINCT a.nik, a.nu, a.nama, b.nama as nama_karyawan 
-            FROM hr_pelatihan a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi 
-            WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT nu, nama, convert(varchar,tanggal,103) as tanggal
+            FROM hr_penghargaan
+            WHERE kode_lokasi = '".$kode_lokasi."' AND nik = '".$nik."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -83,11 +82,9 @@ class PenghargaanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.nu, a.sertifikat, convert(varchar,a.tanggal,103) as tanggal,
-            b.nama as nama_karyawan   
-            FROM hr_pelatihan a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."'";
+            $sql = "SELECT nama, nu, sertifikat, convert(varchar,tanggal,103) as tanggal   
+            FROM hr_penghargaan
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -125,8 +122,6 @@ class PenghargaanController extends Controller
             'nama' => 'required',
             'tanggal' => 'required'
         ]);
-
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -134,7 +129,7 @@ class PenghargaanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = NULL;
+            $foto = "-";
             if($request->hasFile('file')) {
                 $file = $request->file('file');
                 $nama_foto = "_".$file->getClientOriginalName();
@@ -146,9 +141,9 @@ class PenghargaanController extends Controller
             }
 
             $nu = $this->getNU($nik, $kode_lokasi);
-            $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nu, nama, tanggal, sertifikat) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('nama')."',
-            '".$request->input('tanggal')."', '".$foto."')";
+            $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
+            '".$request->input('tanggal')."', '".$foto."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);
 
@@ -157,7 +152,6 @@ class PenghargaanController extends Controller
             $success['kode'] = $nik;
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data penghargaan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -204,7 +198,7 @@ class PenghargaanController extends Controller
                 $foto = $nama_foto;
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             } else {
-                $foto = $result[0]->foto;
+                $foto = $result[0]->sertifikat;
             }
 
             $update = "UPDATE hr_penghargaan SET nama = '".$request->input('nama')."', tanggal = '".$request->input('tanggal')."',

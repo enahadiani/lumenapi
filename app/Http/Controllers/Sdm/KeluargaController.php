@@ -54,7 +54,7 @@ class KeluargaController extends Controller
                 ELSE 'Tidak diketahui'
             END AS jenis_kelamin
             from hr_keluarga
-            WHERE nik = '".$nik."' AND '".$kode_lokasi."'";
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -93,12 +93,10 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.nu, a.jenis, a.jk, a.tempat, a.tgl_lahir, a.status_kes, a.foto,
-            b.nama as nama_karyawan   
-            FROM hr_keluarga a
-            INNER JOIN hr_karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
-			$res = DB::connection($this->db)->select($sql);
+            $sql = "SELECT nama, nu, jenis, jk, tempat, tgl_lahir, status_kes, foto   
+            FROM hr_keluarga
+            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             if(count($res) > 0){ 
@@ -147,7 +145,7 @@ class KeluargaController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = NULL;
+            $foto = "-";
             if($request->hasFile('file')) {
                 $file = $request->file('file');
                 $nama_foto = "_".$file->getClientOriginalName();
@@ -157,14 +155,11 @@ class KeluargaController extends Controller
                 }
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
-
-            $nu = $this->getNU($nik, $kode_lokasi);
                 
-            $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, nu, jenis, nama, jk, tempat, tgl_lahir, 
+            $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, jenis, nama, jk, tempat, tgl_lahir, 
             status_kes, foto) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('jenis')."', '".$request->input('nama')."',
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('jenis')."', '".$request->input('nama')."',
             '".$request->input('jk')."', '".$request->input('tempat')."', '".$request->input('tgl_lahir')."', '".$request->input('status_kes')."', '".$foto."')";
-
             DB::connection($this->db)->insert($insert);
             $success['status'] = true;
             $success['message'] = "Data keluarga karyawan berhasil disimpan";
@@ -209,7 +204,7 @@ class KeluargaController extends Controller
             AND nu = '".$request->input('nu')."'";
 
             $result = DB::connection($this->db)->select($select);
-            $foto = NULL;
+            $foto = "-";
             
             if($request->hasFile('file')) {
                 if(count($result) > 0){
@@ -275,7 +270,7 @@ class KeluargaController extends Controller
             DB::connection($this->db)->table('hr_keluarga')
             ->where('nik', $nik)
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('nu', $nu)
+            ->where('nu', $request->nu)
             ->delete();
 
             $success['status'] = true;

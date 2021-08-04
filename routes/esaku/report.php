@@ -168,9 +168,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-piu-jurnalakru','Esaku\Piutang\LaporanController@getPiutangJurnal');
     $router->get('lap-piu-jurnalbayar','Esaku\Piutang\LaporanController@getPiutangKas');
 
-    
-
-
+    // LAPORAN SDM
+    // KARYAWAN
+    $router->get('sdm-lap-karyawan','Sdm\LaporanController@getKaryawan');
+    $router->get('sdm-lap-karyawanCv','Sdm\LaporanController@getCVKaryawan');
 
     
 

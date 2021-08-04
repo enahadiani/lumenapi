@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class SanksiController extends Controller
+class SanksiAdmController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -33,6 +33,17 @@ class SanksiController extends Controller
         return $nu;
     }
 
+    public function isUnik($isi, $kode_lokasi){
+        
+        $auth = DB::connection($this->db)->select("SELECT nik FROM hr_sanksi WHERE nik ='".$isi."' AND kode_lokasi = '".$kode_lokasi."'");
+        $auth = json_decode(json_encode($auth),true);
+        if(count($auth) > 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -41,8 +52,13 @@ class SanksiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nama, nu, convert(varchar,tanggal,103) as tanggal, jenis 
-            FROM hr_sanksi WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT a.nik, a.nama, isnull(b.jum,0) AS jum
+            FROM hr_karyawan a
+            LEFT JOIN (select a.nik,a.kode_lokasi,count(*) AS jum
+			FROM hr_sanksi a
+		    GROUP BY a.nik,a.kode_lokasi
+			) b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -72,7 +88,7 @@ class SanksiController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'nu' => 'required'
+            'nik' => 'required'
         ]);
 
         try {
@@ -81,14 +97,20 @@ class SanksiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nik, nama, nu, convert(varchar,tanggal,103) as tanggal, jenis   
+            $karyawan = "SELECT nik, nama FROM hr_karyawan WHERE nik = '".$request->query('nik')."' 
+            AND kode_lokasi = '".$kode_lokasi."'";
+            $resKaryawan = DB::connection($this->db)->select($karyawan);
+            $resKaryawan = json_decode(json_encode($resKaryawan),true);
+
+            $sql = "SELECT nik, nama, tanggal, jenis   
             FROM hr_sanksi
-            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->nu."'";
+            WHERE nik = '".$request->query('nik')."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            if(count($res) > 0){ 
-                $success['data'] = $res;
+            if(count($resKaryawan) > 0){ 
+                $success['data'] = $resKaryawan;
+                $success['detail'] = $res;
                 $success['status'] = true;
                 $success['message'] = "Success!";
 
@@ -119,27 +141,43 @@ class SanksiController extends Controller
     public function save(Request $request)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'tanggal' => 'required',
-            'jenis' => 'required'
+            'nik' => 'required',
+            'nama' => 'required|array',
+            'tanggal' => 'required|array',
+            'jenis' => 'required|array'
         ]);
         
+        DB::connection($this->db)->beginTransaction();
+
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            if($this->isUnik($request->input('nik'), $kode_lokasi)) { 
+                for($i=0;$i<count($request->input('nomor'));$i++) { 
+                    $nu = $this->getNU($request->input('nik'),$kode_lokasi);
+                    $nama = $request->input('nama');
+                    $tanggal = $request->input('tanggal');
+                    $jenis = $request->input('jenis');
 
-            $nu = $this->getNU($nik, $kode_lokasi);
-            $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis, nu) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."', 
-            '".$request->input('tanggal')."', '".$request->input('jenis')."', '".$nu."')";
+                    $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis, nu) 
+                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."', 
+                    '".$tanggal[$i]."', '".$jenis[$i]."', '".$nu."')";
 
-            DB::connection($this->db)->insert($insert);
+                    DB::connection($this->db)->insert($insert);
+                }
 
-            $success['kode'] = $nik;
-            $success['status'] = true;
-            $success['message'] = "Data sanksi karyawan berhasil disimpan";
+                DB::connection($this->db)->commit();
+                $success['kode'] = $request->input('nik');
+                $success['status'] = true;
+                $success['message'] = "Data sanksi karyawan berhasil disimpan";
+            } else {
+                $success['kode'] = $request->input('nik');
+                $success['status'] = false;
+                $success['message'] = "Error : Duplicate entry. NIK SK karyawan sudah ada di database!";
+            }
+
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -151,10 +189,13 @@ class SanksiController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'tanggal' => 'required',
-            'jenis' => 'required'
+            'nik' => 'required',
+            'nama' => 'required|array',
+            'tanggal' => 'required|array',
+            'jenis' => 'required|array'
         ]);
+
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -162,15 +203,28 @@ class SanksiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_sanksi SET nama = '".$request->input('nama')."', tanggal = '".$request->input('tanggal')."',
-            jenis = '".$request->input('jenis')."'
-            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->input('nu')."'";
-            
-            DB::connection($this->db)->update($update);
+            DB::connection($this->db)->table('hr_sk')
+            ->where('nik', $request->nik)
+            ->where('kode_lokasi', $kode_lokasi)
+            ->delete();
 
+            for($i=0;$i<count($request->input('nomor'));$i++) { 
+                $nu = $this->getNU($request->input('nik'),$kode_lokasi);
+                $nama = $request->input('nama');
+                $tanggal = $request->input('tanggal');
+                $jenis = $request->input('jenis');
+
+                $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis, nu) 
+                VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."', 
+                '".$tanggal[$i]."', '".$jenis[$i]."', '".$nu."')";
+
+                DB::connection($this->db)->insert($insert);
+            }
+
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data sanksi karyawan berhasil diubah";
-            $success['kode'] = $nik;
+            $success['kode'] = $request->input('nik');
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -188,7 +242,7 @@ class SanksiController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'nu' => 'required'
+            'nik' => 'required'
         ]);
         
         try {
@@ -198,9 +252,8 @@ class SanksiController extends Controller
             }
             
             DB::connection($this->db)->table('hr_sanksi')
-            ->where('nik', $nik)
+            ->where('nik', $request->nik)
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('nu', $request->nu)
             ->delete();
 
             $success['status'] = true;

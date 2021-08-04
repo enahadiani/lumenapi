@@ -41,7 +41,7 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nu, a.nama, b.nama as nama_jurusan, c.nama as nama_strata 
+            $sql = "SELECT a.nu, a.nama, b.nama as nama_jurusan, c.nama as nama_strata 
             FROM hr_pendidikan a 
             INNER JOIN hr_jur b ON a.kode_jurusan =b.kode_jur AND a.kode_lokasi=b.kode_lokasi 
             INNER JOIN hr_strata c ON a.kode_strata =c.kode_strata AND a.kode_lokasi=c.kode_lokasi
@@ -84,13 +84,12 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.nu, a.tahun, a.kode_jurusan,a.kode_strata, b.nama as nama_jur,c.nama as nama_str,
-            a.sertifikat, d.nama as nama_karyawan   
+            $sql = "SELECT a.nama, a.nu, a.tahun, a.kode_jurusan,a.kode_strata, b.nama as nama_jur,c.nama as nama_str,
+            a.setifikat
             FROM hr_pendidikan a 
             INNER JOIN hr_jur b ON a.kode_jurusan =b.kode_jur AND a.kode_lokasi=b.kode_lokasi 
             INNER JOIN hr_strata c ON a.kode_strata =c.kode_strata AND a.kode_lokasi=c.kode_lokasi
-            INNER JOIN hr_karyawan d ON a.nik=d.nik AND a.kode_lokasi=d.kode_lokasi
-            WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
+            WHERE a.nik = '".$nik."' AND a.kode_lokasi = '".$kode_lokasi."' AND a.nu = '".$request->nu."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
@@ -130,8 +129,6 @@ class PendidikanController extends Controller
             'kode_jurusan' => 'required',
             'kode_strata' => 'required'
         ]);
-
-        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -139,7 +136,7 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = NULL;
+            $foto = "-";
             if($request->hasFile('file')) {
                 $file = $request->file('file');
                 $nama_foto = "_".$file->getClientOriginalName();
@@ -149,13 +146,13 @@ class PendidikanController extends Controller
                 }
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
-
-            $nu = $this->getNU($nik, $kode_lokasi);
-            $insert = "INSERT INTO hr_pendidikan(nik, kode_lokasi, nu, nama, tahun, sertifikat, kode_jurusan,
-            kode_strata) 
-            VALUES ('".$nik."', '".$kode_lokasi."', '".$nu."', '".$request->input('nama')."',
+            
+            $nu = $this->getNU($nik,$kode_lokasi);
+            $insert = "INSERT INTO hr_pendidikan(nik, kode_lokasi, nama, tahun, setifikat, kode_jurusan,
+            kode_strata, nu) 
+            VALUES ('".$nik."', '".$kode_lokasi."', '".$request->input('nama')."',
             '".$request->input('tahun')."','".$foto."', '".$request->input('kode_jurusan')."',
-            '".$request->input('kode_strata')."')";
+            '".$request->input('kode_strata')."', '".$nu."')";
 
             DB::connection($this->db)->insert($insert);   
             $success['kode'] = $nik;
@@ -163,7 +160,6 @@ class PendidikanController extends Controller
             $success['message'] = "Data pendidikan karyawan berhasil disimpan";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data pendidikan karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -193,7 +189,7 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select= "SELECT sertifikat FROM hr_pendidikan WHERE nik='".$nik."'
+            $select= "SELECT setifikat FROM hr_pendidikan WHERE nik='".$nik."'
             AND kode_lokasi='".$kode_lokasi."'
             AND nu = '".$request->input('nu')."'";
 
@@ -202,8 +198,8 @@ class PendidikanController extends Controller
             
             if($request->hasFile('file')) {
                 if(count($result) > 0){
-                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->sertifikat)){
-                        Storage::disk('s3')->delete('sdm/'.$result[0]->sertifikat);
+                    if(Storage::disk('s3')->exists('sdm/'.$result[0]->setifikat)){
+                        Storage::disk('s3')->delete('sdm/'.$result[0]->setifikat);
                     }
                 }
 
@@ -212,11 +208,11 @@ class PendidikanController extends Controller
                 $foto = $nama_foto;
                 Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             } else {
-                $foto = $result[0]->foto;
+                $foto = $result[0]->setifikat;
             }
 
-            $update = "UPDATE hr_pendidikan SET nama = '".$request->input('nama')."', tahun = '".$request->input('nama')."',
-            sertifikat = '".$foto."', kode_jurusan = '".$request->input('kode_jurusan')."',
+            $update = "UPDATE hr_pendidikan SET nama = '".$request->input('nama')."', tahun = '".$request->input('tahun')."',
+            setifikat = '".$foto."', kode_jurusan = '".$request->input('kode_jurusan')."',
             kode_strata = '".$request->input('kode_strata')."'
             WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."' AND nu = '".$request->input('nu')."'";
             
@@ -251,13 +247,13 @@ class PendidikanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select = "SELECT sertifikat FROM hr_pendidikan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
+            $select = "SELECT setifikat FROM hr_pendidikan WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'
             AND nu = '".$request->nu."'";
             $foto = DB::connection($this->db)->select($select);
 
             if(count($foto) > 0){ 
-                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->sertifikat)){
-                    Storage::disk('s3')->delete('sdm/'.$foto[0]->sertifikat);
+                if(Storage::disk('s3')->exists('sdm/'.$foto[0]->setifikat)){
+                    Storage::disk('s3')->delete('sdm/'.$foto[0]->setifikat);
                 }
             }
             
