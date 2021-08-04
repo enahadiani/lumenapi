@@ -203,7 +203,7 @@ class SanksiAdmController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            DB::connection($this->db)->table('hr_sk')
+            DB::connection($this->db)->table('hr_sanksi')
             ->where('nik', $request->nik)
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
