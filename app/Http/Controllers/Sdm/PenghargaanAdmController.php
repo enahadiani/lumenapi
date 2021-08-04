@@ -103,7 +103,7 @@ class PenghargaanAdmController extends Controller
 
             $sql = "SELECT nama, sertifikat, tanggal   
             FROM hr_penghargaan
-            WHERE nik = '".$nik."' AND kode_lokasi = '".$kode_lokasi."'";
+            WHERE nik = '".$request->query('nik')."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
