@@ -148,10 +148,10 @@ class LaporanController extends Controller
 
                 $resdata[]=(array)$row;
                 if($i == 0){
-                    $nb .= "'$row->no_bukti'";
+                    $nb .= "'$row->no_bukti_close'";
                 }else{
 
-                    $nb .= ","."'$row->no_bukti'";
+                    $nb .= ","."'$row->no_bukti_close'";
                 }
                 $i++;
             }
