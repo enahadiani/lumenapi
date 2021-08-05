@@ -131,9 +131,10 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.no_close as no_bukti, convert(varchar,a.tgl_input,103) as tanggal_open, 
-            convert(varchar,b.tgl_input,103) as tanggal_close, convert(char(5), a.tgl_input, 108) as jam_close,
-            convert(char(5), b.tgl_input, 108) as jam_open, b.saldo_awal, a.total_pnj, a.nik_user 
+            $sql="select a.no_close as no_bukti_close, b.no_open as no_bukti_open, 
+            convert(varchar,a.tgl_input,103) as tanggal_open, convert(varchar,b.tgl_input,103) as tanggal_close,
+            convert(char(5), a.tgl_input, 108) as jam_close, convert(char(5), b.tgl_input, 108) as jam_open, 
+            b.saldo_awal, a.total_pnj, a.nik_user 
             from kasir_close a
             inner join kasir_open b on a.no_close=b.no_close and a.kode_lokasi=b.kode_lokasi 
             $where ";
