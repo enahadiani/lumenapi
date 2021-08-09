@@ -56,7 +56,7 @@ class DashboardController extends Controller
             FROM hr_karyawan
             GROUP BY kode_jab, kode_lokasi
             ) b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."'";
+            WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_jab != '-'";
 
             $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
             $resJK = json_decode(json_encode($selectJK),true);
