@@ -56,8 +56,10 @@ class ReferensiTransController extends Controller
            
             if ($request->jenis == "PENGELUARAN") {
                 $vKode = "K";
-            }else{
+            }else if ($request->jenis == "PEMASUKAN"){
                 $vKode = "T";
+            }else{
+                $vKode = "P";
             }
             $kode = $this->generateKode("trans_ref","kode_ref",$vKode,"001");
             $success['status'] = true;
@@ -111,6 +113,7 @@ class ReferensiTransController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
+                $success['data'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus);
             }

@@ -269,6 +269,13 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('surat-pengantar-ubah','Rtrw\SuratPengantarController@update');
     $router->delete('surat-pengantar','Rtrw\SuratPengantarController@destroy');
 
+    //PEMASUKAN PENGELUARAN PINBOOK
+    $router->get('kbdual','Rtrw\KasBankDualController@index');
+    $router->get('kbdual-detail','Rtrw\KasBankDualController@show');
+    $router->post('kbdual','Rtrw\KasBankDualController@store');
+    $router->put('kbdual','Rtrw\KasBankDualController@update');
+    $router->delete('kbdual','Rtrw\KasBankDualController@destroy');
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
