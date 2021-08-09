@@ -50,6 +50,14 @@ class DashboardController extends Controller
             ) b ON a.kode_loker=b.kode_loker AND a.kode_lokasi=b.kode_lokasi
             WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_loker != '-'";
 
+            $jabatan = "SELECT a.kode_jab, a.nama AS nama_jabatan, isnull(b.jumlah, 0) AS jumlah
+            FROM hr_jab a
+            LEFT JOIN (SELECT kode_jab, kode_lokasi, count(nik) AS jumlah
+            FROM hr_karyawan
+            GROUP BY kode_jab, kode_lokasi
+            ) b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
+
             $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
             $resJK = json_decode(json_encode($selectJK),true);
 
@@ -71,6 +79,9 @@ class DashboardController extends Controller
             $selectLok = DB::connection($this->db)->select($lokasi_kerja);
             $resLok = json_decode(json_encode($selectLok),true);
 
+            $selectJab = DB::connection($this->db)->select($jabatan);
+            $resJab = json_decode(json_encode($selectJab),true);
+
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['jumlah_karyawan'] = $resJK;
@@ -80,6 +91,7 @@ class DashboardController extends Controller
             $success['jumlah_wanita'] = $resWanita;
             $success['tingkat_pendidikan'] = $resPend;
             $success['lokasi_kerja'] = $resLok;
+            $success['jabatan'] = $resJab;
 
             return response()->json($success, $this->successStatus);     
             
