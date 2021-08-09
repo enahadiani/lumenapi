@@ -40,7 +40,7 @@ class DashboardController extends Controller
             FROM hr_pendidikan
             GROUP BY kode_strata, kode_lokasi
             ) b ON a.kode_strata=b.kode_strata AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."'";
+            WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_strata != '-'";
 
             $lokasi_kerja = "SELECT a.kode_loker, a.nama AS nama_loker, isnull(b.jumlah, 0) AS jumlah
             FROM hr_loker a
