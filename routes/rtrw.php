@@ -276,6 +276,18 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->put('kbdual','Rtrw\KasBankDualController@update');
     $router->delete('kbdual','Rtrw\KasBankDualController@destroy');
 
+    //Format Laporan
+    $router->get('format-laporan','Rtrw\FormatLaporanController@show');
+    $router->post('format-laporan','Rtrw\FormatLaporanController@store');
+    $router->put('format-laporan','Rtrw\FormatLaporanController@update');
+    $router->delete('format-laporan','Rtrw\FormatLaporanController@destroy');
+    $router->get('format-laporan-versi','Rtrw\FormatLaporanController@getVersi');
+    $router->get('format-laporan-tipe','Rtrw\FormatLaporanController@getTipe');
+    $router->get('format-laporan-relakun','Rtrw\FormatLaporanController@getRelakun');
+    $router->post('format-laporan-relasi','Rtrw\FormatLaporanController@simpanRelasi');
+    $router->post('format-laporan-move','Rtrw\FormatLaporanController@simpanMove');
+
+
 });
 
 $router->group(['middleware' => 'auth:warga'], function () use ($router) {
