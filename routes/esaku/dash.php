@@ -28,6 +28,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('penjualan','Esaku\Dashboard\DashboardController@getLapPnj');
     $router->get('vendor','Esaku\Dashboard\DashboardController@getLapVendor');
     $router->get('jurnal','Esaku\Dashboard\DashboardController@getJurnal');
+    
+    $router->get('sdm-dash','Sdm\DashboardController@getDataDashboard');
 });
 
 

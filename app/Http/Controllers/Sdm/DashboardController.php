@@ -13,40 +13,74 @@ class DashboardController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function getDataBox(Request $request){
+    public function getDataDashboard(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-                $status_admin = $data->status_admin;
             }
-            if($status_admin == "A"){
-                $filter = "";
-            } else {
-                $filter = " and nik='$nik' ";
-            }
-            $sql0 = "select count(*) as jum from hr_karyawan where kode_lokasi='$kode_lokasi' $filter ";
-			$res = DB::connection($this->db)->select($sql0);
-            $success['jum_profile'] = (count($res) > 0 ? $res[0]->jum : 0);
 
-            $sql1 = "select count(*) as jum from hr_absen where kode_lokasi='$kode_lokasi' $filter ";
-			$res = DB::connection($this->db)->select($sql1);
-            $success['jum_absen'] = (count($res) > 0 ? $res[0]->jum : 0);
+            $jumlah_karyawan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'";
 
-            $sql2 = "select count(*) as jum from hr_pelatihan where kode_lokasi='$kode_lokasi' $filter ";
-			$res = DB::connection($this->db)->select($sql2);
-            $success['jum_pelatihan'] = (count($res) > 0 ? $res[0]->jum : 0);
+            $jumlah_kesehatan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
+            AND bpjs = '1'";
 
-            $sql3 = "select count(*) as jum from hr_penghargaan where kode_lokasi='$kode_lokasi' $filter ";
-			$res = DB::connection($this->db)->select($sql3);
-            $success['jum_penghargaan'] = (count($res) > 0 ? $res[0]->jum : 0);
+            $jumlah_ketenagakerjaan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
+            AND no_bpjs != '-' OR no_bpjs != null";
 
-            $sql4 = "select count(*) as jum from hr_sanksi where kode_lokasi='$kode_lokasi' $filter ";
-			$res = DB::connection($this->db)->select($sql4);
-            $success['jum_sanksi'] = (count($res) > 0 ? $res[0]->jum : 0);
+            $jumlah_pria = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'
+            AND jk = 'L'";
+
+            $jumlah_wanita = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'
+            AND jk = 'P'";
+
+            $tingkat_pendidikan = "SELECT a.kode_strata, a.nama AS nama_strata, isnull(b.jumlah, 0) AS jumlah
+            FROM hr_strata a
+            LEFT JOIN (SELECT kode_strata, kode_lokasi, count(nik) AS jumlah
+            FROM hr_pendidikan
+            GROUP BY kode_strata, kode_lokasi
+            ) b ON a.kode_strata=b.kode_strata AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
+
+            $lokasi_kerja = "SELECT a.kode_loker, a.nama AS nama_loker, isnull(b.jumlah, 0) AS jumlah
+            FROM hr_loker a
+            LEFT JOIN (SELECT kode_loker, kode_lokasi, count(nik) AS jumlah
+            FROM hr_karyawan
+            GROUP BY kode_loker, kode_lokasi
+            ) b ON a.kode_loker=b.kode_loker AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_loker != '-'";
+
+            $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
+            $resJK = json_decode(json_encode($selectJK),true);
+
+            $selectKes = DB::connection($this->db)->select($jumlah_kesehatan);
+            $resKes = json_decode(json_encode($selectKes),true);
+
+            $selectKer = DB::connection($this->db)->select($jumlah_ketenagakerjaan);
+            $resKer = json_decode(json_encode($selectKer),true);
+
+            $selectPria = DB::connection($this->db)->select($jumlah_pria);
+            $resPria = json_decode(json_encode($selectPria),true);
+
+            $selectWanita = DB::connection($this->db)->select($jumlah_wanita);
+            $resWanita = json_decode(json_encode($selectWanita),true);
+            
+            $selectPend = DB::connection($this->db)->select($tingkat_pendidikan);
+            $resPend = json_decode(json_encode($selectPend),true);
+
+            $selectLok = DB::connection($this->db)->select($lokasi_kerja);
+            $resLok = json_decode(json_encode($selectLok),true);
 
             $success['status'] = true;
             $success['message'] = "Success!";
+            $success['jumlah_karyawan'] = $resJK;
+            $success['jumlah_kesehatan'] = $resKes;
+            $success['jumlah_kerja'] = $resKer;
+            $success['jumlah_pria'] = $resPria;
+            $success['jumlah_wanita'] = $resWanita;
+            $success['tingkat_pendidikan'] = $resPend;
+            $success['lokasi_kerja'] = $resLok;
+
             return response()->json($success, $this->successStatus);     
             
         } catch (\Throwable $e) {
@@ -54,58 +88,5 @@ class DashboardController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
-    }
-
-    public function getChart(Request $request){
-        $this->validate($request,[
-            'periode' => 'required'
-        ]);
-
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $periode = $request->periode;
-
-			$sql="select a.kode_sts,a.nama,isnull(b.jumlah,0) as jum
-            from hr_stsabsen a
-            left join ( select status,kode_lokasi, count(*) as jumlah
-            from hr_absen
-            where kode_lokasi='$kode_lokasi' and nik='$nik' and substring(convert(varchar,tanggal,112),1,6) = '$periode'
-            group by status,kode_lokasi ) b on a.kode_sts=b.status and a.kode_lokasi=b.kode_lokasi ";
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            $ctg= array();
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $dt = array();
-                for($i=0;$i<count($res);$i++){
-                    $dt[] = array('y'=>floatval($res[$i]['jum']),'name'=>$res[$i]['nama'],'key'=>$res[$i]['kode_sts']);  
-                    array_push($ctg,$res[$i]['nama']);    
-                }
-                $success['ctg'] = $ctg;
-                $success["series"][0]= array(
-                    "name"=> 'Jumlah',"colorByPoint"=>true,"data"=>$dt
-                );
-                $success['status'] = true;
-                $success['message'] = "Success!";
-                return response()->json($success, $this->successStatus);     
-            }
-            else{
-                $success['ctg'] = $ctg;
-                $success['series'] = [];
-                $success['status'] = true;
-                $success['message'] = "Data Kosong!";
-                return response()->json($success, $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
-
-        
+    }   
 }
