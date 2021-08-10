@@ -19,8 +19,10 @@ class LaporanProyekController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('no_proyek', 'kode_cust', 'status');
-            $db_col_name = array('a.no_proyek', 'a.kode_cust', 'd.status');
+            // $col_array = array('no_proyek', 'kode_cust', 'status');
+            // $db_col_name = array('a.no_proyek', 'a.kode_cust', 'd.status');
+            $col_array = array('no_proyek', 'kode_cust');
+            $db_col_name = array('a.no_proyek', 'a.kode_cust');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -44,6 +46,34 @@ class LaporanProyekController extends Controller {
                 }
             }
 
+            // $sql = "select a.no_proyek, a.no_kontrak, convert(varchar,tgl_mulai,103) as tgl_mulai, 
+            // convert(varchar,tgl_selesai,103) as tgl_selesai, a.keterangan,b.nama as nama_cust,isnull(c.nilai,0) as rab,
+            // isnull(d.nilai,0) as beban, isnull(e.nilai,0) as tagihan,isnull(f.nilai,0) as bayar, a.nilai as nilai_proyek
+            // from java_proyek a
+            // inner join java_cust b on a.kode_cust=b.kode_cust and a.kode_lokasi=b.kode_lokasi
+            // left join (select b.no_proyek,b.kode_lokasi,sum(a.jumlah*a.harga) as nilai
+            // from java_rab_d a
+            // inner join java_rab_m b on a.no_rab=b.no_rab and a.kode_lokasi=b.kode_lokasi
+            // where a.kode_lokasi='11'
+            // group by b.no_proyek,b.kode_lokasi
+            // )c on a.no_proyek=c.no_proyek and a.kode_lokasi=b.kode_lokasi
+            // left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai, a.status
+            // from java_beban  a
+            // where a.kode_lokasi='11'
+            // group by a.no_proyek,a.kode_lokasi,a.status
+            // )d on a.no_proyek=d.no_proyek and a.kode_lokasi=d.kode_lokasi
+            // left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
+            // from java_tagihan  a
+            // where a.kode_lokasi='11'
+            // group by a.no_proyek,a.kode_lokasi
+            // )e on a.no_proyek=e.no_proyek and a.kode_lokasi=e.kode_lokasi
+            // left join (select b.no_proyek,a.kode_lokasi,sum(a.nilai_bayar) as nilai
+            // from java_bayar_detail a
+            // inner join java_tagihan b on a.no_tagihan=b.no_tagihan and a.kode_lokasi=b.kode_lokasi
+            // where a.kode_lokasi='11'
+            // group by b.no_proyek,a.kode_lokasi
+            // )f on a.no_proyek=f.no_proyek and a.kode_lokasi=f.kode_lokasi
+            // $where";
             $sql = "select a.no_proyek, a.no_kontrak, convert(varchar,tgl_mulai,103) as tgl_mulai, 
             convert(varchar,tgl_selesai,103) as tgl_selesai, a.keterangan,b.nama as nama_cust,isnull(c.nilai,0) as rab,
             isnull(d.nilai,0) as beban, isnull(e.nilai,0) as tagihan,isnull(f.nilai,0) as bayar, a.nilai as nilai_proyek
@@ -55,10 +85,10 @@ class LaporanProyekController extends Controller {
             where a.kode_lokasi='11'
             group by b.no_proyek,b.kode_lokasi
             )c on a.no_proyek=c.no_proyek and a.kode_lokasi=b.kode_lokasi
-            left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai, a.status
+            left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
             from java_beban  a
             where a.kode_lokasi='11'
-            group by a.no_proyek,a.kode_lokasi,a.status
+            group by a.no_proyek,a.kode_lokasi
             )d on a.no_proyek=d.no_proyek and a.kode_lokasi=d.kode_lokasi
             left join (select a.no_proyek,a.kode_lokasi,sum(a.nilai) as nilai
             from java_tagihan  a
