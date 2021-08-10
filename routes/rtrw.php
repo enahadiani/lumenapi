@@ -287,6 +287,15 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->post('format-laporan-relasi','Rtrw\FormatLaporanController@simpanRelasi');
     $router->post('format-laporan-move','Rtrw\FormatLaporanController@simpanMove');
 
+    // LAPORAN
+    $router->get('filter-periode-keu','Rtrw\FilterController@getFilterPeriodeKeuangan');
+    $router->get('filter-modul','Rtrw\FilterController@getFilterModul');
+    $router->get('filter-bukti-trans','Rtrw\FilterController@getFilterBuktiTrans');
+    
+    $router->get('lap-bukti-trans','Rtrw\LaporanController@getBuktiTrans');
+    $router->get('lap-saldo','Rtrw\LaporanController@getSaldo');
+    $router->get('lap-kartu-iuran','Rtrw\LaporanController@getKartuIuran');
+
 
 });
 

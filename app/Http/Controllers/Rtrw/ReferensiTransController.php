@@ -209,8 +209,8 @@ class ReferensiTransController extends Controller
             $akun = DB::connection($this->sql)->select("select a.kode_ref,a.nama,a.akun_debet,a.akun_kredit,a.jenis,a.kode_pp,b.nama as nama_pp,c.nama as nama_debet,d.nama as nama_kredit
             from trans_ref a 
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            inner join masakun c on a.akun_debet=c.kode_akun and a.kode_lokasi=c.kode_lokasi
-            inner join masakun d on a.akun_kredit=d.kode_akun and a.kode_lokasi=d.kode_lokasi
+            left join masakun c on a.akun_debet=c.kode_akun and a.kode_lokasi=c.kode_lokasi
+            left join masakun d on a.akun_kredit=d.kode_akun and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.kode_ref='$request->kode_ref'				 
             ");
 
