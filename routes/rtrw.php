@@ -296,6 +296,8 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('lap-saldo','Rtrw\LaporanController@getSaldo');
     $router->get('lap-kartu-iuran','Rtrw\LaporanController@getKartuIuran');
 
+    $router->post('send-email-report', 'EmailController@send');
+
 
 });
 
