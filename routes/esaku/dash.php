@@ -30,6 +30,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('jurnal','Esaku\Dashboard\DashboardController@getJurnal');
     
     $router->get('sdm-dash','Sdm\DashboardController@getDataDashboard');
+    $router->get('sdm-karyawan','Sdm\DashboardController@getDataKaryawan');
 });
 
 

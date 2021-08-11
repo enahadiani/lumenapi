@@ -13,6 +13,62 @@ class DashboardController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
+    public function getDataKaryawan(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $where = "where a.kode_lokasi = '".$kode_lokasi."'";
+
+            if($request->input('pendidikan') === null) {
+                $filter_array = array('jk','kode_loker');
+                $col_array = array('a.jk', 'a.kode_loker');
+
+                for($i=0;$i<count($col_array);$i++) {
+                    if($request->input($filter_array[$i]) !== null) {
+                        $where .= " AND ".$col_array[$i]." = '".$request->input($filter_array[$i])."'";
+                    }
+                }
+
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
+                FROM hr_karyawan a
+                INNER JOIN hr_jab b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
+                $where";
+
+                $res = DB::connection($this->db)->select($select);
+                $res = json_decode(json_encode($res),true);
+            } else {
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
+                FROM hr_karyawan a
+                INNER JOIN hr_jab b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
+                INNER JOIN hr_pendidikan c ON a.nik=c.nik AND a.kode_lokasi=c.kode_lokasi
+                $where AND c.kode_strata = '".$request->input('pendidikan')."'";
+
+                $res = DB::connection($this->db)->select($select);
+                $res = json_decode(json_encode($res),true);
+            }
+
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+            }
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getDataDashboard(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
