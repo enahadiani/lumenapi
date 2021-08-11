@@ -22,13 +22,13 @@ class DashboardController extends Controller
 
             $where = "where a.kode_lokasi = '".$kode_lokasi."'";
 
-            if($request->input('pendidikan') === null) {
+            if($request->query('pendidikan') === null) {
                 $filter_array = array('jk','kode_loker');
                 $col_array = array('a.jk', 'a.kode_loker');
 
                 for($i=0;$i<count($col_array);$i++) {
-                    if($request->input($filter_array[$i]) !== null) {
-                        $where .= " AND ".$col_array[$i]." = '".$request->input($filter_array[$i])."'";
+                    if($request->query($filter_array[$i]) !== null) {
+                        $where .= " AND ".$col_array[$i]." = '".$request->query($filter_array[$i])."'";
                     }
                 }
 
@@ -44,7 +44,7 @@ class DashboardController extends Controller
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 INNER JOIN hr_pendidikan c ON a.nik=c.nik AND a.kode_lokasi=c.kode_lokasi
-                $where AND c.kode_strata = '".$request->input('pendidikan')."'";
+                $where AND c.kode_strata = '".$request->query('pendidikan')."'";
 
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
