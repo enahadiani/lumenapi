@@ -291,13 +291,15 @@ $router->group(['middleware' => 'auth:rtrw'], function () use ($router) {
     $router->get('filter-periode-keu','Rtrw\FilterController@getFilterPeriodeKeuangan');
     $router->get('filter-modul','Rtrw\FilterController@getFilterModul');
     $router->get('filter-bukti-trans','Rtrw\FilterController@getFilterBuktiTrans');
+    $router->get('filter-rumah','Rtrw\FilterController@getFilterRumah');
+    $router->get('filter-jenis','Rtrw\FilterController@getFilterJenis');
     
     $router->get('lap-bukti-trans','Rtrw\LaporanController@getBuktiTrans');
-    $router->get('lap-saldo','Rtrw\LaporanController@getSaldo');
+    $router->get('lap-saldo-akun','Rtrw\LaporanController@getSaldoAkun');
     $router->get('lap-kartu-iuran','Rtrw\LaporanController@getKartuIuran');
 
     $router->post('send-email-report', 'EmailController@send');
-
+    $router->post('cek-query', 'Rtrw\LaporanController@cekQuery');
 
 });
 
