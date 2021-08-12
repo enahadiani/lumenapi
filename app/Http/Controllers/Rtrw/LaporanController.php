@@ -145,6 +145,7 @@ class LaporanController extends Controller
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             $where and a.nik_user='$nik_user' and (a.so_awal<>0 or a.debet<>0 or a.kredit<>0 or a.so_akhir<>0)
             order by a.kode_akun";
+            $success['sql'] = $sql;
             $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -154,7 +155,7 @@ class LaporanController extends Controller
             $reslok= json_decode(json_encode($reslok),true);
             $success['lokasi'] = $reslok;
             
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+            if(count($res2) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res2;
                 $success['message'] = "Success!";
@@ -183,8 +184,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','rt','kode_rumah');
-            $db_col_name = array('a.periode','a.rt','a.kode_rumah');
+            $col_array = array('rt','kode_rumah');
+            $db_col_name = array('a.rt','a.kode_rumah');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
