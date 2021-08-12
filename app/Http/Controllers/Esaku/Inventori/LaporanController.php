@@ -229,12 +229,20 @@ class LaporanController extends Controller
             DB::connection($this->sql)->update($sql1);
             DB::connection($this->sql)->update($sql2);
 
+            // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
+            //     b.nama as nama_barang,c.nama as nama_gudang
+            //     from brg_stok a
+            //     inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+            //     inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi 
+            //     inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang and a.nik_user=d.nik_user
+            //     $where
+            //     order by a.kode_barang,a.kode_gudang";
             $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
                 b.nama as nama_barang,c.nama as nama_gudang
                 from brg_stok a
                 inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
                 inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi 
-                inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang and a.nik_user=d.nik_user
+                inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang
                 $where
                 order by a.kode_barang,a.kode_gudang";
            
@@ -290,7 +298,7 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
-                $success['sql'] = $sql;
+                $success['sql'] = $sql4;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
