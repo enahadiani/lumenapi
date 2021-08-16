@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
+use Log;
 
 function joinNum($num){
     // menggabungkan angka yang di-separate(10.000,75) menjadi 10000.00
@@ -478,6 +479,7 @@ class Sync2Controller extends Controller
                     }
                 }
 
+                $jum_vendor = $total;
                 $msg .= "Sync vendor sukses, total vendor: ".count($vendor).", error: ".$msg_loop.", total vendor berhasil: ".$total.".";
                 // //BARANG
                 
@@ -526,6 +528,8 @@ class Sync2Controller extends Controller
                 }
                 $msg .= " Sync barang sukses, total barang: ".count($barang).", error: ".$msg_loop.", total barang berhasil: ".$total.".";
                 
+                $jum_barang = $total;
+                
                 $sql_gudang = "";
                 $gudang = DB::connection($this->sql)->select("select kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp from brg_gudang where kode_lokasi='$kode_lokasi' ");
                 $jum_gudang = count($gudang);
@@ -572,6 +576,8 @@ class Sync2Controller extends Controller
                     
                 }
                 $msg .= " Sync gudang sukses, total gudang: ".count($gudang).", error: ".$msg_loop.", total gudang berhasil: ".$total.".";
+                
+                $jum_gudang = $total;
     
                 // //BARANG KLP
                 $sql_klp = "";
@@ -621,6 +627,8 @@ class Sync2Controller extends Controller
                     
                 }
                 $msg .= " Sync klp barang sukses, total klp barang: ".count($klp).", error: ".$msg_loop.", total klp barang berhasil: ".$total.".";
+                
+                $jum_klp = $total;
     
                 // //SATUAN
                 $sql_satuan = "";
@@ -670,6 +678,8 @@ class Sync2Controller extends Controller
                     
                 }
                 $msg .= " Sync satuan sukses, total satuan: ".count($satuan).", error: ".$msg_loop.", total satuan berhasil: ".$total.".";
+                
+                $jum_satuan = $total;
     
                 // //BONUS
                 $sql_bonus = "";
@@ -719,6 +729,8 @@ class Sync2Controller extends Controller
                    
                 }
                 $msg .= " Sync bonus sukses, total bonus: ".count($bonus).", error: ".$msg_loop.", total bonus berhasil: ".$total.".";
+                
+                $jum_bonus = $total;
     
                 $sql_his = "insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','BARANG',getdate(),'$nik',$jum_barang);
                             insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','GUDANG',getdate(),'$nik',$jum_gudang);
@@ -1005,6 +1017,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= "Sync trans_m sukses, total trans_m: ".count($transm).", error: ".$msg_loop.", total trans_m berhasil: ".$total.".";
+                $jum_transm = $total;
 
                 //TRANSJ
                 $sql_transj = "";
@@ -1055,6 +1068,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= " Sync trans_j sukses, total trans_j: ".count($transj).", error: ".$msg_loop.", total trans_j berhasil: ".$total.".";
+                $jum_transj = $total;
 
                 //BRGJUAL
                 $sql_brgjual = "";
@@ -1103,6 +1117,7 @@ class Sync2Controller extends Controller
                 }
                 
                 $msg .= " Sync brg_jualpiu_d sukses, total brg_jualpiu_d: ".count($brgjual).", error: ".$msg_loop.", total brg_jualpiu_d berhasil: ".$total.".";
+                $jum_brgjual = $total;
 
                 //BRGTRANS
                 $sql_brgtrans = "";
@@ -1153,8 +1168,8 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= " Sync brg_trans_d barang sukses, total brg_trans_d barang: ".count($brgtrans).", error: ".$msg_loop.", total brg_trans_d barang berhasil: ".$total.".";
+                $jum_brgtrans = $total;
         
-
                 $total = $jum_transm+$jum_transj+$jum_brgjual+$jum_brgtrans;
                 $sql_his = "insert into sync_pnj (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
                 values ('$id','$kode_lokasi','DATA PENJUALAN DAN JURNAL',getdate(),'$nik',$total) ;
@@ -1501,6 +1516,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= "Sync trans_m sukses, total trans_m: ".count($transm).", error: ".$msg_loop.", total trans_m berhasil: ".$total.".";
+                $jum_transm = $total;
 
                 //TRANSJ
                 $sql_transj = "";
@@ -1550,6 +1566,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= " Sync trans_j sukses, total trans_j: ".count($transj).", error: ".$msg_loop.", total trans_j berhasil: ".$total.".";
+                $jum_transj = $total;
 
                 //BRGBELI HUT
                 $sql_brgbeli = "";
@@ -1600,6 +1617,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= " Sync brg_belihut_d sukses, total brg_belihut_d: ".count($brgbeli).", error: ".$msg_loop.", total brg_belihut_d berhasil: ".$total.".";
+                $jum_brgbeli = $total;
 
                 //BRGTRANS
                 $sql_brgtrans = "";
@@ -1650,6 +1668,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= " Sync brg_trans_d barang sukses, total brg_trans_d barang: ".count($brgtrans).", error: ".$msg_loop.", total brg_trans_d barang berhasil: ".$total.".";
+                $jum_brgtrans = $total;
 
                 $total = $jum_transm+$jum_transj+$jum_brgbeli+$jum_brgtrans;
                 $sql_his = "insert into sync_pmb (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
@@ -1975,6 +1994,7 @@ class Sync2Controller extends Controller
                             if(!$curl['status']){
                                 $sts_loop = false;
                                 $msg_loop .= "gagal di looping transm 1000 ke ".$c;
+                                Log::error($cur['message']);
                             }else{
                                 $total +=1000;
                             }
@@ -2001,7 +2021,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= "Sync trans_m sukses, total trans_m: ".count($transm).", error: ".$msg_loop.", total trans_m berhasil: ".$total.".";
-    
+                $jum_transm = $total;
                 //TRANSJ
                 
                 $sql_transj = "";
@@ -2049,6 +2069,7 @@ class Sync2Controller extends Controller
                     }
                 }
                 $msg .= " Sync trans_j sukses, total trans_j: ".count($transj).", error: ".$msg_loop.", total trans_j berhasil: ".$total.".";
+                $jum_transj = $total;
     
                 //BRGBELI BAYAR
 
@@ -2098,6 +2119,7 @@ class Sync2Controller extends Controller
                 }
     
                 $msg .= " Sync brg_belibayar_d sukses, total brg_belibayar_d: ".count($brgbeli).", error: ".$msg_loop.", total brg_belibayar_d berhasil: ".$total.".";
+                $jum_brgbeli = $total;
 
                 //BRGTRANS
                 $sql_brgtrans = "";
@@ -2148,6 +2170,7 @@ class Sync2Controller extends Controller
                 }
 
                 $msg .= " Sync brg_trans_d barang sukses, total brg_trans_d barang: ".count($brgtrans).", error: ".$msg_loop.", total brg_trans_d barang berhasil: ".$total.".";
+                $jum_brgtrans = $total;
 
                 $total = $jum_transm+$jum_transj+$jum_brgbeli+$jum_brgtrans;
                 $sql_his = "insert into sync_retbeli (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
@@ -2294,7 +2317,8 @@ class Sync2Controller extends Controller
             $success['status'] = true;
             $success['message'] = "Berhasil.";
             return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) 
+        {
             DB::connection($request->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Error ".$e;
