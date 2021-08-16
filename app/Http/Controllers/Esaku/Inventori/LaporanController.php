@@ -228,7 +228,7 @@ class LaporanController extends Controller
             DB::connection($this->sql)->update($sql1);
             DB::connection($this->sql)->update($sql2);
 
-            $sql3 = "SELECT a.kode_barang, a.kode_gudang, a.stok, a.kode_lokasi, ISNULL(a.so_awal, 0) AS so_awal, 
+            $sql3 = "SELECT DISTINCT a.kode_barang, a.kode_gudang, a.stok, a.kode_lokasi, ISNULL(a.so_awal, 0) AS so_awal, 
             ISNULL(a.debet, 0) AS debet, ISNULL(a.kredit, 0) AS kredit, d.h_avg, d.h_avg*a.stok AS nilai, b.sat_kecil, 
             b.nama AS nama_barang,c.nama AS nama_gudang
             FROM brg_stok a
