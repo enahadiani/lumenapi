@@ -97,6 +97,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sync-pnj','Esaku\Inventori\Sync2Controller@getSyncPnj');
     $router->get('sync-pnj-detail','Esaku\Inventori\Sync2Controller@getSyncPnjDetail');
     $router->get('load-sync-pnj','Esaku\Inventori\Sync2Controller@loadSyncPnj');
+    $router->post('sync-pnj','Esaku\Inventori\Sync2Controller@syncPnj');
     
     $router->get('sync-pmb','Esaku\Inventori\Sync2Controller@getSyncPmb');
     $router->get('sync-pmb-detail','Esaku\Inventori\Sync2Controller@getSyncPmbDetail');
@@ -439,10 +440,10 @@ $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     
-    $router->get('load-sync-master','Esaku\Inventori\Sync2Controller@loadSyncMaster');
-    $router->post('sync-pnj','Esaku\Inventori\Sync2Controller@syncPnj');
-    $router->post('sync-pmb','Esaku\Inventori\Sync2Controller@syncPmb');
-    $router->post('sync-retur-beli','Esaku\Inventori\Sync2Controller@syncReturBeli');
+    // $router->get('load-sync-master','Esaku\Inventori\Sync2Controller@loadSyncMaster');
+    // $router->post('sync-pnj','Esaku\Inventori\Sync2Controller@syncPnj');
+    // $router->post('sync-pmb','Esaku\Inventori\Sync2Controller@syncPmb');
+    // $router->post('sync-retur-beli','Esaku\Inventori\Sync2Controller@syncReturBeli');
 });
 
 $router->get('export', 'Esaku\Keuangan\JurnalController@export');
