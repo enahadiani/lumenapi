@@ -228,14 +228,15 @@ class LaporanController extends Controller
             DB::connection($this->sql)->update($sql1);
             DB::connection($this->sql)->update($sql2);
 
-            $sql3 = "select a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
-            b.nama as nama_barang,c.nama as nama_gudang
-            from brg_stok a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
-            inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi 
-            inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang and a.nik_user=d.nik_user
+            $sql3 = "SELECT a.kode_barang, a.kode_gudang, a.stok, a.kode_lokasi, ISNULL(a.so_awal, 0) AS so_awal, 
+            ISNULL(a.debet, 0) AS debet, ISNULL(a.kredit, 0) AS kredit, d.h_avg, d.h_avg*a.stok AS nilai, b.sat_kecil, 
+            b.nama AS nama_barang,c.nama AS nama_gudang
+            FROM brg_stok a
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi 
+            INNER JOIN brg_gudang c ON a.kode_gudang=c.kode_gudang AND a.kode_lokasi=c.kode_lokasi 
+            INNER JOIN brg_hpp d ON a.kode_lokasi=d.kode_lokasi AND a.kode_barang=d.kode_barang AND a.nik_user=d.nik_user
             $where
-            order by a.kode_barang,a.kode_gudang";
+            ORDER BY a.kode_barang,a.kode_gudang";
 
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs),true);  
