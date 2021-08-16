@@ -351,7 +351,7 @@ class Sync2Controller extends Controller
     function postSql($url,$token,$sql){
         try{
 
-            $client = new Client();
+            $client = new Client(['verify' => false]);
             $response = $client->request('POST',  $url,[
                 'headers' => [
                     'Authorization' => 'Bearer '.$token,
@@ -377,17 +377,26 @@ class Sync2Controller extends Controller
     }
 
     function getToken($url,$param){
-        $client = new Client(['verify' => false]);
-        $data = [];
-        $response = $client->request('POST',  $url,[
-            'form_params' => $param,
-        ]);
-        if ($response->getStatusCode() == 200) { // 200 OK
-            $response_data = $response->getBody()->getContents();
+        try{
+
+            $client = new Client(['verify' => false]);
+            $response = $client->request('POST',  $url,[
+                'form_params' => $param
+            ]);
             
-            $data = json_decode($response_data,true);
-        }
-        return $data;
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                
+                $data = json_decode($response_data,true);
+                return $data; 
+            }
+        } catch (BadResponseException $ex) {
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $result['message'] = $res;
+            $result['status'] = false;
+            return $result;
+        } 
     }
 
     public function syncMaster(Request $request)
@@ -402,13 +411,158 @@ class Sync2Controller extends Controller
                 $nik= $request->nik;
             }
 
-            $url = "https://devapi.simkug.com/api/";
+            $url = "https://api.simkug.com/api/";
             $param = array(
                 'nik' => 'kasir',
                 'password' => 'saisai'
             );
             $res = $this->getToken($url."ginas/login",$param);
-            $success = $res;
+            if(isset($res['message']) && $res['message'] == 'success'){
+                $token = $res['token'];
+
+                $sql = "";
+                $begin = "SET NOCOUNT on;
+                BEGIN tran;
+                ";
+                $commit = "commit tran;";
+                $sql_vendor = "";
+    
+                $vendor = DB::connection($this->sql)->select("select kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang from vendor where kode_lokasi='$kode_lokasi' ");
+                $jum_vendor = count($vendor);
+                $i=1;
+                $sts_loop = true;
+                $msg_loop = "";
+                $c = 1;
+                $total = 0;
+                $x=0;
+                // if($jum_vendor > 0){
+                //     $sql_vendor .= " delete from vendor where kode_lokasi='04x'; ";
+                //     foreach($vendor as $row){
+                //         $sql_vendor .= " insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values ('".$row->kode_vendor."','04x','".$row->nama."','".$row->alamat."','".$row->no_tel."','".$row->email."','".$row->npwp."','".$row->pic."','".$row->alamat2."','".$row->bank."','".$row->cabang."','".$row->no_rek."','".$row->nama_rek."','".$row->no_fax."','".$row->no_pictel."','-','-','-','-','".$row->akun_hutang."'); ";
+                //         $x++;
+                //         if($i % 1000 == 0){
+                //             $sqlvendor = $begin.$sqlvendor.$commit;
+                //             $curl = $this->postSql($url."ginas/exec-sql",$token,$sqlvendor);
+                //             $success['curl'][] = $curl;
+                //             if(!$curl['status']){
+                //                 $sts_loop = false;
+                //                 $msg_loop .= "gagal di looping 1000 ke ".$c;
+                //             }else{
+                //                 $total +=1000;
+                //             }
+                //             $sqlvendor = "";
+                //             $x = 0;
+                //             $c++;
+                //         }
+                //         if($i == count($vendor) && ($i % 1000 != 0) ){
+                //             $sqlvendor = $begin.$sqlvendor.$commit;
+                //             $curl = $this->postSql($url."ginas/exec-sql",$token,$sqlvendor);
+                //             $success['curl'][] = $curl;
+                //             if(!$curl['status']){
+                //                 $sts_loop = false;
+                //                 $msg_loop .= "gagal di looping 1000 ke ".$c;
+                //             }else{
+                //                 $total +=$x;
+                //             }
+                //             $sqlvendor = "";
+                //             $x = 0;
+                //             $c++;
+                //         }
+                //         $i++;
+                //     }
+                // }
+                
+                
+                // //BARANG
+                
+                // $sql_barang = "";
+                // $barang = DB::connection($this->sql2)->select("select kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,nilai_beli from brg_barang where kode_lokasi='$kode_lokasi' ");
+                // $jum_barang = count($barang);
+                // if($jum_barang > 0){
+                //     $sql_barang .= " delete from brg_barang where kode_lokasi='$kode_lokasi'; ";
+                //     foreach($barang as $row){                    
+                //         $sql_barang .= "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,nilai_beli) values ('".$row->kode_barang."','".$row->nama."','".$kode_lokasi."','".$row->sat_kecil."','$row->sat_besar',$row->jml_sat,".floatval($row->hna).",'".$row->pabrik."','$row->flag_gen','$row->flag_aktif',".floatval($row->ss).",".floatval($row->sm1).",".floatval($row->sm2).",".floatval($row->mm1).",".floatval($row->mm2).",".floatval($row->fm1).",".floatval($row->fm2).",'".$row->kode_klp."','".$row->file_gambar."','".$row->barcode."',".floatval($row->hrg_satuan).",".floatval($row->ppn).",".floatval($row->profit).",".floatval($row->nilai_beli)."); ";
+                //     }
+                // }
+                
+                
+    
+                // $sql_gudang = "";
+                // $gudang = DB::connection($this->sql2)->select("select kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp from brg_gudang where kode_lokasi='$kode_lokasi' ");
+                // $jum_gudang = count($gudang);
+                // if($jum_gudang > 0){
+                //     $sql_gudang .= " delete from brg_gudang where kode_lokasi='$kode_lokasi'; ";
+                //     foreach($gudang as $row){
+            
+                //         $sql_gudang .= "insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp) values ('".$row->kode_gudang."','".$kode_lokasi."','".$row->nama."','".$row->pic."','".$row->telp."','".$row->alamat."','".$row->kode_pp."'); ";
+                //     }
+                    
+                // }
+    
+                // //BARANG KLP
+                // $sql_klp = "";
+                // $klp = DB::connection($this->sql2)->select("select kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp from brg_barangklp where kode_lokasi='$kode_lokasi' ");
+                // $jum_klp = count($klp);
+                // if($jum_klp > 0){
+                //     $sql_klp .= "delete from brg_barangklp where kode_lokasi='$kode_lokasi';";
+    
+                //     foreach($klp as $row){
+                //         $sql_klp .= "insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp) values ('".$row->kode_klp."','".$kode_lokasi."','".$row->nama."','".$row->akun_pers."','".$row->akun_pdpt."','".$row->akun_hpp."'); ";
+                //     }
+                    
+                // }
+    
+                // //SATUAN
+                // $sql_satuan = "";
+                // $satuan = DB::connection($this->sql2)->select("select kode_satuan,kode_lokasi,nama from brg_satuan where kode_lokasi='$kode_lokasi' ");
+                // $jum_satuan = count($satuan);
+                // if($jum_satuan > 0){
+                    
+                //     $sql_satuan .= "delete from brg_satuan where kode_lokasi='$kode_lokasi'; ";
+                //     foreach($satuan as $row){
+            
+                //         $sql_satuan .= "insert into brg_satuan(kode_satuan,kode_lokasi,nama) values ('".$row->kode_satuan."','".$kode_lokasi."','".$row->nama."'); ";
+                //     }
+                    
+                // }
+    
+                // //BONUS
+                // $sql_bonus = "";
+                // $bonus = DB::connection($this->sql2)->select("select kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai from brg_bonus where kode_lokasi='$kode_lokasi' ");
+                // $jum_bonus = count($bonus);
+                // if($jum_bonus > 0){
+    
+                //     $sql_bonus .= "delete from brg_bonus where kode_lokasi='$kode_lokasi'; ";
+    
+                //     foreach($bonus as $row){
+    
+                //         $sql_bonus .= "insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values ('".$row->kode_barang."','".$row->keterangan."','".$kode_lokasi."',".floatval($row->ref_qty).",".floatval($row->bonus_qty).",'".$row->tgl_mulai."','".$row->tgl_selesai."'); ";
+                //     }
+                   
+                // }
+    
+                // $success['vendor'] = $begin.$sql_vendor.$commit;
+                // $success['barang'] = $begin.$sql_barang.$commit;
+                // $success['klp'] = $begin.$sql_klp.$commit;
+                // $success['gudang'] = $begin.$sql_gudang.$commit;
+                // $success['satuan'] = $begin.$sql_satuan.$commit;
+                // $success['bonus'] = $begin.$sql_bonus.$commit;
+    
+                // $sql_his = "insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','BARANG',getdate(),'$nik',$jum_barang);
+                //             insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','GUDANG',getdate(),'$nik',$jum_gudang);
+                //             insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','BARANGKLP',getdate(),'$nik',$jum_klp);
+                //             insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','VENDOR',getdate(),'$nik',$jum_vendor);
+                //             insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','SATUAN',getdate(),'$nik',$jum_satuan); 
+                //             insert into sync_master (kode_lokasi,jenis_master,tgl_sync,nik_user,total_rows) values ('$kode_lokasi','BONUS',getdate(),'$nik',$jum_bonus); ";
+    
+                // $success['histori'] = $begin.$sql_his.$commit;
+                $msg = "sukses. Total seluruh data: ".count($vendor).". error: ".$msg_loop.". Total berhasil: ".$total;
+                $success['status'] = true;
+                $success['message'] = $msg;
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Error, Unauthorized!";
+            }
 
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {

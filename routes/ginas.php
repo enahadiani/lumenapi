@@ -40,6 +40,7 @@ $router->group(['middleware' => 'auth:ginas'], function () use ($router) {
     $router->get('sync-pnj', 'Toko\SyncController@syncPnj');
     $router->get('sync-pmb', 'Toko\SyncController@syncPmb');
     $router->get('sync-retur-beli', 'Toko\SyncController@syncReturBeli');
+    $router->get('exec-sql', 'Toko\SyncController@executeSQL');
 
 });
 
