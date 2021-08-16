@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 function joinNum($num){
     // menggabungkan angka yang di-separate(10.000,75) menjadi 10000.00
@@ -296,10 +298,100 @@ class Sync2Controller extends Controller
         
     }
 
+    // public function syncMaster(Request $request)
+    // {
+    //     DB::connection($this->sql)->beginTransaction();
+        
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
+
+    //         if(isset($request->nik) && $request->nik != ""){
+    //             $nik= $request->nik;
+    //         }
+
+    //         if($request->vendor != "" ){
+    //             $insvendor = DB::connection($this->sql)->insert($request->vendor);
+    //         }
+    //         if($request->barang != "" ){
+    //             $insbarang = DB::connection($this->sql)->insert($request->barang);
+    //         }
+    //         if($request->klp != "" ){
+    //             $insklp = DB::connection($this->sql)->insert($request->klp);
+    //         }
+    //         if($request->satuan != ""){
+    //             $inssatuan = DB::connection($this->sql)->insert($request->satuan);
+    //         }
+    //         if($request->bonus != ""){
+    //             $insbonus = DB::connection($this->sql)->insert($request->bonus);
+    //         }
+    //         if($request->gudang != ""){
+    //             $insgudang = DB::connection($this->sql)->insert($request->gudang);
+    //         }
+    //         if($request->histori != ""){
+    //             $inshistori = DB::connection($this->sql)->insert($request->histori);
+    //         }
+            
+    //         DB::connection($this->sql)->commit();
+    //         $success['status'] = true;
+    //         $success['message'] = "Synchronize Data Successfully. ";
+    //         return response()->json($success, $this->successStatus);     
+    //     } catch (\Throwable $e) {
+    //         DB::connection($this->sql)->rollback();
+    //         $success['status'] = false;
+    //         $success['message'] = "Synchronize Data Failed. ".$e;
+    //         return response()->json($success, $this->successStatus); 
+    //     }				
+        
+        
+    // }
+
+    function postSql($url,$token,$sql){
+        try{
+
+            $client = new Client();
+            $response = $client->request('POST',  $url,[
+                'headers' => [
+                    'Authorization' => 'Bearer '.$token,
+                ],
+                'form_param' => [
+                    'sql' => $sql
+                ]
+            ]);
+            
+            if ($response->getStatusCode() == 200) { // 200 OK
+                $response_data = $response->getBody()->getContents();
+                
+                $data = json_decode($response_data,true);
+                return $data; 
+            }
+        } catch (BadResponseException $ex) {
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $result['message'] = $res;
+            $result['status'] = false;
+            return $result;
+        } 
+    }
+
+    function getToken($url,$param){
+        $client = new Client(['verify' => false]);
+        $data = [];
+        $response = $client->request('POST',  $url,[
+            'form_params' => $param,
+        ]);
+        if ($response->getStatusCode() == 200) { // 200 OK
+            $response_data = $response->getBody()->getContents();
+            
+            $data = json_decode($response_data,true);
+        }
+        return $data;
+    }
+
     public function syncMaster(Request $request)
     {
-        DB::connection($this->sql)->beginTransaction();
-        
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -310,36 +402,18 @@ class Sync2Controller extends Controller
                 $nik= $request->nik;
             }
 
-            if($request->vendor != "" ){
-                $insvendor = DB::connection($this->sql)->insert($request->vendor);
-            }
-            if($request->barang != "" ){
-                $insbarang = DB::connection($this->sql)->insert($request->barang);
-            }
-            if($request->klp != "" ){
-                $insklp = DB::connection($this->sql)->insert($request->klp);
-            }
-            if($request->satuan != ""){
-                $inssatuan = DB::connection($this->sql)->insert($request->satuan);
-            }
-            if($request->bonus != ""){
-                $insbonus = DB::connection($this->sql)->insert($request->bonus);
-            }
-            if($request->gudang != ""){
-                $insgudang = DB::connection($this->sql)->insert($request->gudang);
-            }
-            if($request->histori != ""){
-                $inshistori = DB::connection($this->sql)->insert($request->histori);
-            }
-            
-            DB::connection($this->sql)->commit();
-            $success['status'] = true;
-            $success['message'] = "Synchronize Data Successfully. ";
+            $url = "https://devapi.simkug.com/api/";
+            $param = array(
+                'nik' => 'kasir',
+                'password' => 'saisai'
+            );
+            $res = $this->getToken($url."ginas/login",$param);
+            $success = $res;
+
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Synchronize Data Failed. ".$e;
+            $success['message'] = "Error. ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
