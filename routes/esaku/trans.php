@@ -102,6 +102,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sync-pmb','Esaku\Inventori\Sync2Controller@getSyncPmb');
     $router->get('sync-pmb-detail','Esaku\Inventori\Sync2Controller@getSyncPmbDetail');
     $router->get('load-sync-pmb','Esaku\Inventori\Sync2Controller@loadSyncPmb');
+    $router->post('sync-pmb','Esaku\Inventori\Sync2Controller@syncPmb');
 
     $router->get('sync-retur-beli','Esaku\Inventori\Sync2Controller@getSyncReturBeli');
     $router->get('sync-retur-beli-detail','Esaku\Inventori\Sync2Controller@getSyncReturBeliDetail');
