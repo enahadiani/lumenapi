@@ -350,13 +350,13 @@ class Sync2Controller extends Controller
 
     function postSql($url,$token,$sql){
         try{
-
+            
             $client = new Client(['verify' => false]);
             $response = $client->request('POST',  $url,[
                 'headers' => [
                     'Authorization' => 'Bearer '.$token,
                 ],
-                'form_param' => [
+                'form_params' => [
                     'sql' => $sql
                 ]
             ]);
