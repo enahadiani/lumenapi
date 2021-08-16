@@ -36,10 +36,11 @@ $router->group(['middleware' => 'auth:ginas'], function () use ($router) {
     $router->get('users', 'AdminTokoController@allUsers');
     $router->get('cek-payload', 'AdminTokoController@cekPayload');
 
-    $router->get('sync-master', 'Toko\SyncController@syncMaster');
-    $router->get('sync-pnj', 'Toko\SyncController@syncPnj');
-    $router->get('sync-pmb', 'Toko\SyncController@syncPmb');
-    $router->get('sync-retur-beli', 'Toko\SyncController@syncReturBeli');
+    $router->get('sync-master', 'Esaku\Inventori\SyncController@syncMaster');
+    $router->get('sync-pnj', 'Esaku\Inventori\SyncController@syncPnj');
+    $router->get('sync-pmb', 'Esaku\Inventori\SyncController@syncPmb');
+    $router->get('sync-retur-beli', 'Esaku\Inventori\SyncController@syncReturBeli');
+    $router->post('exec-sql', 'Esaku\Inventori\SyncController@executeSQL');
 
 });
 
