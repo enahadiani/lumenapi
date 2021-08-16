@@ -239,48 +239,48 @@ class LaporanController extends Controller
 
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs),true);  
-            $nb = "";
-            $nb2 = "";
-            $resdata = array();
-            $i=0;
+            // $nb = "";
+            // $nb2 = "";
+            // $resdata = array();
+            // $i=0;
 
-            foreach($rs as $row){
+            // foreach($rs as $row){
 
-                $resdata[]=(array)$row;
-                if($i == 0){
-                    $nb .= "'$row->kode_barang'";
-                    $nb2 .= "'$row->kode_gudang'";
-                }else{
-                    $nb .= ","."'$row->kode_barang'";
-                    $nb2 .= ","."'$row->kode_gudang'";
-                }
-                $i++;
-            }
+            //     $resdata[]=(array)$row;
+            //     if($i == 0){
+            //         $nb .= "'$row->kode_barang'";
+            //         $nb2 .= "'$row->kode_gudang'";
+            //     }else{
+            //         $nb .= ","."'$row->kode_barang'";
+            //         $nb2 .= ","."'$row->kode_gudang'";
+            //     }
+            //     $i++;
+            // }
 
-            $sql4="select * from (select convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
-			case when a.dc='D' then a.jumlah else 0 end as debet,	      
-			case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
-			from brg_trans_d a
-			inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
-			inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
-            where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
-            union all
-            select convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
-			case when a.dc='D' then a.jumlah else 0 end as debet,	      
-			case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
-			from brg_trans_d a
-			inner join brg_jualpiu_d d on a.no_bukti=d.no_jual and a.kode_lokasi=d.kode_lokasi
-			inner join trans_m b on d.no_close=b.no_bukti and d.kode_lokasi=b.kode_lokasi 
-			inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
-            where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
-            )a order by a.tgl_ed";
-            $res2 = DB::connection($this->sql)->select($sql4);
-            $res2 = json_decode(json_encode($res2),true);
+            // $sql4="select * from (select convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+			// case when a.dc='D' then a.jumlah else 0 end as debet,	      
+			// case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
+			// from brg_trans_d a
+			// inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
+			// inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
+            // where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
+            // union all
+            // select convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+			// case when a.dc='D' then a.jumlah else 0 end as debet,	      
+			// case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
+			// from brg_trans_d a
+			// inner join brg_jualpiu_d d on a.no_bukti=d.no_jual and a.kode_lokasi=d.kode_lokasi
+			// inner join trans_m b on d.no_close=b.no_bukti and d.kode_lokasi=b.kode_lokasi 
+			// inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
+            // where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
+            // )a order by a.tgl_ed";
+            // $res2 = DB::connection($this->sql)->select($sql4);
+            // $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['data_detail'] = $res2;
+                // $success['data_detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
@@ -289,8 +289,8 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data_detail'] = [];
-                $success['sql'] = $sql4;
+                // $success['data_detail'] = [];
+                // $success['sql'] = $sql4;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
