@@ -435,42 +435,42 @@ class Sync2Controller extends Controller
                 $c = 1;
                 $total = 0;
                 $x=0;
-                // if($jum_vendor > 0){
-                //     $sql_vendor .= " delete from vendor where kode_lokasi='04x'; ";
-                //     foreach($vendor as $row){
-                //         $sql_vendor .= " insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values ('".$row->kode_vendor."','04x','".$row->nama."','".$row->alamat."','".$row->no_tel."','".$row->email."','".$row->npwp."','".$row->pic."','".$row->alamat2."','".$row->bank."','".$row->cabang."','".$row->no_rek."','".$row->nama_rek."','".$row->no_fax."','".$row->no_pictel."','-','-','-','-','".$row->akun_hutang."'); ";
-                //         $x++;
-                //         if($i % 1000 == 0){
-                //             $sqlvendor = $begin.$sqlvendor.$commit;
-                //             $curl = $this->postSql($url."ginas/exec-sql",$token,$sqlvendor);
-                //             $success['curl'][] = $curl;
-                //             if(!$curl['status']){
-                //                 $sts_loop = false;
-                //                 $msg_loop .= "gagal di looping 1000 ke ".$c;
-                //             }else{
-                //                 $total +=1000;
-                //             }
-                //             $sqlvendor = "";
-                //             $x = 0;
-                //             $c++;
-                //         }
-                //         if($i == count($vendor) && ($i % 1000 != 0) ){
-                //             $sqlvendor = $begin.$sqlvendor.$commit;
-                //             $curl = $this->postSql($url."ginas/exec-sql",$token,$sqlvendor);
-                //             $success['curl'][] = $curl;
-                //             if(!$curl['status']){
-                //                 $sts_loop = false;
-                //                 $msg_loop .= "gagal di looping 1000 ke ".$c;
-                //             }else{
-                //                 $total +=$x;
-                //             }
-                //             $sqlvendor = "";
-                //             $x = 0;
-                //             $c++;
-                //         }
-                //         $i++;
-                //     }
-                // }
+                if($jum_vendor > 0){
+                    $sql_vendor .= " delete from vendor where kode_lokasi='04x'; ";
+                    foreach($vendor as $row){
+                        $sql_vendor .= " insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values ('".$row->kode_vendor."','04x','".$row->nama."','".$row->alamat."','".$row->no_tel."','".$row->email."','".$row->npwp."','".$row->pic."','".$row->alamat2."','".$row->bank."','".$row->cabang."','".$row->no_rek."','".$row->nama_rek."','".$row->no_fax."','".$row->no_pictel."','-','-','-','-','".$row->akun_hutang."'); ";
+                        $x++;
+                        if($i % 1000 == 0){
+                            $sql_vendor = $begin.$sql_vendor.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_vendor);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping 1000 ke ".$c;
+                            }else{
+                                $total +=1000;
+                            }
+                            $sql_vendor = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        if($i == count($vendor) && ($i % 1000 != 0) ){
+                            $sql_vendor = $begin.$sql_vendor.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_vendor);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping 1000 ke ".$c;
+                            }else{
+                                $total +=$x;
+                            }
+                            $sql_vendor = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        $i++;
+                    }
+                }
                 
                 
                 // //BARANG
