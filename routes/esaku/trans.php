@@ -430,9 +430,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-adm-sanksi','Sdm\SanksiAdmController@save');
     $router->post('sdm-adm-sanksi-update','Sdm\SanksiAdmController@update');
     $router->delete('sdm-adm-sanksi','Sdm\SanksiAdmController@destroy');
-
+    
+    
 });
 
+$router->post('select-query', 'Esaku\Inventori\Sync2Controller@selectQuery');
 $router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
