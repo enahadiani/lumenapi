@@ -416,7 +416,7 @@ class Sync2Controller extends Controller
                 $nik= $request->nik;
             }
 
-            $url = "https://api.simkug.com/api/";
+            $url = "https://devapi.simkug.com/api/";
             $param = array(
                 'nik' => 'kasir',
                 'password' => 'saisai'
@@ -442,9 +442,9 @@ class Sync2Controller extends Controller
                 $total = 0;
                 $x=0;
                 if($jum_vendor > 0){
-                    $sql_vendor .= " delete from vendor where kode_lokasi='$kode_lokasi'; ";
+                    $sql_vendor .= " delete from vendor where kode_lokasi='04x'; ";
                     foreach($vendor as $row){
-                        $sql_vendor .= " insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values ('".$row->kode_vendor."','$kode_lokasi','".$row->nama."','".$row->alamat."','".$row->no_tel."','".$row->email."','".$row->npwp."','".$row->pic."','".$row->alamat2."','".$row->bank."','".$row->cabang."','".$row->no_rek."','".$row->nama_rek."','".$row->no_fax."','".$row->no_pictel."','-','-','-','-','".$row->akun_hutang."'); ";
+                        $sql_vendor .= " insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang) values ('".$row->kode_vendor."','04x','".$row->nama."','".$row->alamat."','".$row->no_tel."','".$row->email."','".$row->npwp."','".$row->pic."','".$row->alamat2."','".$row->bank."','".$row->cabang."','".$row->no_rek."','".$row->nama_rek."','".$row->no_fax."','".$row->no_pictel."','-','-','-','-','".$row->akun_hutang."'); ";
                         $x++;
                         if($i % 1000 == 0){
                             $sql_vendor = $begin.$sql_vendor.$commit;
@@ -489,9 +489,9 @@ class Sync2Controller extends Controller
                 $x=0;
                 $i=1;
                 if($jum_barang > 0){
-                    $sql_barang .= " delete from brg_barang where kode_lokasi='$kode_lokasi'; ";
+                    $sql_barang .= " delete from brg_barang where kode_lokasi='04x'; ";
                     foreach($barang as $row){                    
-                        $sql_barang .= "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,nilai_beli) values ('".$row->kode_barang."','".$this->allowKutip($row->nama)."','$kode_lokasi','".$row->sat_kecil."','$row->sat_besar',$row->jml_sat,".floatval($row->hna).",'".$row->pabrik."','$row->flag_gen','$row->flag_aktif',".floatval($row->ss).",".floatval($row->sm1).",".floatval($row->sm2).",".floatval($row->mm1).",".floatval($row->mm2).",".floatval($row->fm1).",".floatval($row->fm2).",'".$row->kode_klp."','".$row->file_gambar."','".$row->barcode."',".floatval($row->hrg_satuan).",".floatval($row->ppn).",".floatval($row->profit).",".floatval($row->nilai_beli)."); ";
+                        $sql_barang .= "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,nilai_beli) values ('".$row->kode_barang."','".$this->allowKutip($row->nama)."','04x','".$row->sat_kecil."','$row->sat_besar',$row->jml_sat,".floatval($row->hna).",'".$row->pabrik."','$row->flag_gen','$row->flag_aktif',".floatval($row->ss).",".floatval($row->sm1).",".floatval($row->sm2).",".floatval($row->mm1).",".floatval($row->mm2).",".floatval($row->fm1).",".floatval($row->fm2).",'".$row->kode_klp."','".$row->file_gambar."','".$row->barcode."',".floatval($row->hrg_satuan).",".floatval($row->ppn).",".floatval($row->profit).",".floatval($row->nilai_beli)."); ";
                         $x++;
                         if($i % 1000 == 0){
                             $sql_barang = $begin.$sql_barang.$commit;
@@ -534,10 +534,10 @@ class Sync2Controller extends Controller
                 $x=0;
                 $i=1;
                 if($jum_gudang > 0){
-                    $sql_gudang .= " delete from brg_gudang where kode_lokasi='$kode_lokasi'; ";
+                    $sql_gudang .= " delete from brg_gudang where kode_lokasi='04x'; ";
                     foreach($gudang as $row){
             
-                        $sql_gudang .= "insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp) values ('".$row->kode_gudang."','$kode_lokasi','".$row->nama."','".$row->pic."','".$row->telp."','".$row->alamat."','".$row->kode_pp."'); ";
+                        $sql_gudang .= "insert into brg_gudang(kode_gudang,kode_lokasi,nama,pic,telp,alamat,kode_pp) values ('".$row->kode_gudang."','04x','".$row->nama."','".$row->pic."','".$row->telp."','".$row->alamat."','".$row->kode_pp."'); ";
                         $x++;
                         if($i % 1000 == 0){
                             $sql_gudang = $begin.$sql_gudang.$commit;
@@ -582,10 +582,10 @@ class Sync2Controller extends Controller
                 $x=0;
                 $i=1;
                 if($jum_klp > 0){
-                    $sql_klp .= "delete from brg_barangklp where kode_lokasi='$kode_lokasi';";
+                    $sql_klp .= "delete from brg_barangklp where kode_lokasi='04x';";
     
                     foreach($klp as $row){
-                        $sql_klp .= "insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp) values ('".$row->kode_klp."','$kode_lokasi','".$row->nama."','".$row->akun_pers."','".$row->akun_pdpt."','".$row->akun_hpp."'); ";
+                        $sql_klp .= "insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp) values ('".$row->kode_klp."','04x','".$row->nama."','".$row->akun_pers."','".$row->akun_pdpt."','".$row->akun_hpp."'); ";
                         $x++;
                         if($i % 1000 == 0){
                             $sql_klp = $begin.$sql_klp.$commit;
@@ -632,10 +632,10 @@ class Sync2Controller extends Controller
                 $i=1;
                 if($jum_satuan > 0){
                     
-                    $sql_satuan .= "delete from brg_satuan where kode_lokasi='$kode_lokasi'; ";
+                    $sql_satuan .= "delete from brg_satuan where kode_lokasi='04x'; ";
                     foreach($satuan as $row){
             
-                        $sql_satuan .= "insert into brg_satuan(kode_satuan,kode_lokasi,nama) values ('".$row->kode_satuan."','$kode_lokasi','".$row->nama."'); ";
+                        $sql_satuan .= "insert into brg_satuan(kode_satuan,kode_lokasi,nama) values ('".$row->kode_satuan."','04x','".$row->nama."'); ";
                         $x++;
                         if($i % 1000 == 0){
                             $sql_satuan = $begin.$sql_satuan.$commit;
@@ -681,10 +681,10 @@ class Sync2Controller extends Controller
                 $i=1;
                 if($jum_bonus > 0){
     
-                    $sql_bonus .= "delete from brg_bonus where kode_lokasi='$kode_lokasi'; ";
+                    $sql_bonus .= "delete from brg_bonus where kode_lokasi='04x'; ";
                     foreach($bonus as $row){
     
-                        $sql_bonus .= "insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values ('".$row->kode_barang."','".$row->keterangan."','$kode_lokasi',".floatval($row->ref_qty).",".floatval($row->bonus_qty).",'".$row->tgl_mulai."','".$row->tgl_selesai."'); ";
+                        $sql_bonus .= "insert into brg_bonus(kode_barang,keterangan,kode_lokasi,ref_qty,bonus_qty,tgl_mulai,tgl_selesai) values ('".$row->kode_barang."','".$row->keterangan."','04x',".floatval($row->ref_qty).",".floatval($row->bonus_qty).",'".$row->tgl_mulai."','".$row->tgl_selesai."'); ";
                         $x++;
                         if($i % 1000 == 0){
                             $sql_bonus = $begin.$sql_bonus.$commit;
