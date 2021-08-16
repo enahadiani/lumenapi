@@ -107,6 +107,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sync-retur-beli','Esaku\Inventori\Sync2Controller@getSyncReturBeli');
     $router->get('sync-retur-beli-detail','Esaku\Inventori\Sync2Controller@getSyncReturBeliDetail');
     $router->get('load-sync-retur-beli','Esaku\Inventori\Sync2Controller@loadSyncReturBeli');
+    $router->post('sync-retur-beli','Esaku\Inventori\Sync2Controller@syncReturBeli');
 
     // KEUANGAN
     $router->get('jurnal','Esaku\Keuangan\JurnalController@index');

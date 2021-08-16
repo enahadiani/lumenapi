@@ -1881,43 +1881,305 @@ class Sync2Controller extends Controller
         
     }
 
+    // public function syncReturBeli(Request $request)
+    // {
+    //     DB::connection($this->sql2)->beginTransaction();
+        
+    //     try {
+    //         if($data =  Auth::guard($this->guard2)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
+
+    //         if($request->transm != "" ){
+    //             $instransm = DB::connection($this->sql2)->insert($request->transm);
+    //         }
+    //         if($request->transj != "" ){
+    //             $instransj = DB::connection($this->sql2)->insert($request->transj);
+    //         }
+    //         if($request->brgbeli != "" ){
+    //             $insbrgbeli = DB::connection($this->sql2)->insert($request->brgbeli);
+    //         }
+    //         if($request->brgtrans != ""){
+    //             $insbrgtrans = DB::connection($this->sql2)->insert($request->brgtrans);
+    //         }
+    //         if($request->histori != ""){
+    //             $inshistori = DB::connection($this->sql)->insert($request->histori);
+    //         }
+            
+    //         DB::connection($this->sql2)->commit();
+    //         $success['status'] = true;
+    //         $success['req'] = $request->all();
+    //         $success['message'] = "Synchronize Data Successfully. ";
+    //         return response()->json($success, $this->successStatus);     
+    //     } catch (\Throwable $e) {
+    //         DB::connection($this->sql2)->rollback();
+    //         $success['status'] = false;
+    //         $success['message'] = "Synchronize Data Failed. ".$e;
+    //         return response()->json($success, $this->successStatus); 
+    //     }		
+        
+    // }
+
     public function syncReturBeli(Request $request)
     {
-        DB::connection($this->sql2)->beginTransaction();
-        
         try {
-            if($data =  Auth::guard($this->guard2)->user()){
+            if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if($request->transm != "" ){
-                $instransm = DB::connection($this->sql2)->insert($request->transm);
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
-            if($request->transj != "" ){
-                $instransj = DB::connection($this->sql2)->insert($request->transj);
-            }
-            if($request->brgbeli != "" ){
-                $insbrgbeli = DB::connection($this->sql2)->insert($request->brgbeli);
-            }
-            if($request->brgtrans != ""){
-                $insbrgtrans = DB::connection($this->sql2)->insert($request->brgtrans);
-            }
-            if($request->histori != ""){
-                $inshistori = DB::connection($this->sql)->insert($request->histori);
+
+            $url = "https://devapi.simkug.com/api/";
+            $param = array(
+                'nik' => 'kasir',
+                'password' => 'saisai'
+            );
+            $res = $this->getToken($url."ginas/login",$param);
+            if(isset($res['message']) && $res['message'] == 'success'){
+                $token = $res['token'];
+                $msg = "";
+                $id =  $this->generateKode("sync_retbeli", "id", $kode_lokasi.'SC'.date('Y'), "00001");
+                $sql = "";
+
+                $sql = "";
+                $begin = "SET NOCOUNT on;
+                BEGIN tran;
+                ";
+                $commit = "commit tran;";
+                //TRANSM
+                $sql_transm = "";
+
+                $transm = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3 from trans_m where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and form='BRGRETBELI' ");
+                $jum_transm = count($transm);
+                
+                $i=1;
+                $sts_loop = true;
+                $msg_loop = "";
+                $c = 1;
+                $total = 0;
+                $x=0;
+                if($jum_transm > 0){
+                    foreach($transm as $row){
+                        
+                        $sql_transm .= "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,id_sync) values 
+                        ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->tgl_input."','".$row->nik_user."','".$row->periode."','".$row->modul."','".$row->form."','".$row->posted."','".$row->prog_seb."','".$row->progress."','".$row->kode_pp."','".$row->tanggal."','".$row->no_dokumen."','".$row->keterangan."','".$row->kode_curr."',".floatval($row->kurs).",".floatval($row->nilai1).",".floatval($row->nilai2).",".floatval($row->nilai3).",'".$row->nik1."','".$row->nik2."','".$row->nik3."','".$row->no_ref1."','".$row->no_ref2."','".$row->no_ref3."','".$row->param1."','".$row->param2."','".$row->param3."','$id');";
+                        $x++;
+                        if($i % 1000 == 0){
+                            $sql_transm = $begin.$sql_transm.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_transm);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping transm 1000 ke ".$c;
+                            }else{
+                                $total +=1000;
+                            }
+                            $sql_transm = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        if($i == count($transm) && ($i % 1000 != 0) ){
+                            $sql_transm = $begin.$sql_transm.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_transm);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping transm 1000 ke ".$c;
+                            }else{
+                                $total +=$x;
+                            }
+                            $sql_transm = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        $i++;
+                    }
+                }
+
+                $msg .= "Sync trans_m sukses, total trans_m: ".count($transm).", error: ".$msg_loop.", total trans_m berhasil: ".$total.".";
+    
+                //TRANSJ
+                
+                $sql_transj = "";
+                $transj = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3 from trans_j where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and modul='BRGBELI' and jenis ='BRGRETBELI'");
+                $jum_transj = count($transj);
+                $c = 1;
+                $total = 0;
+                $x=0;
+                $i=1;
+                if($jum_transj > 0){
+                    foreach($transj as $row){
+                        
+                        $sql_transj .= "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values 
+                        ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->tgl_input."','".$row->nik_user."','".$row->periode."','".$row->no_dokumen."','".$row->tanggal."',".$row->nu.",'".$row->kode_akun."','".$row->dc."',".floatval($row->nilai).",".floatval($row->nilai_curr).",'".$row->keterangan."','".$row->modul."','".$row->jenis."','".$row->kode_curr."',".floatval($row->kurs).",'".$row->kode_pp."','".$row->kode_drk."','".$row->kode_cust."','".$row->kode_vendor."','".$row->no_fa."','".$row->no_selesai."','".$row->no_ref1."','".$row->no_ref2."','".$row->no_ref3."','$id');";
+                        $x++;
+                        if($i % 1000 == 0){
+                            $sql_transj = $begin.$sql_transj.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_transj);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping transj 1000 ke ".$c;
+                            }else{
+                                $total +=1000;
+                            }
+                            $sql_transj = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        if($i == count($transj) && ($i % 1000 != 0) ){
+                            $sql_transj = $begin.$sql_transj.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_transj);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping transj 1000 ke ".$c;
+                            }else{
+                                $total +=$x;
+                            }
+                            $sql_transj = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        $i++;
+                    }
+                }
+                $msg .= " Sync trans_j sukses, total trans_j: ".count($transj).", error: ".$msg_loop.", total trans_j berhasil: ".$total.".";
+    
+                //BRGBELI BAYAR
+
+                $sql_brgbeli = "";
+                $brgbeli = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,no_beli,kode_vendor,periode,dc,modul,nilai,nik_user,tgl_input from brg_belibayar_d where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and modul='KBBELICCL' ");
+                $jum_brgbeli = count($brgbeli);
+                $c = 1;
+                $total = 0;
+                $x=0;
+                $i=1;
+                if($jum_brgbeli > 0){
+                    foreach($brgbeli as $row){
+                        
+                        $sql_brgbeli .= "insert into brg_belibayar_d(no_bukti,kode_lokasi,no_beli,kode_vendor,periode,dc,modul,nilai,nik_user,tgl_input,id_sync) 
+                        values ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->no_beli."','".$row->kode_vendor."', '".$row->periode."','".$row->dc."','".$row->modul."',".floatval($row->nilai).",'".$row->nik_user."','".$row->tgl_input."','$id');";
+                        $x++;
+                        if($i % 1000 == 0){
+                            $sql_brgbeli = $begin.$sql_brgbeli.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_brgbeli);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping brgbeli 1000 ke ".$c;
+                            }else{
+                                $total +=1000;
+                            }
+                            $sql_brgbeli = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        if($i == count($brgbeli) && ($i % 1000 != 0) ){
+                            $sql_brgbeli = $begin.$sql_brgbeli.$commit;
+                            $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_brgbeli);
+                            $success['curl'][] = $curl;
+                            if(!$curl['status']){
+                                $sts_loop = false;
+                                $msg_loop .= "gagal di looping brgbeli 1000 ke ".$c;
+                            }else{
+                                $total +=$x;
+                            }
+                            $sql_brgbeli = "";
+                            $x = 0;
+                            $c++;
+                        }
+                        $i++;
+                    }
+                }
+    
+                $msg .= " Sync brg_belibayar_d sukses, total brg_belibayar_d: ".count($brgbeli).", error: ".$msg_loop.", total brg_belibayar_d berhasil: ".$total.".";
+
+                //BRGTRANS
+                $sql_brgtrans = "";
+
+                $brgtrans = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total
+                from brg_trans_d where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-'  and modul='BRGRETBELI'");
+                $jum_brgtrans = count($brgtrans);
+                $c = 1;
+                $total = 0;
+                $x=0;
+                $i=1;
+                if($jum_brgtrans > 0){
+                    foreach($brgtrans as $row){
+                    
+                        $sql_brgtrans .= "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,id_sync) values 
+                            ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->periode."','".$row->modul."','".$row->form."',".$row->nu.",'".$row->kode_gudang."','".$row->kode_barang."','".$row->no_batch."','".$row->tgl_ed."','".$row->satuan."','".$row->dc."',".floatval($row->stok).",".floatval($row->jumlah).",".floatval($row->bonus).",".floatval($row->harga).",".floatval($row->hpp).",".floatval($row->p_disk).",".floatval($row->diskon).",".floatval($row->tot_diskon).",".floatval($row->total).",'$id'); ";
+                            $x++;
+                            if($i % 1000 == 0){
+                                $sql_brgtrans = $begin.$sql_brgtrans.$commit;
+                                $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_brgtrans);
+                                $success['curl'][] = $curl;
+                                if(!$curl['status']){
+                                    $sts_loop = false;
+                                    $msg_loop .= "gagal di looping brgtrans 1000 ke ".$c;
+                                }else{
+                                    $total +=1000;
+                                }
+                                $sql_brgtrans = "";
+                                $x = 0;
+                                $c++;
+                            }
+                            if($i == count($brgtrans) && ($i % 1000 != 0) ){
+                                $sql_brgtrans = $begin.$sql_brgtrans.$commit;
+                                $curl = $this->postSql($url."ginas/exec-sql",$token,$sql_brgtrans);
+                                $success['curl'][] = $curl;
+                                if(!$curl['status']){
+                                    $sts_loop = false;
+                                    $msg_loop .= "gagal di looping brgtrans 1000 ke ".$c;
+                                }else{
+                                    $total +=$x;
+                                }
+                                $sql_brgtrans = "";
+                                $x = 0;
+                                $c++;
+                            }
+                            $i++;
+                    }
+                }
+
+                $msg .= " Sync brg_trans_d barang sukses, total brg_trans_d barang: ".count($brgtrans).", error: ".$msg_loop.", total brg_trans_d barang berhasil: ".$total.".";
+
+                $total = $jum_transm+$jum_transj+$jum_brgbeli+$jum_brgtrans;
+                $sql_his = "insert into sync_retbeli (id,kode_lokasi,keterangan,tgl_sync,nik_user,total_rows) 
+                    values ('$id','$kode_lokasi','DATA RETUR BELI DAN JURNAL',getdate(),'$nik',$total);insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                    values ('$kode_lokasi','TRANS M',$jum_transm,'$id');
+                    insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                    values ('$kode_lokasi','TRANS J',$jum_transj,'$id');
+                    insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                    values ('$kode_lokasi','BRG BAYAR',$jum_brgbeli,'$id');
+                    insert into sync_retbeli_d (kode_lokasi,keterangan,total_rows,id) 
+                    values ('$kode_lokasi','BRG TRANSD',$jum_brgtrans,'$id');
+                    update trans_m set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi' and form='BRGRETBELI';
+                    update trans_j set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi' and modul='BRGBELI' and jenis='BRGRETBELI';
+                    update brg_belibayar_d set id_sync='$id' where isnull(id_sync,'-') = '-' and kode_lokasi='$kode_lokasi' and modul='KBBELICCL';
+                    update brg_trans_d set id_sync='$id' where isnull(id_sync,'-') = '-' and kode_lokasi='$kode_lokasi' and modul='BRGRETBELI'; ";
+
+                $success['histori'] = DB::connection($this->sql)->update($begin.$sql_his.$commit);
+                $success['status'] = true;
+                $success['message'] = $msg;
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Error, Unauthorized!";
             }
             
-            DB::connection($this->sql2)->commit();
-            $success['status'] = true;
-            $success['req'] = $request->all();
-            $success['message'] = "Synchronize Data Successfully. ";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql2)->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
-            $success['message'] = "Synchronize Data Failed. ".$e;
+            $success['message'] = "Error. ".$e;
             return response()->json($success, $this->successStatus); 
-        }		
+        }				
+        
         
     }
 
