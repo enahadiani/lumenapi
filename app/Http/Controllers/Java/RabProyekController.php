@@ -127,9 +127,15 @@ class RabProyekController extends Controller {
             $per = substr($periode, 2, 4);
             $no_rab = $this->generateKode('java_rab_m', 'no_rab', $kode_lokasi."-AGR$per".".", '00001');
 
-            $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '".$request->no_proyek."', '$tanggal', getdate(), '".$request->nilai_anggaran."')";
-            DB::connection($this->sql)->insert($insertM);
+            $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, nilai_anggaran, tgl_input)
+            values (?, ?, ?, ?, ?, getdate())";
+            DB::connection($this->sql)->insert($insertM, [
+                $no_rab,
+                $kode_lokasi,
+                $request->input('no_proyek'),
+                $tanggal,
+                $request->input('nilai_anggaran'),
+            ]);
 
             $arr_foto = array();
             $arr_jenis = array();
@@ -153,10 +159,17 @@ class RabProyekController extends Controller {
                     }
                 }
                 if(count($arr_no_urut) > 0){
-                    for($i=0; $i<count($arr_no_urut);$i++){
+                    for($i=0; $i<count($arr_no_urut);$i++) {
                         $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                        values ('".$no_rab."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                        DB::connection($this->sql)->insert($insertFile); 
+                        values (?, ?, ?, ?, ?, ?)";
+                        DB::connection($this->sql)->insert($insertFile, [
+                            $no_rab,
+                            $kode_lokasi,
+                            $arr_foto[$i],
+                            $arr_no_urut[$i],
+                            $arr_nama_dok[$i],
+                            $arr_jenis[$i]
+                        ]); 
                     }
                 }
             }
@@ -170,10 +183,17 @@ class RabProyekController extends Controller {
 
                 for($i=0;$i<count($request->nomor);$i++) {
                     $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
-                    values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                    '".$nomor[$i]."', '".$keterangan[$i]."')";
+                    values (?, ?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD, [
+                        $no_rab,
+                        $kode_lokasi,
+                        $jumlah[$i],
+                        $satuan[$i],
+                        $harga[$i],
+                        $nomor[$i],
+                        $keterangan[$i]
+                    ]);
                 }
             }
 
@@ -262,16 +282,29 @@ class RabProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$no_rab."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $no_rab,
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]);  
                         }
                     }
                 }
             }
 
-            $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, tgl_input, nilai_anggaran)
-            values ('$no_rab', '$kode_lokasi', '".$request->no_proyek."', '$tanggal', getdate(), '".$request->nilai_anggaran."')";
-            DB::connection($this->sql)->insert($insertM);
+            $insertM = "insert into java_rab_m (no_rab, kode_lokasi, no_proyek, tanggal, nilai_anggaran, tgl_input)
+            values (?, ?, ?, ?, ?, getdate())";
+            DB::connection($this->sql)->insert($insertM, [
+                $no_rab,
+                $kode_lokasi,
+                $request->input('no_proyek'),
+                $tanggal,
+                $request->input('nilai_anggaran'),
+            ]);
 
             if(!empty($request->input('nomor'))) {
                 $jumlah = $request->input('jumlah');
@@ -282,10 +315,17 @@ class RabProyekController extends Controller {
 
                 for($i=0;$i<count($request->nomor);$i++) {
                     $insertD = "insert into java_rab_d (no_rab, kode_lokasi, jumlah, satuan, harga, no, keterangan)
-                    values ('$no_rab', '$kode_lokasi', '".$jumlah[$i]."', '".$satuan[$i]."', '".$harga[$i]."', 
-                    '".$nomor[$i]."', '".$keterangan[$i]."')";
+                    values (?, ?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD, [
+                        $no_rab,
+                        $kode_lokasi,
+                        $jumlah[$i],
+                        $satuan[$i],
+                        $harga[$i],
+                        $nomor[$i],
+                        $keterangan[$i]
+                    ]);
                 }
             }
 
