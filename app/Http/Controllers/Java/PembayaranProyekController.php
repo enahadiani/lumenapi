@@ -177,9 +177,18 @@ class PembayaranProyekController extends Controller {
 
             $insertM = "insert into java_bayar (no_bayar, kode_lokasi, tanggal, keterangan, nilai, kode_bank, 
             kode_cust, jenis, biaya_lain, tgl_input)
-            values ('$no_bayar', '$kode_lokasi', '".$request->tanggal."', '".$request->keterangan."', 
-            '".$request->nilai."', '".$request->kode_bank."', '".$request->kode_cust."', '".$request->jenis."', '".$request->biaya_lain."', getdate())";
-            DB::connection($this->sql)->insert($insertM);
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
+            DB::connection($this->sql)->insert($insertM, [
+                $no_bayar,
+                $kode_lokasi,
+                $request->input('tanggal'),
+                $request->input('keterangan'),
+                $request->input('nilai'),
+                $request->input('kode_bank'),
+                $request->input('kode_cust'),
+                $request->input('jenis'),
+                $request->input('biaya_lain'),
+            ]);
 
             $nilai_bayar  = $request->input('nilai_bayar');
             $nilai_tagihan  = $request->input('nilai_tagihan');
@@ -189,10 +198,17 @@ class PembayaranProyekController extends Controller {
 
             for($i=0;$i<count($request->nomor);$i++) {
                 $insertD = "insert into java_bayar_detail (no_bayar, kode_lokasi, no, no_tagihan, nilai_bayar, no_dokumen, nilai_tagihan)
-                values ('$no_bayar', '$kode_lokasi', '".$nomor[$i]."', '".$no_tagihan[$i]."', 
-                '".$nilai_bayar[$i]."', '".$no_dokumen[$i]."', '".$nilai_tagihan[$i]."')";
+                values (?, ?, ?, ?, ?, ?, ?)";
 
-                DB::connection($this->sql)->insert($insertD);
+                DB::connection($this->sql)->insert($insertD, [
+                    $no_bayar,
+                    $kode_lokasi,
+                    $nomor[$i],
+                    $no_tagihan[$i],
+                    $nilai_bayar[$i],
+                    $no_dokumen[$i],
+                    $nilai_tagihan[$i]
+                ]);
             }
             
             $arr_foto = array();
@@ -219,8 +235,15 @@ class PembayaranProyekController extends Controller {
                 if(count($arr_no_urut) > 0){
                     for($i=0; $i<count($arr_no_urut);$i++){
                         $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                        values ('".$no_bayar."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                        DB::connection($this->sql)->insert($insertFile); 
+                        values (?, ?, ?, ?, ?, ?)";
+                        DB::connection($this->sql)->insert($insertFile, [
+                            $no_bayar,
+                            $kode_lokasi,
+                            $arr_foto[$i],
+                            $arr_no_urut[$i],
+                            $arr_nama_dok[$i],
+                            $arr_jenis[$i]
+                        ]); 
                     }
                 }
             }
@@ -278,9 +301,18 @@ class PembayaranProyekController extends Controller {
 
             $insertM = "insert into java_bayar (no_bayar, kode_lokasi, tanggal, keterangan, nilai, kode_bank, 
             kode_cust, jenis, biaya_lain, tgl_input)
-            values ('$no_bayar', '$kode_lokasi', '".$request->tanggal."', '".$request->keterangan."', 
-            '".$request->nilai."', '".$request->kode_bank."', '".$request->kode_cust."', '".$request->jenis."', '".$request->biaya_lain."', getdate())";
-            DB::connection($this->sql)->insert($insertM);
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
+            DB::connection($this->sql)->insert($insertM, [
+                $no_bayar,
+                $kode_lokasi,
+                $request->input('tanggal'),
+                $request->input('keterangan'),
+                $request->input('nilai'),
+                $request->input('kode_bank'),
+                $request->input('kode_cust'),
+                $request->input('jenis'),
+                $request->input('biaya_lain'),
+            ]);
 
             $nilai_bayar  = $request->input('nilai_bayar');
             $nilai_tagihan  = $request->input('nilai_tagihan');
@@ -290,10 +322,17 @@ class PembayaranProyekController extends Controller {
 
             for($i=0;$i<count($request->nomor);$i++) {
                 $insertD = "insert into java_bayar_detail (no_bayar, kode_lokasi, no, no_tagihan, nilai_bayar, no_dokumen, nilai_tagihan)
-                values ('$no_bayar', '$kode_lokasi', '".$nomor[$i]."', '".$no_tagihan[$i]."', 
-                '".$nilai_bayar[$i]."', '".$no_dokumen[$i]."', '".$nilai_tagihan[$i]."')";
+                values (?, ?, ?, ?, ?, ?, ?)";
 
-                DB::connection($this->sql)->insert($insertD);
+                DB::connection($this->sql)->insert($insertD, [
+                    $no_bayar,
+                    $kode_lokasi,
+                    $nomor[$i],
+                    $no_tagihan[$i],
+                    $nilai_bayar[$i],
+                    $no_dokumen[$i],
+                    $nilai_tagihan[$i]
+                ]);
             }
 
             $arr_foto = array();
@@ -339,8 +378,15 @@ class PembayaranProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$no_bayar."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $no_bayar,
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]);  
                         }
                     }
                 }
