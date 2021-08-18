@@ -75,10 +75,17 @@ class BankController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            // $insert= "insert into java_bank(kode_bank, nama, no_rek, kode_lokasi, tgl_input)
+            // values('$request->kode_bank', '$request->nama', '$request->no_rek', '$kode_lokasi', getdate())";
             $insert= "insert into java_bank(kode_bank, nama, no_rek, kode_lokasi, tgl_input)
-            values('$request->kode_bank', '$request->nama', '$request->no_rek', '$kode_lokasi', getdate())";
+            values(?, ?, ?, ?, getdate())";
                 
-            DB::connection($this->sql)->insert($insert);
+            DB::connection($this->sql)->insert($insert, [
+                $request->input('kode_bank'), 
+                $request->input('nama'),
+                $request->input('no_rek'),
+                $kode_lokasi
+            ]);
                 
             $success['status'] = true;
             $success['kode'] = $request->kode_bank;
@@ -114,9 +121,14 @@ class BankController extends Controller {
             ->delete();
 
             $insert= "insert into java_bank(kode_bank, nama, no_rek, kode_lokasi, tgl_input)
-            values('$request->kode_bank', '$request->nama', '$request->no_rek', '$kode_lokasi', getdate())";
+            values(?, ?, ?, ?, getdate())";
                 
-            DB::connection($this->sql)->insert($insert);
+            DB::connection($this->sql)->insert($insert, [
+                $request->input('kode_bank'), 
+                $request->input('nama'),
+                $request->input('no_rek'),
+                $kode_lokasi
+            ]);
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
