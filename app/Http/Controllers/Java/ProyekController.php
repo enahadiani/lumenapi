@@ -199,10 +199,22 @@ class ProyekController extends Controller {
 
             if($this->isUnikKontrak($request->no_kontrak, $kode_lokasi) && $this->isUnikProyek($request->no_proyek, $kode_lokasi)) {
                 $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
-                values ('".$request->no_proyek."', '".$kode_lokasi."', '".$request->keterangan."', '".$request->kode_cust."', '".$request->no_kontrak."',
-                '".$request->tgl_selesai."', '".$request->tgl_mulai."','".$request->nilai."', '".$request->ppn."', '".$request->status_ppn."', '".$request->periode."', '".$request->status."', getdate())";
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
 
-                DB::connection($this->sql)->insert($insert);
+                DB::connection($this->sql)->insert($insert, [
+                    $request->input('no_proyek'),
+                    $kode_lokasi,
+                    $request->input('keterangan'),
+                    $request->input('kode_cust'),
+                    $request->input('no_kontrak'),
+                    $request->input('tgl_selesai'),
+                    $request->input('tgl_mulai'),
+                    $request->input('nilai'),
+                    $request->input('ppn'),
+                    $request->input('status_ppn'),
+                    $request->input('periode'),
+                    $request->input('status'),
+                ]);
 
                 $arr_foto = array();
                 $arr_jenis = array();
@@ -228,8 +240,15 @@ class ProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $request->input('no_proyek'),
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]); 
                         }
                     }
                 }
@@ -282,10 +301,22 @@ class ProyekController extends Controller {
             ->delete();
 
             $insert = "insert into java_proyek(no_proyek, kode_lokasi, keterangan, kode_cust, no_kontrak, tgl_selesai, tgl_mulai, nilai, ppn, status_ppn, periode, flag_aktif, tgl_input)
-            values ('".$request->no_proyek."', '".$kode_lokasi."', '".$request->keterangan."', '".$request->kode_cust."', '".$request->no_kontrak."',
-            '".$request->tgl_selesai."', '".$request->tgl_mulai."','".$request->nilai."', '".$request->ppn."', '".$request->status_ppn."', '".$request->periode."', '".$request->status."', getdate())";
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
 
-            DB::connection($this->sql)->insert($insert);
+            DB::connection($this->sql)->insert($insert, [
+                $request->input('no_proyek'),
+                $kode_lokasi,
+                $request->input('keterangan'),
+                $request->input('kode_cust'),
+                $request->input('no_kontrak'),
+                $request->input('tgl_selesai'),
+                $request->input('tgl_mulai'),
+                $request->input('nilai'),
+                $request->input('ppn'),
+                $request->input('status_ppn'),
+                $request->input('periode'),
+                $request->input('status'),
+            ]);
             $arr_foto = array();
             $arr_jenis = array();
             $arr_no_urut = array();
@@ -329,8 +360,15 @@ class ProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$request->no_proyek."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $request->input('no_proyek'),
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]); 
                         }
                     }
                 }
