@@ -141,8 +141,7 @@ class FSController extends Controller
             }
             if($this->isUnik($request->kode_fs,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status,tgl_input) values 
-                                                         ('".$request->kode_fs."','".$request->nama."','".$kode_lokasi."','".$request->flag_status."',getdate())");
+                $ins = DB::connection($this->sql)->insert("insert into fs(kode_fs,nama,kode_lokasi,flag_status,tgl_input) values (?, ?, ?, ?, getdate())",array($request->kode_fs,$request->nama,$kode_lokasi,$request->flag_status));
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
