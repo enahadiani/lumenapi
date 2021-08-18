@@ -277,10 +277,21 @@ class BiayaProyekController extends Controller {
 
             if($this->isUnikDokumen($request->no_dokumen, $kode_lokasi)) {
                 $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
-                values ('$no_bukti', '$kode_lokasi', '".$request->tanggal."', '".$request->keterangan."', '".$request->no_dokumen."',
-                '".$request->kode_vendor."', '".$request->nilai."','".$request->status."', '".$request->no_proyek."', '".$request->kode_cust."', '".$request->no_rab."', getdate())";
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
 
-                DB::connection($this->sql)->insert($insert);
+                DB::connection($this->sql)->insert($insert, [
+                    $no_bukti,
+                    $kode_lokasi,
+                    $request->input('tanggal'),
+                    $request->input('keterangan'),
+                    $request->input('no_dokumen'),
+                    $request->input('kode_vendor'),
+                    $request->input('nilai'),
+                    $request->input('status'),
+                    $request->input('no_proyek'),
+                    $request->input('kode_cust'),
+                    $request->input('no_rab'),
+                ]);
 
                 $arr_foto = array();
                 $arr_jenis = array();
@@ -306,8 +317,15 @@ class BiayaProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$no_bukti."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $no_bukti,
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]); 
                         }
                     }
                 }
@@ -367,10 +385,21 @@ class BiayaProyekController extends Controller {
             ->delete();
 
             $insert = "insert into java_beban(no_bukti, kode_lokasi, tanggal, keterangan, no_dokumen, kode_vendor, nilai, status, no_proyek, kode_cust, no_rab, tgl_input)
-            values ('$no_bukti', '$kode_lokasi', '".$request->tanggal."', '".$request->keterangan."', '".$request->no_dokumen."',
-            '".$request->kode_vendor."', '".$request->nilai."','".$request->status."', '".$request->no_proyek."', '".$request->kode_cust."', '".$request->no_rab."', getdate())";
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
 
-            DB::connection($this->sql)->insert($insert);
+            DB::connection($this->sql)->insert($insert, [
+                $no_bukti,
+                $kode_lokasi,
+                $request->input('tanggal'),
+                $request->input('keterangan'),
+                $request->input('no_dokumen'),
+                $request->input('kode_vendor'),
+                $request->input('nilai'),
+                $request->input('status'),
+                $request->input('no_proyek'),
+                $request->input('kode_cust'),
+                $request->input('no_rab'),
+            ]);
 
             if(!empty($cek)) {
                 if(count($request->file) > 0) { 
@@ -409,8 +438,15 @@ class BiayaProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$no_bukti."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $no_bukti,
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]); 
                         }
                     }
                 }
