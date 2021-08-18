@@ -140,13 +140,32 @@ class CustomerController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
+
                 $insertCust = "insert into java_cust(kode_cust, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
-                kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
-                values('$request->kode_customer', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
-                '$request->kode_pos', '$request->provinsi', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-                '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi', '$request->provinsi_name', '$request->kota_name', '$request->kecamatan_name')";
+                kota, negara, pic, no_telp_pic, email_pic, akun_piutang, kode_lokasi, provinsi_name, kota_name, kecamatan_name, tgl_input)
+                values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
+
                 
-                DB::connection($this->sql)->insert($insertCust);
+                DB::connection($this->sql)->insert($insertCust, [
+                   $request->input('kode_customer'), 
+                   $request->input('nama'), 
+                   $request->input('no_telp'), 
+                   $request->input('email'), 
+                   $request->input('alamat'), 
+                   $request->input('kode_pos'), 
+                   $request->input('provinsi'), 
+                   $request->input('kecamatan'), 
+                   $request->input('kota'), 
+                   $request->input('negara'), 
+                   $request->input('pic'), 
+                   $request->input('no_telp_pic'), 
+                   $request->input('email_pic'), 
+                   $request->input('akun_piutang'),
+                   $kode_lokasi,
+                   $request->input('provinsi_name'), 
+                   $request->input('kota_name'), 
+                   $request->input('kecamatan_name'), 
+                ]);
 
                 if(!empty($request->input('no_rek'))) {
                     $no_rek = $request->input('no_rek');
@@ -156,8 +175,15 @@ class CustomerController extends Controller
 
                     for($i=0;$i<count($request->no_rek);$i++) {
                         $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                        values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
-                        DB::connection($this->sql)->insert($insertDetail);
+                        values (?, ?, ?, ?, ?, ?)";
+                        DB::connection($this->sql)->insert($insertDetail, [
+                            $request->input('kode_customer'),
+                            $nama_rek[$i],
+                            $bank[$i],
+                            $cabang[$i],
+                            $kode_lokasi,
+                            $no_rek[$i]
+                        ]);
                     }
                 }
                 
@@ -241,12 +267,30 @@ class CustomerController extends Controller
             ->delete();
 
             $insertCust = "insert into java_cust(kode_cust, nama, no_telp, email, alamat, kode_pos, provinsi, kecamatan, 
-            kota, negara, pic, no_telp_pic, email_pic, akun_piutang, tgl_input, kode_lokasi, provinsi_name, kota_name, kecamatan_name)
-            values('$request->kode_customer', '$request->nama', '$request->no_telp', '$request->email', '$request->alamat',
-            '$request->kode_pos', '$request->provinsi', '$request->kecamatan', '$request->kota', '$request->negara', '$request->pic', '$request->no_telp_pic',
-            '$request->email_pic', '$request->akun_piutang', getdate(), '$kode_lokasi', '$request->provinsi_name', '$request->kota_name', '$request->kecamatan_name')";
+            kota, negara, pic, no_telp_pic, email_pic, akun_piutang, kode_lokasi, provinsi_name, kota_name, kecamatan_name, tgl_input)
+            values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
+
                 
-            DB::connection($this->sql)->insert($insertCust);
+            DB::connection($this->sql)->insert($insertCust, [
+                $request->input('kode_customer'), 
+                $request->input('nama'), 
+                $request->input('no_telp'), 
+                $request->input('email'), 
+                $request->input('alamat'), 
+                $request->input('kode_pos'), 
+                $request->input('provinsi'), 
+                $request->input('kecamatan'), 
+                $request->input('kota'), 
+                $request->input('negara'), 
+                $request->input('pic'), 
+                $request->input('no_telp_pic'), 
+                $request->input('email_pic'), 
+                $request->input('akun_piutang'),
+                $kode_lokasi,
+                $request->input('provinsi_name'), 
+                $request->input('kota_name'), 
+                $request->input('kecamatan_name'), 
+            ]);
                 
             if(!empty($request->input('no_rek'))) {
                 $no_rek = $request->input('no_rek');
@@ -256,8 +300,15 @@ class CustomerController extends Controller
 
                 for($i=0;$i<count($request->no_rek);$i++) {
                     $insertDetail = "insert into java_cust_detail(kode_cust, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
-                    values ('$request->kode_customer', '".$nama_rek[$i]."', '".$bank[$i]."', '".$cabang[$i]."', '$kode_lokasi', '".$no_rek[$i]."')";
-                    DB::connection($this->sql)->insert($insertDetail);
+                    values (?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->sql)->insert($insertDetail, [
+                        $request->input('kode_customer'),
+                        $nama_rek[$i],
+                        $bank[$i],
+                        $cabang[$i],
+                        $kode_lokasi,
+                        $no_rek[$i]
+                    ]);
                 }
             }
                 
