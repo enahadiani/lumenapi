@@ -140,11 +140,20 @@ class TagihanProyekController extends Controller {
             $no_tagihan = $this->generateKode('java_tagihan', 'no_tagihan', $kode_lokasi."-TGH$per".".", '00001');
 
             $insertM = "insert into java_tagihan (no_tagihan, kode_lokasi, no_proyek, tanggal, keterangan, nilai, 
-            tgl_input, biaya_lain, pajak, uang_muka, kode_cust)
-            values ('$no_tagihan', '$kode_lokasi', '".$request->no_proyek."', '".$request->tanggal."', 
-            '".$request->keterangan."', '".$request->nilai."', getdate(), '".$request->biaya_lain."', '".$request->pajak."', 
-            '".$request->uang_muka."', '".$request->kode_cust."')";
-            DB::connection($this->sql)->insert($insertM);
+            biaya_lain, pajak, uang_muka, kode_cust, tgl_input)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
+            DB::connection($this->sql)->insert($insertM, [
+                $no_tagihan,
+                $kode_lokasi,
+                $request->input('no_proyek'),
+                $request->input('tanggal'),
+                $request->input('keterangan'),
+                $request->input('nilai'),
+                $request->input('biaya_lain'),
+                $request->input('pajak'),
+                $request->input('uang_muka'),
+                $request->input('kode_cust'),
+            ]);
 
             if(!empty($request->input('nomor'))) { 
                 $harga  = $request->input('harga');
@@ -153,9 +162,15 @@ class TagihanProyekController extends Controller {
 
                 for($i=0;$i<count($request->nomor);$i++) {
                     $insertD = "insert into java_tagihan_detail (no_tagihan, kode_lokasi, no, item, harga)
-                    values ('$no_tagihan', '$kode_lokasi', '".$nomor[$i]."', '".$item[$i]."', '".$harga[$i]."')";
+                    values (?, ?, ?, ?, ?)";
 
-                    DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD, [
+                        $no_tagihan,
+                        $kode_lokasi,
+                        $nomor[$i],
+                        $item[$i],
+                        $harga[$i]
+                    ]);
                 }
             }
 
@@ -183,8 +198,15 @@ class TagihanProyekController extends Controller {
                 if(count($arr_no_urut) > 0){
                     for($i=0; $i<count($arr_no_urut);$i++){
                         $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                        values ('".$no_tagihan."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                        DB::connection($this->sql)->insert($insertFile); 
+                        values (?, ?, ?, ?, ?, ?)";
+                        DB::connection($this->sql)->insert($insertFile, [
+                            $no_tagihan,
+                            $kode_lokasi,
+                            $arr_foto[$i],
+                            $arr_no_urut[$i],
+                            $arr_nama_dok[$i],
+                            $arr_jenis[$i]
+                        ]); 
                     }
                 }
             }
@@ -237,11 +259,20 @@ class TagihanProyekController extends Controller {
             ->delete();
 
             $insertM = "insert into java_tagihan (no_tagihan, kode_lokasi, no_proyek, tanggal, keterangan, nilai, 
-            tgl_input, biaya_lain, pajak, uang_muka, kode_cust)
-            values ('$no_tagihan', '$kode_lokasi', '$request->no_proyek', '$request->tanggal', 
-            '$request->keterangan', '$request->nilai', getdate(), '$request->biaya_lain', '$request->pajak', 
-            '$request->uang_muka', '$request->kode_cust')";
-            DB::connection($this->sql)->insert($insertM);
+            biaya_lain, pajak, uang_muka, kode_cust, tgl_input)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())";
+            DB::connection($this->sql)->insert($insertM, [
+                $no_tagihan,
+                $kode_lokasi,
+                $request->input('no_proyek'),
+                $request->input('tanggal'),
+                $request->input('keterangan'),
+                $request->input('nilai'),
+                $request->input('biaya_lain'),
+                $request->input('pajak'),
+                $request->input('uang_muka'),
+                $request->input('kode_cust'),
+            ]);
 
             if(!empty($request->input('nomor'))) { 
                 $harga  = $request->input('harga');
@@ -250,9 +281,15 @@ class TagihanProyekController extends Controller {
 
                 for($i=0;$i<count($request->nomor);$i++) {
                     $insertD = "insert into java_tagihan_detail (no_tagihan, kode_lokasi, no, item, harga)
-                    values ('$no_tagihan', '$kode_lokasi', '".$nomor[$i]."', '".$item[$i]."', '".$harga[$i]."')";
+                    values (?, ?, ?, ?, ?)";
 
-                    DB::connection($this->sql)->insert($insertD);
+                    DB::connection($this->sql)->insert($insertD, [
+                        $no_tagihan,
+                        $kode_lokasi,
+                        $nomor[$i],
+                        $item[$i],
+                        $harga[$i]
+                    ]);
                 }
             }
 
@@ -299,8 +336,15 @@ class TagihanProyekController extends Controller {
                     if(count($arr_no_urut) > 0){
                         for($i=0; $i<count($arr_no_urut);$i++){
                             $insertFile = "insert into java_dok(no_bukti, kode_lokasi, file_dok, no_urut, nama, jenis)
-                            values ('".$no_tagihan."', '$kode_lokasi', '".$arr_foto[$i]."', '".$arr_no_urut[$i]."', '".$arr_nama_dok[$i]."', '".$arr_jenis[$i]."')";
-                            DB::connection($this->sql)->insert($insertFile); 
+                            values (?, ?, ?, ?, ?, ?)";
+                            DB::connection($this->sql)->insert($insertFile, [
+                                $no_tagihan,
+                                $kode_lokasi,
+                                $arr_foto[$i],
+                                $arr_no_urut[$i],
+                                $arr_nama_dok[$i],
+                                $arr_jenis[$i]
+                            ]); 
                         }
                     }
                 }
