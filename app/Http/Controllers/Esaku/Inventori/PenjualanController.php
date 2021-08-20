@@ -96,7 +96,7 @@ class PenjualanController extends Controller
             'harga_barang' => 'required|array',
             'diskon_barang' => 'required|array',
             'sub_barang' => 'required|array',
-            // 'ppn_barang' => 'required|array',
+            'ppn_barang' => 'required|array',
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -163,7 +163,8 @@ class PenjualanController extends Controller
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
                 for($a=0; $a<count($request->kode_barang);$a++){
-                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_dloc (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a]));
+                    $ppn = ($request->ppn_barang[$a] * $request->sub_barang[$a])/100;
+                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_dloc (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,ppn) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a],$ppn));
                 }	
             }
                 

@@ -1122,7 +1122,7 @@ class Sync2Controller extends Controller
                 //BRGTRANS
                 $sql_brgtrans = "";
 
-                $brgtrans = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total from brg_trans_dloc where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and isnull(no_close,'-') <> '-' ");
+                $brgtrans = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,ppn from brg_trans_dloc where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and isnull(no_close,'-') <> '-' ");
                 $jum_brgtrans = count($brgtrans);
                 $c = 1;
                 $total = 0;
@@ -1131,8 +1131,8 @@ class Sync2Controller extends Controller
                 if($jum_brgtrans > 0){
                     foreach($brgtrans as $row){
                     
-                        $sql_brgtrans .= "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,id_sync) values 
-                            ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->periode."','".$row->modul."','".$row->form."',".$row->nu.",'".$row->kode_gudang."','".$row->kode_barang."','".$row->no_batch."','".$row->tgl_ed."','".$row->satuan."','".$row->dc."',".floatval($row->stok).",".floatval($row->jumlah).",".floatval($row->bonus).",".floatval($row->harga).",".floatval($row->hpp).",".floatval($row->p_disk).",".floatval($row->diskon).",".floatval($row->tot_diskon).",".floatval($row->total).",'$id'); ";
+                        $sql_brgtrans .= "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,id_sync,ppn) values 
+                            ('".$row->no_bukti."','".$row->kode_lokasi."','".$row->periode."','".$row->modul."','".$row->form."',".$row->nu.",'".$row->kode_gudang."','".$row->kode_barang."','".$row->no_batch."','".$row->tgl_ed."','".$row->satuan."','".$row->dc."',".floatval($row->stok).",".floatval($row->jumlah).",".floatval($row->bonus).",".floatval($row->harga).",".floatval($row->hpp).",".floatval($row->p_disk).",".floatval($row->diskon).",".floatval($row->tot_diskon).",".floatval($row->total).",'$id',".floatval($row->ppn)."); ";
                         
                         $x++;
                         if($i % 1000 == 0){
