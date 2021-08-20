@@ -133,7 +133,7 @@ class VendorController extends Controller
                         $insertDetail = "insert into vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
                         values (?, ?, ?, ?, ?, ?)";
                         DB::connection($this->sql)->insert($insertDetail, [
-                            $kode_vendor,
+                            $request->kode_vendor,
                             $nama_rek[$i],
                             $bank[$i],
                             $cabang[$i],
@@ -226,7 +226,7 @@ class VendorController extends Controller
                     $insertDetail = "insert into vendor_detail(kode_vendor, nama_rekening, bank, cabang, kode_lokasi, no_rek) 
                     values (?, ?, ?, ?, ?, ?)";
                     DB::connection($this->sql)->insert($insertDetail, [
-                        $kode_vendor,
+                        $request->kode_vendor,
                         $nama_rek[$i],
                         $bank[$i],
                         $cabang[$i],
