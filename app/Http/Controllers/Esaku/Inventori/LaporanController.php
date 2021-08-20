@@ -436,8 +436,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','nik_kasir','no_bukti');
-            $db_col_name = array('a.periode','a.nik_user','a.no_jual');
+            $col_array = array('periode','tanggal','nik_kasir','no_bukti');
+            $db_col_name = array('a.periode','a.tanggal','a.nik_user','a.no_jual');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
