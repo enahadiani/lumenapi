@@ -449,6 +449,12 @@ class FilterController extends Controller
             }else{
                 $filter .= "";
             }
+
+            if(isset($request->tanggal) && $request->tanggal != ""){
+                $filter .= " and a.tanggal='".$request->tanggal."' ";
+            }else{
+                $filter .= "";
+            }
             
             $sql="select a.no_jual,a.keterangan 
             from brg_jualpiu_dloc a 
