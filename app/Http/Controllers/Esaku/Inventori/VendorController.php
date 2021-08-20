@@ -101,7 +101,10 @@ class VendorController extends Controller
             'kode_vendor' => 'required|max:10',
             'nama' => 'required|max:50',
             'alamat' => 'required|max:200',
+            'alamat2' => 'required|max:200',
             'no_tel' => 'required|max:50',
+            'no_fax' => 'required|max:50',
+            'npwp' => 'required|max:50',
             'email' => 'required|max:50',
             'pic' => 'required|max:50',
             'no_pictel' => 'required|max:50',
@@ -121,7 +124,7 @@ class VendorController extends Controller
             }
             if($this->isUnik($request->kode_vendor,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())",array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,'-',$request->pic,'-','-','-','-','-','-',$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
+                $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())",array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,'-','-','-','-',$request->no_fax,$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
         
                 if(!empty($request->input('no_rek'))) { 
                     $no_rek = $request->input('no_rek');
@@ -190,7 +193,10 @@ class VendorController extends Controller
             'kode_vendor' => 'required|max:10',
             'nama' => 'required|max:50',
             'alamat' => 'required|max:200',
+            'alamat2' => 'required|max:200',
             'no_tel' => 'required|max:50',
+            'no_fax' => 'required|max:50',
+            'npwp' => 'required|max:50',
             'email' => 'required|max:50',
             'pic' => 'required|max:50',
             'no_pictel' => 'required|max:50',
@@ -214,7 +220,12 @@ class VendorController extends Controller
             ->where('kode_vendor', $request->kode_vendor)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())",array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,'-',$request->pic,'-','-','-','-','-','-',$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
+            $del = DB::connection($this->sql)->table('vendor_detail')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('kode_vendor', $request->kode_vendor)
+            ->delete();
+
+            $ins = DB::connection($this->sql)->insert("insert into vendor(kode_vendor,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,bank,cabang,no_rek,nama_rek,no_fax,no_pictel,spek,kode_klpvendor,penilaian,bank_trans,akun_hutang,tgl_input) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())",array($request->kode_vendor,$kode_lokasi,$request->nama,$request->alamat, $request->no_tel, $request->email,$request->npwp,$request->pic,$request->alamat2,'-','-','-','-',$request->no_fax,$request->no_pictel,$request->spek,$request->kode_klpvendor,$request->penilaian,$request->bank_trans,$request->akun_hutang));
         
             if(!empty($request->input('no_rek'))) { 
                 $no_rek = $request->input('no_rek');
