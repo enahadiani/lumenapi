@@ -143,7 +143,33 @@ class BarangController extends Controller
                     $foto="-";
                 }
 
-                $ins = DB::connection($this->sql)->insert("insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) values ('$request->kode_barang','$request->nama','$kode_lokasi','$request->sat_kecil','$request->sat_besar',$request->jml_sat,$request->hna,'$request->kode_gudang','$request->flag_gen','$request->flag_aktif',$request->ss,$request->sm1,$request->sm2,$request->mm1,$request->mm2,$request->fm1,$request->fm2,'$request->kode_klp','$foto','$request->barcode',$request->hrg_satuan,$request->ppn,$request->profit,getdate())");
+                $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+                $ins = DB::connection($this->sql)->insert($insert, [
+                    $request->kode_barang,
+                    $request->nama,
+                    $kode_lokasi,
+                    $request->sat_kecil,
+                    $request->sat_besar,
+                    $request->jml_sat,
+                    $request->hna,
+                    $request->kode_gudang,
+                    $request->flag_gen,
+                    $request->flag_aktif,
+                    $request->ss,
+                    $request->sm1,
+                    $request->sm2,
+                    $request->mm1,
+                    $request->mm2,
+                    $request->fm1,
+                    $request->fm2,
+                    $request->kode_klp,
+                    $foto,
+                    $request->barcode,
+                    $request->hrg_satuan,
+                    $request->ppn,
+                    $request->profit
+                ]);
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -253,7 +279,33 @@ class BarangController extends Controller
             ->where('kode_barang', $request->kode_barang)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) values ('$request->kode_barang','$request->nama','$kode_lokasi','$request->sat_kecil','$request->sat_besar',$request->jml_sat,$request->hna,'$request->kode_gudang','$request->flag_gen','$request->flag_aktif',$request->ss,$request->sm1,$request->sm2,$request->mm1,$request->mm2,$request->fm1,$request->fm2,'$request->kode_klp','$foto','$request->barcode',$request->hrg_satuan,$request->ppn,$request->profit,getdate())");
+            $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+            $ins = DB::connection($this->sql)->insert($insert, [
+                $request->kode_barang,
+                $request->nama,
+                $kode_lokasi,
+                $request->sat_kecil,
+                $request->sat_besar,
+                $request->jml_sat,
+                $request->hna,
+                $request->kode_gudang,
+                $request->flag_gen,
+                $request->flag_aktif,
+                $request->ss,
+                $request->sm1,
+                $request->sm2,
+                $request->mm1,
+                $request->mm2,
+                $request->fm1,
+                $request->fm2,
+                $request->kode_klp,
+                $foto,
+                $request->barcode,
+                $request->hrg_satuan,
+                $request->ppn,
+                $request->profit
+            ]);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
