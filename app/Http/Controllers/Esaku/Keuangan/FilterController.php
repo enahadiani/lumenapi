@@ -547,6 +547,45 @@ class FilterController extends Controller
         
     }
 
+    function getFilterTanggalClose(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->periode) && $request->periode != ""){
+                $filter = " and substring(convert(varchar(10),a.tgl_input,121),1,4)+''+substring(convert(varchar(10),a.tgl_input,121),6,2)='".$request->periode."' ";
+            }else{
+                $filter = "";
+            }
+          
+            $sql="select distinct convert(varchar,a.tgl_input,103) as tanggal 
+            from kasir_close a
+            where a.kode_lokasi='$kode_lokasi' $filter";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getFilterNIKClose(Request $request){
         try {
             
