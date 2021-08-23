@@ -113,7 +113,22 @@ class JasaKirimController extends Controller
             }
             if($this->isUnik($request->kode_kirim,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into ol_kirim(kode_kirim,nama,alamat,no_telp,email,pic,bank,cabang,no_rek,nama_rek,no_pic,kode_lokasi,tgl_input) values ('".$request->kode_kirim."','".$request->nama."','".$request->alamat."','".$request->no_telp."','".$request->email."','".$request->pic."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->no_pic."','$kode_lokasi',getdate()) ");
+                $insert = "insert into ol_kirim(kode_kirim,nama,alamat,no_telp,email,pic,bank,cabang,no_rek,nama_rek,no_pic,kode_lokasi,tgl_input) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+                $ins = DB::connection($this->sql)->insert($insert, [
+                    $request->kode_kirim,
+                    $request->nama,
+                    $request->alamat,
+                    $request->no_telp,
+                    $request->email,
+                    $request->pic,
+                    $request->bank,
+                    $request->cabang,
+                    $request->no_rek,
+                    $request->nama_rek,
+                    $request->no_pic,
+                    $kode_lokasi
+                ]);
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -185,7 +200,22 @@ class JasaKirimController extends Controller
             ->where('kode_kirim', $request->kode_kirim)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into ol_kirim(kode_kirim,nama,alamat,no_telp,email,pic,bank,cabang,no_rek,nama_rek,no_pic,kode_lokasi) values ('".$request->kode_kirim."','".$request->nama."','".$request->alamat."','".$request->no_telp."','".$request->email."','".$request->pic."','".$request->bank."','".$request->cabang."','".$request->no_rek."','".$request->nama_rek."','".$request->no_pic."','$kode_lokasi') ");
+            $insert = "insert into ol_kirim(kode_kirim,nama,alamat,no_telp,email,pic,bank,cabang,no_rek,nama_rek,no_pic,kode_lokasi,tgl_input) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+            $ins = DB::connection($this->sql)->insert($insert, [
+                $request->kode_kirim,
+                $request->nama,
+                $request->alamat,
+                $request->no_telp,
+                $request->email,
+                $request->pic,
+                $request->bank,
+                $request->cabang,
+                $request->no_rek,
+                $request->nama_rek,
+                $request->no_pic,
+                $kode_lokasi
+            ]);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
