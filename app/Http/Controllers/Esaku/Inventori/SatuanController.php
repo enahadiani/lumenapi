@@ -104,7 +104,13 @@ class SatuanController extends Controller
             }
             if($this->isUnik($request->kode_satuan,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into brg_satuan(kode_satuan,kode_lokasi,nama,tgl_input) values ('$request->kode_satuan','$kode_lokasi','$request->nama',getdate())");
+                $insert = "insert into brg_satuan(kode_satuan,kode_lokasi,nama,tgl_input) 
+                values (?,?,?,getdate())";
+                DB::connection($this->sql)->insert($insert, [
+                    $request->kode_satuan,
+                    $kode_lokasi,
+                    $request->nama
+                ]);
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -167,7 +173,13 @@ class SatuanController extends Controller
             ->where('kode_satuan', $request->kode_satuan)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into brg_satuan(kode_satuan,kode_lokasi,nama,tgl_input) values ('$request->kode_satuan','$kode_lokasi','$request->nama',getdate())");
+            $insert = "insert into brg_satuan(kode_satuan,kode_lokasi,nama,tgl_input) 
+            values (?,?,?,getdate())";
+            DB::connection($this->sql)->insert($insert, [
+                $request->kode_satuan,
+                $kode_lokasi,
+                $request->nama
+            ]);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
