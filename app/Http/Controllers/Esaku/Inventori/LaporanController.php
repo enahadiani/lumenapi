@@ -692,7 +692,6 @@ class LaporanController extends Controller
             where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
 			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,c.nik_user
             order by c.tanggal";
-            var_dump($sql2);
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
