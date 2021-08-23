@@ -106,8 +106,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode','nik_kasir','no_bukti');
-            $db_col_name = array("substring(convert(varchar(10),a.tgl_input,121),1,4)+''+substring(convert(varchar(10),a.tgl_input,121),6,2)",'a.nik_user','a.no_close');
+            $col_array = array('periode','tanggal','nik_kasir','no_bukti');
+            $db_col_name = array("substring(convert(varchar(10),a.tgl_input,121),1,4)+''+substring(convert(varchar(10),a.tgl_input,121),6,2)",'convert(date,a.tgl_input)','a.nik_user','a.no_close');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -140,7 +140,6 @@ class LaporanController extends Controller
             $where ";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
-
             $nb = "";
             $resdata = array();
             $i=0;

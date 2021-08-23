@@ -561,7 +561,7 @@ class FilterController extends Controller
                 $filter = "";
             }
           
-            $sql="select distinct convert(varchar,a.tgl_input,103) as tanggal 
+            $sql="select distinct convert(date,a.tgl_input) as tanggal 
             from kasir_close a
             where a.kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection($this->db)->select($sql);
@@ -644,6 +644,12 @@ class FilterController extends Controller
 
             if(isset($request->nik_kasir) && $request->nik_kasir != ""){
                 $filter .= " and a.nik_user='".$request->nik_kasir."' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->tanggal) && $request->tanggal != ""){
+                $filter .= " and convert(date,a.tgl_input)='".$request->tanggal."' ";
             }else{
                 $filter .= "";
             }
