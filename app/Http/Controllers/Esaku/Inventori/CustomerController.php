@@ -111,8 +111,22 @@ class CustomerController extends Controller
             }
             if($this->isUnik($request->kode_cust,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang,tgl_input) values('$request->kode_cust','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->no_fax','$request->akun_piutang',getdate())");
-                
+                $insert = "insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang,tgl_input)
+                values (?,?,?,?,?,?,?,?,?,?,?,getdate())";
+                DB::connection($this->sql)->insert($insert, [
+                    $request->kode_cust,
+                    $kode_lokasi,
+                    $request->nama,
+                    $request->alamat,
+                    $request->no_tel,
+                    $request->email,
+                    $request->npwp,
+                    $request->pic,
+                    $request->alamat2,
+                    $request->no_fax,
+                    $request->akun_piutang
+                ]);
+
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Customer berhasil disimpan";
@@ -182,7 +196,21 @@ class CustomerController extends Controller
             ->where('kode_cust', $request->kode_cust)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang,tgl_input) values('$request->kode_cust','$kode_lokasi','$request->nama','$request->alamat',' $request->no_tel',' $request->email','$request->npwp','$request->pic','$request->alamat2','$request->no_fax','$request->akun_piutang',getdate())");
+            $insert = "insert into cust(kode_cust,kode_lokasi,nama,alamat,no_tel,email,npwp,pic,alamat2,no_fax,akun_piutang,tgl_input)
+            values (?,?,?,?,?,?,?,?,?,?,?,getdate())";
+            DB::connection($this->sql)->insert($insert, [
+                $request->kode_cust,
+                $kode_lokasi,
+                $request->nama,
+                $request->alamat,
+                $request->no_tel,
+                $request->email,
+                $request->npwp,
+                $request->pic,
+                $request->alamat2,
+                $request->no_fax,
+                $request->akun_piutang
+            ]);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
