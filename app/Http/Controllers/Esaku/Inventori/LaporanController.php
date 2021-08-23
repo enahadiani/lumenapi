@@ -685,15 +685,22 @@ class LaporanController extends Controller
                 $nik_filter = "and c.nik_user = '".$request->input($col_array[2])[1]."'";
             }
 
-            $sql2="select c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total
+            $sql2="select c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
+            sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex
             from brg_trans_dloc a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
 			inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
 			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,c.nik_user
             order by c.tanggal";
+            
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
+            
+            $total = 0;
+            for($i=0;$i<count($res2);$i++) {
+                $total = $res2[$i]['total_ex'] + $total;
+            }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
