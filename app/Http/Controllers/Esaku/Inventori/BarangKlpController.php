@@ -111,7 +111,16 @@ class BarangKlpController extends Controller
             }
             if($this->isUnik($request->kode_klp,$kode_lokasi)){
 
-                $ins = DB::connection($this->sql)->insert("insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp,tgl_input) values ('$request->kode_klp','$kode_lokasi','$request->nama','$request->akun_pers','$request->akun_pdpt','$request->akun_hpp',getdate())");
+                $insert = "insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp,tgl_input) 
+                values (?,?,?,?,?,?,getdate())";
+                DB::connection($this->sql)->insert($insert, [
+                    $request->kode_klp,
+                    $kode_lokasi,
+                    $request->nama,
+                    $request->akun_pers,
+                    $request->akun_pdpt,
+                    $request->akun_hpp
+                ]);
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
@@ -177,7 +186,16 @@ class BarangKlpController extends Controller
             ->where('kode_klp', $request->kode_klp)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp,tgl_input) values ('$request->kode_klp','$kode_lokasi','$request->nama','$request->akun_pers','$request->akun_pdpt','$request->akun_hpp',getdate())");
+            $insert = "insert into brg_barangklp(kode_klp,kode_lokasi,nama,akun_pers,akun_pdpt,akun_hpp,tgl_input) 
+            values (?,?,?,?,?,?,getdate())";
+            DB::connection($this->sql)->insert($insert, [
+                $request->kode_klp,
+                $kode_lokasi,
+                $request->nama,
+                $request->akun_pers,
+                $request->akun_pdpt,
+                $request->akun_hpp
+            ]);
             
             DB::connection($this->sql)->commit();
             $success['status'] = true;
