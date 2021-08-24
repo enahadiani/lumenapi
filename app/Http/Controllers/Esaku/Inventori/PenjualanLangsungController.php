@@ -82,7 +82,19 @@ class PenjualanLangsungController extends Controller
             if(count($get4) > 0){
                 $upd = DB::connection($this->sql)->update("update ol_cust set nama = '$request->nama_cust',alamat='$request->alamat_cust',no_tel='$request->notel_cust',kota='$request->kota_cust',provinsi='$request->prop_cust',kecamatan='$request->kecamatan_cust' where kode_cust='$request->kode_cust' and kode_lokasi='$kode_lokasi'  ");
             }else{
-                $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,kode_lokasi,kota,provinsi,kecamatan) values ('$request->kode_cust','$request->nama_cust','$request->alamat_cust','$request->notel_cust','$kode_lokasi','$request->kota_cust','$request->prop_cust','$request->kecamatan_cust') ");
+                $insert = "insert into ol_cust(kode_cust,nama,alamat,no_tel,kode_lokasi,kota,provinsi,kecamatan) 
+                values (?,?,?,?,?,?,?,?)";
+                // $ins = DB::connection($this->sql)->insert("insert into ol_cust(kode_cust,nama,alamat,no_tel,kode_lokasi,kota,provinsi,kecamatan) values ('$request->kode_cust','$request->nama_cust','$request->alamat_cust','$request->notel_cust','$kode_lokasi','$request->kota_cust','$request->prop_cust','$request->kecamatan_cust')");
+                DB::connection($this->sql)->insert($insert, [
+                    $request->kode_cust,
+                    $request->nama_cust,
+                    $request->alamat_cust,
+                    $request->notel_cust,
+                    $kode_lokasi,
+                    $request->kota_cust,
+                    $request->prop_cust,
+                    $request->kecamatan_cust
+                ]);
             }
 
             $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
@@ -95,8 +107,31 @@ class PenjualanLangsungController extends Controller
                 $kodeGudang="-";
             }
 
-
-            $ins =DB::connection($this->sql)->insert("insert into ol_pesan_m (no_pesan,kode_lokasi,tanggal,kode_cust,nama_cust,notel_cust,alamat_cust,kota_cust,prop_cust,catatan,status_pesan,kode_kirim,no_resi,nilai_ongkir,nilai_pesan,no_ref1,service,berat,lama_hari,kecamatan_cust) values ('$id','$kode_lokasi',getdate(),'$request->kode_cust','$request->nama_cust','$request->notel_cust','$request->alamat_cust','$request->kota_cust','$request->prop_cust','$request->catatan','input','$request->kode_kirim','$request->no_resi',$request->nilai_ongkir,$request->nilai_pesan,'-','$request->service',$request->berat,'$request->lama_hari','$request->kecamatan_cust') ");		
+            $insert2 = "insert into ol_pesan_m (no_pesan,kode_lokasi,tanggal,kode_cust,nama_cust,notel_cust,alamat_cust,kota_cust,prop_cust,catatan,status_pesan,kode_kirim,no_resi,nilai_ongkir,nilai_pesan,no_ref1,service,berat,lama_hari,kecamatan_cust) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+            // $ins =DB::connection($this->sql)->insert("insert into ol_pesan_m (no_pesan,kode_lokasi,tanggal,kode_cust,nama_cust,notel_cust,alamat_cust,kota_cust,prop_cust,catatan,status_pesan,kode_kirim,no_resi,nilai_ongkir,nilai_pesan,no_ref1,service,berat,lama_hari,kecamatan_cust) values ('$id','$kode_lokasi',getdate(),'$request->kode_cust','$request->nama_cust','$request->notel_cust','$request->alamat_cust','$request->kota_cust','$request->prop_cust','$request->catatan','input','$request->kode_kirim','$request->no_resi',$request->nilai_ongkir,$request->nilai_pesan,'-','$request->service',$request->berat,'$request->lama_hari','$request->kecamatan_cust') ");		
+            DB::connection($this->sql)->insert($insert2, [
+                $id,
+                $kode_lokasi,
+                date('Y-m-d H:i:s'),
+                $request->kode_cust,
+                $request->nama_cust,
+                $request->notel_cust,
+                $request->alamat_cust,
+                $request->kota_cust,
+                $request->prop_cust,
+                $request->catatan,
+                'input',
+                $request->kode_kirim,
+                $request->no_resi,
+                $request->nilai_ongkir,
+                $request->nilai_pesan,
+                '-',
+                $request->service,
+                $request->berat,
+                $request->lama_hari,
+                $request->kecamatan_cust
+            ]);		
 
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
