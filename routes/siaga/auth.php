@@ -54,6 +54,7 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->post('search-form', 'AdminSiagaController@searchForm');
     $router->get('search-form-list', 'AdminSiagaController@searchFormList');
 
+    $router->get('cek', 'Siaga\Approval2Controller@cek');
 });
 
 

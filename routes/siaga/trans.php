@@ -46,6 +46,8 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('app-spb-status','Siaga\ApprovalSPBController@getStatus');
     $router->get('app-spb-preview','Siaga\ApprovalSPBController@getPreview');
     
+    $router->post('send-email', 'Siaga\Approval2Controller@sendNotifikasi');
+    
 });
 
 
