@@ -754,20 +754,21 @@ class Approval2Controller extends Controller
         }
         $request->all();
         $request->request->add(['no_bukti' => ["=",$request->no_aju,""]]);
-        $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+        $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
         $result = json_decode(json_encode($result),true);
         $success['status'] = true;
         if(count($result['original']['data']) > 0){
-            $judul = "Pengajuan Nomor : ".$data[0]['no_pb']." berikut menunggu approval Anda";
+            $judul = "Pengajuan Nomor : ".$data[0]['no_spb']." berikut menunggu approval Anda";
             $result['original']['judul'] = $judul;
-            $html = view('email-siaga',$result['original'])->render();
-            $periode = substr(date('Ym'),2,4);
-            $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+            // $html = view('email-siaga-spb',$result['original'])->render();
+            return view('email-siaga-spb',$result['original']);
+            // $periode = substr(date('Ym'),2,4);
+            // $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
             
-            $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-','enahadiani2@gmail.com',htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-            $success['no_pooling'] = $no_pool;
+            // $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-','enahadiani2@gmail.com',htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+            // $success['no_pooling'] = $no_pool;
         }
-        return response()->json($success, $this->successStatus);
+        // return response()->json($success, $this->successStatus);
         // END EMAIL
     }
 
