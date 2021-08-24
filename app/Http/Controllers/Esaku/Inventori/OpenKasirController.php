@@ -138,6 +138,7 @@ class OpenKasirController extends Controller
             'saldo_awal' => 'required'
         ]);
 
+        date_default_timezone_set('Asia/Jakarta');
         DB::connection($this->sql)->beginTransaction();
         
         try {
@@ -221,6 +222,7 @@ class OpenKasirController extends Controller
         DB::connection($this->sql)->beginTransaction();
         
         try {
+            date_default_timezone_set('Asia/Jakarta');
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
