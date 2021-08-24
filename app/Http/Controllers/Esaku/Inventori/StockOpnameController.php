@@ -338,7 +338,39 @@ class StockOpnameController extends Controller
                 $no_bukti = "-";
             }
             
-            $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGSOP','X','0','0','".$request->kode_pp."','".$request->tanggal."','-','".$request->deskripsi."','IDR',1,0,0,0,'-','-','-','-','-','-','".$request->kode_gudang."','-','-')");
+            $insert = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            // $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGSOP','X','0','0','".$request->kode_pp."','".$request->tanggal."','-','".$request->deskripsi."','IDR',1,0,0,0,'-','-','-','-','-','-','".$request->kode_gudang."','-','-')");
+            DB::connection($this->sql)->insert($insert, [
+                $no_bukti,
+                $kode_lokasi,
+                date('Y-m-d H:i:s'),
+                $nik,
+                $periode,
+                'IV',
+                'BRGSOP',
+                'X',
+                '0',
+                '0',
+                $request->kode_pp,
+                $request->tanggal,
+                '-',
+                $request->deskripsi,
+                'IDR',
+                1,
+                0,
+                0,
+                0,
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                $request->kode_gudang,
+                '-',
+                '-'
+            ]);
 
             $det = DB::connection($this->sql)->update("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
             select '".$no_bukti."','".$kode_lokasi."','".$periode."','BRGSOP','BRGSOP',nu,'".$request->kode_gudang."',kode_barang,'-',getdate(),satuan,case when selisih > 0 then 'C' else 'D' end as dc,stok,selisih,0,0,0,0,0,0,0 
@@ -405,7 +437,40 @@ class StockOpnameController extends Controller
             ->where('no_bukti', $no_bukti)
             ->delete();
 
-            $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGSOP','X','0','0','".$request->kode_pp."','".$request->tanggal."','-','".$request->deskripsi."','IDR',1,0,0,0,'-','-','-','-','-','-','".$request->kode_gudang."','-','-')");
+            $insert = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            DB::connection($this->sql)->insert($insert, [
+                $no_bukti,
+                $kode_lokasi,
+                date('Y-m-d H:i:s'),
+                $nik,
+                $periode,
+                'IV',
+                'BRGSOP',
+                'X',
+                '0',
+                '0',
+                $request->kode_pp,
+                $request->tanggal,
+                '-',
+                $request->deskripsi,
+                'IDR',
+                1,
+                0,
+                0,
+                0,
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                $request->kode_gudang,
+                '-',
+                '-'
+            ]);
+
+            // $ins = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$no_bukti."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGSOP','X','0','0','".$request->kode_pp."','".$request->tanggal."','-','".$request->deskripsi."','IDR',1,0,0,0,'-','-','-','-','-','-','".$request->kode_gudang."','-','-')");
 
             $det = DB::connection($this->sql)->update("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
             select '".$no_bukti."','".$kode_lokasi."','".$periode."','BRGSOP','BRGSOP',nu,'".$request->kode_gudang."',kode_barang,'-',getdate(),satuan,case when selisih > 0 then 'C' else 'D' end as dc,stok,selisih,0,0,0,0,0,0,0 
