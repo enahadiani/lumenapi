@@ -18,6 +18,12 @@ class HppController extends Controller
     public $db = 'tokoaws';
     public $guard = 'toko';
     
+    public function joinNum($num){
+        // menggabungkan angka yang di-separate(10.000,75) menjadi 10000.00
+        $num = str_replace(".", "", $num);
+        $num = str_replace(",", ".", $num);
+        return $num;
+    }
     
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
@@ -25,6 +31,11 @@ class HppController extends Controller
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
         return $id;
+    }
+
+    public function reverseDate($ymd_or_dmy_date, $org_sep='-', $new_sep='-'){
+        $arr = explode($org_sep, $ymd_or_dmy_date);
+        return $arr[2].$new_sep.$arr[1].$new_sep.$arr[0];
     }
 
     function getPeriodeAktif($kode_lokasi){
@@ -179,14 +190,7 @@ class HppController extends Controller
             'tanggal' => 'required',
             'kode_form' => 'required',
             'deskripsi' => 'required',
-            'total_debet' => 'required',
-            'total_kredit' => 'required',
-            'nik_periksa' => 'required',
-            'kode_akun' => 'required|array',
-            'keterangan' => 'required|array',
-            'dc' => 'required|array',
-            'nilai' => 'required|array',
-            'kode_pp' => 'required|array'
+            'total' => 'required'
         ]);
 
         try {
@@ -197,6 +201,8 @@ class HppController extends Controller
                 $status_admin=$rs->status_admin;
             }
 
+            $tanggal = $this->reverseDate($request->tanggal,"/","-");
+
             $res = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'
             ");
             $res = json_decode(json_encode($res),true);
@@ -205,8 +211,8 @@ class HppController extends Controller
             DB::connection($this->db)->beginTransaction();
             
             
-            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-JU".substr($periode,2,4).".", "0001");
+            $periode = substr($tanggal,0,4).substr($tanggal,5,2);
+            $no_bukti = $this->generateKode("trans_m", "no_bukti", $kode_lokasi."-HP".substr($periode,2,4).".", "0001");
             
             $cek = $this->doCekPeriode2('IV',$status_admin,$periode);
             
@@ -217,20 +223,20 @@ class HppController extends Controller
                     //reverse
 					if (substr($periode,4,2) !="01") {
 						$upd = DB::connection($this->db)->table("trans_m")
-                        ->where('substring(periode,1,4)', substr($periode,0,4))
+                        ->where('periode','LIKE', '%'.substr($periode,0,4).'%')
                         ->where('form','BRGHPP')
                         ->where('no_ref1','-') 
                         ->where('kode_lokasi',$kode_lokasi)
                         ->update(['no_ref1'=>$no_bukti]);
 
 						$ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                            select '".$no_bukti."',a.kode_lokasi,getdate(),'".$nik."','".$periode."',a.no_dokumen,'".$request->tanggal."',a.nu,a.kode_akun,case a.dc when 'D' then 'C' else 'D' end,a.nilai,a.nilai_curr,'Reverse HPP '+a.no_bukti,a.modul,a.jenis,a.kode_curr,a.kurs,a.kode_pp,a.kode_drk,a.kode_cust,a.kode_vendor,a.no_fa,a.no_selesai,a.no_ref1,a.no_ref2,a.no_bukti 
+                            select '".$no_bukti."',a.kode_lokasi,getdate(),'".$nik."','".$periode."',a.no_dokumen,'".$tanggal."',a.nu,a.kode_akun,case a.dc when 'D' then 'C' else 'D' end,a.nilai,a.nilai_curr,'Reverse HPP '+a.no_bukti,a.modul,a.jenis,a.kode_curr,a.kurs,a.kode_pp,a.kode_drk,a.kode_cust,a.kode_vendor,a.no_fa,a.no_selesai,a.no_ref1,a.no_ref2,a.no_bukti 
                             from trans_j a inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
                             where b.no_ref1='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."' and a.no_ref3='-'");
 					}
 
 					$insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-							[$no_bukti,$kode_lokasi,$nik,$periode,'IV','BRGHPP','F','-','-',$kode_pp,$request->tanggal,$request->no_dokumen,'Jurnal HPP No: '.$no_bukti,'IDR',1,$total,0,0,'-','-','-','-','-','-','-','-','-']);
+							[$no_bukti,$kode_lokasi,$nik,$periode,'IV','BRGHPP','F','-','-',$kode_pp,$tanggal,$request->no_dokumen,'Jurnal HPP No: '.$no_bukti,'IDR',1,$this->joinNum($request->total),0,0,'-','-','-','-','-','-','-','-','-']);
 
                     $sqldet =  "select *,0 as no from ( 
                                 select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
@@ -261,7 +267,7 @@ class HppController extends Controller
 					for ($i=0;$i<count($detail);$i++){
 						$line = $detail[$i];	
 						if(floatval($line['hpp']) != 0){											
-							$insd = DB::connection($this->db)->insert("insert into brg_hpp_d (no_hpp,kode_lokasi,kode_barang,satuan,jumlah,h_avg,nilai_hpp,kode_gudang,kode_pp,akun_pers,akun_hpp) values ()",[
+							$insd = DB::connection($this->db)->insert("insert into brg_hpp_d (no_hpp,kode_lokasi,kode_barang,satuan,jumlah,h_avg,nilai_hpp,kode_gudang,kode_pp,akun_pers,akun_hpp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",[
 								$no_bukti,$kode_lokasi,$line['kode_barang'],$line['sat_kecil'],floatval($line['jumlah']),floatval($line['h_avg']),floatval($line['hpp']),$line['kode_gudang'],$line['kode_pp'],$line['akun_pers'],$line['akun_hpp']]);																					
 						}
 					}
@@ -270,13 +276,13 @@ class HppController extends Controller
                         select no_hpp,kode_lokasi,getdate(),?,?,?,?,0,akun_hpp,'D',sum(nilai_hpp),sum(nilai_hpp),?,'IV','HPP','IDR',1,kode_pp,'-','-','-','-','-','-','-','-' 
 						from brg_hpp_d 
 						where no_hpp='$no_bukti' and kode_lokasi='$kode_lokasi' 
-						group by no_hpp,kode_lokasi,akun_hpp,kode_pp", [$nik,$periode,$request->no_dokumen,$request->tanggal,$request->keterangan]);
+						group by no_hpp,kode_lokasi,akun_hpp,kode_pp", [$nik,$periode,$request->no_dokumen,$tanggal,$request->keterangan]);
 
                     $insj2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                         select no_hpp,kode_lokasi,getdate(),?,?,?,?,1,akun_pers,'C',sum(nilai_hpp),sum(nilai_hpp),?,'IV','BRG','IDR',1,kode_pp,'-','-','-','-','-','-','-','-' 
                         from brg_hpp_d 
                         where no_hpp='".$no_bukti."' and kode_lokasi='".$kode_lokasi."' 
-                        group by no_hpp,kode_lokasi,akun_pers,kode_pp", [$nik,$periode,$request->no_dokumen,$request->tanggal,$request->keterangan]);
+                        group by no_hpp,kode_lokasi,akun_pers,kode_pp", [$nik,$periode,$request->no_dokumen,$tanggal,$request->keterangan]);
 
                     $tmp="sukses";
                     $sts=true;
@@ -295,20 +301,20 @@ class HppController extends Controller
                 $success['status'] = $sts;
                 $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data HPP berhasil disimpan ";
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
 
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = $sts;
                 $success['no_bukti'] = "-";
                 $success['message'] = $tmp;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             // DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data HPP gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     
     }
@@ -323,19 +329,11 @@ class HppController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required',
             'no_dokumen' => 'required',
             'tanggal' => 'required',
             'kode_form' => 'required',
             'deskripsi' => 'required',
-            'total_debet' => 'required',
-            'total_kredit' => 'required',
-            'nik_periksa' => 'required',
-            'kode_akun' => 'required|array',
-            'keterangan' => 'required|array',
-            'dc' => 'required|array',
-            'nilai' => 'required|array',
-            'kode_pp' => 'required|array'
+            'total' => 'required'
         ]);
 
         try {
@@ -345,6 +343,8 @@ class HppController extends Controller
                 $kode_lokasi= $rs->kode_lokasi;
                 $status_admin= $rs->status_admin;
             }
+            
+            $tanggal = $this->reverseDate($request->tanggal,"/","-");
 
             $res = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik'
             ");
@@ -353,12 +353,12 @@ class HppController extends Controller
             $kode_pp = $res[0]['kode_pp'];
             DB::connection($this->db)->beginTransaction();
             
-            $periode=substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $periode=substr($tanggal,0,4).substr($tanggal,5,2);
             $no_bukti = $request->no_bukti;
             
             $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del3 = DB::connection($this->db)->table('brg_hpp')->where('kode_lokasi', $kode_lokasi)->where('no_hpp', $no_bukti)->delete();
+            $del3 = DB::connection($this->db)->table('brg_hpp_d')->where('kode_lokasi', $kode_lokasi)->where('no_hpp', $no_bukti)->delete();
             $upd = DB::connection($this->db)->table('trans_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_ref1', $no_bukti)
@@ -374,20 +374,20 @@ class HppController extends Controller
                      //reverse
 					if (substr($periode,4,2) !="01") {
 						$upd = DB::connection($this->db)->table("trans_m")
-                        ->where('substring(periode,1,4)', substr($periode,0,4))
+                        ->where('periode','LIKE', '%'.substr($periode,0,4).'%')
                         ->where('form','BRGHPP')
                         ->where('no_ref1','-') 
                         ->where('kode_lokasi',$kode_lokasi)
                         ->update(['no_ref1'=>$no_bukti]);
 
 						$ins = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                            select '".$no_bukti."',a.kode_lokasi,getdate(),'".$nik."','".$periode."',a.no_dokumen,'".$request->tanggal."',a.nu,a.kode_akun,case a.dc when 'D' then 'C' else 'D' end,a.nilai,a.nilai_curr,'Reverse HPP '+a.no_bukti,a.modul,a.jenis,a.kode_curr,a.kurs,a.kode_pp,a.kode_drk,a.kode_cust,a.kode_vendor,a.no_fa,a.no_selesai,a.no_ref1,a.no_ref2,a.no_bukti 
+                            select '".$no_bukti."',a.kode_lokasi,getdate(),'".$nik."','".$periode."',a.no_dokumen,'".$tanggal."',a.nu,a.kode_akun,case a.dc when 'D' then 'C' else 'D' end,a.nilai,a.nilai_curr,'Reverse HPP '+a.no_bukti,a.modul,a.jenis,a.kode_curr,a.kurs,a.kode_pp,a.kode_drk,a.kode_cust,a.kode_vendor,a.no_fa,a.no_selesai,a.no_ref1,a.no_ref2,a.no_bukti 
                             from trans_j a inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
                             where b.no_ref1='".$no_bukti."' and b.kode_lokasi='".$kode_lokasi."' and a.no_ref3='-'");
 					}
 
 					$insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-							[$no_bukti,$kode_lokasi,$nik,$periode,'IV','BRGHPP','F','-','-',$kode_pp,$request->tanggal,$request->no_dokumen,'Jurnal HPP No: '.$no_bukti,'IDR',1,$total,0,0,'-','-','-','-','-','-','-','-','-']);
+							[$no_bukti,$kode_lokasi,$nik,$periode,'IV','BRGHPP','F','-','-',$kode_pp,$tanggal,$request->no_dokumen,'Jurnal HPP No: '.$no_bukti,'IDR',1,$this->joinNum($total),0,0,'-','-','-','-','-','-','-','-','-']);
 
                     $sqldet =  "select *,0 as no from ( 
                                 select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
@@ -418,7 +418,7 @@ class HppController extends Controller
 					for ($i=0;$i<count($detail);$i++){
 						$line = $detail[$i];	
 						if(floatval($line['hpp']) != 0){											
-							$insd = DB::connection($this->db)->insert("insert into brg_hpp_d (no_hpp,kode_lokasi,kode_barang,satuan,jumlah,h_avg,nilai_hpp,kode_gudang,kode_pp,akun_pers,akun_hpp) values ()",[
+							$insd = DB::connection($this->db)->insert("insert into brg_hpp_d (no_hpp,kode_lokasi,kode_barang,satuan,jumlah,h_avg,nilai_hpp,kode_gudang,kode_pp,akun_pers,akun_hpp) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",[
 								$no_bukti,$kode_lokasi,$line['kode_barang'],$line['sat_kecil'],floatval($line['jumlah']),floatval($line['h_avg']),floatval($line['hpp']),$line['kode_gudang'],$line['kode_pp'],$line['akun_pers'],$line['akun_hpp']]);																					
 						}
 					}
@@ -427,13 +427,13 @@ class HppController extends Controller
                         select no_hpp,kode_lokasi,getdate(),?,?,?,?,0,akun_hpp,'D',sum(nilai_hpp),sum(nilai_hpp),?,'IV','HPP','IDR',1,kode_pp,'-','-','-','-','-','-','-','-' 
 						from brg_hpp_d 
 						where no_hpp='$no_bukti' and kode_lokasi='$kode_lokasi' 
-						group by no_hpp,kode_lokasi,akun_hpp,kode_pp", [$nik,$periode,$request->no_dokumen,$request->tanggal,$request->keterangan]);
+						group by no_hpp,kode_lokasi,akun_hpp,kode_pp", [$nik,$periode,$request->no_dokumen,$tanggal,$request->keterangan]);
 
                     $insj2 = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                         select no_hpp,kode_lokasi,getdate(),?,?,?,?,1,akun_pers,'C',sum(nilai_hpp),sum(nilai_hpp),?,'IV','BRG','IDR',1,kode_pp,'-','-','-','-','-','-','-','-' 
                         from brg_hpp_d 
                         where no_hpp='".$no_bukti."' and kode_lokasi='".$kode_lokasi."' 
-                        group by no_hpp,kode_lokasi,akun_pers,kode_pp", [$nik,$periode,$request->no_dokumen,$request->tanggal,$request->keterangan]);
+                        group by no_hpp,kode_lokasi,akun_pers,kode_pp", [$nik,$periode,$request->no_dokumen,$tanggal,$request->keterangan]);
 
                     $tmp="sukses";
                     $sts=true;
@@ -452,20 +452,20 @@ class HppController extends Controller
                 $success['status'] = $sts;
                 $success['no_bukti'] = $no_bukti;
                 $success['message'] = "Data HPP berhasil diubah ";
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
 
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = $sts;
                 $success['no_bukti'] = "-";
                 $success['message'] = $tmp;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data HPP gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -494,7 +494,7 @@ class HppController extends Controller
 
             $del1 = DB::connection($this->db)->table('trans_m')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
             $del2 = DB::connection($this->db)->table('trans_j')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-            $del3 = DB::connection($this->db)->table('brg_hpp')->where('kode_lokasi', $kode_lokasi)->where('no_hpp', $no_bukti)->delete();
+            $del3 = DB::connection($this->db)->table('brg_hpp_d')->where('kode_lokasi', $kode_lokasi)->where('no_hpp', $no_bukti)->delete();
             $upd = DB::connection($this->db)->table('trans_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_ref1', $no_bukti)
@@ -505,13 +505,13 @@ class HppController extends Controller
             $success['status'] = true;
             $success['message'] = "Data HPP berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data HPP gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -534,7 +534,7 @@ class HppController extends Controller
             where a.no_bukti = '".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_barang,a.nama,a.pabrik,a.sat_kecil,b.jumlah,b.h_avg,b.nilai_hpp as hpp,c.kode_pp, c.kode_gudang,f.akun_pers,f.akun_hpp 
+            $res2 = DB::connection($this->db)->select("select 0 as no,a.kode_barang,a.nama,a.pabrik,a.sat_kecil,b.jumlah,b.h_avg,b.nilai_hpp as hpp,c.kode_pp, c.kode_gudang,f.akun_pers,f.akun_hpp 
             from brg_barang a 					 
             inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
             inner join brg_hpp_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
@@ -542,19 +542,24 @@ class HppController extends Controller
             where b.no_hpp='$no_bukti' and b.kode_lokasi='$kode_lokasi'");
             $res2= json_decode(json_encode($res2),true);
 
+            $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['detail'] = $res2;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
                 $success['detail'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             
