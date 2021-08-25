@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Mail;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use Carbon\Carbon;
 
 class Approval2Controller extends Controller
 {
@@ -35,8 +38,116 @@ class Approval2Controller extends Controller
         }  
     }
 
-    public function generateKode($tabel, $kolom_acuan, $prefix, $str_format, $iteration = 1){
-        $query = DB::connection($this->db)->select("select isnull(max(substr($kolom_acuan, -".strlen($str_format)."))+".$iteration.",".$iteration.") as id from $tabel where $kolom_acuan like '$prefix%'");
+    function terbilang($int) {
+        $angka = [
+            "",
+            "satu",
+            "dua",
+            "tiga",
+            "empat",
+            "lima",
+            "enam",
+            "tujuh",
+            "delapan",
+            "sembilan",
+            "sepuluh",
+            "sebelas",
+        ];
+        if ($int < 12) return " " .$angka[$int];
+        else if ($int < 20) return $this->terbilang($int - 10) ." belas ";
+        else if ($int < 100)
+            return $this->terbilang($int / 10) ." puluh " .$this->terbilang($int % 10);
+        else if ($int < 200) return "seratus" .$this->terbilang($int - 100);
+        else if ($int < 1000)
+            return $this->terbilang($int / 100) ." ratus " .$this->terbilang($int % 100);
+        else if ($int < 2000) return "seribu" .$this->terbilang($int - 1000);
+        else if ($int < 1000000)
+            return $this->terbilang($int / 1000) ." ribu " .$this->terbilang($int % 1000);
+        else if ($int < 1000000000)
+            return $this->terbilang($int / 1000000) ." juta " .$this->terbilang($int % 1000000);
+        else if ($int < 1000000000000)
+            return (
+                $this->terbilang($int / 1000000) ." milyar " .$this->terbilang($int % 1000000000)
+            );
+        else if ($int >= 1000000000000)
+            return (
+                $this->terbilang($int / 1000000).
+                " trilyun ".
+                $this->terbilang($int % 1000000000000)
+            );
+    }
+    
+    function getNamaBulan($no_bulan) {
+        switch ($no_bulan) {
+            case 1:
+            case "1":
+            case "01":
+                $bulan = "Januari";
+                break;
+            case 2:
+            case "2":
+            case "02":
+                $bulan = "Februari";
+                break;
+            case 3:
+            case "3":
+            case "03":
+                $bulan = "Maret";
+                break;
+            case 4:
+            case "4":
+            case "04":
+                $bulan = "April";
+                break;
+            case 5:
+            case "5":
+            case "05":
+                $bulan = "Mei";
+                break;
+            case 6:
+            case "6":
+            case "06":
+                $bulan = "Juni";
+                break;
+            case 7:
+            case "7":
+            case "07":
+                $bulan = "Juli";
+                break;
+            case 8:
+            case "8":
+            case "08":
+                $bulan = "Agustus";
+                break;
+            case 9:
+            case "9":
+            case "09":
+                $bulan = "September";
+                break;
+            case 10:
+            case "10":
+            case "10":
+                $bulan = "Oktober";
+                break;
+            case 11:
+            case "11":
+            case "11":
+                $bulan = "November";
+                break;
+            case 12:
+            case "12":
+            case "12":
+                $bulan = "Desember";
+                break;
+            default:
+                $bulan = null;
+        }
+    
+        return $bulan;
+    }
+
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
         $kode = $query[0]['id'];
         $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -212,9 +323,9 @@ class Approval2Controller extends Controller
                 if($request->no_urut != $max[0]['nu']){
 
                     $sqlapp="
-                    select isnull(b.no_telp,'-') as no_telp,b.nik
+                    select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join apv_karyawan b on a.kode_jab=b.kode_jab 
+                    left join apv_karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
 
                     $rs = DB::connection($this->db)->select($sqlapp);
@@ -222,6 +333,7 @@ class Approval2Controller extends Controller
                     if(count($rs)>0){
                         $no_telp = $rs[0]["no_telp"];
                         $nik_app1 = $rs[0]["nik"];
+                        $app_email = $rs[0]["email"];
                     }else{
                         $no_telp = "-";
                         $nik_app1 = "-";
@@ -245,7 +357,7 @@ class Approval2Controller extends Controller
 
                 // //send to nik buat
                 $sqlbuat = "
-                select isnull(c.no_telp,'-') as no_telp,b.nik_buat
+                select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from gr_pb_m b 
                 inner join apv_karyawan c on b.nik_buat=c.nik 
                 where b.no_pb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
@@ -254,11 +366,56 @@ class Approval2Controller extends Controller
                 if(count($rs2)>0){
                     $no_telp2 = $rs2[0]["no_telp"];
                     $nik_buat = $rs2[0]['nik_buat'];
+                    if(intval($request->no_urut) == intval($max[0]['nu'])){
+                        $app_email2 = $rs2[0]['email'];
+                    }
                 }else{
                     $no_telp2 = "-";
                     $nik_buat = "-";
                 }
                 $success['approval'] = "Approve";
+                
+                $request->request->add(['no_bukti' => ["=",$no_bukti,""]]);
+                $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                $result = json_decode(json_encode($result),true);
+                if(isset($app_email) && $app_email != "-"){
+                    $pesan_header = "Pengajuan $no_bukti berikut telah di approve oleh $nik_user, menunggu approval Anda:";
+
+                    if(count($result['original']['data']) > 0){
+                   
+                        $result['original']['judul'] = $pesan_header;
+                        $html = view('email-siaga',$result['original'])->render();
+                        $periode = substr(date('Ym'),2,4);
+                        $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+                        
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+                        $success['no_pooling'] = $no_pool;
+                        $msg_email = "";
+                    }else{
+                        $msg_email = "Form Aju Kosong";
+                    }
+                }else{
+                    $msg_email = "";
+                }
+
+                if(isset($app_email2) && $app_email2 != "-"){
+                    $pesan_header = "Pengajuan $no_bukti Anda telah diapprove oleh $nik_user, berikut ini rinciannya:";
+                    if(count($result['original']['data']) > 0){
+                   
+                        $result['original']['judul'] = $pesan_header;
+                        $html = view('email-siaga',$result['original'])->render();
+                        $periode = substr(date('Ym'),2,4);
+                        $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+                        
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email2,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+                        $success['no_pooling2'] = $no_pool;
+                        $msg_email = "";
+                    }else{
+                        $msg_email = "Form Aju Kosong";
+                    }
+                }else{
+                        $msg_email = "";
+                }
 
             }else{
                 $nu=$request->no_urut-1;
@@ -273,7 +430,7 @@ class Approval2Controller extends Controller
                 if(intval($request->no_urut) != intval($min[0]['nu'])){
                     // //send to approver sebelumnya
                     $sqlapp="
-                    select isnull(b.no_telp,'-') as no_telp,b.nik
+                    select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
                     left join apv_karyawan b on a.kode_jab=b.kode_jab 
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi' ";
@@ -282,6 +439,7 @@ class Approval2Controller extends Controller
                     if(count($rs)>0){
                         $no_telp = $rs[0]["no_telp"];
                         $nik_app1 = $rs[0]["nik"];
+                        $app_email = $rs[0]["email"];
                     }else{
                         $no_telp = "-";
                         $nik_app1 = "-";
@@ -301,7 +459,7 @@ class Approval2Controller extends Controller
                 //send to nik buat
 
                 $sqlbuat="
-                select isnull(c.no_telp,'-') as no_telp,b.nik_buat
+                select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from gr_pb_m b
                 inner join apv_karyawan c on b.nik_buat=c.nik 
                 where b.no_pb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
@@ -310,9 +468,54 @@ class Approval2Controller extends Controller
                 if(count($rs2)>0){
                     $no_telp2 = $rs2[0]["no_telp"];
                     $nik_buat = $rs2[0]["nik_buat"];
+                    if(intval($request->no_urut) == intval($min[0]['nu'])){
+                        $app_email2 = $rs2[0]['email'];
+                    }
                 }else{
                     $no_telp2 = "-";
                     $nik_buat = "-";
+                }
+
+                $request->request->add(['no_bukti' => ["=",$no_bukti,""]]);
+                $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                $result = json_decode(json_encode($result),true);
+                if(isset($app_email) && $app_email != "-"){
+                    $pesan_header = "Pengajuan $no_bukti berikut telah di approve oleh $nik_user, menunggu approval Anda:";
+
+                    if(count($result['original']['data']) > 0){
+                   
+                        $result['original']['judul'] = $pesan_header;
+                        $html = view('email-siaga',$result['original'])->render();
+                        $periode = substr(date('Ym'),2,4);
+                        $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+                        
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+                        $success['no_pooling'] = $no_pool;
+                        $msg_email = "";
+                    }else{
+                        $msg_email = "Form Aju Kosong";
+                    }
+                }else{
+                    $msg_email = "";
+                }
+
+                if(isset($app_email2) && $app_email2 != "-"){
+                    $pesan_header = "Pengajuan $no_bukti Anda telah direturn oleh $nik_user, berikut ini rinciannya:";
+                    if(count($result['original']['data']) > 0){
+                   
+                        $result['original']['judul'] = $pesan_header;
+                        $html = view('email-siaga',$result['original'])->render();
+                        $periode = substr(date('Ym'),2,4);
+                        $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+                        
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email2,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+                        $success['no_pooling2'] = $no_pool;
+                        $msg_email = "";
+                    }else{
+                        $msg_email = "Form Aju Kosong";
+                    }
+                }else{
+                        $msg_email = "";
                 }
                 
                 $success['approval'] = "Return";
@@ -539,6 +742,106 @@ class Approval2Controller extends Controller
             $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
+        }
+    }
+
+
+    function cek(Request $request){
+        // EMAIL
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik_user= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+        $request->all();
+        $request->request->add(['no_bukti' => ["=",$request->no_aju,""]]);
+        $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
+        $result = json_decode(json_encode($result),true);
+        $success['status'] = true;
+        if(count($result['original']['data']) > 0){
+            $judul = "Pengajuan Nomor : ".$data[0]['no_spb']." berikut menunggu approval Anda";
+            $result['original']['judul'] = $judul;
+            // $html = view('email-siaga-spb',$result['original'])->render();
+            return view('email-siaga-spb',$result['original']);
+            // $periode = substr(date('Ym'),2,4);
+            // $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+            
+            // $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-','enahadiani2@gmail.com',htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+            // $success['no_pooling'] = $no_pool;
+        }
+        // return response()->json($success, $this->successStatus);
+        // END EMAIL
+    }
+
+    public function sendNotifikasi(Request $request)
+    {
+        $this->validate($request,[
+            "no_pooling" => 'required'
+        ]);
+
+        if($auth =  Auth::guard($this->guard)->user()){
+            $nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+        }
+
+        DB::connection($this->db)->beginTransaction();
+        try{
+            $client = new Client();
+            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis,email from pooling where flag_kirim=0 and no_pool ='$request->no_pooling'  ");
+            if(count($res) > 0){
+                $msg = "";
+                $sts = false;
+                foreach($res as $row){
+                    if($row->jenis == "EMAIL") {
+                        $credentials = base64_encode('api:'.config('services.mailgun.secret'));
+                        $domain = "https://api.mailgun.net/v3/".config('services.mailgun.domain')."/messages";
+                        $response = $client->request('POST',  $domain,[
+                            'headers' => [
+                                'Authorization' => 'Basic '.$credentials
+                            ],
+                            'form_params' => [
+                                'from' => 'devsaku5@gmail.com',
+                                'to' => $row->email,
+                                'subject' => 'Approval Siaga',
+                                'html' => htmlspecialchars_decode($row->pesan)
+                            ]
+                        ]);
+                        if ($response->getStatusCode() == 200) { // 200 OK
+                            $response_data = $response->getBody()->getContents();
+                            $data = json_decode($response_data,true);
+                            if(isset($data["id"])){
+                                $success['data2'] = $data;
+
+                                $updt =  DB::connection($this->db)->table('pooling')
+                                ->where('no_pool', $request->no_pooling)    
+                                ->where('jenis', 'EMAIL')
+                                ->where('flag_kirim', 0)
+                                ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
+
+                                
+                                DB::connection($this->db)->commit();
+                                $sts = true;
+                                $msg .= $data['message'];
+                            }
+                        }
+                    }
+                    
+                }
+
+                $success['message'] = $msg;
+                $success['status'] = $sts;
+            }else{
+                $success['message'] = "Data pooling tidak valid";
+                $success['status'] = false;
+            }
+            return response()->json($success, 200);
+        } catch (BadResponseException $ex) {
+            
+            DB::connection($this->db)->rollback();
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $data['message'] = $res;
+            $data['status'] = false;
+            return response()->json($data, 500);
         }
     }
 

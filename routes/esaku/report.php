@@ -59,6 +59,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-retur-beli','Esaku\Inventori\LaporanController@getReportReturBeli');
     $router->get('lap-kartu-stok','Esaku\Inventori\LaporanController@getKartuStok');
     $router->get('lap-saldo-stok','Esaku\Inventori\LaporanController@getLapSaldoStok');
+    $router->get('lap-nota-jual','Esaku\Inventori\LaporanController@getNotaPnj');
 
     $router->get('lap_kartu','Esaku\Inventori\LaporanController@getGlReportBukuBesar');
     $router->get('lap_saldo','Esaku\Inventori\LaporanController@getGlReportNeracaLajur');
