@@ -473,7 +473,7 @@ class ApprovalSPBController extends Controller
             from gr_spb2_m a
             inner join apv_pesan e on a.no_spb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
-            inner join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_spb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
 			order by id2
 	        ";

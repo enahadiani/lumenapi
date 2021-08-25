@@ -139,26 +139,27 @@ class HppController extends Controller
 
             $periode_aktif = $this->getPeriodeAktif($kode_lokasi);
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.no_dokumen 
+            $res = DB::connection($this->db)->select("select a.no_bukti,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.no_dokumen,case a.posted when 'T' then 'Close' else 'Open' end as posted,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input
             from trans_m a 
-            inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user' 			 
+            inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik' 			 
             where a.modul='IV' and a.form='BRGHPP' and a.kode_lokasi='$kode_lokasi' and a.posted ='F' ");
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['jurnal'] = $res;
+                $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
-                $success['jurnal']= [];
+                $success['data']= [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data']= [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -231,7 +232,32 @@ class HppController extends Controller
 					$insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 							[$no_bukti,$kode_lokasi,$nik,$periode,'IV','BRGHPP','F','-','-',$kode_pp,$request->tanggal,$request->no_dokumen,'Jurnal HPP No: '.$no_bukti,'IDR',1,$total,0,0,'-','-','-','-','-','-','-','-','-']);
 
-                    
+                    $sqldet =  "select *,0 as no from ( 
+                                select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
+                                isnull(round(e.h_avg,2),0) as h_avg,
+                                round((isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0)) * isnull(e.h_avg,0),0) as hpp from (select a.kode_barang,a.sat_kecil,'-' as pabrik,a.nama,b.kode_gudang,b.kode_pp,a.kode_lokasi,a.kode_klp 
+                                    from brg_barang a cross join brg_gudang b
+                                    where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' 
+                                ) a 
+                                inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
+                                left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
+                                        from brg_sawal 
+                                        where periode='".substr($periode,0,4)."01' and kode_lokasi='$kode_lokasi' 
+                                        group by kode_lokasi,kode_barang,kode_gudang 
+                                ) b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang 
+                                left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah+bonus) as beli 
+                                        from brg_trans_d 
+                                        where modul='BRGBELI' and periode like '".substr($periode,0,4)."%' and periode <= '".$periode."' and kode_lokasi='".$kode_lokasi."' 
+                                        group by kode_lokasi,kode_barang,kode_gudang 
+                                ) c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.kode_gudang   
+                                left join (select kode_barang,kode_gudang,kode_lokasi,sum(stok) as sakhir 
+                                         from brg_stok where kode_lokasi='".$kode_lokasi."' and nik_user ='".$nik."' 
+                                         group by kode_lokasi,kode_barang,kode_gudang 
+                                         ) d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.kode_gudang=d.kode_gudang 
+                                left join brg_hpp e on a.kode_barang=e.kode_barang and a.kode_lokasi=e.kode_lokasi and e.nik_user ='".$nik."' 
+                              ) x where  x.hpp<>0 order by x.kode_barang ";
+                    $detail = DB::connection($this->db)->select($sqldet);				
+                    $detail= json_decode(json_encode($detail),true);
 					for ($i=0;$i<count($detail);$i++){
 						$line = $detail[$i];	
 						if(floatval($line['hpp']) != 0){											
@@ -363,7 +389,32 @@ class HppController extends Controller
 					$insm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values (?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 							[$no_bukti,$kode_lokasi,$nik,$periode,'IV','BRGHPP','F','-','-',$kode_pp,$request->tanggal,$request->no_dokumen,'Jurnal HPP No: '.$no_bukti,'IDR',1,$total,0,0,'-','-','-','-','-','-','-','-','-']);
 
-                    
+                    $sqldet =  "select *,0 as no from ( 
+                                select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
+                                isnull(round(e.h_avg,2),0) as h_avg,
+                                round((isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0)) * isnull(e.h_avg,0),0) as hpp from (select a.kode_barang,a.sat_kecil,'-' as pabrik,a.nama,b.kode_gudang,b.kode_pp,a.kode_lokasi,a.kode_klp 
+                                    from brg_barang a cross join brg_gudang b
+                                    where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' 
+                                ) a 
+                                inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
+                                left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
+                                        from brg_sawal 
+                                        where periode='".substr($periode,0,4)."01' and kode_lokasi='$kode_lokasi' 
+                                        group by kode_lokasi,kode_barang,kode_gudang 
+                                ) b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang 
+                                left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah+bonus) as beli 
+                                        from brg_trans_d 
+                                        where modul='BRGBELI' and periode like '".substr($periode,0,4)."%' and periode <= '".$periode."' and kode_lokasi='".$kode_lokasi."' 
+                                        group by kode_lokasi,kode_barang,kode_gudang 
+                                ) c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.kode_gudang   
+                                left join (select kode_barang,kode_gudang,kode_lokasi,sum(stok) as sakhir 
+                                         from brg_stok where kode_lokasi='".$kode_lokasi."' and nik_user ='".$nik."' 
+                                         group by kode_lokasi,kode_barang,kode_gudang 
+                                         ) d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.kode_gudang=d.kode_gudang 
+                                left join brg_hpp e on a.kode_barang=e.kode_barang and a.kode_lokasi=e.kode_lokasi and e.nik_user ='".$nik."' 
+                              ) x where  x.hpp<>0 order by x.kode_barang ";
+                    $detail = DB::connection($this->db)->select($sqldet);				
+                    $detail= json_decode(json_encode($detail),true);
 					for ($i=0;$i<count($detail);$i++){
 						$line = $detail[$i];	
 						if(floatval($line['hpp']) != 0){											
@@ -527,7 +578,7 @@ class HppController extends Controller
             $periode = $request->periode;
             $exec1 = DB::connection($this->db)->update("exec sp_brg_hpp ?, ?, ?",[$periode,$kode_lokasi,$nik]);
             $exec2 = DB::connection($this->db)->update("exec sp_brg_stok_hpp ?, ?, ?",[$periode,$kode_lokasi,$nik]);
-            $sql =  "select * from ( 
+            $sql =  "select *,0 as no from ( 
                         select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
                         isnull(round(e.h_avg,2),0) as h_avg,
                         round((isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0)) * isnull(e.h_avg,0),0) as hpp from (select a.kode_barang,a.sat_kecil,'-' as pabrik,a.nama,b.kode_gudang,b.kode_pp,a.kode_lokasi,a.kode_klp 
@@ -567,7 +618,7 @@ class HppController extends Controller
                 //--------- kode_barang tidak terdaftar -----
                 $brgIlegal = 0;
 
-		        $strSQL =  "select distinct a.kode_barang,a.tgl_ed
+		        $strSQL =  "select distinct 0 as no,a.kode_barang,a.tgl_ed
 					from brg_trans_d a left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
 					where b.kode_barang is null and a.modul='BRGBELI' and a.periode >= '".substr($periode,0,4)."' and a.periode <= '".$periode."' and a.kode_lokasi='".$kode_lokasi."' ";
                 $res2 = DB::connection($this->db)->select($strSQL);						
@@ -575,18 +626,20 @@ class HppController extends Controller
                 $success['detail'] = $res2;
                 $success['status'] = true;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
                 $success['detail'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
+            $success['data'] = [];
+            $success['detail'] = [];
             return response()->json($success, $this->successStatus);
         }
         
