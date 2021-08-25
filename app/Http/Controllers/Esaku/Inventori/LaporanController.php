@@ -20,6 +20,11 @@ class LaporanController extends Controller
     public $guard = 'toko';
     public $sql = 'tokoaws';
 
+    public function convertDate($date, $from = '-', $to = '/') {
+        $explode = explode($from, $date);
+        return "$explode[2]"."$to"."$explode[1]"."$to"."$explode[0]";
+    }
+
     public function sendMail(Request $request){
         $this->validate($request,[
             'email' => 'required'
@@ -686,7 +691,8 @@ class LaporanController extends Controller
             }
 
             $sql2="select c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
-            sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex
+            sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex,
+            '0' as hpp,'0' as stok_akhir, '-' as keterangan
             from brg_trans_dloc a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
 			inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
@@ -696,16 +702,121 @@ class LaporanController extends Controller
             
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
-            
-            $total = 0;
-            for($i=0;$i<count($res2);$i++) {
-                $total = $res2[$i]['total_ex'] + $total;
-            }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['sql'] = $sql;
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getReportPenjualanHarianV2(Request $request){
+        date_default_timezone_set('Asia/Jakarta');
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','tanggal','nik_kasir','no_bukti');
+            $db_col_name = array('a.periode','a.tanggal','a.nik_user','a.no_jual');
+            
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama as nama_pp,d.nama as nama_user,e.nama as nama_gudang,a.nik_user as nik_kasir,sum(a.nilai) as nilai
+            from brg_jualpiu_dloc a 
+            left join ( select no_bukti,kode_gudang,kode_lokasi,sum(case when dc='D' then -total else total end) as nilai
+                        from brg_trans_dloc 
+                        where kode_lokasi='$kode_lokasi' and form='BRGJUAL'
+                        group by no_bukti,kode_gudang,kode_lokasi
+                        ) b on a.no_jual=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            left join pp c on a.kode_pp=c.kode_pp 
+            left join karyawan d on a.nik_user=d.nik and a.kode_lokasi=d.kode_lokasi
+            left join brg_gudang e on b.kode_gudang=e.kode_gudang and b.kode_lokasi=e.kode_lokasi
+            $where
+            group by a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama,d.nama,e.nama,a.nik_user";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            $tgl = "";
+            $resdata = array();
+            $i=0;
+            foreach($rs as $row){
+
+                $resdata[]=(array)$row;
+                if($i == 0){
+                    $tgl .= "'$row->tanggal'";
+                }else{
+
+                    $tgl .= ","."'$row->tanggal'";
+                }
+                $i++;
+            }
+            $nik_filter = null;
+            if($request->input($col_array[2])[0] == "=" && ISSET($request->input($col_array[2])[1])) {
+                $nik_filter = "and c.nik_user = '".$request->input($col_array[2])[1]."'";
+                $success['nik_kasir'] = $request->input($col_array[2])[1];
+            } else {
+                $success['nik_kasir'] = 'All';
+            }
+
+            $sql2="select a.no_bukti,b.sat_kecil as satuan,c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
+            sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex
+            from brg_trans_dloc a
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
+            group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,a.no_bukti,b.sat_kecil
+            order by c.tanggal";
+            
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['tanggal'] = $this->convertDate(date('Y-m-d'));
+                $success['jam'] = date('H:i');
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
