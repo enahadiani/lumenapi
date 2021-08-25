@@ -380,6 +380,47 @@
                 <td height='60' valign='top'>&nbsp;&nbsp; &nbsp;Catatan Perpajakan :  &nbsp;{{ $data[0]['cat_pajak'] }}</td>
                 <td valign='top'>&nbsp;&nbsp;&nbsp;&nbsp;Catatan Perbendaharaan :  &nbsp;{{ $data[0]['cat_bdh'] }}</td>
             </tr>
+            <tr>
+                <td colspan="2" style="padding:4px 8px">
+                    <div class="col-12">
+                        <p style='font-weight:bold'># <u>LAMPIRAN</u></p>
+                    </div>
+                    <div class="col-12">
+                    <table id="table-penutup" style="border: 1px solid black;border-collapse: collapse;margin-bottom: 20px;" class="" width="100%" border="1">
+                    <thead class="text-center">
+                    <tr>
+                    <td width="10%"></td>
+                    <td width="25">NAMA/NIK</td>
+                    <td width="15%">JABATAN</td>
+                    <td width="10%">TANGGAL</td>
+                    <td width="15%">NO APPROVAL</td>
+                    <td width="10%">STATUS</td>
+                    <td width="15%">TTD</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @php
+                    $no=1;
+                    @endphp
+                    @for($i=0; $i < count($histori); $i++)
+                       <tr>
+                        <td>{{ $histori[$i]['ket'] }} </td>
+                        <td>{{ $histori[$i]['nama_kar'] }} /{{ $histori[$i]['nik'] }} </td>
+                        <td>{{ $histori[$i]['nama_jab'] }} </td>
+                        <td>{{ $histori[$i]['tanggal'] }} </td>
+                        <td>{{ $histori[$i]['no_app'] }} </td>
+                        <td>{{ $histori[$i]['status'] }} </td>
+                        <td>&nbsp;</td>
+                        </tr>
+                        @php
+                        $no++;
+                        @endphp
+                    @endfor
+                    </tbody>
+                    </table>
+                    </div>
+                </td>
+            </tr>
             </table> 
     </div>
 </body>

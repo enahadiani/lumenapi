@@ -370,9 +370,26 @@ class LaporanController extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
+            $sql="select 'Dibuat oleh' as ket,c.kode_jab,a.nik_user as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut
+			from gr_spb2_m a
+            inner join apv_karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_spb='$no_bukti'
+			union all
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut
+            from apv_flow a
+            inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+            inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi and a.nik=c.nik
+			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+            ";
+            $res3 = DB::connection($this->db)->select($sql);
+            $res3 = json_decode(json_encode($res3),true);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['histori'] = $res3;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
@@ -381,11 +398,14 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['histori'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
+            $success['histori'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
