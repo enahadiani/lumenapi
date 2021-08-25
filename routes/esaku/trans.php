@@ -434,6 +434,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-adm-sanksi-update','Sdm\SanksiAdmController@update');
     $router->delete('sdm-adm-sanksi','Sdm\SanksiAdmController@destroy');
     
+    $router->get('inv-hitung-hpp','Esaku\Inventori\HppController@index');
+    $router->get('inv-hitung-hpp','Esaku\Inventori\HppController@show');
+    $router->get('inv-hitung-hpp-load','Esaku\Inventori\HppController@loadData');
+    $router->post('inv-hitung-hpp','Esaku\Inventori\HppController@store');
+    $router->post('inv-hitung-hpp-update','Esaku\Inventori\HppController@update');
+    $router->delete('inv-hitung-hpp','Esaku\Inventori\HppController@destroy');
+    
     
 });
 
