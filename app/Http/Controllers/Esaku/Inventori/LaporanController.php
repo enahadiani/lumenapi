@@ -778,11 +778,13 @@ class LaporanController extends Controller
             $res = json_decode(json_encode($rs),true);
 
             $tgl = "";
+            $kasir = array();
             $resdata = array();
             $i=0;
             foreach($rs as $row){
 
                 $resdata[]=(array)$row;
+                array_push($kasir, $row->nik_kasir);
                 if($i == 0){
                     $tgl .= "'$row->tanggal'";
                 }else{
@@ -794,9 +796,6 @@ class LaporanController extends Controller
             $nik_filter = null;
             if($request->input($col_array[2])[0] == "=" && ISSET($request->input($col_array[2])[1])) {
                 $nik_filter = "and c.nik_user = '".$request->input($col_array[2])[1]."'";
-                $success['nik_kasir'] = $request->input($col_array[2])[1];
-            } else {
-                $success['nik_kasir'] = 'All';
             }
 
             $sql2="select a.no_bukti,b.sat_kecil as satuan,c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
@@ -817,6 +816,7 @@ class LaporanController extends Controller
                 $success['data_detail'] = $res2;
                 $success['tanggal'] = $this->convertDate(date('Y-m-d'));
                 $success['jam'] = date('H:i');
+                $success['kasir'] = $kasir;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
