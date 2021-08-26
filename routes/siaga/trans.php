@@ -48,6 +48,7 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     
     $router->post('send-email', 'Siaga\Approval2Controller@sendNotifikasi');
     $router->post('cek', 'Siaga\Approval2Controller@cek');
+    $router->post('send-email-saku3', 'Siaga\Approval2Controller@sendEmailSaku3');
     
 });
 

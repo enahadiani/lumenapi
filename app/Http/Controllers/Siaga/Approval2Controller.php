@@ -846,4 +846,78 @@ class Approval2Controller extends Controller
         }
     }
 
+    function sendEmailSaku3(Request $request){
+
+        $this->validate($request,[
+            'no_aju' => 'required',
+            'email_kirim' => 'required',
+            'nik_kirim' => 'required',
+            'jenis' => 'required',
+            'judul' => 'required',
+        ]);
+        // EMAIL
+        if($data =  Auth::guard($this->guard)->user()){
+            $nik_user= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+        $request->request->add(['no_bukti' => ["=",$request->no_aju,""]]);
+        if($request->jenis == "PB"){
+
+            $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+        }else{
+            $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
+        }
+        $result = json_decode(json_encode($result),true);
+        $success['status'] = true;
+        if(count($result['original']['data']) > 0){
+            $judul = $request->judul;
+            $msg = "";
+            $result['original']['judul'] = $judul;
+            $html = view('email-siaga-spb',$result['original'])->render();
+            $periode = substr(date('Ym'),2,4);
+            $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
+            $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$request->email_kirim,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
+            $success['no_pooling'] = $no_pool;
+            $client = new Client;
+            $credentials = base64_encode('api:'.config('services.mailgun.secret'));
+            $domain = "https://api.mailgun.net/v3/".config('services.mailgun.domain')."/messages";
+            $response = $client->request('POST',  $domain,[
+                'headers' => [
+                    'Authorization' => 'Basic '.$credentials
+                ],
+                'form_params' => [
+                    'from' => 'devsaku5@gmail.com',
+                    'to' => $request->email_kirim,
+                    'subject' => 'Approval Siaga',
+                    'html' => $html
+                    ]
+                ]);
+                if ($response->getStatusCode() == 200) { // 200 OK
+                    $response_data = $response->getBody()->getContents();
+                    $data = json_decode($response_data,true);
+                    if(isset($data["id"])){
+                        $success['data2'] = $data;
+                        
+                        $updt =  DB::connection($this->db)->table('pooling')
+                        ->where('no_pool', $request->no_pooling)    
+                        ->where('jenis', 'EMAIL')
+                        ->where('flag_kirim', 0)
+                        ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
+                        
+                        
+                        DB::connection($this->db)->commit();
+                        $sts = true;
+                        $msg .= $data['message'];
+                    }
+                }
+            
+                $success['message'] = $msg;
+        }else{
+            $success['status'] = false;
+            $success['message'] = 'Data tidak ditemukan';
+        }
+        return response()->json($success, $this->successStatus);
+        // END EMAIL
+    }
+
 }
