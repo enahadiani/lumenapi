@@ -864,8 +864,10 @@ class Approval2Controller extends Controller
         if($request->jenis == "PB"){
 
             $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+            $template= 'email-siaga';
         }else{
             $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
+            $template= 'email-siaga-spb';
         }
         $result = json_decode(json_encode($result),true);
         $success['status'] = true;
@@ -873,7 +875,7 @@ class Approval2Controller extends Controller
             $judul = $request->judul;
             $msg = "";
             $result['original']['judul'] = $judul;
-            $html = view('email-siaga-spb',$result['original'])->render();
+            $html = view($template,$result['original'])->render();
             $periode = substr(date('Ym'),2,4);
             $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
             $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$request->email_kirim,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
