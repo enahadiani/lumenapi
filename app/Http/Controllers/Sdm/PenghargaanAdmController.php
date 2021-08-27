@@ -173,10 +173,16 @@ class PenghargaanAdmController extends Controller
                     $tanggal = $request->input('tanggal');
 
                     $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$tanggal[$i]."', '".$fileName[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->db)->insert($insert);
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $tanggal[$i],
+                        $fileName[$i],
+                        $nu
+                    ]);
                 }
 
                 DB::connection($this->db)->commit();
@@ -248,14 +254,27 @@ class PenghargaanAdmController extends Controller
 
                 if($isUpload[$i] === 'false') { // kalo gak upload
                     $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$tanggal[$i]."', '".$filePrevName[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $tanggal[$i],
+                        $filePrevName[$i],
+                        $nu
+                    ]);
                 } else {
                     $insert = "INSERT INTO hr_penghargaan(nik, kode_lokasi, nama, tanggal, sertifikat, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$tanggal[$i]."', '".$fileName[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $tanggal[$i],
+                        $fileName[$i],
+                        $nu
+                    ]);
                 }
-                DB::connection($this->db)->insert($insert);
             }
 
             DB::connection($this->db)->commit();

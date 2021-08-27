@@ -162,10 +162,16 @@ class SanksiAdmController extends Controller
                     $jenis = $request->input('jenis');
 
                     $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."', 
-                    '".$tanggal[$i]."', '".$jenis[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->db)->insert($insert);
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $tanggal[$i],
+                        $jenis[$i],
+                        $nu
+                    ]);
                 }
 
                 DB::connection($this->db)->commit();
@@ -215,10 +221,16 @@ class SanksiAdmController extends Controller
                 $jenis = $request->input('jenis');
 
                 $insert = "INSERT INTO hr_sanksi(nik, kode_lokasi, nama, tanggal, jenis, nu) 
-                VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."', 
-                '".$tanggal[$i]."', '".$jenis[$i]."', '".$nu."')";
+                VALUES (?, ?, ?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('nik'),
+                    $kode_lokasi,
+                    $nama[$i],
+                    $tanggal[$i],
+                    $jenis[$i],
+                    $nu
+                ]);
             }
 
             DB::connection($this->db)->commit();

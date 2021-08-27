@@ -125,10 +125,14 @@ class JabatanController extends Controller
             }
             if($this->isUnik($request->input('kode_jab'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_jab(kode_jab, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_jab')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_jab'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data jabatan karyawan berhasil disimpan";

@@ -178,11 +178,18 @@ class PelatihanAdmController extends Controller
 
                     $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
                     tgl_selesai, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$panitia[$i]."', '".$fileName[$i]."', '".$tgl_mulai[$i]."',
-                    '".$tgl_selesai[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->db)->insert($insert);
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $panitia[$i],
+                        $fileName[$i],
+                        $tgl_mulai[$i],
+                        $tgl_selesai[$i],
+                        $nu
+                    ]);
                 }
                 
                 DB::connection($this->db)->commit();
@@ -261,17 +268,33 @@ class PelatihanAdmController extends Controller
                 if($isUpload[$i] === 'false') { // kalo gak upload
                     $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
                     tgl_selesai, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$panitia[$i]."', '".$filePrevName[$i]."', '".$tgl_mulai[$i]."',
-                    '".$tgl_selesai[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $panitia[$i],
+                        $filePrevName[$i],
+                        $tgl_mulai[$i],
+                        $tgl_selesai[$i],
+                        $nu
+                    ]);
                 } else {
                     $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
                     tgl_selesai, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$panitia[$i]."', '".$fileName[$i]."', '".$tgl_mulai[$i]."',
-                    '".$tgl_selesai[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $panitia[$i],
+                        $fileName[$i],
+                        $tgl_mulai[$i],
+                        $tgl_selesai[$i],
+                        $nu
+                    ]);
+
                 }
-                DB::connection($this->db)->insert($insert);
             }
 
             DB::connection($this->db)->commit();

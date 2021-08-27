@@ -125,10 +125,14 @@ class StrataController extends Controller
             }
             if($this->isUnik($request->input('kode_strata'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_strata(kode_strata, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_strata')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_strata'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data strata karyawan berhasil disimpan";

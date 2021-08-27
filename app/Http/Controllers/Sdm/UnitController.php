@@ -129,11 +129,15 @@ class UnitController extends Controller
             }
             if($this->isUnik($request->input('kode_unit'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_unit(kode_unit, nama, flag_aktif, kode_pp, kode_lokasi) 
-                VALUES ('".$request->input('kode_unit')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$request->input('kode_pp')."',
-                '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_unit'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $request->input('kode_pp'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data unit karyawan berhasil disimpan";

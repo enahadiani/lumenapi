@@ -163,10 +163,16 @@ class DinasAdmController extends Controller {
                     $tgl_sk = $request->input('tgl_sk');
 
                     $insert = "INSERT INTO hr_sk(nik, kode_lokasi, no_sk, nama, tgl_sk, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$sk[$i]."', 
-                    '".$nama[$i]."', '".$tgl_sk[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->db)->insert($insert);
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $sk[$i],
+                        $nama[$i],
+                        $tgl_sk[$i],
+                        $nu
+                    ]);
                 }
 
                 DB::connection($this->db)->commit();
@@ -216,10 +222,16 @@ class DinasAdmController extends Controller {
                 $tgl_sk = $request->input('tgl_sk');
 
                 $insert = "INSERT INTO hr_sk(nik, kode_lokasi, no_sk, nama, tgl_sk, nu) 
-                VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$sk[$i]."', 
-                '".$nama[$i]."', '".$tgl_sk[$i]."', '".$nu."')";
+                    VALUES (?, ?, ?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('nik'),
+                    $kode_lokasi,
+                    $sk[$i],
+                    $nama[$i],
+                    $tgl_sk[$i],
+                    $nu
+                ]);
             }
 
             DB::connection($this->db)->commit();

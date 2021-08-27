@@ -125,10 +125,14 @@ class JurusanController extends Controller
             }
             if($this->isUnik($request->input('kode_jur'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_jur(kode_jur, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_jur')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_jur'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data jurusan karyawan berhasil disimpan";

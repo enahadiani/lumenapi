@@ -128,11 +128,16 @@ class StatusPajakController extends Controller
             }
             if($this->isUnik($request->input('kode_pajak'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_pajak(kode_pajak, nama, nilai, biaya_jab, jab_max, kode_lokasi) 
-                VALUES ('".$request->input('kode_pajak')."', '".$request->input('nama')."', 
-                '".$request->input('nilai')."', '".$request->input('biaya_jab')."', '".$request->input('jab_max')."',
-                '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_pajak'),
+                    $request->input('nama'),
+                    $request->input('nilai'),
+                    $request->input('biaya_jab'),
+                    $request->input('jab_max'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data pajak karyawan berhasil disimpan";

@@ -185,9 +185,18 @@ class KeluargaAdmController extends Controller
 
                     $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, jenis, nama, jk, tempat, tgl_lahir, 
                     status_kes, foto) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$jenis[$i]."', '".$nama[$i]."',
-                    '".$jk[$i]."', '".$tempat[$i]."', '".$tgl_lahir[$i]."', '".$tanggungan[$i]."', '".$fileName[$i]."')";
-                    DB::connection($this->db)->insert($insert);
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $jenis[$i],
+                        $nama[$i],
+                        $jk[$i],
+                        $tempat[$i],
+                        $tgl_lahir[$i],
+                        $tanggungan[$i],
+                        $fileName[$i]
+                    ]);
                 }
 
                 DB::connection($this->db)->commit();
@@ -270,16 +279,34 @@ class KeluargaAdmController extends Controller
                 if($isUpload[$i] === 'false') { // kalo gak upload
                     $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, jenis, nama, jk, tempat, tgl_lahir, 
                     status_kes, foto) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$jenis[$i]."', '".$nama[$i]."',
-                    '".$jk[$i]."', '".$tempat[$i]."', '".$tgl_lahir[$i]."', '".$tanggungan[$i]."', '".$filePrevName[$i]."')";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $jenis[$i],
+                        $nama[$i],
+                        $jk[$i],
+                        $tempat[$i],
+                        $tgl_lahir[$i],
+                        $tanggungan[$i],
+                        $filePrevName[$i]
+                    ]);
                 } else {
                     $insert = "INSERT INTO hr_keluarga(nik, kode_lokasi, jenis, nama, jk, tempat, tgl_lahir, 
                     status_kes, foto) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$jenis[$i]."', '".$nama[$i]."',
-                    '".$jk[$i]."', '".$tempat[$i]."', '".$tgl_lahir[$i]."', '".$tanggungan[$i]."', '".$fileName[$i]."')";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $jenis[$i],
+                        $nama[$i],
+                        $jk[$i],
+                        $tempat[$i],
+                        $tgl_lahir[$i],
+                        $tanggungan[$i],
+                        $fileName[$i]
+                    ]);
                 }
-                
-                DB::connection($this->db)->insert($insert);
             }
 
             DB::connection($this->db)->commit();
