@@ -240,10 +240,10 @@ class KepegawaianController extends Controller
                 tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
                 b_badan, provinsi, client, fungsi, skill, tgl_kontrak_akhir, gaji_pokok, tunj_jabatan, tunj_penampilan, tunj_gondola,
                 tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli, tunj_lembur, tunj_masakerja, no_bpjs_kerja, atasan_langsung,
-                atasan_t_langsung, no_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta) 
+                atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 DB::connection($this->db)->insert($insert, [
                     $request->input('nik'),
@@ -320,6 +320,7 @@ class KepegawaianController extends Controller
                     $request->input('atasan_langsung'),
                     $request->input('atasan_t_langsung'),
                     $request->input('no_kta'),
+                    $request->input('no_reg_kta'),
                     $request->input('tgl_berlaku_kta'),
                     $request->input('tgl_kadaluarsa_kta'),
                 ]);
@@ -458,10 +459,10 @@ class KepegawaianController extends Controller
             tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
             b_badan, provinsi, client, fungsi, skill, tgl_kontrak_akhir, gaji_pokok, tunj_jabatan, tunj_penampilan, tunj_gondola,
             tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli, tunj_lembur, tunj_masakerja, no_bpjs_kerja, atasan_langsung,
-            atasan_t_langsung, no_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta) 
+            atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             DB::connection($this->db)->insert($insert, [
                 $request->input('nik'),
@@ -538,6 +539,7 @@ class KepegawaianController extends Controller
                 $request->input('atasan_langsung'),
                 $request->input('atasan_t_langsung'),
                 $request->input('no_kta'),
+                $request->input('no_reg_kta'),
                 $request->input('tgl_berlaku_kta'),
                 $request->input('tgl_kadaluarsa_kta'),
             ]);
