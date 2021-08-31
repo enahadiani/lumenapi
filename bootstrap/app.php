@@ -803,4 +803,43 @@ $app->router->group([
     require __DIR__.'/../routes/sdm.php';
 });
 
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/bdh-auth'
+], function ($router) {
+    require __DIR__.'/../routes/bdh/auth.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/bdh-master'
+], function ($router) {
+    require __DIR__.'/../routes/bdh/master.php';
+});
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/bdh-trans'
+], function ($router) {
+    require __DIR__.'/../routes/bdh/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/bdh-report'
+], function ($router) {
+    require __DIR__.'/../routes/bdh/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/bdh-dash'
+], function ($router) {
+    require __DIR__.'/../routes/bdh/dash.php';
+});
+
+
 return $app;
