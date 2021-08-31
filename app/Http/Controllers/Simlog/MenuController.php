@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Bdh;
+namespace App\Http\Controllers\Simlog;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
