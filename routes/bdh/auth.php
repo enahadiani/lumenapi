@@ -18,8 +18,8 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('login', 'AuthController@loginYptKug');
-    $router->get('hash_pass', 'AuthController@hashPasswordYptKug');
-    $router->get('hash_pass_nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
+    $router->get('hash-pass', 'AuthController@hashPasswordYptKug');
+    $router->get('hash-pass-nik/{db}/{table}/{nik}', 'AuthController@hashPasswordByNIK');
    
 });
 
