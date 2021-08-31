@@ -1147,12 +1147,17 @@ class MobileController extends Controller
                 $filter = "";
             }
 
-            $res3 = DB::connection($this->db)->select("
-            select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
-            $res3 = json_decode(json_encode($res3),true);
+            if(isset($request->kode_ta) && $request->kode_ta != ""){
+                $kode_ta = $request->kode_ta;
+            }else{
+                
+                $res3 = DB::connection($this->db)->select("
+                select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
+                $res3 = json_decode(json_encode($res3),true);
+    
+                $kode_ta = $res3[0]['kode_ta'];
+            }
 
-            $kode_ta = $res3[0]['kode_ta'];
-            
             $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel,c.skode as singkatan 
             from sis_guru_matpel_kelas a
             inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
