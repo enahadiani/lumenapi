@@ -125,10 +125,14 @@ class LokerController extends Controller
             }
             if($this->isUnik($request->input('kode_loker'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_loker(kode_loker, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_loker')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_loker'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data lokasi kerja berhasil disimpan";

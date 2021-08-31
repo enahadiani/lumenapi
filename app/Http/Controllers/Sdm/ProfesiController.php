@@ -125,10 +125,14 @@ class ProfesiController extends Controller
             }
             if($this->isUnik($request->input('kode_profesi'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_profesi(kode_profesi, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_profesi')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_profesi'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data profesi karyawan berhasil disimpan";

@@ -125,10 +125,14 @@ class GolonganController extends Controller
             }
             if($this->isUnik($request->input('kode_gol'), $kode_lokasi)){
                 $insert = "INSERT INTO hr_gol(kode_gol, nama, flag_aktif, kode_lokasi) 
-                VALUES ('".$request->input('kode_gol')."', '".$request->input('nama')."', 
-                '".$request->input('status')."', '".$kode_lokasi."')";
+                VALUES (?, ?, ?, ?)";
 
-                DB::connection($this->db)->insert($insert);
+                DB::connection($this->db)->insert($insert, [
+                    $request->input('kode_gol'),
+                    $request->input('nama'),
+                    $request->input('status'),
+                    $kode_lokasi
+                ]);
                 
                 $success['status'] = true;
                 $success['message'] = "Data golongan karyawan berhasil disimpan";

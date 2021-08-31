@@ -100,7 +100,7 @@ class PelatihanAdmController extends Controller
             $resKaryawan = DB::connection($this->db)->select($karyawan);
             $resKaryawan = json_decode(json_encode($resKaryawan),true);
 
-            $sql = "SELECT nik, nama, panitia, setifikat, tgl_mulai, tgl_selesai   
+            $sql = "SELECT nik, nama, panitia, setifikat, tgl_mulai, tgl_selesai, no_ijazah   
             FROM hr_pelatihan
             WHERE nik = '".$request->query('nik')."' AND kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
@@ -142,7 +142,8 @@ class PelatihanAdmController extends Controller
             'nama' => 'required|array',
             'panitia' => 'required|array',
             'tgl_mulai' => 'required|array',
-            'tgl_selesai' => 'required|array'
+            'tgl_selesai' => 'required|array',
+            'no_ijazah' => 'required|array'
         ]);
         
         try {
@@ -175,14 +176,23 @@ class PelatihanAdmController extends Controller
                     $panitia = $request->input('panitia');
                     $tgl_mulai = $request->input('tgl_mulai');
                     $tgl_selesai = $request->input('tgl_selesai');
+                    $no_ijazah = $request->input('no_ijazah');
 
                     $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
-                    tgl_selesai, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$panitia[$i]."', '".$fileName[$i]."', '".$tgl_mulai[$i]."',
-                    '".$tgl_selesai[$i]."', '".$nu."')";
+                    tgl_selesai, nu, no_ijazah) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                    DB::connection($this->db)->insert($insert);
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $panitia[$i],
+                        $fileName[$i],
+                        $tgl_mulai[$i],
+                        $tgl_selesai[$i],
+                        $nu,
+                        $tgl_ijazah[$i],
+                    ]);
                 }
                 
                 DB::connection($this->db)->commit();
@@ -218,7 +228,8 @@ class PelatihanAdmController extends Controller
             'nama' => 'required|array',
             'panitia' => 'required|array',
             'tgl_mulai' => 'required|array',
-            'tgl_selesai' => 'required|array'
+            'tgl_selesai' => 'required|array',
+            'no_ijazah' => 'required|array'
         ]);
         
         DB::connection($this->db)->beginTransaction();
@@ -257,21 +268,40 @@ class PelatihanAdmController extends Controller
                 $panitia = $request->input('panitia');
                 $tgl_mulai = $request->input('tgl_mulai');
                 $tgl_selesai = $request->input('tgl_selesai');
+                $no_ijazah = $request->input('no_ijazah');
 
                 if($isUpload[$i] === 'false') { // kalo gak upload
                     $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
-                    tgl_selesai, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$panitia[$i]."', '".$filePrevName[$i]."', '".$tgl_mulai[$i]."',
-                    '".$tgl_selesai[$i]."', '".$nu."')";
+                    tgl_selesai, nu, no_ijazah) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $panitia[$i],
+                        $filePrevName[$i],
+                        $tgl_mulai[$i],
+                        $tgl_selesai[$i],
+                        $nu,
+                        $no_ijazah[$i]
+                    ]);
                 } else {
                     $insert = "INSERT INTO hr_pelatihan(nik, kode_lokasi, nama, panitia, setifikat, tgl_mulai,
-                    tgl_selesai, nu) 
-                    VALUES ('".$request->input('nik')."', '".$kode_lokasi."', '".$nama[$i]."',
-                    '".$panitia[$i]."', '".$fileName[$i]."', '".$tgl_mulai[$i]."',
-                    '".$tgl_selesai[$i]."', '".$nu."')";
+                    tgl_selesai, nu, no_ijazah) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    DB::connection($this->db)->insert($insert, [
+                        $request->input('nik'),
+                        $kode_lokasi,
+                        $nama[$i],
+                        $panitia[$i],
+                        $fileName[$i],
+                        $tgl_mulai[$i],
+                        $tgl_selesai[$i],
+                        $nu,
+                        $no_ijazah[$i]
+                    ]);
+
                 }
-                DB::connection($this->db)->insert($insert);
             }
 
             DB::connection($this->db)->commit();
