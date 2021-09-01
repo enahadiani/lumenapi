@@ -18,7 +18,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Filter Laporan
-    $router->get('filter-periode','Esaku\Keuangan\FilterController@getFilterPeriode');
+    $router->get('filter-periode-pnj','Esaku\Keuangan\FilterController@getFilterPeriode');
     $router->get('filter-nik','Esaku\Keuangan\FilterController@getFilterNIK');
     $router->get('filter-tanggal','Esaku\Keuangan\FilterController@getFilterTanggal');
     $router->get('filter-bukti','Esaku\Keuangan\FilterController@getFilterNoBukti');
