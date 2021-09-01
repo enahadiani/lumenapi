@@ -406,7 +406,7 @@ class PtgBebanController extends Controller
             
                             if(count($arr_no_urut) > 0){
                                 for($i=0; $i<count($arr_no_urut);$i++){
-                                    $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_no_urut[$i],$arr_dok[$i],$request->kode_jenis[$i],$kode_lokasi,'PBBAU',$no_bukti)); 
+                                    $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_no_urut[$i],$arr_dok[$i],$arr_jenis[$i],$kode_lokasi,'PBBAU',$no_bukti)); 
                                 }
                             }
                         }

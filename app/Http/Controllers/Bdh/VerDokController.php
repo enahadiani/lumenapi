@@ -455,9 +455,9 @@ class VerDokController extends Controller
 
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $modul = $res[0]->modul;
-                $status = $res[0]->status;
-                $no_verlama = $res[0]->no_ver1;
+                $modul = $res[0]['modul'];
+                $status = $res[0]['status'];
+                $no_verlama = $res[0]['no_ver1'];
                 
                 // data jurnal
                 if ($modul == "PBBAU" || $modul == "PBBMHD" || $modul == "PBADK" || $modul == "PBBA") {			  
@@ -497,7 +497,7 @@ class VerDokController extends Controller
                 $strSQL3 = "select a.bank,a.nama,a.no_rek,a.nama_rek,a.bruto,a.pajak,b.keterangan 
                 from pbh_rek a
                 inner join pbh_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-                where no_bukti ='".$request->no_pb."' and kode_lokasi='".$kode_lokasi."'";
+                where a.no_bukti ='".$request->no_pb."' and a.kode_lokasi='".$kode_lokasi."'";
                 $rs3 = DB::connection($this->db)->select($strSQL3);
                 $res3 = json_decode(json_encode($rs3),true);
     

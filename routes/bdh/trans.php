@@ -33,6 +33,13 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('nik-ver','Bdh\PtgBebanController@getNIKVer');
     $router->get('ptg-beban-budget','Bdh\PtgBebanController@cekBudget');
 
+    // SERAH TERIMA DOK
+    $router->get('serah-dok-pb','Bdh\SerahTerimaOnlineController@getPB');
+    $router->get('serah-dok-detail','Bdh\SerahTerimaOnlineController@show');
+    $router->post('serah-dok','Bdh\SerahTerimaOnlineController@store');
+    $router->get('serah-dok-nik','Bdh\SerahTerimaOnlineController@getNIK');
+
+
     // VERIFIKASI DOKUMEN
     $router->get('ver-dok-nobukti','Bdh\VerDokController@generateNo');
     $router->get('ver-dok','Bdh\VerDokController@index');
