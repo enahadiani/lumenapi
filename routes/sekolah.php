@@ -315,6 +315,8 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->post('absen-kelas','Sekolah\AbsenKelasController@store');
 
     $router->post('siswa-simpan','Sekolah\SiswaInputController@save');
+    $router->post('siswa-update','Sekolah\SiswaInputController@update');
+    $router->get('siswa-edit','Sekolah\SiswaInputController@show');
 
     // UPLOAD RAPORT
     $router->get('raport-dok-all','Sekolah\UploadRaportController@index');
