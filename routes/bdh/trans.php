@@ -17,6 +17,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
+    // PERTANGGUNGAN BEBAN
     $router->get('ptg-beban-nobukti','Bdh\PtgBebanController@generateNo');
     $router->get('ptg-beban','Bdh\PtgBebanController@index');
     $router->get('ptg-beban-detail','Bdh\PtgBebanController@show');
@@ -31,6 +32,15 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('nik-tahu','Bdh\PtgBebanController@getNIKTahu');
     $router->get('nik-ver','Bdh\PtgBebanController@getNIKVer');
     $router->get('ptg-beban-budget','Bdh\PtgBebanController@cekBudget');
+
+    // VERIFIKASI DOKUMEN
+    $router->get('ver-dok-nobukti','Bdh\VerDokController@generateNo');
+    $router->get('ver-dok','Bdh\VerDokController@index');
+    $router->get('ver-dok-detail','Bdh\VerDokController@show');
+    $router->post('ver-dok','Bdh\VerDokController@store');
+    $router->delete('ver-dok','Bdh\VerDokController@destroy');
+
+    $router->get('ver-dok-pb','Bdh\VerDokController@getPB');
 });
 
 ?>

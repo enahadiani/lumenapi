@@ -833,6 +833,13 @@ class PtgBebanController extends Controller
             $rs4 = DB::connection($this->db)->select($strSQL4);
             $res4 = json_decode(json_encode($rs4),true);
 
+            $strSQL5 = "select distinct convert(varchar,tanggal,103) as tgl,tanggal 
+            from pbh_ver_m 
+            where no_bukti='".$request->no_bukti."' and kode_lokasi='".$kode_lokasi."' 
+            order by convert(varchar,tanggal,103) desc";
+            $rs5 = DB::connection($this->db)->select($strSQL5);
+            $res5 = json_decode(json_encode($rs5),true);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
 
                 $success['status'] = true;
@@ -840,6 +847,19 @@ class PtgBebanController extends Controller
                 $success['detail_rek'] = $res2;
                 $success['detail_jurnal'] = $res3;
                 $success['detail_dok'] = $res4;
+                if(count($res5) > 0){
+                    $i=0;
+                    foreach($res5 as $row){
+                        $sql = "select catatan,no_ver, convert(varchar,tanggal,103) as tgl,tanggal, convert(varchar,tgl_input,108) as jam,nik_user 
+                        from pbh_ver_m 
+                        where no_bukti='".$request->no_bukti."' and tanggal='".$row['tanggal']."' and kode_lokasi='".$kode_lokasi."' 
+                        order by tanggal desc,convert(varchar,tgl_input,108) desc ";
+                        $rs6 = DB::connection($this->db)->select($sql);
+                        $res5[$i]['detail'] = json_decode(json_encode($rs6),true);
+                        $i++;
+                    }
+                }
+                $success['detail_catatan'] = $res5;
                 $success['message'] = "Success!";     
             }
             else{
@@ -848,6 +868,7 @@ class PtgBebanController extends Controller
                 $success['detail_rek'] = [];
                 $success['detail_jurnal'] = [];
                 $success['detail_dok'] = [];
+                $success['detail_catatan'] = [];
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -857,6 +878,7 @@ class PtgBebanController extends Controller
             $success['detail_rek'] = [];
             $success['detail_jurnal'] = [];
             $success['detail_dok'] = [];
+            $success['detail_catatan'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
