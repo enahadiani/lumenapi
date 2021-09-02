@@ -342,18 +342,29 @@ class VerDokController extends Controller
                 ->where('kode_lokasi',$kode_lokasi)
                 ->update(['no_verdok'=>$no_bukti,'progress'=>$vStatus]);
                 
-                //dokumen						
+                //dokumen			
+                $check = false;			
                 if (count($request->kode_dok) > 0){
-                    for ($i=0; $i < ($request->kode_dok);$i++){
-                        $ins = DB::connection($this->db)->insert("insert into pbh_verdok_d (no_ver,no_bukti,kode_lokasi,kode_dok,status,catatan) values (?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_pb,$kode_lokasi,$request->kode_dok[$i],$request->status_dok[$i],$request->catatan_dok[$i]));	
+                    for ($i=0; $i < count($request->kode_dok);$i++){
+                        if($request->status_dok[$i] == "CHECK"){
+                            $check = true;	
+                        }
+                        $ins = DB::connection($this->db)->insert("insert into pbh_verdok_d (no_ver,no_bukti,kode_lokasi,kode_dok,status,catatan) values (?, ?, ?, ?, ?, ?) ",array($no_bukti,$request->no_pb,$kode_lokasi,$request->kode_dok[$i],$request->status_dok[$i],$request->catatan_dok[$i]));
                     }
                 }
 
-                DB::connection($this->db)->commit();
-                $success['status'] = true;
-                $success['no_bukti'] = $no_bukti;
-                $success['message'] = "Data Verifikasi Dokumen berhasil disimpan";
+                if(!$check){
+                    DB::connection($this->db)->rollback();
+                    $success['status'] = false;
+                    $success['no_bukti'] = '-';
+                    $success['message'] = "Data Verifikasi Dokumen gagal disimpan. Transaksi tidak valid. Tidak ada status CHECK dokumen.";
+                }else{
 
+                    DB::connection($this->db)->commit();
+                    $success['status'] = true;
+                    $success['no_bukti'] = $no_bukti;
+                    $success['message'] = "Data Verifikasi Dokumen berhasil disimpan";
+                }
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = false;

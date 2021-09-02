@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class SerahTerimaOnlineController extends Controller
 {
@@ -280,7 +281,7 @@ class SerahTerimaOnlineController extends Controller
 				}
 			}
 
-			$cek3 = DB::connection($this->db)->select("SELECT FORMAT(getdate(), 'dddd') AS hari",true);	
+			$cek3 = DB::connection($this->db)->select("SELECT FORMAT(getdate(), 'dddd') AS hari");	
 			if (count($cek3) > 0){
 				$line = $cek3[0];
 				if ($line->hari == "Sunday" || $line->hari == "Saturday") {
