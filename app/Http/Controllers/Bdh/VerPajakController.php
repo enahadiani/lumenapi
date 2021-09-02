@@ -357,12 +357,12 @@ class VerPajakController extends Controller
                 ->where('kode_lokasi',$kode_lokasi)		
                 ->update(['no_flag'=>$no_bukti]);
                 
-                $ins = DB::connection($this->db)->insert("insert into pbh_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat) values (?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?)", array($request->no_aju,$kode_lokasi,$request->tanggal,$periode,$nik,$vStatus,$request->modul,'VERPJK',$request->no_aju,$request->memo,'-','X','X'));
+                $ins = DB::connection($this->db)->insert("insert into pbh_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat) values (?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?)", array($no_bukti,$kode_lokasi,$request->tanggal,$periode,$nik,$vStatus,$request->modul,'VERPJK',$request->no_aju,$request->memo,'-','X','X'));
                     													
                 $upd = DB::connection($this->db)->table('pbh_pb_m')
                 ->where('no_pb',$request->no_aju)
                 ->where('kode_lokasi',$kode_lokasi)
-                ->update(['no_pajak'=>$request->no_aju,'progress'=>$vStatus,'nilai'=>floatval($request->total),'nilai_final'=>floatval($request->total)]);
+                ->update(['no_pajak'=>$no_bukti,'progress'=>$vStatus,'nilai'=>floatval($request->total),'nilai_final'=>floatval($request->total)]);
 
                 $del = DB::connection($this->db)->table('pbh_pb_j') 
                 ->where('no_pb',$request->no_aju)
@@ -551,9 +551,9 @@ class VerPajakController extends Controller
                 if (count($request->atensi) > 0){
                     $netto = 0;
                     for ($i=0;$i < count($request->atensi);$i++){
-                        $netto = floatval($request->bruto[$i]) - floatval($request->potongan);
+                        $netto = floatval($request->bruto[$i]) - floatval($request->potongan[$i]);
                         $ins6 = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            array($request->no_aju,$kode_lokasi,$request->modul,$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi[$i],floatval($request->bruto[$i]),floatval($request->potongan),$netto));
+                            array($request->no_aju,$kode_lokasi,$request->modul,$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi[$i],floatval($request->bruto[$i]),floatval($request->potongan[$i]),$netto));
                     }
                 }
                 
@@ -631,11 +631,358 @@ class VerPajakController extends Controller
         
     }
 
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'tanggal' => 'required|date_format:Y-m-d',
+            'no_aju' => 'required|max:20',
+            'kode_pp_aju' => 'required|max:10',
+            'tgl_aju' => 'required|date_format:Y-m-d',
+            'memo' => 'required|max:200',
+            'total' => 'required',
+            'no_dokumen' => 'required',
+            'modul' => 'required',
+            'status' => 'required|in:APPROVE,RETURN',
+            'nik_buat' => 'required|max:20',
+            'atensi' => 'required|array',
+            'bank' => 'required|array',
+            'nama_rek' => 'required|array',
+            'no_rek' => 'required|array',
+            'bruto' => 'required|array',
+            'potongan' => 'required|array',
+            'netto' => 'required|array',
+            'kode_akun' => 'required|array',
+            'dc' => 'required|array',
+            'keterangan' => 'required|array',
+            'nilai' => 'required|array',
+            'kode_pp' => 'required|array',
+            'kode_drk' => 'required|array',
+            'kode_akun_pajak' => 'required|array',
+            'dc_pajak' => 'required|array',
+            'keterangan_pajak' => 'required|array',
+            'nilai_pajak' => 'required|array',
+            'kode_pp_pajak' => 'required|array',
+            'kode_drk_pajak' => 'required|array',
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
+            }
+
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+
+            $no_bukti = $this->generateKode("pbh_ver_m", "no_ver", $kode_lokasi."-PJK".substr($periode,2,4).".", "0001");
+
+            // CEK PERIODE
+            $cek = $this->doCekPeriode($periode);
+            if($cek['status']){
+
+                $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+                if(count($getPP) > 0){
+                    $kode_pp = $getPP[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
+
+                if ($request->status == "APPROVE") {
+                    $vStatus = "P";
+                }else{
+                    $vStatus = "K";						
+                }
+                
+                $upd = DB::connection($this->db)->table('pbh_ver_m')
+                ->where('no_bukti',$request->no_aju)
+                ->where('no_flag','-')
+                ->where('form','VERPJK')
+                ->where('modul',$request->modul)
+                ->where('kode_lokasi',$kode_lokasi)		
+                ->update(['no_flag'=>$no_bukti]);
+                
+                $ins = DB::connection($this->db)->insert("insert into pbh_ver_m (no_ver,kode_lokasi,tanggal,periode,tgl_input,nik_user,status,modul,form,no_bukti,catatan,no_flag,nik_bdh,nik_fiat) values (?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?)", array($no_bukti,$kode_lokasi,$request->tanggal,$periode,$nik,$vStatus,$request->modul,'VERPJK',$request->no_aju,$request->memo,'-','X','X'));
+                    													
+                $upd = DB::connection($this->db)->table('pbh_pb_m')
+                ->where('no_pb',$request->no_aju)
+                ->where('kode_lokasi',$kode_lokasi)
+                ->update(['no_pajak'=>$no_bukti,'progress'=>$vStatus,'nilai'=>floatval($request->total),'nilai_final'=>floatval($request->total)]);
+
+                $del = DB::connection($this->db)->table('pbh_pb_j') 
+                ->where('no_pb',$request->no_aju)
+                ->where('kode_lokasi',$kode_lokasi)
+                ->delete();
+
+                $del2 = DB::connection($this->db)->table('angg_r') 
+                ->where('no_bukti',$request->no_aju)
+                ->where('kode_lokasi',$kode_lokasi)
+                ->delete();
+
+                $del3 = DB::connection($this->db)->table('pbh_rek') 
+                ->where('no_bukti',$request->no_aju)
+                ->where('kode_lokasi',$kode_lokasi)
+                ->delete();
+                
+                $del4 = DB::connection($this->db)->table('pbh_dok') 
+                ->where('no_bukti',$request->no_aju)
+                ->where('kode_lokasi',$kode_lokasi)
+                ->delete();
+				//------------------------------------------------------------------------------------------------------------------------------------------
+                if ($request->modul == "PBBAU" || $request->modul == "PBBMHD" || $request->modul == "PBADK" || $request->modul == "PBBA") {
+                    if (count($request->kode_akun) > 0){
+                        for ($i=0; $i < count($request->kode_akun);$i++){
+                            $ins2[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($request->no_aju,$request->no_dokumen,$request->tgl_aju,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,$request->modul,'BEBAN',$periode,$nik,'IDR',1));		
+                        }
+                    }
+                    if (count($request->kode_akun_pajak) > 0){
+                        for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($request->no_aju,$request->no_dokumen,$request->tgl_aju,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,$request->modul,'PAJAK',$periode,$nik,'IDR',1));		
+                        }
+                    }
+                }
+                
+                //update transaksi
+                $periodeAju = substr($request->tgl_aju,0,4).substr($request->tgl_aju,5,2);
+                if ($periodeAju != $periode) {
+                    $periodeInput = $periode;
+                    $tglInput = $request->tanggal;
+                }
+                else {
+                    $periodeInput = $periodeAju;
+                    $tglInput = $request->tgl_aju;
+                }
+
+                //modul IFREIM					
+                if ($request->modul == "IFREIM") {
+                    $upd2 = DB::connection($this->db)->table('hutang_m')
+                    ->where('no_hutang',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->update(['tanggal'=>$tglInput,'posted'=>'F','periode'=>$periodeInput,'nilai_final'=>floatval($request->total)]);
+
+                    $del5 = DB::connection($this->db)->table('hutang_j') 
+                    ->where('no_hutang',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->whereIn('jenis',array('BEBAN','PAJAK'))
+                    ->delete();
+                    
+                    $del6 = DB::connection($this->db)->table('angg_r') 
+                    ->where('no_bukti',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->delete();
+
+                   if (count($request->kode_akun) > 0){
+                        for ($i=0; $i < count($request->kode_akun);$i++){								
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],'IDR',1,floatval($request->nilai[$i]),floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'IFREIM','BEBAN',$periodeInput,$nik));
+                        }
+                    }
+                    if (count($request->kode_akun_pajak) > 0){
+                        for ($i=0; $i < count($request->kode_akun_pajak);$i++){	
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'IFREIM','PAJAK',$periodeInput,$nik));	
+                        }
+                    }
+
+                    $upd3 = DB::connection($this->db)->table('hutang_j')
+                    ->where('no_hutang',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->where('jenis','HUT')
+                    ->update(['tanggal'=>$tglInput,'periode'=>$periodeInput,'nilai_curr'=>floatval($request->total),'nilai'=>floatval($request->total)]);
+
+                    $ins5 = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) 
+                        select no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,'D',nilai,kode_pp,kode_drk,kode_lokasi,'IFREIM','HUTIF',periode,nik_user,tgl_input,kode_curr,kurs
+                        from hutang_j 
+                        where no_hutang='".$request->no_aju."' and kode_lokasi='".$kode_lokasi."' and jenis='HUT'");					
+                }
+                
+                if ($request->modul == "IFCLOSE") {
+                    $upd2 = DB::connection($this->db)->table('hutang_m')
+                    ->where('no_hutang',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->update(['tanggal'=>$tglInput,'periode'=>$periodeInput,'nilai'=>floatval($request->total)]);
+
+                    $del5 = DB::connection($this->db)->table('hutang_j') 
+                    ->where('no_hutang',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->whereIn('jenis',array('BEBAN','PAJAK'))
+                    ->delete();
+                    
+                    $del6 = DB::connection($this->db)->table('angg_r') 
+                    ->where('no_bukti',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->delete();
+
+                    if (count($request->kode_akun) > 0){
+                        for ($i=0; $i < count($request->kode_akun);$i++){								
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())", array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],'IDR',1,floatval($request->nilai[$i]),floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'IFREIM','BEBAN',$periodeInput,$nik));					
+                        }
+                    }	
+
+                    if (count($request->kode_akun_pajak) > 0){
+                        for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'IFREIM','PAJAK',$periodeInput,$nik));	
+                        }
+                    }					
+                }
+
+                //pjaju
+                if ($request->modul == "PJAJU") {
+                    $upd2 = DB::connection($this->db)->table('panjar_m')
+                    ->where('no_pj',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->update(['tanggal'=>$tglInput,'periode'=>$periodeInput,'nilai'=>floatval($request->total)]);
+
+                    $del5 = DB::connection($this->db)->table('panjar_j') 
+                    ->where('no_pj',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->whereIn('jenis',array('BEBAN','PAJAK'))
+                    ->delete();
+                    
+                    $del6 = DB::connection($this->db)->table('angg_r') 
+                    ->where('no_bukti',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->delete();
+
+                    if (count($request->kode_akun) > 0){
+                        for ($i=0; $i < count($request->kode_akun);$i++){								
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','BEBAN',$periodeInput,'IDR',1,$nik));
+                        }
+                    }
+
+                    if (count($request->kode_akun_pajak) > 0){
+                        for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','PAJAK',$periodeInput,'IDR',1,$nik));	
+                        }
+                    }
+
+                    $ins4[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) 
+                        select no_pj,no_dokumen,'".$tglInput."',0,akun_pj,keterangan,'D',nilai,kode_pp,'-',kode_lokasi,'PJAJU','PJ','".$periodeInput."','".$nik."',getdate(),'IDR',1 
+                        from panjar_m where no_pj='".$request->no_aju."' and kode_lokasi='".$kode_lokasi."'");					
+                }
+
+                //ptg panjar
+                if ($request->modul == "PJPTG") {
+
+                    $upd2 = DB::connection($this->db)->table('ptg_m')
+                    ->where('no_ptg',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->update(['tanggal'=>$tglInput,'periode'=>$periodeInput,'nilai'=>floatval($request->total)]);
+
+                    $del5 = DB::connection($this->db)->table('ptg_j') 
+                    ->where('no_ptg',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->whereIn('jenis',array('BEBAN','PAJAK'))
+                    ->delete();
+                    
+                    $del6 = DB::connection($this->db)->table('angg_r') 
+                    ->where('no_bukti',$request->no_aju)
+                    ->where('kode_lokasi',$kode_lokasi)
+                    ->delete();
+
+                    if (count($request->kode_akun) > 0){
+                        for ($i=0; $i < count($request->kode_akun);$i++){								
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],'IDR',1,floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periodeInput,'IDR',1,$nik,'-'));
+                        }
+                    }
+                    if (count($request->kode_akun_pajak) > 0){
+                        for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PTGPJ','PAJAK',$periodeInput,'IDR',1,$nik,'-'));			
+                        }
+                    }
+                }
+
+
+                //------------------------------------------------------------------------------------------------------------------------------------------
+                //rekening dan budget
+                if (count($request->atensi) > 0){
+                    $netto = 0;
+                    for ($i=0;$i < count($request->atensi);$i++){
+                        $netto = floatval($request->bruto[$i]) - floatval($request->potongan[$i]);
+                        $ins6 = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            array($request->no_aju,$kode_lokasi,$request->modul,$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi[$i],floatval($request->bruto[$i]),floatval($request->potongan[$i]),$netto));
+                    }
+                }
+                
+                //dokumen						
+                $arr_dok = array();
+                $arr_jenis = array();
+                $arr_no_urut = array();
+                $i=0;
+                $cek = $request->file_dok;
+                if(!empty($cek)){
+                    if(count($request->nama_file_seb) > 0){
+                        //looping berdasarkan nama dok
+                        for($i=0;$i<count($request->nama_file_seb);$i++){
+                            //cek row i ada file atau tidak
+                            if(isset($request->file('file_dok')[$i])){
+                                $file = $request->file('file_dok')[$i];
+                                //kalo ada cek nama sebelumnya ada atau -
+                                if($request->nama_file_seb[$i] != "-"){
+                                    //kalo ada hapus yang lama
+                                    Storage::disk('s3')->delete('bdh/'.$request->nama_file_seb[$i]);
+                                }
+                                $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                $dok = $nama_dok;
+                                if(Storage::disk('s3')->exists('bdh/'.$dok)){
+                                    Storage::disk('s3')->delete('bdh/'.$dok);
+                                }
+                                Storage::disk('s3')->put('bdh/'.$dok,file_get_contents($file));
+                                $arr_dok[] = $dok;
+                                $arr_jenis[] = $request->kode_jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                            }else if($request->nama_file_seb[$i] != "-"){
+                                $arr_dok[] = $request->nama_file_seb[$i];
+                                $arr_jenis[] = $request->kode_jenis[$i];
+                                $arr_no_urut[] = $request->no_urut[$i];
+                            }     
+                        }
+                        
+                        $deldok = DB::connection($this->db)->table('pbh_dok') 
+                        ->where('no_bukti',$request->no_aju)
+                        ->where('kode_lokasi',$kode_lokasi)	
+                        ->delete();
+                    }
+                }
+                
+                if(count($arr_dok) > 0){
+
+                    for ($i=0; $i < count($arr_dok);$i++){						
+                        $insdok[] = DB::connection($this->db)->insert("insert into pbh_dok(no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?)",array($request->no_aju,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'VERPB',$request->no_aju));
+                    }	
+                }
+
+                $insn = DB::connection($this->db)->insert("insert into api_notif (nik,tgl_notif,title,pesan,kode_lokasi,modul,status,kode_pp,no_bukti) values (?, getdate(), ?, ?, ?, ?, ?, ?, ?)",array($request->nik_buat,'VERIFIKASI PB',$request->memo,$kode_lokasi,'VERPB',$vStatus,$request->kode_pp_aju,$request->no_aju));	
+            
+				//modul PB-cashbasis
+                
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['no_bukti'] = $no_bukti;
+                $success['message'] = "Data Verifikasi Pajak berhasil diubah";
+
+            }else{
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['no_bukti'] = "-";
+                $success['message'] = $cek["message"];
+            }
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Verifikasi Pajak gagal diubah ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
+    }
+
     public function destroy(Request $request)
     {
         $this->validate($request, [
             'no_ver' => 'required',
-            'no_pb' => 'required'
+            'no_aju' => 'required'
         ]);
         DB::connection($this->db)->beginTransaction();
         
@@ -651,30 +998,26 @@ class VerPajakController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_ver', $no_bukti)
             ->delete();
-            $del2 = DB::connection($this->db)->table('pbh_verdok_d')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_ver', $no_bukti)
-            ->delete();
             
             $upd = DB::connection($this->db)->table('pbh_pb_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_pb', $request->no_aju)
-            ->update(['no_verdok'=>'-','progress'=>'S']);
+            ->update(['no_pajak'=>'-','progress'=>'D']);
 
             $upd2 = DB::connection($this->db)->table('panjar_m')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_pj', $request->no_aju)
-            ->updatea(['progress','S']);
+            ->update(['progress' => 'D']);
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Akru Simpanan berhasil dihapus";
+            $success['message'] = "Data Verifikasi Pajak berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Akru Simpanan gagal dihapus ".$e;
+            $success['message'] = "Data Verifikasi Pajak gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

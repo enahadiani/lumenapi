@@ -419,13 +419,13 @@ class VerDokController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Akru Simpanan berhasil dihapus";
+            $success['message'] = "Data Verifikasi Dokumen berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Akru Simpanan gagal dihapus ".$e;
+            $success['message'] = "Data Verifikasi Dokumen gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
