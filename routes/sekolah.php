@@ -314,9 +314,12 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('absen-kelas','Sekolah\AbsenKelasController@show');
     $router->post('absen-kelas','Sekolah\AbsenKelasController@store');
 
+    // INPUT SISWA
     $router->post('siswa-simpan','Sekolah\SiswaInputController@save');
     $router->post('siswa-update','Sekolah\SiswaInputController@update');
     $router->get('siswa-edit','Sekolah\SiswaInputController@show');
+
+    // UPLOAD SISWA
 
     // UPLOAD RAPORT
     $router->get('raport-dok-all','Sekolah\UploadRaportController@index');
@@ -329,3 +332,6 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     
     
 });
+
+// UPLOAD SISWA
+$router->get('siswa-export', 'Sekolah\UploadSiswaController@exportXLS');
