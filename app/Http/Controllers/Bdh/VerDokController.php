@@ -555,6 +555,7 @@ class VerDokController extends Controller
                 $success['detail_gar'] = $res4;
                 $success['detail_dok'] = $res7;
                 $success['detail_dok_check'] = $res9;
+                $success['memo'] = $memo;
                 if(count($res5) > 0){
                     $i=0;
                     foreach($res5 as $row){
@@ -579,6 +580,7 @@ class VerDokController extends Controller
                 $success['detail_dok'] = [];
                 $success['detail_dok_check'] = [];
                 $success['detail_catatan'] = [];
+                $success['memo'] = '';
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -591,6 +593,7 @@ class VerDokController extends Controller
             $success['detail_dok'] = [];
             $success['detail_dok_check'] = [];
             $success['detail_catatan'] = [];
+            $success['memo'] = '';
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

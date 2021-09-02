@@ -49,6 +49,20 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->delete('ver-dok','Bdh\VerDokController@destroy');
 
     $router->get('ver-dok-pb','Bdh\VerDokController@getPB');
+
+    // VERIFIKASI PAJAK
+    $router->get('ver-pajak-nobukti','Bdh\VerPajakController@generateNo');
+    $router->get('ver-pajak','Bdh\VerPajakController@index');
+    $router->get('ver-pajak-detail','Bdh\VerPajakController@show');
+    $router->post('ver-pajak','Bdh\VerPajakController@store');
+    $router->post('ver-pajak-ubah','Bdh\VerPajakController@update');
+    $router->delete('ver-pajak','Bdh\VerPajakController@destroy');
+
+    $router->get('ver-pajak-pp','Bdh\VerPajakController@getPP');
+    $router->get('ver-pajak-jenis-dok','Bdh\VerPajakController@getJenisDokumen');
+    $router->get('ver-pajak-akun','Bdh\VerPajakController@getAkun');
+    $router->get('ver-pajak-drk','Bdh\VerPajakController@getDRK');
+    $router->get('ver-pajak-akun-gar','Bdh\VerPajakController@getAkunGar');
 });
 
 ?>
