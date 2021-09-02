@@ -1141,4 +1141,42 @@ class PtgBebanController extends Controller
         
     }
 
+    public function getJenisDokumen(Request $request)
+    {
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+           
+            $strSQL = "select kode_jenis, nama  from dok_jenis where kode_lokasi='$kode_lokasi' ";
+          
+            $rs = DB::connection($this->db)->select($strSQL);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 }

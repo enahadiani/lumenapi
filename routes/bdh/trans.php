@@ -32,6 +32,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('nik-tahu','Bdh\PtgBebanController@getNIKTahu');
     $router->get('nik-ver','Bdh\PtgBebanController@getNIKVer');
     $router->get('ptg-beban-budget','Bdh\PtgBebanController@cekBudget');
+    $router->get('ptg-beban-jenis-dok','Bdh\PtgBebanController@getJenisDokumen');
 
     // SERAH TERIMA DOK
     $router->get('serah-dok-pb','Bdh\SerahTerimaOnlineController@getPB');
