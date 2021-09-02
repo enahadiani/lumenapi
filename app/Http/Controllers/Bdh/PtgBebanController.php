@@ -464,12 +464,33 @@ class PtgBebanController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'no_bukti' => 'required|max:20',
+            'no_bukti' => 'required',
             'tanggal' => 'required|date_format:Y-m-d',
-            'keterangan' => 'required|max:100',
-            'akun_piutang' => 'required|array',
-            'akun_simpanan' => 'required|array',
-            'nilai' => 'required|array'
+            'due_date' => 'required|date_format:Y-m-d',
+            'no_dokumen' => 'required|max:50',
+            'deskripsi' => 'required|max:200',
+            'nik_buat' => 'required|max:20',
+            'nik_tahu' => 'required|max:20',
+            'nik_ver' => 'required|max:20',
+            'atensi' => 'required|array',
+            'bank' => 'required|array',
+            'nama_rek' => 'required|array',
+            'no_rek' => 'required|array',
+            'bruto' => 'required|array',
+            'potongan' => 'required|array',
+            'netto' => 'required|array',
+            'kode_akun' => 'required|array',
+            'dc' => 'required|array',
+            'keterangan' => 'required|array',
+            'nilai' => 'required|array',
+            'kode_pp' => 'required|array',
+            'kode_drk' => 'required|array',
+            'kode_akun_agg' => 'required|array',
+            'kode_pp_agg' => 'required|array',
+            'kode_drk_agg' => 'required|array',
+            'saldo_awal_agg' => 'required|array',
+            'nilai_agg' => 'required|array',
+            'saldo_akhir_agg' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -497,7 +518,7 @@ class PtgBebanController extends Controller
             ->where('no_bukti', $no_bukti)
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('pbh_pb_rek')
+            $del4 = DB::connection($this->db)->table('pbh_rek')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
@@ -695,7 +716,7 @@ class PtgBebanController extends Controller
             ->where('no_bukti', $no_bukti)
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('pbh_pb_rek')
+            $del4 = DB::connection($this->db)->table('pbh_rek')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti)
             ->delete();
