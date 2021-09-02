@@ -90,6 +90,11 @@ class DashboardController extends Controller
             $jumlah_wanita = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'
             AND jk = 'P'";
 
+            $jumlah_client = "SELECT client,count(*) AS jumlah 
+            FROM hr_karyawan 
+            WHERE kode_lokasi = '".$kode_lokasi."'
+            GROUP BY client";
+
             $tingkat_pendidikan = "SELECT a.kode_strata, a.nama AS nama_strata, isnull(b.jumlah, 0) AS jumlah
             FROM hr_strata a
             LEFT JOIN (SELECT kode_strata, kode_lokasi, count(nik) AS jumlah
@@ -135,6 +140,9 @@ class DashboardController extends Controller
 
             $selectWanita = DB::connection($this->db)->select($jumlah_wanita);
             $resWanita = json_decode(json_encode($selectWanita),true);
+
+            $selectClient = DB::connection($this->db)->select($jumlah_client);
+            $resClient = json_decode(json_encode($selectClient),true);
             
             $selectPend = DB::connection($this->db)->select($tingkat_pendidikan);
             $resPend = json_decode(json_encode($selectPend),true);
@@ -154,6 +162,7 @@ class DashboardController extends Controller
             $success['jumlah_wanita'] = $resWanita;
             $success['tingkat_pendidikan'] = $resPend;
             $success['lokasi_kerja'] = $resLok;
+            $success['jumlah_client'] = count($resClient);
             $success['jabatan'] = $resJab;
 
             return response()->json($success, $this->successStatus);     
