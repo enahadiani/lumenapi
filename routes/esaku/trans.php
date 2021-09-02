@@ -356,6 +356,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-karyawan-update','Sdm\KepegawaianController@update');
     $router->delete('sdm-karyawan','Sdm\KepegawaianController@destroy');
 
+    // UPLOAD KARYAWAN
+    $router->post('sdm-karyawan-simpan','Sdm\UploadPegawaiController@store');
+    $router->post('sdm-karyawan-import','Sdm\UploadPegawaiController@importXLS');
+    $router->get('sdm-karyawan-tmp','Sdm\UploadPegawaiController@dataTMP');
+
     // Keluarga
     $router->get('sdm-keluargas','Sdm\KeluargaController@index');
     $router->get('sdm-keluarga','Sdm\KeluargaController@show');
@@ -460,6 +465,7 @@ $router->get('sawal-export', 'Esaku\Keuangan\SawalController@export');
 $router->get('jurnal-upload-export', 'Esaku\Keuangan\JurnalUploadController@export');
 $router->get('akun-export', 'Esaku\Keuangan\AkunController@export');
 $router->get('terima-simp-upload-export', 'Esaku\Simpanan\PenerimaanUploadController@export');
+$router->get('sdm-export', 'Sdm\UploadPegawaiController@exportXLS');
 
 
 
