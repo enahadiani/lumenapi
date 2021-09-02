@@ -93,7 +93,7 @@ class DashboardController extends Controller
             $tingkat_pendidikan = "SELECT a.kode_strata, a.nama AS nama_strata, isnull(b.jumlah, 0) AS jumlah
             FROM hr_strata a
             LEFT JOIN (SELECT kode_strata, kode_lokasi, count(nik) AS jumlah
-            FROM hr_pendidikan
+            FROM hr_karyawan
             GROUP BY kode_strata, kode_lokasi
             ) b ON a.kode_strata=b.kode_strata AND a.kode_lokasi=b.kode_lokasi
             WHERE a.kode_lokasi = '".$kode_lokasi."'";
