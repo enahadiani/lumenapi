@@ -111,7 +111,7 @@ class UploadPegawaiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select = "SELECT nik, nama, status_nikah, tempat, tgl_lahir, jk, 
+            $select = "SELECT nu,nik, nama, status_nikah, tempat, tgl_lahir, jk, 
             t_badan, b_badan, gol_darah, kode_agama, alamat, kelurahan, kecamatan, kota, provinsi, kode_pos, 
             no_ktp, no_telp, email, kode_strata, client, area, kota_area, fm, bm, loker, jabatan, skill, fungsi,
             no_kontrak, tgl_kontrak, tgl_kontrak_akhir, bank, no_rek, nama_rek, gaji_pokok, 
