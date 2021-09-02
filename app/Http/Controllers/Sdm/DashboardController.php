@@ -79,10 +79,10 @@ class DashboardController extends Controller
             $jumlah_karyawan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'";
 
             $jumlah_kesehatan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
-            AND bpjs = '1'";
+            AND (no_bpjs IS NOT NULL AND no_bpjs <> '-' AND no_bpjs <> '')";
 
             $jumlah_ketenagakerjaan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
-            AND no_bpjs != '-' OR no_bpjs != null";
+            AND (no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> '-' AND no_bpjs_kerja <> '')";
 
             $jumlah_pria = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'
             AND jk = 'L'";
@@ -96,7 +96,7 @@ class DashboardController extends Controller
             FROM hr_pendidikan
             GROUP BY kode_strata, kode_lokasi
             ) b ON a.kode_strata=b.kode_strata AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_strata != '-'";
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
 
             $lokasi_kerja = "SELECT a.kode_loker, a.nama AS nama_loker, isnull(b.jumlah, 0) AS jumlah
             FROM hr_loker a
@@ -104,15 +104,22 @@ class DashboardController extends Controller
             FROM hr_karyawan
             GROUP BY kode_loker, kode_lokasi
             ) b ON a.kode_loker=b.kode_loker AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_loker != '-'";
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
 
+            // $jabatan = "SELECT a.kode_jab, a.nama AS nama_jabatan, isnull(b.jumlah, 0) AS jumlah
+            // FROM hr_jab a
+            // LEFT JOIN (SELECT jabatan, kode_lokasi, count(nik) AS jumlah
+            // FROM hr_karyawan
+            // GROUP BY kode_jab, kode_lokasi
+            // ) b ON a.kode_jab=b.jabatan AND a.kode_lokasi=b.kode_lokasi
+            // WHERE a.kode_lokasi = '".$kode_lokasi."'";
             $jabatan = "SELECT a.kode_jab, a.nama AS nama_jabatan, isnull(b.jumlah, 0) AS jumlah
             FROM hr_jab a
-            LEFT JOIN (SELECT kode_jab, kode_lokasi, count(nik) AS jumlah
+            LEFT JOIN (SELECT jabatan, kode_lokasi, count(nik) AS jumlah
             FROM hr_karyawan
-            GROUP BY kode_jab, kode_lokasi
-            ) b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."' AND a.kode_jab != '-'";
+            GROUP BY jabatan, kode_lokasi
+            ) b ON a.kode_jab=b.jabatan AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
 
             $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
             $resJK = json_decode(json_encode($selectJK),true);
