@@ -344,9 +344,9 @@ class VerPajakController extends Controller
                 }
 
                 if ($request->status == "APPROVE") {
-                    $$vStatus = "P";
+                    $vStatus = "P";
                 }else{
-                    $$vStatus = "K";						
+                    $vStatus = "K";						
                 }
                 
                 $upd = DB::connection($this->db)->table('pbh_ver_m')
@@ -387,12 +387,12 @@ class VerPajakController extends Controller
                 if ($request->modul == "PBBAU" || $request->modul == "PBBMHD" || $request->modul == "PBADK" || $request->modul == "PBBA") {
                     if (count($request->kode_akun) > 0){
                         for ($i=0; $i < count($request->kode_akun);$i++){
-                            $ins2[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($request->no_aju,$request->no_dokumen,$request->tgl_aju,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,$request->modul,'BEBAN',$periode,$nik,getdate(),'IDR',1));		
+                            $ins2[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($request->no_aju,$request->no_dokumen,$request->tgl_aju,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,$request->modul,'BEBAN',$periode,$nik,'IDR',1));		
                         }
                     }
                     if (count($request->kode_akun_pajak) > 0){
                         for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
-                            $ins3[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($request->no_aju,$request->no_dokumen,$request->tgl_aju,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,$request->modul,'PAJAK',$periode,$nik,getdate(),'IDR',1));		
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($request->no_aju,$request->no_dokumen,$request->tgl_aju,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,$request->modul,'PAJAK',$periode,$nik,'IDR',1));		
                         }
                     }
                 }
@@ -552,7 +552,7 @@ class VerPajakController extends Controller
                     $netto = 0;
                     for ($i=0;$i < count($request->atensi);$i++){
                         $netto = floatval($request->bruto[$i]) - floatval($request->potongan);
-                        $ins6 = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        $ins6 = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             array($request->no_aju,$kode_lokasi,$request->modul,$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi[$i],floatval($request->bruto[$i]),floatval($request->potongan),$netto));
                     }
                 }
@@ -605,7 +605,7 @@ class VerPajakController extends Controller
                     }	
                 }
 
-                $insn = DB::connection($this->db)->insert("insert into api_notif (nik,tgl_notif,title,pesan,kode_lokasi,modul,status,kode_pp,no_bukti) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",array($request->nik_buat,getdate(),'VERIFIKASI PB',$request->memo,$kode_lokasi,'VERPB',$vStatus,$request->kode_pp_aju,$request->no_aju));	
+                $insn = DB::connection($this->db)->insert("insert into api_notif (nik,tgl_notif,title,pesan,kode_lokasi,modul,status,kode_pp,no_bukti) values (?, getdate(), ?, ?, ?, ?, ?, ?, ?)",array($request->nik_buat,'VERIFIKASI PB',$request->memo,$kode_lokasi,'VERPB',$vStatus,$request->kode_pp_aju,$request->no_aju));	
             
 				//modul PB-cashbasis
                 
@@ -684,7 +684,7 @@ class VerPajakController extends Controller
     public function show(Request $request)
     {
         $this->validate($request,[
-            'no_pb' => 'required'
+            'no_aju' => 'required'
         ]);
 
         try {
@@ -873,6 +873,42 @@ class VerPajakController extends Controller
             }
 
             $strSQL = "select a.kode_akun,a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag = '063' where a.block= '0' and a.kode_lokasi = '".$kode_lokasi."' ";
+
+            $rs = DB::connection($this->db)->select($strSQL);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getAkunGar(Request $request)
+    {
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $strSQL = "select a.kode_akun,a.nama from masakun a where a.status_gar= '1' and a.kode_lokasi = '".$kode_lokasi."' ";
 
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
