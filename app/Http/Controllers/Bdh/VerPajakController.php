@@ -725,11 +725,6 @@ class VerPajakController extends Controller
                 ->where('no_bukti',$request->no_aju)
                 ->where('kode_lokasi',$kode_lokasi)
                 ->delete();
-                
-                $del4 = DB::connection($this->db)->table('pbh_dok') 
-                ->where('no_bukti',$request->no_aju)
-                ->where('kode_lokasi',$kode_lokasi)
-                ->delete();
 				//------------------------------------------------------------------------------------------------------------------------------------------
                 if ($request->modul == "PBBAU" || $request->modul == "PBBMHD" || $request->modul == "PBADK" || $request->modul == "PBBA") {
                     if (count($request->kode_akun) > 0){

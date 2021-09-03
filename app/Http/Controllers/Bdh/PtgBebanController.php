@@ -523,8 +523,6 @@ class PtgBebanController extends Controller
             ->where('no_bukti', $no_bukti)
             ->delete();
 
-            $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
 
             // CEK PERIODE
