@@ -198,7 +198,7 @@ class DashboardController extends Controller
                     }
                 }
 
-                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.client
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 $where";
@@ -206,7 +206,7 @@ class DashboardController extends Controller
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
             } else {
-                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.client
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 $where AND a.kode_strata = '".$request->query('pendidikan')."'";
