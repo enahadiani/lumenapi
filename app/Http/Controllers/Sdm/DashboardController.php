@@ -23,7 +23,9 @@ class DashboardController extends Controller
             $sql1 = "exec [dbo].[sp_hr_dash] '202108','$kode_lokasi';";
             DB::connection($this->db)->update($sql1);
 
-            $select = "SELECT * FROM hr_dashklp_periode WHERE jenis_klp = 'UMUR'";
+            $select = "SELECT a.kode_klp, b.nama_klp, a.nilai FROM hr_dashklp_periode a
+            INNER JOIN hr_dashklp b on a.kode_klp=b.kode_klp and b.kode_lokasi = '".$kode_lokasi."' 
+            WHERE a.jenis_klp = 'UMUR' AND b.kode_lokasi = '".$kode_lokasi."' AND a.periode = '202108'";
             $select = DB::connection($this->db)->select($select);
             $res = json_decode(json_encode($select),true);
 
@@ -31,7 +33,7 @@ class DashboardController extends Controller
                 $ctg = array();
                 $value = array();
                 for($i=0;$i<count($res);$i++) {
-                    array_push($ctg, $res[$i]['kode_klp']);
+                    array_push($ctg, $res[$i]['nama_klp']);
                     array_push($value, floatval($res[$i]['nilai']));
                 }
 
@@ -66,7 +68,9 @@ class DashboardController extends Controller
             $sql1 = "exec [dbo].[sp_hr_dash] '202108','$kode_lokasi';";
             DB::connection($this->db)->update($sql1);
 
-            $select = "SELECT * FROM hr_dashklp_periode WHERE jenis_klp = 'GAJI'";
+            $select = "SELECT a.kode_klp, b.nama_klp, a.nilai FROM hr_dashklp_periode a
+            INNER JOIN hr_dashklp b on a.kode_klp=b.kode_klp and b.kode_lokasi = '".$kode_lokasi."' 
+            WHERE a.jenis_klp = 'GAJI' AND b.kode_lokasi = '".$kode_lokasi."' AND a.periode = '202108'";
             $select = DB::connection($this->db)->select($select);
             $res = json_decode(json_encode($select),true);
 
@@ -76,7 +80,7 @@ class DashboardController extends Controller
                 $ctg = array();
                 $value = array();
                 for($i=0;$i<count($res);$i++) {
-                    array_push($ctg, $res[$i]['kode_klp']);
+                    array_push($ctg, $res[$i]['nama_klp']);
                     array_push($value, floatval($res[$i]['nilai']));
                 }
 
