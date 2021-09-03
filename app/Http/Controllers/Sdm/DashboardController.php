@@ -13,6 +13,94 @@ class DashboardController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
+    public function getDataUmur() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql1 = "exec [dbo].[sp_hr_dash] '202108','$kode_lokasi';";
+            DB::connection($this->db)->update($sql1);
+
+            $select = "SELECT * FROM hr_dashklp_periode WHERE jenis_klp = 'UMUR'";
+            $select = DB::connection($this->db)->select($select);
+            $res = json_decode(json_encode($select),true);
+
+            if(count($res) > 0){ 
+                $ctg = array();
+                $value = array();
+                for($i=0;$i<count($res);$i++) {
+                    array_push($ctg, $res[$i]['kode_klp']);
+                    array_push($value, floatval($res[$i]['nilai']));
+                }
+
+                $success['categories'] = $ctg;
+                $success['value'] = $value;
+                $success['status'] = true;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['categories'] = [];
+                $success['value'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+            }
+
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataGaji() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql1 = "exec [dbo].[sp_hr_dash] '202108','$kode_lokasi';";
+            DB::connection($this->db)->update($sql1);
+
+            $select = "SELECT * FROM hr_dashklp_periode WHERE jenis_klp = 'GAJI'";
+            $select = DB::connection($this->db)->select($select);
+            $res = json_decode(json_encode($select),true);
+
+
+
+            if(count($res) > 0){ 
+                $ctg = array();
+                $value = array();
+                for($i=0;$i<count($res);$i++) {
+                    array_push($ctg, $res[$i]['kode_klp']);
+                    array_push($value, floatval($res[$i]['nilai']));
+                }
+
+                $success['categories'] = $ctg;
+                $success['value'] = $value;
+                $success['status'] = true;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['categories'] = [];
+                $success['value'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+            }
+
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getDataBPJSTenagaKerja(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
