@@ -855,10 +855,10 @@ class PtgBebanController extends Controller
             $rs4 = DB::connection($this->db)->select($strSQL4);
             $res4 = json_decode(json_encode($rs4),true);
 
-            $strSQL5 = "select distinct convert(varchar,tanggal,103) as tgl,tanggal 
+            $strSQL7 = "select distinct convert(varchar,tgl_input,103) as tgl
             from pbh_ver_m 
             where no_bukti='".$request->no_bukti."' and kode_lokasi='".$kode_lokasi."' 
-            order by convert(varchar,tanggal,103) desc";
+            order by convert(varchar,tgl_input,103) desc";
             $rs5 = DB::connection($this->db)->select($strSQL5);
             $res5 = json_decode(json_encode($rs5),true);
 
@@ -872,10 +872,10 @@ class PtgBebanController extends Controller
                 if(count($res5) > 0){
                     $i=0;
                     foreach($res5 as $row){
-                        $sql = "select catatan,no_ver, convert(varchar,tanggal,103) as tgl,tanggal, convert(varchar,tgl_input,108) as jam,nik_user 
+                        $sql = "select catatan,no_ver, convert(varchar,tgl_input,103) as tgl,convert(varchar,tgl_input,108) as jam,nik_user 
                         from pbh_ver_m 
-                        where no_bukti='".$request->no_bukti."' and tanggal='".$row['tanggal']."' and kode_lokasi='".$kode_lokasi."' 
-                        order by tanggal desc,convert(varchar,tgl_input,108) desc ";
+                        where no_bukti='".$request->no_bukti."' and convert(varchar,tgl_input,103)='".$row['tgl']."' and kode_lokasi='".$kode_lokasi."' 
+                        order by convert(varchar,tgl_input,103) desc,convert(varchar,tgl_input,108) desc ";
                         $rs6 = DB::connection($this->db)->select($sql);
                         $res5[$i]['detail'] = json_decode(json_encode($rs6),true);
                         $i++;

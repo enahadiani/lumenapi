@@ -523,10 +523,10 @@ class VerDokController extends Controller
                 $rs5 = DB::connection($this->db)->select($strSQL5);
                 $res5 = json_decode(json_encode($rs5),true);
     
-                $strSQL7="select b.kode_jenis,b.nama,a.no_gambar 
-                from pbh_dok a 
-                inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
-                where a.no_ref = '".$request->no_pb."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
+                $strSQL7 = "select distinct convert(varchar,tgl_input,103) as tgl
+                from pbh_ver_m 
+                where no_bukti='".$request->no_pb."' and kode_lokasi='".$kode_lokasi."' 
+                order by convert(varchar,tgl_input,103) desc";
                 $rs7 = DB::connection($this->db)->select($strSQL7);
                 $res7 = json_decode(json_encode($rs7),true);
                 $memo = "-";
@@ -559,10 +559,10 @@ class VerDokController extends Controller
                 if(count($res5) > 0){
                     $i=0;
                     foreach($res5 as $row){
-                        $sql = "select catatan,no_ver, convert(varchar,tanggal,103) as tgl,tanggal, convert(varchar,tgl_input,108) as jam,nik_user 
+                        $sql = "select catatan,no_ver, convert(varchar,tgl_input,103) as tgl,convert(varchar,tgl_input,108) as jam,nik_user 
                         from pbh_ver_m 
-                        where no_bukti='".$request->no_pb."' and tanggal='".$row['tanggal']."' and kode_lokasi='".$kode_lokasi."' 
-                        order by tanggal desc,convert(varchar,tgl_input,108) desc ";
+                        where no_bukti='".$request->no_pb."' and convert(varchar,tgl_input,103)='".$row['tgl']."' and kode_lokasi='".$kode_lokasi."' 
+                        order by convert(varchar,tgl_input,103) desc,convert(varchar,tgl_input,108) desc ";
                         $rs6 = DB::connection($this->db)->select($sql);
                         $res5[$i]['detail'] = json_decode(json_encode($rs6),true);
                         $i++;
