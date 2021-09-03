@@ -82,7 +82,7 @@ class KepegawaianController extends Controller
             a.gelar_depan, a.gelar_belakang, a.ibu_kandung, a.status_nikah, a.tgl_nikah, a.gol_darah, a.kelurahan, a.kecamatan,
             a.no_kk, a.no_sk, a.tgl_sk, a.tgl_masuk, a.no_bpjs, a.no_ktp, a.ijht, a.bpjs, a.jp, a.no_kontrak, a.tgl_kontrak,
             a.mk_gol, a.mk_ytb, a.kode_pp, b.nama AS nama_pp, a.kode_sdm, c.nama AS nama_sdm, a.kode_gol, d.nama as nama_golongan,
-            a.kode_jab, e.nama AS nama_jabatan, a.kode_loker, f.nama AS nama_loker, a.kode_pajak, g.nama AS nama_pajak,
+            a.jabatan, e.nama AS nama_jabatan, a.kode_loker, f.nama AS nama_loker, a.kode_pajak, g.nama AS nama_pajak,
             a.kode_unit, h.nama AS nama_unit, a.kode_profesi, i.nama AS nama_profesi, a.kode_agama, j.nama AS nama_agama,
             a.kode_strata, k.nama AS nama_strata, ISNULL(a.t_badan, 0) AS t_badan, ISNULL(a.b_badan, 0) AS b_badan,
             ISNULL(a.gaji_pokok, 0) AS gaji_pokok, ISNULL(a.tunj_jabatan, 0) AS tunj_jabatan, 
@@ -96,7 +96,7 @@ class KepegawaianController extends Controller
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN hr_sdm c ON a.kode_sdm=c.kode_sdm AND a.kode_lokasi=c.kode_lokasi
             LEFT JOIN hr_gol d ON a.kode_gol=d.kode_gol AND a.kode_lokasi=d.kode_lokasi
-            LEFT JOIN hr_jab e ON a.kode_jab=e.kode_jab AND a.kode_lokasi=e.kode_lokasi
+            LEFT JOIN hr_jab e ON a.jabatan=e.kode_jab AND a.kode_lokasi=e.kode_lokasi
             LEFT JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi
             LEFT JOIN hr_pajak g ON a.kode_pajak=g.kode_pajak AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN hr_unit h ON a.kode_unit=h.kode_unit AND a.kode_lokasi=h.kode_lokasi
@@ -234,7 +234,7 @@ class KepegawaianController extends Controller
                 }
 
                 $insert = "INSERT INTO hr_karyawan(nik, kode_lokasi, nama, alamat, no_telp, email, kode_pp, npwp, bank,
-                cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, kode_jab, kode_loker,
+                cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, jabatan, kode_loker,
                 kode_pajak, nip, kode_unit, kode_profesi, jk, kode_agama, tempat, tgl_lahir, tahun_masuk, gelar_depan, 
                 gelar_belakang, ibu_kandung, status_nikah, tgl_nikah, gol_darah, kelurahan, kecamatan, no_kk, no_sk, tgl_sk,
                 tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
@@ -453,7 +453,7 @@ class KepegawaianController extends Controller
             ->delete();
 
             $insert = "INSERT INTO hr_karyawan(nik, kode_lokasi, nama, alamat, no_telp, email, kode_pp, npwp, bank,
-            cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, kode_jab, kode_loker,
+            cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, jabatan, kode_loker,
             kode_pajak, nip, kode_unit, kode_profesi, jk, kode_agama, tempat, tgl_lahir, tahun_masuk, gelar_depan, 
             gelar_belakang, ibu_kandung, status_nikah, tgl_nikah, gol_darah, kelurahan, kecamatan, no_kk, no_sk, tgl_sk,
             tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
