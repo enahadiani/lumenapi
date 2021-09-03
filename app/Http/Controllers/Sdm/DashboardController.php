@@ -13,6 +13,136 @@ class DashboardController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
+    public function getDataBPJSTenagaKerja(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $jumlah_karyawan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'";
+
+            $jumlah_ketenagaan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
+            AND (no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> '-' AND no_bpjs_kerja <> '')";
+
+            $data_karyawan = "SELECT nik, nama, no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' AND no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> ''
+            AND no_bpjs_kerja <> '-'";
+
+            $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
+            $resJK = json_decode(json_encode($selectJK),true);
+
+            $selectKerja = DB::connection($this->db)->select($jumlah_ketenagaan);
+            $resKerja = json_decode(json_encode($selectKerja),true);
+
+            $selectKaryawan = DB::connection($this->db)->select($data_karyawan);
+            $resKaryawan = json_decode(json_encode($selectKaryawan),true);
+
+            $jumlah_karyawan = floatval($resJK[0]['jumlah']);
+            $jumlah_bpjs = floatval($resKerja[0]['jumlah']);
+
+            $percentage = ($jumlah_bpjs / $jumlah_karyawan) * 100;
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $resKaryawan;
+            $success['jumlah_karyawan'] = $jumlah_karyawan;
+            $success['jumlah_terdaftar'] = $jumlah_bpjs;
+            $success['percentage'] = round($percentage);
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataBPJSKesehatan(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $jumlah_karyawan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'";
+
+            $jumlah_kesehatan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
+            AND (no_bpjs IS NOT NULL AND no_bpjs <> '-' AND no_bpjs <> '')";
+
+            $data_karyawan = "SELECT nik, nama, no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' AND no_bpjs IS NOT NULL AND no_bpjs <> '' AND no_bpjs <> '-'";
+
+            $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
+            $resJK = json_decode(json_encode($selectJK),true);
+
+            $selectKes = DB::connection($this->db)->select($jumlah_kesehatan);
+            $resKes = json_decode(json_encode($selectKes),true);
+
+            $selectKaryawan = DB::connection($this->db)->select($data_karyawan);
+            $resKaryawan = json_decode(json_encode($selectKaryawan),true);
+
+            $jumlah_karyawan = floatval($resJK[0]['jumlah']);
+            $jumlah_bpjs = floatval($resKes[0]['jumlah']);
+
+            $percentage = ($jumlah_bpjs / $jumlah_karyawan) * 100;
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $resKaryawan;
+            $success['jumlah_karyawan'] = $jumlah_karyawan;
+            $success['jumlah_terdaftar'] = $jumlah_bpjs;
+            $success['percentage'] = round($percentage);
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getKomposisiClient(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $jumlah_client = "SELECT client,count(*) AS jumlah 
+            FROM hr_karyawan 
+            WHERE kode_lokasi = '".$kode_lokasi."'
+            GROUP BY client";
+
+            $selectClient = DB::connection($this->db)->select($jumlah_client);
+            $resClient = json_decode(json_encode($selectClient),true);
+
+            $total = 0;
+            for($i=0;$i<count($resClient);$i++) {
+                $total += floatval($resClient[$i]['jumlah']);
+            }
+
+            $ctg = array();
+            $komposisi = array();
+            for($i=0;$i<count($resClient);$i++) {
+                array_push($ctg, $resClient[$i]['client']);
+                $percentage = (floatval($resClient[$i]['jumlah']) / $total) * 100;
+                array_push($komposisi, round($percentage, 2));
+            }
+            
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['categories'] = $ctg;
+            $success['komposisi'] = $komposisi;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getDataKaryawan(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
