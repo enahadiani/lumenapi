@@ -34,7 +34,7 @@ class DashboardController extends Controller
 
                 $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
                 FROM hr_karyawan a
-                INNER JOIN hr_jab b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
+                INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 $where";
 
                 $res = DB::connection($this->db)->select($select);
@@ -42,9 +42,8 @@ class DashboardController extends Controller
             } else {
                 $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
                 FROM hr_karyawan a
-                INNER JOIN hr_jab b ON a.kode_jab=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
-                INNER JOIN hr_pendidikan c ON a.nik=c.nik AND a.kode_lokasi=c.kode_lokasi
-                $where AND c.kode_strata = '".$request->query('pendidikan')."'";
+                INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
+                $where AND a.kode_strata = '".$request->query('pendidikan')."'";
 
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
@@ -90,13 +89,18 @@ class DashboardController extends Controller
             $jumlah_wanita = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."'
             AND jk = 'P'";
 
+            $jumlah_client = "SELECT client,count(*) AS jumlah 
+            FROM hr_karyawan 
+            WHERE kode_lokasi = '".$kode_lokasi."'
+            GROUP BY client";
+
             $tingkat_pendidikan = "SELECT a.kode_strata, a.nama AS nama_strata, isnull(b.jumlah, 0) AS jumlah
             FROM hr_strata a
             LEFT JOIN (SELECT kode_strata, kode_lokasi, count(nik) AS jumlah
-            FROM hr_pendidikan
+            FROM hr_karyawan
             GROUP BY kode_strata, kode_lokasi
             ) b ON a.kode_strata=b.kode_strata AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."'";
+            WHERE a.kode_lokasi = '".$kode_lokasi."' ORDER BY a.nu";
 
             $lokasi_kerja = "SELECT a.kode_loker, a.nama AS nama_loker, isnull(b.jumlah, 0) AS jumlah
             FROM hr_loker a
@@ -135,6 +139,9 @@ class DashboardController extends Controller
 
             $selectWanita = DB::connection($this->db)->select($jumlah_wanita);
             $resWanita = json_decode(json_encode($selectWanita),true);
+
+            $selectClient = DB::connection($this->db)->select($jumlah_client);
+            $resClient = json_decode(json_encode($selectClient),true);
             
             $selectPend = DB::connection($this->db)->select($tingkat_pendidikan);
             $resPend = json_decode(json_encode($selectPend),true);
@@ -154,6 +161,7 @@ class DashboardController extends Controller
             $success['jumlah_wanita'] = $resWanita;
             $success['tingkat_pendidikan'] = $resPend;
             $success['lokasi_kerja'] = $resLok;
+            $success['jumlah_client'] = count($resClient);
             $success['jabatan'] = $resJab;
 
             return response()->json($success, $this->successStatus);     

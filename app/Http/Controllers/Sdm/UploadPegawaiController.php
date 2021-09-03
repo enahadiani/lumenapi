@@ -39,6 +39,15 @@ class UploadPegawaiController extends Controller
         return $num;
     }
 
+    public function getKodeLoker($nama, $kode_lokasi) {
+        $select = "SELECT kode_loker FROM hr_loker WHERE LOWER(nama) = '".strtolower($nama)."'
+        AND kode_lokasi = '".$kode_lokasi."'";
+        $res1 = DB::connection($this->db)->select($select);
+        $res1 = json_decode(json_encode($res1),true);
+        
+        return $res1[0]['kode_loker'];
+    }
+
     public function store(Request $request) {
         $this->validate($request, [ 
             'nik_user' => 'required'
@@ -72,12 +81,12 @@ class UploadPegawaiController extends Controller
             no_ktp, no_telp, email, kode_strata, client, area, kota_area, fm, bm, loker, jabatan, skill, fungsi,
             no_kontrak, tgl_kontrak, tgl_kontrak_akhir, bank, no_rek, nama_rek, gaji_pokok, 
             tunj_jabatan, tunj_penampilan, tunj_gondola, tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli,
-            tunj_lembur, tunj_masakerja, no_bpjs, no_bpjs_kerja, kode_lokasi) SELECT nik, nama, status_nikah, tempat, tgl_lahir, jk, 
+            tunj_lembur, tunj_masakerja, no_bpjs, no_bpjs_kerja, kode_lokasi, kode_loker) SELECT nik, nama, status_nikah, tempat, tgl_lahir, jk, 
             t_badan, b_badan, gol_darah, kode_agama, alamat, kelurahan, kecamatan, kota, provinsi, kode_pos, 
             no_ktp, no_telp, email, kode_strata, client, area, kota_area, fm, bm, loker, jabatan, skill, fungsi,
             no_kontrak, tgl_kontrak, tgl_kontrak_akhir, bank, no_rek, nama_rek, gaji_pokok, 
             tunj_jabatan, tunj_penampilan, tunj_gondola, tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli,
-            tunj_lembur, tunj_masakerja, no_bpjs, no_bpjs_kerja, kode_lokasi FROM hr_karyawan_tmp 
+            tunj_lembur, tunj_masakerja, no_bpjs, no_bpjs_kerja, kode_lokasi, kode_loker FROM hr_karyawan_tmp 
             WHERE kode_lokasi = '".$kode_lokasi."' AND nik_user = '".$request->input('nik_user')."'";
             DB::connection($this->db)->insert($insert);
             
@@ -193,7 +202,8 @@ class UploadPegawaiController extends Controller
                     } else {
                         $row[31] = $this->convertDateExcel($row[31]);
                     }
-
+                    
+                    $kode_loker = $this->getKodeLoker($row[25], $kode_lokasi);
                     $sts = 1;
                     $insert = "INSERT INTO hr_karyawan_tmp (nik, nama, status_nikah, tempat, tgl_lahir, jk, 
                     t_badan, b_badan, gol_darah, kode_agama, alamat, kelurahan, kecamatan, kota, provinsi, kode_pos, 
@@ -201,8 +211,8 @@ class UploadPegawaiController extends Controller
                     no_kontrak, tgl_kontrak, tgl_kontrak_akhir, bank, no_rek, nama_rek, gaji_pokok, 
                     tunj_jabatan, tunj_penampilan, tunj_gondola, tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli,
                     tunj_lembur, tunj_masakerja, no_bpjs, no_bpjs_kerja, kode_lokasi, sts_upload, 
-                    ket_upload, nu, nik_user) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    ket_upload, nu, nik_user, kode_loker) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     DB::connection($this->db)->insert($insert, [
                         $row[0],
                         $row[1],
@@ -255,7 +265,8 @@ class UploadPegawaiController extends Controller
                         $sts,
                         "",
                         $no,
-                        $request->input('nik_user')
+                        $request->input('nik_user'),
+                        $kode_loker
                     ]);
                     $no++;
                 }
