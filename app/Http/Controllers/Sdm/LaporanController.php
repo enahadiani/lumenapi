@@ -20,7 +20,7 @@ class LaporanController extends Controller {
             }
 
             $col_array = array('kode_sdm', 'kode_gol', 'kode_jab', 'kode_loker', 'nik');
-            $db_col_name = array('a.kode_sdm', 'a.kode_gol', 'a.kode_jab', 'a.kode_loker', 'a.nik');
+            $db_col_name = array('a.kode_sdm', 'a.kode_gol', 'a.jabatan', 'a.kode_loker', 'a.nik');
             $where = "where a.kode_lokasi='".$kode_lokasi."'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -50,7 +50,7 @@ class LaporanController extends Controller {
             FROM hr_karyawan a 
             INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi  
             INNER JOIN hr_gol c ON a.kode_gol=c.kode_gol AND a.kode_lokasi=c.kode_lokasi 
-            INNER JOIN hr_jab d ON a.kode_jab=d.kode_jab AND a.kode_lokasi=d.kode_lokasi 
+            INNER JOIN hr_jab d ON a.jabatan=d.kode_jab AND a.kode_lokasi=d.kode_lokasi 
             INNER JOIN hr_sdm e ON a.kode_sdm=e.kode_sdm AND a.kode_lokasi=e.kode_lokasi 
             INNER JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi 
             $where
@@ -92,7 +92,7 @@ class LaporanController extends Controller {
             }
 
             $col_array = array('kode_sdm', 'kode_gol', 'kode_jab', 'kode_loker', 'nik');
-            $db_col_name = array('a.kode_sdm', 'a.kode_gol', 'a.kode_jab', 'a.kode_loker', 'a.nik');
+            $db_col_name = array('a.kode_sdm', 'a.kode_gol', 'a.jabatan', 'a.kode_loker', 'a.nik');
             $where = "where a.kode_lokasi='".$kode_lokasi."'";
             $this_in = "";
             for($i = 0; $i<count($col_array); $i++){
@@ -128,7 +128,7 @@ class LaporanController extends Controller {
 		    FROM hr_karyawan a 
 			INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi  
 			INNER JOIN hr_gol c ON a.kode_gol=c.kode_gol AND a.kode_lokasi=c.kode_lokasi 
-			INNER JOIN hr_jab d ON a.kode_jab=d.kode_jab AND a.kode_lokasi=d.kode_lokasi 
+			INNER JOIN hr_jab d ON a.jabatan=d.kode_jab AND a.kode_lokasi=d.kode_lokasi 
 			INNER JOIN hr_sdm e ON a.kode_sdm=e.kode_sdm AND a.kode_lokasi=e.kode_lokasi 
 			INNER JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi 
 			INNER JOIN hr_agama g ON a.kode_agama=g.kode_agama AND a.kode_lokasi=g.kode_lokasi
