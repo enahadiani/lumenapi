@@ -34,6 +34,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sdm-client','Sdm\DashboardController@getKomposisiClient');
     $router->get('sdm-bpjs-sehat','Sdm\DashboardController@getDataBPJSKesehatan');
     $router->get('sdm-bpjs-kerja','Sdm\DashboardController@getDataBPJSTenagaKerja');
+    $router->get('sdm-umur','Sdm\DashboardController@getDataUmur');
+    $router->get('sdm-gaji','Sdm\DashboardController@getDataGaji');
 });
 
 

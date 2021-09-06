@@ -13,6 +13,98 @@ class DashboardController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
+    public function getDataUmur() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql1 = "exec [dbo].[sp_hr_dash] '202108','$kode_lokasi';";
+            DB::connection($this->db)->update($sql1);
+
+            $select = "SELECT a.kode_klp, b.nama_klp, a.nilai FROM hr_dashklp_periode a
+            INNER JOIN hr_dashklp b on a.kode_klp=b.kode_klp and b.kode_lokasi = '".$kode_lokasi."' 
+            WHERE a.jenis_klp = 'UMUR' AND b.kode_lokasi = '".$kode_lokasi."' AND a.periode = '202108'";
+            $select = DB::connection($this->db)->select($select);
+            $res = json_decode(json_encode($select),true);
+
+            if(count($res) > 0){ 
+                $ctg = array();
+                $value = array();
+                for($i=0;$i<count($res);$i++) {
+                    array_push($ctg, $res[$i]['nama_klp']);
+                    array_push($value, floatval($res[$i]['nilai']));
+                }
+
+                $success['categories'] = $ctg;
+                $success['value'] = $value;
+                $success['status'] = true;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['categories'] = [];
+                $success['value'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+            }
+
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataGaji() {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql1 = "exec [dbo].[sp_hr_dash] '202108','$kode_lokasi';";
+            DB::connection($this->db)->update($sql1);
+
+            $select = "SELECT a.kode_klp, b.nama_klp, a.nilai FROM hr_dashklp_periode a
+            INNER JOIN hr_dashklp b on a.kode_klp=b.kode_klp and b.kode_lokasi = '".$kode_lokasi."' 
+            WHERE a.jenis_klp = 'GAJI' AND b.kode_lokasi = '".$kode_lokasi."' AND a.periode = '202108'";
+            $select = DB::connection($this->db)->select($select);
+            $res = json_decode(json_encode($select),true);
+
+
+
+            if(count($res) > 0){ 
+                $ctg = array();
+                $value = array();
+                for($i=0;$i<count($res);$i++) {
+                    array_push($ctg, $res[$i]['nama_klp']);
+                    array_push($value, floatval($res[$i]['nilai']));
+                }
+
+                $success['categories'] = $ctg;
+                $success['value'] = $value;
+                $success['status'] = true;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['categories'] = [];
+                $success['value'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+            }
+
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getDataBPJSTenagaKerja(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -24,10 +116,17 @@ class DashboardController extends Controller
             $jumlah_ketenagaan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
             AND (no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> '-' AND no_bpjs_kerja <> '')";
 
-            $data_karyawan = "SELECT nik, nama, no_bpjs
+            $jumlah_non_ketenagaan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
+            AND (no_bpjs_kerja IS NULL OR no_bpjs_kerja = '-' OR no_bpjs_kerja = '')";
+
+            $data_karyawan_tedaftar = "SELECT nik, nama, no_bpjs
 			FROM hr_karyawan
 			WHERE kode_lokasi = '".$kode_lokasi."' AND no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> ''
             AND no_bpjs_kerja <> '-'";
+
+            $data_karyawan_non_terdaftar = "SELECT nik, nama, isnull(no_bpjs_kerja, '-') AS no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' AND (no_bpjs_kerja IS NULL OR no_bpjs_kerja = '' OR no_bpjs_kerja = '-')";
 
             $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
             $resJK = json_decode(json_encode($selectJK),true);
@@ -35,20 +134,31 @@ class DashboardController extends Controller
             $selectKerja = DB::connection($this->db)->select($jumlah_ketenagaan);
             $resKerja = json_decode(json_encode($selectKerja),true);
 
-            $selectKaryawan = DB::connection($this->db)->select($data_karyawan);
-            $resKaryawan = json_decode(json_encode($selectKaryawan),true);
+            $selectNonKerja = DB::connection($this->db)->select($jumlah_non_ketenagaan);
+            $resNonKerja = json_decode(json_encode($selectNonKerja),true);
+
+            $selectKaryawanTerdaftar = DB::connection($this->db)->select($data_karyawan_tedaftar);
+            $resKaryawanTerdaftar = json_decode(json_encode($selectKaryawanTerdaftar),true);
+
+            $selectKaryawanNonTerdaftar = DB::connection($this->db)->select($data_karyawan_non_terdaftar);
+            $resKaryawanNonTerdaftar = json_decode(json_encode($selectKaryawanNonTerdaftar),true);
 
             $jumlah_karyawan = floatval($resJK[0]['jumlah']);
             $jumlah_bpjs = floatval($resKerja[0]['jumlah']);
+            $jumlah_non_bpjs = floatval($resNonKerja[0]['jumlah']);
 
-            $percentage = ($jumlah_bpjs / $jumlah_karyawan) * 100;
+            $percentage_terdaftar = ($jumlah_bpjs / $jumlah_karyawan) * 100;
+            $percentage_non_terdaftar = ($jumlah_non_bpjs / $jumlah_karyawan) * 100;
 
             $success['status'] = true;
             $success['message'] = "Success!";
-            $success['data'] = $resKaryawan;
+            $success['data_terdaftar'] = $resKaryawanTerdaftar;
+            $success['data_non_terdaftar'] = $resKaryawanNonTerdaftar;
             $success['jumlah_karyawan'] = $jumlah_karyawan;
             $success['jumlah_terdaftar'] = $jumlah_bpjs;
-            $success['percentage'] = round($percentage);
+            $success['jumlah_non_terdaftar'] = $jumlah_non_bpjs;
+            $success['percentage_terdaftar'] = round($percentage_terdaftar);
+            $success['percentage_non_terdaftar'] = round($percentage_non_terdaftar);
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
@@ -69,9 +179,16 @@ class DashboardController extends Controller
             $jumlah_kesehatan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
             AND (no_bpjs IS NOT NULL AND no_bpjs <> '-' AND no_bpjs <> '')";
 
-            $data_karyawan = "SELECT nik, nama, no_bpjs
+            $jumlah_non_kesehatan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
+            AND (no_bpjs IS NULL OR no_bpjs = '-' OR no_bpjs = '')";
+
+            $data_karyawan_terdaftar = "SELECT nik, nama, no_bpjs
 			FROM hr_karyawan
 			WHERE kode_lokasi = '".$kode_lokasi."' AND no_bpjs IS NOT NULL AND no_bpjs <> '' AND no_bpjs <> '-'";
+
+            $data_karyawan_non_terdaftar = "SELECT nik, nama, isnull(no_bpjs, '-') AS no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' AND (no_bpjs IS NULL OR no_bpjs = '' OR no_bpjs = '-')";
 
             $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
             $resJK = json_decode(json_encode($selectJK),true);
@@ -79,20 +196,31 @@ class DashboardController extends Controller
             $selectKes = DB::connection($this->db)->select($jumlah_kesehatan);
             $resKes = json_decode(json_encode($selectKes),true);
 
-            $selectKaryawan = DB::connection($this->db)->select($data_karyawan);
-            $resKaryawan = json_decode(json_encode($selectKaryawan),true);
+            $selectNonKes = DB::connection($this->db)->select($jumlah_non_kesehatan);
+            $resNonKes = json_decode(json_encode($selectNonKes),true);
+
+            $selectKaryawanTerdaftar = DB::connection($this->db)->select($data_karyawan_terdaftar);
+            $resKaryawanTerdaftar = json_decode(json_encode($selectKaryawanTerdaftar),true);
+
+            $selectKaryawanNonTerdaftar = DB::connection($this->db)->select($data_karyawan_non_terdaftar);
+            $resKaryawanNonTerdaftar = json_decode(json_encode($selectKaryawanNonTerdaftar),true);
 
             $jumlah_karyawan = floatval($resJK[0]['jumlah']);
             $jumlah_bpjs = floatval($resKes[0]['jumlah']);
+            $jumlah_non_bpjs = floatval($resNonKes[0]['jumlah']);
 
-            $percentage = ($jumlah_bpjs / $jumlah_karyawan) * 100;
+            $percentage_terdaftar = ($jumlah_bpjs / $jumlah_karyawan) * 100;
+            $percentage_non_terdaftar = ($jumlah_non_bpjs / $jumlah_karyawan) * 100;
 
             $success['status'] = true;
             $success['message'] = "Success!";
-            $success['data'] = $resKaryawan;
+            $success['data_terdaftar'] = $resKaryawanTerdaftar;
+            $success['data_non_terdaftar'] = $resKaryawanNonTerdaftar;
             $success['jumlah_karyawan'] = $jumlah_karyawan;
             $success['jumlah_terdaftar'] = $jumlah_bpjs;
-            $success['percentage'] = round($percentage);
+            $success['jumlah_non_terdaftar'] = $jumlah_non_bpjs;
+            $success['percentage_terdaftar'] = round($percentage_terdaftar);
+            $success['percentage_non_terdaftar'] = round($percentage_non_terdaftar);
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
@@ -162,7 +290,7 @@ class DashboardController extends Controller
                     }
                 }
 
-                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.client
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 $where";
@@ -170,7 +298,7 @@ class DashboardController extends Controller
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
             } else {
-                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.email
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, a.no_telp, a.client
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 $where AND a.kode_strata = '".$request->query('pendidikan')."'";

@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class KepegawaianController extends Controller
+class KepegawaianV2Controller extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -91,7 +91,7 @@ class KepegawaianController extends Controller
             ISNULL(a.tunj_skill, 0) AS tunj_skill, ISNULL(a.tunj_patroli, 0) AS tunj_patroli,
             ISNULL(a.tunj_lembur, 0) AS tunj_lembur, ISNULL(a.tunj_masakerja, 0) AS tunj_masakerja, a.provinsi, a.client,
             a.fungsi, a.skill, a.tgl_kontrak_akhir, a.no_bpjs_kerja, a.atasan_langsung, a.atasan_t_langsung, a.no_kta,
-            a.no_reg_kta, a.tgl_berlaku_kta, a.tgl_kadaluarsa_kta
+            a.no_reg_kta, a.tgl_berlaku_kta, a.tgl_kadaluarsa_kta, a.area, a.fm, a.bm, a.kota_area, a.loker
             FROM hr_karyawan a
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN hr_sdm c ON a.kode_sdm=c.kode_sdm AND a.kode_lokasi=c.kode_lokasi
@@ -213,7 +213,12 @@ class KepegawaianController extends Controller
             'no_kta' => 'required',
             'no_reg_kta' => 'required',
             'tgl_berlaku_kta' => 'required',
-            'tgl_kadaluarsa_kta' => 'required'
+            'tgl_kadaluarsa_kta' => 'required',
+            'area' => 'required',
+            'fm' => 'required',
+            'bm' => 'required',
+            'kota_area' => 'required',
+            'loker' => 'required',
         ]);
         
         try {
@@ -233,6 +238,7 @@ class KepegawaianController extends Controller
                      Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
                 }
 
+                // 83 field
                 $insert = "INSERT INTO hr_karyawan(nik, kode_lokasi, nama, alamat, no_telp, email, kode_pp, npwp, bank,
                 cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, jabatan, kode_loker,
                 kode_pajak, nip, kode_unit, kode_profesi, jk, kode_agama, tempat, tgl_lahir, tahun_masuk, gelar_depan, 
@@ -240,10 +246,10 @@ class KepegawaianController extends Controller
                 tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
                 b_badan, provinsi, client, fungsi, skill, tgl_kontrak_akhir, gaji_pokok, tunj_jabatan, tunj_penampilan, tunj_gondola,
                 tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli, tunj_lembur, tunj_masakerja, no_bpjs_kerja, atasan_langsung,
-                atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta) 
+                atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta, area, fm, bm, kota_area, loker, kode_jab) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 DB::connection($this->db)->insert($insert, [
                     $request->input('nik'),
@@ -323,6 +329,12 @@ class KepegawaianController extends Controller
                     $request->input('no_reg_kta'),
                     $request->input('tgl_berlaku_kta'),
                     $request->input('tgl_kadaluarsa_kta'),
+                    $request->input('area'),
+                    $request->input('fm'),
+                    $request->input('bm'),
+                    $request->input('kota_area'),
+                    $request->input('loker'),
+                    $request->input('kode_jab'),
                 ]);
                 
                 $success['status'] = true;
@@ -427,7 +439,12 @@ class KepegawaianController extends Controller
             'no_kta' => 'required',
             'no_reg_kta' => 'required',
             'tgl_berlaku_kta' => 'required',
-            'tgl_kadaluarsa_kta' => 'required'
+            'tgl_kadaluarsa_kta' => 'required',
+            'area' => 'required',
+            'fm' => 'required',
+            'bm' => 'required',
+            'kota_area' => 'required',
+            'loker' => 'required',
         ]);
         
         try {
@@ -452,6 +469,7 @@ class KepegawaianController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
+            // 83 field
             $insert = "INSERT INTO hr_karyawan(nik, kode_lokasi, nama, alamat, no_telp, email, kode_pp, npwp, bank,
             cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, jabatan, kode_loker,
             kode_pajak, nip, kode_unit, kode_profesi, jk, kode_agama, tempat, tgl_lahir, tahun_masuk, gelar_depan, 
@@ -459,10 +477,10 @@ class KepegawaianController extends Controller
             tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
             b_badan, provinsi, client, fungsi, skill, tgl_kontrak_akhir, gaji_pokok, tunj_jabatan, tunj_penampilan, tunj_gondola,
             tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli, tunj_lembur, tunj_masakerja, no_bpjs_kerja, atasan_langsung,
-            atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta) 
+            atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta, area, fm, bm, kota_area, loker, kode_jab) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             DB::connection($this->db)->insert($insert, [
                 $request->input('nik'),
@@ -542,7 +560,13 @@ class KepegawaianController extends Controller
                 $request->input('no_reg_kta'),
                 $request->input('tgl_berlaku_kta'),
                 $request->input('tgl_kadaluarsa_kta'),
-            ]);
+                $request->input('area'),
+                $request->input('fm'),
+                $request->input('bm'),
+                $request->input('kota_area'),
+                $request->input('loker'),
+                $request->input('kode_jab'),
+                ]);
             
             $success['status'] = true;
             $success['message'] = "Data karyawan berhasil diubah";
