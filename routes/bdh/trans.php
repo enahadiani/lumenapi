@@ -96,7 +96,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     // Bayar SPB
     $router->get('bayar-spb-nobukti','Bdh\BayarSPBController@generateNo');
-    $router->get('bayar-spb-pb-list','Bdh\BayarSPBController@getPBList');
+    $router->get('bayar-spb-list','Bdh\BayarSPBController@getSPBList');
     $router->get('bayar-spb','Bdh\BayarSPBController@index');
     $router->get('bayar-spb-detail','Bdh\BayarSPBController@show');
     $router->post('bayar-spb','Bdh\BayarSPBController@store');

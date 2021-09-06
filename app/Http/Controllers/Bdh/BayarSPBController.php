@@ -300,14 +300,14 @@ class BayarSPBController extends Controller
                     $kode_pp = "-";
                 }
 
-                $ins = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kasbank,$request->tanggal,$request->deskripsi,$kode_pp,'KBSPB','BK',$periode,'IDR',1,floatval($request->nilai_kasbank),$nik,$nik,getdate(),$nik,'F','-','-','-','-'));	
+                $ins = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kasbank,$request->tanggal,$request->deskripsi,$kode_pp,'KBSPB','BK',$periode,'IDR',1,floatval($request->nilai_kasbank),$nik,$nik,$nik,'F','-','-','-','-'));	
 
-				$ins2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ()", array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_kasbank,$request->deskripsi,'C',"+nilaiToFloat(this.e_nilaikb.getText())+",$kode_pp,'-','-','-',$kode_lokasi,'KBSPB','KB',$periode,'IDR',1,$nik,getdate(),'-',"+nilaiToFloat(this.e_nilaikb.getText())+"));
+				$ins2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_kasbank,$request->deskripsi,'C',floatval($request->nilai_kasbank),$kode_pp,'-','-','-',$kode_lokasi,'KBSPB','KB',$periode,'IDR',1,$nik,'-',floatval($request->nilai_kasbank)));
 										
 				for($i=0;$i<count($request->no_spb);$i++){
                     if ($request->status[$i] == "BAYAR") {
                         $upd1[] = DB::connection($this->db)->table("pbh_pb_m")
-                        ->where('no_spb',$request->no_spb) 
+                        ->where('no_spb',$request->no_spb[$i]) 
                         ->where('kode_lokasi',$kode_lokasi)
                         ->update([
                             'progress'=>'3', 
@@ -315,7 +315,7 @@ class BayarSPBController extends Controller
                         ]);
 
                         $upd2[] = DB::connection($this->db)->table("spb_m")
-                        ->where('no_spb',$kode_lokasi) 
+                        ->where('no_spb',$request->no_spb[$i]) 
                         ->where('kode_lokasi',$kode_lokasi)
                         ->update([
                             'progress'=>'1', 
@@ -351,7 +351,7 @@ class BayarSPBController extends Controller
                     }
                 }
 
-                if (count($request->kode_akun) > 0){
+                if (isset($request->kode_akun) && count($request->kode_akun) > 0){
                     for ($i=0; $i < count($request->kode_akun);$i++){
                         $k = 1000+$i;
                         $ins5[] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(),?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$k,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],'-','-','-',$kode_lokasi,'KBSPB','NONKB',$periode,'IDR',1,$nik,'-',floatval($request->nilai[$i])));			
@@ -441,22 +441,22 @@ class BayarSPBController extends Controller
                     $kode_pp = "-";
                 }
 
-                $ins = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kasbank,$request->tanggal,$request->deskripsi,$kode_pp,'KBSPB','BK',$periode,'IDR',1,floatval($request->nilai_kasbank),$nik,$nik,getdate(),$nik,'F','-','-','-','-'));	
+                $ins = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kasbank,$request->tanggal,$request->deskripsi,$kode_pp,'KBSPB','BK',$periode,'IDR',1,floatval($request->nilai_kasbank),$nik,$nik,$nik,'F','-','-','-','-'));	
 
-				$ins2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values ()", array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_kasbank,$request->deskripsi,'C',"+nilaiToFloat(this.e_nilaikb.getText())+",$kode_pp,'-','-','-',$kode_lokasi,'KBSPB','KB',$periode,'IDR',1,$nik,getdate(),'-',"+nilaiToFloat(this.e_nilaikb.getText())+"));
+				$ins2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)", array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_kasbank,$request->deskripsi,'C',floatval($request->nilai_kasbank),$kode_pp,'-','-','-',$kode_lokasi,'KBSPB','KB',$periode,'IDR',1,$nik,'-',floatval($request->nilai_kasbank)));
 										
 				for($i=0;$i<count($request->no_spb);$i++){
                     if ($request->status[$i] == "BAYAR") {
                         $upd1[] = DB::connection($this->db)->table("pbh_pb_m")
-                        ->where('no_spb',$request->no_spb) 
+                        ->where('no_spb',$request->no_spb[$i]) 
                         ->where('kode_lokasi',$kode_lokasi)
                         ->update([
                             'progress'=>'3', 
                             'no_kas'=>$no_bukti 
                         ]);
 
-                        $upd2[] = DB::connection($this->db)->table("spb_m")
-                        ->where('no_spb',$kode_lokasi) 
+                        $upd5[] = DB::connection($this->db)->table("spb_m")
+                        ->where('no_spb',$request->no_spb[$i]) 
                         ->where('kode_lokasi',$kode_lokasi)
                         ->update([
                             'progress'=>'1', 
@@ -470,7 +470,7 @@ class BayarSPBController extends Controller
 
                         //------update status modul ---------
                         //PANJAR
-                        $upd3[] = DB::connection($this->db)->update("update a set a.progress='2', a.no_kas=? 
+                        $upd6[] = DB::connection($this->db)->update("update a set a.progress='2', a.no_kas=? 
                             from panjar_m a 
                             inner join pbh_pb_m b on a.no_pj=b.no_pb and a.kode_lokasi=b.kode_lokasi 
                             where b.no_spb=? and b.kode_lokasi=? ",array($no_bukti,$request->no_spb[$i],$kode_lokasi));									
@@ -479,7 +479,7 @@ class BayarSPBController extends Controller
                         // "where c.no_spb='"+line.no_spb+"' and c.kode_lokasi=$kode_lokasi ");
                             
                         //DROPING		
-                        $upd4[] = DB::connection($this->db)->update("update a set a.progress='2', a.no_kas=? 
+                        $upd7[] = DB::connection($this->db)->update("update a set a.progress='2', a.no_kas=? 
                                 from ys_minta_m a 
                                 inner join pbh_pb_m b on a.no_minta=b.no_pb and a.kode_lokasi=b.kode_loktuj 
                                 where b.no_spb=? and b.kode_lokasi=? ",array($no_bukti,$request->no_spb[$i],$kode_lokasi));	
@@ -492,12 +492,12 @@ class BayarSPBController extends Controller
                     }
                 }
 
-                if (count($request->kode_akun) > 0){
+                if (isset($request->kode_akun) && count($request->kode_akun) > 0){
                     for ($i=0; $i < count($request->kode_akun);$i++){
                         $k = 1000+$i;
                         $ins5[] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank,nilai_curr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(),?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$k,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],'-','-','-',$kode_lokasi,'KBSPB','NONKB',$periode,'IDR',1,$nik,'-',floatval($request->nilai[$i])));			
                     }
-                }						
+                }										
                 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
