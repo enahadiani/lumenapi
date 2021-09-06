@@ -405,17 +405,6 @@ class KepegawaianV2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $foto = $request->input('prevFoto');
-            if($request->hasFile('file')) {
-                $file = $request->file('file');
-                $nama_foto = "_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
-                    Storage::disk('s3')->delete('sdm/'.$nama_foto);
-                }
-                Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
-            }
-
             DB::connection($this->db)->table('hr_karyawan')
             ->where('nik', $request->input('nik'))
             ->where('kode_lokasi', $kode_lokasi)
