@@ -1428,5 +1428,58 @@ class VerAkunController extends Controller
         
     }
 
+    public function deleteDokPB(Request $request)
+    {
+        $this->validate($request, [
+            'no_bukti' => 'required',
+            'no_urut' => 'required'
+        ]);
+        
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $no_bukti = $request->no_bukti;
+            $no_urut = $request->no_urut;
+
+            $cek = DB::connection($this->db)->select("select a.no_gambar as file_dok
+            from pbh_dok a
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
+            $cek = json_decode(json_encode($cek),true);
+            if(count($cek) > 0){
+                $file = $cek[0]['file_dok'];
+            }else{
+                $file = "";
+            }
+
+            if($file != ""){
+                if(Storage::disk('s3')->exists('bdh/'.$file)){
+                    Storage::disk('s3')->delete('bdh/'.$file);
+                }
+            }
+
+            $del = DB::connection($this->db)->table('pbh_dok')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_bukti', $no_bukti) 
+            ->where('no_urut', $no_urut)
+            ->delete();
+
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Dokumen berhasil dihapus";
+            
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Dokumen gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
 
 }

@@ -77,6 +77,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ver-akun-akun','Bdh\VerAkunController@getAkun');
     $router->get('ver-akun-drk','Bdh\VerAkunController@getDRK');
     $router->get('ver-akun-budget','Bdh\VerAkunController@cekBudget');
+    
+    $router->get('hapus-dokumen','Bdh\VerAkunController@deleteDokPB');
 });
 
 ?>
