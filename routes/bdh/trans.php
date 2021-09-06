@@ -79,6 +79,20 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ver-akun-budget','Bdh\VerAkunController@cekBudget');
     
     $router->delete('hapus-dokumen','Bdh\VerAkunController@deleteDokPB');
+
+    // SPB
+    $router->get('spb-nobukti','Bdh\SPBController@generateNo');
+    $router->get('spb-pb-list','Bdh\SPBController@getPBList');
+    $router->get('spb','Bdh\SPBController@index');
+    $router->get('spb-detail','Bdh\SPBController@show');
+    $router->post('spb','Bdh\SPBController@store');
+    $router->post('spb-ubah','Bdh\SPBController@update');
+    $router->delete('spb','Bdh\SPBController@destroy');
+
+    $router->get('spb-nik-bdh','Bdh\SPBController@getNIKBdh');
+    $router->get('spb-nik-fiat','Bdh\SPBController@getNIKFiat');
+    $router->get('spb-rek-transfer','Bdh\SPBController@getRekTransfer');
+    $router->get('spb-tambah-pb','Bdh\SPBController@getPBTambah');
 });
 
 ?>
