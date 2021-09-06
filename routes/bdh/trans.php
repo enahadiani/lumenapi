@@ -93,6 +93,20 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('spb-nik-fiat','Bdh\SPBController@getNIKFiat');
     $router->get('spb-rek-transfer','Bdh\SPBController@getRekTransfer');
     $router->get('spb-tambah-pb','Bdh\SPBController@getPBTambah');
+
+    // Bayar SPB
+    $router->get('bayar-spb-nobukti','Bdh\BayarSPBController@generateNo');
+    $router->get('bayar-spb-pb-list','Bdh\BayarSPBController@getPBList');
+    $router->get('bayar-spb','Bdh\BayarSPBController@index');
+    $router->get('bayar-spb-detail','Bdh\BayarSPBController@show');
+    $router->post('bayar-spb','Bdh\BayarSPBController@store');
+    $router->post('bayar-spb-ubah','Bdh\BayarSPBController@update');
+    $router->delete('bayar-spb','Bdh\BayarSPBController@destroy');
+
+    $router->get('bayar-spb-akun','Bdh\BayarSPBController@getAkun');
+    $router->get('bayar-spb-pp','Bdh\BayarSPBController@getPP');
+    $router->get('bayar-spb-rek-transfer','Bdh\BayarSPBController@getRekTransfer');
+    $router->get('bayar-spb-akun-kasbank','Bdh\BayarSPBController@getAkunKasBank');
 });
 
 ?>
