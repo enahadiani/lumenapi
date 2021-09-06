@@ -1447,7 +1447,7 @@ class VerAkunController extends Controller
 
             $cek = DB::connection($this->db)->select("select a.no_gambar as file_dok
             from pbh_dok a
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.no_urut='".$no_urut."' ");
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='".$no_bukti."' and a.nu='".$no_urut."' ");
             $cek = json_decode(json_encode($cek),true);
             if(count($cek) > 0){
                 $file = $cek[0]['file_dok'];
@@ -1464,7 +1464,7 @@ class VerAkunController extends Controller
             $del = DB::connection($this->db)->table('pbh_dok')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $no_bukti) 
-            ->where('no_urut', $no_urut)
+            ->where('nu', $no_urut)
             ->delete();
 
             DB::connection($this->db)->commit();
