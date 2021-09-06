@@ -234,9 +234,15 @@ class SPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            if(isset($request->no_pb) && $request->no_pb != ""){
+                $filter = " and no_pb='$request->no_pb' ";
+            }else{
+                $filter = "";
+            }
+
             $sql = "select 'INPROG' as status,no_pb,convert(varchar,tanggal,103) as tgl,keterangan,nilai 
             from pbh_pb_m 
-            where progress='1' and no_spb='-' and kode_lokasi='".$kode_lokasi."' and modul not in ('IFCLOSE','PJPTG')";
+            where progress='1' and no_spb='-' and kode_lokasi='".$kode_lokasi."' and modul not in ('IFCLOSE','PJPTG') $filter ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -309,6 +315,7 @@ class SPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $this_in = "";
             $tmp = explode(",",$request->input('no_pb'));
             for($x=0;$x<count($tmp);$x++){
                 if($x == 0){
@@ -319,7 +326,7 @@ class SPBController extends Controller
                 }
             }
 
-            $where = " a.kode_lokasi='$kode_lokasi' and b.no_pb in ($this_in) ";
+            $where = "where a.kode_lokasi='$kode_lokasi' and b.no_pb in ($this_in) ";
 
             $sql = "select a.bank,a.nama,a.no_rek,a.nama_rek,a.bruto,a.pajak,a.nilai, case when a.modul='PINBUK-C' then 'SUMBER' else 'TUJUAN' end jenis 
             from pbh_rek a inner join pbh_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi 
@@ -391,10 +398,10 @@ class SPBController extends Controller
 
             $no_bukti = $this->generateKode("spb_m", "no_spb", $kode_lokasi."-SPB".substr($periode,2,4).".", "0001");
 
-            $ins = DB::connection($this->db)->insert("insert into spb_m (no_spb,no_dokumen,no_ver,no_bukti,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nik_buat,nik_sah,nik_fiat,nik_bdh,lok_bayar,no_kas,nilai,modul,no_fiat,progress,kode_ppasal) values ()",array($no_bukti,$request->no_dokumen,'-','-',$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,$nik,'-',$request->nik_fiat,$request->nik_bdh,$kode_lokasi,'-',floatval($request->total),'SPB','-','0','-'));
+            $ins = DB::connection($this->db)->insert("insert into spb_m (no_spb,no_dokumen,no_ver,no_bukti,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nik_buat,nik_sah,nik_fiat,nik_bdh,lok_bayar,no_kas,nilai,modul,no_fiat,progress,kode_ppasal) values (?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,'-','-',$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,$nik,'-',$request->nik_fiat,$request->nik_bdh,$kode_lokasi,'-',floatval($request->total),'SPB','-','0','-'));
 
             $nilai_pb=0;
-            for ($i=0; count($request->no_pb);$i++){
+            for ($i=0; $i < count($request->no_pb);$i++){
                 if ($request->status[$i] == "SPB"){							
                     $upd = DB::connection($this->db)->table("pbh_pb_m")
                     ->where('no_pb',$request->no_pb[$i])
@@ -461,25 +468,25 @@ class SPBController extends Controller
 
             $no_bukti = $request->no_bukti;
 
-            $del = DB::connection($this->db)-table("spb_m")
+            $del = DB::connection($this->db)->table("spb_m")
             ->where('no_spb',$no_bukti) 
             ->where('kode_lokasi',$kode_lokasi)
             ->delete();
 
-            $del = DB::connection($this->db)-table("spb_j")
+            $del = DB::connection($this->db)->table("spb_j")
             ->where('no_spb',$no_bukti) 
             ->where('kode_lokasi',$kode_lokasi)
             ->delete();
 
-            $del = DB::connection($this->db)-table("pbh_pb_m")
+            $del = DB::connection($this->db)->table("pbh_pb_m")
             ->where('no_spb',$no_bukti) 
             ->where('kode_lokasi',$kode_lokasi)
             ->update(['progress'=>'1', 'no_spb'=>'-']);
 
-            $ins = DB::connection($this->db)->insert("insert into spb_m (no_spb,no_dokumen,no_ver,no_bukti,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nik_buat,nik_sah,nik_fiat,nik_bdh,lok_bayar,no_kas,nilai,modul,no_fiat,progress,kode_ppasal) values ()",array($no_bukti,$request->no_dokumen,'-','-',$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,$nik,'-',$request->nik_fiat,$request->nik_bdh,$kode_lokasi,'-',floatval($request->total),'SPB','-','0','-'));
+            $ins = DB::connection($this->db)->insert("insert into spb_m (no_spb,no_dokumen,no_ver,no_bukti,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nik_buat,nik_sah,nik_fiat,nik_bdh,lok_bayar,no_kas,nilai,modul,no_fiat,progress,kode_ppasal) values (?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,'-','-',$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,$nik,'-',$request->nik_fiat,$request->nik_bdh,$kode_lokasi,'-',floatval($request->total),'SPB','-','0','-'));
 
             $nilai_pb=0;
-            for ($i=0; count($request->no_pb);$i++){
+            for ($i=0;$i < count($request->no_pb);$i++){
                 if ($request->status[$i] == "SPB"){							
                     $upd = DB::connection($this->db)->table("pbh_pb_m")
                     ->where('no_pb',$request->no_pb[$i])
@@ -536,17 +543,17 @@ class SPBController extends Controller
             
             $no_bukti = $request->no_bukti;			
             
-            $del = DB::connection($this->db)-table("spb_m")
+            $del = DB::connection($this->db)->table("spb_m")
             ->where('no_spb',$no_bukti) 
             ->where('kode_lokasi',$kode_lokasi)
             ->delete();
 
-            $del = DB::connection($this->db)-table("spb_j")
+            $del = DB::connection($this->db)->table("spb_j")
             ->where('no_spb',$no_bukti) 
             ->where('kode_lokasi',$kode_lokasi)
             ->delete();
 
-            $del = DB::connection($this->db)-table("pbh_pb_m")
+            $del = DB::connection($this->db)->table("pbh_pb_m")
             ->where('no_spb',$no_bukti) 
             ->where('kode_lokasi',$kode_lokasi)
             ->update(['progress'=>'1', 'no_spb'=>'-']);
