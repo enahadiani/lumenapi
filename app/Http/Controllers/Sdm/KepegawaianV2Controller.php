@@ -96,8 +96,8 @@ class KepegawaianV2Controller extends Controller
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2 = "SELECT jenis, dokumen, sts_dokumen FROM hr_karyawan_doc WHERE kode_lokasi = '".$kode_lokasi."'
-            AND nik = '".$request->query('nik')."'";
+            $sql2 = "SELECT nu, jenis, dokumen, sts_dokumen FROM hr_karyawan_doc WHERE kode_lokasi = '".$kode_lokasi."'
+            AND nik = '".$request->query('nik')."' ORDER BY nu";
 
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
