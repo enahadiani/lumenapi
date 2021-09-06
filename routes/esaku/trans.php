@@ -356,6 +356,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-karyawan-update','Sdm\KepegawaianController@update');
     $router->delete('sdm-karyawan','Sdm\KepegawaianController@destroy');
 
+    $router->get('v2/sdm-karyawans','Sdm\KepegawaianV2Controller@index');
+    $router->get('v2/sdm-karyawan','Sdm\KepegawaianV2Controller@show');
+    $router->post('v2/sdm-karyawan','Sdm\KepegawaianV2Controller@save');
+    $router->post('v2/sdm-karyawan-update','Sdm\KepegawaianV2Controller@update');
+    $router->delete('v2/sdm-karyawan','Sdm\KepegawaianV2Controller@destroy');
+
     // UPLOAD KARYAWAN
     $router->post('sdm-karyawan-simpan','Sdm\UploadPegawaiController@store');
     $router->post('sdm-karyawan-import','Sdm\UploadPegawaiController@importXLS');

@@ -77,32 +77,21 @@ class KepegawaianV2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik, a.nama, a.alamat, a.no_telp, a.email, a.npwp, a.bank, a.cabang, a.no_rek, a.nama_rek,
-            a.grade, a.kota, a.kode_pos, a.no_hp, a.flag_aktif, a.foto, a.nip, a.jk, a.tempat, a.tgl_lahir, a.tahun_masuk,
-            a.gelar_depan, a.gelar_belakang, a.ibu_kandung, a.status_nikah, a.tgl_nikah, a.gol_darah, a.kelurahan, a.kecamatan,
-            a.no_kk, a.no_sk, a.tgl_sk, a.tgl_masuk, a.no_bpjs, a.no_ktp, a.ijht, a.bpjs, a.jp, a.no_kontrak, a.tgl_kontrak,
-            a.mk_gol, a.mk_ytb, a.kode_pp, b.nama AS nama_pp, a.kode_sdm, c.nama AS nama_sdm, a.kode_gol, d.nama as nama_golongan,
-            a.jabatan, e.nama AS nama_jabatan, a.kode_loker, f.nama AS nama_loker, a.kode_pajak, g.nama AS nama_pajak,
-            a.kode_unit, h.nama AS nama_unit, a.kode_profesi, i.nama AS nama_profesi, a.kode_agama, j.nama AS nama_agama,
-            a.kode_strata, k.nama AS nama_strata, ISNULL(a.t_badan, 0) AS t_badan, ISNULL(a.b_badan, 0) AS b_badan,
-            ISNULL(a.gaji_pokok, 0) AS gaji_pokok, ISNULL(a.tunj_jabatan, 0) AS tunj_jabatan, 
-            ISNULL(a.tunj_penampilan, 0) AS tunj_penampilan, ISNULL(a.tunj_gondola, 0) AS tunj_gondola,
-            ISNULL(a.tunj_taman, 0) AS tunj_taman, ISNULL(a.tunj_kompetensi, 0) AS tunj_kompetensi,
-            ISNULL(a.tunj_skill, 0) AS tunj_skill, ISNULL(a.tunj_patroli, 0) AS tunj_patroli,
-            ISNULL(a.tunj_lembur, 0) AS tunj_lembur, ISNULL(a.tunj_masakerja, 0) AS tunj_masakerja, a.provinsi, a.client,
-            a.fungsi, a.skill, a.tgl_kontrak_akhir, a.no_bpjs_kerja, a.atasan_langsung, a.atasan_t_langsung, a.no_kta,
-            a.no_reg_kta, a.tgl_berlaku_kta, a.tgl_kadaluarsa_kta, a.area, a.fm, a.bm, a.kota_area, a.loker
+            $sql = "SELECT 
+            a.nik, a.no_ktp, a.nama, a.jk, a.kode_agama, a.no_telp, a.no_hp, a.tempat, convert(varchar(10), a.tgl_lahir, 101) as tgl_lahir, a.alamat,
+            a.provinsi, a.kota, a.kecamatan, a.kelurahan, a.kode_pos, ISNULL(a.t_badan, 0) AS t_badan, ISNULL(a.b_badan, 0) AS b_badan, a.gol_darah, a.no_kk, a.status_nikah,
+            convert(varchar(10), a.tgl_nikah, 101) as tgl_nikah, a.kode_gol, a.kode_sdm, a.kode_unit, a.kode_pp, a.kode_loker, convert(varchar(10), a.tgl_masuk, 101) as tgl_masuk, a.npwp, a.no_bpjs, a.no_bpjs_kerja,
+            a.kode_profesi, a.bank, a.cabang, a.no_rek, a.nama_rek, a.client, a.fungsi, a.skill, a.no_kontrak, convert(varchar(10), a.tgl_kontrak, 101) as tgl_kontrak,
+            convert(varchar(10), a.tgl_kontrak_akhir, 101) as tgl_kontrak_akhir, a.area, a.kota_area, a.fm, a.bm, a.loker_client, a.jabatan_client, a.atasan_langsung, a.atasan_t_langsung, b.nama as nama_pp,
+            c.nama as nama_sdm, d.nama as nama_gol, e.nama as nama_loker, f.nama as nama_unit, g.nama as nama_profesi, h.nama as nama_agama
             FROM hr_karyawan a
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN hr_sdm c ON a.kode_sdm=c.kode_sdm AND a.kode_lokasi=c.kode_lokasi
             LEFT JOIN hr_gol d ON a.kode_gol=d.kode_gol AND a.kode_lokasi=d.kode_lokasi
-            LEFT JOIN hr_jab e ON a.jabatan=e.kode_jab AND a.kode_lokasi=e.kode_lokasi
-            LEFT JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi
-            LEFT JOIN hr_pajak g ON a.kode_pajak=g.kode_pajak AND a.kode_lokasi=g.kode_lokasi
-            LEFT JOIN hr_unit h ON a.kode_unit=h.kode_unit AND a.kode_lokasi=h.kode_lokasi
-            LEFT JOIN hr_profesi i ON a.kode_profesi=i.kode_profesi AND a.kode_lokasi=i.kode_lokasi
-            LEFT JOIN hr_agama j ON a.kode_agama=j.kode_agama AND a.kode_lokasi=j.kode_lokasi
-            LEFT JOIN hr_strata k ON a.kode_strata=k.kode_strata AND a.kode_lokasi=k.kode_lokasi
+            LEFT JOIN hr_loker e ON a.kode_loker=e.kode_loker AND a.kode_lokasi=e.kode_lokasi
+            LEFT JOIN hr_unit f ON a.kode_unit=f.kode_unit AND a.kode_lokasi=f.kode_lokasi
+            LEFT JOIN hr_profesi g ON a.kode_profesi=g.kode_profesi AND a.kode_lokasi=g.kode_lokasi
+            LEFT JOIN hr_agama h ON a.kode_agama=h.kode_agama AND a.kode_lokasi=h.kode_lokasi
             WHERE a.nik = '".$request->nik."' AND a.kode_lokasi = '".$kode_lokasi."'";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -140,203 +129,186 @@ class KepegawaianV2Controller extends Controller
     {
         $this->validate($request, [
             'nik' => 'required',
+            'no_ktp' => 'required',
             'nama' => 'required',
-            'alamat' => 'required',
+            'jk' => 'required',
+            'kode_agama' => 'required',
             'no_telp' => 'required',
-            'email' => 'required',
+            'no_hp' => 'required',
+            'tempat' => 'required',
+            'tgl_lahir' => 'required',
+            'alamat' => 'required',
+            'provinsi' => 'required',
+            'kota' => 'required',
+            'kecamatan' => 'required',
+            'kelurahan' => 'required',
+            'kode_pos' => 'required',
+            't_badan' => 'required',
+            'b_badan' => 'required',
+            'gol_darah' => 'required',
+            'no_kk' => 'required',
+            'status_nikah' => 'required',
+            'tgl_nikah' => 'required',
+            'kode_gol' => 'required',
+            'kode_sdm' => 'required',
+            'kode_unit' => 'required',
             'kode_pp' => 'required',
+            'kode_loker' => 'required',
+            'tgl_masuk' => 'required',
             'npwp' => 'required',
+            'no_bpjs' => 'required',
+            'no_bpjs_kerja' => 'required',
+            'kode_profesi' => 'required',
             'bank' => 'required',
             'cabang' => 'required',
             'no_rek' => 'required',
             'nama_rek' => 'required',
-            'grade' => 'required',
-            'kota' => 'required',
-            'kode_pos' => 'required',
-            'no_hp' => 'required',
-            'flag_aktif' => 'required',
-            'kode_sdm' => 'required',
-            'kode_gol' => 'required',
-            'kode_jab' => 'required',
-            'kode_loker' => 'required',
-            'kode_pajak' => 'required',
-            'nip' => 'required',
-            'kode_unit' => 'required',
-            'kode_profesi' => 'required',
-            'jk' => 'required',
-            'kode_agama' => 'required',
-            'tempat' => 'required',
-            'tgl_lahir' => 'required',
-            'tahun_masuk' => 'required',
-            'gelar_depan' => 'required',
-            'gelar_belakang' => 'required',
-            'ibu_kandung' => 'required',
-            'status_nikah' => 'required',
-            'tgl_nikah' => 'required',
-            'gol_darah' => 'required',
-            'kelurahan' => 'required',
-            'kecamatan' => 'required',
-            'no_kk' => 'required',
-            'no_sk' => 'required',
-            'tgl_sk' => 'required',
-            'tgl_masuk' => 'required',
-            'no_bpjs' => 'required',
-            'no_ktp' => 'required',
-            'kode_strata' => 'required',
-            'ijht' => 'required',
-            'bpjs' => 'required',
-            'jp' => 'required',
-            'no_kontrak' => 'required',
-            'tgl_kontrak' => 'required',
-            'mk_gol' => 'required',
-            'mk_ytb' => 'required',
-            't_badan' => 'required',
-            'b_badan' => 'required',
-            'provinsi' => 'required',
             'client' => 'required',
             'fungsi' => 'required',
             'skill' => 'required',
+            'no_kontrak' => 'required',
+            'tgl_kontrak' => 'required',
             'tgl_kontrak_akhir' => 'required',
-            'gaji_pokok' => 'required',
-            'tunj_jabatan' => 'required',
-            'tunj_penampilan' => 'required',
-            'tunj_gondola' => 'required',
-            'tunj_taman' => 'required',
-            'tunj_kompetensi' => 'required',
-            'tunj_skill' => 'required',
-            'tunj_patroli' => 'required',
-            'tunj_lembur' => 'required',
-            'tunj_masakerja' => 'required',
-            'no_bpjs_kerja' => 'required',
-            'atasan_langsung' => 'required',
-            'atasan_t_langsung' => 'required',
-            'no_kta' => 'required',
-            'no_reg_kta' => 'required',
-            'tgl_berlaku_kta' => 'required',
-            'tgl_kadaluarsa_kta' => 'required',
             'area' => 'required',
+            'kota_area' => 'required',
             'fm' => 'required',
             'bm' => 'required',
-            'kota_area' => 'required',
-            'loker' => 'required',
+            'loker_client' => 'required',
+            'jabatan_client' => 'required',
+            'atasan_langsung' => 'required',
+            'atasan_t_langsung' => 'required',
         ]);
+        // 49 field
         
+        DB::connection($this->db)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
             if($this->isUnik($request->input('nik'), $kode_lokasi)) {
-                $foto = NULL;
-                if($request->hasFile('file')) {
-                    $file = $request->file('file');
-                    $nama_foto = "_".$file->getClientOriginalName();
-                    $foto = $nama_foto;
-                    if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
-                        Storage::disk('s3')->delete('sdm/'.$nama_foto);
-                    }
-                     Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
-                }
+                //  50 column
+                $insert_kar = "INSERT INTO hr_karyawan(
+                nik, no_ktp, nama, jk, kode_agama, no_telp, no_hp, tempat, tgl_lahir, alamat, 
+                provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah,
+                tgl_nikah, kode_gol, kode_sdm, kode_unit, kode_pp, kode_loker, tgl_masuk, npwp, no_bpjs, no_bpjs_kerja,
+                kode_profesi, bank, cabang, no_rek, nama_rek, client, fungsi, skill, no_kontrak, tgl_kontrak,
+                tgl_kontrak_akhir, area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung, kode_lokasi) 
+                VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                // 83 field
-                $insert = "INSERT INTO hr_karyawan(nik, kode_lokasi, nama, alamat, no_telp, email, kode_pp, npwp, bank,
-                cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, jabatan, kode_loker,
-                kode_pajak, nip, kode_unit, kode_profesi, jk, kode_agama, tempat, tgl_lahir, tahun_masuk, gelar_depan, 
-                gelar_belakang, ibu_kandung, status_nikah, tgl_nikah, gol_darah, kelurahan, kecamatan, no_kk, no_sk, tgl_sk,
-                tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
-                b_badan, provinsi, client, fungsi, skill, tgl_kontrak_akhir, gaji_pokok, tunj_jabatan, tunj_penampilan, tunj_gondola,
-                tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli, tunj_lembur, tunj_masakerja, no_bpjs_kerja, atasan_langsung,
-                atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta, area, fm, bm, kota_area, loker, kode_jab) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-                DB::connection($this->db)->insert($insert, [
+                DB::connection($this->db)->insert($insert_kar, [
                     $request->input('nik'),
-                    $kode_lokasi,
+                    $request->input('no_ktp'),
                     $request->input('nama'),
-                    $request->input('alamat'),
+                    $request->input('jk'),
+                    $request->input('kode_agama'),
                     $request->input('no_telp'),
-                    $request->input('email'),
+                    $request->input('no_hp'),
+                    $request->input('tempat'),
+                    $request->input('tgl_lahir'),
+                    $request->input('alamat'),
+                    // 10
+                    $request->input('provinsi'),
+                    $request->input('kota'),
+                    $request->input('kecamatan'),
+                    $request->input('kelurahan'),
+                    $request->input('kode_pos'),
+                    $request->input('t_badan'),
+                    $request->input('b_badan'),
+                    $request->input('gol_darah'),
+                    $request->input('no_kk'),
+                    $request->input('status_nikah'),
+                    // 10
+                    $request->input('tgl_nikah'),
+                    $request->input('kode_gol'),
+                    $request->input('kode_sdm'),
+                    $request->input('kode_unit'),
                     $request->input('kode_pp'),
+                    $request->input('kode_loker'),
+                    $request->input('tgl_masuk'),
                     $request->input('npwp'),
+                    $request->input('no_bpjs'),
+                    $request->input('no_bpjs_kerja'),
+                    // 10
+                    $request->input('kode_profesi'),
                     $request->input('bank'),
                     $request->input('cabang'),
                     $request->input('no_rek'),
                     $request->input('nama_rek'),
-                    $request->input('kota'),
-                    $request->input('kode_pos'),
-                    $request->input('no_hp'),
-                    $request->input('flag_aktif'),
-                    $foto,
-                    $request->input('kode_sdm'),
-                    $request->input('kode_gol'),
-                    $request->input('kode_jab'),
-                    $request->input('kode_loker'),
-                    $request->input('kode_pajak'),
-                    $request->input('nip'),
-                    $request->input('kode_unit'),                                        
-                    $request->input('kode_profesi'),
-                    $request->input('jk'),
-                    $request->input('kode_agama'),
-                    $request->input('tempat'),
-                    $request->input('tgl_lahir'),
-                    $request->input('tahun_masuk'),
-                    $request->input('gelar_depan'),
-                    $request->input('gelar_belakang'),
-                    $request->input('ibu_kandung'),
-                    $request->input('status_nikah'),
-                    $request->input('tgl_nikah'),
-                    $request->input('gol_darah'),
-                    $request->input('kelurahan'),
-                    $request->input('kecamatan'),
-                    $request->input('no_kk'),
-                    $request->input('no_sk'),
-                    $request->input('tgl_sk'),
-                    $request->input('tgl_masuk'),
-                    $request->input('no_bpjs'),
-                    $request->input('no_ktp'),
-                    $request->input('kode_strata'),
-                    $request->input('ijht'),
-                    $request->input('bpjs'),
-                    $request->input('jp'),
-                    $request->input('no_kontrak'),
-                    $request->input('tgl_kontrak'),
-                    $request->input('mk_gol'),
-                    $request->input('mk_ytb'),
-                    $request->input('grade'),
-                    $request->input('t_badan'),
-                    $request->input('b_badan'),
-                    $request->input('provinsi'),
                     $request->input('client'),
                     $request->input('fungsi'),
                     $request->input('skill'),
+                    $request->input('no_kontrak'),
+                    $request->input('tgl_kontrak'),
+                    // 10
                     $request->input('tgl_kontrak_akhir'),
-                    $request->input('gaji_pokok'),
-                    $request->input('tunj_jabatan'),
-                    $request->input('tunj_penampilan'),
-                    $request->input('tunj_gondola'),
-                    $request->input('tunj_taman'),
-                    $request->input('tunj_kompetensi'),
-                    $request->input('tunj_skill'),
-                    $request->input('tunj_patroli'),
-                    $request->input('tunj_lembur'),
-                    $request->input('tunj_masakerja'),
-                    $request->input('no_bpjs_kerja'),
-                    $request->input('atasan_langsung'),
-                    $request->input('atasan_t_langsung'),
-                    $request->input('no_kta'),
-                    $request->input('no_reg_kta'),
-                    $request->input('tgl_berlaku_kta'),
-                    $request->input('tgl_kadaluarsa_kta'),
                     $request->input('area'),
+                    $request->input('kota_area'),
                     $request->input('fm'),
                     $request->input('bm'),
-                    $request->input('kota_area'),
-                    $request->input('loker'),
-                    $request->input('kode_jab'),
+                    $request->input('loker_client'),
+                    $request->input('jabatan_client'),
+                    $request->input('atasan_langsung'),
+                    $request->input('atasan_t_langsung'),
+                    $kode_lokasi
+                    // 10
                 ]);
+
+                if(count($request->input('nu')) > 0) {
+                    if(!empty($request->file('file'))) { 
+                        if(count($request->file('file')) > 0) {
+                            for($j=0;$j<count($request->file('file'));$j++) {
+                                $file = $request->file('file')[$j];
+                                $nama_foto = $request->input('nik')."_".$file->getClientOriginalName();
+                                        
+                                if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
+                                    Storage::disk('s3')->delete('sdm/'.$nama_foto);
+                                }
+                                Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));     
+                            }
+                        }
+                    }
+                    // 6 column
+                    $insert_doc = "INSERT INTO hr_karyawan_doc(
+                        nik, nu, kode_lokasi, jenis, dokumen, sts_dokumen
+                    ) VALUES (?, ?, ?, ?, ?, ?)";
+
+                    for($i=0;$i<count($request->input('nu'));$i++) {
+                        $nu = $request->input('nu'); 
+                        $jenis = $request->input('jenis'); 
+                        $fileName = $request->input('fileName');
+                        $filePrevName = $request->input('filePrevName');
+                        $isUpload = $request->input('isUpload');
+                        $sts_dokumen = $request->input('sts_dokumen');
+                        
+                        if($isUpload[$i] == "false") {
+                            DB::connection($this->db)->insert($insert_doc, [
+                                $request->input('nik'),
+                                $nu[$i],
+                                $kode_lokasi,
+                                $jenis[$i],
+                                $filePrevName[$i],
+                                $sts_dokumen[$i]
+                            ]);
+                        } else {
+                            DB::connection($this->db)->insert($insert_doc, [
+                                $request->input('nik'),
+                                $nu[$i],
+                                $kode_lokasi,
+                                $jenis[$i],
+                                $fileName[$i],
+                                $sts_dokumen[$i]
+                            ]);
+                        }
+                    }   
+                }
                 
+                DB::connection($this->db)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data karyawan berhasil disimpan";
             }else{
@@ -347,6 +319,7 @@ class KepegawaianV2Controller extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data karyawan gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -366,87 +339,58 @@ class KepegawaianV2Controller extends Controller
     {
         $this->validate($request, [
             'nik' => 'required',
+            'no_ktp' => 'required',
             'nama' => 'required',
-            'alamat' => 'required',
+            'jk' => 'required',
+            'kode_agama' => 'required',
             'no_telp' => 'required',
-            'email' => 'required',
+            'no_hp' => 'required',
+            'tempat' => 'required',
+            'tgl_lahir' => 'required',
+            'alamat' => 'required',
+            'provinsi' => 'required',
+            'kota' => 'required',
+            'kecamatan' => 'required',
+            'kelurahan' => 'required',
+            'kode_pos' => 'required',
+            't_badan' => 'required',
+            'b_badan' => 'required',
+            'gol_darah' => 'required',
+            'no_kk' => 'required',
+            'status_nikah' => 'required',
+            'tgl_nikah' => 'required',
+            'kode_gol' => 'required',
+            'kode_sdm' => 'required',
+            'kode_unit' => 'required',
             'kode_pp' => 'required',
+            'kode_loker' => 'required',
+            'tgl_masuk' => 'required',
             'npwp' => 'required',
+            'no_bpjs' => 'required',
+            'no_bpjs_kerja' => 'required',
+            'kode_profesi' => 'required',
             'bank' => 'required',
             'cabang' => 'required',
             'no_rek' => 'required',
             'nama_rek' => 'required',
-            'grade' => 'required',
-            'kota' => 'required',
-            'kode_pos' => 'required',
-            'no_hp' => 'required',
-            'flag_aktif' => 'required',
-            'kode_sdm' => 'required',
-            'kode_gol' => 'required',
-            'kode_jab' => 'required',
-            'kode_loker' => 'required',
-            'kode_pajak' => 'required',
-            'nip' => 'required',
-            'kode_unit' => 'required',
-            'kode_profesi' => 'required',
-            'jk' => 'required',
-            'kode_agama' => 'required',
-            'tempat' => 'required',
-            'tgl_lahir' => 'required',
-            'tahun_masuk' => 'required',
-            'gelar_depan' => 'required',
-            'gelar_belakang' => 'required',
-            'ibu_kandung' => 'required',
-            'status_nikah' => 'required',
-            'tgl_nikah' => 'required',
-            'gol_darah' => 'required',
-            'kelurahan' => 'required',
-            'kecamatan' => 'required',
-            'no_kk' => 'required',
-            'no_sk' => 'required',
-            'tgl_sk' => 'required',
-            'tgl_masuk' => 'required',
-            'no_bpjs' => 'required',
-            'no_ktp' => 'required',
-            'kode_strata' => 'required',
-            'ijht' => 'required',
-            'bpjs' => 'required',
-            'jp' => 'required',
-            'no_kontrak' => 'required',
-            'tgl_kontrak' => 'required',
-            'mk_gol' => 'required',
-            'mk_ytb' => 'required',
-            't_badan' => 'required',
-            'b_badan' => 'required',
-            'provinsi' => 'required',
             'client' => 'required',
             'fungsi' => 'required',
             'skill' => 'required',
+            'no_kontrak' => 'required',
+            'tgl_kontrak' => 'required',
             'tgl_kontrak_akhir' => 'required',
-            'gaji_pokok' => 'required',
-            'tunj_jabatan' => 'required',
-            'tunj_penampilan' => 'required',
-            'tunj_gondola' => 'required',
-            'tunj_taman' => 'required',
-            'tunj_kompetensi' => 'required',
-            'tunj_skill' => 'required',
-            'tunj_patroli' => 'required',
-            'tunj_lembur' => 'required',
-            'tunj_masakerja' => 'required',
-            'no_bpjs_kerja' => 'required',
-            'atasan_langsung' => 'required',
-            'atasan_t_langsung' => 'required',
-            'no_kta' => 'required',
-            'no_reg_kta' => 'required',
-            'tgl_berlaku_kta' => 'required',
-            'tgl_kadaluarsa_kta' => 'required',
             'area' => 'required',
+            'kota_area' => 'required',
             'fm' => 'required',
             'bm' => 'required',
-            'kota_area' => 'required',
-            'loker' => 'required',
+            'loker_client' => 'required',
+            'jabatan_client' => 'required',
+            'atasan_langsung' => 'required',
+            'atasan_t_langsung' => 'required',
         ]);
-        
+        // 49 field
+        DB::connection($this->db)->beginTransaction();
+
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -465,114 +409,143 @@ class KepegawaianV2Controller extends Controller
             }
 
             DB::connection($this->db)->table('hr_karyawan')
-            ->where('nik', $request->nik)
+            ->where('nik', $request->input('nik'))
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
-            // 83 field
-            $insert = "INSERT INTO hr_karyawan(nik, kode_lokasi, nama, alamat, no_telp, email, kode_pp, npwp, bank,
-            cabang, no_rek, nama_rek, kota, kode_pos, no_hp, flag_aktif, foto, kode_sdm, kode_gol, jabatan, kode_loker,
-            kode_pajak, nip, kode_unit, kode_profesi, jk, kode_agama, tempat, tgl_lahir, tahun_masuk, gelar_depan, 
-            gelar_belakang, ibu_kandung, status_nikah, tgl_nikah, gol_darah, kelurahan, kecamatan, no_kk, no_sk, tgl_sk,
-            tgl_masuk, no_bpjs, no_ktp, kode_strata, ijht, bpjs, jp, no_kontrak, tgl_kontrak, mk_gol, mk_ytb, grade, t_badan,
-            b_badan, provinsi, client, fungsi, skill, tgl_kontrak_akhir, gaji_pokok, tunj_jabatan, tunj_penampilan, tunj_gondola,
-            tunj_taman, tunj_kompetensi, tunj_skill, tunj_patroli, tunj_lembur, tunj_masakerja, no_bpjs_kerja, atasan_langsung,
-            atasan_t_langsung, no_kta, no_reg_kta, tgl_berlaku_kta, tgl_kadaluarsa_kta, area, fm, bm, kota_area, loker, kode_jab) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            DB::connection($this->db)->table('hr_karyawan_doc')
+            ->where('nik', $request->input('nik'))
+            ->where('kode_lokasi', $kode_lokasi)
+            ->delete();
 
-            DB::connection($this->db)->insert($insert, [
+            //  50 column
+            $insert_kar = "INSERT INTO hr_karyawan(
+            nik, no_ktp, nama, jk, kode_agama, no_telp, no_hp, tempat, tgl_lahir, alamat, 
+            provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah,
+            tgl_nikah, kode_gol, kode_sdm, kode_unit, kode_pp, kode_loker, tgl_masuk, npwp, no_bpjs, no_bpjs_kerja,
+            kode_profesi, bank, cabang, no_rek, nama_rek, client, fungsi, skill, no_kontrak, tgl_kontrak,
+            tgl_kontrak_akhir, area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung, kode_lokasi) 
+            VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            DB::connection($this->db)->insert($insert_kar, [
                 $request->input('nik'),
-                $kode_lokasi,
+                $request->input('no_ktp'),
                 $request->input('nama'),
-                $request->input('alamat'),
+                $request->input('jk'),
+                $request->input('kode_agama'),
                 $request->input('no_telp'),
-                $request->input('email'),
+                $request->input('no_hp'),
+                $request->input('tempat'),
+                $request->input('tgl_lahir'),
+                $request->input('alamat'),
+                // 10
+                $request->input('provinsi'),
+                $request->input('kota'),
+                $request->input('kecamatan'),
+                $request->input('kelurahan'),
+                $request->input('kode_pos'),
+                $request->input('t_badan'),
+                $request->input('b_badan'),
+                $request->input('gol_darah'),
+                $request->input('no_kk'),
+                $request->input('status_nikah'),
+                // 10
+                $request->input('tgl_nikah'),
+                $request->input('kode_gol'),
+                $request->input('kode_sdm'),
+                $request->input('kode_unit'),
                 $request->input('kode_pp'),
+                $request->input('kode_loker'),
+                $request->input('tgl_masuk'),
                 $request->input('npwp'),
+                $request->input('no_bpjs'),
+                $request->input('no_bpjs_kerja'),
+                // 10
+                $request->input('kode_profesi'),
                 $request->input('bank'),
                 $request->input('cabang'),
                 $request->input('no_rek'),
                 $request->input('nama_rek'),
-                $request->input('kota'),
-                $request->input('kode_pos'),
-                $request->input('no_hp'),
-                $request->input('flag_aktif'),
-                $foto,
-                $request->input('kode_sdm'),
-                $request->input('kode_gol'),
-                $request->input('kode_jab'),
-                $request->input('kode_loker'),
-                $request->input('kode_pajak'),
-                $request->input('nip'),
-                $request->input('kode_unit'),                                        
-                $request->input('kode_profesi'),
-                $request->input('jk'),
-                $request->input('kode_agama'),
-                $request->input('tempat'),
-                $request->input('tgl_lahir'),
-                $request->input('tahun_masuk'),
-                $request->input('gelar_depan'),
-                $request->input('gelar_belakang'),
-                $request->input('ibu_kandung'),
-                $request->input('status_nikah'),
-                $request->input('tgl_nikah'),
-                $request->input('gol_darah'),
-                $request->input('kelurahan'),
-                $request->input('kecamatan'),
-                $request->input('no_kk'),
-                $request->input('no_sk'),
-                $request->input('tgl_sk'),
-                $request->input('tgl_masuk'),
-                $request->input('no_bpjs'),
-                $request->input('no_ktp'),
-                $request->input('kode_strata'),
-                $request->input('ijht'),
-                $request->input('bpjs'),
-                $request->input('jp'),
-                $request->input('no_kontrak'),
-                $request->input('tgl_kontrak'),
-                $request->input('mk_gol'),
-                $request->input('mk_ytb'),
-                $request->input('grade'),
-                $request->input('t_badan'),
-                $request->input('b_badan'),
-                $request->input('provinsi'),
                 $request->input('client'),
                 $request->input('fungsi'),
                 $request->input('skill'),
+                $request->input('no_kontrak'),
+                $request->input('tgl_kontrak'),
+                // 10
                 $request->input('tgl_kontrak_akhir'),
-                $request->input('gaji_pokok'),
-                $request->input('tunj_jabatan'),
-                $request->input('tunj_penampilan'),
-                $request->input('tunj_gondola'),
-                $request->input('tunj_taman'),
-                $request->input('tunj_kompetensi'),
-                $request->input('tunj_skill'),
-                $request->input('tunj_patroli'),
-                $request->input('tunj_lembur'),
-                $request->input('tunj_masakerja'),
-                $request->input('no_bpjs_kerja'),
-                $request->input('atasan_langsung'),
-                $request->input('atasan_t_langsung'),
-                $request->input('no_kta'),
-                $request->input('no_reg_kta'),
-                $request->input('tgl_berlaku_kta'),
-                $request->input('tgl_kadaluarsa_kta'),
                 $request->input('area'),
+                $request->input('kota_area'),
                 $request->input('fm'),
                 $request->input('bm'),
-                $request->input('kota_area'),
-                $request->input('loker'),
-                $request->input('kode_jab'),
-                ]);
+                $request->input('loker_client'),
+                $request->input('jabatan_client'),
+                $request->input('atasan_langsung'),
+                $request->input('atasan_t_langsung'),
+                $kode_lokasi
+                // 10
+            ]);
+
+            if(count($request->input('nu')) > 0) {
+                if(!empty($request->file('file'))) { 
+                    if(count($request->file('file')) > 0) {
+                        for($j=0;$j<count($request->file('file'));$j++) {
+                            $file = $request->file('file')[$j];
+                            $nama_foto = $request->input('nik')."_".$file->getClientOriginalName();
+                                        
+                            if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
+                                Storage::disk('s3')->delete('sdm/'.$nama_foto);
+                            }
+                            Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));     
+                        }
+                    }
+                }
+                // 6 column
+                $insert_doc = "INSERT INTO hr_karyawan_doc(
+                nik, nu, kode_lokasi, jenis, dokumen, sts_dokumen
+                ) VALUES (?, ?, ?, ?, ?, ?)";
+
+                for($i=0;$i<count($request->input('nu'));$i++) {
+                    $nu = $request->input('nu'); 
+                    $jenis = $request->input('jenis'); 
+                    $fileName = $request->input('fileName');
+                    $filePrevName = $request->input('filePrevName');
+                    $isUpload = $request->input('isUpload');
+                    $sts_dokumen = $request->input('sts_dokumen');
+                        
+                    if($isUpload[$i] == "false") {
+                        DB::connection($this->db)->insert($insert_doc, [
+                            $request->input('nik'),
+                            $nu[$i],
+                            $kode_lokasi,
+                            $jenis[$i],
+                            $filePrevName[$i],
+                            $sts_dokumen[$i]
+                        ]);
+                    } else {
+                        DB::connection($this->db)->insert($insert_doc, [
+                            $request->input('nik'),
+                            $nu[$i],
+                            $kode_lokasi,
+                            $jenis[$i],
+                            $fileName[$i],
+                            $sts_dokumen[$i]
+                        ]);
+                    }
+                }   
+            }
             
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data karyawan berhasil diubah";
             $success['kode'] = $request->nik;
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data karyawan gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
@@ -591,22 +564,30 @@ class KepegawaianV2Controller extends Controller
             'nik' => 'required'
         ]);
         
+        DB::connection($this->db)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            DB::connection($this->db)->table('hr_karyawan_doc')
+            ->where('nik', $request->input('nik'))
+            ->where('kode_lokasi', $kode_lokasi)
+            ->delete();
             
             DB::connection($this->db)->table('hr_karyawan')
-            ->where('nik', $request->nik)
+            ->where('nik', $request->input('nik'))
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
 
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data karyawan berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data karyawan gagal dihapus ".$e;
             
