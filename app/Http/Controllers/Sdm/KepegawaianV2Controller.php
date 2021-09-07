@@ -96,8 +96,8 @@ class KepegawaianV2Controller extends Controller
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2 = "SELECT jenis, dokumen, sts_dokumen FROM hr_karyawan_doc WHERE kode_lokasi = '".$kode_lokasi."'
-            AND nik = '".$request->query('nik')."'";
+            $sql2 = "SELECT nu, jenis, dokumen, sts_dokumen FROM hr_karyawan_doc WHERE kode_lokasi = '".$kode_lokasi."'
+            AND nik = '".$request->query('nik')."' ORDER BY nu";
 
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
@@ -403,17 +403,6 @@ class KepegawaianV2Controller extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $foto = $request->input('prevFoto');
-            if($request->hasFile('file')) {
-                $file = $request->file('file');
-                $nama_foto = "_".$file->getClientOriginalName();
-                $foto = $nama_foto;
-                if(Storage::disk('s3')->exists('sdm/'.$nama_foto)){
-                    Storage::disk('s3')->delete('sdm/'.$nama_foto);
-                }
-                Storage::disk('s3')->put('sdm/'.$nama_foto,file_get_contents($file));
             }
 
             DB::connection($this->db)->table('hr_karyawan')
