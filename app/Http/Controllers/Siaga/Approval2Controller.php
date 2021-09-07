@@ -582,7 +582,7 @@ class Approval2Controller extends Controller
             $res3 = json_decode(json_encode($res3),true);
 
             $sql4 = "
-			select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,c.tgl_app,103) as tgl  
+			select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl  
             from gr_pb_m a
             inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
