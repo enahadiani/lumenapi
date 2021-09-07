@@ -1149,6 +1149,9 @@ class MobileController extends Controller
 
             if(isset($request->kode_ta) && $request->kode_ta != ""){
                 $kode_ta = $request->kode_ta;
+                $res3 = DB::connection($this->db)->select("
+                select kode_ta,nama from sis_ta where kode_ta='$request->kode_ta' and kode_lokasi='$kode_lokasi'");
+                $res3 = json_decode(json_encode($res3),true);
             }else{
                 
                 $res3 = DB::connection($this->db)->select("
