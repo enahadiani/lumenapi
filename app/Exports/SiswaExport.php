@@ -133,7 +133,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
                     //     ],
                     // ],
                 ];
-                $event->sheet->getStyle('A1:T1')->applyFromArray($styleArray);
+                $event->sheet->getStyle('A1:U1')->applyFromArray($styleArray);
             },
         ];
         
