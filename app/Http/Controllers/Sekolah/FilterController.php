@@ -18,6 +18,36 @@ class FilterController extends Controller
     public $guard = "siswa";
     public $db = "sqlsrvtarbak";
 
+    public function getFilterTahunAjaran(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $where = "where kode_lokasi='$kode_lokasi' and kode_pp='$request->kode_pp'";
+            $sql="select kode_ta, nama, flag_aktif from sis_ta a $where";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getFilterPP(Request $request){
         try {
             

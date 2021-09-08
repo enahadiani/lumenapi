@@ -22,7 +22,8 @@ class DashboardController extends Controller
         $this->validate($request,[
             'kode_kelas' => 'required',
             'kode_matpel' => 'required',
-            'kode_pp' => 'required'
+            'kode_pp' => 'required',
+            'kode_ta' => 'required'
         ]);
         try {
             
@@ -39,7 +40,7 @@ class DashboardController extends Controller
             inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
             inner join sis_kelas c on b.kode_tingkat=c.kode_tingkat and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.kode_pp='$request->kode_pp' and c.kode_kelas='$request->kode_kelas' 
-            and a.kode_matpel='$request->kode_matpel'
+            and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$request->kode_ta'
             order by a.kode_kd
             ");
             $rs = json_decode(json_encode($rs),true);
@@ -78,7 +79,7 @@ class DashboardController extends Controller
                         where a.kode_pp='$request->kode_pp'
                         group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
             ) e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and b.kode_kelas=e.kode_kelas and a.kode_sem=e.kode_sem
-            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas'
+            where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas' and a.kode_ta='$request->kode_ta'
             order by a.kode_kd";
             // $success['sql2'] = $sql2;
             $rs2 = DB::connection($this->db)->select($sql2) ;

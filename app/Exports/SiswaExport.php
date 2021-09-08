@@ -36,13 +36,14 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
             $res = collect(DB::connection('sqlsrvtarbak')
             ->select("select '' as nis, '' as flag_aktif, '' as kode_kelas, '' as kode_akt, '' as nama, '' as tmp_lahir, 
             '' as tgl_lahir, '' as jk, '' as agama, '' as hp_siswa, '' as email, '' as alamat_siswa, '' as nama_wali, 
-            '' as alamat_wali, '' as kerja_wali, '' as hp_wali, '' as email_wali, '' as gol_darah, '' as id_bank, '' as nis2"));
+            '' as alamat_wali, '' as kerja_wali, '' as hp_wali, '' as email_wali, '' as gol_darah, '' as id_bank, '' as nis2,
+            '' as kode_pp"));
         }else{
             
             $res = collect(DB::connection('sqlsrvtarbak')
             ->select("select nis, flag_aktif, kode_kelas, kode_akt as angkatan, nama, tmp_lahir as tempat_lahir, tgl_lahir, 
             jk as jenis_kelamin, agama, hp_siswa, email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali,
-            gol_darah, id_bank, nis2, sts_upload, ket_upload, nu 
+            gol_darah, id_bank, nis2, kode_pp, sts_upload, ket_upload, nu 
             from sis_siswa_tmp
             where nik_user ='$this->nik_user' 
             order by nu"));
@@ -56,54 +57,56 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
         if($this->type == 'template'){
             return [
                 [
-                    'nis',
-                    'status_siswa',
-                    'kode_kelas',
-                    'angkatan',
-                    'nama',
-                    'tempat_lahir',
-                    'tgl_lahir',
-                    'jenis_kelamin',
-                    'agama',
-                    'no_hp_siswa',
-                    'email_siswa',
-                    'alamat_siswa',
-                    'nama_wali',
-                    'alamat_wali',
-                    'kerja_wali',
-                    'no_hp_wali',
-                    'email_wali',
-                    'gol_darah_siswa',
-                    'id_bank',
-                    'nis2'
+                    'ID Keuangan',
+                    'Status Siswa',
+                    'Kelas',
+                    'Angkatan',
+                    'Nama',
+                    'Tempat Lahir',
+                    'Tanggal Lahir',
+                    'Jenis Kelamin',
+                    'Agama',
+                    'No. HP Siswa',
+                    'Email Siswa',
+                    'Alamat Siswa',
+                    'Nama Wali',
+                    'Alamat Wali',
+                    'Pekerjaan Wali',
+                    'No. HP Wali',
+                    'Email Wali',
+                    'Gol. Darah Siswa',
+                    'ID Bank',
+                    'ID Sekolah',
+                    'Kode PP'
                 ]
             ];
         }else{
             return [
                 [
-                    'nis',
-                    'status_siswa',
-                    'kode_kelas',
-                    'angkatan',
-                    'nama',
-                    'tempat_lahir',
-                    'tgl_lahir',
-                    'jenis_kelamin',
-                    'agama',
-                    'no_hp_siswa',
-                    'email_siswa',
-                    'alamat_siswa',
-                    'nama_wali',
-                    'alamat_wali',
-                    'kerja_wali',
-                    'no_hp_wali',
-                    'email_wali',
-                    'gol_darah_siswa',
-                    'id_bank',
-                    'nis2',
-                    'sts_upload',
-                    'ket_upload',
-                    'nu'
+                    'ID Keuangan',
+                    'Status Siswa',
+                    'Kelas',
+                    'Angkatan',
+                    'Nama',
+                    'Tempat Lahir',
+                    'Tanggal Lahir',
+                    'Jenis Kelamin',
+                    'Agama',
+                    'No. HP Siswa',
+                    'Email Siswa',
+                    'Alamat Siswa',
+                    'Nama Wali',
+                    'Alamat Wali',
+                    'Pekerjaan Wali',
+                    'No. HP Wali',
+                    'Email Wali',
+                    'Gol. Darah Siswa',
+                    'ID Bank',
+                    'ID Sekolah',
+                    'Kode PP',
+                    'Status Upload',
+                    'Keterangan Upload',
+                    'Nomor Urut'
                 ]
             ];
         }
@@ -130,7 +133,7 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
                     //     ],
                     // ],
                 ];
-                $event->sheet->getStyle('A1:T1')->applyFromArray($styleArray);
+                $event->sheet->getStyle('A1:U1')->applyFromArray($styleArray);
             },
         ];
         
