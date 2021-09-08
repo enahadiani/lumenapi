@@ -55,6 +55,32 @@ class DashboardController extends Controller
             }
             $success['ctg']=$ctg;
             
+            // $sql2 = "select a.kode_kd,a.nama,b.kode_kelas,a.kode_matpel,isnull(c.rata2,0) as nilai,isnull(d.nilai_tertinggi,0) as nilai_tertinggi,isnull(e.nilai_terendah,0) as nilai_terendah 
+            // from sis_kd a 
+            // inner join sis_kelas b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_tingkat=b.kode_tingkat
+            // left join (
+            //             select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2
+            //             from sis_nilai_m a
+            //             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            //             where a.kode_pp='$request->kode_pp'
+            //             group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
+            // ) c on a.kode_kd=c.kode_kd and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_matpel=c.kode_matpel and b.kode_kelas=c.kode_kelas and a.kode_sem=c.kode_sem
+            // left join (
+            //             select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,max(b.nilai) as nilai_tertinggi
+            //             from sis_nilai_m a
+            //             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            //             where a.kode_pp='$request->kode_pp'
+            //             group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
+            // ) d on a.kode_kd=d.kode_kd and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_matpel=d.kode_matpel and b.kode_kelas=d.kode_kelas and a.kode_sem=d.kode_sem
+            // left join (
+            //             select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,min(b.nilai) as nilai_terendah
+            //             from sis_nilai_m a
+            //             inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            //             where a.kode_pp='$request->kode_pp'
+            //             group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
+            // ) e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and b.kode_kelas=e.kode_kelas and a.kode_sem=e.kode_sem
+            // where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas' and a.kode_ta='$request->kode_ta'
+            // order by a.kode_kd";
             $sql2 = "select a.kode_kd,a.nama,b.kode_kelas,a.kode_matpel,isnull(c.rata2,0) as nilai,isnull(d.nilai_tertinggi,0) as nilai_tertinggi,isnull(e.nilai_terendah,0) as nilai_terendah 
             from sis_kd a 
             inner join sis_kelas b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and a.kode_tingkat=b.kode_tingkat
@@ -62,21 +88,21 @@ class DashboardController extends Controller
                         select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,avg(b.nilai) as rata2
                         from sis_nilai_m a
                         inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                        where a.kode_pp='$request->kode_pp'
+                        where a.kode_pp='$request->kode_pp' and a.kode_ta='$request->kode_ta'
                         group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
             ) c on a.kode_kd=c.kode_kd and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp and a.kode_matpel=c.kode_matpel and b.kode_kelas=c.kode_kelas and a.kode_sem=c.kode_sem
             left join (
                         select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,max(b.nilai) as nilai_tertinggi
                         from sis_nilai_m a
                         inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                        where a.kode_pp='$request->kode_pp'
+                        where a.kode_pp='$request->kode_pp' and a.kode_ta='$request->kode_ta'
                         group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
             ) d on a.kode_kd=d.kode_kd and a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp and a.kode_matpel=d.kode_matpel and b.kode_kelas=d.kode_kelas and a.kode_sem=d.kode_sem
             left join (
                         select a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp,min(b.nilai) as nilai_terendah
                         from sis_nilai_m a
                         inner join sis_nilai b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                        where a.kode_pp='$request->kode_pp'
+                        where a.kode_pp='$request->kode_pp' and a.kode_ta='$request->kode_ta'
                         group by a.kode_kd,a.kode_matpel,a.kode_kelas,a.kode_sem,a.kode_lokasi,a.kode_pp
             ) e on a.kode_kd=e.kode_kd and a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp and a.kode_matpel=e.kode_matpel and b.kode_kelas=e.kode_kelas and a.kode_sem=e.kode_sem
             where a.kode_pp='$request->kode_pp' and a.kode_lokasi='$kode_lokasi' and a.kode_matpel='$request->kode_matpel' and b.kode_kelas='$request->kode_kelas' and a.kode_ta='$request->kode_ta'
