@@ -152,7 +152,7 @@ class UploadSiswaController extends Controller
 
             Storage::disk('local')->put($nama_file,file_get_contents($file));
 
-            $dt = Excel::toArray(new SDMKaryawanImport(), $nama_file);
+            $dt = Excel::toArray(new SiswaImport(), $nama_file);
             $excel = $dt[0];
 
             $x = array();
