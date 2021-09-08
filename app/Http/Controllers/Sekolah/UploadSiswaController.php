@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Imports\SiswaImport;
 use App\Exports\SiswaExport;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Log; 
 
 class UploadSiswaController extends Controller
 {
@@ -163,7 +165,7 @@ class UploadSiswaController extends Controller
                     if($row[6] == "") {
                         $row[6] = date('Y-m-d');
                     } else {
-                        $row[6] = $this->convertDate($row[6]);
+                        $row[6] = $this->convertDateExcel($row[6]);
                     }
 
                     $sts = 1;
