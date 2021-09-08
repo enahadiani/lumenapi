@@ -169,7 +169,7 @@ class UploadSiswaController extends Controller
                     }
 
                     $sts = 1;
-                    $insert = "INSERT INTO hr_karyawan_tmp (
+                    $insert = "INSERT INTO sis_siswa_tmp (
                     nis, flag_aktif, kode_kelas, kode_akt, nama, tmp_lahir, tgl_lahir, jk, agama, hp_siswa,
                     email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2,
                     kode_lokasi, nik_user, nu, sts_upload, ket_upload) 
