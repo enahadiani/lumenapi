@@ -175,7 +175,7 @@ class UploadSiswaController extends Controller
                     kode_lokasi, nik_user, nu, sts_upload, ket_upload) 
                     VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?)";
                     DB::connection($this->db)->insert($insert, [
                         $row[0],
@@ -203,7 +203,7 @@ class UploadSiswaController extends Controller
                         $request->input('nik_user'),
                         $no,
                         $sts,
-                        ""
+                        "-"
                     ]);
                     $no++;
                 }
