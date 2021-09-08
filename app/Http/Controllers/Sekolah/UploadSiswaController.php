@@ -63,9 +63,9 @@ class UploadSiswaController extends Controller
             ->delete();
 
             $insert = "INSERT INTO sis_siswa (nis, flag_aktif, kode_kelas, kode_akt, nama, tmp_lahir, tgl_lahir, jk, agama, hp_siswa,
-            email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2,
+            email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2, kode_pp,
             kode_lokasi) SELECT nis, flag_aktif, kode_kelas, kode_akt, nama, tmp_lahir, tgl_lahir, jk, agama, hp_siswa,
-            email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2,
+            email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2, kode_pp,
             kode_lokasi FROM sis_siswa_tmp 
             WHERE kode_lokasi = '".$kode_lokasi."' AND nik_user = '".$request->input('nik_user')."'";
             DB::connection($this->db)->insert($insert);
@@ -171,11 +171,11 @@ class UploadSiswaController extends Controller
                     $sts = 1;
                     $insert = "INSERT INTO sis_siswa_tmp (
                     nis, flag_aktif, kode_kelas, kode_akt, nama, tmp_lahir, tgl_lahir, jk, agama, hp_siswa,
-                    email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2,
+                    email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali, gol_darah, id_bank, nis2, kode_pp,
                     kode_lokasi, nik_user, nu, sts_upload, ket_upload) 
                     VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     ?, ?, ?, ?, ?)";
                     DB::connection($this->db)->insert($insert, [
                         $row[0],
@@ -198,6 +198,7 @@ class UploadSiswaController extends Controller
                         $row[17],
                         $row[18],
                         $row[19],
+                        $row[20],
                         $kode_lokasi,
                         $request->input('nik_user'),
                         $no,

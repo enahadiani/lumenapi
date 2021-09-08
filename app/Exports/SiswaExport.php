@@ -36,13 +36,14 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
             $res = collect(DB::connection('sqlsrvtarbak')
             ->select("select '' as nis, '' as flag_aktif, '' as kode_kelas, '' as kode_akt, '' as nama, '' as tmp_lahir, 
             '' as tgl_lahir, '' as jk, '' as agama, '' as hp_siswa, '' as email, '' as alamat_siswa, '' as nama_wali, 
-            '' as alamat_wali, '' as kerja_wali, '' as hp_wali, '' as email_wali, '' as gol_darah, '' as id_bank, '' as nis2"));
+            '' as alamat_wali, '' as kerja_wali, '' as hp_wali, '' as email_wali, '' as gol_darah, '' as id_bank, '' as nis2,
+            '' as kode_pp"));
         }else{
             
             $res = collect(DB::connection('sqlsrvtarbak')
             ->select("select nis, flag_aktif, kode_kelas, kode_akt as angkatan, nama, tmp_lahir as tempat_lahir, tgl_lahir, 
             jk as jenis_kelamin, agama, hp_siswa, email, alamat_siswa, nama_wali, alamat_wali, kerja_wali, hp_wali, email_wali,
-            gol_darah, id_bank, nis2, sts_upload, ket_upload, nu 
+            gol_darah, id_bank, nis2, kode_pp, sts_upload, ket_upload, nu 
             from sis_siswa_tmp
             where nik_user ='$this->nik_user' 
             order by nu"));
@@ -75,7 +76,8 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
                     'Email Wali',
                     'Gol. Darah Siswa',
                     'ID Bank',
-                    'ID Sekolah'
+                    'ID Sekolah',
+                    'Kode PP'
                 ]
             ];
         }else{
@@ -100,7 +102,11 @@ class SiswaExport implements FromCollection, WithHeadings, WithColumnFormatting,
                     'Email Wali',
                     'Gol. Darah Siswa',
                     'ID Bank',
-                    'ID Sekolah'
+                    'ID Sekolah',
+                    'Kode PP',
+                    'Status Upload',
+                    'Keterangan Upload',
+                    'Nomor Urut'
                 ]
             ];
         }
