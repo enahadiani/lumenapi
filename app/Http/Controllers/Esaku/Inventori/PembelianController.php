@@ -572,6 +572,8 @@ class PembelianController extends Controller
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
             }	
 
+            $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,? ", array($periode,$kode_lokasi,$nik));
+
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
             DB::connection($this->sql)->commit();
@@ -955,7 +957,9 @@ class PembelianController extends Controller
                     $update = DB::connection($this->sql)->table('brg_barang')
                     ->where('kode_lokasi', $kode_lokasi)
                     ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
-                }	
+                }
+                
+                $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,? ", array($periode,$kode_lokasi,$nik));
     
                 DB::connection($this->sql)->commit();
                 $tmp = "Data Pembelian berhasil diubah";
