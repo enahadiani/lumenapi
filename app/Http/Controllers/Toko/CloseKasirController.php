@@ -215,7 +215,7 @@ class CloseKasirController extends Controller
     
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
-                inner join brg_trans_dloc c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
+                inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
                 inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi
                 where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' group by a.akun_pdpt
                 ");
@@ -282,7 +282,7 @@ class CloseKasirController extends Controller
                         ->where('no_jual', $return[$i]['no_jual'])
                         ->update(['no_close'=>$id]);
 
-                        $upd2[$i] = DB::connection($this->sql)->table('brg_trans_dloc')
+                        $upd2[$i] = DB::connection($this->sql)->table('brg_trans_d')
                         ->where('kode_lokasi', $kode_lokasi)
                         ->where('no_bukti', $return[$i]['no_jual'])
                         ->update(['no_close'=>$id]);   
@@ -379,7 +379,7 @@ class CloseKasirController extends Controller
     
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
-                inner join brg_trans_dloc c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
+                inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
                 inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi
                 where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' group by a.akun_pdpt
                 ");
@@ -481,7 +481,7 @@ class CloseKasirController extends Controller
                         ->where('no_jual', $return[$i]['no_jual'])
                         ->update(['no_close'=>$id]);
 
-                        $upd2[$i] = DB::connection($this->sql)->table('brg_trans_dloc')
+                        $upd2[$i] = DB::connection($this->sql)->table('brg_trans_d')
                         ->where('kode_lokasi', $kode_lokasi)
                         ->where('no_bukti', $return[$i]['no_jual'])
                         ->update(['no_close'=>$id]);   

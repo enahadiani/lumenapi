@@ -332,7 +332,7 @@ class LaporanController extends Controller
             $sql="select a.no_jual,convert(varchar,a.tanggal,103) as tanggal,a.keterangan,a.nilai,b.nilai as nilai2,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama as nama_pp,d.nama as nama_user,e.nama as nama_gudang,a.nik_user as nik_kasir,a.tobyr,a.diskon
             from brg_jualpiu_dloc a 
             left join ( select no_bukti,kode_gudang,kode_lokasi,sum(case when dc='D' then -total else total end) as nilai
-                        from brg_trans_dloc 
+                        from brg_trans_d 
                         where kode_lokasi='".$kode_lokasi."' and form='BRGJUAL'
                         group by no_bukti,kode_gudang,kode_lokasi
                         ) b on a.no_jual=b.no_bukti and a.kode_lokasi=b.kode_lokasi
@@ -360,7 +360,7 @@ class LaporanController extends Controller
             }
 
             $sql2="select distinct a.no_bukti,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,a.jumlah,a.bonus,a.harga,a.diskon,(a.harga)*a.jumlah-a.diskon as total
-            from brg_trans_dloc a
+            from brg_trans_d a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi = '".$kode_lokasi."'  and a.no_bukti in ($nb) 
             order by a.no_bukti
@@ -523,7 +523,7 @@ class LaporanController extends Controller
             $sql="select a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama as nama_pp,d.nama as nama_user,e.nama as nama_gudang,a.nik_user as nik_kasir,sum(a.nilai) as nilai
             from brg_jualpiu_dloc a 
             left join ( select no_bukti,kode_gudang,kode_lokasi,sum(case when dc='D' then -total else total end) as nilai
-                        from brg_trans_dloc 
+                        from brg_trans_d 
                         where kode_lokasi='$kode_lokasi' and form='BRGJUAL'
                         group by no_bukti,kode_gudang,kode_lokasi
                         ) b on a.no_jual=b.no_bukti and a.kode_lokasi=b.kode_lokasi
@@ -551,7 +551,7 @@ class LaporanController extends Controller
             }
 
             $sql2="select c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total
-            from brg_trans_dloc a
+            from brg_trans_d a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
 			inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl)

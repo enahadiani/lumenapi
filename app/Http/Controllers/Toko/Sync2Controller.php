@@ -445,7 +445,7 @@ class Sync2Controller extends Controller
             //BRGTRANS
             $sql_brgtrans = "";
 
-            $brgTrans = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total from brg_trans_dloc where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and isnull(no_close,'-') <> '-' ");
+            $brgTrans = DB::connection($this->sql)->select("select no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total from brg_trans_d where kode_lokasi='$kode_lokasi' and isnull(id_sync,'-')='-' and isnull(no_close,'-') <> '-' ");
             $jum_brgtrans = count($brgTrans);
             if($jum_brgtrans > 0){
                 foreach($brgTrans as $row){
@@ -470,7 +470,7 @@ class Sync2Controller extends Controller
             update trans_m set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi'  and form='CLOSING';
             update trans_j set id_sync='$id' where isnull(id_sync,'-') = '-'  and kode_lokasi='$kode_lokasi'  and modul='BRGJUAL';
             update brg_jualpiu_dloc set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi';
-            update brg_trans_dloc set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi'; ";
+            update brg_trans_d set id_sync='$id' where isnull(id_sync,'-') = '-' and isnull(no_close,'-') <> '-'  and kode_lokasi='$kode_lokasi'; ";
 
             $success['transm']= ($sql_transm != "" ? $begin.$sql_transm.$commit : "");
             $success['transj'] = ($sql_transj != "" ? $begin.$sql_transj.$commit : "");

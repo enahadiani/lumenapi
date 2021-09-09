@@ -33,7 +33,7 @@ class DashboardController extends Controller
             $aju = DB::connection($this->sql)->select(" select top 5 a.kode_barang,a.nama,isnull(b.jumlah,0) as jumlah
             from brg_barang a
             left join (select a.kode_barang,a.kode_lokasi,count(a.kode_barang) as jumlah
-            from brg_trans_dloc a
+            from brg_trans_d a
             where a.kode_lokasi='$kode_lokasi' and a.modul='BRGJUAL'
             group by a.kode_barang,a.kode_lokasi
                     )b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
@@ -72,7 +72,7 @@ class DashboardController extends Controller
             }
 
             $col = DB::connection($this->sql)->select(" select distinct LTRIM(RTRIM(b.kode_klp)) as kode_klp
-            from brg_trans_dloc a
+            from brg_trans_d a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.modul='BRGJUAL' ");
             $col = json_decode(json_encode($col),true);
@@ -81,9 +81,9 @@ class DashboardController extends Controller
             foreach($col as $row){
                 $kode_klp= trim($row["kode_klp"],'\r\n');
                 $kode_klp= trim($kode_klp," ");
-                $sql[$kode_klp] = "select distinct a.tgl_ed,isnull(b.jumlah,0) as jumlah from brg_trans_dloc a
+                $sql[$kode_klp] = "select distinct a.tgl_ed,isnull(b.jumlah,0) as jumlah from brg_trans_d a
 				left join (select b.kode_klp,a.kode_lokasi,a.tgl_ed,count(a.kode_barang) as jumlah
-                from brg_trans_dloc a
+                from brg_trans_d a
                 inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi' and a.modul='BRGJUAL' and b.kode_klp='$kode_klp' 
                 group by b.kode_klp,a.kode_lokasi,a.tgl_ed
@@ -98,7 +98,7 @@ class DashboardController extends Controller
                 $series[] = array("name"=>$kode_klp,"data"=>$sellctg[$kode_klp]);
             }
 
-            $rs = DB::connection($this->sql)->select("select distinct tgl_ed from brg_trans_dloc where kode_lokasi='$kode_lokasi' and modul='BRGJUAL' order by tgl_ed
+            $rs = DB::connection($this->sql)->select("select distinct tgl_ed from brg_trans_d where kode_lokasi='$kode_lokasi' and modul='BRGJUAL' order by tgl_ed
             ");
             $ctg = array(); 
             foreach($rs as $row2){
@@ -634,7 +634,7 @@ class DashboardController extends Controller
             $rs = DB::connection($this->sql)->select("select top 20 a.kode_barang,a.nama,isnull(b.jumlah,0) as jumlah,0 as stok,0 as persen
             from brg_barang a
             left join (select a.kode_barang,a.kode_lokasi,sum(a.jumlah) as jumlah
-            from brg_trans_dloc a
+            from brg_trans_d a
             where a.kode_lokasi='$kode_lokasi' and a.modul='BRGJUAL' $filterper
             group by a.kode_barang,a.kode_lokasi
                     )b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi

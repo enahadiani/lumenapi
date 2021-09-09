@@ -161,7 +161,7 @@ class PenjualanController extends Controller
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
                 for($a=0; $a<count($request->kode_barang);$a++){
-                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_dloc (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a]));
+                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a]));
                 }	
             }
                 
@@ -251,7 +251,7 @@ class PenjualanController extends Controller
             $success["total_byr"]=$total_byr;
             $success["kembalian"]=$kembalian;
 
-            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_dloc a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_jual' and a.kode_lokasi='$kode_lokasi' ";
+            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_jual' and a.kode_lokasi='$kode_lokasi' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             

@@ -131,10 +131,12 @@ class PembelianController extends Controller
             $periode = date('Ym');
             $tahun = date('Y');
 
+            $kodeGudang = ($kode_lokasi == 100 ? 'GT1' : 'G01');
+
             $sql="select a.kode_barang,a.nama,a.hna as harga,a.barcode,a.sat_kecil as satuan,x.akun_pers as kode_akun,isnull(a.nilai_beli,0) as harga_seb,isnull(d.sakhir,0) as saldo 
             from ( select a.kode_barang,a.nama,a.hna,a.barcode,a.sat_kecil,a.nilai_beli,b.kode_gudang,a.kode_klp,a.kode_lokasi
 			from brg_barang a cross join brg_gudang b
-			where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and b.kode_gudang='G01'
+			where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang'
 			) a
             inner join brg_barangklp x on a.kode_klp=x.kode_klp and a.kode_lokasi=x.kode_lokasi 
             left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal from brg_sawal 
