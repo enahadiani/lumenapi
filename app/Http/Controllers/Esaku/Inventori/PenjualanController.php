@@ -172,7 +172,7 @@ class PenjualanController extends Controller
             update a set a.hpp=b.hpp 
             from brg_trans_dloc a 
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
-            where  a.no_bukti=? a.kode_lokasi=? ",array($id,$kode_lokasi));
+            where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;
