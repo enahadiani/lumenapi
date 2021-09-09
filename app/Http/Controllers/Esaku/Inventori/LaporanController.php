@@ -799,7 +799,7 @@ class LaporanController extends Controller
             }
 
             $sql2="select a.no_bukti,b.sat_kecil as satuan,c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
-            sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex, a.hpp as hpp,
+            sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex, sum(a.hpp) as hpp,
             '0' as stok_akhir, '-' as keterangan
             from brg_trans_dloc a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
