@@ -859,6 +859,7 @@ class PembelianController extends Controller
     
                 if ($request->total_trans > 0) {
                     $x=$x+1;
+                    $hut = floatval($request->total_trans)+floatval($request->total_ppn)-floatval($totDiskon);
                     $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                     values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     DB::connection($this->sql)->insert($insert7, [
@@ -872,8 +873,8 @@ class PembelianController extends Controller
                         $x,
                         $akunHutang,
                         'C',
-                        $request->total_trans,
-                        $request->total_trans,
+                        $hut,
+                        $hut,
                         'Hutang Vendor Pembelian',
                         'BRGBELI',
                         'BELIDISC',
