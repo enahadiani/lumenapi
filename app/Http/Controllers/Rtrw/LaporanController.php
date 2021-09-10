@@ -271,6 +271,76 @@ class LaporanController extends Controller
         return response()->json($success, $this->successStatus);
     }
 
+
+    function getSuratPengantar(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('tanggal','no_surat');
+            $db_col_name = array('a.tanggal','a.no_surat');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql = "select a.no_surat,a.nomor,convert(varchar,a.tanggal,103) as tanggal,a.id_warga,a.keperluan,a.kode_lokasi,a.kode_pp,a.tgl_input,a.nik_user,a.nama_rt,a.nama_rw,a.no_app_rt,a.no_app_rw,c.alamat,b.kode_jk as jk,b.tempat_lahir,convert(varchar,b.tgl_lahir,103) as tgl_lahir,b.kode_agama as agama,b.kode_kerja as pekerjaan,b.kode_sts_nikah as sts_nikah,b.nama,b.nik,b.kode_sts_wni as sts_wni
+            from rt_surat_antar a 
+            inner join rt_warga_d b on a.id_warga=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            inner join rt_rumah c on b.no_rumah=c.kode_rumah and b.kode_lokasi=c.kode_lokasi
+            $where ";
+            $success['sql'] = $sql;
+            $res2 = DB::connection($this->sql)->select($sql);
+            $res2 = json_decode(json_encode($res2),true);
+
+            $reslok = DB::connection($this->sql)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email,a.logo
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
+            
+            if(count($res2) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 
 }
