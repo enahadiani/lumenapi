@@ -762,7 +762,7 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama as nama_pp,d.nama as nama_user,e.nama as nama_gudang,a.nik_user as nik_kasir,sum(a.nilai) as nilai
+            $sql="select a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama as nama_pp,d.nama as nama_user,e.nama as nama_gudang,a.nik_user as nik_kasir,sum(a.nilai) as nilai,a.no_close
             from brg_jualpiu_dloc a 
             left join ( select no_bukti,kode_gudang,kode_lokasi,sum(case when dc='D' then -total else total end) as nilai
                         from brg_trans_d 
@@ -773,7 +773,7 @@ class LaporanController extends Controller
             left join karyawan d on a.nik_user=d.nik and a.kode_lokasi=d.kode_lokasi
             left join brg_gudang e on b.kode_gudang=e.kode_gudang and b.kode_lokasi=e.kode_lokasi
             $where
-            group by a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama,d.nama,e.nama,a.nik_user";
+            group by a.tanggal,b.kode_gudang,a.periode,a.nik_user,a.kode_pp,c.nama,d.nama,e.nama,a.nik_user,a.no_close";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
@@ -798,14 +798,24 @@ class LaporanController extends Controller
                 $nik_filter = "and c.nik_user = '".$request->input($col_array[2])[1]."'";
             }
 
-            $sql2="select a.no_bukti,b.sat_kecil as satuan,c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
+            // $sql2="select a.no_bukti,b.sat_kecil as satuan,c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
+            // sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex, sum(a.hpp) as hpp,
+            // '0' as stok_akhir, '-' as keterangan
+            // from brg_trans_d a
+            // inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            // inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
+            // where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
+            // group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,a.no_bukti,b.sat_kecil
+            // order by c.tanggal";
+            $sql2 = "select b.sat_kecil as satuan,c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
             sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex, sum(a.hpp) as hpp,
-            '0' as stok_akhir, '-' as keterangan
+            isnull(sum(d.so_akhir), 0) as stok_akhir, '-' as keterangan
             from brg_trans_d a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
+			left join brg_lap_harian d on a.kode_lokasi=d.kode_lokasi and a.no_close=d.no_bukti and a.kode_barang=d.kode_barang
             where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
-            group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,a.no_bukti,b.sat_kecil
+            group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,b.sat_kecil
             order by c.tanggal";
             
             $res2 = DB::connection($this->sql)->select($sql2);
