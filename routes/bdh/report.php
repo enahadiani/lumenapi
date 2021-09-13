@@ -16,8 +16,12 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 
-$router->group(['middleware' => 'auth:toko'], function () use ($router) {
-    
+$router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
+    $router->get('filter-periode','Bdh\FilterController@DataPeriode');
+    $router->get('filter-nover','Bdh\FilterController@DataNoBuktiVerifikasi');
+
+    $router->get('lap-verifikasi','Bdh\LaporanController@DataVerifikasi');
+
 });
 
 
