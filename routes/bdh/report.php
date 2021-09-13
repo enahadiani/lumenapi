@@ -19,11 +19,15 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-periodever','Bdh\FilterController@DataPeriodeVerifikasi');
     $router->get('filter-periodespb','Bdh\FilterController@DataPeriodeSPB');
+    $router->get('filter-periodebayar','Bdh\FilterController@DataPeriodeBayar');
+    
     $router->get('filter-nover','Bdh\FilterController@DataNoBuktiVerifikasi');
     $router->get('filter-nospb','Bdh\FilterController@DataNoBuktiSPB');
+    $router->get('filter-nobayar','Bdh\FilterController@DataNoBuktiBayar');
 
     $router->get('lap-verifikasi','Bdh\LaporanController@DataVerifikasi');
     $router->get('lap-spb','Bdh\LaporanController@DataSPB');
+    $router->get('lap-bayar','Bdh\LaporanController@DataPembayaran');
 
 });
 

@@ -19,6 +19,101 @@ class LaporanController extENDs Controller
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    public function DataPembayaran(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode', 'no_bukti');
+            $db_col_name = array('a.periode', 'a.no_kas');
+            $where = "where a.kode_lokasi='".$kode_lokasi."'";
+
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($r->input($col_array[$i])[0])){
+                    if($r->input($col_array[$i])[0] == "range" AND ISSET($r->input($col_array[$i])[1]) AND ISSET($r->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$r->input($col_array[$i])[1]."' AND '".$r->input($col_array[$i])[2]."') ";
+                    }else if($r->input($col_array[$i])[0] == "=" AND ISSET($r->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$r->input($col_array[$i])[1]."' ";
+                    }else if($r->input($col_array[$i])[0] == "in" AND ISSET($r->input($col_array[$i])[1])){
+                        $tmp = explode(",",$r->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $select1 = "SELECT a.no_kas, a.no_dokumen, a.kode_lokasi, a.periode, a.tanggal, 
+            CONVERT(varchar,a.tanggal,103) AS tanggal1, a.keterangan, d.nama as nama_lokasi, 
+            a.nik_buat, b.nama as nama_buat, b.jabatan as jabatan_buat, a.nik_app, c.nama as nama_setuju, 
+            c.jabatan as jabatan_setuju, d.kota, a.nilai, d.logo, d.alamat
+            FROM kas_m a 
+            INNER JOIN lokasi d ON a.kode_lokasi=d.kode_lokasi
+            LEFT JOIN karyawan b ON a.nik_buat=b.nik AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN karyawan c ON a.nik_app=c.nik AND a.kode_lokasi=c.kode_lokasi
+            $where";
+
+            $res1 = DB::connection($this->db)->select($select1);
+            $res1 = json_decode(json_encode($res1),true);
+
+            $no_kas = "";
+            $tahun = "";
+            $i=0;
+            foreach($res1 as $row) { 
+                if($i == 0) {
+                    $tahun = "'".substr($row['periode'], 0, 4)."'";
+                    $no_kas = "'".$row['no_kas']."'";
+                } else {
+                    $tahun = ", '".substr($row['periode'], 0, 4)."'";
+                    $no_kas .= ", '".$row['no_kas']."'";
+                }
+                $i++;
+            }
+
+            $select2 = "SELECT a.kode_akun, a.no_dokumen, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.kode_cf, 
+            isnull(c.nama,'-') as nama_drk, 
+            CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet, 
+            CASE dc when 'C' THEN nilai ELSE 0 END AS kredit
+            FROM kas_j a 
+            INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+			LEFT JOIN drk c ON a.kode_drk=c.kode_drk AND a.kode_lokasi=c.kode_lokasi AND c.tahun in ($tahun)
+			WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
+			ORDER BY a.no_dokumen,a.no_urut ";
+
+            $res2 = DB::connection($this->db)->select($select2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;  
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function DataSPB(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
