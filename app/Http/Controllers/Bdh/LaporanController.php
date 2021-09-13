@@ -19,6 +19,105 @@ class LaporanController extENDs Controller
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    public function DataSPB(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode', 'no_bukti');
+            $db_col_name = array('a.periode', 'a.no_spb');
+            $where = "where a.kode_lokasi='".$kode_lokasi."'";
+
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($r->input($col_array[$i])[0])){
+                    if($r->input($col_array[$i])[0] == "range" AND ISSET($r->input($col_array[$i])[1]) AND ISSET($r->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$r->input($col_array[$i])[1]."' AND '".$r->input($col_array[$i])[2]."') ";
+                    }else if($r->input($col_array[$i])[0] == "=" AND ISSET($r->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$r->input($col_array[$i])[1]."' ";
+                    }else if($r->input($col_array[$i])[0] == "in" AND ISSET($r->input($col_array[$i])[1])){
+                        $tmp = explode(",",$r->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $select1 = "SELECT a.no_spb, a.periode, a.tanggal, a.keterangan, f.kota, a.nilai, a.nik_user, 
+            b.nama as nama_user, a.nik_bdh, c.nama as nama_bdh, a.nik_sah as nik_ver, d.nama as nama_ver, a.nik_fiat, 
+            e.nama as nama_fiat, CONVERT(varchar,a.tanggal,103) as tgl, f.logo, f.alamat, f.nama as nama_lokasi, f.kota
+            FROM spb_m a 
+            INNER JOIN lokasi f ON a.kode_lokasi=f.kode_lokasi
+            LEFT JOIN karyawan b ON a.nik_user=b.nik AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN karyawan c ON a.nik_bdh=c.nik AND a.kode_lokasi=c.kode_lokasi
+            LEFT JOIN karyawan d ON a.nik_sah=d.nik AND a.kode_lokasi=d.kode_lokasi
+            LEFT JOIN karyawan e ON a.nik_fiat=e.nik AND a.kode_lokasi=e.kode_lokasi
+            $where";
+
+            $res1 = DB::connection($this->db)->select($select1);
+            $res1 = json_decode(json_encode($res1),true);
+
+            $no_spb = "";
+            $i=0;
+            foreach($res1 as $row) { 
+                if($i == 0) {
+                    $no_spb = "'".$row['no_spb']."'";
+                } else {
+                    $no_spb .= ", '".$row['no_spb']."'";
+                }
+                $i++;
+            }
+
+            $select2 = "SELECT a.no_pb, a.tanggal, a.keterangan, CONVERT(varchar,a.tanggal,103) AS tgl, 
+            ISNULL(b.nilai,0) + ISNULL(b.nilai2,0) AS nilai, ISNULL(b.npajak,0) AS npajak, 
+            (ISNULL(b.nilai,0) + ISNULL(b.nilai2,0)) - ISNULL(b.npajak,0) AS netto
+            FROM pbh_pb_m a 
+            LEFT JOIN (SELECT a.no_pb,a.kode_lokasi,
+                SUM(CASE WHEN a.kode_akun IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105') AND a.dc='C' THEN a.nilai ELSE 0 END) AS npajak, 
+                SUM(CASE WHEN a.kode_akun NOT IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105')  THEN a.nilai ELSE 0 END) AS nilai,
+                SUM(CASE WHEN a.kode_akun IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105') AND a.dc='D' then a.nilai ELSE 0 END) AS nilai2
+                FROM pbh_pb_j a
+                inner join pbh_pb_m b on a.no_pb=b.no_pb AND a.kode_lokasi=b.kode_lokasi
+                WHERE b.no_spb IN ($no_spb) AND b.kode_lokasi='03'
+                GROUP BY a.no_pb,a.kode_lokasi
+            ) b ON a.no_pb=b.no_pb AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.no_spb IN ($no_spb) AND a.kode_lokasi='03'
+            ORDER BY a.no_pb";
+
+            $res2 = DB::connection($this->db)->select($select2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;  
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function DataVerifikasi(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
