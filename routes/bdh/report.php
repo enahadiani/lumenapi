@@ -34,8 +34,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-bayar','Bdh\LaporanController@DataPembayaran');
     $router->get('lap-transbank','Bdh\LaporanController@DataTransferBank');
     $router->get('lap-jurfinalpertanggungpanjar','Bdh\LaporanController@DataJurnalFinalPertanggungPanjar');
-    $router->get('lap-pb','Bdh\LaporanController@DataPB');
-    $router->get('lap-posisipertanggungpb','Bdh\LaporanController@DataPosisiPertanggunganPB');
+    $router->get('lap-pb','Bdh\LaporanBebanController@DataPB');
+    $router->get('lap-posisipertanggungpb','Bdh\LaporanBebanController@DataPosisiPertanggunganPB');
 
 });
 
