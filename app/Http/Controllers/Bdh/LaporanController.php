@@ -66,27 +66,29 @@ class LaporanController extends Controller
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_kas = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $no_kas = "'".$row['no_kas']."'";
-                } else {
-                    $no_kas .= ", '".$row['no_kas']."'";
+            if(count($res1) > 0) {
+                $no_kas = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    if($i == 0) {
+                        $no_kas = "'".$row['no_kas']."'";
+                    } else {
+                        $no_kas .= ", '".$row['no_kas']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT a.no_kas, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, 
+                CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet, 
+                CASE dc WHEN 'C' THEN nilai ELSE 0 END AS kredit
+                FROM kas_j a 
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
+                ORDER BY a.no_urut ";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
             }
-
-            $select2 = "SELECT a.no_kas, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, 
-            CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet, 
-            CASE dc WHEN 'C' THEN nilai ELSE 0 END AS kredit
-            FROM kas_j a 
-            INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
-			WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
-			ORDER BY a.no_urut ";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -159,27 +161,29 @@ class LaporanController extends Controller
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_spb = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $no_spb = "'".$row['no_spb']."'";
-                } else {
-                    $no_spb .= ", '".$row['no_spb']."'";
+            if(count($res1) > 0) {
+                $no_spb = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    if($i == 0) {
+                        $no_spb = "'".$row['no_spb']."'";
+                    } else {
+                        $no_spb .= ", '".$row['no_spb']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT a.no_spb, a.no_pb, 
+                CASE WHEN SUBSTRING(b.no_rek,1,1) = '0' THEN ''''+ b.no_rek ELSE  ''''+ b.no_rek END AS no_rek, 
+                b.nilai, b.nama_rek, b.bank, a.keterangan AS berita
+                FROM pbh_pb_m a 
+                INNER JOIN pbh_rek b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_spb IN ($no_spb) AND a.kode_lokasi='".$kode_lokasi."'
+                ORDER BY b.bank, b.nama_rek";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
             }
-
-            $select2 = "SELECT a.no_spb, a.no_pb, 
-            CASE WHEN SUBSTRING(b.no_rek,1,1) = '0' THEN ''''+ b.no_rek ELSE  ''''+ b.no_rek END AS no_rek, 
-            b.nilai, b.nama_rek, b.bank, a.keterangan AS berita
-            FROM pbh_pb_m a 
-            INNER JOIN pbh_rek b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.no_spb IN ($no_spb) AND a.kode_lokasi='".$kode_lokasi."'
-            ORDER BY b.bank, b.nama_rek";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -249,32 +253,34 @@ class LaporanController extends Controller
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_kas = "";
-            $tahun = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $tahun = "'".substr($row['periode'], 0, 4)."'";
-                    $no_kas = "'".$row['no_kas']."'";
-                } else {
-                    $tahun = ", '".substr($row['periode'], 0, 4)."'";
-                    $no_kas .= ", '".$row['no_kas']."'";
+            if(count($res1) > 0) { 
+                $no_kas = "";
+                $tahun = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    if($i == 0) {
+                        $tahun = "'".substr($row['periode'], 0, 4)."'";
+                        $no_kas = "'".$row['no_kas']."'";
+                    } else {
+                        $tahun = ", '".substr($row['periode'], 0, 4)."'";
+                        $no_kas .= ", '".$row['no_kas']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT a.no_kas, a.kode_akun, a.no_dokumen, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.kode_cf, 
+                isnull(c.nama,'-') as nama_drk, 
+                CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet, 
+                CASE dc when 'C' THEN nilai ELSE 0 END AS kredit
+                FROM kas_j a 
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                LEFT JOIN drk c ON a.kode_drk=c.kode_drk AND a.kode_lokasi=c.kode_lokasi AND c.tahun in ($tahun)
+                WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
+                ORDER BY a.no_dokumen,a.no_urut ";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
             }
-
-            $select2 = "SELECT a.no_kas, a.kode_akun, a.no_dokumen, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.kode_cf, 
-            isnull(c.nama,'-') as nama_drk, 
-            CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet, 
-            CASE dc when 'C' THEN nilai ELSE 0 END AS kredit
-            FROM kas_j a 
-            INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
-			LEFT JOIN drk c ON a.kode_drk=c.kode_drk AND a.kode_lokasi=c.kode_lokasi AND c.tahun in ($tahun)
-			WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
-			ORDER BY a.no_dokumen,a.no_urut ";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -345,35 +351,37 @@ class LaporanController extends Controller
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_spb = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $no_spb = "'".$row['no_spb']."'";
-                } else {
-                    $no_spb .= ", '".$row['no_spb']."'";
+            if(count($res1) > 0) { 
+                $no_spb = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    if($i == 0) {
+                        $no_spb = "'".$row['no_spb']."'";
+                    } else {
+                        $no_spb .= ", '".$row['no_spb']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT a.no_spb, a.no_pb, a.tanggal, a.keterangan, CONVERT(varchar,a.tanggal,103) AS tgl, 
+                ISNULL(b.nilai,0) + ISNULL(b.nilai2,0) AS nilai, ISNULL(b.npajak,0) AS npajak, 
+                (ISNULL(b.nilai,0) + ISNULL(b.nilai2,0)) - ISNULL(b.npajak,0) AS netto
+                FROM pbh_pb_m a 
+                LEFT JOIN (SELECT a.no_pb,a.kode_lokasi,
+                    SUM(CASE WHEN a.kode_akun IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105') AND a.dc='C' THEN a.nilai ELSE 0 END) AS npajak, 
+                    SUM(CASE WHEN a.kode_akun NOT IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105')  THEN a.nilai ELSE 0 END) AS nilai,
+                    SUM(CASE WHEN a.kode_akun IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105') AND a.dc='D' then a.nilai ELSE 0 END) AS nilai2
+                    FROM pbh_pb_j a
+                    inner join pbh_pb_m b on a.no_pb=b.no_pb AND a.kode_lokasi=b.kode_lokasi
+                    WHERE b.no_spb IN ($no_spb) AND b.kode_lokasi='".$kode_lokasi."'
+                    GROUP BY a.no_pb,a.kode_lokasi
+                ) b ON a.no_pb=b.no_pb AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_spb IN ($no_spb) AND a.kode_lokasi='".$kode_lokasi."'
+                ORDER BY a.no_pb";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
             }
-
-            $select2 = "SELECT a.no_spb, a.no_pb, a.tanggal, a.keterangan, CONVERT(varchar,a.tanggal,103) AS tgl, 
-            ISNULL(b.nilai,0) + ISNULL(b.nilai2,0) AS nilai, ISNULL(b.npajak,0) AS npajak, 
-            (ISNULL(b.nilai,0) + ISNULL(b.nilai2,0)) - ISNULL(b.npajak,0) AS netto
-            FROM pbh_pb_m a 
-            LEFT JOIN (SELECT a.no_pb,a.kode_lokasi,
-                SUM(CASE WHEN a.kode_akun IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105') AND a.dc='C' THEN a.nilai ELSE 0 END) AS npajak, 
-                SUM(CASE WHEN a.kode_akun NOT IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105')  THEN a.nilai ELSE 0 END) AS nilai,
-                SUM(CASE WHEN a.kode_akun IN ('1132103','2121101','2121102','4960001','2121103','2121107','2121105') AND a.dc='D' then a.nilai ELSE 0 END) AS nilai2
-                FROM pbh_pb_j a
-                inner join pbh_pb_m b on a.no_pb=b.no_pb AND a.kode_lokasi=b.kode_lokasi
-                WHERE b.no_spb IN ($no_spb) AND b.kode_lokasi='".$kode_lokasi."'
-                GROUP BY a.no_pb,a.kode_lokasi
-            ) b ON a.no_pb=b.no_pb AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.no_spb IN ($no_spb) AND a.kode_lokasi='".$kode_lokasi."'
-            ORDER BY a.no_pb";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
