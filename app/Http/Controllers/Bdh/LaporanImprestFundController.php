@@ -62,7 +62,7 @@ class LaporanImprestFundController extends Controller {
             LEFT JOIN karyawan f ON a.nik_user=f.nik AND a.kode_lokasi=f.kode_lokasi
             LEFT JOIN karyawan g ON a.nik_app=g.nik AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN lokasi h ON a.kode_lokasi=h.kode_lokasi
-            $where
+            $where AND a.modul IN ('IFREIM','IFCLOSE')
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
