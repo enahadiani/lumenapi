@@ -17,6 +17,72 @@ class LaporanPanjarController extends Controller {
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    public function DataSaldoPanjar(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode', 'no_bukti');
+            $db_col_name = array('a.periode', 'a.no_kas');
+            $where = "where a.kode_lokasi='".$kode_lokasi."'";
+
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($r->input($col_array[$i])[0])){
+                    if($r->input($col_array[$i])[0] == "range" AND ISSET($r->input($col_array[$i])[1]) AND ISSET($r->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$r->input($col_array[$i])[1]."' AND '".$r->input($col_array[$i])[2]."') ";
+                    }else if($r->input($col_array[$i])[0] == "=" AND ISSET($r->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$r->input($col_array[$i])[1]."' ";
+                    }else if($r->input($col_array[$i])[0] == "in" AND ISSET($r->input($col_array[$i])[1])){
+                        $tmp = explode(",",$r->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $select1 = "SELECT a.no_pj, a.no_kas, CONVERT(varchar,a.tanggal,103) AS tgl,a.keterangan,a.nilai,
+            a.kode_pp, c.nama AS nama_pp, a.nik_pengaju, d.nama,
+            b.no_ptg, b.no_kas AS kas_ptg, ISNULL(b.nilai,0) + ISNULL(b.nilai_kas,0) AS nilai_ptg
+            FROM panjar_m a
+            LEFT JOIN ptg_m b ON a.no_pj=b.no_pj AND a.kode_lokasi=b.kode_lokasi
+            INNER JOIN pp c ON a.kode_pp=c.kode_pp AND a.kode_lokasi=c.kode_lokasi
+            INNER JOIN karyawan d ON a.nik_pengaju=d.nik AND a.kode_lokasi=d.kode_lokasi
+            $where
+            ORDER BY a.no_pj";
+
+            $res1 = DB::connection($this->db)->select($select1);
+            $res1 = json_decode(json_encode($res1),true);
+            
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;  
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function DataPosisiTanggungPanjar(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
