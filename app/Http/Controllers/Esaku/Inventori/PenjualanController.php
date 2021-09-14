@@ -173,6 +173,8 @@ class PenjualanController extends Controller
             from brg_trans_d a 
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
+
+            $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
                 
             DB::connection($this->sql)->commit();
             $success['status'] = true;

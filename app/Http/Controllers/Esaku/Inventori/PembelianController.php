@@ -576,7 +576,7 @@ class PembelianController extends Controller
             }	
 
             $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,? ", array($periode,$kode_lokasi,$nik));
-
+            $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
             DB::connection($this->sql)->commit();
@@ -964,6 +964,7 @@ class PembelianController extends Controller
                 }
                 
                 $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,? ", array($periode,$kode_lokasi,$nik));
+                $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
     
                 DB::connection($this->sql)->commit();
                 $tmp = "Data Pembelian berhasil diubah";
