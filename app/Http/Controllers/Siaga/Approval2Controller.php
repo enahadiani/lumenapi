@@ -222,7 +222,7 @@ class Approval2Controller extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date
+            $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
             from apv_flow a
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
             inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
