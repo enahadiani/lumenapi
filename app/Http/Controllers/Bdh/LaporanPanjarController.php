@@ -140,14 +140,7 @@ class LaporanPanjarController extends Controller {
             LEFT JOIN kas_m g ON a.no_kas=g.no_kas AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN pbh_ver_m h ON a.no_fisik=h.no_ver AND a.kode_lokasi=h.kode_lokasi
             LEFT JOIN pbh_ver_m i ON a.no_pajak=i.no_ver AND a.kode_lokasi=i.kode_lokasi
-            left join (
-                SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok 
-                FROM pbh_pb_m a
-                INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where
-                GROUP BY b.no_bukti, b.kode_lokasi
-            ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where
+            $where AND a.modul='PJPTG'
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
@@ -215,7 +208,7 @@ class LaporanPanjarController extends Controller {
             LEFT JOIN lokasi h ON a.kode_lokasi=h.kode_lokasi
             LEFT JOIN ptg_m b ON a.no_pb=b.no_ptg AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN panjar_m c ON b.no_pj=c.no_pj AND b.kode_lokasi=c.kode_lokasi
-            $where
+            $where AND a.modul='PJPTG'
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
@@ -322,10 +315,10 @@ class LaporanPanjarController extends Controller {
                 SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok 
                 FROM pbh_pb_m a
                 INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where
+                $where AND a.modul='PJAJU'
                 GROUP BY b.no_bukti, b.kode_lokasi
             ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where
+            $where AND a.modul='PJAJU'
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
@@ -391,7 +384,7 @@ class LaporanPanjarController extends Controller {
             INNER JOIN lokasi d ON a.kode_lokasi=d.kode_lokasi
             LEFT JOIN karyawan b ON a.nik_buat=b.nik AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN karyawan c ON a.nik_app=c.nik AND a.kode_lokasi=c.kode_lokasi
-            $where";
+            $where AND a.modul='KBPJCAIR'";
 
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);

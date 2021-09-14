@@ -77,10 +77,10 @@ class LaporanBebanController extends Controller {
                 SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok
                 FROM pbh_pb_m a
                 INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where
+                $where AND a.modul IN ('PBBAU','PBADK')
                 GROUP BY b.no_bukti, b.kode_lokasi
             ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where
+            $where AND a.modul IN ('PBBAU','PBADK')
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
@@ -146,7 +146,7 @@ class LaporanBebanController extends Controller {
             LEFT JOIN karyawan f ON a.nik_user=f.nik AND a.kode_lokasi=f.kode_lokasi
             LEFT JOIN karyawan g ON a.nik_app=g.nik AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN lokasi h ON a.kode_lokasi=h.kode_lokasi
-            $where
+            $where AND a.modul IN ('PBBAU','PBADK')
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
