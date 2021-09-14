@@ -77,10 +77,10 @@ class LaporanBebanController extends Controller {
                 SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok
                 FROM pbh_pb_m a
                 INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where
+                $where AND a.modul IN ('PBBAU','PBADK')
                 GROUP BY b.no_bukti, b.kode_lokasi
             ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where
+            $where AND a.modul IN ('PBBAU','PBADK')
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
@@ -146,45 +146,47 @@ class LaporanBebanController extends Controller {
             LEFT JOIN karyawan f ON a.nik_user=f.nik AND a.kode_lokasi=f.kode_lokasi
             LEFT JOIN karyawan g ON a.nik_app=g.nik AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN lokasi h ON a.kode_lokasi=h.kode_lokasi
-            $where
+            $where AND a.modul IN ('PBBAU','PBADK')
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_pb = "";
-            $tahun = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $no_pb = "'".$row['no_pb']."'";
-                    $tahun = "'".$row['tahun']."'";
-                } else {
-                    $no_pb .= ", '".$row['no_pb']."'";
-                    $tahun .= ", '".$row['tahun']."'";
+            if(count($res1) > 0) { 
+                $no_pb = "";
+                $tahun = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    if($i == 0) {
+                        $no_pb = "'".$row['no_pb']."'";
+                        $tahun = "'".$row['tahun']."'";
+                    } else {
+                        $no_pb .= ", '".$row['no_pb']."'";
+                        $tahun .= ", '".$row['tahun']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT a.no_pb, a.kode_akun, a.kode_drk, a.kode_pp, a.kode_lokasi,
+                b.nama AS nama_pp, c.nama AS nama_akun, d.nama AS nama_drk, ISNULL(a.nilai,0) AS nilai
+                FROM (SELECT a.no_pb, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
+                FROM pbh_pb_j a 
+                WHERE a.no_pb IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."'
+                GROUP BY a.no_pb, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
+                UNION ALL
+                SELECT a.no_ptg, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
+                FROM ptg_j a
+                WHERE a.no_ptg in ($no_pb) and a.kode_lokasi='".$kode_lokasi."' AND a.jenis='Beban'
+                GROUP BY a.no_ptg, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
+                )a
+                INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi 
+                INNER JOIN masakun c ON a.kode_akun=c.kode_akun AND a.kode_lokasi=c.kode_lokasi 
+                LEFT JOIN drk d ON a.kode_drk=d.kode_drk AND a.kode_lokasi=d.kode_lokasi AND d.tahun IN ($tahun) 
+                ORDER BY a.kode_akun";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
             }
-
-            $select2 = "SELECT a.no_pb, a.kode_akun, a.kode_drk, a.kode_pp, a.kode_lokasi,
-            b.nama AS nama_pp, c.nama AS nama_akun, d.nama AS nama_drk, ISNULL(a.nilai,0) AS nilai
-            FROM (SELECT a.no_pb, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
-            FROM pbh_pb_j a 
-            WHERE a.no_pb IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."'
-            GROUP BY a.no_pb, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
-            UNION ALL
-            SELECT a.no_ptg, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
-            FROM ptg_j a
-            WHERE a.no_ptg in ($no_pb) and a.kode_lokasi='".$kode_lokasi."' AND a.jenis='Beban'
-            GROUP BY a.no_ptg, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
-            )a
-            INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi 
-            INNER JOIN masakun c ON a.kode_akun=c.kode_akun AND a.kode_lokasi=c.kode_lokasi 
-            LEFT JOIN drk d ON a.kode_drk=d.kode_drk AND a.kode_lokasi=d.kode_lokasi AND d.tahun IN ($tahun) 
-            ORDER BY a.kode_akun";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;

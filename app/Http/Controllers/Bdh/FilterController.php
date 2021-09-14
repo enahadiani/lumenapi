@@ -19,6 +19,38 @@ class FilterController extENDs Controller
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    public function DataNIK(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $select = "SELECT a.nik, b.nama FROM if_nik a
+            INNER JOIN karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi 
+            WHERE a.kode_lokasi = '".$kode_lokasi."'";
+
+            $res = DB::connection($this->db)->select($select);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function DataNoBuktiPanjar(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
