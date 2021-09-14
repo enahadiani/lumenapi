@@ -356,7 +356,7 @@ class LaporanController extends Controller
                 $i++;
             }
 
-            $select2 = "SELECT a.no_pb, a.tanggal, a.keterangan, CONVERT(varchar,a.tanggal,103) AS tgl, 
+            $select2 = "SELECT a.no_spb, a.no_pb, a.tanggal, a.keterangan, CONVERT(varchar,a.tanggal,103) AS tgl, 
             ISNULL(b.nilai,0) + ISNULL(b.nilai2,0) AS nilai, ISNULL(b.npajak,0) AS npajak, 
             (ISNULL(b.nilai,0) + ISNULL(b.nilai2,0)) - ISNULL(b.npajak,0) AS netto
             FROM pbh_pb_m a 

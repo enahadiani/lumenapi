@@ -166,17 +166,17 @@ class LaporanBebanController extends Controller {
                 $i++;
             }
 
-            $select2 = "SELECT a.kode_akun, a.kode_drk, a.kode_pp, a.kode_lokasi,
+            $select2 = "SELECT a.no_pb, a.kode_akun, a.kode_drk, a.kode_pp, a.kode_lokasi,
             b.nama AS nama_pp, c.nama AS nama_akun, d.nama AS nama_drk, ISNULL(a.nilai,0) AS nilai
-            FROM (SELECT a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
+            FROM (SELECT a.no_pb, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
             FROM pbh_pb_j a 
             WHERE a.no_pb IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."'
-            GROUP BY a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
+            GROUP BY a.no_pb, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
             UNION ALL
-            SELECT a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
+            SELECT a.no_ptg, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk, SUM(a.nilai) as nilai
             FROM ptg_j a
             WHERE a.no_ptg in ($no_pb) and a.kode_lokasi='".$kode_lokasi."' AND a.jenis='Beban'
-            GROUP BY a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
+            GROUP BY a.no_ptg, a.kode_akun, a.kode_lokasi, a.kode_pp, a.kode_drk
             )a
             INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi 
             INNER JOIN masakun c ON a.kode_akun=c.kode_akun AND a.kode_lokasi=c.kode_lokasi 
