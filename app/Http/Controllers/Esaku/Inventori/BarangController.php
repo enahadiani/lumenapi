@@ -274,17 +274,10 @@ class BarangController extends Controller
                 
             }
             
-            $del = DB::connection($this->sql)->table('brg_barang')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('kode_barang', $request->kode_barang)
-            ->delete();
-
-            $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) 
-            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+            $update = "update brg_barang set nama = ?, sat_kecil= ?,sat_besar=?,jml_sat=?,hna=?,pabrik=?,flag_gen=?,flag_aktif=?,ss=?,sm1=?,sm2=?,mm1=?,mm2=?,fm1=?,fm2=?,kode_klp=?,file_gambar=?,barcode=?,hrg_satuan=?,ppn=?,profit=?,tgl_input=getdate() 
+            where kode_barang=? and kode_lokasi=?";
             $ins = DB::connection($this->sql)->insert($insert, [
-                $request->kode_barang,
                 $request->nama,
-                $kode_lokasi,
                 $request->sat_kecil,
                 $request->sat_besar,
                 $request->jml_sat,
@@ -304,7 +297,9 @@ class BarangController extends Controller
                 $request->barcode,
                 $request->hrg_satuan,
                 $request->ppn,
-                $request->profit
+                $request->profit,
+                $request->kode_barang,
+                $kode_lokasi
             ]);
             
             DB::connection($this->sql)->commit();
