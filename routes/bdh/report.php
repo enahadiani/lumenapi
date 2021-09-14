@@ -23,6 +23,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-periodepb','Bdh\FilterController@DataPeriodePB');
     $router->get('filter-periodepanjar','Bdh\FilterController@DataPeriodePanjar');
     $router->get('filter-periode','Bdh\FilterController@DataPeriode');
+    $router->get('filter-nik','Bdh\FilterController@DataNIK');
     
     $router->get('filter-nover','Bdh\FilterController@DataNoBuktiVerifikasi');
     $router->get('filter-nospb','Bdh\FilterController@DataNoBuktiSPB');
@@ -50,6 +51,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-bukaif','Bdh\LaporanImprestFundController@DataPembukaanIF');
     $router->get('lap-imburseif','Bdh\LaporanImprestFundController@DataImburseIF');
     $router->get('lap-posisiimburseif','Bdh\LaporanImprestFundController@DataPosisiImburseIF');
+    $router->get('lap-kartuif','Bdh\LaporanImprestFundController@DataKartuIF');
 
 });
 

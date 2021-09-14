@@ -17,6 +17,110 @@ class LaporanImprestFundController extends Controller {
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    public function DataKartuIF(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('periode', 'nik');
+            $db_col_name = array('a.periode', 'a.nik');
+            $where = "where a.kode_lokasi='".$kode_lokasi."'";
+
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($r->input($col_array[$i])[0])){
+                    if($r->input($col_array[$i])[0] == "range" AND ISSET($r->input($col_array[$i])[1]) AND ISSET($r->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$r->input($col_array[$i])[1]."' AND '".$r->input($col_array[$i])[2]."') ";
+                    }else if($r->input($col_array[$i])[0] == "=" AND ISSET($r->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$r->input($col_array[$i])[1]."' ";
+                    }else if($r->input($col_array[$i])[0] == "in" AND ISSET($r->input($col_array[$i])[1])){
+                        $tmp = explode(",",$r->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $select1 = "SELECT distinct a.nik, b.nama, a.kode_pp, c.nama as nama_pp, a.periode 
+            FROM if_nik a 
+            INNER JOIN karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            INNER JOIN pp c ON a.kode_pp=c.kode_pp AND a.kode_lokasi=c.kode_lokasi
+            $where
+            ORDER BY a.nik";
+
+            $res1 = DB::connection($this->db)->select($select1);
+            $res1 = json_decode(json_encode($res1),true);
+
+            if(count($res1) > 0) {
+                $nik = "";
+                $tahun = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    if($i == 0) {
+                        $nik = "'".$row['nik']."'";
+                        $tahun = "'".substr($row['periode'], 0, 4)."'";
+                    } else {
+                        $nik .= ", '".$row['nik']."'";
+                        $tahun = ", '".substr($row['periode'], 0, 4)."'";
+                    }
+                    $i++;
+                }
+
+                $select2 = "SELECT a.nik, a.no_kas AS no_bukti, b.tanggal, b.keterangan, b.nilai AS debet, 0 AS kredit, 
+                CONVERT(varchar,b.tanggal,103) AS tgl, 1 AS nu 
+                FROM if_nik a
+                INNER JOIN kas_m b ON a.no_kas=b.no_kas AND a.kode_lokasi=b.kode_lokasi AND SUBSTRING(a.periode,1,4) IN ($tahun)
+                WHERE a.nik IN ($nik) AND a.kode_lokasi='".$kode_lokasi."'
+                UNION ALL
+                SELECT a.nik_user AS nik, a.no_pb as no_bukti, a.tanggal, a.keterangan, 0 as debet, a.nilai as kredit,
+                CONVERT(varchar,a.tanggal,103) as tgl, 2 as nu 
+                FROM pbh_pb_m a
+                WHERE a.nik_user IN ($nik) AND a.kode_lokasi='".$kode_lokasi."' AND a.nilai<>0 
+                AND SUBSTRING(a.periode,1,4) IN ($tahun) AND a.modul='IFREIM'
+                UNION ALL
+                SELECT a.nik_user AS nik, a.no_pb as no_bukti, b.tanggal, a.keterangan, a.nilai AS debet, 0 AS kredit,
+                CONVERT(varchar,b.tanggal,103) as tgl, 3 AS nu
+                FROM pbh_pb_m a
+                INNER JOIN kas_m b ON a.no_kas=b.no_kas AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.nik_user IN ($nik) AND a.kode_lokasi='".$kode_lokasi."' AND a.no_kas<>'-' 
+                AND SUBSTRING(a.periode,1,4) IN ($tahun) AND a.modul='IFREIM'
+                ORDER BY tanggal";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
+            }
+
+            if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res1;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;  
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function DataPosisiImburseIF(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
