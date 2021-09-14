@@ -48,6 +48,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-saldopanjar','Bdh\LaporanPanjarController@DataSaldoPanjar');
     
     $router->get('lap-bukaif','Bdh\LaporanImprestFundController@DataPembukaanIF');
+    $router->get('lap-imburseif','Bdh\LaporanImprestFundController@DataImburseIF');
 
 });
 
