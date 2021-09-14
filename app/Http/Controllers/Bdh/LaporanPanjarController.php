@@ -17,7 +17,7 @@ class LaporanPanjarController extends Controller {
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
-    public function DataPosisiPertanggunganPB(Request $r) {
+    public function DataPencairanPanjar(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -25,7 +25,7 @@ class LaporanPanjarController extends Controller {
             }
 
             $col_array = array('periode', 'no_bukti');
-            $db_col_name = array('a.periode', 'a.no_pb');
+            $db_col_name = array('a.periode', 'a.no_kas');
             $where = "where a.kode_lokasi='".$kode_lokasi."'";
 
             $this_in = "";
@@ -50,51 +50,51 @@ class LaporanPanjarController extends Controller {
                 }
             }
 
-            $select1 = "SELECT a.no_pb, CONVERT(varchar,a.tanggal,103) AS tgl, a.keterangan, a.posted, a.nilai, 
-            d.no_dokumen AS no_dpc, ISNULL(j.jum_dok,0) AS jum_dok,
-            CASE a.progress WHEN '0' THEN 'Pengajuan PB' 
-            WHEN 'D' THEN 'Ver Dok'
-            WHEN '1' THEN 'Ver Akun'
-            WHEN 'C' THEN 'Return Ver Dok'
-            WHEN 'V' THEN 'Return Ver Akun'
-            WHEN '2' THEN 'SPB'
-            WHEN '3' THEN 'Dibayar'
-            WHEN 'R' THEN 'Return Ver Dok'
-            WHEN 'K' THEN 'Return Ver Pajak'
-            END AS progress ,a.kode_pp, b.nama AS nama_pp, a.no_ver, CONVERT(varchar,c.tanggal,103) AS tgl_ver, 
-            a.no_verdok, CONVERT(varchar,e.tanggal,103) AS tgl_verdok, a.no_kas, 
-            CONVERT(varchar,g.tanggal,103) AS tgl_kas, a.no_spb, CONVERT(varchar,d.tanggal,103) AS tgl_spb, a.no_fisik, 
-            CONVERT(varchar,h.tanggal,103) AS tgl_fisik, a.no_pajak, CONVERT(varchar,i.tanggal,103) AS tgl_pajak
-            FROM pbh_pb_m a 
-            INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
-            LEFT JOIN pbh_ver_m c ON a.no_ver=c.no_ver AND a.kode_lokasi=c.kode_lokasi
-            LEFT JOIN spb_m d ON a.no_spb=d.no_spb AND a.kode_lokasi=d.kode_lokasi
-            LEFT JOIN pbh_ver_m e ON a.no_verdok=e.no_ver AND a.kode_lokasi=e.kode_lokasi
-            LEFT JOIN kas_m g ON a.no_kas=g.no_kas AND a.kode_lokasi=g.kode_lokasi
-            LEFT JOIN pbh_ver_m h ON a.no_fisik=h.no_ver AND a.kode_lokasi=h.kode_lokasi
-            LEFT JOIN pbh_ver_m i ON a.no_pajak=i.no_ver AND a.kode_lokasi=i.kode_lokasi
-            LEFT JOIN ( 
-                SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok
-                FROM pbh_pb_m a
-                INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where
-                GROUP BY b.no_bukti, b.kode_lokasi
-            ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where
-            ORDER BY a.no_pb";
+            $select1 = "SELECT a.no_kas, a.no_dokumen, a.periode, a.tanggal, CONVERT(varchar,a.tanggal,103) as tanggal1, 
+            a.keterangan, a.nik_buat, b.nama as nama_buat, b.jabatan as jabatan_buat, a.nik_app,c.nama as nama_setuju, 
+            c.jabatan as jabatan_setuju, d.kota, a.nilai, d.logo, d.alamat
+            FROM kas_m a 
+            INNER JOIN lokasi d ON a.kode_lokasi=d.kode_lokasi
+            LEFT JOIN karyawan b ON a.nik_buat=b.nik AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN karyawan c ON a.nik_app=c.nik AND a.kode_lokasi=c.kode_lokasi
+            $where";
 
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
+            $no_kas = "";
+            $i=0;
+            foreach($res1 as $row) { 
+                if($i == 0) {
+                    $no_kas = "'".$row['no_kas']."'";
+                } else {
+                    $no_kas .= ", '".$row['no_kas']."'";
+                }
+                $i++;
+            }
+
+            $select2 = "SELECT a.no_kas, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.kode_cf, 
+            CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet,
+            CASE dc WHEN 'C' THEN nilai ELSE 0 END AS kredit
+            FROM kas_j a
+			INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+			WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
+			ORDER BY a.no_urut";
+
+            $res2 = DB::connection($this->db)->select($select2);
+            $res2 = json_decode(json_encode($res2),true);
+
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
+                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['data_detail'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);

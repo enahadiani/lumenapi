@@ -41,6 +41,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-posisipertanggungpb','Bdh\LaporanBebanController@DataPosisiPertanggunganPB');
     
     $router->get('lap-panjar','Bdh\LaporanPanjarController@DataPanjar');
+    $router->get('lap-cairpanjar','Bdh\LaporanPanjarController@DataPencairanPanjar');
 
 });
 
