@@ -280,41 +280,43 @@ class ReturPembelianController extends Controller
                             $id,$kode_lokasi,$periode,'BRGRETBELI','BRGRETBELI',$nu,$kodeGudang,$request->kode_barang[$i],'-',date('Y-m-d H:i:s'),$request->satuan[$i],'C',$request->qty_beli[$i],$request->qty_return[$i],0,$request->harga[$i],0,0,0,0,$request->subtotal[$i]
                         ]);
     
-                        $get =  DB::connection($this->sql)->select("select round(a.hpp*b.stok,0) as nilai_hpp,c.akun_hpp 
-                        from brg_barang a
-                        inner join brg_trans_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
-                        inner join brg_barangklp c on a.kode_klp=c.kode_klp
-                        where b.no_bukti=? and a.kode_lokasi=?",array($id,$kode_lokasi));
-                        if(count($get) > 0){
-                            $nilai_hpp = $get[0]->nilai_hpp;
-                            $akun_hpp = $get[0]->akun_hpp;
-                        }else{
-                            $nilai_hpp = 0;
-                            $akun_hpp = '-';
-                        }
+                        // $get =  DB::connection($this->sql)->select("select round(a.hpp*b.stok,0) as nilai_hpp,c.akun_hpp 
+                        // from brg_barang a
+                        // inner join brg_trans_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                        // inner join brg_barangklp c on a.kode_klp=c.kode_klp
+                        // where b.no_bukti=? and a.kode_lokasi=?",array($id,$kode_lokasi));
+                        // if(count($get) > 0){
+                        //     $nilai_hpp = $get[0]->nilai_hpp;
+                        //     $akun_hpp = $get[0]->akun_hpp;
+                        // }else{
+                        //     $nilai_hpp = 0;
+                        //     $akun_hpp = '-';
+                        // }
     
-                        $inserthppc = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                        values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                        DB::connection($this->sql)->insert($inserthppc, [
-                           $id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,$nu,$akun_hpp,'C',$request->subtotal[$i],$request->subtotal[$i],"Retur Pembelian No: ".$request->no_bukti,'BRGBELI','BRGRETBELI','IDR',1,$kode_pp,'-','-',$request->kode_vendor,'-','-','-','-','-' 
-                        ]);
+                        // $inserthppc = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                        // values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        // DB::connection($this->sql)->insert($inserthppc, [
+                        //    $id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,$nu,$akun_hpp,'C',$request->subtotal[$i],$request->subtotal[$i],"Retur Pembelian No: ".$request->no_bukti,'BRGBELI','BRGRETBELI','IDR',1,$kode_pp,'-','-',$request->kode_vendor,'-','-','-','-','-' 
+                        // ]);
     
-                        $inserthppd = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                        values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                        DB::connection($this->sql)->insert($inserthppd, [
-                           $id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,$nu,$akun_hpp,'D',floatval($nilai_hpp),floatval($nilai_hpp),"Retur Pembelian No: ".$request->no_bukti,'BRGBELI','BRGRETBELI','IDR',2,$kode_pp,'-','-',$request->kode_vendor,'-','-','-','-','-' 
-                        ]);
+                        // $inserthppd = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                        // values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        // DB::connection($this->sql)->insert($inserthppd, [
+                        //    $id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,$nu,$akun_hpp,'D',floatval($nilai_hpp),floatval($nilai_hpp),"Retur Pembelian No: ".$request->no_bukti,'BRGBELI','BRGRETBELI','IDR',2,$kode_pp,'-','-',$request->kode_vendor,'-','-','-','-','-' 
+                        // ]);
                         
                         $insert4 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                         values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                         DB::connection($this->sql)->insert($insert4, [
-                           $id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,$nu,$request->kode_akun[$i],'C',floatval($nilai_hpp),floatval($nilai_hpp),"Retur Pembelian No: ".$request->no_bukti,'BRGBELI','BRGRETBELI','IDR',3,$kode_pp,'-','-',$request->kode_vendor,'-','-','-','-','-' 
+                           $id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,$nu,$request->kode_akun[$i],'C',floatval($request->subtotal[$i]),floatval($request->subtotal[$i]),"Retur Pembelian No: ".$request->no_bukti,'BRGBELI','BRGRETBELI','IDR',3,$kode_pp,'-','-',$request->kode_vendor,'-','-','-','-','-' 
                         ]);
                         $nu++;	
                     }
                     
                 }
                 	
+                $exec = DB::connection($this->sql)->update("exec sp_brg_batalbeli ?, ?, ?, ?, ? ",array($id, $request->no_bukti, $periode, $kode_lokasi, $nik));
+                
                 $tmp="Data Retur Pembelian berhasil disimpan";
                 $sts=true;
                 $success["no_bukti"] =$id;
