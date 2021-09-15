@@ -276,7 +276,7 @@ class BarangController extends Controller
             
             $update = "update brg_barang set nama = ?, sat_kecil= ?,sat_besar=?,jml_sat=?,hna=?,pabrik=?,flag_gen=?,flag_aktif=?,ss=?,sm1=?,sm2=?,mm1=?,mm2=?,fm1=?,fm2=?,kode_klp=?,file_gambar=?,barcode=?,hrg_satuan=?,ppn=?,profit=?,tgl_input=getdate() 
             where kode_barang=? and kode_lokasi=?";
-            $ins = DB::connection($this->sql)->insert($insert, [
+            $ins = DB::connection($this->sql)->update($update, [
                 $request->nama,
                 $request->sat_kecil,
                 $request->sat_besar,

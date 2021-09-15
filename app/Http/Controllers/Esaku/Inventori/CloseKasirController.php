@@ -372,6 +372,8 @@ class CloseKasirController extends Controller
                         
                     } 
                 }
+
+                $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
     
                 $tmp="Data Close Kasir berhasil disimpan";
                 $sts=true;
