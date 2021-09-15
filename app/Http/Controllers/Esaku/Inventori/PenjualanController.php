@@ -169,7 +169,7 @@ class PenjualanController extends Controller
             }
 
             $ins3 = DB::connection($this->sql)->insert("
-            update a set a.hpp=b.hpp 
+            update a set a.hpp=b.hpp, a.no_belicurr=b.no_belicurr 
             from brg_trans_d a 
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
