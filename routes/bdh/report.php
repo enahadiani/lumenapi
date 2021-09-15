@@ -32,26 +32,26 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-nopb','Bdh\FilterController@DataNoBuktiPB');
     $router->get('filter-nopanjar','Bdh\FilterController@DataNoBuktiPanjar');
 
-    $router->post('lap-verifikasi','Bdh\LaporanController@DataVerifikasi');
-    $router->post('lap-spb','Bdh\LaporanController@DataSPB');
-    $router->post('lap-bayar','Bdh\LaporanController@DataPembayaran');
-    $router->post('lap-transbank','Bdh\LaporanController@DataTransferBank');
-    $router->post('lap-jurfinalpertanggungpanjar','Bdh\LaporanController@DataJurnalFinalPertanggungPanjar');
+    $router->get('lap-verifikasi','Bdh\LaporanController@DataVerifikasi');
+    $router->get('lap-spb','Bdh\LaporanController@DataSPB');
+    $router->get('lap-bayar','Bdh\LaporanController@DataPembayaran');
+    $router->get('lap-transbank','Bdh\LaporanController@DataTransferBank');
+    $router->get('lap-jurfinalpertanggungpanjar','Bdh\LaporanController@DataJurnalFinalPertanggungPanjar');
     
-    $router->post('lap-pb','Bdh\LaporanBebanController@DataPB');
-    $router->post('lap-posisipertanggungpb','Bdh\LaporanBebanController@DataPosisiPertanggunganPB');
+    $router->get('lap-pb','Bdh\LaporanBebanController@DataPB');
+    $router->get('lap-posisipertanggungpb','Bdh\LaporanBebanController@DataPosisiPertanggunganPB');
     
-    $router->post('lap-panjar','Bdh\LaporanPanjarController@DataPanjar');
-    $router->post('lap-cairpanjar','Bdh\LaporanPanjarController@DataPencairanPanjar');
-    $router->post('lap-posisiajupanjar','Bdh\LaporanPanjarController@DataPosisiAjuPanjar');
-    $router->post('lap-tanggungpanjar','Bdh\LaporanPanjarController@DataTanggungPanjar');
-    $router->post('lap-posisitanggungpanjar','Bdh\LaporanPanjarController@DataPosisiTanggungPanjar');
-    $router->post('lap-saldopanjar','Bdh\LaporanPanjarController@DataSaldoPanjar');
+    $router->get('lap-panjar','Bdh\LaporanPanjarController@DataPanjar');
+    $router->get('lap-cairpanjar','Bdh\LaporanPanjarController@DataPencairanPanjar');
+    $router->get('lap-posisiajupanjar','Bdh\LaporanPanjarController@DataPosisiAjuPanjar');
+    $router->get('lap-tanggungpanjar','Bdh\LaporanPanjarController@DataTanggungPanjar');
+    $router->get('lap-posisitanggungpanjar','Bdh\LaporanPanjarController@DataPosisiTanggungPanjar');
+    $router->get('lap-saldopanjar','Bdh\LaporanPanjarController@DataSaldoPanjar');
     
-    $router->post('lap-bukaif','Bdh\LaporanImprestFundController@DataPembukaanIF');
-    $router->post('lap-imburseif','Bdh\LaporanImprestFundController@DataImburseIF');
-    $router->post('lap-posisiimburseif','Bdh\LaporanImprestFundController@DataPosisiImburseIF');
-    $router->post('lap-kartuif','Bdh\LaporanImprestFundController@DataKartuIF');
+    $router->get('lap-bukaif','Bdh\LaporanImprestFundController@DataPembukaanIF');
+    $router->get('lap-imburseif','Bdh\LaporanImprestFundController@DataImburseIF');
+    $router->get('lap-posisiimburseif','Bdh\LaporanImprestFundController@DataPosisiImburseIF');
+    $router->get('lap-kartuif','Bdh\LaporanImprestFundController@DataKartuIF');
 
 });
 
