@@ -36,7 +36,7 @@ class LaporanController extends Controller
 		} else if ($nilai < 2000) {
 			$temp = " seribu" . $this->convertBilangan($nilai - 1000);
 		} else if ($nilai < 1000000) {
-			$temp = $this->convertBilangan($nilai/1000) . "Ribu" . $this->convertBilangan($nilai % 1000);
+			$temp = $this->convertBilangan($nilai/1000) . " Ribu" . $this->convertBilangan($nilai % 1000);
 		} else if ($nilai < 1000000000) {
 			$temp = $this->convertBilangan($nilai/1000000) . " Juta" . $this->convertBilangan($nilai % 1000000);
 		} else if ($nilai < 1000000000000) {
