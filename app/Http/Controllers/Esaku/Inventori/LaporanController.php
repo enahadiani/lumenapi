@@ -101,7 +101,7 @@ class LaporanController extends Controller
                 $i++;
             }
 
-            $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.nik_user as kasir,
+            $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.tanggal as tgl, a.nik_user as kasir,
             sum(c.total) as total, sum(c.ppn) as ppn, sum(c.hpp) as hpp, count(a.no_jual) as struk,
             (sum(c.total) - sum(c.ppn)) as bersih, isnull(sum(d.brg_pajak),0) as brg_pajak, 
             isnull(sum(e.brg_non_pajak),0) as brg_non_pajak, '0' as margin, '0' as rata, '0' as persen
