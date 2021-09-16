@@ -43,6 +43,117 @@ class LaporanController extends Controller
         } 
     }
 
+    function getReportRekapPenjualan(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','tanggal','nik_kasir');
+            $db_col_name = array('a.periode','a.tanggal','a.nik_user');
+            
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+
+            $sql="select a.tanggal, a.nik_user 
+            from brg_jualpiu_dloc a 
+            $where
+            group by tanggal, nik_user";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs),true);
+
+            $tgl = "";
+            $kasir = "";
+            $resdata = array();
+            $i=0;
+            foreach($rs as $row){
+
+                $resdata[]=(array)$row;
+                if($i == 0){
+                    $kasir .= "'$row->nik_user'";
+                    $tgl .= "'$row->tanggal'";
+                }else{
+                    $tgl .= ","."'$row->tanggal'";
+                    $kasir .= ","."'$row->nik_user'";
+                }
+                $i++;
+            }
+
+            $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.nik_user as kasir,
+            sum(c.total) as total, sum(c.ppn) as ppn, sum(c.hpp) as hpp, count(a.no_jual) as struk,
+            (sum(c.total) - sum(c.ppn)) as bersih, isnull(sum(d.brg_pajak),0) as brg_pajak, 
+            isnull(sum(e.brg_non_pajak),0) as brg_non_pajak, '-' as margin, '-' as rata
+            from brg_jualpiu_dloc a
+            left join (
+            select no_bukti, kode_lokasi, isnull(sum(total),0) as total, 
+            isnull(sum(ppn),0) as ppn, isnull(sum(hpp),0) as hpp
+            from brg_trans_d
+            where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL'
+            group by no_bukti, kode_lokasi
+            ) c on a.kode_lokasi=c.kode_lokasi and a.no_jual=c.no_bukti
+            left join (
+                select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_pajak
+                from brg_trans_d
+                where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn > 0
+                group by no_bukti, kode_lokasi
+            ) d on a.kode_lokasi=d.kode_lokasi and a.no_jual=d.no_bukti
+            left join (
+                select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_non_pajak
+                from brg_trans_d
+                where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn = 0
+                group by no_bukti, kode_lokasi
+            ) e on a.kode_lokasi=e.kode_lokasi and a.no_jual=e.no_bukti
+            where a.kode_lokasi = '".$kode_lokasi."' and a.tanggal in ($tgl) and a.nik_user in ($kasir)
+            group by a.tanggal, a.nik_user";
+            
+            $res2 = DB::connection($this->sql)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getReportBarang(Request $request){
         try {
             
