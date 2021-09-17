@@ -562,7 +562,7 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp
+            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
             from apv_flow a
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
             left join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
