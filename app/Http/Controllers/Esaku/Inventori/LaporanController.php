@@ -77,14 +77,13 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.tanggal, a.nik_user 
+            $sql="select a.nik_user 
             from brg_jualpiu_dloc a 
             $where
-            group by tanggal, nik_user";
+            group by a.nik_user";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
-            $tgl = "";
             $kasir = "";
             $resdata = array();
             $i=0;
@@ -93,43 +92,73 @@ class LaporanController extends Controller
                 $resdata[]=(array)$row;
                 if($i == 0){
                     $kasir .= "'$row->nik_user'";
-                    $tgl .= "'$row->tanggal'";
                 }else{
-                    $tgl .= ","."'$row->tanggal'";
                     $kasir .= ","."'$row->nik_user'";
                 }
                 $i++;
             }
 
-            $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.tanggal as tgl, a.nik_user as kasir,
-            sum(c.total) as total, sum(c.ppn) as ppn, sum(c.hpp) as hpp, count(a.no_jual) as struk,
-            (sum(c.total) - sum(c.ppn)) as bersih, isnull(sum(d.brg_pajak),0) as brg_pajak, 
-            isnull(sum(e.brg_non_pajak),0) as brg_non_pajak, '0' as margin, '0' as rata, '0' as persen
-            from brg_jualpiu_dloc a
-            left join (
-            select no_bukti, kode_lokasi, isnull(sum(total),0) as total, 
-            isnull(sum(ppn),0) as ppn, isnull(sum(hpp),0) as hpp
-            from brg_trans_d
-            where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL'
-            group by no_bukti, kode_lokasi
-            ) c on a.kode_lokasi=c.kode_lokasi and a.no_jual=c.no_bukti
-            left join (
-                select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_pajak
+            if(count($res) > 0) { 
+                $tgl_filter = null;
+                if($request->input($col_array[1])[0] == "=" && ISSET($request->input($col_array[1])[1])) {
+                    $tgl_filter = "and a.tanggal = '".$request->input($col_array[1])[1]."'";
+                } elseif($request->input($col_array[1])[0] == "range" && ISSET($request->input($col_array[1])[1]) && ISSET($request->input($col_array[1])[2])) {
+                    $tgl_filter = "and a.tanggal between '".$request->input($col_array[1])[1]."' and '".$request->input($col_array[1])[2]."'";
+                }
+
+                $sql3 = "select a.tanggal 
+                from brg_jualpiu_dloc a 
+                where a.kode_lokasi = '".$kode_lokasi."' and  a.nik_user in ($kasir) and a.periode = '".$request->input($col_array[0])[1]."'
+                $tgl_filter
+                group by a.tanggal";
+                $rs3 = DB::connection($this->sql)->select($sql3);
+                $res3 = json_decode(json_encode($rs3),true);
+
+                $tgl = "";
+                $resdata = array();
+                $i=0;
+                foreach($rs3 as $row){
+                    $resdata[]=(array)$row;
+                    if($i == 0){
+                        $tgl .= "'$row->tanggal'";
+                    }else{
+                        $tgl .= ","."'$row->tanggal'";
+                    }
+                    $i++;
+                }
+            }
+
+            if(count($res3) > 0) {
+                $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.tanggal as tgl, a.nik_user as kasir,
+                sum(c.total) as total, sum(c.ppn) as ppn, sum(c.hpp) as hpp, count(a.no_jual) as struk,
+                (sum(c.total) - sum(c.ppn)) as bersih, isnull(sum(d.brg_pajak),0) as brg_pajak, 
+                isnull(sum(e.brg_non_pajak),0) as brg_non_pajak, '0' as margin, '0' as rata, '0' as persen
+                from brg_jualpiu_dloc a
+                left join (
+                select no_bukti, kode_lokasi, isnull(sum(total),0) as total, 
+                isnull(sum(ppn),0) as ppn, isnull(sum(hpp),0) as hpp
                 from brg_trans_d
-                where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn > 0
+                where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL'
                 group by no_bukti, kode_lokasi
-            ) d on a.kode_lokasi=d.kode_lokasi and a.no_jual=d.no_bukti
-            left join (
-                select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_non_pajak
-                from brg_trans_d
-                where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn = 0
-                group by no_bukti, kode_lokasi
-            ) e on a.kode_lokasi=e.kode_lokasi and a.no_jual=e.no_bukti
-            where a.kode_lokasi = '".$kode_lokasi."' and a.tanggal in ($tgl) and a.nik_user in ($kasir)
-            group by a.tanggal, a.nik_user";
-            
-            $res2 = DB::connection($this->sql)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
+                ) c on a.kode_lokasi=c.kode_lokasi and a.no_jual=c.no_bukti
+                left join (
+                    select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_pajak
+                    from brg_trans_d
+                    where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn > 0
+                    group by no_bukti, kode_lokasi
+                ) d on a.kode_lokasi=d.kode_lokasi and a.no_jual=d.no_bukti
+                left join (
+                    select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_non_pajak
+                    from brg_trans_d
+                    where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn = 0
+                    group by no_bukti, kode_lokasi
+                ) e on a.kode_lokasi=e.kode_lokasi and a.no_jual=e.no_bukti
+                where a.kode_lokasi = '".$kode_lokasi."' and a.tanggal in ($tgl) and a.nik_user in ($kasir)
+                group by a.tanggal, a.nik_user";
+                
+                $res2 = DB::connection($this->sql)->select($sql2);
+                $res2 = json_decode(json_encode($res2),true);
+            }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
