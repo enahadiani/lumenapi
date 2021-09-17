@@ -70,7 +70,7 @@ class LaporanImprestFundController extends Controller {
                         $tahun = "'".substr($row['periode'], 0, 4)."'";
                     } else {
                         $nik .= ", '".$row['nik']."'";
-                        $tahun = ", '".substr($row['periode'], 0, 4)."'";
+                        $tahun .= ", '".substr($row['periode'], 0, 4)."'";
                     }
                     $i++;
                 }
