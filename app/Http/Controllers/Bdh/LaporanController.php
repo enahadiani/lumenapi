@@ -300,7 +300,6 @@ class LaporanController extends Controller
                     if($i == 0) {
                         $tahun = "'".substr($row['periode'], 0, 4)."'";
                         $no_kas = "'".$row['no_kas']."'";
-                        var_dump($tahun);
                     } else {
                         $tahun .= ", '".substr($row['periode'], 0, 4)."'";
                         $no_kas .= ", '".$row['no_kas']."'";
