@@ -293,8 +293,10 @@ class LaporanController extends Controller
             if(count($res1) > 0) { 
                 $no_kas = "";
                 $tahun = "";
+                $bilanganAngka = array();
                 $i=0;
                 foreach($res1 as $row) { 
+                    array_push($bilanganAngka, $this->bilanganAngka(floatval($row['nilai']))); 
                     if($i == 0) {
                         $tahun = "'".substr($row['periode'], 0, 4)."'";
                         $no_kas = "'".$row['no_kas']."'";
@@ -323,6 +325,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['data_detail'] = $res2;
+                $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
             }
@@ -330,6 +333,7 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['bilangan_angka'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);
