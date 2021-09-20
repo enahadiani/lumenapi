@@ -18,6 +18,86 @@ class FilterController extends Controller
     public $guard = "siswa";
     public $db = "sqlsrvtarbak";
 
+    function getFilterKelasDashboard(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_login= $data->status_login;
+            }
+
+            $sql="select distinct a.kode_kelas,b.nama 
+            from sis_guru_matpel_kelas a
+            inner join (select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama 
+                        from sis_kelas a 
+                        union all
+                        select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama
+                        from sis_kelas_khusus a
+                        ) b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi = '".$kode_lokasi."' and a.kode_pp = '".$request->query('kode_pp')."' 
+            and a.nik = '".$request->query('nik_guru')."' and a.kode_ta = '".$request->query('kode_ta')."'
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterMatpelDashboard(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_login= $data->status_login;
+            }
+
+            $sql="select distinct a.kode_matpel,b.nama 
+            from sis_guru_matpel_kelas a 
+            inner join sis_matpel b on a.kode_matpel=b.kode_matpel and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_lokasi = '".$kode_lokasi."' and a.kode_pp = '".$request->query('kode_pp')."' 
+            and a.nik = '".$request->query('nik_guru')."' and a.kode_kelas = '".$request->query('kode_kelas')."'
+            and a.kode_ta = '".$request->query('kode_ta')."'
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getFilterTahunAjaran(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
