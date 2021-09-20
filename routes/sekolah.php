@@ -336,6 +336,8 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->get('filter-guru','Sekolah\FilterController@getFilterGuru');
     $router->get('filter-semester','Sekolah\FilterController@getFilterSemester');
     $router->get('filter-tahunajar','Sekolah\FilterController@getFilterTahunAjaran');
+    $router->get('filter-kelas-dash','Sekolah\FilterController@getFilterKelasDashboard');
+    $router->get('filter-matpel-dash','Sekolah\FilterController@getFilterMatpelDashboard');
     
     $router->get('lap-nilai','Sekolah\LaporanController@getNilai');
     $router->get('lap-guru-kelas','Sekolah\LaporanController@getGuruKelas');
