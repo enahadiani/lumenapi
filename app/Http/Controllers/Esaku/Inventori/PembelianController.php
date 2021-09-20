@@ -196,7 +196,7 @@ class PembelianController extends Controller
             }
             $no_bukti = $request->no_bukti;
 
-            $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen,convert(varchar,tanggal,103) as tanggal from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
+            $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen,convert(varchar,tanggal,103) as tanggal,keterangan from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
             ";
 
             $res = DB::connection($this->sql)->select($sql);
@@ -236,6 +236,7 @@ class PembelianController extends Controller
         $this->validate($request, [
             'kode_vendor' => 'required',
             'no_faktur' => 'required',
+            'keterangan' => 'required',
             'kode_pp' => 'required',
             'total_trans' => 'required',
             'total_diskon' => 'required',
@@ -319,7 +320,7 @@ class PembelianController extends Controller
                 $request->kode_pp,
                 date('Y-m-d H:i:s'),
                 $request->no_faktur,
-                'Pembelian Persediaan',
+                $request->keterangan,
                 'IDR',
                 1,
                 $request->total_trans,
@@ -415,7 +416,7 @@ class PembelianController extends Controller
                     'D',
                     $series2[$series[$x]],
                     $series2[$series[$x]],
-                    'Persediaan Barang',
+                    $request->keterangan,
                     'BRGBELI',
                     'BRGBELI',
                     'IDR',
@@ -605,6 +606,7 @@ class PembelianController extends Controller
             'total_trans' => 'required',
             'total_diskon' => 'required',
             'total_ppn' => 'required',
+            'keterangan' => 'required',
             'kode_akun' => 'required|array',
             'kode_barang' => 'required|array',
             'qty_barang' => 'required|array',
@@ -704,7 +706,7 @@ class PembelianController extends Controller
                     $request->kode_pp,
                     date('Y-m-d H:i:s'),
                     $request->no_faktur,
-                    'Pembelian Persediaan',
+                    $request->keterangan,
                     'IDR',
                     1,
                     $request->total_trans,
@@ -802,7 +804,7 @@ class PembelianController extends Controller
                         'D',
                         $series2[$series[$x]],
                         $series2[$series[$x]],
-                        'Persediaan Barang',
+                        $request->keterangan,
                         'BRGBELI',
                         'BRGBELI',
                         'IDR',

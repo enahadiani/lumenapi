@@ -143,8 +143,8 @@ class BarangController extends Controller
                     $foto="-";
                 }
 
-                $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+                $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input,hpp,no_belicurr) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate(),?,?)";
                 $ins = DB::connection($this->sql)->insert($insert, [
                     $request->kode_barang,
                     $request->nama,
@@ -168,7 +168,9 @@ class BarangController extends Controller
                     $request->barcode,
                     $request->hrg_satuan,
                     $request->ppn,
-                    $request->profit
+                    $request->profit,
+                    0,
+                    '-'
                 ]);
                 
                 DB::connection($this->sql)->commit();
