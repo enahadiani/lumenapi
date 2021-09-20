@@ -55,6 +55,48 @@ $router->group(['middleware' => 'auth:siswa'], function () use ($router) {
     $router->post('search-form', 'AdminSiswaController@searchForm');
     $router->get('search-form-list', 'AdminSiswaController@searchFormList');
 
+    //ADMIN SETTING
+    //Menu
+    $router->get('menu','Sekolah\MenuController@index');
+    $router->post('menu','Sekolah\MenuController@store');
+    $router->put('menu','Sekolah\MenuController@update');
+    $router->delete('menu','Sekolah\MenuController@destroy');
+    $router->get('menu-klp','Sekolah\MenuController@getKlp');
+    $router->post('menu-move','Sekolah\MenuController@simpanMove');
+
+    //Akses User
+    $router->get('akses-user','Sekolah\HakaksesController@index');
+    $router->post('akses-user','Sekolah\HakaksesController@store');
+    $router->get('akses-user-detail','Sekolah\HakaksesController@show');
+    $router->put('akses-user','Sekolah\HakaksesController@update');
+    $router->delete('akses-user','Sekolah\HakaksesController@destroy');
+    $router->get('akses-user-menu','Sekolah\HakaksesController@getMenu');
+    
+    //Form
+    $router->get('form','Sekolah\FormController@index');
+    $router->post('form','Sekolah\FormController@store');
+    $router->put('form','Sekolah\FormController@update');
+    $router->delete('form','Sekolah\FormController@destroy');
+
+    //Karyawan
+    $router->get('karyawan','Sekolah\KaryawanController@index');
+    $router->post('karyawan','Sekolah\KaryawanController@store');
+    $router->get('karyawan-detail','Sekolah\KaryawanController@show');
+    $router->post('karyawan-ubah','Sekolah\KaryawanController@update');
+    $router->delete('karyawan','Sekolah\KaryawanController@destroy');
+
+    //Kelompok Menu
+    $router->get('menu-klp','Sekolah\KelompokMenuController@index');
+    $router->post('menu-klp','Sekolah\KelompokMenuController@store');
+    $router->put('menu-klp','Sekolah\KelompokMenuController@update');
+    $router->delete('menu-klp','Sekolah\KelompokMenuController@destroy');
+
+    //Unit
+    $router->get('unit','Sekolah\UnitController@index');
+    $router->post('unit','Sekolah\UnitController@store');
+    $router->put('unit','Sekolah\UnitController@update');
+    $router->delete('unit','Sekolah\UnitController@destroy');
+    
     //Tahun Ajaran
     $router->get('pp','Sekolah\TahunAjaranController@getPP');
     $router->get('tahun-ajaran-all','Sekolah\TahunAjaranController@index');
