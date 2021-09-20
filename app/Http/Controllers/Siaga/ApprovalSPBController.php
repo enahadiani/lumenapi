@@ -63,7 +63,7 @@ class ApprovalSPBController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,'Beban' as modul
             from apv_pesan a
 			inner join gr_spb2_m c on a.no_bukti=c.no_spb and a.kode_lokasi=c.kode_lokasi 
             left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
@@ -111,14 +111,38 @@ class ApprovalSPBController extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection($this->db)->select("
-			select b.no_spb as no_bukti,b.nilai,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan
-            from apv_flow a
-            inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user'
-            ");
-            $res = json_decode(json_encode($res),true);
+            $filter = "";
+            if(isset($request->no_spb) && $request->no_spb != ""){
+                $filter .= " and b.no_spb='$request->no_spb' ";
+            }
+
+            if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
+                $filter .= " and b.tanggal between '$request->start_date' and '$request->end_date' ";
+            }
             
+            if(isset($request->jenis) && $request->jenis != ""){
+                if($request->jenis == "Beban"){
+
+                    $res = DB::connection($this->db)->select("
+                    select b.no_spb as no_bukti,b.nilai,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan
+                    from apv_flow a
+                    inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    ");
+                    $res = json_decode(json_encode($res),true);
+                }else{
+                    $res = DB::connection($this->db)->select("select * from gr_pb_m where modul='Panjar' ");
+                }
+            }else{
+                $res = DB::connection($this->db)->select("
+                    select b.no_spb as no_bukti,b.nilai,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan
+                    from apv_flow a
+                    inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    ");
+                $res = json_decode(json_encode($res),true);
+            }
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -469,7 +493,82 @@ class ApprovalSPBController extends Controller
             // $res3 = json_decode(json_encode($res3),true);
 
             $sql4 = "
-			select convert(varchar,e.id) as id,a.no_spb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl  
+			select convert(varchar,e.id) as id,a.no_spb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl  
+            from gr_spb2_m a
+            inner join apv_pesan e on a.no_spb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            where a.no_spb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
+			order by id2
+	        ";
+            $res4 = DB::connection($this->db)->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
+
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                // $success['data_dokumen'] = $res3;
+                $success['data_histori'] = $res4;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                // $success['data_dokumen'] = [];
+                $success['data_histori'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function detailHistory(Request $request)
+    {
+        $this->validate($request,[
+            'no_aju' => 'required',
+            'id' => 'required',
+        ]);
+        
+        try {
+            $no_aju = $request->no_aju;
+            $id = $request->id;
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_bukti,b.nilai,b.tanggal,b.keterangan,a.no_urut,b.nama,case d.status when '2' then 'Approved' when '3' then 'Returned' else 'In Progress' end as status,convert(varchar,a.tgl_app,103) as tgl_app
+            from apv_flow a
+            inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
+            inner join apv_pesan d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and d.id='$id' ";
+            
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2="select a.no_beban,convert(varchar,a.tanggal,103) as tanggal,a.modul,b.kode_pp+' - '+b.nama as pp,a.keterangan,a.nilai_curr as nilai,e.catatan,convert(varchar,a.tgl_input,103) as tgl_input,a.nik_user,e.no_bukti as no_aju,convert(varchar,e.tgl_input,103) as tgl_ver,a.kode_curr 
+            from gr_beban_m a 
+            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            inner join gr_app_m e on a.no_beban=e.no_app and a.kode_lokasi=e.kode_lokasi 
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_spb='$no_aju' ";					
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            // $sql3="select no_spb,no_gambar,nu,kode_jenis,no_ref from gr_pb_dok where kode_lokasi='".$kode_lokasi."' and no_spb='$no_aju' order by nu";
+            // $res3 = DB::connection($this->db)->select($sql3);
+            // $res3 = json_decode(json_encode($res3),true);
+
+            $sql4 = "
+			select convert(varchar,e.id) as id,a.no_spb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl  
             from gr_spb2_m a
             inner join apv_pesan e on a.no_spb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut

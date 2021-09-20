@@ -224,7 +224,6 @@ class Approval2Controller extends Controller
                 $kode_jab = "";
             }
 
-            
             $filter = "";
             if(isset($request->no_pb) && $request->no_pb != ""){
                 $filter .= " and b.no_pb='$request->no_pb' ";
@@ -611,14 +610,14 @@ class Approval2Controller extends Controller
 
             $sql4 = "
 			select * from (
-                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
                 left join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
-                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
@@ -701,14 +700,14 @@ class Approval2Controller extends Controller
 
             $sql4 = "
 			select * from (
-                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
                 left join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
-                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
