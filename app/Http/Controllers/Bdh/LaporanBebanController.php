@@ -227,10 +227,32 @@ class LaporanBebanController extends Controller {
                 $res2 = json_decode(json_encode($res2),true);
             }
 
+            if(count($res2) > 0) { 
+                $no_pb = "";
+                $i=0;
+                foreach($res2 as $row) { 
+                    if($i == 0) {
+                        $no_pb = "'".$row['no_pb']."'";
+                    } else {
+                        $no_pb .= ", '".$row['no_pb']."'";
+                    }
+                    $i++;
+                }
+
+                $select3 = "select no_rek,nama_rek,bank,nilai+isnull(pajak,0) as nilai,isnull(pajak,0) as pajak,nilai as netto 
+                from pbh_rek
+                where no_bukti in ($no_pb) and kode_lokasi='".$kode_lokasi."' 
+                order by no_rek";
+
+                $res3 = DB::connection($this->db)->select($select3);
+                $res3 = json_decode(json_encode($res3),true);
+            }
+
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['data_detail'] = $res2;
+                $success['data_sub_detail'] = $res3;
                 $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
@@ -239,6 +261,7 @@ class LaporanBebanController extends Controller {
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['data_sub_detail'] = [];
                 $success['bilangan_angka'] = [];
                 $success['status'] = true;
             }
