@@ -939,7 +939,7 @@ class Approval2Controller extends Controller
                         $success['data2'] = $data;
                         
                         $updt =  DB::connection($this->db)->table('pooling')
-                        ->where('no_pool', $request->no_pooling)    
+                        ->where('no_pool', $no_pool)    
                         ->where('jenis', 'EMAIL')
                         ->where('flag_kirim', 0)
                         ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
