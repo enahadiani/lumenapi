@@ -175,7 +175,7 @@ class Approval2Controller extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
             from apv_pesan a
 			inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
             left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
@@ -579,6 +579,7 @@ class Approval2Controller extends Controller
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
+
     public function show(Request $request)
     {
         try {
@@ -594,6 +595,96 @@ class Approval2Controller extends Controller
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
             left join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1' ";
+            
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2="select a.no_pb,a.nama_brg,a.satuan,a.jumlah,a.harga,a.nu 
+            from gr_pb_boq a 
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_pb='$no_aju' order by a.nu";					
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            $sql3="select no_pb,no_gambar,nu,kode_jenis,no_ref from gr_pb_dok where kode_lokasi='".$kode_lokasi."' and no_pb='$no_aju' order by nu";
+            $res3 = DB::connection($this->db)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+
+            $sql4 = "
+			select * from (
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
+                from gr_pb_m a
+                inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+                inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+                left join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+                where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
+                union all
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
+                from gr_pb_m a
+                inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
+                inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
+                left join apv_karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
+                where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
+            ) a order by id2,tanggal
+	        ";
+            $res4 = DB::connection($this->db)->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
+
+            $sql5="select a.no_pb,count(*) as jum_brg
+            from gr_pb_boq a 
+            where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi'
+            group by a.no_pb";
+            $res5 = DB::connection($this->db)->select($sql5);
+            $res5 = json_decode(json_encode($res5),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['data_detail'] = $res2;
+                $success['data_total'] = $res5;
+                $success['data_dokumen'] = $res3;
+                $success['data_histori'] = $res4;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Tidak ditemukan!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['data_total'] = [];
+                $success['data_dokumen'] = [];
+                $success['data_histori'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus); 
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function detailHistory(Request $request)
+    {
+        $this->validate($request,[
+            'no_aju' => 'required',
+            'id' => 'required',
+        ]);
+        
+        try {
+            $no_aju = $request->no_aju;
+            $id = $request->id;
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul,case d.status when '2' then 'Approved' when '3' then 'Returned' else 'In Progress' end as status,convert(varchar,a.tgl_app,103) as tgl_app
+            from apv_flow a
+            inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+            inner join apv_pesan d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
+            left join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and d.id='$id' ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);

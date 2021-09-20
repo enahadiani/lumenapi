@@ -36,7 +36,8 @@ return [
     'gcm' => [
         // Midtrans server key
         'api_tarbak'     => env('GCM_APIKEY_TARBAK'),
-        'api_ts'     => env('GCM_APIKEY_TS')                
+        'api_ts'     => env('GCM_APIKEY_TS')     ,
+        'api_siaga'     => env('GCM_APIKEY_SIAGA')                
     ]
 
 ];
