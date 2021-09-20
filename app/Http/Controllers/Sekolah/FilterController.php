@@ -35,7 +35,7 @@ class FilterController extends Controller
                         select a.kode_kelas,a.kode_pp,a.kode_lokasi,a.nama
                         from sis_kelas_khusus a
                         ) b on a.kode_kelas=b.kode_kelas and a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi = '".$kode_lokassi."' and a.kode_pp = '".$request->query('kode_pp')."' 
+            where a.kode_lokasi = '".$kode_lokasi."' and a.kode_pp = '".$request->query('kode_pp')."' 
             and a.nik = '".$request->query('nik_guru')."' and a.kode_ta = '".$request->query('kode_ta')."'
             ";
             $res = DB::connection($this->db)->select($sql);
