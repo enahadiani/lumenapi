@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Carbon\Carbon;
+use Log;
 
 class Approval2Controller extends Controller
 {
@@ -905,6 +906,7 @@ class Approval2Controller extends Controller
         }
         $result = json_decode(json_encode($result),true);
         $success['status'] = true;
+        DB::connection($this->db)->beginTransaction();
         if(count($result['original']['data']) > 0){
             $judul = $request->judul;
             $msg = "";
@@ -931,6 +933,8 @@ class Approval2Controller extends Controller
                 if ($response->getStatusCode() == 200) { // 200 OK
                     $response_data = $response->getBody()->getContents();
                     $data = json_decode($response_data,true);
+                    Log::info("send email saku3 :");
+                    Log::info($data);
                     if(isset($data["id"])){
                         $success['data2'] = $data;
                         
@@ -939,8 +943,8 @@ class Approval2Controller extends Controller
                         ->where('jenis', 'EMAIL')
                         ->where('flag_kirim', 0)
                         ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
-                        
-                        
+                        Log::info("update pooling :");
+                        Log::info($updt);
                         DB::connection($this->db)->commit();
                         $sts = true;
                         $msg .= $data['message'];
@@ -949,6 +953,7 @@ class Approval2Controller extends Controller
             
                 $success['message'] = $msg;
         }else{
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = 'Data tidak ditemukan';
         }
