@@ -38,8 +38,8 @@ class GuruMultiKelasController extends Controller
                 $filter = "";
             }
 
-            if(isset($request->flag_aktif)){
-                $filter = "and b.flag_aktif='$request->kode_ta' ";
+            if(isset($request->kode_ta)){
+                $filter = "and b.kode_ta='$request->kode_ta' ";
             }else{
                 $filter = "";
             }
