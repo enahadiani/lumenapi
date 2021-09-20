@@ -239,7 +239,7 @@ class LaporanBebanController extends Controller {
                     $i++;
                 }
 
-                $select3 = "select no_rek,nama_rek,bank,nilai+isnull(pajak,0) as nilai,isnull(pajak,0) as pajak,nilai as netto 
+                $select3 = "select no_bukti,no_rek,nama_rek,bank,nilai+isnull(pajak,0) as nilai,isnull(pajak,0) as pajak,nilai as netto 
                 from pbh_rek
                 where no_bukti in ($no_pb) and kode_lokasi='".$kode_lokasi."' 
                 order by no_rek";
