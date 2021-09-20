@@ -174,10 +174,11 @@ class Approval2Controller extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status,c.nilai,c.due_date,'Beban' as modul
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'APPROVE' else 'REJECT' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
             from apv_pesan a
 			inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
             left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
+			inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.kode_jab='".$kode_jab."' and b.nik= '$nik_user' 
             ");
             $res = json_decode(json_encode($res),true);
@@ -202,7 +203,7 @@ class Approval2Controller extends Controller
         
     }
 
-    public function getPengajuan()
+    public function getPengajuan(Request $request)
     {
         try {
             
@@ -222,12 +223,37 @@ class Approval2Controller extends Controller
                 $kode_jab = "";
             }
 
-            $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
-            from apv_flow a
-            inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-            inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user'
-            ");
+            
+            $filter = "";
+            if(isset($request->no_pb) && $request->no_pb != ""){
+                $filter .= " and b.no_pb='$request->no_pb' ";
+            }
+
+            if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
+                $filter .= " and b.tanggal between '$request->start_date' and '$request->end_date' ";
+            }
+            
+            if(isset($request->jenis) && $request->jenis != ""){
+                if($request->jenis == "Beban"){
+
+                    $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
+                    from apv_flow a
+                    inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+                    inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    ");
+                }else{
+                    $res = DB::connection($this->db)->select("select * from gr_pb_m where modul='Panjar' ");
+                }
+            }else{
+                $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
+                    from apv_flow a
+                    inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+                    inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    ");
+            }
+
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -583,20 +609,20 @@ class Approval2Controller extends Controller
 
             $sql4 = "
 			select * from (
-                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl  
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
                 left join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
-                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl  
+                select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
                 left join apv_karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
-            ) a order by tgl,id2
+            ) a order by id2,tanggal
 	        ";
             $res4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
