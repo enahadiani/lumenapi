@@ -954,6 +954,12 @@ class PenilaianController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_ta) && $request->kode_ta != ""){
+                $filter .= " and a.kode_ta='$request->kode_ta' ";
+            }else{
+                $filter .= "";
+            }
+
             $res = DB::connection($this->db)->select("select a.kode_kd,a.nama
             from sis_kd a
             inner join sis_tingkat b on a.kode_tingkat=b.kode_tingkat and a.kode_lokasi=b.kode_lokasi
@@ -1300,6 +1306,12 @@ class PenilaianController extends Controller
                 $filter_nik = "";
             }
 
+            if(isset($request->kode_ta)){
+                $filter .= "and a.kode_ta='$request->kode_ta' ";
+            }else{
+                $filter .= "";
+            }
+
             if(isset($request->flag_kelas)){
                 $filter .= "and a.flag_kelas='$request->flag_kelas' ";
                 if($request->flag_kelas == "khusus"){
@@ -1367,6 +1379,12 @@ class PenilaianController extends Controller
 
             if(isset($request->kode_matpel)){
                 $filter .= "and a.kode_matpel='$request->kode_matpel' ";
+            }else{
+                $filter .= "";
+            }
+            
+            if(isset($request->kode_ta) && $request->kode_ta != ""){
+                $filter .= " and a.kode_ta='$request->kode_ta' ";
             }else{
                 $filter .= "";
             }

@@ -355,6 +355,7 @@ class GuruMultiKelasController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $ta = "";
             $filter = "where a.kode_lokasi ='$kode_lokasi' ";
             if(isset($request->kode_pp)){
                 $filter .= "and a.kode_pp='$request->kode_pp' ";
@@ -368,6 +369,12 @@ class GuruMultiKelasController extends Controller
                 $filter .= "";
             }
 
+            if(isset($request->kode_kelas)){
+                $ta .= "and b.kode_ta='$request->kode_ta' ";
+            }else{
+                $ta .= "";
+            }
+
             if(isset($request->kode_matpel)){
                 $cek = DB::connection($this->db)->select("select sifat from sis_matpel where kode_matpel='$request->kode_matpel' and kode_pp='$request->kode_pp' and kode_lokasi='$kode_lokasi' ");
                 if(count($cek) > 0){
@@ -375,7 +382,7 @@ class GuruMultiKelasController extends Controller
                         $sql = "select distinct a.kode_kelas,a.nama, 'khusus' as flag_kelas 
                         from sis_kelas_khusus a
                         inner join sis_siswa_matpel_khusus b on a.kode_kelas=b.kode_kelas and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                        $filter and b.kode_matpel='$request->kode_matpel' ";
+                        $filter and b.kode_matpel='$request->kode_matpel' $ta";
                     }else{
                         $sql = "select a.kode_kelas,a.nama, 'reguler' as flag_kelas
                         from sis_kelas a
