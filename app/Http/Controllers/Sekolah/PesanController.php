@@ -258,7 +258,7 @@ class PesanController extends Controller
             $per = date('ym');
             $kode_ta = "-";
             $no_bukti = $this->generateKode("sis_pesan_m", "no_bukti", $kode_lokasi."-PSN".$per.".", "000001");
-            if(!isset($request->kode_ta)) {
+            if(!isset($request->kode_ta) || $request->kode_ta == "-") {
                 $kode_ta = $this->getKodeTA($kode_lokasi, $request->input('kode_pp'));
             } else {
                 $kode_ta = $request->kode_ta;
