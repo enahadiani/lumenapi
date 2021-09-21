@@ -23,7 +23,7 @@ class PesanController extends Controller
         $sql = "SELECT kode_ta FROM sis_ta
         WHERE kode_lokasi = '".$kode_lokasi."' AND kode_pp = '".$kode_pp."' AND flag_aktif = '1'";
         $res = DB::connection($this->db)->select($sql);
-        $res = json_decode(json_encode($query),true);
+        $res = json_decode(json_encode($res),true);
 
         return $res[0]['kode_ta'];
     }
