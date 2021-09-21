@@ -239,10 +239,11 @@ class LaporanBebanController extends Controller {
                     $i++;
                 }
 
-                $select3 = "select no_bukti,no_rek,nama_rek,bank,nilai+isnull(pajak,0) as nilai,isnull(pajak,0) as pajak,nilai as netto 
-                from pbh_rek
-                where no_bukti in ($no_pb) and kode_lokasi='".$kode_lokasi."' 
-                order by no_rek";
+                $select3 = "SELECT no_bukti,no_rek,nama_rek,bank,nilai + ISNULL(pajak,0) AS nilai, 
+                ISNULL(pajak,0) AS pajak, nilai AS netto 
+                FROM pbh_rek
+                WHERE no_bukti IN ($no_pb) AND kode_lokasi='".$kode_lokasi."' 
+                ORDER BY no_rek";
 
                 $res3 = DB::connection($this->db)->select($select3);
                 $res3 = json_decode(json_encode($res3),true);
