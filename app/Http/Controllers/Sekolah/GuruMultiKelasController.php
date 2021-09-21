@@ -26,10 +26,23 @@ class GuruMultiKelasController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            $filter = "";
             if(isset($request->kode_pp)){
-                $filter = "and a.kode_pp='$request->kode_pp' ";
+                $filter .= "and a.kode_pp='$request->kode_pp' ";
             }else{
-                $filter = "";
+                $filter .= "";
+            }
+
+            if(isset($request->flag_aktif)){
+                $filter .= "and a.flag_aktif='$request->flag_aktif' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->kode_ta)){
+                $filter .= "and b.kode_ta='$request->kode_ta' ";
+            }else{
+                $filter .= "";
             }
 
             $res = DB::connection($this->db)->select("select distinct a.nik,a.nama,a.kode_pp+'-'+c.nama as pp,b.tgl_input,case when datediff(minute,b.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,case a.flag_aktif when 1 then 'AKTIF' else 'NONAKTIF' end as flag_aktif,b.kode_matpel+'-'+d.nama as kode_matpel,b.kode_ta,e.nama as nama_ta,dbo.fnGetGuruKelas(a.nik,a.kode_lokasi,a.kode_pp) as kelas
