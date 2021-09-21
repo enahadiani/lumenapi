@@ -549,28 +549,28 @@ class LaporanPanjarController extends Controller {
 
                 $res2 = DB::connection($this->db)->select($select2);
                 $res2 = json_decode(json_encode($res2),true);
-            }
 
-            if(count($res2) > 0) { 
-                $no_pb = "";
-                $i=0;
-                foreach($res2 as $row) { 
-                    if($i == 0) {
-                        $no_pb = "'".$row['no_pb']."'";
-                    } else {
-                        $no_pb .= ", '".$row['no_pb']."'";
+                if(count($res2) > 0) { 
+                    $no_pb = "";
+                    $i=0;
+                    foreach($res2 as $row) { 
+                        if($i == 0) {
+                            $no_pb = "'".$row['no_pj']."'";
+                        } else {
+                            $no_pb .= ", '".$row['no_pj']."'";
+                        }
+                        $i++;
                     }
-                    $i++;
+
+                    $select3 = "SELECT no_bukti, no_rek, nama_rek, bank, nilai + ISNULL(pajak,0) AS nilai, 
+                    ISNULL(pajak,0) AS pajak, nilai AS netto 
+                    FROM pbh_rek
+                    WHERE no_bukti IN ($no_pb) AND kode_lokasi='".$kode_lokasi."' 
+                    ORDER BY no_rek";
+
+                    $res3 = DB::connection($this->db)->select($select3);
+                    $res3 = json_decode(json_encode($res3),true);
                 }
-
-                $select3 = "SELECT no_bukti, no_rek, nama_rek, bank, nilai + ISNULL(pajak,0) AS nilai, 
-                ISNULL(pajak,0) AS pajak, nilai AS netto 
-                FROM pbh_rek
-                WHERE no_bukti IN ($no_pb) AND kode_lokasi='".$kode_lokasi."' 
-                ORDER BY no_rek";
-
-                $res3 = DB::connection($this->db)->select($select3);
-                $res3 = json_decode(json_encode($res3),true);
             }   
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
