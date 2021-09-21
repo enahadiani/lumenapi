@@ -279,29 +279,31 @@ class LaporanController extends Controller
             $sql="select a.no_close as no_bukti_close, b.no_open as no_bukti_open, 
             convert(varchar,a.tgl_input,103) as tanggal_close, convert(varchar,b.tgl_input,103) as tanggal_open,
             convert(char(5), a.tgl_input, 108) as jam_close, convert(char(5), b.tgl_input, 108) as jam_open, 
-            b.saldo_awal, a.total_pnj, a.nik_user 
+            b.saldo_awal, a.total_pnj, a.nik_user, convert(varchar(10),a.tgl_input,121) as tanggal
             from kasir_close a
             inner join kasir_open b on a.no_close=b.no_close and a.kode_lokasi=b.kode_lokasi 
-            $where ";
+            $where";
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
             $nb = "";
+            $tanggal = "";
             $resdata = array();
             $i=0;
             foreach($rs as $row){
 
                 $resdata[]=(array)$row;
                 if($i == 0){
+                    $tanggal .= "'$row->tanggal'";
                     $nb .= "'$row->no_bukti_close'";
                 }else{
-
+                    $tanggal .= ", '$row->tanggal'";
                     $nb .= ","."'$row->no_bukti_close'";
                 }
                 $i++;
             }
 
             $sql2="select no_jual,tanggal,keterangan,periode,nilai,diskon,no_close as no_bukti from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb) " ;
+            where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb) and tanggal in ($tanggal)" ;
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
