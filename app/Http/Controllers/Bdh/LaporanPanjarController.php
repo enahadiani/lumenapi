@@ -352,10 +352,10 @@ class LaporanPanjarController extends Controller {
                 SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok 
                 FROM pbh_pb_m a
                 INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where AND a.modul='PJAJU'
+                $where AND a.modul='PJPTG'
                 GROUP BY b.no_bukti, b.kode_lokasi
             ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where AND a.modul='PJAJU'
+            $where AND a.modul='PJPTG'
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
