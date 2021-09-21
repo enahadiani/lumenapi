@@ -352,10 +352,10 @@ class LaporanPanjarController extends Controller {
                 SELECT b.no_bukti, b.kode_lokasi, COUNT(b.no_gambar) AS jum_dok 
                 FROM pbh_pb_m a
                 INNER JOIN pbh_dok b ON a.no_pb=b.no_bukti AND a.kode_lokasi=b.kode_lokasi
-                $where AND a.modul='PJAJU'
+                $where AND a.modul='PJPTG'
                 GROUP BY b.no_bukti, b.kode_lokasi
             ) j ON a.no_pb=j.no_bukti AND a.kode_lokasi=j.kode_lokasi
-            $where AND a.modul='PJAJU'
+            $where AND a.modul='PJPTG'
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
@@ -426,32 +426,37 @@ class LaporanPanjarController extends Controller {
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_kas = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $no_kas = "'".$row['no_kas']."'";
-                } else {
-                    $no_kas .= ", '".$row['no_kas']."'";
+            if(count($res1) > 0) { 
+                $bilanganAngka = array();
+                $no_kas = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    array_push($bilanganAngka, $this->bilanganAngka(floatval($row['nilai']))); 
+                    if($i == 0) {
+                        $no_kas = "'".$row['no_kas']."'";
+                    } else {
+                        $no_kas .= ", '".$row['no_kas']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT a.no_kas, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.kode_cf, 
+                CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet,
+                CASE dc WHEN 'C' THEN nilai ELSE 0 END AS kredit
+                FROM kas_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
+                ORDER BY a.no_urut";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
             }
-
-            $select2 = "SELECT a.no_kas, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.kode_cf, 
-            CASE dc WHEN 'D' THEN nilai ELSE 0 END AS debet,
-            CASE dc WHEN 'C' THEN nilai ELSE 0 END AS kredit
-            FROM kas_j a
-			INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
-			WHERE a.no_kas IN ($no_kas) AND a.kode_lokasi='".$kode_lokasi."'
-			ORDER BY a.no_urut";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['data_detail'] = $res2;
+                $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
             }
@@ -459,6 +464,7 @@ class LaporanPanjarController extends Controller {
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['bilangan_angka'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);
