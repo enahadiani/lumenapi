@@ -611,8 +611,7 @@ class PenilaianController extends Controller
                     'tipe' => 'nilai',
                     'pesan' => 'Koreksi untuk nilai '.$nama_jenis.' mata pelajaran '.$nama_matpel.' sudah bisa dilihat.',
                     'tipe' => 'nilai',
-                    'ref1' => $no_bukti,
-                    'kode_ta' => $request->kode_ta
+                    'ref1' => $no_bukti
                 ]);
 
                 $notif = app('App\Http\Controllers\Sekolah\PesanController')->store($request);
