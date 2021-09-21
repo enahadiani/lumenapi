@@ -24,21 +24,6 @@ class Approval2Controller extends Controller
     public $db = 'dbsiaga';
     public $guard = 'siaga';
 
-    function sendMail($email,$to_name,$data){
-        try {
-            $template_data = array("name"=>$to_name,"body"=>$data);
-            Mail::send('mail', $template_data,
-            function ($message) use ($email) {
-                $message->to($email)
-                ->subject('Pengajuan (SAI LUMEN)');
-            });
-            
-            return array('status' => 200, 'msg' => 'Sent successfully');
-        } catch (Exception $ex) {
-            return array('status' => 200, 'msg' => 'Something went wrong, please try later.');
-        }  
-    }
-
     function terbilang($int) {
         $angka = [
             "",
@@ -443,6 +428,23 @@ class Approval2Controller extends Controller
                         $msg_email = "";
                 }
 
+                $title = "Beban";
+                $subtitle = "Approval Pengajuan Beban";
+                $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di approve oleh ".$nik_app." , menunggu approval anda.";
+
+                $content2 = "Pengajuan dengan no transaksi ".$no_bukti." Anda telah di approve oleh ".$nik_app;
+
+                $periode = substr(date('Ym'),2,4);
+                $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
+                $success['no_pesan'] = $no_pesan;
+                
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Beban','-',0,0]);
+
+                $no_pesan2 = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
+                $success['no_pesan2'] = $no_pesan2;
+                
+                $inspesan2= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content2,$nik_buat,'-',$no_bukti,'Beban','-',0,0]);
+
             }else{
                 $nu=$request->no_urut-1;
 
@@ -545,6 +547,24 @@ class Approval2Controller extends Controller
                 }
                 
                 $success['approval'] = "Return";
+
+                $title = "Beban";
+                $subtitle = "Return Pengajuan Beban";
+                $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di return oleh ".$nik_app." , menunggu approval anda.";
+
+                $content2 = "Pengajuan dengan no transaksi ".$no_bukti." Anda telah di return oleh ".$nik_app;
+
+                $periode = substr(date('Ym'),2,4);
+                $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
+                $success['no_pesan'] = $no_pesan;
+                
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Beban','-',0,0]);
+
+                $no_pesan2 = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
+                $success['no_pesan2'] = $no_pesan2;
+                
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content2,$nik_buat,'-',$no_bukti,'Beban','-',0,0]);
+
             }
 
             DB::connection($this->db)->commit();
@@ -552,18 +572,12 @@ class Approval2Controller extends Controller
             $success['status'] = true;
             $success['message'] = "Data Approval Pengajuan berhasil disimpan. No Bukti:".$no_bukti;
             $success['no_aju'] = $no_bukti;
-            $success['nik_buat'] = $nik_buat;
-            $success['nik_app1'] = $nik_app1;
-            $success['nik_app'] = $nik_app;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Data Approval Pengajuan gagal disimpan ".$e;
             $success['no_aju'] = "";
-            $success['nik_buat'] = "-";
-            $success['nik_app1'] = "-";
-            $success['nik_app'] = "-";
             $success['approval'] = "Failed";
             DB::connection($this->db)->rollback();
             return response()->json($success, $this->successStatus); 
