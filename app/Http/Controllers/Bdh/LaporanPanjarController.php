@@ -251,30 +251,67 @@ class LaporanPanjarController extends Controller {
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
-            $no_pb = "";
-            $i=0;
-            foreach($res1 as $row) { 
-                if($i == 0) {
-                    $no_pb = "'".$row['no_pb']."'";
-                } else {
-                    $no_pb .= ", '".$row['no_pb']."'";
+            if(count($res1) > 0) { 
+                $bilanganAngka = array();
+                $no_pb = "";
+                $i=0;
+                foreach($res1 as $row) { 
+                    array_push($bilanganAngka, $this->bilanganAngka(floatval($row['nilai'])));
+                    if($i == 0) {
+                        $no_pb = "'".$row['no_pb']."'";
+                    } else {
+                        $no_pb .= ", '".$row['no_pb']."'";
+                    }
+                    $i++;
                 }
-                $i++;
+
+                $select2 = "SELECT no_bukti, no_rek, nama_rek, bank, 
+                nilai + ISNULL(pajak,0) AS nilai, ISNULL(pajak,0) AS pajak, nilai AS netto 
+                FROM pbh_rek
+                WHERE no_bukti IN ($no_pb) AND kode_lokasi='".$kode_lokasi."' 
+                ORDER BY no_rek";
+
+                $res2 = DB::connection($this->db)->select($select2);
+                $res2 = json_decode(json_encode($res2),true);
+
+                $select3 = "SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai  
+                FROM ptg_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='D'
+                UNION ALL
+                SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai*-1 AS nilai  
+                FROM ptg_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='C' AND a.jenis='PAJAK'
+                ORDER BY a.kode_akun";
+
+                $res3 = DB::connection($this->db)->select($select3);
+                $res3 = json_decode(json_encode($res3),true);
+
+                $select4 = "SELECT a.kode_akun, b.nama, SUM(a.nilai) AS nilai  
+                FROM ptg_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='D'
+                GROUP BY a.kode_akun, b.nama
+                UNION ALL
+                SELECT a.kode_akun, b.nama, SUM(a.nilai)*-1 AS nilai  
+                FROM ptg_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='C' AND a.jenis='PAJAK'
+                GROUP BY a.kode_akun, b.nama";
+
+                $res4 = DB::connection($this->db)->select($select4);
+                $res4 = json_decode(json_encode($res4),true);
+                
             }
-
-            $select2 = "SELECT no_bukti, no_rek, nama_rek, bank, 
-            nilai + ISNULL(pajak,0) AS nilai, ISNULL(pajak,0) AS pajak, nilai AS netto 
-            FROM pbh_rek
-            WHERE no_bukti IN ($no_pb) AND kode_lokasi='".$kode_lokasi."' 
-            ORDER BY no_rek";
-
-            $res2 = DB::connection($this->db)->select($select2);
-            $res2 = json_decode(json_encode($res2),true);
             
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['data_detail'] = $res2;
+                $success['data_akun'] = $res3;
+                $success['data_lain'] = $res4;
+                $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
             }
@@ -282,6 +319,9 @@ class LaporanPanjarController extends Controller {
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['data_akun'] = [];
+                $success['data_lain'] = [];
+                $success['bilangan_angka'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);
