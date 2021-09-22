@@ -274,12 +274,12 @@ class LaporanPanjarController extends Controller {
                 $res2 = DB::connection($this->db)->select($select2);
                 $res2 = json_decode(json_encode($res2),true);
 
-                $select3 = "SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai  
+                $select3 = "SELECT a.no_ptg, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai  
                 FROM ptg_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='D'
                 UNION ALL
-                SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai*-1 AS nilai  
+                SELECT a.no_ptg, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai*-1 AS nilai  
                 FROM ptg_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='C' AND a.jenis='PAJAK'
@@ -288,17 +288,17 @@ class LaporanPanjarController extends Controller {
                 $res3 = DB::connection($this->db)->select($select3);
                 $res3 = json_decode(json_encode($res3),true);
 
-                $select4 = "SELECT a.kode_akun, b.nama, SUM(a.nilai) AS nilai  
+                $select4 = "SELECT a.no_ptg, a.kode_akun, b.nama, SUM(a.nilai) AS nilai  
                 FROM ptg_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='D'
-                GROUP BY a.kode_akun, b.nama
+                GROUP BY a.kode_akun, b.nama, a.no_ptg
                 UNION ALL
-                SELECT a.kode_akun, b.nama, SUM(a.nilai)*-1 AS nilai  
+                SELECT a.no_ptg, a.kode_akun, b.nama, SUM(a.nilai)*-1 AS nilai  
                 FROM ptg_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_ptg IN ($no_pb) AND a.kode_lokasi='".$kode_lokasi."' AND a.dc='C' AND a.jenis='PAJAK'
-                GROUP BY a.kode_akun, b.nama";
+                GROUP BY a.kode_akun, b.nama, a.no_ptg";
 
                 $res4 = DB::connection($this->db)->select($select4);
                 $res4 = json_decode(json_encode($res4),true);
