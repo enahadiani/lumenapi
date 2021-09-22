@@ -164,7 +164,7 @@ class LaporanPanjarController extends Controller {
             END AS progress, a.kode_pp,b.nama AS nama_pp,
             a.no_ver, CONVERT(varchar,c.tanggal,103) AS tgl_ver,
             a.no_verdok, CONVERT(varchar,e.tanggal,103) AS tgl_verdok,
-            a.no_kas, CONVERT(varchar,g.tanggal,103) AS tgl_kas,
+            f.no_kas, CONVERT(varchar,g.tanggal,103) AS tgl_kas,
             a.no_spb, CONVERT(varchar,d.tanggal,103) AS tgl_spb,
             a.no_fisik, CONVERT(varchar,h.tanggal,103) AS tgl_fisik,
             a.no_pajak, CONVERT(varchar,i.tanggal,103) AS tgl_pajak
@@ -174,7 +174,7 @@ class LaporanPanjarController extends Controller {
             LEFT JOIN spb_m d ON a.no_spb=d.no_spb AND a.kode_lokasi=d.kode_lokasi
             LEFT JOIN pbh_ver_m e ON a.no_verdok=e.no_ver AND a.kode_lokasi=e.kode_lokasi
             INNER JOIN ptg_m f on a.no_pb=f.no_ptg and a.kode_lokasi=f.kode_lokasi
-            LEFT JOIN kas_m g ON a.no_kas=g.no_kas AND a.kode_lokasi=g.kode_lokasi
+            LEFT JOIN kas_m g ON f.no_kas=g.no_kas AND f.kode_lokasi=g.kode_lokasi
             LEFT JOIN pbh_ver_m h ON a.no_fisik=h.no_ver AND a.kode_lokasi=h.kode_lokasi
             LEFT JOIN pbh_ver_m i ON a.no_pajak=i.no_ver AND a.kode_lokasi=i.kode_lokasi
             $where AND a.modul='PJPTG'
