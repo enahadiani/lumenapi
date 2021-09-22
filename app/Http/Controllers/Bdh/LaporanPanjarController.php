@@ -158,8 +158,7 @@ class LaporanPanjarController extends Controller {
             CASE a.progress WHEN '0' THEN 'Pengajuan PB' 
             WHEN 'D' THEN 'Ver Dok'
             WHEN '1' THEN 'Ver Akun'
-            WHEN 'C' THEN 'Return Ver Dok'
-            WHEN 'V' THEN 'Return Ver Akun'
+            WHEN 'C' THEN 'Return Ver'
             WHEN '2' THEN 'SPB'
             WHEN '3' THEN 'Dibayar'
             END AS progress, a.kode_pp,b.nama AS nama_pp,
@@ -174,6 +173,7 @@ class LaporanPanjarController extends Controller {
             LEFT JOIN pbh_ver_m c ON a.no_ver=c.no_ver AND a.kode_lokasi=c.kode_lokasi
             LEFT JOIN spb_m d ON a.no_spb=d.no_spb AND a.kode_lokasi=d.kode_lokasi
             LEFT JOIN pbh_ver_m e ON a.no_verdok=e.no_ver AND a.kode_lokasi=e.kode_lokasi
+            INNER JOIN ptg_m f on a.no_pb=f.no_ptg and a.kode_lokasi=f.kode_lokasi
             LEFT JOIN kas_m g ON a.no_kas=g.no_kas AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN pbh_ver_m h ON a.no_fisik=h.no_ver AND a.kode_lokasi=h.kode_lokasi
             LEFT JOIN pbh_ver_m i ON a.no_pajak=i.no_ver AND a.kode_lokasi=i.kode_lokasi
