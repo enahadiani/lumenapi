@@ -308,8 +308,8 @@ class LaporanPanjarController extends Controller {
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
-                $success['data_detail'] = $res2;
-                $success['data_akun'] = $res3;
+                $success['data_rek'] = $res2;
+                $success['data_detail'] = $res3;
                 $success['data_lain'] = $res4;
                 $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
