@@ -154,7 +154,7 @@ class LaporanPanjarController extends Controller {
             }
 
             $select1 = "SELECT a.no_pb, CONVERT(varchar,a.tanggal,103) AS tgl, a.keterangan, a.posted, a.nilai, 
-            d.no_dokumen AS no_dpc, ISNULL(j.jum_dok,0) AS jum_dok, 
+            d.no_dokumen AS no_dpc,
             CASE a.progress WHEN '0' THEN 'Pengajuan PB' 
             WHEN 'D' THEN 'Ver Dok'
             WHEN '1' THEN 'Ver Akun'
