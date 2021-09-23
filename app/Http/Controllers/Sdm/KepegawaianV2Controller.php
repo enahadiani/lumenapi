@@ -38,7 +38,7 @@ class KepegawaianV2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "SELECT nik, nama, alamat FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' ";
+            $sql = "SELECT nik, nama, alamat, ISNULL(no_bpjs_kerja, '-') AS no_bpjs_kerja FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' ";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
