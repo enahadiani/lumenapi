@@ -190,7 +190,7 @@ class NotifController extends Controller
 
 			$post = array(
                 'registration_ids'  => $ids,
-                'data'              => $data,
+                'notification'      => $data,
                 'priority' => "high",
                 'android' => array(
                     "priority" => "high",
@@ -324,7 +324,7 @@ class NotifController extends Controller
 					}
 					$payload = array(
 						'title' => $title,
-						'message' => $message,
+						'body' => $message,
 						'click_action' => 'detail_pengajuan',
 						'key' => array(
 							'no_bukti' => $no_bukti,
@@ -438,7 +438,7 @@ class NotifController extends Controller
             
 			$payload = array(
 				'title' => $request->title,
-				'message' => $request->message,
+				'body' => $request->message,
 				'click_action' => 'detail_pengajuan',
 				'key' => array(
 					'no_bukti' => '-',
