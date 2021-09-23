@@ -236,11 +236,13 @@ class SPBController extends Controller
 
             if(isset($request->no_pb) && $request->no_pb != ""){
                 $filter = " and no_pb='$request->no_pb' ";
+                $status = "SPB";
             }else{
                 $filter = "";
+                $status = "INPROG";
             }
 
-            $sql = "select 'INPROG' as status,no_pb,convert(varchar,tanggal,103) as tgl,keterangan,nilai 
+            $sql = "select $status as status,no_pb,convert(varchar,tanggal,103) as tgl,keterangan,nilai 
             from pbh_pb_m 
             where progress='1' and no_spb='-' and kode_lokasi='".$kode_lokasi."' and modul not in ('IFCLOSE','PJPTG') $filter ";
 
