@@ -563,7 +563,7 @@ class Approval2Controller extends Controller
                 $no_pesan2 = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
                 $success['no_pesan2'] = $no_pesan2;
                 
-                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content2,$nik_buat,'-',$no_bukti,'Beban','-',0,0]);
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan2,$kode_lokasi,$title,$subtitle,$content2,$nik_buat,'-',$no_bukti,'Beban','-',0,0]);
 
             }
 
