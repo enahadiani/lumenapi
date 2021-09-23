@@ -242,8 +242,16 @@ class DashboardController extends Controller
             WHERE kode_lokasi = '".$kode_lokasi."'
             GROUP BY client";
 
+            $data_client = "SELECT client, fungsi, ISNULL(alamat, '-') AS alamat, count(*) AS jumlah
+			FROM hr_karyawan 
+            WHERE kode_lokasi = '".$kode_lokasi."'
+            GROUP BY client, fungsi, alamat";
+
             $selectClient = DB::connection($this->db)->select($jumlah_client);
             $resClient = json_decode(json_encode($selectClient),true);
+
+            $selectData = DB::connection($this->db)->select($data_client);
+            $resData = json_decode(json_encode($selectData),true);
 
             $total = 0;
             for($i=0;$i<count($resClient);$i++) {
@@ -262,6 +270,7 @@ class DashboardController extends Controller
             $success['message'] = "Success!";
             $success['categories'] = $ctg;
             $success['komposisi'] = $komposisi;
+            $success['data'] = $resData;
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
