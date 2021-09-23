@@ -58,8 +58,11 @@ class DashboardController extends Controller
             LEFT JOIN hr_agama h ON a.kode_agama=h.kode_agama AND a.kode_lokasi=h.kode_lokasi
             $where";
 
-            if(count($res) > 0){ 
-                $success['data'] = $res;
+            $selectData = DB::connection($this->db)->select($select);
+            $resData = json_decode(json_encode($selectData),true);
+
+            if(count($resData) > 0){ 
+                $success['data'] = $resData;
                 $success['status'] = true;
                 $success['message'] = "Success!";     
             }
