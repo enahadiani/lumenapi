@@ -47,7 +47,7 @@ class DashboardController extends Controller
             ISNULL(a.bm, '-') AS bm, ISNULL(a.atasan_langsung, '-') AS atasan_langsung, 
             ISNULL(a.atasan_t_langsung, '-') AS atasan_t_langsung, ISNULL(c.nama, '-') AS nama_sdm, 
             ISNULL(d.nama, '-') AS nama_gol, ISNULL(e.nama, '-') AS nama_loker, ISNULL(f.nama, '-') AS nama_unit, 
-            ISNULL(g.nama, '-') AS nama_profesi, ISNULL(h.nama, '-') AS nama_agama
+            ISNULL(g.nama, '-') AS nama_profesi, ISNULL(h.nama, '-') AS nama_agama, ISNULL(a.email, '-') AS email
             FROM hr_karyawan a
             LEFT JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN hr_sdm c ON a.kode_sdm=c.kode_sdm AND a.kode_lokasi=c.kode_lokasi
