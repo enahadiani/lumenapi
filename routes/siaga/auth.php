@@ -54,6 +54,8 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->post('notif-tes', 'Siaga\NotifController@tesSend');
     $router->get('notif-approval', 'Siaga\NotifController@getNotifPusher');
     $router->post('notif-approval', 'Siaga\NotifController@sendNotifApproval');
+    $router->put('notif-approval-status', 'Siaga\NotifController@updateStatusReadMobile');
+
     $router->put('notif-update-status', 'Siaga\NotifController@updateStatusRead');
 
     $router->post('search-form', 'AdminSiagaController@searchForm');

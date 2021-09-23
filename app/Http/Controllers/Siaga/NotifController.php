@@ -405,7 +405,7 @@ class NotifController extends Controller
 		DB::connection($this->db)->beginTransaction();
         try{
             
-			$upd = DB::connection($this->db)->insert("update user_message set sts_read_mob = '1' where nik='$nik' and id='$request->id' and kode_lokasi='$kode_lokasi' ");
+			$upd = DB::connection($this->db)->insert("update app_notif_m set sts_read = '1' where nik='$nik' and id='$request->id' and kode_lokasi='$kode_lokasi' ");
 
 			DB::connection($this->db)->commit();
 			$success['status'] = true;
