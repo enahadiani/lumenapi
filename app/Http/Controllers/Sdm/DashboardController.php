@@ -282,7 +282,7 @@ class DashboardController extends Controller
 
             if($request->query('pendidikan') === null) {
                 $filter_array = array('jk','kode_loker','kode_jab');
-                $col_array = array('a.jk', 'a.kode_loker', 'a.kode_jab');
+                $col_array = array('a.jk', 'a.kode_loker', 'a.jabatan');
 
                 for($i=0;$i<count($col_array);$i++) {
                     if($request->query($filter_array[$i]) !== null) {
@@ -296,6 +296,7 @@ class DashboardController extends Controller
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 INNER JOIN hr_loker c ON a.kode_loker=c.kode_loker AND a.kode_lokasi=c.kode_lokasi
                 $where";
+                var_dump($select);
 
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
