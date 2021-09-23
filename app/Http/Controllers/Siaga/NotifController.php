@@ -419,5 +419,59 @@ class NotifController extends Controller
         }
 	}
 
+	public function tesSend(Request $request)
+	{
+		$this->validate($request,[
+			"title" => 'required',
+			"message" => 'required',
+			"id" => 'required|array',
+			"sts_insert" => 'required'
+		]);
+
+		if($auth =  Auth::guard($this->guard)->user()){
+			$nik= $auth->nik;
+			$kode_lokasi= $auth->kode_lokasi;
+		}
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			$payload = array(
+				'title' => $request->title,
+				'message' => $request->message,
+				'click_action' => 'detail_pengajuan',
+				'key' => array(
+					'no_bukti' => '-',
+					'modul' => 'Beban'
+				)
+			);
+			$res = $this->gcm($request->id,$payload);
+			$hasil= json_decode($res,true);
+			$success['hasil'] = $hasil;
+			if(isset($hasil['success'])){
+				if($hasil['failure'] > 0){
+					$sts = 0;
+					$msg_n = "Notif FCM gagal dikirim";
+				}else{
+					$msg_n = "Notif FCM berhasil dikirim";
+					$sts = 1;
+				}
+			}else{
+				$msg_n = "Notif FCM gagal dikirim";
+				$sts = 0;
+			}
+
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = $msg_n;
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+	}
+
 	
 }
