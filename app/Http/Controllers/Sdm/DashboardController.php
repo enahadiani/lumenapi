@@ -281,8 +281,8 @@ class DashboardController extends Controller
             $where = "where a.kode_lokasi = '".$kode_lokasi."'";
 
             if($request->query('pendidikan') === null) {
-                $filter_array = array('jk','kode_loker');
-                $col_array = array('a.jk', 'a.kode_loker');
+                $filter_array = array('jk','kode_loker','kode_jab');
+                $col_array = array('a.jk', 'a.kode_loker', 'a.kode_jab');
 
                 for($i=0;$i<count($col_array);$i++) {
                     if($request->query($filter_array[$i]) !== null) {
@@ -290,7 +290,8 @@ class DashboardController extends Controller
                     }
                 }
 
-                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, c.nama AS nama_loker, a.client
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, c.nama AS nama_loker, a.client,
+                ISNULL(a.no_bpjs_kerja, '-') AS no_bpjs_kerja
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 INNER JOIN hr_loker c ON a.kode_loker=c.kode_loker AND a.kode_lokasi=c.kode_lokasi
@@ -299,7 +300,8 @@ class DashboardController extends Controller
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
             } else {
-                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, c.nama AS nama_loker, a.client
+                $select = "SELECT a.nik, a.nama AS nama_pegawai, b.nama AS nama_jabatan, c.nama AS nama_loker, a.client,
+                ISNULL(a.no_bpjs_kerja, '-') AS no_bpjs_kerja
                 FROM hr_karyawan a
                 INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 INNER JOIN hr_loker c ON a.kode_loker=c.kode_loker AND a.kode_lokasi=c.kode_lokasi
