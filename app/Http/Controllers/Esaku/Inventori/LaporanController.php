@@ -302,8 +302,10 @@ class LaporanController extends Controller
                 $i++;
             }
 
+            // $sql2="select no_jual,tanggal,keterangan,periode,nilai,diskon,no_close as no_bukti from brg_jualpiu_dloc
+            // where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb) and tanggal in ($tanggal)" ;
             $sql2="select no_jual,tanggal,keterangan,periode,nilai,diskon,no_close as no_bukti from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb) and tanggal in ($tanggal)" ;
+            where kode_lokasi = '".$kode_lokasi."' and no_close in ($nb)" ;
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
