@@ -26,7 +26,7 @@ class DaftarPenjualanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql1="SELECT no_jual, nilai, diskon, (nilai + diskon) AS total_trans, tobyr
+            $sql1="SELECT no_open, no_jual, nilai, diskon, (nilai + diskon) AS total_trans, tobyr
             FROM brg_jualpiu_dloc
             WHERE kode_lokasi = '".$kode_lokasi."' and no_jual = '".$request->query('no_bukti')."'";
 
