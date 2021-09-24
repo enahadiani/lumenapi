@@ -523,10 +523,9 @@ class VerDokController extends Controller
                 $rs5 = DB::connection($this->db)->select($strSQL5);
                 $res5 = json_decode(json_encode($rs5),true);
     
-                $strSQL7 = "select distinct convert(varchar,tgl_input,103) as tgl
-                from pbh_ver_m 
-                where no_bukti='".$request->no_pb."' and kode_lokasi='".$kode_lokasi."' 
-                order by convert(varchar,tgl_input,103) desc";
+                $strSQL7 = "select b.kode_jenis,b.nama,a.no_gambar 
+                from pbh_dok a inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
+                where a.no_ref = '".$request->no_pb."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
                 $rs7 = DB::connection($this->db)->select($strSQL7);
                 $res7 = json_decode(json_encode($rs7),true);
                 $memo = "-";
@@ -542,7 +541,7 @@ class VerDokController extends Controller
                     from pbh_dok_ver a left join pbh_verdok_d b on a.kode_dok=b.kode_dok and a.kode_lokasi=b.kode_lokasi and b.no_ver='".$no_verlama."' 
                     where b.kode_lokasi='".$kode_lokasi."' order by a.idx";				
                 }else{
-                    $strSQL9 = "select 'UNCHECK' as status,kode_dok,nama from pbh_dok_ver where kode_lokasi='".$kode_lokasi."' order by idx";	
+                    $strSQL9 = "select 'UNCHECK' as status,'-' as catatan,kode_dok,nama from pbh_dok_ver where kode_lokasi='".$kode_lokasi."' order by idx";	
                 }	
 
                 $rs9 = DB::connection($this->db)->select($strSQL9);
