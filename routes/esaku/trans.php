@@ -78,6 +78,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     //Daftar Penjualan
     $router->get('daftar-penjualan','Esaku\Inventori\DaftarPenjualanController@index');
+    $router->get('daftar-penjualandetail','Esaku\Inventori\DaftarPenjualanController@show');
 
     //Penjualan (OL pesan)
     $router->post('penjualan-langsung','Esaku\Inventori\PenjualanLangsungController@store');
