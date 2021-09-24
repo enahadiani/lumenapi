@@ -38,6 +38,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sdm-bpjs-kerja','Sdm\DashboardController@getDataBPJSTenagaKerja');
     $router->get('sdm-umur','Sdm\DashboardController@getDataUmur');
     $router->get('sdm-gaji','Sdm\DashboardController@getDataGaji');
+    $router->get('sdm-searchbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanTerdaftar');
+    $router->get('sdm-searchnonbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanNonTerdaftar');
+    $router->get('sdm-searchbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanTerdaftar');
+    $router->get('sdm-searchnonbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanNonTerdaftar');
 });
 
 

@@ -13,6 +13,135 @@ class DashboardController extends Controller
     public $guard = 'toko';
     public $db = 'tokoaws';
 
+    public function getListBPJSKetenagaanNonTerdaftar(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $where = "";
+            if($request->query('bpjs') != null && $request->query('bpjs') != '') {
+                $where = " AND no_bpjs_kerja LIKE '%".$request->query('bpjs')."%'";
+            }
+
+            $sql = "SELECT nik, nama, ISNULL(no_bpjs_kerja, '-') AS no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' AND (no_bpjs_kerja IS NULL OR no_bpjs_kerja = '-' OR no_bpjs_kerja = '') 
+            $where";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getListBPJSKetenagaanTerdaftar(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $where = "";
+            if($request->query('bpjs') != null && $request->query('bpjs') != '') {
+                $where = " AND no_bpjs_kerja LIKE '%".$request->query('bpjs')."%'";
+            } else {
+                $where = " AND no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> '' AND no_bpjs_kerja <> '-'";
+            }
+
+            $sql = "SELECT nik, nama, no_bpjs_kerja AS no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' $where";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getListBPJSKesehatanNonTerdaftar(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $where = "";
+            if($request->query('bpjs') != null && $request->query('bpjs') != '') {
+                $where = " AND no_bpjs LIKE '%".$request->query('bpjs')."%'";
+            }
+
+            $sql = "SELECT nik, nama, no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' AND (no_bpjs IS NULL OR no_bpjs = '-' OR no_bpjs = '') $where";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getListBPJSKesehatanTerdaftar(Request $request) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $where = "";
+            if($request->query('bpjs') != null && $request->query('bpjs') != '') {
+                $where = " AND no_bpjs LIKE '%".$request->query('bpjs')."%'";
+            } else {
+                $where = " AND no_bpjs IS NOT NULL AND no_bpjs <> '' AND no_bpjs <> '-'";
+            }
+
+            $sql = "SELECT nik, nama, no_bpjs
+			FROM hr_karyawan
+			WHERE kode_lokasi = '".$kode_lokasi."' $where";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getDataKaryawanDetail(Request $request) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -213,7 +342,7 @@ class DashboardController extends Controller
             $jumlah_non_ketenagaan = "SELECT count(nik) AS jumlah FROM hr_karyawan WHERE kode_lokasi = '".$kode_lokasi."' 
             AND (no_bpjs_kerja IS NULL OR no_bpjs_kerja = '-' OR no_bpjs_kerja = '')";
 
-            $data_karyawan_tedaftar = "SELECT nik, nama, no_bpjs
+            $data_karyawan_tedaftar = "SELECT nik, nama, no_bpjs_kerja AS no_bpjs
 			FROM hr_karyawan
 			WHERE kode_lokasi = '".$kode_lokasi."' AND no_bpjs_kerja IS NOT NULL AND no_bpjs_kerja <> ''
             AND no_bpjs_kerja <> '-'";
