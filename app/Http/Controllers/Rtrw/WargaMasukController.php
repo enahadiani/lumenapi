@@ -488,7 +488,7 @@ class WargaMasukController extends Controller
 
             
             if($request->no_hp != "" && $request->no_hp != "-"){
-                $pass = substr($request->no_hp[$i],6);
+                $pass = substr($request->no_hp,6);
                 $password = app('hash')->make($pass);
             }else{
                 $pass = "-";
