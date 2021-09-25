@@ -76,6 +76,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('stok-opname', 'Esaku\Inventori\StockOpnameController@update');
     $router->delete('stok-opname', 'Esaku\Inventori\StockOpnameController@destroy');
 
+    //Daftar Penjualan
+    $router->get('daftar-penjualan','Esaku\Inventori\DaftarPenjualanController@index');
+    $router->get('daftar-penjualandetail','Esaku\Inventori\DaftarPenjualanController@show');
+
     //Penjualan (OL pesan)
     $router->post('penjualan-langsung','Esaku\Inventori\PenjualanLangsungController@store');
     $router->get('penjualan-langsung-nota','Esaku\Inventori\PenjualanLangsungController@getNota');
