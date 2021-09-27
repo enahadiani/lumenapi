@@ -8,6 +8,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Mail;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use Carbon\Carbon;
+use Log;
 
 class ApprovalSPBController extends Controller
 {
@@ -20,19 +24,112 @@ class ApprovalSPBController extends Controller
     public $db = 'dbsiaga';
     public $guard = 'siaga';
 
-    function sendMail($email,$to_name,$data){
-        try {
-            $template_data = array("name"=>$to_name,"body"=>$data);
-            Mail::send('mail', $template_data,
-            function ($message) use ($email) {
-                $message->to($email)
-                ->subject('Pengajuan (SAI LUMEN)');
-            });
-            
-            return array('status' => 200, 'msg' => 'Sent successfully');
-        } catch (Exception $ex) {
-            return array('status' => 200, 'msg' => 'Something went wrong, please try later.');
-        }  
+    function terbilang($int) {
+        $angka = [
+            "",
+            "satu",
+            "dua",
+            "tiga",
+            "empat",
+            "lima",
+            "enam",
+            "tujuh",
+            "delapan",
+            "sembilan",
+            "sepuluh",
+            "sebelas",
+        ];
+        if ($int < 12) return " " .$angka[$int];
+        else if ($int < 20) return $this->terbilang($int - 10) ." belas ";
+        else if ($int < 100)
+            return $this->terbilang($int / 10) ." puluh " .$this->terbilang($int % 10);
+        else if ($int < 200) return "seratus" .$this->terbilang($int - 100);
+        else if ($int < 1000)
+            return $this->terbilang($int / 100) ." ratus " .$this->terbilang($int % 100);
+        else if ($int < 2000) return "seribu" .$this->terbilang($int - 1000);
+        else if ($int < 1000000)
+            return $this->terbilang($int / 1000) ." ribu " .$this->terbilang($int % 1000);
+        else if ($int < 1000000000)
+            return $this->terbilang($int / 1000000) ." juta " .$this->terbilang($int % 1000000);
+        else if ($int < 1000000000000)
+            return (
+                $this->terbilang($int / 1000000) ." milyar " .$this->terbilang($int % 1000000000)
+            );
+        else if ($int >= 1000000000000)
+            return (
+                $this->terbilang($int / 1000000).
+                " trilyun ".
+                $this->terbilang($int % 1000000000000)
+            );
+    }
+    
+    function getNamaBulan($no_bulan) {
+        switch ($no_bulan) {
+            case 1:
+            case "1":
+            case "01":
+                $bulan = "Januari";
+                break;
+            case 2:
+            case "2":
+            case "02":
+                $bulan = "Februari";
+                break;
+            case 3:
+            case "3":
+            case "03":
+                $bulan = "Maret";
+                break;
+            case 4:
+            case "4":
+            case "04":
+                $bulan = "April";
+                break;
+            case 5:
+            case "5":
+            case "05":
+                $bulan = "Mei";
+                break;
+            case 6:
+            case "6":
+            case "06":
+                $bulan = "Juni";
+                break;
+            case 7:
+            case "7":
+            case "07":
+                $bulan = "Juli";
+                break;
+            case 8:
+            case "8":
+            case "08":
+                $bulan = "Agustus";
+                break;
+            case 9:
+            case "9":
+            case "09":
+                $bulan = "September";
+                break;
+            case 10:
+            case "10":
+            case "10":
+                $bulan = "Oktober";
+                break;
+            case 11:
+            case "11":
+            case "11":
+                $bulan = "November";
+                break;
+            case 12:
+            case "12":
+            case "12":
+                $bulan = "Desember";
+                break;
+            default:
+                $bulan = null;
+        }
+    
+        return $bulan;
     }
 
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
@@ -91,7 +188,7 @@ class ApprovalSPBController extends Controller
         
     }
 
-    public function getPengajuan()
+    public function getPengajuan(Request $request)
     {
         try {
             
@@ -238,7 +335,7 @@ class ApprovalSPBController extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join apv_karyawan b on a.kode_jab=b.kode_jab 
+                    left join apv_karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
 
                     $rs = DB::connection($this->db)->select($sqlapp);
@@ -327,6 +424,15 @@ class ApprovalSPBController extends Controller
                 }else{
                         $msg_email = "";
                 }
+                $title = "SPB";
+                $subtitle = "Approval Pengajuan SPB";
+                $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di approve oleh ".$nik_app." , menunggu approval anda.";
+
+                $periode = substr(date('Ym'),2,4);
+                $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
+                $success['no_pesan'] = $no_pesan;
+                
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'SPB','-',0,0]);
 
             }else{
                 $nu=$request->no_urut-1;
@@ -429,6 +535,14 @@ class ApprovalSPBController extends Controller
                 }
                 
                 $success['approval'] = "Return";
+                $title = "SPB";
+                $subtitle = "Return Pengajuan SPB";
+                $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di return oleh ".$nik_app." , menunggu approval anda.";
+                $periode = substr(date('Ym'),2,4);
+                $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
+                $success['no_pesan'] = $no_pesan;
+                
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'SPB','-',0,0]);
             }
 
             DB::connection($this->db)->commit();
@@ -436,18 +550,12 @@ class ApprovalSPBController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Approval Pengajuan berhasil disimpan. No Bukti:".$no_bukti;
             $success['no_aju'] = $no_bukti;
-            $success['nik_buat'] = $nik_buat;
-            $success['nik_app1'] = $nik_app1;
-            $success['nik_app'] = $nik_app;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Data Approval Pengajuan gagal disimpan ".$e;
             $success['no_aju'] = "";
-            $success['nik_buat'] = "-";
-            $success['nik_app1'] = "-";
-            $success['nik_app'] = "-";
             $success['approval'] = "Failed";
             DB::connection($this->db)->rollback();
             return response()->json($success, $this->successStatus); 
