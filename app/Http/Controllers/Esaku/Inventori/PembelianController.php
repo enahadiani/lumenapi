@@ -31,7 +31,7 @@ class PembelianController extends Controller
                 $nik= $request->nik;
             }
 
-            $sql="select no_bukti,nik_user,tanggal,param2 as kode_vendor,nilai1 as total from trans_m where kode_lokasi='".$kode_lokasi."' and nik_user='".$nik."' and form = 'BRGBELI' ";
+            $sql="select no_bukti,nik_user,tanggal,param2 as kode_vendor,(nilai1-nilai3) as total from trans_m where kode_lokasi='".$kode_lokasi."' and nik_user='".$nik."' and form = 'BRGBELI' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
