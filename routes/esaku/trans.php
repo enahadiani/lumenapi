@@ -33,6 +33,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Penjualan (POS)
     $router->get('penjualan-open','Esaku\Inventori\PenjualanController@getNoOpen');
     $router->post('penjualan','Esaku\Inventori\PenjualanController@store');
+    $router->post('penjualan-ubah','Esaku\Inventori\PenjualanController@update');
     $router->get('penjualan-nota','Esaku\Inventori\PenjualanController@getNota');
     $router->get('penjualan-bonus','Esaku\Inventori\PenjualanController@cekBonus');
 

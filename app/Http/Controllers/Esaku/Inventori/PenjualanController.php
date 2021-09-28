@@ -179,6 +179,117 @@ class PenjualanController extends Controller
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['no_jual'] = $id;
+            $success['message'] = "Data Penjualan berhasil diubah";
+            
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Penjualan gagal diubah ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+        
+        
+    }
+
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'no_open' => 'required',
+            'no_jual' => 'required',
+            'kode_pp' => 'required',
+            'total_trans' => 'required',
+            // 'total_ppn' => 'required',
+            'diskon' => 'required',
+            'total_bayar' => 'required',
+            'kode_barang' => 'required|array',
+            'qty_barang' => 'required|array',
+            'harga_barang' => 'required|array',
+            'diskon_barang' => 'required|array',
+            'sub_barang' => 'required|array',
+            'ppn_barang' => 'required|array',
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
+            }
+
+            $periode=date('Y').date('m');
+            $id= $request->no_jual;
+
+            $delm = DB::connection($this->sql)->table('brg_jualpiu_dloc')
+            ->where('no_jual',$id)
+            ->where('kode_lokasi',$kode_lokasi)
+            ->delete();
+            
+            $deld = DB::connection($this->sql)->table('brg_trans_d')
+            ->where('no_bukti',$id)
+            ->where('kode_lokasi',$kode_lokasi)
+            ->delete();
+
+            $sql="select kode_spro,flag from spro where kode_spro in ('JUALDIS','HUTPPN','JUALKAS','CUSTINV') and kode_lokasi = '".$kode_lokasi."'";
+            $get2 = DB::connection($this->sql)->select($sql);
+            $get2 = json_decode(json_encode($get2),true);
+            if(count($get2) > 0){
+                foreach ($get2 as $row){
+                    if ($row['kode_spro'] == "HUTPPN") $akunPPN=$row['flag'];
+                    if ($row['kode_spro'] == "JUALDIS") $akunDiskon=$row['flag'];
+                    if ($row['kode_spro'] == "JUALKAS") $akunKas=$row['flag'];
+                    if ($row['kode_spro'] == "CUSTINV") $akunPiutang=$row['flag'];
+                }
+            }
+
+            $sqlp="select distinct b.akun_pdpt as kode_akun from brg_barang a inner join brg_barangklp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='$kode_lokasi' ";
+
+            $get3 = DB::connection($this->sql)->select($sqlp);
+            $get3 = json_decode(json_encode($get3),true);
+            if(count($get3) > 0){
+
+                $akunPDPT=$get3[0]['kode_akun'];
+            }else{
+                $akunPDPT= "-";
+            }
+
+            $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
+
+            $get4 = DB::connection($this->sql)->select($sqlg);
+            $get4 = json_decode(json_encode($get4),true);
+            if(count($get4) > 0){
+                $kodeGudang=$get4[0]['kode_gudang'];
+            }else{
+                $kodeGudang="-";
+            }
+
+            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,0,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-'));		
+
+            if(isset($request->kode_barang) && count($request->kode_barang) > 0){
+
+                for($a=0; $a<count($request->kode_barang);$a++){
+                    $ppn = ($request->ppn_barang[$a] * $request->sub_barang[$a])/100;
+                    $ins2[$a] = DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,ppn) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",array($id,$kode_lokasi,$periode,'BRGJUAL','BRGJUAL',$a,$kodeGudang,$request->kode_barang[$a],'-',date('Y-m-d H:i:s'),'-','C',0,$request->qty_barang[$a],0,$request->harga_barang[$a],0,0,$request->diskon_barang[$a],0,$request->sub_barang[$a],$ppn));
+                }	
+            }
+
+            $ins3 = DB::connection($this->sql)->insert("
+            update a set a.hpp=b.hpp, a.no_belicurr=b.no_belicurr 
+            from brg_trans_d a 
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
+
+            // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
+                
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['no_jual'] = $id;
             $success['message'] = "Data Penjualan berhasil disimpan";
             
             return response()->json($success, $this->successStatus);     
@@ -202,19 +313,6 @@ class PenjualanController extends Controller
     public function edit(Fs $Fs)
     {
         //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Fs  $Fs
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request)
-    {
-        //
-        
     }
 
     public function getNota(Request $request)
