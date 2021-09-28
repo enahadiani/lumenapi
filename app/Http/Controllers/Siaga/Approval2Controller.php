@@ -166,7 +166,7 @@ class Approval2Controller extends Controller
             }
 
             if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
-                $filter .= " and c.tanggal between '$request->start_date' and '$request->end_date' ";
+                $filter .= " and a.tanggal between '$request->start_date' and '$request->end_date' ";
             }
 
             if(isset($request->jenis) && $request->jenis != ""){
