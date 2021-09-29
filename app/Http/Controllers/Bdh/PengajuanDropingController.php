@@ -482,7 +482,7 @@ class PengajuanDropingController extends Controller
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
                     $success['no_bukti'] = $no_bukti;
-                    $success['message'] = "Data Pengajuan Droping berhasil disimpan";
+                    $success['message'] = "Data Pengajuan Droping berhasil diubah";
                 }else{
 
                     DB::connection($this->db)->rollback();
