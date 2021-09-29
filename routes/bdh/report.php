@@ -24,6 +24,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-periodepanjar','Bdh\FilterController@DataPeriodePanjar');
     $router->get('filter-periode','Bdh\FilterController@DataPeriode');
     $router->get('filter-nik','Bdh\FilterController@DataNIK');
+    $router->get('filter-pp','Bdh\FilterController@DataPP');
     
     $router->get('filter-nover','Bdh\FilterController@DataNoBuktiVerifikasi');
     $router->get('filter-nospb','Bdh\FilterController@DataNoBuktiSPB');
