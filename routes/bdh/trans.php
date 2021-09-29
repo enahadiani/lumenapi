@@ -119,6 +119,18 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('droping-aju-pp','Bdh\PengajuanDropingController@getPP');
     $router->get('droping-aju-akun','Bdh\PengajuanDropingController@getAkun');
     $router->get('droping-aju-budget','Bdh\PengajuanDropingController@cekBudget');
+
+    // PENGAJUAN DROPING 
+    $router->get('droping-terima-nobukti','Bdh\PenerimaanDropingController@generateNo');
+    $router->get('droping-terima','Bdh\PenerimaanDropingController@index');
+    $router->get('droping-terima-detail','Bdh\PenerimaanDropingController@show');
+    $router->post('droping-terima','Bdh\PenerimaanDropingController@store');
+    $router->post('droping-terima-ubah','Bdh\PenerimaanDropingController@update');
+    $router->delete('droping-terima','Bdh\PenerimaanDropingController@destroy');
+
+    $router->get('droping-terima-load','Bdh\PenerimaanDropingController@loadData');
+    $router->get('droping-terima-niktahu','Bdh\PenerimaanDropingController@getNIKTahu');
+    $router->get('droping-terima-akun','Bdh\PenerimaanDropingController@getAkun');
 });
 
 ?>
