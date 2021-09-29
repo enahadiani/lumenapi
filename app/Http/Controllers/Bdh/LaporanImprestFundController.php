@@ -122,14 +122,14 @@ class LaporanImprestFundController extends Controller {
                 CONVERT(varchar,a.tanggal,103) as tgl, 2 as nu 
                 FROM pbh_pb_m a
                 WHERE a.nik_user IN ($nik) AND a.kode_lokasi='".$kode_lokasi."' AND a.nilai<>0 
-                AND SUBSTRING(a.periode,1,4) IN ($tahun) AND a.modul='IFREIM'
+                AND SUBSTRING(a.periode,1,4) IN ($tahun) AND a.modul IN ('IFREIM','IFCLOSE')
                 UNION ALL
                 SELECT a.nik_user AS nik, a.no_pb as no_bukti, b.tanggal, a.keterangan, a.nilai AS debet, 0 AS kredit,
                 CONVERT(varchar,b.tanggal,103) as tgl, 3 AS nu
                 FROM pbh_pb_m a
                 INNER JOIN kas_m b ON a.no_kas=b.no_kas AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.nik_user IN ($nik) AND a.kode_lokasi='".$kode_lokasi."' AND a.no_kas<>'-' 
-                AND SUBSTRING(a.periode,1,4) IN ($tahun) AND a.modul='IFREIM'
+                AND SUBSTRING(a.periode,1,4) IN ($tahun) AND a.modul IN ('IFREIM','IFCLOSE')
                 ORDER BY tanggal";
 
                 $res2 = DB::connection($this->db)->select($select2);
