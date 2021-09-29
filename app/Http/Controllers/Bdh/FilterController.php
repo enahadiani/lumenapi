@@ -26,7 +26,7 @@ class FilterController extENDs Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $select = "SELECT DISTINCT SUBSTRING(periode, 1, 4) AS tahun FROM pbh_pb_m WHERE 
-            kode_lokasi = '".$kode_lokasi."' ORDER BY periode";
+            kode_lokasi = '".$kode_lokasi."' ORDER BY tahun";
 
             $res = DB::connection($this->db)->select($select);
             $res = json_decode(json_encode($res),true);
