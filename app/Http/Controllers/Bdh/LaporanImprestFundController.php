@@ -255,8 +255,8 @@ class LaporanImprestFundController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('periode', 'no_bukti');
-            $db_col_name = array('a.periode', 'a.no_pb');
+            $col_array = array('periode', 'kode_pp', 'no_bukti');
+            $db_col_name = array('a.periode', 'a.kode_pp', 'a.no_pb');
             $where = "where a.kode_lokasi='".$kode_lokasi."'";
 
             $this_in = "";
