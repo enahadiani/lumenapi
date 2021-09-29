@@ -702,6 +702,81 @@ class Approval2Controller extends Controller
         }
     }
 
+    public function cekBudget(Request $request){
+        $this->validate($request,[
+            'no_pb' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $no_bukti = $request->no_pb;
+            $nilai = 0; $total = 0;
+            $sls = 0;
+            $result = array();
+            
+            $sql="select a.no_pb,a.kode_akun,a.nilai,b.nama as nama_akun,c.periode 
+            from gr_pb_j a
+            inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join gr_pb_m c on a.no_pb=c.no_pb and a.kode_lokasi=c.kode_lokasi
+            where a.no_pb='$request->no_pb' and a.kode_lokasi='$kode_lokasi' ";
+            $res2 = DB::connection($this->db)->select($sql);
+			foreach ($res2 as $row){
+
+				$periode = $row->periode;
+                $sql="select dbo.fn_cekagg8('$kode_lokasi','".$row->kode_akun."','".$periode."','".$row->no_pb."') as gar";
+                $res = DB::connection($this->db)->select($sql);
+				if (count($res) > 0){
+					$line = $res[0];
+                    if($line->gar != ""){
+                        $data = explode(";",$line->gar);					
+                        $so_awal = floatval($data[0]) - floatval($data[1]);
+                        $so_akhir = $so_awal - floatval($row->nilai);
+
+                    }else{
+                        $so_awal = 0;
+                        $so_akhir = $so_awal - floatval($row->nilai);
+                    }
+				}else{
+                    $so_awal = 0;
+					$so_akhir = $so_awal - floatval($row->nilai);
+                }
+
+                $hasil = array(
+                    'no_pb' => $row->no_pb,
+                    'periode' => $periode,
+                    'kode_akun' => $row->kode_akun,
+                    'nama_akun' => $row->nama_akun,
+                    'saldo_awal' => $so_awal,
+                    'pemakaian' => $row->nilai,
+                    'saldo_akhir' => $so_akhir,
+                );
+                $result[] = $hasil;
+			}
+            
+            if(count($result) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $result;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Internal Server Error".$e;
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function detailHistory(Request $request)
     {
         $this->validate($request,[

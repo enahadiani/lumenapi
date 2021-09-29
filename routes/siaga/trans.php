@@ -32,6 +32,7 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     //Approval 
     $router->get('app','Siaga\Approval2Controller@index');
     $router->get('app-aju','Siaga\Approval2Controller@getPengajuan');
+    $router->get('app-aju-budget','Siaga\Approval2Controller@cekBudget');
     $router->get('app-detail','Siaga\Approval2Controller@show');
     $router->get('app-detail-history','Siaga\Approval2Controller@detailHistory');
     $router->post('app','Siaga\Approval2Controller@store');

@@ -792,7 +792,7 @@ class PtgBebanController extends Controller
                     'nilai_agg' => $request->nilai_agg[$i],
                     'so_akhir_agg' => $so_akhir,
                 );
-                $result = array_merge($result, $hasil);
+                $result[] = $hasil;
 			}
             
             if(count($result) > 0){ //mengecek apakah data kosong atau tidak
