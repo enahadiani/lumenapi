@@ -87,7 +87,7 @@ class LaporanImprestFundController extends Controller {
                 }
             }
 
-            $select1 = "SELECT distinct a.nik, b.nama, a.kode_pp, c.nama as nama_pp 
+            $select1 = "SELECT distinct a.nik, b.nama, a.kode_pp, c.nama as nama_pp, SUBSTRING(a.periode, 1, 4) AS periode 
             FROM if_nik a 
             INNER JOIN karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
             INNER JOIN pp c ON a.kode_pp=c.kode_pp AND a.kode_lokasi=c.kode_lokasi
@@ -104,10 +104,10 @@ class LaporanImprestFundController extends Controller {
                 foreach($res1 as $row) { 
                     if($i == 0) {
                         $nik = "'".$row['nik']."'";
-                        $tahun = "'".substr($row['periode'], 0, 4)."'";
+                        $tahun = "'".$row['periode']."'";
                     } else {
                         $nik .= ", '".$row['nik']."'";
-                        $tahun .= ", '".substr($row['periode'], 0, 4)."'";
+                        $tahun .= ", '".$row['periode']."'";
                     }
                     $i++;
                 }
