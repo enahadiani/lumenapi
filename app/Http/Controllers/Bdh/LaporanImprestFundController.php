@@ -17,6 +17,43 @@ class LaporanImprestFundController extends Controller {
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    private function convertBilangan($nilai) {
+		$nilai = abs($nilai);
+		$huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+		$temp = "";
+		if ($nilai < 12) {
+			$temp = " ". $huruf[$nilai];
+		} else if ($nilai <20) {
+			$temp = $this->convertBilangan($nilai - 10). " Belas";
+		} else if ($nilai < 100) {
+			$temp = $this->convertBilangan($nilai/10)." Puluh". $this->convertBilangan($nilai % 10);
+		} else if ($nilai < 200) {
+			$temp = " seratus" . $this->convertBilangan($nilai - 100);
+		} else if ($nilai < 1000) {
+			$temp = $this->convertBilangan($nilai/100) . " Ratus" . $this->convertBilangan($nilai % 100);
+		} else if ($nilai < 2000) {
+			$temp = " seribu" . $this->convertBilangan($nilai - 1000);
+		} else if ($nilai < 1000000) {
+			$temp = $this->convertBilangan($nilai/1000) . " Ribu" . $this->convertBilangan($nilai % 1000);
+		} else if ($nilai < 1000000000) {
+			$temp = $this->convertBilangan($nilai/1000000) . " Juta" . $this->convertBilangan($nilai % 1000000);
+		} else if ($nilai < 1000000000000) {
+			$temp = $this->convertBilangan($nilai/1000000000) . " Milyar" . $this->convertBilangan(fmod($nilai,1000000000));
+		} else if ($nilai < 1000000000000000) {
+			$temp = $this->convertBilangan($nilai/1000000000000) . " Trilyun" . $this->convertBilangan(fmod($nilai,1000000000000));
+		}     
+		return $temp;
+    }
+    
+    private function bilanganAngka($nilai) {
+		if($nilai<0) {
+			$hasil = "minus ". trim($this->convertBilangan($nilai));
+		} else {
+			$hasil = trim($this->convertBilangan($nilai));
+		}     		
+		return $hasil." "."Rupiah";
+	}
+
     public function DataKartuIF(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -244,28 +281,34 @@ class LaporanImprestFundController extends Controller {
                 }
             }
 
-            $select1 = "SELECT a.no_pb, CONVERT(varchar,a.tanggal,103) AS tgl, a.keterangan, i.kode_pp, 
-            b.nama AS nama_pp, a.nilai, a.nik_user, a.tanggal, i.kode_akun, c.nama AS nama_akun, 
-            i.kode_drk, e.nama AS nama_drk, h.logo, h.alamat, a.nik_user, a.nik_app, f.nama AS nama_user, 
-            g.nama AS nama_app
-            FROM pbh_pb_m a 
-            INNER JOIN pbh_pb_j i ON a.no_pb=i.no_pb AND a.kode_lokasi=i.kode_lokasi
-            INNER JOIN pp b ON i.kode_pp=b.kode_pp AND i.kode_lokasi=b.kode_lokasi
-            INNER JOIN masakun c ON i.kode_akun=c.kode_akun AND i.kode_lokasi=c.kode_lokasi
-            LEFT JOIN drk e ON i.kode_drk=e.kode_drk AND i.kode_lokasi=e.kode_lokasi AND e.tahun='2020'
+            $tahun = substr($r->input('periode')[1], 0, 4);
+
+            $select1 = "SELECT a.no_pb, CONVERT(varchar,a.tanggal,103) AS tgl, a.keterangan, 
+            a.kode_pp, b.nama AS nama_pp, a.nilai, a.nik_user, a.tanggal, i.kode_akun, c.nama AS nama_akun, d.bank,
+            d.no_rek, d.nama_rek, i.kode_drk, e.nama AS nama_drk, a.nik_user, 
+            a.nik_app, f.nama AS nama_user, g.nama AS nama_app, h.logo, h.alamat, ISNULL(j.kode_project,'-') AS status
+            FROM pbh_pb_m a
+            LEFT JOIN pbh_pb_j i ON a.no_pb=i.no_pb AND a.kode_lokasi=i.kode_lokasi
+            INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN masakun c ON i.kode_akun=c.kode_akun AND i.kode_lokasi=c.kode_lokasi
+            LEFT JOIN pbh_rek d ON a.no_pb=d.no_bukti AND a.kode_lokasi=d.kode_lokasi
+            LEFT JOIN drk e ON i.kode_drk=e.kode_drk AND i.kode_lokasi=e.kode_lokasi AND e.tahun='".$tahun."'
             LEFT JOIN karyawan f ON a.nik_user=f.nik AND a.kode_lokasi=f.kode_lokasi
             LEFT JOIN karyawan g ON a.nik_app=g.nik AND a.kode_lokasi=g.kode_lokasi
             LEFT JOIN lokasi h ON a.kode_lokasi=h.kode_lokasi
-            $where AND a.modul='IFREIM'
+            LEFT JOIN hutang_m j ON a.no_pb=j.no_hutang AND a.kode_lokasi=j.kode_lokasi
+            $where AND a.modul IN ('IFREIM','IFCLOSE')
             ORDER BY a.no_pb";
 
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
             if(count($res1) > 0) { 
+                $bilanganAngka = array();
                 $no_pb = "";
                 $i=0;
                 foreach($res1 as $row) { 
+                    array_push($bilanganAngka, $this->bilanganAngka(floatval($row['nilai'])));
                     if($i == 0) {
                         $no_pb = "'".$row['no_pb']."'";
                     } else {
@@ -282,19 +325,54 @@ class LaporanImprestFundController extends Controller {
 
                 $res2 = DB::connection($this->db)->select($select2);
                 $res2 = json_decode(json_encode($res2),true);
+
+                $select3 = "SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai 
+                FROM hutang_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='D'
+                UNION ALL
+                SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai*-1 as nilai 
+                FROM hutang_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc = 'C' AND a.jenis = 'PAJAK'
+                ORDER BY a.kode_akun";
+
+                $res3 = DB::connection($this->db)->select($select3);
+                $res3 = json_decode(json_encode($res3),true);
+
+                $select4 = "SELECT a.kode_akun, b.nama, SUM(a.nilai) AS nilai 
+                FROM hutang_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='D'
+                GROUP BY a.kode_akun,b.nama
+                UNION ALL
+                SELECT a.kode_akun, b.nama, SUM(a.nilai) * -1 as nilai 
+                FROM hutang_j a
+                INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
+                WHERE a.no_hutang IN ($no_pb)  AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='C' AND a.jenis='PAJAK'
+                GROUP BY a.kode_akun,b.nama";
+
+                $res4 = DB::connection($this->db)->select($select4);
+                $res4 = json_decode(json_encode($res4),true);
             }
 
             if(count($res1) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res1;
-                $success['data_detail'] = $res2;
+                $success['data_rek'] = $res2;
+                $success['data_detail'] = $res3;
+                $success['data_real'] = $res4;
+                $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['data_rek'] = [];
                 $success['data_detail'] = [];
+                $success['data_real'] = [];
+                $success['bilangan_angka'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);
@@ -346,15 +424,17 @@ class LaporanImprestFundController extends Controller {
             INNER JOIN lokasi d ON a.kode_lokasi=d.kode_lokasi
             LEFT JOIN karyawan b ON a.nik_buat=b.nik AND a.kode_lokasi=b.kode_lokasi
             LEFT JOIN karyawan c ON a.nik_app=c.nik AND a.kode_lokasi=c.kode_lokasi
-            $where";
+            $where AND a.modul='KBIFCAIR'";
 
             $res1 = DB::connection($this->db)->select($select1);
             $res1 = json_decode(json_encode($res1),true);
 
             if(count($res1) > 0) { 
+                $bilanganAngka = array();
                 $no_kas = "";
                 $i=0;
                 foreach($res1 as $row) { 
+                    array_push($bilanganAngka, $this->bilanganAngka(floatval($row['nilai'])));
                     if($i == 0) {
                         $no_kas = "'".$row['no_kas']."'";
                     } else {
@@ -379,6 +459,7 @@ class LaporanImprestFundController extends Controller {
                 $success['status'] = true;
                 $success['data'] = $res1;
                 $success['data_detail'] = $res2;
+                $success['bilangan_angka'] = $bilanganAngka;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;  
             }
@@ -386,6 +467,7 @@ class LaporanImprestFundController extends Controller {
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['bilangan_angka'] = [];
                 $success['status'] = true;
             }
             return response()->json($success, $this->successStatus);
