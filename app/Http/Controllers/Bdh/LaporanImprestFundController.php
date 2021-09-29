@@ -326,7 +326,7 @@ class LaporanImprestFundController extends Controller {
                 $res2 = DB::connection($this->db)->select($select2);
                 $res2 = json_decode(json_encode($res2),true);
 
-                $select3 = "SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai 
+                $select3 = "SELECT a.no_hutang, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai 
                 FROM hutang_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='D'
@@ -340,7 +340,7 @@ class LaporanImprestFundController extends Controller {
                 $res3 = DB::connection($this->db)->select($select3);
                 $res3 = json_decode(json_encode($res3),true);
 
-                $select4 = "SELECT a.kode_akun, b.nama, SUM(a.nilai) AS nilai 
+                $select4 = "SELECT a.no_hutang, a.kode_akun, b.nama, SUM(a.nilai) AS nilai 
                 FROM hutang_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='D'
