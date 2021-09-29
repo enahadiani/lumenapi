@@ -57,7 +57,7 @@ class FilterController extENDs Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $select = "SELECT a.kode_pp, b  .nama
+            $select = "SELECT DISTINCT a.kode_pp, b  .nama
             FROM if_nik a
             INNER JOIN pp b ON a.kode_pp=b.kode_pp AND a.kode_lokasi=b.kode_lokasi
             WHERE a.kode_lokasi = '".$kode_lokasi."'";
