@@ -16,8 +16,13 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 
-$router->group(['middleware' => 'auth:toko'], function () use ($router) {
-    
+$router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
+   
+    //Data Dok Jenis
+    $router->get('dok-jenis','Bdh\JenisDokController@index');
+    $router->post('dok-jenis','Bdh\JenisDokController@store');
+    $router->put('dok-jenis','Bdh\JenisDokController@update');
+    $router->delete('dok-jenis','Bdh\JenisDokController@destroy'); 
 });
 
 
