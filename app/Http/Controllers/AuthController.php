@@ -394,6 +394,34 @@ class AuthController extends Controller
         }
     }
 
+    public function logoutSiaga(Request $request)
+    {
+        $this->validate($request, [
+            'id_device' => 'required|string',
+            'nik' => 'required|string'
+        ]);
+
+        DB::connection('dbsiaga')->beginTransaction();
+        try{
+            
+            
+            $del = DB::connection('dbsiaga')->table('users_device')
+            ->where('id_device',$request->id_device)
+            ->where('nik',$request->nik)
+            ->delete();
+
+            DB::connection('dbsiaga')->commit();
+            $success['status'] = true;
+            $success['message'] = "Logout berhasil";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+            DB::connection('dbsiaga')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
     public function loginDago(Request $request)
     {
           //validate incoming request 
