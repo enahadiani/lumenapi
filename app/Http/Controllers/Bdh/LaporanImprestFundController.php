@@ -331,7 +331,7 @@ class LaporanImprestFundController extends Controller {
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='D'
                 UNION ALL
-                SELECT a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai*-1 as nilai 
+                SELECT a.no_hutang, a.kode_akun, b.nama, a.keterangan, a.kode_pp, a.kode_drk, a.nilai*-1 as nilai 
                 FROM hutang_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc = 'C' AND a.jenis = 'PAJAK'
@@ -344,13 +344,13 @@ class LaporanImprestFundController extends Controller {
                 FROM hutang_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_hutang IN ($no_pb) AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='D'
-                GROUP BY a.kode_akun,b.nama
+                GROUP BY a.kode_akun,b.nama,a.no_hutang
                 UNION ALL
-                SELECT a.kode_akun, b.nama, SUM(a.nilai) * -1 as nilai 
+                SELECT a.no_hutang,     a.kode_akun, b.nama, SUM(a.nilai) * -1 as nilai 
                 FROM hutang_j a
                 INNER JOIN masakun b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
                 WHERE a.no_hutang IN ($no_pb)  AND a.kode_lokasi = '".$kode_lokasi."' AND a.dc='C' AND a.jenis='PAJAK'
-                GROUP BY a.kode_akun,b.nama";
+                GROUP BY a.kode_akun,b.nama,a.no_hutang";
 
                 $res4 = DB::connection($this->db)->select($select4);
                 $res4 = json_decode(json_encode($res4),true);
