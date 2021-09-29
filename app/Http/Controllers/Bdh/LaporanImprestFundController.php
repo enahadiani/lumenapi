@@ -87,7 +87,7 @@ class LaporanImprestFundController extends Controller {
                 }
             }
 
-            $select1 = "SELECT distinct a.nik, b.nama, a.kode_pp, c.nama as nama_pp, a.periode 
+            $select1 = "SELECT distinct a.nik, b.nama, a.kode_pp, c.nama as nama_pp 
             FROM if_nik a 
             INNER JOIN karyawan b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
             INNER JOIN pp c ON a.kode_pp=c.kode_pp AND a.kode_lokasi=c.kode_lokasi
