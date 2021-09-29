@@ -421,7 +421,7 @@ class PtgBebanController extends Controller
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total akru simpanan tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total pertanggungan beban tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
 
@@ -654,7 +654,7 @@ class PtgBebanController extends Controller
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total akru simpanan tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total pertanggungan beban tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
 

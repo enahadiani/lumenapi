@@ -107,6 +107,18 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('bayar-spb-pp','Bdh\BayarSPBController@getPP');
     $router->get('bayar-spb-rek-transfer','Bdh\BayarSPBController@getRekTransfer');
     $router->get('bayar-spb-akun-kasbank','Bdh\BayarSPBController@getAkunKasBank');
+
+    // PENGAJUAN DROPING 
+    $router->get('droping-aju-nobukti','Bdh\PengajuanDropingController@generateNo');
+    $router->get('droping-aju','Bdh\PengajuanDropingController@index');
+    $router->get('droping-aju-detail','Bdh\PengajuanDropingController@show');
+    $router->post('droping-aju','Bdh\PengajuanDropingController@store');
+    $router->post('droping-aju-ubah','Bdh\PengajuanDropingController@update');
+    $router->delete('droping-aju','Bdh\PengajuanDropingController@destroy');
+
+    $router->get('droping-aju-pp','Bdh\PengajuanDropingController@getPP');
+    $router->get('droping-aju-akun','Bdh\PengajuanDropingController@getAkun');
+    $router->get('droping-aju-budget','Bdh\PengajuanDropingController@cekBudget');
 });
 
 ?>
