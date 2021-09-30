@@ -449,7 +449,7 @@ class ApprovalDropingController extends Controller
             ->where('no_pb', $request->no_aju)
             ->delete();
 
-            $del3 = DB::connection($this->db)->table('pbh_pb_rek')
+            $del3 = DB::connection($this->db)->table('pbh_rek')
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_bukti', $request->no_aju)
             ->delete();
