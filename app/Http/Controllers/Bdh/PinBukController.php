@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class PtgBebanController extends Controller
+class PinBukController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -199,14 +199,11 @@ class PtgBebanController extends Controller
             }
 
             $sql="select a.no_pb,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan,a.nilai, 
-            case a.progress when '0' then 'input' 
-            				  when 'R' then 'return dokumen' 
-            				  when 'K' then 'return pajak' 
-            				  when 'V' then 'return verifikasi' 					 
+            case a.progress when '1' then 'input' 					 
             end as status 
             from pbh_pb_m a 					 					 
             where a.kode_lokasi='".$kode_lokasi."' 
-            and a.modul = 'PBBAU' and a.progress in ('0','R','K','V') and a.kode_pp in (select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi='".$kode_lokasi."') 
+            and a.modul = 'PINBUK' and a.progress in ('1') and a.kode_pp in (select kode_pp from karyawan_pp where nik='".$nik."' and kode_lokasi='".$kode_lokasi."') 
             order by a.no_pb desc";
 
             $res = DB::connection($this->db)->select($sql);
@@ -255,28 +252,19 @@ class PtgBebanController extends Controller
             'due_date' => 'required|date_format:Y-m-d',
             'no_dokumen' => 'required|max:50',
             'deskripsi' => 'required|max:200',
+            'total_pinbuk' => 'required',
             'nik_buat' => 'required|max:20',
             'nik_tahu' => 'required|max:20',
             'nik_ver' => 'required|max:20',
-            'atensi' => 'required|array',
-            'bank' => 'required|array',
-            'nama_rek' => 'required|array',
-            'no_rek' => 'required|array',
-            'bruto' => 'required|array',
-            'potongan' => 'required|array',
-            'netto' => 'required|array',
+            'atensi' => 'required',
+            'bank_sumber' => 'required',
+            'nama_rek_sumber' => 'required',
+            'no_rek_sumber' => 'required',
             'kode_akun' => 'required|array',
-            'dc' => 'required|array',
-            'keterangan' => 'required|array',
+            'bank' => 'required|array',
+            'no_rek' => 'required|array',
+            'nama_rek' => 'required|array',
             'nilai' => 'required|array',
-            'kode_pp' => 'required|array',
-            'kode_drk' => 'required|array',
-            'kode_akun_agg' => 'required|array',
-            'kode_pp_agg' => 'required|array',
-            'kode_drk_agg' => 'required|array',
-            'saldo_awal_agg' => 'required|array',
-            'nilai_agg' => 'required|array',
-            'saldo_akhir_agg' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -302,72 +290,33 @@ class PtgBebanController extends Controller
                 }else{
                     $kode_pp = "-";
                 }
-
-                $getSPRO = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('PBBMHD','NIKVER') and kode_lokasi = '".$kode_lokasi."'");
-                if(count($getSPRO) > 0){
-                    $line = $getSPRO[0];
-                    if ($line->kode_spro == "PBBMHD") $akunBMHD = $line->flag;
-                    if ($line->kode_spro == "NIKVER") $cb_ver = $line->flag;
-                }else{
-                    $akunBMHD = "-";
-                    $cb_ver = "-";
-                }
                 
                 $j = 0;
                 $total = 0;
                 if(count($request->kode_akun) > 0){
 
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PBBAU','BEBAN',$periode,$nik,'IDR',1));
-                        if($request->dc[$i] == "D"){
-                            $total+= +floatval($request->nilai[$i]);
-                        }else{
-                            $total-= +floatval($request->nilai[$i]);
-                        }
+                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->deskripsi,'D',floatval($request->nilai[$i]),$kode_pp[$i],'-',$kode_lokasi,'PINBUK','TUJUAN',$periode,$nik,'IDR',1));
+                        $total+= +floatval($request->nilai[$i]);
+
+                        $insrek[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-D',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi,floatval($request->nilai[$i]),0,floatval($request->nilai[$i])));
                     }
                 }
 
-                $total_rek = 0;
-                if(count($request->atensi) > 0){
-
-                    for ($i=0; $i<count($request->atensi); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PBBAU',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi[$i],floatval($request->bruto[$i]),floatval($request->pajak[$i]),floatval($request->netto[$i])));
-                        $total_rek+= floatval($request->netto[$i]);
-                    }
-                }
-
-                if($total != $total_rek){
-                    $msg = "Transaksi tidak valid.Total Jurnal ($total) dan TotalNet Rekening ($total_rek) tidak sama.";
+                if($total != floatval($request->total_pinbuk)){
+                    $msg = "Transaksi tidak valid.Total Pinbuk ($request->total_pinbuk) dan Total Detail Rekening ($total) tidak sama.";
                     DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['no_bukti'] = "-";
                     $success['message'] = $msg;
                 }else{
-                    
-                    $total_agg=0;
-                    if(count($request->kode_akun_agg) > 0){
-    
-                        for ($i=0; $i<count($request->kode_akun_agg); $i++){	
-    
-                            if(floatval($request->nilai_agg[$i]) > 0){
-                                $dc = "D";
-                                $nilai = floatval($request->nilai_agg[$i]);
-                            }else{
-                                
-                                $dc = "C";
-                                $nilai = floatval($request->nilai_agg[$i]) * -1;
-                            }
-                            $insj[$i] = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,'PBBAU',$kode_lokasi,$request->kode_akun_agg[$i],$request->kode_pp_agg[$i],$request->kode_drk_agg[$i],$periode,$periode,$dc,floatval($request->saldo_akhir_agg[$i]),$nilai));
-                            
-                            if($dc == "D"){
-                                $total_agg+= floatval($request->nilai[$i]);
-                            }
-                        }
-                    }
-    
+                
                     if($total > 0){
     
-                        $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PBBAU',0,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-','-',$request->nik_ver));
+                        $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PINBUK',0,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-',$request->rekening_sumber,$request->nik_ver));
+
+                        //rek sumber
+				        $insrek0 = DB::connection($this->db)->select("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-C',$request->nama_rek_sumber,$request->no_rek_sumber,$request->bank_sumber,$request->atensi,$total,0,$total,99999));	
                         
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -415,13 +364,13 @@ class PtgBebanController extends Controller
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Pertanggungan Beban berhasil disimpan";
+                        $success['message'] = "Data Pindah Buku berhasil disimpan";
                     }else{
     
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total pertanggungan beban tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total Pindah Buku tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
 
@@ -435,7 +384,7 @@ class PtgBebanController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Pertanggungan Beban gagal disimpan ".$e;
+            $success['message'] = "Data Pindah Buku gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -469,28 +418,19 @@ class PtgBebanController extends Controller
             'due_date' => 'required|date_format:Y-m-d',
             'no_dokumen' => 'required|max:50',
             'deskripsi' => 'required|max:200',
+            'total_pinbuk' => 'required',
             'nik_buat' => 'required|max:20',
             'nik_tahu' => 'required|max:20',
             'nik_ver' => 'required|max:20',
-            'atensi' => 'required|array',
-            'bank' => 'required|array',
-            'nama_rek' => 'required|array',
-            'no_rek' => 'required|array',
-            'bruto' => 'required|array',
-            'potongan' => 'required|array',
-            'netto' => 'required|array',
+            'atensi' => 'required',
+            'bank_sumber' => 'required',
+            'nama_rek_sumber' => 'required',
+            'no_rek_sumber' => 'required',
             'kode_akun' => 'required|array',
-            'dc' => 'required|array',
-            'keterangan' => 'required|array',
+            'bank' => 'required|array',
+            'no_rek' => 'required|array',
+            'nama_rek' => 'required|array',
             'nilai' => 'required|array',
-            'kode_pp' => 'required|array',
-            'kode_drk' => 'required|array',
-            'kode_akun_agg' => 'required|array',
-            'kode_pp_agg' => 'required|array',
-            'kode_drk_agg' => 'required|array',
-            'saldo_awal_agg' => 'required|array',
-            'nilai_agg' => 'required|array',
-            'saldo_akhir_agg' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -536,14 +476,11 @@ class PtgBebanController extends Controller
                     $kode_pp = "-";
                 }
 
-                $getSPRO = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('PBBMHD','NIKVER') and kode_lokasi = '".$kode_lokasi."'");
-                if(count($getSPRO) > 0){
-                    $line = $getSPRO[0];
-                    if ($line->kode_spro == "PBBMHD") $akunBMHD = $line->flag;
-                    if ($line->kode_spro == "NIKVER") $cb_ver = $line->flag;
+                $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+                if(count($getPP) > 0){
+                    $kode_pp = $getPP[0]->kode_pp;
                 }else{
-                    $akunBMHD = "-";
-                    $cb_ver = "-";
+                    $kode_pp = "-";
                 }
                 
                 $j = 0;
@@ -551,56 +488,27 @@ class PtgBebanController extends Controller
                 if(count($request->kode_akun) > 0){
 
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PBBAU','BEBAN',$periode,$nik,'IDR',1));
-                        if($request->dc[$i] == "D"){
-                            $total+= +floatval($request->nilai[$i]);
-                        }else{
-                            $total-= +floatval($request->nilai[$i]);
-                        }
+                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->deskripsi,'D',floatval($request->nilai[$i]),$kode_pp[$i],'-',$kode_lokasi,'PINBUK','TUJUAN',$periode,$nik,'IDR',1));
+                        $total+= +floatval($request->nilai[$i]);
+
+                        $insrek[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-D',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi,floatval($request->nilai[$i]),0,floatval($request->nilai[$i])));
                     }
                 }
 
-                $total_rek = 0;
-                if(count($request->atensi) > 0){
-
-                    for ($i=0; $i<count($request->atensi); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PBBAU',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi[$i],floatval($request->bruto[$i]),floatval($request->pajak[$i]),floatval($request->netto[$i])));
-                        $total_rek+= floatval($request->netto[$i]);
-                    }
-                }
-
-                if($total != $total_rek){
-                    $msg = "Transaksi tidak valid.Total Jurnal ($total) dan TotalNet Rekening ($total_rek) tidak sama.";
+                if($total != floatval($request->total_pinbuk)){
+                    $msg = "Transaksi tidak valid.Total Pinbuk ($request->total_pinbuk) dan Total Detail Rekening ($total) tidak sama.";
                     DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['no_bukti'] = "-";
                     $success['message'] = $msg;
                 }else{
-                    
-                    $total_agg=0;
-                    if(count($request->kode_akun_agg) > 0){
-    
-                        for ($i=0; $i<count($request->kode_akun_agg); $i++){	
-    
-                            if(floatval($request->nilai_agg[$i]) > 0){
-                                $dc = "D";
-                                $nilai = floatval($request->nilai_agg[$i]);
-                            }else{
-                                
-                                $dc = "C";
-                                $nilai = floatval($request->nilai_agg[$i]) * -1;
-                            }
-                            $insj[$i] = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,'PBBAU',$kode_lokasi,$request->kode_akun_agg[$i],$request->kode_pp_agg[$i],$request->kode_drk_agg[$i],$periode,$periode,$dc,floatval($request->saldo_akhir_agg[$i]),$nilai));
-                            
-                            if($dc == "D"){
-                                $total_agg+= floatval($request->nilai[$i]);
-                            }
-                        }
-                    }
-    
+                
                     if($total > 0){
     
-                        $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PBBAU',0,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-','-',$request->nik_ver));
+                        $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PINBUK',0,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-',$request->rekening_sumber,$request->nik_ver));
+
+                        //rek sumber
+				        $insrek0 = DB::connection($this->db)->select("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-C',$request->nama_rek_sumber,$request->no_rek_sumber,$request->bank_sumber,$request->atensi,$total,0,$total,99999));	
                         
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -640,7 +548,7 @@ class PtgBebanController extends Controller
             
                             if(count($arr_no_urut) > 0){
                                 for($i=0; $i<count($arr_no_urut);$i++){
-                                    $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$request->kode_jenis[$i],$kode_lokasi,'PBBAU',$no_bukti)); 
+                                    $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'PBBAU',$no_bukti)); 
                                 }
                             }
                         }
@@ -648,13 +556,13 @@ class PtgBebanController extends Controller
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Pertanggungan Beban berhasil diubah";
+                        $success['message'] = "Data Pindah Buku berhasil diubah";
                     }else{
     
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total pertanggungan beban tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total Pindah Buku tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
 
@@ -670,7 +578,7 @@ class PtgBebanController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['no_bukti'] = "-";
-            $success['message'] = "Data Pertanggungan Beban gagal diubah ".$e;
+            $success['message'] = "Data Pindah Buku gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -693,125 +601,58 @@ class PtgBebanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $no_bukti = $request->no_bukti;
-            // backup hapus
-            $ins = DB::connection($this->db)->insert("insert into pbh_pb_his (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver,nik_del,tgl_del)  
-                    select no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver,'".$nik."',getdate() 
-                    from pbh_pb_m where no_pb='".$no_bukti."' and kode_lokasi='".$kode_lokasi."'");
-           
-            $del = DB::connection($this->db)->table('pbh_pb_m')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_pb', $no_bukti)
-            ->delete();
-            $del2 = DB::connection($this->db)->table('pbh_pb_j')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_pb', $no_bukti)
-            ->delete();
-            
-            $del3 = DB::connection($this->db)->table('angg_r')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
-            ->delete();
 
-            $del4 = DB::connection($this->db)->table('pbh_rek')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $no_bukti)
-            ->delete();
+            $periode = date('Ym');
+            $cek = $this->doCekPeriode($periode);
+            if($cek['status']){
+            
+                $no_bukti = $request->no_bukti;
+                // backup hapus
+                $ins = DB::connection($this->db)->insert("insert into pbh_pb_his (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver,nik_del,tgl_del)  
+                        select no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver,'".$nik."',getdate() 
+                        from pbh_pb_m where no_pb='".$no_bukti."' and kode_lokasi='".$kode_lokasi."'");
+            
+                $del = DB::connection($this->db)->table('pbh_pb_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_pb', $no_bukti)
+                ->delete();
+                $del2 = DB::connection($this->db)->table('pbh_pb_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_pb', $no_bukti)
+                ->delete();
 
-            $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
-            $res = json_decode(json_encode($res),true);
-            for($i=0;$i<count($res);$i++){
-                if(Storage::disk('s3')->exists('bdh/'.$res[$i]['no_gambar'])){
-                    Storage::disk('s3')->delete('bdh/'.$res[$i]['no_gambar']);
+                $del4 = DB::connection($this->db)->table('pbh_rek')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_bukti', $no_bukti)
+                ->delete();
+
+                $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+                $res = json_decode(json_encode($res),true);
+                for($i=0;$i<count($res);$i++){
+                    if(Storage::disk('s3')->exists('bdh/'.$res[$i]['no_gambar'])){
+                        Storage::disk('s3')->delete('bdh/'.$res[$i]['no_gambar']);
+                    }
                 }
+
+                $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Pindah Buku berhasil dihapus";
+            }else{
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['message'] = $cek["message"];
             }
-
-            $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Pertanggungan Beban berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Pertanggungan Beban gagal dihapus ".$e;
+            $success['message'] = "Data Pindah Buku gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
-    }
-
-    public function cekBudget(Request $request)
-    {
-        $this->validate($request,[
-            'kode_akun_agg' => 'required|array',
-            'kode_pp_agg' => 'required|array',
-            'kode_drk_agg' => 'required|array',
-            'nilai_agg' => 'required|array',
-            'periode' => 'required',
-            'no_bukti' => 'required',
-        ]);
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-            $periode = $request->periode;
-            $no_bukti = $request->no_bukti;
-            $nilai = 0; $total = 0;
-            $sls = 0;
-            $result = array();
-			for ($i=0;$i < count($request->kode_akun_agg);$i++){
-				$strSQL = "select dbo.fn_cekagg3('".$request->kode_pp_agg[$i]."','".$kode_lokasi."','".$request->kode_akun_agg[$i]."','".$request->kode_drk_agg[$i]."','".$periode."','".$no_bukti."') as gar ";			
-                $res = DB::connection($this->db)->select($strSQL);
-				if (count($res) > 0){
-					$line = $res[0];
-                    if($line->gar != ""){
-                        $data = explode(";",$line->gar);					
-                        $so_awal = floatval($data[0]) - floatval($data[1]);
-                        $so_akhir = $so_awal - floatval($request->nilai_agg[$i]);
-
-                    }else{
-                        $so_awal = 0;
-                        $so_akhir = $so_awal - floatval($request->nilai_agg[$i]);
-                    }
-				}else{
-                    $so_awal = 0;
-					$so_akhir = $so_awal - floatval($request->nilai_agg[$i]);
-                }
-
-                $hasil = array(
-                    'kode_akun_agg' => $request->kode_akun_agg[$i],
-                    'kode_pp_agg' => $request->kode_pp_agg[$i],
-                    'kode_drk_agg' => $request->kode_drk_agg[$i],
-                    'so_awal_agg' => $so_awal,
-                    'nilai_agg' => $request->nilai_agg[$i],
-                    'so_akhir_agg' => $so_akhir,
-                );
-                $result[] = $hasil;
-			}
-            
-            if(count($result) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $result;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
     }
 
     public function show(Request $request)
@@ -838,12 +679,10 @@ class PtgBebanController extends Controller
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
 
-            $strSQL3 = "select a.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,a.kode_drk,isnull(d.nama,'-') as nama_drk 
+            $strSQL3 = "select a.kode_akun,b.nama as nama_akun,c.bank,c.no_rek,c.nama_rek,a.nilai 
             from pbh_pb_j a inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 		
-                            left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and substring(a.periode,1,4)=d.tahun 																				
-            where a.jenis='BEBAN' and a.no_pb = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."'
-            order by a.no_urut";
+                            inner join pbh_rek c on a.no_urut=c.nu and a.kode_lokasi=c.kode_lokasi 	
+            where a.jenis='TUJUAN' and a.no_pb = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.no_urut";
             $rs3 = DB::connection($this->db)->select($strSQL3);
             $res3 = json_decode(json_encode($rs3),true);
 
@@ -916,10 +755,8 @@ class PtgBebanController extends Controller
             }
 
             $strSQL = "select distinct a.kode_akun,a.nama from masakun a 
-            inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag in ('062','004') 							
-            inner join anggaran_d c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-            inner join karyawan_pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi and d.nik='".$nik."' 
-            where a.block= '0' and a.kode_lokasi = '".$kode_lokasi."' ";
+            	inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag in ('009') 							
+            where a.block= '0' and a.kode_lokasi'".$kode_lokasi."' ";
 
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
@@ -945,7 +782,7 @@ class PtgBebanController extends Controller
         
     }
 
-    public function getPP(Request $request)
+    public function getRekeningSumber(Request $request)
     {
 
         try {
@@ -956,105 +793,8 @@ class PtgBebanController extends Controller
                 $status_admin= $data->status_admin;
             }
 
-            if ($status_admin == "A") {
-                $strSQL = "select a.kode_pp,a.nama from pp a where a.flag_aktif= '1' and a.kode_lokasi = '".$kode_lokasi."'";
-            }
-            else {
-                $strSQL = "select a.kode_pp,a.nama from pp a inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi where b.nik='".$nik."' and a.flag_aktif= '1' and a.kode_lokasi = '".$kode_lokasi."'";
-            }
+            $strSQL = "select a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag='009' where a.block='0' and a.kode_lokasi = '".$kode_lokasi."'";
 
-            $rs = DB::connection($this->db)->select($strSQL);
-            $res = json_decode(json_encode($rs),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getDRK(Request $request)
-    {
-        $this->validate($request,[
-            'kode_akun' => 'required',
-            'periode' => 'required',
-            'kode_pp' => 'required'
-        ]);
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $status_admin= $data->status_admin;
-            }
-
-            $vUnion = "";
-            $data = DB::connection($this->db)->select("select status_gar from masakun where kode_akun='".$request->kode_akun."' and kode_lokasi='".$kode_lokasi."'");
-            if(count($data) > 0){
-                $line = $data[0];							
-                if ($line->status_gar != "1") $vUnion = " union select '-','-' "; 
-                
-            }
-            $strSQL="select distinct a.kode_drk, a.nama from drk a inner join anggaran_d b on a.kode_drk=b.kode_drk where a.tahun=substring(b.periode,1,4) and b.periode like '".$request->periode."%' and b.kode_akun='".$request->kode_akun."' and b.kode_pp = '".$request->kode_pp."' and a.kode_lokasi='".$kode_lokasi."' ".$vUnion;
-
-            $rs = DB::connection($this->db)->select($strSQL);
-            $res = json_decode(json_encode($rs),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getNIKBuat(Request $request)
-    {
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $status_admin= $data->status_admin;
-            }
-
-            $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
-            if(count($getPP) > 0){
-                $kode_pp = $getPP[0]->kode_pp;
-            }else{
-                $kode_pp = "-";
-            }            
-
-            $strSQL = "select nik, nama from karyawan where kode_pp ='".$kode_pp."' and flag_aktif='1' and kode_lokasi = '".$kode_lokasi."'";
-          
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
@@ -1088,9 +828,60 @@ class PtgBebanController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $status_admin= $data->status_admin;
+            }
+
+            $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+            if(count($getPP) > 0){
+                $kode_pp = $getPP[0]->kode_pp;
+            }else{
+                $kode_pp = "-";
             }            
 
-            $strSQL = "select distinct a.nik, a.nama from karyawan a inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='".$nik."' where a.flag_aktif='1' and a.kode_lokasi='".$kode_lokasi."'";
+            $strSQL = "select distinct a.nik, a.nama from karyawan a inner join karyawan_pp b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and b.kode_pp='".$kode_pp."' where a.flag_aktif='1' and a.kode_lokasi = '".$kode_lokasi."'";
+          
+            $rs = DB::connection($this->db)->select($strSQL);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getNIKBuat(Request $request)
+    {
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }            
+
+            $getPP = DB::connection($this->db)->select("select kode_pp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+            if(count($getPP) > 0){
+                $kode_pp = $getPP[0]->kode_pp;
+            }else{
+                $kode_pp = "-";
+            }   
+
+            $strSQL = "select nik, nama from karyawan where kode_pp ='".$kode_pp."' and flag_aktif='1' and kode_lokasi='".$kode_lokasi."'";
           
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
@@ -1127,7 +918,7 @@ class PtgBebanController extends Controller
                 $status_admin= $data->status_admin;
             }
 
-            $getSPRO = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('PBBMHD','NIKVER') and kode_lokasi = '".$kode_lokasi."'");
+            $getSPRO = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('NIKVER') and kode_lokasi = '".$kode_lokasi."'");
             if(count($getSPRO) > 0){
                 $line = $getSPRO[0];
                 if ($line->kode_spro == "NIKVER") $cb_ver = $line->flag;
@@ -1136,44 +927,6 @@ class PtgBebanController extends Controller
             }         
             $success['nik_default'] = $cb_ver;
             $strSQL = "select nik, nama from karyawan where flag_aktif='1' and kode_lokasi='$kode_lokasi' ";
-          
-            $rs = DB::connection($this->db)->select($strSQL);
-            $res = json_decode(json_encode($rs),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getJenisDokumen(Request $request)
-    {
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $status_admin= $data->status_admin;
-            }
-
-           
-            $strSQL = "select kode_jenis, nama  from dok_jenis where kode_lokasi='$kode_lokasi' ";
           
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);

@@ -141,6 +141,20 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->delete('droping-app','Bdh\ApprovalDropingController@destroy');
 
     $router->get('droping-app-akun-mutasi','Bdh\ApprovalDropingController@getAkunMutasi');
+
+    // PINDAH BUKU
+    $router->get('pindah-buku-nobukti','Bdh\PinBukController@generateNo');
+    $router->get('pindah-buku','Bdh\PinBukController@index');
+    $router->get('pindah-buku-detail','Bdh\PinBukController@show');
+    $router->post('pindah-buku','Bdh\PinBukController@store');
+    $router->post('pindah-buku-ubah','Bdh\PinBukController@update');
+    $router->delete('pindah-buku','Bdh\PinBukController@destroy');
+
+    $router->get('pindah-buku-akun','Bdh\PinBukController@getAkun');
+    $router->get('pindah-buku-rekening-sumber','Bdh\PinBukController@getRekeningSumber');
+    $router->get('pindah-buku-nik-buat','Bdh\PinBukController@getNIKBuat');
+    $router->get('pindah-buku-nik-tahu','Bdh\PinBukController@getNIKTahu');
+    $router->get('pindah-buku-nik-ver','Bdh\PinBukController@getNIKVer');
 });
 
 ?>
