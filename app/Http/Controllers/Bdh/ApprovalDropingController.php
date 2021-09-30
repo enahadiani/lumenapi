@@ -491,7 +491,7 @@ class ApprovalDropingController extends Controller
                     where a.kode_lokasi='".$kode_lokasi."' 
                     group by a.no_minta,a.kode_lokasi  ) d 
                     on a.no_minta=d.no_minta and a.kode_lokasi=d.kode_lokasi 
-                where a.no_app='".$request->no_app."'";
+                where a.no_app='".$request->no_app."' and a.no_minta='$request->no_aju' ";
             }else{
 
                 $sql="select a.tanggal as due_date,a.no_minta as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.tanggal,103) as tgl2,'DROPING' as modul, 
@@ -503,7 +503,7 @@ class ApprovalDropingController extends Controller
                     from ys_minta_d a 
                     group by a.no_minta,a.kode_lokasi 
                     ) d on a.no_minta=d.no_minta and a.kode_lokasi=d.kode_lokasi 
-                where a.kode_lokasi='$kode_lokasi' and a.progress='0'";
+                where a.kode_lokasi='$kode_lokasi' and a.no_minta='$request->no_aju' and a.progress='0'";
             }
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
@@ -513,27 +513,27 @@ class ApprovalDropingController extends Controller
 
                 $sqldet = "select a.kode_akun,b.nama,a.keterangan,a.nilai_usul,a.nilai_app,a.nu 
                 from ys_minta_d a inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                where a.no_minta = '".$request->no_minta."'  order by a.nu";
+                where a.no_minta = '".$request->no_aju."'  order by a.nu";
 
-                $rsdet = DB::connection($this->db)->select($sql);
+                $rsdet = DB::connection($this->db)->select($sqldet);
                 $resdet = json_decode(json_encode($rsdet),true);
 
                 $sqldok = "select b.kode_jenis,b.nama,a.no_gambar 
                 from pbh_dok a inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 
                 where a.no_bukti = '".$request->no_aju."' and a.kode_lokasi='".$lokasi_asal."' order by a.nu";
 
-                $rsdok = DB::connection($this->db)->select($sql);
+                $rsdok = DB::connection($this->db)->select($sqldok);
                 $resdok = json_decode(json_encode($rsdok),true);
 
                 $sqlrek = "select *
                 from pbh_rek a 
                 where a.no_bukti = '".$request->no_aju."' and a.kode_lokasi='".$kode_lokasi."' ";
 
-                $rsrek = DB::connection($this->db)->select($sql);
+                $rsrek = DB::connection($this->db)->select($sqlrek);
                 $resrek = json_decode(json_encode($rsrek),true);
 
                 $sqlakun = "select kode_akun from pbh_pb_j where jenis ='TAK' and no_pb = '".$request->no_aju."' and kode_lokasi='".$kode_lokasi."'";
-                $get = DB::connection($this->db)->select($sql);
+                $get = DB::connection($this->db)->select($sqlakun);
                 if(count($get) > 0){
                     $success['kode_akun'] = $get[0]->kode_akun;
                 }else{
