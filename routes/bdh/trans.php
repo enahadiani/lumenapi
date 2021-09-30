@@ -140,7 +140,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('droping-app-aju','Bdh\ApprovalDropingController@getAju');
     $router->delete('droping-app','Bdh\ApprovalDropingController@destroy');
 
-    $router->get('droping-app-akun-mutasi','Bdh\ApprovalDropingController@getAkunGar');
+    $router->get('droping-app-akun-mutasi','Bdh\ApprovalDropingController@getAkunMutasi');
 });
 
 ?>
