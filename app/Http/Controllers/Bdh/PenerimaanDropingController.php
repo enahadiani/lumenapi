@@ -271,7 +271,7 @@ class PenerimaanDropingController extends Controller
             }
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $this->generateKode("ys_minta_m", "no_minta", $kode_lokasi."-PMT".substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
 
             // CEK PERIODE
             $cek = $this->doCekPeriode($periode);
