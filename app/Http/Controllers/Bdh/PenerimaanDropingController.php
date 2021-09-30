@@ -285,7 +285,7 @@ class PenerimaanDropingController extends Controller
                     $kode_pp = "-";
                 }
 
-                $insjm = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
+                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
 
                 $nu = 2;
                 if(count($request->akun_tak) > 0){
@@ -425,7 +425,7 @@ class PenerimaanDropingController extends Controller
                     $kode_pp = "-";
                 }
 
-                $insjm = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
+                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
 
                 $nu = 2;
                 if(count($request->akun_tak) > 0){
@@ -454,12 +454,12 @@ class PenerimaanDropingController extends Controller
                 }else{
                     if($total > 0){
 
-                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$request->kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$nik,'F','-','-','-','-'));
+                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
                         
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Penerimaan Droping berhasil disimpan";
+                        $success['message'] = "Data Penerimaan Droping berhasil diubah";
                     }else{
 
                         DB::connection($this->db)->rollback();
