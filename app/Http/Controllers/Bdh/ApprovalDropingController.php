@@ -206,7 +206,7 @@ class ApprovalDropingController extends Controller
                     where a.kode_lokasi='".$kode_lokasi."' 
                     group by a.no_minta,a.kode_lokasi  ) d 
                     on a.no_minta=d.no_minta and a.kode_lokasi=d.kode_lokasi 
-                where a.no_minta='".$request->no_pb."'";
+                where a.no_minta='".$request->no_aju."'";
             }else{
 
                 $sql="select a.tanggal as due_date,a.no_minta as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.tanggal,103) as tgl2,'DROPING' as modul, 
