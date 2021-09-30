@@ -131,6 +131,16 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('droping-terima-load','Bdh\PenerimaanDropingController@loadData');
     $router->get('droping-terima-niktahu','Bdh\PenerimaanDropingController@getNIKTahu');
     $router->get('droping-terima-akun','Bdh\PenerimaanDropingController@getAkun');
+
+    // APPROVAL DROPING
+    $router->get('droping-app-nobukti','Bdh\ApprovalDropingController@generateNo');
+    $router->get('droping-app','Bdh\ApprovalDropingController@index');
+    $router->get('droping-app-detail','Bdh\ApprovalDropingController@show');
+    $router->post('droping-app','Bdh\ApprovalDropingController@store');
+    $router->get('droping-app-aju','Bdh\ApprovalDropingController@getAju');
+    $router->delete('droping-app','Bdh\ApprovalDropingController@destroy');
+
+    $router->get('droping-app-akun-mutasi','Bdh\ApprovalDropingController@getAkunGar');
 });
 
 ?>
