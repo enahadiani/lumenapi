@@ -754,9 +754,10 @@ class PinBukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select distinct a.kode_akun,a.nama from masakun a 
+            $strSQL = "select distinct a.kode_akun,a.nama 
+            from masakun a 
             	inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi and b.kode_flag in ('009') 							
-            where a.block= '0' and a.kode_lokasi'".$kode_lokasi."' ";
+            where a.block= '0' and a.kode_lokasi= '".$kode_lokasi."' ";
 
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
