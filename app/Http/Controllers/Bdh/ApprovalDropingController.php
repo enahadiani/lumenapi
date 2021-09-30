@@ -379,7 +379,7 @@ class ApprovalDropingController extends Controller
                 ->delete();
     
                 $del3 = DB::connection($this->db)->table('pbh_rek')
-                ->where('no_pb',$request->no_aju) ->where('kode_lokasi',$kode_lokasi)
+                ->where('no_bukti',$request->no_aju) ->where('kode_lokasi',$kode_lokasi)
                 ->delete();
                 
                 $insm = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($request->no_aju,$no_bukti,$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->catatan,floatval($request->total_approve),'PBMINTA','1',$kode_pp,$nik,$nik,'-','-','-','-',$request->kode_pp_bukti,$request->lokasi_asal,floatval($request->total_approve),'X','-','-','-','-','-',$request->akun_minta,$nik));
