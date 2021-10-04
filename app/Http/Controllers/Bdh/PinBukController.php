@@ -126,7 +126,7 @@ class PinBukController extends Controller
                     $perValid = false;
                     $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh kurang dari periode aktif sistem.[$periode_aktif]";
                 }else{
-                    $perNext = $this->nextNPeriode($periode);
+                    $perNext = $this->nextNPeriode($periode,1);
                     if($perNext == "1"){
                         $perValid = true;
                         $msg = "ok";
@@ -257,6 +257,7 @@ class PinBukController extends Controller
             'nik_tahu' => 'required|max:20',
             'nik_ver' => 'required|max:20',
             'atensi' => 'required',
+            'rekening_sumber' => 'required',
             'bank_sumber' => 'required',
             'nama_rek_sumber' => 'required',
             'no_rek_sumber' => 'required',
@@ -423,6 +424,7 @@ class PinBukController extends Controller
             'nik_tahu' => 'required|max:20',
             'nik_ver' => 'required|max:20',
             'atensi' => 'required',
+            'rekening_sumber' => 'required',
             'bank_sumber' => 'required',
             'nama_rek_sumber' => 'required',
             'no_rek_sumber' => 'required',
