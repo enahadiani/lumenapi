@@ -317,7 +317,7 @@ class PinBukController extends Controller
                         $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PINBUK',0,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-',$request->rekening_sumber,$request->nik_ver));
 
                         //rek sumber
-				        $insrek0 = DB::connection($this->db)->select("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-C',$request->nama_rek_sumber,$request->no_rek_sumber,$request->bank_sumber,$request->atensi,$total,0,$total,99999));	
+				        $insrek0 = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-C',$request->nama_rek_sumber,$request->no_rek_sumber,$request->bank_sumber,$request->atensi,$total,0,$total,99999));	
                         
                         $arr_dok = array();
                         $arr_jenis = array();
