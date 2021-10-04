@@ -803,7 +803,6 @@ $app->router->group([
     require __DIR__.'/../routes/sdm.php';
 });
 
-
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bdh-auth'
@@ -841,5 +840,39 @@ $app->router->group([
     require __DIR__.'/../routes/bdh/dash.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-ypt'
+], function ($router) {
+    require __DIR__.'/../routes/dash-ypt/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-ypt-master'
+], function ($router) {
+    require __DIR__.'/../routes/dash-ypt/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-ypt-trans'
+], function ($router) {
+    require __DIR__.'/../routes/dash-ypt/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-ypt-report'
+], function ($router) {
+    require __DIR__.'/../routes/dash-ypt/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-ypt-dash'
+], function ($router) {
+    require __DIR__.'/../routes/dash-ypt/dash.php';
+});
 
 return $app;
