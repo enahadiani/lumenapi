@@ -600,7 +600,12 @@ class PinBukController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $periode = date('Ym');
+            if(isset($request->periode) && $request->periode != ""){
+                $periode = $request->periode;
+            }else{
+                $periode = date('Ym');
+            }
+            
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
             
