@@ -314,7 +314,7 @@ class PinBukController extends Controller
                 
                     if($total > 0){
     
-                        $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PINBUK',0,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-',$request->rekening_sumber,$request->nik_ver));
+                        $ins1 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang,nik_ver) values (?, ?, ?, ?, ?,getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$nik,$request->tanggal,$request->due_date,$request->deskripsi,$total,'PINBUK',1,$kode_pp,$request->nik_tahu,$request->nik_buat,'-','-','-','-',$kode_pp,$kode_lokasi,$total,'X','-','-','-','-','-',$request->rekening_sumber,$request->nik_ver));
 
                         //rek sumber
 				        $insrek0 = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-C',$request->nama_rek_sumber,$request->no_rek_sumber,$request->bank_sumber,$request->atensi,$total,0,$total,99999));	
@@ -493,7 +493,7 @@ class PinBukController extends Controller
                         $insj[$i] = DB::connection($this->db)->insert("insert into pbh_pb_j(no_pb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->deskripsi,'D',floatval($request->nilai[$i]),$kode_pp[$i],'-',$kode_lokasi,'PINBUK','TUJUAN',$periode,$nik,'IDR',1));
                         $total+= +floatval($request->nilai[$i]);
 
-                        $insrek[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-D',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi,floatval($request->nilai[$i]),0,floatval($request->nilai[$i])));
+                        $insrek[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PINBUK-D',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],$request->atensi,floatval($request->nilai[$i]),1,floatval($request->nilai[$i])));
                     }
                 }
 
@@ -677,13 +677,15 @@ class PinBukController extends Controller
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
-            $strSQL2 = "select * from pbh_rek a where a.no_bukti = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."'";
+            $strSQL2 = "select * from pbh_rek a where a.no_bukti = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' and a.modul='PINBUK-C' ";
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
 
-            $strSQL3 = "select a.kode_akun,b.nama as nama_akun,c.bank,c.no_rek,c.nama_rek,a.nilai 
-            from pbh_pb_j a inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-                            inner join pbh_rek c on a.no_urut=c.nu and a.kode_lokasi=c.kode_lokasi 	
+            $strSQL3 = "select a.no_pb,a.kode_akun,b.nama as nama_akun,c.bank,c.no_rek,c.nama_rek,a.nilai
+            from pbh_pb_j a 
+			inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            inner join pbh_rek c on a.no_pb=c.no_bukti and c.modul='PINBUK-D' and
+			a.kode_lokasi=c.kode_lokasi 	
             where a.jenis='TUJUAN' and a.no_pb = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.no_urut";
             $rs3 = DB::connection($this->db)->select($strSQL3);
             $res3 = json_decode(json_encode($rs3),true);
@@ -705,8 +707,8 @@ class PinBukController extends Controller
 
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['detail_rek'] = $res2;
-                $success['detail_jurnal'] = $res3;
+                $success['detail_rek_sumber'] = $res2;
+                $success['detail_rek_tuju'] = $res3;
                 $success['detail_dok'] = $res4;
                 if(count($res5) > 0){
                     $i=0;
@@ -726,8 +728,8 @@ class PinBukController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['detail_rek'] = [];
-                $success['detail_jurnal'] = [];
+                $success['detail_rek_sumber'] = [];
+                $success['detail_rek_tuju'] = [];
                 $success['detail_dok'] = [];
                 $success['detail_catatan'] = [];
                 $success['status'] = false;
@@ -736,8 +738,8 @@ class PinBukController extends Controller
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = [];
-            $success['detail_rek'] = [];
-            $success['detail_jurnal'] = [];
+            $success['detail_rek_sumber'] = [];
+            $success['detail_rek_tuju'] = [];
             $success['detail_dok'] = [];
             $success['detail_catatan'] = [];
             $success['message'] = "Error ".$e;
