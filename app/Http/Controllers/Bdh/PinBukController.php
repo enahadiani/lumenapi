@@ -677,7 +677,9 @@ class PinBukController extends Controller
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
-            $strSQL2 = "select * from pbh_rek a where a.no_bukti = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' and a.modul='PINBUK-C' ";
+            $strSQL2 = "select a.*,b.akun_hutang as rekening_sumber from pbh_rek a 
+            inner join pbh_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+            where a.no_bukti = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' and a.modul='PINBUK-C' ";
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
 
