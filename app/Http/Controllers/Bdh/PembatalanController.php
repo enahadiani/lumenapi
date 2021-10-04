@@ -201,7 +201,7 @@ class PembatalanController extends Controller
 
             $sql="select a.no_kas,convert(varchar,a.tanggal,103) as tgl,a.jenis,a.no_dokumen,a.keterangan,a.nilai 
             from kas_m a 
-            where a.kode_lokasi='".$kode_lokasi."' and a.modul = 'KBDROPTRM' and a.posted ='F'";
+            where a.kode_lokasi='".$kode_lokasi."' and a.modul = 'KBDROPBTL' and a.posted ='F'";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -285,7 +285,7 @@ class PembatalanController extends Controller
                     $kode_pp = "-";
                 }
 
-                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
+                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPBTL','KB',$periode,'IDR',1,$kode_lokasi,'-'));
 
                 $nu = 2;
                 if(count($request->akun_tak) > 0){
@@ -298,7 +298,7 @@ class PembatalanController extends Controller
                             ->where('kode_lokasi',$request->lokasi_kirim[$i])
                             ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
 
-                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
+                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPBTL','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
                             $total+= +floatval($request->nilai[$i]);
                             $nu++;
                         }
@@ -306,7 +306,7 @@ class PembatalanController extends Controller
                 }
 
                 if($total != floatval($request->total)){
-                    $msg = "Transaksi tidak valid. Total Penerimaan ($request->total) dan Total Detail Penerimaan ($total) tidak sama.";
+                    $msg = "Transaksi tidak valid. Total Pembatalan ($request->total) dan Total Detail Pembatalan ($total) tidak sama.";
                     DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['no_bukti'] = "-";
@@ -314,18 +314,18 @@ class PembatalanController extends Controller
                 }else{
                     if($total > 0){
 
-                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
+                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPBTL',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
                         
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Penerimaan Droping berhasil disimpan";
+                        $success['message'] = "Data Pembatalan Droping berhasil disimpan";
                     }else{
 
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total Penerimaan tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total Pembatalan tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
 
@@ -340,7 +340,7 @@ class PembatalanController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penerimaan Droping gagal disimpan ".$e;
+            $success['message'] = "Data Pembatalan Droping gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -425,7 +425,7 @@ class PembatalanController extends Controller
                     $kode_pp = "-";
                 }
 
-                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
+                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPBTL','KB',$periode,'IDR',1,$kode_lokasi,'-'));
 
                 $nu = 2;
                 if(count($request->akun_tak) > 0){
@@ -438,7 +438,7 @@ class PembatalanController extends Controller
                             ->where('kode_lokasi',$request->lokasi_kirim[$i])
                             ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
 
-                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
+                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPBTL','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
                             $total+= +floatval($request->nilai[$i]);
                             $nu++;
                         }
@@ -446,7 +446,7 @@ class PembatalanController extends Controller
                 }
 
                 if($total != floatval($request->total)){
-                    $msg = "Transaksi tidak valid. Total Penerimaan ($request->total) dan Total Detail Penerimaan ($total) tidak sama.";
+                    $msg = "Transaksi tidak valid. Total Pembatalan ($request->total) dan Total Detail Pembatalan ($total) tidak sama.";
                     DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['no_bukti'] = "-";
@@ -454,18 +454,18 @@ class PembatalanController extends Controller
                 }else{
                     if($total > 0){
 
-                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
+                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPBTL',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
                         
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Penerimaan Droping berhasil diubah";
+                        $success['message'] = "Data Pembatalan Droping berhasil diubah";
                     }else{
 
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total Penerimaan tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total Pembatalan tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
 
@@ -481,7 +481,7 @@ class PembatalanController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['no_bukti'] = "-";
-            $success['message'] = "Data Penerimaan Droping gagal diubah ".$e;
+            $success['message'] = "Data Pembatalan Droping gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -527,7 +527,7 @@ class PembatalanController extends Controller
 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Penerimaan Droping berhasil dihapus";
+                $success['message'] = "Data Pembatalan Droping berhasil dihapus";
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = false;
@@ -538,7 +538,7 @@ class PembatalanController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penerimaan Droping gagal dihapus ".$e;
+            $success['message'] = "Data Pembatalan Droping gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
