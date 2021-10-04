@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class SPBController extends Controller
+class PembatalanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -163,7 +163,8 @@ class SPBController extends Controller
 
     public function generateNo(Request $request) {
         $this->validate($request, [    
-            'tanggal' => 'required'       
+            'tanggal' => 'required',
+            'jenis' => 'required'      
         ]);
         
         try {
@@ -174,7 +175,7 @@ class SPBController extends Controller
             }	
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $no_bukti = $this->generateKode("spb_m", "no_spb", $kode_lokasi."-SPB".substr($periode,2,4).".", "0001");
+            $no_bukti = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
 
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
@@ -198,141 +199,9 @@ class SPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.no_spb,convert(varchar,a.tanggal,103) as tgl,a.keterangan,a.nilai 
-            from spb_m a 					 					 
-            where a.kode_lokasi='".$kode_lokasi."' and a.progress ='0'";
-
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getPBList(Request $request)
-    {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            if(isset($request->no_pb) && $request->no_pb != ""){
-                $filter = " and no_pb='$request->no_pb' ";
-                $status = "SPB";
-            }else{
-                $filter = "";
-                $status = "INPROG";
-            }
-
-            $sql = "select '$status' as status,no_pb,convert(varchar,tanggal,103) as tgl,keterangan,nilai 
-            from pbh_pb_m 
-            where progress='1' and no_spb='-' and kode_lokasi='".$kode_lokasi."' and modul not in ('IFCLOSE','PJPTG') $filter ";
-
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getPBTambah(Request $request)
-    {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $sql="select no_pb,keterangan 
-            from pbh_pb_m 
-            where progress='1' and no_spb='-' and kode_lokasi='".$kode_lokasi."'";
-
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getRekTransfer(Request $request)
-    {
-        $this->validate($request,[
-            'no_pb' => 'required'
-        ]);
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $this_in = "";
-            $tmp = explode(",",$request->input('no_pb'));
-            for($x=0;$x<count($tmp);$x++){
-                if($x == 0){
-                    $this_in .= "'".$tmp[$x]."'";
-                }else{
-                    
-                    $this_in .= ","."'".$tmp[$x]."'";
-                }
-            }
-
-            $where = "where a.kode_lokasi='$kode_lokasi' and b.no_pb in ($this_in) ";
-
-            $sql = "select a.bank,a.nama,a.no_rek,a.nama_rek,a.bruto,a.pajak,a.nilai, case when a.modul='PINBUK-C' then 'SUMBER' else 'TUJUAN' end jenis 
-            from pbh_rek a inner join pbh_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi 
-            $where ";
+            $sql="select a.no_kas,convert(varchar,a.tanggal,103) as tgl,a.jenis,a.no_dokumen,a.keterangan,a.nilai 
+            from kas_m a 
+            where a.kode_lokasi='".$kode_lokasi."' and a.modul = 'KBDROPTRM' and a.posted ='F'";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -377,14 +246,19 @@ class SPBController extends Controller
     {
         $this->validate($request, [
             'tanggal' => 'required|date_format:Y-m-d',
-            'no_dokumen' => 'required',
-            'deskripsi' => 'required',
-            'nik_fiat' => 'required',
-            'nik_bdh' => 'required',
+            'jenis' => 'required',
+            'no_dokumen' => 'required|max:50',
+            'deskripsi' => 'required|max:150',
+            'akun_kas' => 'required|max:10',
+            'nik_tahu' => 'required|max:10',
             'total' => 'required',
             'status' => 'required|array',
-            'no_pb' => 'required|array',
-            'nilai_pb' => 'required|array'
+            'no_kas_kirim' => 'required|array',
+            'lokasi_kirim' => 'required|array',
+            'akun_tak' => 'required|array',
+            'keterangan' => 'required|array',
+            'nilai' => 'required|array',
+            'id' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -397,64 +271,119 @@ class SPBController extends Controller
             }
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $no_bukti = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
 
-            $no_bukti = $this->generateKode("spb_m", "no_spb", $kode_lokasi."-SPB".substr($periode,2,4).".", "0001");
-
-            $ins = DB::connection($this->db)->insert("insert into spb_m (no_spb,no_dokumen,no_ver,no_bukti,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nik_buat,nik_sah,nik_fiat,nik_bdh,lok_bayar,no_kas,nilai,modul,no_fiat,progress,kode_ppasal) values (?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,'-','-',$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,$nik,'-',$request->nik_fiat,$request->nik_bdh,$kode_lokasi,'-',floatval($request->total),'SPB','-','0','-'));
-
-            $nilai_pb=0;
-            for ($i=0; $i < count($request->no_pb);$i++){
-                if ($request->status[$i] == "SPB"){							
-                    $upd = DB::connection($this->db)->table("pbh_pb_m")
-                    ->where('no_pb',$request->no_pb[$i])
-                    ->where('kode_lokasi',$kode_lokasi)
-                    ->update(['progress'=>'2', 'no_spb'=>$no_bukti]); 
-
-                    $upd = DB::connection($this->db)->insert("insert into spb_j (no_spb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs)  
-                    select ?,no_pb,?,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,?,?,getdate(),'IDR',1 
-                    from pbh_pb_j where no_pb=? and jenis in ('BEBAN','HUTIF','PJ','TAK','TUJUAN') and kode_lokasi=? ",array($no_bukti,$request->tanggal,$periode,$nik,$request->no_pb[$i],$kode_lokasi));		
-                    $nilai_pb+=floatval($request->nilai_pb[$i]);					
+            // CEK PERIODE
+            $cek = $this->doCekPeriode($periode);
+            if($cek['status']){
+                $j = 0;
+                $total = 0;
+                $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+                if(count($get) > 0){
+                    $kode_pp = $get[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
                 }
-            }
 
-            if(floatval($request->total) <= 0){
-                DB::connection($this->db)->rollback();
-                $success['status'] = false;
-                $success['no_bukti'] = '-';
-                $success['message'] = "Data SPB tidak valid. Total SPB tidak boleh 0 atau kurang";
-            }else if(floatval($request->total) != $nilai_pb){
-                DB::connection($this->db)->rollback();
-                $success['status'] = false;
-                $success['no_bukti'] = '-';
-                $success['message'] = "Data SPB tidak valid. Total SPB tidak sama dengan Total detail SPB";
+                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
+
+                $nu = 2;
+                if(count($request->akun_tak) > 0){
+                    for ($i=0; $i<count($request->akun_tak); $i++){	
+                        if ($request->status[$i] == "APP"){
+                            $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
+                            ->where('nu',$request->id[$i]) 
+                            ->where('no_kas',$request->no_kas_kirim[$i])
+                            ->where('kode_loktuj',$kode_lokasi)
+                            ->where('kode_lokasi',$request->lokasi_kirim[$i])
+                            ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
+
+                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
+                            $total+= +floatval($request->nilai[$i]);
+                            $nu++;
+                        }
+                    }
+                }
+
+                if($total != floatval($request->total)){
+                    $msg = "Transaksi tidak valid. Total Penerimaan ($request->total) dan Total Detail Penerimaan ($total) tidak sama.";
+                    DB::connection($this->db)->rollback();
+                    $success['status'] = false;
+                    $success['no_bukti'] = "-";
+                    $success['message'] = $msg;
+                }else{
+                    if($total > 0){
+
+                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
+                        
+                        DB::connection($this->db)->commit();
+                        $success['status'] = true;
+                        $success['no_bukti'] = $no_bukti;
+                        $success['message'] = "Data Penerimaan Droping berhasil disimpan";
+                    }else{
+
+                        DB::connection($this->db)->rollback();
+                        $success['status'] = false;
+                        $success['no_bukti'] = "-";
+                        $success['message'] = "Transaksi tidak valid. Total Penerimaan tidak boleh kurang dari atau sama dengan nol";
+                    }
+                }
+
             }else{
-                DB::connection($this->db)->commit();
-                $success['status'] = true;
-                $success['no_bukti'] = $no_bukti;
-                $success['message'] = "Data SPB berhasil disimpan";
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['no_bukti'] = "-";
+                $success['message'] = $cek["message"];
             }
+            
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data SPB gagal disimpan ".$e;
+            $success['message'] = "Data Penerimaan Droping gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
+        
+        
     }
 
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Fs $Fs)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request)
     {
         $this->validate($request, [
             'no_bukti' => 'required',
             'tanggal' => 'required|date_format:Y-m-d',
-            'no_dokumen' => 'required',
-            'deskripsi' => 'required',
-            'nik_fiat' => 'required',
-            'nik_bdh' => 'required',
+            'jenis' => 'required',
+            'no_dokumen' => 'required|max:50',
+            'deskripsi' => 'required|max:150',
+            'akun_kas' => 'required|max:10',
+            'nik_tahu' => 'required|max:10',
             'total' => 'required',
             'status' => 'required|array',
-            'no_pb' => 'required|array',
-            'nilai_pb' => 'required|array'
+            'no_kas_kirim' => 'required|array',
+            'lokasi_kirim' => 'required|array',
+            'akun_tak' => 'required|array',
+            'keterangan' => 'required|array',
+            'nilai' => 'required|array',
+            'id' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -464,72 +393,105 @@ class SPBController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
                 $status_admin = $data->status_admin;
-            }	
+            }
+            
+            $no_bukti = $request->no_bukti;
+            
+            $del = DB::connection($this->db)->table('kas_m')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_kas', $no_bukti)
+            ->delete();
+
+            $del2 = DB::connection($this->db)->table('kas_j')
+            ->where('kode_lokasi', $kode_lokasi)
+            ->where('no_kas', $no_bukti)
+            ->delete();
+
+            $updd = DB::connection($this->db)->table('yk_kasdrop_d')
+            ->where('kode_loktuj', $kode_lokasi)
+            ->where('no_kasterima', $no_bukti)
+            ->update(['no_kasterima'=>'-','progress'=>'0']);
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-
-            $no_bukti = $request->no_bukti;
-
-            $del = DB::connection($this->db)->table("spb_m")
-            ->where('no_spb',$no_bukti) 
-            ->where('kode_lokasi',$kode_lokasi)
-            ->delete();
-
-            $del = DB::connection($this->db)->table("spb_j")
-            ->where('no_spb',$no_bukti) 
-            ->where('kode_lokasi',$kode_lokasi)
-            ->delete();
-
-            $del = DB::connection($this->db)->table("pbh_pb_m")
-            ->where('no_spb',$no_bukti) 
-            ->where('kode_lokasi',$kode_lokasi)
-            ->update(['progress'=>'1', 'no_spb'=>'-']);
-
-            $ins = DB::connection($this->db)->insert("insert into spb_m (no_spb,no_dokumen,no_ver,no_bukti,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nik_buat,nik_sah,nik_fiat,nik_bdh,lok_bayar,no_kas,nilai,modul,no_fiat,progress,kode_ppasal) values (?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_dokumen,'-','-',$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,$nik,'-',$request->nik_fiat,$request->nik_bdh,$kode_lokasi,'-',floatval($request->total),'SPB','-','0','-'));
-
-            $nilai_pb=0;
-            for ($i=0;$i < count($request->no_pb);$i++){
-                if ($request->status[$i] == "SPB"){							
-                    $upd = DB::connection($this->db)->table("pbh_pb_m")
-                    ->where('no_pb',$request->no_pb[$i])
-                    ->where('kode_lokasi',$kode_lokasi)
-                    ->update(['progress'=>'2', 'no_spb'=>$no_bukti]); 
-
-                    $upd = DB::connection($this->db)->insert("insert into spb_j (no_spb,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,kode_curr,kurs)  
-                    select ?,no_pb,?,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,?,?,getdate(),'IDR',1 
-                    from pbh_pb_j where no_pb=? and jenis in ('BEBAN','HUTIF','PJ','TAK','TUJUAN') and kode_lokasi=? ",array($no_bukti,$request->tanggal,$periode,$nik,$request->no_pb[$i],$kode_lokasi));		
-                    $nilai_pb+=floatval($request->nilai_pb[$i]);					
+            // CEK PERIODE
+            $cek = $this->doCekPeriode($periode);
+            if($cek['status']){
+                $j = 0;
+                $total = 0;
+                $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+                if(count($get) > 0){
+                    $kode_pp = $get[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
                 }
-            }
 
-            if(floatval($request->total) <= 0){
-                DB::connection($this->db)->rollback();
-                $success['status'] = false;
-                $success['no_bukti'] = '-';
-                $success['message'] = "Data SPB tidak valid. Total SPB tidak boleh 0 atau kurang";
-            }else if(floatval($request->total) != $nilai_pb){
-                DB::connection($this->db)->rollback();
-                $success['status'] = false;
-                $success['no_bukti'] = '-';
-                $success['message'] = "Data SPB tidak valid. Total SPB tidak sama dengan Total detail SPB";
+                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$kode_lokasi,'-'));
+
+                $nu = 2;
+                if(count($request->akun_tak) > 0){
+                    for ($i=0; $i<count($request->akun_tak); $i++){	
+                        if ($request->status[$i] == "APP"){
+                            $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
+                            ->where('nu',$request->id[$i]) 
+                            ->where('no_kas',$request->no_kas_kirim[$i])
+                            ->where('kode_loktuj',$kode_lokasi)
+                            ->where('kode_lokasi',$request->lokasi_kirim[$i])
+                            ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
+
+                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
+                            $total+= +floatval($request->nilai[$i]);
+                            $nu++;
+                        }
+                    }
+                }
+
+                if($total != floatval($request->total)){
+                    $msg = "Transaksi tidak valid. Total Penerimaan ($request->total) dan Total Detail Penerimaan ($total) tidak sama.";
+                    DB::connection($this->db)->rollback();
+                    $success['status'] = false;
+                    $success['no_bukti'] = "-";
+                    $success['message'] = $msg;
+                }else{
+                    if($total > 0){
+
+                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
+                        
+                        DB::connection($this->db)->commit();
+                        $success['status'] = true;
+                        $success['no_bukti'] = $no_bukti;
+                        $success['message'] = "Data Penerimaan Droping berhasil diubah";
+                    }else{
+
+                        DB::connection($this->db)->rollback();
+                        $success['status'] = false;
+                        $success['no_bukti'] = "-";
+                        $success['message'] = "Transaksi tidak valid. Total Penerimaan tidak boleh kurang dari atau sama dengan nol";
+                    }
+                }
+
             }else{
-                DB::connection($this->db)->commit();
-                $success['status'] = true;
-                $success['no_bukti'] = $no_bukti;
-                $success['message'] = "Data SPB berhasil diubah";
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['no_bukti'] = "-";
+                $success['message'] = $cek["message"];
             }
-
-            return response()->json($success, $this->successStatus);     
+             
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data SPB gagal diubah ".$e;
+            $success['no_bukti'] = "-";
+            $success['message'] = "Data Penerimaan Droping gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
-        }				
-        
-        
+        }	
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Fs  $Fs
+     * @return \Illuminate\Http\Response
+     */
     public function destroy(Request $request)
     {
         $this->validate($request, [
@@ -543,42 +505,49 @@ class SPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $no_bukti = $request->no_bukti;			
+            $no_bukti = $request->no_bukti;
+            $periode = date('Ym');
+            $cek = $this->doCekPeriode($periode);
+            if($cek['status']){
             
-            $del = DB::connection($this->db)->table("spb_m")
-            ->where('no_spb',$no_bukti) 
-            ->where('kode_lokasi',$kode_lokasi)
-            ->delete();
+                $del = DB::connection($this->db)->table('kas_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kas', $no_bukti)
+                ->delete();
 
-            $del = DB::connection($this->db)->table("spb_j")
-            ->where('no_spb',$no_bukti) 
-            ->where('kode_lokasi',$kode_lokasi)
-            ->delete();
+                $del2 = DB::connection($this->db)->table('kas_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kas', $no_bukti)
+                ->delete();
 
-            $del = DB::connection($this->db)->table("pbh_pb_m")
-            ->where('no_spb',$no_bukti) 
-            ->where('kode_lokasi',$kode_lokasi)
-            ->update(['progress'=>'1', 'no_spb'=>'-']);
+                $updd = DB::connection($this->db)->table('yk_kasdrop_d')
+                ->where('kode_loktuj', $kode_lokasi)
+                ->where('no_kasterima', $no_bukti)
+                ->update(['no_kasterima'=>'-','progress'=>'0']);
 
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data SPB berhasil dihapus";
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Penerimaan Droping berhasil dihapus";
+            }else{
+                DB::connection($this->db)->rollback();
+                $success['status'] = false;
+                $success['message'] = $cek["message"];
+            }
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data SPB gagal dihapus ".$e;
+            $success['message'] = "Data Penerimaan Droping gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
     }
 
-
-    public function show(Request $request)
+    public function loadData(Request $request)
     {
         $this->validate($request,[
-            'no_spb' => 'required'
+            'tanggal' => 'required',
         ]);
 
         try {
@@ -588,40 +557,74 @@ class SPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // data main
-           
-           $sql = "select * from spb_m where no_spb = '".$request->no_spb."' and kode_lokasi='".$kode_lokasi."'";
-           
-           $rs = DB::connection($this->db)->select($sql);
-           $res = json_decode(json_encode($rs),true);
+            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
+            $sql = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
+            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.kode_loktuj='".$kode_lokasi."' and a.progress = '0' and a.periode <= '$periode' ";
 
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                
-                $strSQL2 = "
-                select 'SPB' as status,b.no_pb,convert(varchar,b.tanggal,103) as tgl,b.keterangan,b.nilai 
-					from pbh_pb_m b 
-					where b.progress='2' and b.no_spb='".$request->no_spb."' and b.kode_lokasi='".$kode_lokasi."' and modul not in ('IFCLOSE','PJPTG')
-                ";
-                $rs2 = DB::connection($this->db)->select($strSQL2);
-                $res2 = json_decode(json_encode($rs2),true);
-    
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['detail'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['detail'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function show(Request $request)
+    {
+        $this->validate($request,[
+            'no_bukti' => 'required'
+        ]);
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $strSQL = "select a.keterangan,a.no_dokumen,a.jenis,a.tanggal,a.akun_kb,a.nik_app 
+            from kas_m a					 
+            where a.no_kas = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' ";
+            $rs = DB::connection($this->db)->select($strSQL);
+            $res = json_decode(json_encode($rs),true);
+            
+            $strSQL2 = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
+            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.no_kasterima='".$request->no_bukti."' and a.kode_loktuj='".$kode_lokasi."'";
+            $rs2 = DB::connection($this->db)->select($strSQL2);
+            $res2 = json_decode(json_encode($rs2),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail_terima'] = $res2;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail_terima'] = [];
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = [];
-            $success['detail'] = [];
+            $success['detail_terima'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -638,8 +641,10 @@ class SPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select a.kode_akun,a.nama from masakun a where a.block= '0' and a.kode_lokasi = '".$kode_lokasi."' ";
-
+            $strSQL = "select a.kode_akun, a.nama 
+            from masakun a inner join 
+            flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            where b.kode_flag in ('001','009') and a.kode_lokasi='$kode_lokasi' ";
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
@@ -664,8 +669,9 @@ class SPBController extends Controller
         
     }
 
-    public function getNIKBdh(Request $request)
+    public function getNIKTahu(Request $request)
     {
+
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -674,15 +680,20 @@ class SPBController extends Controller
                 $status_admin= $data->status_admin;
             }
 
-            $nik_default = "-";
-            $data = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('NIKBDH') and kode_lokasi = '".$kode_lokasi."'");
-            if(count($data) > 0){
-                $line = $data[0];							
-                if ($line->flag != "") $nik_default = $line->flag; 
+            $get = DB::connection($this->db)->select("select a.flag,b.nama from spro a inner join karyawan b on a.flag=b.nik and a.kode_lokasi=b.kode_lokasi where kode_spro='KBAPP' and a.kode_lokasi='$kode_lokasi' ");
+            if(count($get) > 0){
+                $nik = $get[0]->flag;
+                $nama = $get[0]->nama;
+            }else{
+                $nik = "-";
+                $nama = "-";
             }
-            $success['nik_default'] = $nik_default;
-            $strSQL="select nik, nama from karyawan where flag_aktif='1' and kode_lokasi='".$kode_lokasi."' ";
 
+            $success['nik_default'] = $nik;
+            $success['nama_nik_default'] = $nama;
+            
+            $strSQL = "select nik, nama from karyawan where flag_aktif='1' and kode_lokasi = '".$kode_lokasi."'";
+            
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
@@ -706,52 +717,5 @@ class SPBController extends Controller
         }
         
     }
-
-    public function getNIKFiat(Request $request)
-    {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $status_admin= $data->status_admin;
-            }
-
-            $nik_default = "-";
-            $data = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('NIKFIA') and kode_lokasi = '".$kode_lokasi."'");
-            if(count($data) > 0){
-                $line = $data[0];							
-                if ($line->flag != "") $nik_default = $line->flag; 
-            }
-            $success['nik_default'] = $nik_default;
-            $strSQL="select nik, nama from karyawan where flag_aktif='1' and kode_lokasi='".$kode_lokasi."' ";
-
-            $rs = DB::connection($this->db)->select($strSQL);
-            $res = json_decode(json_encode($rs),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-    
-
-    
-
 
 }

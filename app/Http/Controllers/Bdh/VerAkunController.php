@@ -126,7 +126,7 @@ class VerAkunController extends Controller
                     $perValid = false;
                     $msg = "Periode transaksi tidak valid. Periode transaksi tidak boleh kurang dari periode aktif sistem.[$periode_aktif]";
                 }else{
-                    $perNext = $this->nextNPeriode($periode);
+                    $perNext = $this->nextNPeriode($periode,1);
                     if($perNext == "1"){
                         $perValid = true;
                         $msg = "ok";
