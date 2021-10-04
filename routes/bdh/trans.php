@@ -120,7 +120,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('droping-aju-akun','Bdh\PengajuanDropingController@getAkun');
     $router->get('droping-aju-budget','Bdh\PengajuanDropingController@cekBudget');
 
-    // PENGAJUAN DROPING 
+    // PENERIMAAN DROPING 
     $router->get('droping-terima-nobukti','Bdh\PenerimaanDropingController@generateNo');
     $router->get('droping-terima','Bdh\PenerimaanDropingController@index');
     $router->get('droping-terima-detail','Bdh\PenerimaanDropingController@show');
@@ -155,6 +155,18 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('pindah-buku-nik-buat','Bdh\PinBukController@getNIKBuat');
     $router->get('pindah-buku-nik-tahu','Bdh\PinBukController@getNIKTahu');
     $router->get('pindah-buku-nik-ver','Bdh\PinBukController@getNIKVer');
+
+    // PEMBATALAN DROPING 
+    $router->get('droping-batal-nobukti','Bdh\PembatalanDropingController@generateNo');
+    $router->get('droping-batal','Bdh\PembatalanDropingController@index');
+    $router->get('droping-batal-detail','Bdh\PembatalanDropingController@show');
+    $router->post('droping-batal','Bdh\PembatalanDropingController@store');
+    $router->post('droping-batal-ubah','Bdh\PembatalanDropingController@update');
+    $router->delete('droping-batal','Bdh\PembatalanDropingController@destroy');
+
+    $router->get('droping-batal-load','Bdh\PembatalanDropingController@loadData');
+    $router->get('droping-batal-niktahu','Bdh\PembatalanDropingController@getNIKTahu');
+    $router->get('droping-batal-akun','Bdh\PembatalanDropingController@getAkun');
 });
 
 ?>
