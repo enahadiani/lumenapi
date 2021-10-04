@@ -294,7 +294,6 @@ class PembatalanController extends Controller
                             $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
                             ->where('nu',$request->id[$i]) 
                             ->where('no_kas',$request->no_kas_kirim[$i])
-                            ->where('kode_loktuj',$kode_lokasi)
                             ->where('kode_lokasi',$request->lokasi_kirim[$i])
                             ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
 
