@@ -579,7 +579,7 @@ class DropingKirimNonAjuController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "elect a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag = '016' and a.kode_lokasi='$kode_lokasi' ";
+            $strSQL = "select a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag = '016' and a.kode_lokasi='$kode_lokasi' ";
 
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
