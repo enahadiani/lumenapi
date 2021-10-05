@@ -288,7 +288,7 @@ class PembukaanIFController extends Controller
                         $kode_pp = "-";
                     }
                     
-                    if($total > 0){
+                    if(floatval($request->nilai) > 0){
 
                         $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->nik_if,$request->akun_if,$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBIFCAIR',$request->jenis,$periode,'IDR',1,floatval($request->nilai),$nik,$nik,$nik,'F','-','-','-','-'));
 
@@ -410,7 +410,7 @@ class PembukaanIFController extends Controller
                     $kode_pp = "-";
                 }
                 
-                if($total > 0){
+                if(floatval($request->nilai) > 0){
                     
                     $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->nik_if,$request->akun_if,$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBIFCAIR',$request->jenis,$periode,'IDR',1,floatval($request->nilai),$nik,$nik,$nik,'F','-','-','-','-'));
                     
