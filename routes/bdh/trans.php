@@ -192,6 +192,26 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('if-buka-nik-if','Bdh\PembukaanIFController@getNIKIF');
     $router->get('if-buka-akun-if','Bdh\PembukaanIFController@getAkunIF');
     $router->get('if-buka-akun-kas','Bdh\PembukaanIFController@getAkunKas');
+
+    
+    // REIMBURSE IF
+    $router->get('if-reim-nobukti','Bdh\ReimburseIFController@generateNo');
+    $router->get('if-reim','Bdh\ReimburseIFController@index');
+    $router->get('if-reim-detail','Bdh\ReimburseIFController@show');
+    $router->post('if-reim','Bdh\ReimburseIFController@store');
+    $router->post('if-reim-ubah','Bdh\ReimburseIFController@update');
+    $router->delete('if-reim','Bdh\ReimburseIFController@destroy');
+
+    $router->get('if-reim-nik-pemegang','Bdh\ReimburseIFController@getNIKPemegang');
+    $router->get('if-reim-load-pemegang','Bdh\ReimburseIFController@loadData');
+    $router->get('if-reim-akun','Bdh\ReimburseIFController@getAkun');
+    $router->get('if-reim-pp','Bdh\ReimburseIFController@getPP');
+    $router->get('if-reim-drk','Bdh\ReimburseIFController@getDRK');
+    $router->get('if-reim-cek-budget','Bdh\ReimburseIFController@cekBudget');
+    $router->get('if-reim-pp-master','Bdh\ReimburseIFController@getPPMaster');
+    $router->get('if-reim-nik-buat','Bdh\ReimburseIFController@getNIKBuat');
+    $router->get('if-reim-nik-tahu','Bdh\ReimburseIFController@getNIKTahu');
+    $router->get('if-reim-nik-ver','Bdh\ReimburseIFController@getNIKVer');
 });
 
 ?>
