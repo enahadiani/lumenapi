@@ -279,6 +279,13 @@ class DropingKirimNonAjuController extends Controller
 
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
+
+                $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+                if(count($get) > 0){
+                    $kode_pp = $get[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
             
                 $j = 0;
                 $total = 0;
@@ -386,7 +393,14 @@ class DropingKirimNonAjuController extends Controller
 
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
-
+                
+                $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+                if(count($get) > 0){
+                    $kode_pp = $get[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
+                
                 $del = DB::connection($this->db)->table('ys_kasdrop_d')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kas', $no_bukti)
