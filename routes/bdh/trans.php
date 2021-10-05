@@ -167,6 +167,19 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('droping-batal-load','Bdh\PembatalanDropingController@loadData');
     $router->get('droping-batal-niktahu','Bdh\PembatalanDropingController@getNIKTahu');
     $router->get('droping-batal-akun','Bdh\PembatalanDropingController@getAkun');
+
+    // DROPING NON AJU
+    $router->get('droping-nonaju-nobukti','Bdh\DropingNonAjuController@generateNo');
+    $router->get('droping-nonaju','Bdh\DropingNonAjuController@index');
+    $router->get('droping-nonaju-detail','Bdh\DropingNonAjuController@show');
+    $router->post('droping-nonaju','Bdh\DropingNonAjuController@store');
+    $router->post('droping-nonaju-ubah','Bdh\DropingNonAjuController@update');
+    $router->delete('droping-nonaju','Bdh\DropingNonAjuController@destroy');
+
+    $router->get('droping-nonaju-lokasi','Bdh\DropingNonAjuController@getLokasi');
+    $router->get('droping-nonaju-nikapp','Bdh\DropingNonAjuController@getNIKApp');
+    $router->get('droping-nonaju-akun-mutasi','Bdh\DropingNonAjuController@getAkunMutasi');
+    $router->get('droping-nonaju-akun-kas','Bdh\DropingNonAjuController@getAkunKas');
 });
 
 ?>
