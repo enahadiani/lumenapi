@@ -180,6 +180,18 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('droping-nonaju-nikapp','Bdh\DropingKirimNonAjuController@getNIKApp');
     $router->get('droping-nonaju-akun-mutasi','Bdh\DropingKirimNonAjuController@getAkunMutasi');
     $router->get('droping-nonaju-akun-kas','Bdh\DropingKirimNonAjuController@getAkunKas');
+
+    // PEMBUKAAN IF
+    $router->get('if-buka-nobukti','Bdh\PembukaanIFController@generateNo');
+    $router->get('if-buka','Bdh\PembukaanIFController@index');
+    $router->get('if-buka-detail','Bdh\PembukaanIFController@show');
+    $router->post('if-buka','Bdh\PembukaanIFController@store');
+    $router->post('if-buka-ubah','Bdh\PembukaanIFController@update');
+    $router->delete('if-buka','Bdh\PembukaanIFController@destroy');
+
+    $router->get('if-buka-nik-if','Bdh\PembukaanIFController@getNIKIF');
+    $router->get('if-buka-akun-if','Bdh\PembukaanIFController@getAkunIF');
+    $router->get('if-buka-akun-kas','Bdh\PembukaanIFController@getAkunKas');
 });
 
 ?>
