@@ -610,20 +610,20 @@ class PembatalanDropingController extends Controller
 
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['detail_terima'] = $res2;
+                $success['detail_batal'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['detail_terima'] = [];
+                $success['detail_batal'] = [];
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = [];
-            $success['detail_terima'] = [];
+            $success['detail_batal'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
