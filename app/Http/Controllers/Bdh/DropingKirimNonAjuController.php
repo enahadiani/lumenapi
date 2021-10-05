@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 
-class PenerimaanDropingController extends Controller
+class DropingKirimNonAjuController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -164,7 +164,7 @@ class PenerimaanDropingController extends Controller
     public function generateNo(Request $request) {
         $this->validate($request, [    
             'tanggal' => 'required',
-            'jenis' => 'required'      
+            'jenis' => 'required'       
         ]);
         
         try {
@@ -199,9 +199,16 @@ class PenerimaanDropingController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_kas,convert(varchar,a.tanggal,103) as tgl,a.jenis,a.no_dokumen,a.keterangan,a.nilai 
-            from kas_m a 
-            where a.kode_lokasi='".$kode_lokasi."' and a.modul = 'KBDROPTRM' and a.posted ='F'";
+            $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+            if(count($get) > 0){
+                $kode_pp = $get[0]->kode_pp;
+            }else{
+                $kode_pp = "-";
+            }
+
+            $sql="select distinct a.no_kas,convert(varchar,a.tanggal,103) as tgl,a.jenis,a.no_dokumen,a.keterangan,a.nilai 
+            from kas_m a left join yk_kasdrop_d b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi and b.no_kasterima<>'-' 
+            where b.no_kasterima is null and a.kode_lokasi='".$kode_lokasi."' and a.modul = 'KBDROP' and a.posted ='F'";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -248,17 +255,14 @@ class PenerimaanDropingController extends Controller
             'tanggal' => 'required|date_format:Y-m-d',
             'jenis' => 'required',
             'no_dokumen' => 'required|max:50',
-            'deskripsi' => 'required|max:150',
-            'akun_kas' => 'required|max:10',
-            'nik_tahu' => 'required|max:10',
+            'deskripsi' => 'required|max:200',
+            'akun_mutasi' => 'required',
+            'akun_kas' => 'required',
+            'nik_app' => 'required',
             'total' => 'required',
-            'status' => 'required|array',
-            'no_kas_kirim' => 'required|array',
-            'lokasi_kirim' => 'required|array',
-            'akun_tak' => 'required|array',
+            'kode_lokasi' => 'required|array',
             'keterangan' => 'required|array',
-            'nilai' => 'required|array',
-            'id' => 'required|array'
+            'nilai' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -273,40 +277,20 @@ class PenerimaanDropingController extends Controller
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("kas_m", "no_kas", $kode_lokasi."-".$request->jenis.substr($periode,2,4).".", "0001");
 
-            // CEK PERIODE
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
+            
                 $j = 0;
                 $total = 0;
-                $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
-                if(count($get) > 0){
-                    $kode_pp = $get[0]->kode_pp;
-                }else{
-                    $kode_pp = "-";
-                }
-
-                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$nik,'-'));
-
-                $nu = 2;
-                if(count($request->akun_tak) > 0){
-                    for ($i=0; $i<count($request->akun_tak); $i++){	
-                        if ($request->status[$i] == "APP"){
-                            $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
-                            ->where('nu',$request->id[$i]) 
-                            ->where('no_kas',$request->no_kas_kirim[$i])
-                            ->where('kode_loktuj',$kode_lokasi)
-                            ->where('kode_lokasi',$request->lokasi_kirim[$i])
-                            ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
-
-                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','TAK',$periode,'IDR',1,$nik,'-'));
-                            $total+= +floatval($request->nilai[$i]);
-                            $nu++;
-                        }
+                if(count($request->kode_lokasi) > 0){
+                    for ($i=0; $i<count($request->kode_lokasi); $i++){	
+                        $insj[$i] = DB::connection($this->db)->insert("insert into yk_kasdrop_d(no_spb,nu,no_kas,no_dokumen,kode_lokasi,periode,kode_loktuj,kode_rek,keterangan,nilai,progress,akun_tak,no_kasterima) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$i,$no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$request->kode_lokasi[$i],'-',$request->keterangan[$i],floatval($request->nilai[$i]),0,$request->akun_mutasi,'-'));
+                        $total+= +floatval($request->nilai[$i]);
                     }
                 }
 
                 if($total != floatval($request->total)){
-                    $msg = "Transaksi tidak valid. Total Penerimaan ($request->total) dan Total Detail Penerimaan ($total) tidak sama.";
+                    $msg = "Transaksi tidak valid. Total Droping ($request->total) dan Total Detail ($total) tidak sama.";
                     DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['no_bukti'] = "-";
@@ -314,21 +298,26 @@ class PenerimaanDropingController extends Controller
                 }else{
                     if($total > 0){
 
-                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
+                        $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROP',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_app,$nik,'F','-','-',$request->akun_mutasi,'-'));
+
+                        $insj1 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,0,$request->akun_mutasi,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROP','TAK',$periode,'IDR',1,$nik,'-'));
+
+                        $insj2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'C',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROP','KB',$periode,'IDR',1,$nik,'-'));
                         
+                    
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Penerimaan Droping berhasil disimpan";
+                        $success['message'] = "Data Droping berhasil disimpan";
                     }else{
 
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total Penerimaan tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total Droping tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
-
+            
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = false;
@@ -340,7 +329,7 @@ class PenerimaanDropingController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penerimaan Droping gagal disimpan ".$e;
+            $success['message'] = "Data Droping gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
         }				
         
@@ -373,17 +362,14 @@ class PenerimaanDropingController extends Controller
             'tanggal' => 'required|date_format:Y-m-d',
             'jenis' => 'required',
             'no_dokumen' => 'required|max:50',
-            'deskripsi' => 'required|max:150',
-            'akun_kas' => 'required|max:10',
-            'nik_tahu' => 'required|max:10',
+            'deskripsi' => 'required|max:200',
+            'akun_mutasi' => 'required',
+            'akun_kas' => 'required',
+            'nik_app' => 'required',
             'total' => 'required',
-            'status' => 'required|array',
-            'no_kas_kirim' => 'required|array',
-            'lokasi_kirim' => 'required|array',
-            'akun_tak' => 'required|array',
+            'kode_lokasi' => 'required|array',
             'keterangan' => 'required|array',
-            'nilai' => 'required|array',
-            'id' => 'required|array'
+            'nilai' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -396,57 +382,37 @@ class PenerimaanDropingController extends Controller
             }
             
             $no_bukti = $request->no_bukti;
-            
-            $del = DB::connection($this->db)->table('kas_m')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_kas', $no_bukti)
-            ->delete();
-
-            $del2 = DB::connection($this->db)->table('kas_j')
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_kas', $no_bukti)
-            ->delete();
-
-            $updd = DB::connection($this->db)->table('yk_kasdrop_d')
-            ->where('kode_loktuj', $kode_lokasi)
-            ->where('no_kasterima', $no_bukti)
-            ->update(['no_kasterima'=>'-','progress'=>'0']);
-
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            // CEK PERIODE
+
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
+
+                $del = DB::connection($this->db)->table('ys_kasdrop_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kas', $no_bukti)
+                ->delete();
+
+                $del2 = DB::connection($this->db)->table('kas_m')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kas', $no_bukti)
+                ->delete();
+
+                $del3 = DB::connection($this->db)->table('kas_j')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kas', $no_bukti)
+                ->delete();
+
                 $j = 0;
                 $total = 0;
-                $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
-                if(count($get) > 0){
-                    $kode_pp = $get[0]->kode_pp;
-                }else{
-                    $kode_pp = "-";
-                }
-
-                $insjd = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','KB',$periode,'IDR',1,$nik,'-'));
-
-                $nu = 2;
-                if(count($request->akun_tak) > 0){
-                    for ($i=0; $i<count($request->akun_tak); $i++){	
-                        if ($request->status[$i] == "APP"){
-                            $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
-                            ->where('nu',$request->id[$i]) 
-                            ->where('no_kas',$request->no_kas_kirim[$i])
-                            ->where('kode_loktuj',$kode_lokasi)
-                            ->where('kode_lokasi',$request->lokasi_kirim[$i])
-                            ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
-
-                            $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPTRM','TAK',$periode,'IDR',1,$nik,'-'));
-                            $total+= +floatval($request->nilai[$i]);
-                            $nu++;
-                        }
+                if(count($request->kode_lokasi) > 0){
+                    for ($i=0; $i<count($request->kode_lokasi); $i++){	
+                        $insj[$i] = DB::connection($this->db)->insert("insert into yk_kasdrop_d(no_spb,nu,no_kas,no_dokumen,kode_lokasi,periode,kode_loktuj,kode_rek,keterangan,nilai,progress,akun_tak,no_kasterima) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$i,$no_bukti,$request->no_dokumen,$kode_lokasi,$periode,$request->kode_lokasi[$i],'-',$request->keterangan[$i],floatval($request->nilai[$i]),0,$request->akun_mutasi,'-'));
+                        $total+= +floatval($request->nilai[$i]);
                     }
                 }
 
                 if($total != floatval($request->total)){
-                    $msg = "Transaksi tidak valid. Total Penerimaan ($request->total) dan Total Detail Penerimaan ($total) tidak sama.";
+                    $msg = "Transaksi tidak valid. Total Droping ($request->total) dan Total Detail ($total) tidak sama.";
                     DB::connection($this->db)->rollback();
                     $success['status'] = false;
                     $success['no_bukti'] = "-";
@@ -454,34 +420,39 @@ class PenerimaanDropingController extends Controller
                 }else{
                     if($total > 0){
 
-                        $ins1 = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROPTRM',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_tahu,$nik,'F','-','-','-','-'));
+                        $insm = DB::connection($this->db)->insert("insert into kas_m (no_kas,kode_lokasi,no_dokumen,no_bg,akun_kb,tanggal,keterangan,kode_pp,modul,jenis,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,'-',$request->akun_kas,$request->tanggal, $request->deskripsi,$kode_pp,'KBDROP',$request->jenis,$periode,'IDR',1,floatval($request->total),$nik,$request->nik_app,$nik,'F','-','-',$request->akun_mutasi,'-'));
+
+                        $insj1 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,0,$request->akun_mutasi,$request->deskripsi,'D',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROP','TAK',$periode,'IDR',1,$nik,'-'));
+
+                        $insj2 = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,1,$request->akun_kas,$request->deskripsi,'C',floatval($request->total),$kode_pp,'-','-','-',$kode_lokasi,'KBDROP','KB',$periode,'IDR',1,$nik,'-'));
                         
+                    
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Penerimaan Droping berhasil diubah";
+                        $success['message'] = "Data Droping berhasil disimpan";
                     }else{
 
                         DB::connection($this->db)->rollback();
                         $success['status'] = false;
                         $success['no_bukti'] = "-";
-                        $success['message'] = "Transaksi tidak valid. Total Penerimaan tidak boleh kurang dari atau sama dengan nol";
+                        $success['message'] = "Transaksi tidak valid. Total Droping tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
-
+            
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = false;
                 $success['no_bukti'] = "-";
                 $success['message'] = $cek["message"];
             }
-             
+                            
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['no_bukti'] = "-";
-            $success['message'] = "Data Penerimaan Droping gagal diubah ".$e;
+            $success['message'] = "Data Droping gagal diubah ".$e;
             return response()->json($success, $this->successStatus); 
         }	
     }
@@ -506,6 +477,7 @@ class PenerimaanDropingController extends Controller
             }
             
             $no_bukti = $request->no_bukti;
+           
             if(isset($request->periode) && $request->periode != ""){
                 $periode = $request->periode;
             }else{
@@ -524,14 +496,14 @@ class PenerimaanDropingController extends Controller
                 ->where('no_kas', $no_bukti)
                 ->delete();
 
-                $updd = DB::connection($this->db)->table('yk_kasdrop_d')
-                ->where('kode_loktuj', $kode_lokasi)
-                ->where('no_kasterima', $no_bukti)
-                ->update(['no_kasterima'=>'-','progress'=>'0']);
+                $del3 = DB::connection($this->db)->table('yk_kasdrop_d')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('no_kas', $no_bukti)
+                ->delete();
 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
-                $success['message'] = "Data Penerimaan Droping berhasil dihapus";
+                $success['message'] = "Data Droping berhasil dihapus";
             }else{
                 DB::connection($this->db)->rollback();
                 $success['status'] = false;
@@ -542,49 +514,10 @@ class PenerimaanDropingController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data Penerimaan Droping gagal dihapus ".$e;
+            $success['message'] = "Data Droping gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
-    }
-
-    public function loadData(Request $request)
-    {
-        $this->validate($request,[
-            'tanggal' => 'required',
-        ]);
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $sql = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
-            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.kode_loktuj='".$kode_lokasi."' and a.progress = '0' and a.periode <= '$periode' ";
-
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
     }
 
     public function show(Request $request)
@@ -600,14 +533,15 @@ class PenerimaanDropingController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select a.keterangan,a.no_dokumen,a.jenis,a.tanggal,a.akun_kb,a.nik_app 
-            from kas_m a					 
-            where a.no_kas = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' ";
+            $strSQL = "select keterangan,no_dokumen,jenis,tanggal,akun_kb,ref1,nik_app 
+            from kas_m 							 
+            where no_kas = '".$request->no_bukti."' and kode_lokasi='".$kode_lokasi."' ";
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
-            $strSQL2 = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
-            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.no_kasterima='".$request->no_bukti."' and a.kode_loktuj='".$kode_lokasi."'";
+            $strSQL2 = "select a.kode_loktuj,b.nama,a.keterangan,a.nilai 
+            from yk_kasdrop_d a inner join lokasi b on a.kode_loktuj=b.kode_lokasi 
+            where a.no_kas = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
 
@@ -615,27 +549,27 @@ class PenerimaanDropingController extends Controller
 
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['detail_terima'] = $res2;
+                $success['detail'] = $res2;
                 $success['message'] = "Success!";     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['detail_terima'] = [];
+                $success['detail'] = [];
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = [];
-            $success['detail_terima'] = [];
+            $success['detail'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
         
     }
 
-    public function getAkun(Request $request)
+    public function getAkunMutasi(Request $request)
     {
 
         try {
@@ -645,10 +579,8 @@ class PenerimaanDropingController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select a.kode_akun, a.nama 
-            from masakun a inner join 
-            flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            where b.kode_flag in ('001','009') and a.kode_lokasi='$kode_lokasi' ";
+            $strSQL = "elect a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi where b.kode_flag = '016' and a.kode_lokasi='$kode_lokasi' ";
+
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
@@ -673,7 +605,44 @@ class PenerimaanDropingController extends Controller
         
     }
 
-    public function getNIKTahu(Request $request)
+    public function getAkunKas(Request $request)
+    {
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+            $strSQL = "select a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
+            where b.kode_flag in ('009') and a.kode_lokasi = '".$kode_lokasi."'";
+            $rs = DB::connection($this->db)->select($strSQL);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getNIKApp(Request $request)
     {
 
         try {
@@ -698,6 +667,49 @@ class PenerimaanDropingController extends Controller
             
             $strSQL = "select nik, nama from karyawan where flag_aktif='1' and kode_lokasi = '".$kode_lokasi."'";
             
+            $rs = DB::connection($this->db)->select($strSQL);
+            $res = json_decode(json_encode($rs),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getLokasi(Request $request)
+    {
+
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+
+            $get = DB::connection($this->db)->select("select kode_lokkonsol from lokasi where kode_lokasi='$kode_lokasi' ");
+            if(count($get) > 0){
+                $kode_lokasi_konsol = $get[0]->kode_lokkonsol;
+            }else{
+                $kode_lokasi_konsol = "-";
+            }
+
+            $strSQL = "select kode_lokasi, nama from lokasi where kode_lokasi not in ('".$kode_lokasi_konsol."','".$kode_lokasi."')";
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
