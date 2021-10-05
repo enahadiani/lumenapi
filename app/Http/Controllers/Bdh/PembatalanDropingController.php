@@ -505,7 +505,11 @@ class PembatalanDropingController extends Controller
             }
             
             $no_bukti = $request->no_bukti;
-            $periode = date('Ym');
+            if(isset($request->periode) && $request->periode != ""){
+                $periode = $request->periode;
+            }else{
+                $periode = date('Ym');
+            }
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
             
