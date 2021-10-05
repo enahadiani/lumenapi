@@ -444,7 +444,7 @@ class DropingKirimNonAjuController extends Controller
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Droping berhasil disimpan";
+                        $success['message'] = "Data Droping berhasil diubah";
                     }else{
 
                         DB::connection($this->db)->rollback();
