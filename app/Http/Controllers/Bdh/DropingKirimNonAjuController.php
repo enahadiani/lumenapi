@@ -400,8 +400,8 @@ class DropingKirimNonAjuController extends Controller
                 }else{
                     $kode_pp = "-";
                 }
-                
-                $del = DB::connection($this->db)->table('ys_kasdrop_d')
+
+                $del = DB::connection($this->db)->table('yk_kasdrop_d')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_kas', $no_bukti)
                 ->delete();
