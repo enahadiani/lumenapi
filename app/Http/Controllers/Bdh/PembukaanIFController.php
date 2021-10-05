@@ -192,7 +192,7 @@ class PembukaanIFController extends Controller
 
     public function isAktif($isi,$kode_lokasi){
         
-        $auth = DB::connection($this->sql)->select("select no_kas from if_nik where kode_lokasi='".$kode_lokasi."' and no_flag='-' and nik='".$isi."' ");
+        $auth = DB::connection($this->db)->select("select no_kas from if_nik where kode_lokasi='".$kode_lokasi."' and no_flag='-' and nik='".$isi."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return true;
@@ -210,16 +210,10 @@ class PembukaanIFController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
-            if(count($get) > 0){
-                $kode_pp = $get[0]->kode_pp;
-            }else{
-                $kode_pp = "-";
-            }
-
-            $sql="select distinct a.no_kas,convert(varchar,a.tanggal,103) as tgl,a.jenis,a.no_dokumen,a.keterangan,a.nilai 
-            from kas_m a left join yk_kasdrop_d b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi and b.no_kasterima<>'-' 
-            where b.no_kasterima is null and a.kode_lokasi='".$kode_lokasi."' and a.modul = 'KBDROP' and a.posted ='F'";
+            $sql="select distinct a.no_kas,convert(varchar,a.tanggal,103) as tgl,a.no_dokumen,a.keterangan,a.nilai,a.tanggal 
+            from kas_m a 			 					 
+            where a.kode_lokasi='".$kode_lokasi."' and a.modul='KBIFCAIR' and a.posted ='F' 
+            order by a.tanggal";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -605,7 +599,7 @@ class PembukaanIFController extends Controller
             }
 
             $strSQL = "select a.kode_akun, a.nama from masakun a inner join flag_relasi b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
-            where b.kode_flag in ('009') and a.kode_lokasi = '".$kode_lokasi."'";
+            where b.kode_flag in ('001','009') and a.kode_lokasi = '".$kode_lokasi."'";
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
