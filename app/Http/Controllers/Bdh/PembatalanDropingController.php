@@ -294,7 +294,7 @@ class PembatalanDropingController extends Controller
                             $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
                             ->where('nu',$request->id[$i]) 
                             ->where('no_kas',$request->no_kas_kirim[$i])
-                            ->where('kode_lokasi',$request->lokasi_kirim[$i])
+                            ->where('kode_lokasi',$kode_lokasi)
                             ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
 
                             $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPBTL','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
@@ -433,8 +433,7 @@ class PembatalanDropingController extends Controller
                             $upd[$i] = DB::connection($this->db)->table('yk_kasdrop_d')
                             ->where('nu',$request->id[$i]) 
                             ->where('no_kas',$request->no_kas_kirim[$i])
-                            ->where('kode_loktuj',$kode_lokasi)
-                            ->where('kode_lokasi',$request->lokasi_kirim[$i])
+                            ->where('kode_lokasi',$kode_lokasi)
                             ->update(['progress'=>'1','no_kasterima'=>$no_bukti]);
 
                             $insj[$i] = DB::connection($this->db)->insert("insert into kas_j(no_kas,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,kode_cf,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input,kode_bank) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($no_bukti,$request->no_dokumen,$request->tanggal,$nu,$request->akun_tak[$i],$request->keterangan[$i],'C',floatval($request->nilai[$i]),$kode_pp,'-','-','-',$kode_lokasi,'KBDROPBTL','TAK',$periode,'IDR',1,$kode_lokasi,'-'));
@@ -561,8 +560,8 @@ class PembatalanDropingController extends Controller
             }
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $sql = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
-            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.kode_loktuj='".$kode_lokasi."' and a.progress = '0' and a.periode <= '$periode' ";
+            $sql = "select a.no_kas,a.no_dokumen,a.kode_loktuj,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
+            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and a.progress = '0' and a.periode <= '$periode' ";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -605,8 +604,8 @@ class PembatalanDropingController extends Controller
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
-            $strSQL2 = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
-            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.no_kasterima='".$request->no_bukti."' and a.kode_loktuj='".$kode_lokasi."'";
+            $strSQL2 = "select a.no_kas,a.no_dokumen,a.kode_loktuj,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
+            from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.no_kasterima='".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."'";
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
 
