@@ -988,7 +988,7 @@ class ReimburseIFController extends Controller
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $noIFCair = $res[0]->no_kas;
+                $noIFCair = $res[0]['no_kas'];
 
                 $strNIK = "select a.nik, a.nama from karyawan a inner join if_nik b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi where b.no_kas='".$noIFCair."' and a.kode_lokasi='".$kode_lokasi."'";
                 $rsnik = DB::connection($this->db)->select($strNIK);
