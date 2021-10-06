@@ -409,7 +409,7 @@ class ReimburseIFController extends Controller
 
                                         if(floatval($request->nilai_agg[$i]) > 0 && (floatval($request->nilai_agg[$i]) > floatval($request->saldo_awal_agg[$i]))){
                                             $sts_agg = false;
-                                            $msg_agg .= "Transaksi tidak valid. Saldo Anggaran tidak mencukupi. [Baris : ".($i+1)."] , silahkan melakukan RRA dari menu anggaran";
+                                            $msg_agg .= "Transaksi tidak valid. Saldo Anggaran Akun ".$request->kode_akun_agg[$i]." tidak mencukupi. [Baris : ".($i+1)."] , silahkan melakukan RRA dari menu anggaran";
                                             break;
                                         }
         
@@ -709,7 +709,7 @@ class ReimburseIFController extends Controller
 
                                         if(floatval($request->nilai_agg[$i]) > 0 && (floatval($request->nilai_agg[$i]) > floatval($request->saldo_awal_agg[$i]))){
                                             $sts_agg = false;
-                                            $msg_agg .= "Transaksi tidak valid. Saldo Anggaran tidak mencukupi. [Baris : ".($i+1)."] , silahkan melakukan RRA dari menu anggaran";
+                                            $msg_agg .= "Transaksi tidak valid. Saldo Anggaran Akun ".$request->kode_akun_agg[$i]." tidak mencukupi. [Baris : ".($i+1)."] , silahkan melakukan RRA dari menu anggaran";
                                             break;
                                         }
         
