@@ -291,7 +291,13 @@ class ReimburseIFController extends Controller
             // CEK PERIODE
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
-            
+                $getpp = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+                if(count($getpp) > 0){
+                    $kode_pp = $getpp[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
+
                 $j = 0;
                 $total = 0;
                 if(count($request->kode_akun) > 0){
@@ -548,6 +554,13 @@ class ReimburseIFController extends Controller
             // CEK PERIODE
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
+
+                $getpp = DB::connection($this->db)->select("select kode_pp from karyawan where kode_lokasi='$kode_lokasi' and nik='$nik' ");
+                if(count($getpp) > 0){
+                    $kode_pp = $getpp[0]->kode_pp;
+                }else{
+                    $kode_pp = "-";
+                }
 
                 $akunHutIF = "-";
                 $spro = DB::connection($this->db)->select("select kode_spro,flag from spro where kode_spro in ('HUTIF') and kode_lokasi = '".$kode_lokasi."'");			
