@@ -213,16 +213,16 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('if-reim-nik-ver','Bdh\ReimburseIFController@getNIKVer');
 
     // PENUTUPAN IF
-    $router->get('if-close-nobukti','Bdh\ReimburseIFController@generateNo');
-    $router->get('if-close','Bdh\ReimburseIFController@index');
-    $router->get('if-close-detail','Bdh\ReimburseIFController@show');
-    $router->post('if-close','Bdh\ReimburseIFController@store');
-    $router->post('if-close-ubah','Bdh\ReimburseIFController@update');
-    $router->delete('if-close','Bdh\ReimburseIFController@destroy');
+    $router->get('if-close-nobukti','Bdh\PenutupanIFController@generateNo');
+    $router->get('if-close','Bdh\PenutupanIFController@index');
+    $router->get('if-close-detail','Bdh\PenutupanIFController@show');
+    $router->post('if-close','Bdh\PenutupanIFController@store');
+    $router->post('if-close-ubah','Bdh\PenutupanIFController@update');
+    $router->delete('if-close','Bdh\PenutupanIFController@destroy');
 
-    $router->get('if-close-reimburse','Bdh\ReimburseIFController@getReimburse');
-    $router->get('if-close-load-reimburse','Bdh\ReimburseIFController@loadData');
-    $router->get('if-close-akun-kas','Bdh\ReimburseIFController@getAkunKas');
+    $router->get('if-close-reimburse','Bdh\PenutupanIFController@getReimburse');
+    $router->get('if-close-load-reimburse','Bdh\PenutupanIFController@loadData');
+    $router->get('if-close-akun-kas','Bdh\PenutupanIFController@getAkunKas');
 });
 
 ?>
