@@ -878,10 +878,13 @@ class ReimburseIFController extends Controller
                 ->where('no_bukti', $no_bukti)
                 ->delete();
 
-                $updnik = DB::connection($this->db)->table('if_nik')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_kas', $noIFCair)
-                ->update(['no_flag'=>'-','flag_aktif'=>1]);
+                $updnik = DB::connection($this->db)->update("
+                update if_nik
+                set no_flag='-',flag_aktif=1
+                from if_nik a
+                inner join hutang_m b on a.no_kas=b.no_dokumen and a.kode_lokasi=b.kode_lokasi
+                inner join pbh_pb_m c on b.no_hutang=c.no_pb and b.kode_lokasi=c.kode_lokasi 
+                where b.no_hutang=? and a.kode_lokasi=? ",[$no_bukti,$kode_lokasi]);
 
                 $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
                 $res = json_decode(json_encode($res),true);
