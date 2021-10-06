@@ -529,13 +529,28 @@ class ReimburseIFController extends Controller
         $this->validate($request, [
             'no_bukti' => 'required',
             'tanggal' => 'required|date_format:Y-m-d',
-            'no_dokumen' => 'required|max:50',
+            'nik_pemegang' => 'required|max:50',
             'deskripsi' => 'required|max:200',
-            'kode_pp' => 'required|max:10',
+            'status' => 'required|in:REIMBURSE,CLOSE',
+            'no_rek' => 'required',
+            'nama_rek' => 'required',
+            'bank' => 'required',
+            'nik_buat' => 'required',
+            'nik_tahu' => 'required',
+            'nik_ver' => 'required',
             'total' => 'required',
             'kode_akun' => 'required|array',
-            'kegiatan' => 'required|array',
-            'nilai' => 'required|array'
+            'kode_pp' => 'required|array',
+            'kode_drk' => 'required|array',
+            'dc' => 'required|array',
+            'keterangan' => 'required|array',
+            'nilai' => 'required|array',
+            'kode_akun_agg' => 'required|array',
+            'kode_pp_agg' => 'required|array',
+            'kode_drk_agg' => 'required|array',
+            'saldo_awal_agg' => 'required|array',
+            'nilai_agg' => 'required|array',
+            'saldo_akhir_agg' => 'required|array'
         ]);
 
         DB::connection($this->db)->beginTransaction();
