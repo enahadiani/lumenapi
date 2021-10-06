@@ -377,6 +377,7 @@ class PenutupanIFController extends Controller
             }
             
             $no_bukti = $request->no_bukti;
+            $jenis = $request->jenis;
             
             $del = DB::connection($this->db)->table('kas_m')
             ->where('kode_lokasi', $kode_lokasi)
