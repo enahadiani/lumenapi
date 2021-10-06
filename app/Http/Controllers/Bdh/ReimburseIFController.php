@@ -390,7 +390,7 @@ class ReimburseIFController extends Controller
                                     $insj2 = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,'-',$request->tanggal,888,$akunIF,$request->deskripsi,'C','IDR',1,floatval($nilaiIF),floatval($nilaiIF),$kode_pp,'-',$kode_lokasi,'IFREIM','R-IF',$periode,$nik));										
                                 }
                                 
-                                $total_agg = 0;
+                                $total_agg = 0; $sts_agg = true; $msg_agg ="";
                                 if (count($request->kode_akun_agg) > 0){
                                     for ($i=0; $i < count($request->kode_akun_agg);$i++){
                                         if (floatval($request->nilai_agg[$i]) > 0) {
@@ -400,6 +400,12 @@ class ReimburseIFController extends Controller
                                             $DC = "C";
                                             $nilai = floatval($request->nilai_agg[$i]) * -1;
                                         }
+
+                                        if(floatval($request->nilai_agg[$i]) > 0 && (floatval($request->nilai_agg[$i]) > floatval($request->saldo_awal_agg[$i]))){
+                                            $sts_agg = false;
+                                            $msg_agg .= "Transaksi tidak valid. Saldo Anggaran tidak mencukupi. [Baris : ".($i+1)."] , silahkan melakukan RRA dari menu anggaran";
+                                            break;
+                                        }
         
                                         DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,'IFREIM',$kode_lokasi,$request->kode_akun_agg[$i],$request->kode_pp_agg[$i],$request->kode_drk_agg[$i],$periode,$periode,$dc,floatval($request->saldo_akhir_agg[$i]),$nilai));
         
@@ -408,56 +414,63 @@ class ReimburseIFController extends Controller
                                         }
                                     }
                                 }
-        
-                                
-                                $arr_dok = array();
-                                $arr_jenis = array();
-                                $arr_no_urut = array();
-                                $i=0;
-                                $cek = $request->file_dok;
-                                if(!empty($cek)){
-                                    if(count($request->nama_file_seb) > 0){
-                                        //looping berdasarkan nama dok
-                                        for($i=0;$i<count($request->nama_file_seb);$i++){
-                                            //cek row i ada file atau tidak
-                                            if(isset($request->file('file_dok')[$i])){
-                                                $file = $request->file('file_dok')[$i];
-                                                //kalo ada cek nama sebelumnya ada atau -
-                                                if($request->nama_file_seb[$i] != "-"){
-                                                    //kalo ada hapus yang lama
-                                                    Storage::disk('s3')->delete('bdh/'.$request->nama_file_seb[$i]);
-                                                }
-                                                $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                                                $dok = $nama_dok;
-                                                if(Storage::disk('s3')->exists('bdh/'.$dok)){
-                                                    Storage::disk('s3')->delete('bdh/'.$dok);
-                                                }
-                                                Storage::disk('s3')->put('bdh/'.$dok,file_get_contents($file));
-                                                $arr_dok[] = $dok;
-                                                $arr_jenis[] = $request->kode_jenis[$i];
-                                                $arr_no_urut[] = $request->no_urut[$i];
-                                            }else if($request->nama_file_seb[$i] != "-"){
-                                                $arr_dok[] = $request->nama_file_seb[$i];
-                                                $arr_jenis[] = $request->kode_jenis[$i];
-                                                $arr_no_urut[] = $request->no_urut[$i];
-                                            }     
+
+                                if(!$sts_agg){
+                                    DB::connection($this->db)->rollback();
+                                    $success['status'] = true;
+                                    $success['no_bukti'] = "-";
+                                    $success['message'] = $msg_agg;
+                                }else{
+
+                                    $arr_dok = array();
+                                    $arr_jenis = array();
+                                    $arr_no_urut = array();
+                                    $i=0;
+                                    $cek = $request->file_dok;
+                                    if(!empty($cek)){
+                                        if(count($request->nama_file_seb) > 0){
+                                            //looping berdasarkan nama dok
+                                            for($i=0;$i<count($request->nama_file_seb);$i++){
+                                                //cek row i ada file atau tidak
+                                                if(isset($request->file('file_dok')[$i])){
+                                                    $file = $request->file('file_dok')[$i];
+                                                    //kalo ada cek nama sebelumnya ada atau -
+                                                    if($request->nama_file_seb[$i] != "-"){
+                                                        //kalo ada hapus yang lama
+                                                        Storage::disk('s3')->delete('bdh/'.$request->nama_file_seb[$i]);
+                                                    }
+                                                    $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                                    $dok = $nama_dok;
+                                                    if(Storage::disk('s3')->exists('bdh/'.$dok)){
+                                                        Storage::disk('s3')->delete('bdh/'.$dok);
+                                                    }
+                                                    Storage::disk('s3')->put('bdh/'.$dok,file_get_contents($file));
+                                                    $arr_dok[] = $dok;
+                                                    $arr_jenis[] = $request->kode_jenis[$i];
+                                                    $arr_no_urut[] = $request->no_urut[$i];
+                                                }else if($request->nama_file_seb[$i] != "-"){
+                                                    $arr_dok[] = $request->nama_file_seb[$i];
+                                                    $arr_jenis[] = $request->kode_jenis[$i];
+                                                    $arr_no_urut[] = $request->no_urut[$i];
+                                                }     
+                                            }
+                                            
+                                            $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                                         }
-                                        
-                                        $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-                                    }
-                    
-                                    if(count($arr_no_urut) > 0){
-                                        for($i=0; $i<count($arr_no_urut);$i++){
-                                            $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) 
-                                            values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'IFREIM',$no_bukti)); 
+                        
+                                        if(count($arr_no_urut) > 0){
+                                            for($i=0; $i<count($arr_no_urut);$i++){
+                                                $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) 
+                                                values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'IFREIM',$no_bukti)); 
+                                            }
                                         }
                                     }
+            
+                                    DB::connection($this->db)->commit();
+                                    $success['status'] = true;
+                                    $success['no_bukti'] = $no_bukti;
+                                    $success['message'] = "Data Reimburse IF berhasil disimpan";
                                 }
-        
-                                DB::connection($this->db)->commit();
-                                $success['status'] = true;
-                                $success['no_bukti'] = $no_bukti;
-                                $success['message'] = "Data Reimburse IF berhasil disimpan";
                             }
                         }
                     }else{
@@ -670,7 +683,7 @@ class ReimburseIFController extends Controller
                                     $insj2 = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,'-',$request->tanggal,888,$akunIF,$request->deskripsi,'C','IDR',1,floatval($nilaiIF),floatval($nilaiIF),$kode_pp,'-',$kode_lokasi,'IFREIM','R-IF',$periode,$nik));										
                                 }
                                 
-                                $total_agg = 0;
+                                $total_agg = 0; $sts_agg = true; $msg_agg ="";
                                 if (count($request->kode_akun_agg) > 0){
                                     for ($i=0; $i < count($request->kode_akun_agg);$i++){
                                         if (floatval($request->nilai_agg[$i]) > 0) {
@@ -680,6 +693,12 @@ class ReimburseIFController extends Controller
                                             $DC = "C";
                                             $nilai = floatval($request->nilai_agg[$i]) * -1;
                                         }
+
+                                        if(floatval($request->nilai_agg[$i]) > 0 && (floatval($request->nilai_agg[$i]) > floatval($request->saldo_awal_agg[$i]))){
+                                            $sts_agg = false;
+                                            $msg_agg .= "Transaksi tidak valid. Saldo Anggaran tidak mencukupi. [Baris : ".($i+1)."] , silahkan melakukan RRA dari menu anggaran";
+                                            break;
+                                        }
         
                                         DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,'IFREIM',$kode_lokasi,$request->kode_akun_agg[$i],$request->kode_pp_agg[$i],$request->kode_drk_agg[$i],$periode,$periode,$dc,floatval($request->saldo_akhir_agg[$i]),$nilai));
         
@@ -688,56 +707,64 @@ class ReimburseIFController extends Controller
                                         }
                                     }
                                 }
-        
-                                
-                                $arr_dok = array();
-                                $arr_jenis = array();
-                                $arr_no_urut = array();
-                                $i=0;
-                                $cek = $request->file_dok;
-                                if(!empty($cek)){
-                                    if(count($request->nama_file_seb) > 0){
-                                        //looping berdasarkan nama dok
-                                        for($i=0;$i<count($request->nama_file_seb);$i++){
-                                            //cek row i ada file atau tidak
-                                            if(isset($request->file('file_dok')[$i])){
-                                                $file = $request->file('file_dok')[$i];
-                                                //kalo ada cek nama sebelumnya ada atau -
-                                                if($request->nama_file_seb[$i] != "-"){
-                                                    //kalo ada hapus yang lama
-                                                    Storage::disk('s3')->delete('bdh/'.$request->nama_file_seb[$i]);
-                                                }
-                                                $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
-                                                $dok = $nama_dok;
-                                                if(Storage::disk('s3')->exists('bdh/'.$dok)){
-                                                    Storage::disk('s3')->delete('bdh/'.$dok);
-                                                }
-                                                Storage::disk('s3')->put('bdh/'.$dok,file_get_contents($file));
-                                                $arr_dok[] = $dok;
-                                                $arr_jenis[] = $request->kode_jenis[$i];
-                                                $arr_no_urut[] = $request->no_urut[$i];
-                                            }else if($request->nama_file_seb[$i] != "-"){
-                                                $arr_dok[] = $request->nama_file_seb[$i];
-                                                $arr_jenis[] = $request->kode_jenis[$i];
-                                                $arr_no_urut[] = $request->no_urut[$i];
-                                            }     
+
+                                if(!$sts_agg){
+                                    DB::connection($this->db)->rollback();
+                                    $success['status'] = true;
+                                    $success['no_bukti'] = "-";
+                                    $success['message'] = $msg_agg;
+                                }else{
+
+                                    $arr_dok = array();
+                                    $arr_jenis = array();
+                                    $arr_no_urut = array();
+                                    $i=0;
+                                    $cek = $request->file_dok;
+                                    if(!empty($cek)){
+                                        if(count($request->nama_file_seb) > 0){
+                                            //looping berdasarkan nama dok
+                                            for($i=0;$i<count($request->nama_file_seb);$i++){
+                                                //cek row i ada file atau tidak
+                                                if(isset($request->file('file_dok')[$i])){
+                                                    $file = $request->file('file_dok')[$i];
+                                                    //kalo ada cek nama sebelumnya ada atau -
+                                                    if($request->nama_file_seb[$i] != "-"){
+                                                        //kalo ada hapus yang lama
+                                                        Storage::disk('s3')->delete('bdh/'.$request->nama_file_seb[$i]);
+                                                    }
+                                                    $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
+                                                    $dok = $nama_dok;
+                                                    if(Storage::disk('s3')->exists('bdh/'.$dok)){
+                                                        Storage::disk('s3')->delete('bdh/'.$dok);
+                                                    }
+                                                    Storage::disk('s3')->put('bdh/'.$dok,file_get_contents($file));
+                                                    $arr_dok[] = $dok;
+                                                    $arr_jenis[] = $request->kode_jenis[$i];
+                                                    $arr_no_urut[] = $request->no_urut[$i];
+                                                }else if($request->nama_file_seb[$i] != "-"){
+                                                    $arr_dok[] = $request->nama_file_seb[$i];
+                                                    $arr_jenis[] = $request->kode_jenis[$i];
+                                                    $arr_no_urut[] = $request->no_urut[$i];
+                                                }     
+                                            }
+                                            
+                                            $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
                                         }
-                                        
-                                        $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
-                                    }
-                    
-                                    if(count($arr_no_urut) > 0){
-                                        for($i=0; $i<count($arr_no_urut);$i++){
-                                            $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) 
-                                            values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'IFREIM',$no_bukti)); 
+                        
+                                        if(count($arr_no_urut) > 0){
+                                            for($i=0; $i<count($arr_no_urut);$i++){
+                                                $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) 
+                                                values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'IFREIM',$no_bukti)); 
+                                            }
                                         }
                                     }
+            
+                                    DB::connection($this->db)->commit();
+                                    $success['status'] = true;
+                                    $success['no_bukti'] = $no_bukti;
+                                    $success['message'] = "Data Reimburse IF berhasil diubah";
                                 }
-        
-                                DB::connection($this->db)->commit();
-                                $success['status'] = true;
-                                $success['no_bukti'] = $no_bukti;
-                                $success['message'] = "Data Reimburse IF berhasil diubah";
+                                
                             }
                         }
                     }else{
