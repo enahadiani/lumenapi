@@ -606,7 +606,7 @@ class PenerimaanDropingController extends Controller
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
-            $strSQL2 = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
+            $strSQL2 = "select 'APP' as status,a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
             from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.no_kasterima='".$request->no_bukti."' and a.kode_loktuj='".$kode_lokasi."'";
             $rs2 = DB::connection($this->db)->select($strSQL2);
             $res2 = json_decode(json_encode($rs2),true);
