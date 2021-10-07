@@ -309,7 +309,7 @@ class PencairanPanjarController extends Controller
                 $total = 0;
                 if(count($request->kode_akun) > 0){
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PJAJU','BEBAN','IDR',1,$nik));
+                        $insj[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PJAJU','BEBAN',$periode,'IDR',1,$nik));
                         if($request->dc[$i] == "D"){
                             $total+= +floatval($request->nilai[$i]);
                         }else{
@@ -543,7 +543,7 @@ class PencairanPanjarController extends Controller
                 $total = 0;
                 if(count($request->kode_akun) > 0){
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PJAJU','BEBAN','IDR',1,$nik));
+                        $insj[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PJAJU','BEBAN',$periode,'IDR',1,$nik));
                         if($request->dc[$i] == "D"){
                             $total+= +floatval($request->nilai[$i]);
                         }else{
