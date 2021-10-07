@@ -600,8 +600,10 @@ class PenerimaanDropingController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select a.keterangan,a.no_dokumen,a.jenis,a.tanggal,a.akun_kb,a.nik_app 
-            from kas_m a					 
+            $strSQL = "select a.keterangan,a.no_dokumen,a.jenis,a.tanggal,a.akun_kb,a.nik_app,b.nama as nama_akun,c.nama as nama_app 
+            from kas_m a
+            left join masakun b on a.akun_kb=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            left join karyawan c on a.nik_app=c.nik and a.kode_lokasi=c.kode_lokasi	
             where a.no_kas = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' ";
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);

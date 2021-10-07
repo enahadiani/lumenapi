@@ -841,7 +841,11 @@ class PencairanPanjarController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select * from panjar_m where no_pj = '".$request->no_bukti."' and kode_lokasi='".$kode_lokasi."'";
+            $strSQL = "select a.*,b.nama as nama_akun,c.nama as nama_aju 
+            from panjar_m a
+            left join masakun b on a.akun_pj=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+            left join karyawan c on a.nik_pengaju=c.nik and a.kode_lokasi=c.kode_lokasi	
+            where a.no_pj = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."'";
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
             
