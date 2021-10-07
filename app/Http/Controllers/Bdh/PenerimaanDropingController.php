@@ -562,7 +562,7 @@ class PenerimaanDropingController extends Controller
             }
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-            $sql = "select a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
+            $sql = "select 'INPROG' as status,a.no_kas,a.no_dokumen,a.kode_lokasi,a.akun_tak,a.keterangan,a.nilai,convert(varchar,b.tanggal,103) as tanggal,a.nu 
             from yk_kasdrop_d a inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi where a.kode_loktuj='".$kode_lokasi."' and a.progress = '0' and a.periode <= '$periode' ";
 
             $res = DB::connection($this->db)->select($sql);
