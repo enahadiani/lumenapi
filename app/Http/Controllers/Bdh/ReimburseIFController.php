@@ -649,6 +649,8 @@ class ReimburseIFController extends Controller
                         $insj[$i] = DB::connection($this->db)->insert("insert into hutang_j(no_hutang,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],'IDR',1,floatval($request->nilai[$i]),floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'IFREIM','BEBAN',$periode,$nik));
                         if($request->dc[$i] == "D"){
                             $total+= +floatval($request->nilai[$i]);
+                        }else{
+                            $total-= +floatval($request->nilai[$i]);
                         }
                     }
                 }

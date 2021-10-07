@@ -223,6 +223,24 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('if-close-reimburse','Bdh\PenutupanIFController@getReimburse');
     $router->get('if-close-load-reimburse','Bdh\PenutupanIFController@loadData');
     $router->get('if-close-akun-kas','Bdh\PenutupanIFController@getAkunKas');
+
+    // PENCAIRAN PANJAR
+    $router->get('panjar-cair-nobukti','Bdh\PencairanPanjarController@generateNo');
+    $router->get('panjar-cair','Bdh\PencairanPanjarController@index');
+    $router->get('panjar-cair-detail','Bdh\PencairanPanjarController@show');
+    $router->post('panjar-cair','Bdh\PencairanPanjarController@store');
+    $router->post('panjar-cair-ubah','Bdh\PencairanPanjarController@update');
+    $router->delete('panjar-cair','Bdh\PencairanPanjarController@destroy');
+
+    $router->get('panjar-cair-load-datanik','Bdh\PencairanPanjarController@loadData');
+    $router->get('panjar-cair-akun-panjar','Bdh\PencairanPanjarController@getAkunPanjar');
+    $router->get('panjar-cair-akun','Bdh\PencairanPanjarController@getAkun');
+    $router->get('panjar-cair-pp','Bdh\PencairanPanjarController@getPP');
+    $router->get('panjar-cair-drk','Bdh\PencairanPanjarController@getDRK');
+    $router->get('panjar-cair-cek-budget','Bdh\PencairanPanjarController@cekBudget');
+    $router->get('panjar-cair-nik-panjar','Bdh\PencairanPanjarController@getNIKPanjar');
+    $router->get('panjar-cair-nik-app','Bdh\PencairanPanjarController@getNIKApp');
+    $router->get('panjar-cair-nik-tahu','Bdh\PencairanPanjarController@getNIKTahu');
 });
 
 ?>
