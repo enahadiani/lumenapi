@@ -860,7 +860,7 @@ class PencairanPanjarController extends Controller
                                 inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 																				
                                 left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and substring(a.periode,1,4)=d.tahun 																				
                 where a.jenis='BEBAN' and a.no_pj = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.no_urut";
-                $rsj = DB::connection($this->db)->select($strrek);
+                $rsj = DB::connection($this->db)->select($strj);
                 $resj = json_decode(json_encode($rsj),true);
 
                 $strdok = "select b.kode_jenis,b.nama,a.no_gambar 
