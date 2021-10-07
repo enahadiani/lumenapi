@@ -300,9 +300,9 @@ class PencairanPanjarController extends Controller
             if($cek['status']){
                 $getpp = DB::connection($this->db)->select("select kode_pp from karyawan where nik='".$request->nik_panjar."' and kode_lokasi='$kode_lokasi' ");
                 if(count($getpp) > 0){
-                    $kode_pp = $getpp[0]->kode_pp;
+                    $this_pp = $getpp[0]->kode_pp;
                 }else{
-                    $kode_pp = "-";
+                    $this_pp = "-";
                 }
 
                 $j = 0;
@@ -509,9 +509,9 @@ class PencairanPanjarController extends Controller
 
                 $getpp = DB::connection($this->db)->select("select kode_pp from karyawan where nik='".$request->nik_panjar."' and kode_lokasi='$kode_lokasi' ");
                 if(count($getpp) > 0){
-                    $kode_pp = $getpp[0]->kode_pp;
+                    $this_pp = $getpp[0]->kode_pp;
                 }else{
-                    $kode_pp = "-";
+                    $this_pp = "-";
                 }
                 
                 $del = DB::connection($this->db)->table('pbh_pb_m')
