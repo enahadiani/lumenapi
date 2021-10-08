@@ -451,7 +451,7 @@ class VerDokController extends Controller
                 from pbh_pb_m a 
                 		inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                       inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi 
-                where a.progress in ('D','R') and a.no_pb='".$request->no_pb."' and a.kode_lokasi='".$kode_lokasi."' and a.modul in ('PBBAU', 'PBBMHD', 'PBBA', 'PBADK','IFREIM','IFCLOSE','PJAJU','PJPTG')  ";
+                where a.progress in ('D','R') and a.no_pb='".$request->no_pb."' and a.kode_lokasi='".$kode_lokasi."' and a.modul in ('PBBAU', 'PBBMHD', 'PBBA', 'PBADK','IFREIM','IFCLOSE','PJAJU','PJPTG') and a.no_verdok='$request->no_ver' ";
             }else{
 
                 $sql="select a.due_date,a.no_pb as no_bukti,'INPROG' as status,convert(varchar,a.tanggal,103) as tgl,convert(varchar,a.due_date,103) as tgl2,a.modul,b.kode_pp+' - '+b.nama as pp,'-' as no_dokumen,a.keterangan,a.nilai,a.nik_user as pembuat,a.no_ver as no_ver1,a.kode_lokasi,convert(varchar,a.tgl_input,120) as tglinput,b.kode_pp 
