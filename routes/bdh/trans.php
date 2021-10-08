@@ -260,6 +260,24 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('ptg-panjar-nik-panjar','Bdh\PtgAjuController@getNIKPanjar');
     $router->get('ptg-panjar-nik-app','Bdh\PtgAjuController@getNIKApp');
     $router->get('ptg-panjar-nik-tahu','Bdh\PtgAjuController@getNIKTahu');
+
+    // JURNAL BMHD
+    $router->get('bmhd-nobukti','Bdh\JurnalBYMHDController@generateNo');
+    $router->get('bmhd','Bdh\JurnalBYMHDController@index');
+    $router->get('bmhd-detail','Bdh\JurnalBYMHDController@show');
+    $router->post('bmhd','Bdh\JurnalBYMHDController@store');
+    $router->post('bmhd-ubah','Bdh\JurnalBYMHDController@update');
+    $router->delete('bmhd','Bdh\JurnalBYMHDController@destroy');
+
+    $router->get('bmhd-load-data','Bdh\JurnalBYMHDController@loadData');
+    $router->get('bmhd-akun-bmhd','Bdh\JurnalBYMHDController@getAkunBMHD');
+    $router->get('bmhd-unit','Bdh\JurnalBYMHDController@getUnit');
+    $router->get('bmhd-vendor','Bdh\JurnalBYMHDController@getVendor');
+    $router->get('bmhd-nik-tahu','Bdh\JurnalBYMHDController@getNIKTahu');
+    $router->get('bmhd-akun','Bdh\JurnalBYMHDController@getAkun');
+    $router->get('bmhd-pp','Bdh\JurnalBYMHDController@getPP');
+    $router->get('bmhd-drk','Bdh\JurnalBYMHDController@getDRK');
+    $router->get('bmhd-cek-budget','Bdh\JurnalBYMHDController@cekBudget');
 });
 
 ?>
