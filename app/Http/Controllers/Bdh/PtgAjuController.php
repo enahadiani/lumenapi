@@ -557,7 +557,7 @@ class PtgAjuController extends Controller
 
                 $updm = DB::connection($this->db)->table('panjar_m')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_panjar)
+                ->where('no_pj', $request->no_panjar)
                 ->update(['progress'=>'2']); 
             
                 $get = DB::connection($this->db)->select("select a.no_pj, a.keterangan, a.nilai, a.nik_pengaju, b.nama, a.akun_pj, a.kode_pp, b.bank+' - '+b.cabang as bank, b.no_rek,b.nama_rek 
@@ -786,7 +786,7 @@ class PtgAjuController extends Controller
 
                 $updm = DB::connection($this->db)->table('panjar_m')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('no_bukti', $request->no_panjar)
+                ->where('no_pj', $request->no_panjar)
                 ->update(['progress'=>'2']); 
 
                 $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
