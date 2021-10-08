@@ -311,7 +311,7 @@ class PtgAjuController extends Controller
                 $total = 0;
                 if(count($request->kode_akun) > 0){
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periode,'IDR',1,$nik));
+                        $insj[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periode,'IDR',1,$nik,'-'));
                         if($request->dc[$i] == "D"){
                             $total+= +floatval($request->nilai[$i]);
                         }else{
@@ -338,7 +338,7 @@ class PtgAjuController extends Controller
                             
                             $insm = DB::connection($this->db)->insert("no_ptg, no_pj, no_kas, no_dokumen, tanggal, keterangan, catatan, kode_curr, kurs, akun_pj, akun_kas, nik_buat, nik_setuju, kode_lokasi, kode_pp, modul, nilai, nilai_kas, kode_drk, progress, posted, periode, no_del, no_link, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_panjar,'-','-',$request->tanggal,$request->deskripsi,'-','IDR',1,$request->akun_panjar,'-',$request->nik_panjar,$request->nik_app,$kode_lokasi,$this_pp,'PJPTG',floatval($request->total),floatval($request->nilai_kasas),'-',0,'X',$periode,'-','-',$nik));
     
-                            $insjj = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,999,$akunPJ,$request->deskripsi,'C',floatval($saldo),$this_pp,'-',$kode_lokasi,'PTGPJ','PJ',$periode,'IDR',1,$nik));
+                            $insjj = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,999,$akunPJ,$request->deskripsi,'C',floatval($saldo),$this_pp,'-',$kode_lokasi,'PTGPJ','PJ',$periode,'IDR',1,$nik,'-'));
     
                             $upd = DB::connection($this->db)->update('panjar_m')
                             ->where('no_pj',$request->no_panjar)
@@ -574,7 +574,7 @@ class PtgAjuController extends Controller
                 $total = 0;
                 if(count($request->kode_akun) > 0){
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periode,'IDR',1,$nik));
+                        $insj[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(),?)",array($no_bukti,'-',$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periode,'IDR',1,$nik,'-'));
                         if($request->dc[$i] == "D"){
                             $total+= +floatval($request->nilai[$i]);
                         }else{
@@ -601,7 +601,7 @@ class PtgAjuController extends Controller
                             
                             $insm = DB::connection($this->db)->insert("no_ptg, no_pj, no_kas, no_dokumen, tanggal, keterangan, catatan, kode_curr, kurs, akun_pj, akun_kas, nik_buat, nik_setuju, kode_lokasi, kode_pp, modul, nilai, nilai_kas, kode_drk, progress, posted, periode, no_del, no_link, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_panjar,'-','-',$request->tanggal,$request->deskripsi,'-','IDR',1,$request->akun_panjar,'-',$request->nik_panjar,$request->nik_app,$kode_lokasi,$this_pp,'PJPTG',floatval($request->total),floatval($request->nilai_kasas),'-',0,'X',$periode,'-','-',$nik));
     
-                            $insjj = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,999,$akunPJ,$request->deskripsi,'C',floatval($saldo),$this_pp,'-',$kode_lokasi,'PTGPJ','PJ',$periode,'IDR',1,$nik));
+                            $insjj = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,999,$akunPJ,$request->deskripsi,'C',floatval($saldo),$this_pp,'-',$kode_lokasi,'PTGPJ','PJ',$periode,'IDR',1,$nik,'-'));
     
                             $upd = DB::connection($this->db)->update('panjar_m')
                             ->where('no_pj',$request->no_panjar)
