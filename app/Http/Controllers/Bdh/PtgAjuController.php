@@ -340,7 +340,7 @@ class PtgAjuController extends Controller
     
                             $insjj = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,999,$akunPJ,$request->deskripsi,'C',floatval($saldo),$this_pp,'-',$kode_lokasi,'PTGPJ','PJ',$periode,'IDR',1,$nik,'-'));
     
-                            $upd = DB::connection($this->db)->update('panjar_m')
+                            $upd = DB::connection($this->db)->table('panjar_m')
                             ->where('no_pj',$request->no_panjar)
                             ->where('kode_lokasi',$kode_lokasi)
                             ->update(['progress'=>'3']);
@@ -604,7 +604,7 @@ class PtgAjuController extends Controller
     
                             $insjj = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,'-',$request->tanggal,999,$akunPJ,$request->deskripsi,'C',floatval($saldo),$this_pp,'-',$kode_lokasi,'PTGPJ','PJ',$periode,'IDR',1,$nik,'-'));
     
-                            $upd = DB::connection($this->db)->update('panjar_m')
+                            $upd = DB::connection($this->db)->table('panjar_m')
                             ->where('no_pj',$request->no_panjar)
                             ->where('kode_lokasi',$kode_lokasi)
                             ->update(['progress'=>'3']);
