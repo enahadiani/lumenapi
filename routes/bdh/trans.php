@@ -241,6 +241,25 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('panjar-cair-nik-panjar','Bdh\PencairanPanjarController@getNIKPanjar');
     $router->get('panjar-cair-nik-app','Bdh\PencairanPanjarController@getNIKApp');
     $router->get('panjar-cair-nik-tahu','Bdh\PencairanPanjarController@getNIKTahu');
+
+    
+    // PERTANGGUNGAN PANJAR
+    $router->get('ptg-panjar-nobukti','Bdh\PtgAjuController@generateNo');
+    $router->get('ptg-panjar','Bdh\PtgAjuController@index');
+    $router->get('ptg-panjar-detail','Bdh\PtgAjuController@show');
+    $router->post('ptg-panjar','Bdh\PtgAjuController@store');
+    $router->post('ptg-panjar-ubah','Bdh\PtgAjuController@update');
+    $router->delete('ptg-panjar','Bdh\PtgAjuController@destroy');
+
+    $router->get('ptg-panjar-load-data','Bdh\PtgAjuController@loadData');
+    $router->get('ptg-panjar-no-panjar','Bdh\PtgAjuController@getNoPanjar');
+    $router->get('ptg-panjar-akun','Bdh\PtgAjuController@getAkun');
+    $router->get('ptg-panjar-pp','Bdh\PtgAjuController@getPP');
+    $router->get('ptg-panjar-drk','Bdh\PtgAjuController@getDRK');
+    $router->get('ptg-panjar-cek-budget','Bdh\PtgAjuController@cekBudget');
+    $router->get('ptg-panjar-nik-panjar','Bdh\PtgAjuController@getNIKPanjar');
+    $router->get('ptg-panjar-nik-app','Bdh\PtgAjuController@getNIKApp');
+    $router->get('ptg-panjar-nik-tahu','Bdh\PtgAjuController@getNIKTahu');
 });
 
 ?>
