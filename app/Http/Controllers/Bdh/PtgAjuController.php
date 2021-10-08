@@ -346,7 +346,9 @@ class PtgAjuController extends Controller
                             ->update(['progress'=>'3']);
     
                             // reverse keep budget saat panjar
-                            $insanggr = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,'PJAJU',$kode_lokasi,$request->kode_akun_agg[$i],$request->kode_pp_agg[$i],$request->kode_drk_agg[$i],$periode,$periode,$DC,floatval($request->saldo_akhir_agg[$i]),$nilai));
+                            $insanggr = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) 
+						    select no_bukti,'PJPTG',kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,case dc when 'D' then 'C' else 'D' end,0,nilai 
+						    from angg_r where modul='PJAJU' and no_bukti = '".$request->no_panjar."' and kode_lokasi='".$kode_lokasi."'");
     
                             $insm2 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang) values (?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_panjar,$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,floatval($request->total),'PJPTG','0',$this_pp,$request->nik_app,$request->nik_tahu,'-','-','-','-',$this_pp,$kode_lokasi,floatval($request->total),'X','-','-','-','-','-','-'));
     
@@ -610,7 +612,10 @@ class PtgAjuController extends Controller
                             ->update(['progress'=>'3']);
     
                             // reverse keep budget saat panjar
-                            $insanggr = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,'PJAJU',$kode_lokasi,$request->kode_akun_agg[$i],$request->kode_pp_agg[$i],$request->kode_drk_agg[$i],$periode,$periode,$DC,floatval($request->saldo_akhir_agg[$i]),$nilai));
+                            $insanggr = DB::connection($this->db)->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) 
+						    select no_bukti,'PJPTG',kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,case dc when 'D' then 'C' else 'D' end,0,nilai 
+						    from angg_r where modul='PJAJU' and no_bukti = '".$request->no_panjar."' and kode_lokasi='".$kode_lokasi."'");
+    
     
                             $insm2 = DB::connection($this->db)->insert("insert into pbh_pb_m (no_pb,no_dokumen,kode_lokasi,periode,nik_user,tgl_input,tanggal,due_date,keterangan,nilai,modul,progress,kode_pp,nik_app,nik_tahu,no_hutang,no_app,no_spb,no_ver,kode_bidang,kode_loktuj,nilai_final,posted,kode_proyek,no_app2,no_app3,no_fiat,no_kas,akun_hutang) values (?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$request->no_panjar,$kode_lokasi,$periode,$nik,$request->tanggal,$request->tanggal,$request->deskripsi,floatval($request->total),'PJPTG','0',$this_pp,$request->nik_app,$request->nik_tahu,'-','-','-','-',$this_pp,$kode_lokasi,floatval($request->total),'X','-','-','-','-','-','-'));
     
