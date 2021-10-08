@@ -499,13 +499,13 @@ class VerPajakController extends Controller
 
                     if (count($request->kode_akun) > 0){
                         for ($i=0; $i < count($request->kode_akun);$i++){								
-                            $ins3[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','BEBAN',$periodeInput,'IDR',1,$nik));
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PJAJU','BEBAN',$periodeInput,'IDR',1,$nik));
                         }
                     }
 
                     if (count($request->kode_akun_pajak) > 0){
                         for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
-                            $ins4[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','PAJAK',$periodeInput,'IDR',1,$nik));	
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','PAJAK',$periodeInput,'IDR',1,$nik));	
                         }
                     }
 
@@ -535,12 +535,12 @@ class VerPajakController extends Controller
 
                     if (count($request->kode_akun) > 0){
                         for ($i=0; $i < count($request->kode_akun);$i++){								
-                            $ins3[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],'IDR',1,floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periodeInput,'IDR',1,$nik,'-'));
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periodeInput,'IDR',1,$nik,'-'));
                         }
                     }
                     if (count($request->kode_akun_pajak) > 0){
                         for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
-                            $ins4[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PTGPJ','PAJAK',$periodeInput,'IDR',1,$nik,'-'));			
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PTGPJ','PAJAK',$periodeInput,'IDR',1,$nik,'-'));			
                         }
                     }
                 }
@@ -841,13 +841,13 @@ class VerPajakController extends Controller
 
                     if (count($request->kode_akun) > 0){
                         for ($i=0; $i < count($request->kode_akun);$i++){								
-                            $ins3[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','BEBAN',$periodeInput,'IDR',1,$nik));
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PJAJU','BEBAN',$periodeInput,'IDR',1,$nik));
                         }
                     }
 
                     if (count($request->kode_akun_pajak) > 0){
                         for ($i=0; $i < count($request->kode_akun_pajak);$i++){								
-                            $ins4[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],'IDR',1,floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','PAJAK',$periodeInput,'IDR',1,$nik));	
+                            $ins4[$i] = DB::connection($this->db)->insert("insert into panjar_j(no_pj, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate()) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun_pajak[$i],$request->keterangan_pajak[$i],$request->dc_pajak[$i],floatval($request->nilai_pajak[$i]),$request->kode_pp_pajak[$i],$request->kode_drk_pajak[$i],$kode_lokasi,'PJAJU','PAJAK',$periodeInput,'IDR',1,$nik));	
                         }
                     }
 
@@ -877,7 +877,7 @@ class VerPajakController extends Controller
 
                     if (count($request->kode_akun) > 0){
                         for ($i=0; $i < count($request->kode_akun);$i++){								
-                            $ins3[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],'IDR',1,floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periodeInput,'IDR',1,$nik,'-'));
+                            $ins3[$i] = DB::connection($this->db)->insert("insert into ptg_j(no_ptg, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?) ",array($request->no_aju,'-',$tglInput,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],$kode_lokasi,'PTGPJ','BEBAN',$periodeInput,'IDR',1,$nik,'-'));
                         }
                     }
                     if (count($request->kode_akun_pajak) > 0){
