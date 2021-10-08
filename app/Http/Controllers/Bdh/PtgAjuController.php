@@ -296,7 +296,7 @@ class PtgAjuController extends Controller
 
                 $get = DB::connection($this->db)->select("select a.no_pj, a.keterangan, a.nilai, a.nik_pengaju, b.nama, a.akun_pj, a.kode_pp, b.bank+' - '+b.cabang as bank, b.no_rek,b.nama_rek 
                 from panjar_m a inner join karyawan b on a.nik_pengaju=b.nik and a.kode_lokasi=b.kode_lokasi 	
-                where a.no_pj='".$request->no_panjar."' and a.kode_lokasi=");
+                where a.no_pj='".$request->no_panjar."' and a.kode_lokasi='".$kode_lokasi."' ");
                 if(count($get) > 0){
                     $saldo = floatval($get[0]->nilai);
                     $akunPJ = $get[0]->akun_pj;
@@ -559,7 +559,7 @@ class PtgAjuController extends Controller
             
                 $get = DB::connection($this->db)->select("select a.no_pj, a.keterangan, a.nilai, a.nik_pengaju, b.nama, a.akun_pj, a.kode_pp, b.bank+' - '+b.cabang as bank, b.no_rek,b.nama_rek 
                 from panjar_m a inner join karyawan b on a.nik_pengaju=b.nik and a.kode_lokasi=b.kode_lokasi 	
-                where a.no_pj='".$request->no_panjar."' and a.kode_lokasi=");
+                where a.no_pj='".$request->no_panjar."' and a.kode_lokasi='".$kode_lokasi."' ");
                 if(count($get) > 0){
                     $saldo = floatval($get[0]->nilai);
                     $akunPJ = $get[0]->akun_pj;
