@@ -882,7 +882,7 @@ class JurnalBYMHDController extends Controller
             $strSQL = "select a.kode_pp, a.nama  
             from pp a 
             inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-            where b.nik='".$request->nik."' and a.kode_lokasi = '".$kode_lokasi."' and a.tipe='posting' and a.flag_aktif ='1'";
+            where b.nik='".$nik."' and a.kode_lokasi = '".$kode_lokasi."' and a.tipe='posting' and a.flag_aktif ='1'";
             
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
