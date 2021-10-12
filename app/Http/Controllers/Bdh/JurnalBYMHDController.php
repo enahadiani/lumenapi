@@ -279,6 +279,7 @@ class JurnalBYMHDController extends Controller
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             $no_bukti = $this->generateKode("bmhd_m", "no_bmhd", $kode_lokasi."-BY".substr($periode,2,4).".", "0001");
+            $kode_pp = $request->kode_unit;
 
             // CEK PERIODE
             $cek = $this->doCekPeriode($periode);
@@ -315,7 +316,7 @@ class JurnalBYMHDController extends Controller
                         
                         $insm = DB::connection($this->db)->insert("insert into bmhd_m(no_bmhd,kode_lokasi,no_dokumen,kode_akun,tanggal,keterangan,kode_pp,modul,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1, dc,kode_vendor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,$request->akun_bmhd,$request->tanggal,$request->deskripsi,$kode_pp,'BMHD',$periode,'IDR',1,floatval($total_d),$nik,$request->nik_tahu,$nik,'F','-','-','-','D',$request->kode_vendor));
 
-                        $insjj = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_bmhd,$request->deskripsi,C,floatval($request->nilai_bmhd),$request->kode_unit,$request->kode_drk,'-',$kode_lokasi,'BMHD','BMHD',$periode,'IDR',1,$nik));
+                        $insjj = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_bmhd,$request->deskripsi,C,floatval($request->nilai_bmhd),$kode_pp,$request->kode_drk,'-',$kode_lokasi,'BMHD','BMHD',$periode,'IDR',1,$nik));
                         
                         $total_agg = 0; $sts_agg = true; $msg_agg ="";
                         if (count($request->kode_akun_agg) > 0){
@@ -440,7 +441,8 @@ class JurnalBYMHDController extends Controller
             $no_bukti = $request->no_bukti;
 
             $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
-
+            
+            $kode_pp = $request->kode_unit;
             // CEK PERIODE
             $cek = $this->doCekPeriode($periode);
             if($cek['status']){
@@ -491,7 +493,7 @@ class JurnalBYMHDController extends Controller
                         
                         $insm = DB::connection($this->db)->insert("insert into bmhd_m(no_bmhd,kode_lokasi,no_dokumen,kode_akun,tanggal,keterangan,kode_pp,modul,periode,kode_curr,kurs,nilai,nik_buat,nik_app,tgl_input,nik_user,posted,no_del,no_link,ref1, dc,kode_vendor) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->no_dokumen,$request->akun_bmhd,$request->tanggal,$request->deskripsi,$kode_pp,'BMHD',$periode,'IDR',1,floatval($total_d),$nik,$request->nik_tahu,$nik,'F','-','-','-','D',$request->kode_vendor));
 
-                        $insjj = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_bmhd,$request->deskripsi,C,floatval($request->nilai_bmhd),$request->kode_unit,$request->kode_drk,'-',$kode_lokasi,'BMHD','BMHD',$periode,'IDR',1,$nik));
+                        $insjj = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd, no_dokumen, tanggal, no_urut, kode_akun, keterangan, dc, nilai, kode_pp, kode_drk, kode_lokasi, modul, jenis, periode, kode_curr, kurs, nik_user, tgl_input, no_link) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?)",array($no_bukti,$request->no_dokumen,$request->tanggal,999,$request->akun_bmhd,$request->deskripsi,C,floatval($request->nilai_bmhd),$kode_pp,$request->kode_drk,'-',$kode_lokasi,'BMHD','BMHD',$periode,'IDR',1,$nik));
                         
                         $total_agg = 0; $sts_agg = true; $msg_agg ="";
                         if (count($request->kode_akun_agg) > 0){
