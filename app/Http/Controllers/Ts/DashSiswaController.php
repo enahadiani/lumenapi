@@ -671,7 +671,7 @@ class DashSiswaController extends Controller
                         from sis_mandiri_bill_d x 
                         inner join sis_mandiri_bill z on x.no_bukti=z.no_bukti and x.kode_lokasi=z.kode_lokasi
                                 inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                                where x.kode_lokasi = '12' and x.nis='0501819022' and x.kode_pp='YSPTE05' and x.nilai<>0 and z.status not in ('CANCEL','WAITING','FAILED')
+                                where x.kode_lokasi = '$kode_lokasi' and x.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 and z.status not in ('CANCEL','WAITING','FAILED')
                                 group by x.kode_lokasi,x.no_bill,x.nis,x.kode_param ) d on a.no_bill=d.no_bill and a.kode_lokasi=d.kode_lokasi and a.kode_param=d.kode_param
                         where (a.tagihan - isnull(c.bayar,0) - isnull(d.bayar,0) > 0)
                         ) a
