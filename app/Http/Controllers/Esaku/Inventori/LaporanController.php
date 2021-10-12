@@ -372,17 +372,26 @@ class LaporanController extends Controller
             }
 
             $sql1 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
-            $sql2 = "exec sp_brg_hpp '$periode','$kode_lokasi','$nik_user' ";
+            // $sql2 = "exec sp_brg_hpp '$periode','$kode_lokasi','$nik_user' ";
             DB::connection($this->sql)->update($sql1);
-            DB::connection($this->sql)->update($sql2);
+            // DB::connection($this->sql)->update($sql2);
 
+            // $sql3 = "SELECT DISTINCT a.kode_barang, a.kode_gudang, a.stok, a.kode_lokasi, ISNULL(a.so_awal, 0) AS so_awal, 
+            // ISNULL(a.debet, 0) AS debet, ISNULL(a.kredit, 0) AS kredit, d.h_avg, d.h_avg*a.stok AS nilai, b.sat_kecil, 
+            // b.nama AS nama_barang,c.nama AS nama_gudang
+            // FROM brg_stok a
+            // INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi 
+            // INNER JOIN brg_gudang c ON a.kode_gudang=c.kode_gudang AND a.kode_lokasi=c.kode_lokasi 
+            // INNER JOIN brg_hpp d ON a.kode_lokasi=d.kode_lokasi AND a.kode_barang=d.kode_barang AND a.nik_user=d.nik_user
+            // $where
+            // ORDER BY a.kode_barang,a.kode_gudang";
             $sql3 = "SELECT DISTINCT a.kode_barang, a.kode_gudang, a.stok, a.kode_lokasi, ISNULL(a.so_awal, 0) AS so_awal, 
             ISNULL(a.debet, 0) AS debet, ISNULL(a.kredit, 0) AS kredit, d.h_avg, d.h_avg*a.stok AS nilai, b.sat_kecil, 
             b.nama AS nama_barang,c.nama AS nama_gudang
             FROM brg_stok a
             INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi 
             INNER JOIN brg_gudang c ON a.kode_gudang=c.kode_gudang AND a.kode_lokasi=c.kode_lokasi 
-            INNER JOIN brg_hpp d ON a.kode_lokasi=d.kode_lokasi AND a.kode_barang=d.kode_barang AND a.nik_user=d.nik_user
+            INNER JOIN brg_hpp d ON a.kode_lokasi=d.kode_lokasi AND a.kode_barang=d.kode_barang
             $where
             ORDER BY a.kode_barang,a.kode_gudang";
 
