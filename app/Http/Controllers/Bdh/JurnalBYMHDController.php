@@ -295,7 +295,7 @@ class JurnalBYMHDController extends Controller
                 $total = 0; $total_d = 0; $total_k =0;
                 if(count($request->kode_akun) > 0){
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],'-',$kode_lokasi,'BMHD','UMUM',$periode,'IDR',1,$nik));
+                        $insj[$i] = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],'-',$kode_lokasi,'BMHD','UMUM',$periode,'IDR',1,$nik));
                         if($request->dc[$i] == "D"){
                             $total_d+= +floatval($request->nilai[$i]);
                         }else{
@@ -471,7 +471,7 @@ class JurnalBYMHDController extends Controller
                 $total = 0; $total_d = 0; $total_k =0;
                 if(count($request->kode_akun) > 0){
                     for ($i=0; $i<count($request->kode_akun); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input) values values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],'-',$kode_lokasi,'BMHD','UMUM',$periode,'IDR',1,$nik));
+                        $insj[$i] = DB::connection($this->db)->insert("insert into bmhd_j(no_bmhd,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,nilai,kode_pp,kode_drk,ref1,kode_lokasi,modul,jenis,periode,kode_curr,kurs,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate())",array($no_bukti,$request->no_dokumen,$request->tanggal,$i,$request->kode_akun[$i],$request->keterangan[$i],$request->dc[$i],floatval($request->nilai[$i]),$request->kode_pp[$i],$request->kode_drk[$i],'-',$kode_lokasi,'BMHD','UMUM',$periode,'IDR',1,$nik));
                         if($request->dc[$i] == "D"){
                             $total_d+= +floatval($request->nilai[$i]);
                         }else{
