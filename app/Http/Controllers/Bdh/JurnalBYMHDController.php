@@ -867,9 +867,6 @@ class JurnalBYMHDController extends Controller
 
     public function getPP(Request $request)
     {
-        $this->validate($request,[
-            'nik' => 'required'
-        ]);
 
         try {
             
