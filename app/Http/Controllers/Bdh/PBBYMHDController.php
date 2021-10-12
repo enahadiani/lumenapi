@@ -323,7 +323,7 @@ class PBBYMHDController extends Controller
                 $total_rek = 0; $total_d = 0; $total_k =0;
                 if(count($request->atensi) > 0){
                     for ($i=0; $i<count($request->atensi); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->tanggal,'PBBMHD',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],
+                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PBBMHD',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],
                         $request->atensi[$i],floatval($request->bruto[$i]),floatval($request->potongan[$i]),floatval($request->netto[$i])));
                         $total_rek+= +floatval($request->netto[$i]);
                         
@@ -598,7 +598,7 @@ class PBBYMHDController extends Controller
                 $total_rek = 0; $total_d = 0; $total_k =0;
                 if(count($request->atensi) > 0){
                     for ($i=0; $i<count($request->atensi); $i++){	
-                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->tanggal,'PBBMHD',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],
+                        $insj[$i] = DB::connection($this->db)->insert("insert into pbh_rek(no_bukti,kode_lokasi,modul,nama_rek,no_rek,bank,nama,bruto,pajak,nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,'PBBMHD',$request->nama_rek[$i],$request->no_rek[$i],$request->bank[$i],
                         $request->atensi[$i],floatval($request->bruto[$i]),floatval($request->potongan[$i]),floatval($request->netto[$i])));
                         $total_rek+= +floatval($request->netto[$i]);
                         
@@ -858,7 +858,7 @@ class PBBYMHDController extends Controller
             $result = array();
 			for ($i=0;$i < count($request->kode_akun_agg);$i++){
                 
-                $strSQL = "select dbo.fn_cekagg3('".$request->kode_pp_agg[$i]."','".$kode_lokasi."','".$request->kode_akun_agg[$i]."','".$request->kode_drk_agg[$i]."','".$periode."','".$no_bukti."') as gar ";			
+                $strSQL = "select dbo.fn_cekagg3('".$request->kode_pp_agg[$i]."','".$kode_lokasi."','".$request->kode_akun_agg[$i]."','".$request->kode_drk_agg[$i]."','".$periode."','".$request->no_bukti."') as gar ";			
                 $res = DB::connection($this->db)->select($strSQL);
 				if (count($res) > 0){
 					$line = $res[0];
@@ -933,7 +933,7 @@ class PBBYMHDController extends Controller
                 $strj = "select a.kode_akun,b.nama as nama_akun,a.dc,a.keterangan,a.nilai,a.kode_pp,c.nama as nama_pp,a.kode_drk,isnull(d.nama,'-') as nama_drk 
                 from pbh_pb_j a inner join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi 
                                 inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi 		
-                                left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and substring(a.periode,1,4)=d.tahun 																				
+                                left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and substring(a.periode,1,4)=d.tahun 							
                 where a.jenis='BEBAN' and a.no_pb = '".$request->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.no_urut";
                 $rsj = DB::connection($this->db)->select($strj);
                 $resj = json_decode(json_encode($rsj),true);
