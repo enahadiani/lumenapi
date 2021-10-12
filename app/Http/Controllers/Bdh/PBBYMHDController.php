@@ -843,7 +843,7 @@ class PBBYMHDController extends Controller
             'kode_drk_agg' => 'required|array',
             'nilai_agg' => 'required|array',
             'periode' => 'required',
-            'sts_simpan' => 'required'
+            'no_bukti' => 'required'
         ]);
 
         try {
@@ -853,21 +853,12 @@ class PBBYMHDController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             $periode = $request->periode;
-            if(isset($request->no_bukti)){
-                $no_bukti = $request->no_bukti;
-            }else{
-                $no_bukti = '-';
-            }
             $nilai = 0; $total = 0;
             $sls = 0;
             $result = array();
 			for ($i=0;$i < count($request->kode_akun_agg);$i++){
-                if($request->sts_simpan == 1){
-                    $strSQL = "select dbo.fn_cekagg2('".$request->kode_pp_agg[$i]."','".$kode_lokasi."','".$request->kode_akun_agg[$i]."','".$request->kode_drk_agg[$i]."','".$periode."') as gar ";			
-                }else{
-
-                    $strSQL = "select dbo.fn_cekagg3('".$request->kode_pp_agg[$i]."','".$kode_lokasi."','".$request->kode_akun_agg[$i]."','".$request->kode_drk_agg[$i]."','".$periode."','".$no_bukti."') as gar ";			
-                }
+                
+                $strSQL = "select dbo.fn_cekagg3('".$request->kode_pp_agg[$i]."','".$kode_lokasi."','".$request->kode_akun_agg[$i]."','".$request->kode_drk_agg[$i]."','".$periode."','".$no_bukti."') as gar ";			
                 $res = DB::connection($this->db)->select($strSQL);
 				if (count($res) > 0){
 					$line = $res[0];
