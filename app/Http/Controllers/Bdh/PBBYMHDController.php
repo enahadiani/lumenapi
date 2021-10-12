@@ -1015,9 +1015,10 @@ class PBBYMHDController extends Controller
             $strSQL = "select a.no_bmhd,a.keterangan 
             from bmhd_m a left join (
                     select no_bmhd,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as bayar  
-            		 from bmhd_bayar where kode_lokasi='".$kode_lokasi."' group by no_bmhd,kode_lokasi 
+            		 from bmhd_bayar where kode_lokasi='".$kode_lokasi."' 
+                     group by no_bmhd,kode_lokasi 
             		) b on a.no_bmhd=b.no_bmhd and a.kode_lokasi=b.kode_lokasi 
-            where a.modul='BMHD' and a.kode_lokasi='".$kode_lokasi."' and a.nilai > isnull(b.bayar,0) = '".$kode_lokasi."'";
+            where a.modul='BMHD' and a.kode_lokasi='".$kode_lokasi."' and a.nilai > isnull(b.bayar,0)";
 
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
