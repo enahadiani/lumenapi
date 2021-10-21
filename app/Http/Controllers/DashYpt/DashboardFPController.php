@@ -191,29 +191,55 @@ class DashboardFPController extENDs Controller
             }
 
             $chart = [];
-            foreach($res as $item) { 
-                $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                $_persen = number_format((float)$persen, 1, '.', '');
-                
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
-                }
+            if($total > 0) {
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                $value = [
-                    'name' => $name,
-                    'y' => floatval($_persen)
-                ];
-                array_push($chart, $value);
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
+            } else {
+                foreach($res as $item) {
+                    $_persen = 0;
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
+
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
             }
 
             $success['status'] = true;
@@ -269,29 +295,55 @@ class DashboardFPController extENDs Controller
             }
 
             $chart = [];
-            foreach($res as $item) { 
-                $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                $_persen = number_format((float)$persen, 1, '.', '');
+            if($total > 0) {
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
                 }
+            } else {
+                foreach($res as $item) {
+                    $_persen = 0;
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                $value = [
-                    'name' => $name,
-                    'y' => floatval($_persen)
-                ];
-                array_push($chart, $value);
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
             }
 
             $success['status'] = true;
@@ -347,29 +399,55 @@ class DashboardFPController extENDs Controller
             }
 
             $chart = [];
-            foreach($res as $item) { 
-                $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                $_persen = number_format((float)$persen, 1, '.', '');
+            if($total > 0) {
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
                 }
+            } else {
+                foreach($res as $item) {
+                    $_persen = 0;
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                $value = [
-                    'name' => $name,
-                    'y' => floatval($_persen)
-                ];
-                array_push($chart, $value);
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
             }
 
             $success['status'] = true;
@@ -424,29 +502,55 @@ class DashboardFPController extENDs Controller
             }
 
             $chart = [];
-            foreach($res as $item) { 
-                $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                $_persen = number_format((float)$persen, 1, '.', '');
+            if($total > 0) {
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
                 }
+            } else {
+                foreach($res as $item) {
+                    $_persen = 0;
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
 
-                $value = [
-                    'name' => $name,
-                    'y' => floatval($_persen)
-                ];
-                array_push($chart, $value);
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
             }
 
             $success['status'] = true;
