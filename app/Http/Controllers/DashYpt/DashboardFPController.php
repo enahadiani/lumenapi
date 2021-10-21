@@ -194,8 +194,23 @@ class DashboardFPController extENDs Controller
             foreach($res as $item) { 
                 $persen = (floatval(abs($item['n4'])) / $total) * 100;
                 $_persen = number_format((float)$persen, 1, '.', '');
+                
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
                 $value = [
-                    'name' => $item['nama'],
+                    'name' => $name,
                     'y' => floatval($_persen)
                 ];
                 array_push($chart, $value);
@@ -257,8 +272,23 @@ class DashboardFPController extENDs Controller
             foreach($res as $item) { 
                 $persen = (floatval(abs($item['n4'])) / $total) * 100;
                 $_persen = number_format((float)$persen, 1, '.', '');
+
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
                 $value = [
-                    'name' => $item['nama'],
+                    'name' => $name,
                     'y' => floatval($_persen)
                 ];
                 array_push($chart, $value);
@@ -320,8 +350,23 @@ class DashboardFPController extENDs Controller
             foreach($res as $item) { 
                 $persen = (floatval(abs($item['n4'])) / $total) * 100;
                 $_persen = number_format((float)$persen, 1, '.', '');
+
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
                 $value = [
-                    'name' => $item['nama'],
+                    'name' => $name,
                     'y' => floatval($_persen)
                 ];
                 array_push($chart, $value);
@@ -382,8 +427,23 @@ class DashboardFPController extENDs Controller
             foreach($res as $item) { 
                 $persen = (floatval(abs($item['n4'])) / $total) * 100;
                 $_persen = number_format((float)$persen, 1, '.', '');
+
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
                 $value = [
-                    'name' => $item['nama'],
+                    'name' => $name,
                     'y' => floatval($_persen)
                 ];
                 array_push($chart, $value);
@@ -443,7 +503,21 @@ class DashboardFPController extENDs Controller
                 $beban = floatval(number_format((float)$item['beban'], 0, '.', ''));
                 $shu = floatval(number_format((float)$item['shu'], 0, '.', ''));
 
-                array_push($ctg, $item['nama']);
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
+                array_push($ctg, $name);
                 array_push($data_pdpt, $pdpt);
                 array_push($data_beban, $beban);
                 array_push($data_shu, $shu);
@@ -508,9 +582,23 @@ class DashboardFPController extENDs Controller
 
             $data_perform = [];
             foreach($res as $item) { 
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
                 $perform = [
                     "kode_lokasi" => $item['kode_lokasi'],
-                    "nama" => $item['nama'],
+                    "nama" => $name,
                     "pdpt_ach" => floatval(number_format((float)$item['pdpt_ach'], 1, '.', '')),
                     "pdpt_ach" => floatval(number_format((float)$item['pdpt_yoy'], 1, '.', '')),
                     "beban_ach" => floatval(number_format((float)$item['beban_ach'], 1, '.', '')),
