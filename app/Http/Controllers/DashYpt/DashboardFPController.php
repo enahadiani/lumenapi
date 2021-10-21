@@ -600,7 +600,7 @@ class DashboardFPController extENDs Controller
                     "kode_lokasi" => $item['kode_lokasi'],
                     "nama" => $name,
                     "pdpt_ach" => floatval(number_format((float)$item['pdpt_ach'], 1, '.', '')),
-                    "pdpt_ach" => floatval(number_format((float)$item['pdpt_yoy'], 1, '.', '')),
+                    "pdpt_yoy" => floatval(number_format((float)$item['pdpt_yoy'], 1, '.', '')),
                     "beban_ach" => floatval(number_format((float)$item['beban_ach'], 1, '.', '')),
                     "beban_yoy" => floatval(number_format((float)$item['beban_yoy'], 1, '.', '')),
                     "shu_ach" => floatval(number_format((float)$item['shu_ach'], 1, '.', '')),
