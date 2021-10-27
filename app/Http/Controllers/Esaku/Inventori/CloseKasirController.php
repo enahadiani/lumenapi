@@ -128,7 +128,7 @@ class CloseKasirController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' " ;
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and no_jual not like '%RJ%'" ;
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -136,13 +136,18 @@ class CloseKasirController extends Controller
             where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' " ;
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
-          
+
+            $sql4 = "select no_jual as no_retur,tanggal,keterangan,periode,nilai,diskon from brg_jualpiu_dloc
+            where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' and no_jual like '%RJ%' " ;
+            $res4 = DB::connection($this->sql)->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
                 $success['data_beli'] = $res3;
+                $success['data_retur_jual'] = $res4;
                 $success['message'] = "Success!";     
             }
             else{
@@ -150,6 +155,7 @@ class CloseKasirController extends Controller
                 $success['data'] = [];
                 $success['data_detail'] = [];
                 $success['data_beli'] = [];
+                $success['data_retur_jual'] = [];
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -158,6 +164,7 @@ class CloseKasirController extends Controller
             $success['data'] = [];
             $success['data_detail'] = [];
             $success['data_beli'] = [];
+            $success['data_retur_jual'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -228,7 +235,7 @@ class CloseKasirController extends Controller
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
                 inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
-                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi
+                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%'
                 where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' group by a.akun_pdpt
                 ");
                 $spro = json_decode(json_encode($spro),true);
@@ -276,7 +283,7 @@ class CloseKasirController extends Controller
     
                 if(count($request->no_jual) > 0){
 
-                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' ";
+                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%'";
                     $return = DB::connection($this->sql)->select($sql);
                     $return = json_decode(json_encode($return),true);
     
@@ -350,7 +357,31 @@ class CloseKasirController extends Controller
     
                     // ///------------------------------------END JURNAL--------------------------------//                    
     
-                }    
+                } 
+                
+                if(count($request->no_retur) > 0){
+
+                    $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' ";
+                    $return = DB::connection($this->sql)->select($sql);
+                    $return = json_decode(json_encode($return),true);
+    
+                    for($i=0;$i<count($return);$i++){
+    
+                        $upd5[$i] = DB::connection($this->sql)->table('brg_jualpiu_dloc')
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->where('no_jual', $return[$i]['no_jual'])
+                        ->update(['no_close'=>$id]);
+
+                        $upd6[$i] = DB::connection($this->sql)->table('brg_trans_d')
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->where('no_bukti', $return[$i]['no_jual'])
+                        ->update(['no_close'=>$id]);   
+                        
+                    } 
+                    
+                    // $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));                 
+    
+                } 
                 
                 if(isset($request->no_beli) && count($request->no_beli) > 0){
 
@@ -466,7 +497,7 @@ class CloseKasirController extends Controller
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
                 inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
-                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi
+                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%'
                 where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' group by a.akun_pdpt
                 ");
                 $spro = json_decode(json_encode($spro),true);
@@ -551,7 +582,7 @@ class CloseKasirController extends Controller
     
                 if(count($request->no_jual) > 0){
                     
-                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' ";
+                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%' ";
                     $return = DB::connection($this->sql)->select($sql);
                     $return = json_decode(json_encode($return),true);
     
@@ -624,6 +655,30 @@ class CloseKasirController extends Controller
                     // array($id,$kode_lokasi,date('Y-m-d H:i:s'),$nik,$periode,'-',$request->tanggal,4,$akunpdpt,'C',floatval($request->total_pnj),floatval($request->total_pnj),'Penjualan','BRGJUAL','PDPT','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-'));
     
                     // ///------------------------------------END JURNAL--------------------------------//                    
+    
+                }
+
+                if(count($request->no_retur) > 0){
+
+                    $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' ";
+                    $return = DB::connection($this->sql)->select($sql);
+                    $return = json_decode(json_encode($return),true);
+    
+                    for($i=0;$i<count($return);$i++){
+    
+                        $upd5[$i] = DB::connection($this->sql)->table('brg_jualpiu_dloc')
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->where('no_jual', $return[$i]['no_jual'])
+                        ->update(['no_close'=>$id]);
+
+                        $upd6[$i] = DB::connection($this->sql)->table('brg_trans_d')
+                        ->where('kode_lokasi', $kode_lokasi)
+                        ->where('no_bukti', $return[$i]['no_jual'])
+                        ->update(['no_close'=>$id]);   
+                        
+                    } 
+                    
+                    // $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));                 
     
                 }
 
