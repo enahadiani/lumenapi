@@ -202,6 +202,12 @@ class ReturPenjualanController extends Controller
                     }
                     
                 }
+
+                $ins3 = DB::connection($this->sql)->insert("
+                update a set a.hpp=b.hpp, a.no_belicurr=b.no_belicurr 
+                from brg_trans_d a 
+                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
                 	
                 // $exec = DB::connection($this->sql)->update("exec sp_brg_batalbeli ?, ?, ?, ?, ? ",array($id, $request->no_bukti, $periode, $kode_lokasi, $nik));
                 
@@ -213,6 +219,7 @@ class ReturPenjualanController extends Controller
             }else{
                 $success["message"] = "error. Total Retur tidak boleh melebihi saldo Penjualan ";
                 $success["status"] = false;
+                DB::connection($this->sql)->rollback();
             }
 
             return response()->json($success, $this->successStatus);     
