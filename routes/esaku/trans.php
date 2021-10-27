@@ -467,6 +467,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('inv-hitung-hpp-update','Esaku\Inventori\HppController@update');
     $router->delete('inv-hitung-hpp','Esaku\Inventori\HppController@destroy');
     
+    //Retur Penjualan
+    $router->get('retur-jual-bukti','Esaku\Inventori\ReturPenjualanController@getPenjualan');
+    $router->get('retur-jual-detail','Esaku\Inventori\ReturPenjualanController@show');
+    $router->post('retur-jual','Esaku\Inventori\ReturPenjualanController@store');
     
 });
 
