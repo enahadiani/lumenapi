@@ -26,6 +26,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-fp-pl','DashYpt\DashboardFPController@getDataBoxPerformLembaga'); 
 
     $router->get('data-fp-detail-perform','DashYpt\DashboardFPController@getDataPerformansiLembaga');  
+    $router->get('data-fp-detail-lembaga','DashYpt\DashboardFPController@getDataPerLembaga');  
 
 });
 

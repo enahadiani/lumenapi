@@ -805,4 +805,109 @@ class DashboardFPController extENDs Controller
         }
     }
 
+    /**
+     * Function ini untuk API detail performansi lembaga
+     * 
+     */
+    public function getDataPerLembaga(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_grafik');
+            $db_col_name = array('b.periode','a.kode_grafik');
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+
+            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.capai,0) as capai
+            FROM lokasi a
+            LEFT JOIN (
+                SELECT a.kode_lokasi,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+                FROM db_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where
+                GROUP BY a.kode_lokasi
+            ) b ON a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $total = 0;
+            foreach($res as $item) {
+                $total = $total + floatval(abs($item['n4']));
+            }
+
+            $chart = [];
+            if($total > 0) {
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
+
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
+            } else {
+                foreach($res as $item) {
+                    $_persen = 0;
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
+
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $chart;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
