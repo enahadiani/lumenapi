@@ -847,6 +847,7 @@ class DashboardFPController extENDs Controller
             }
 
             $chart = [];
+            $idx = 0;
             if($total > 0) {
                 foreach($res as $item) { 
                     $persen = (floatval(abs($item['n4'])) / $total) * 100;
@@ -866,11 +867,21 @@ class DashboardFPController extENDs Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($idx == 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'sliced' =>  true,
+                            'selected' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen)
+                        ];
+                    }
                     array_push($chart, $value);
+                    $idx++;
                 }
             } else {
                 foreach($res as $item) {
