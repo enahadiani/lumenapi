@@ -49,7 +49,7 @@ class DashboardFPController extENDs Controller
 
     /**
      * Function ini untuk API data box pertama
-     * PENDapatan, Beban, SHU, dan OR
+     * Pendapatan, Beban, SHU, dan OR
      * Data yang diberikan berupa nilai real, persentase Ach, nilai YoY, dan persentase YoY
      * 
      */
@@ -66,9 +66,9 @@ class DashboardFPController extENDs Controller
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_grafik, c.nama,
-            CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END AS n1,
-            CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END AS n4,
-            CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n5 ELSE b.n5 END AS n5,
+            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n1,
+            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n4,
+            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
             CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
             CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END AS ach,
             CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END AS yoy
@@ -150,7 +150,7 @@ class DashboardFPController extENDs Controller
     }
 
     /**
-     * Function ini untuk API data box pENDapatan
+     * Function ini untuk API data box Pendapatan
      * 
      */
     public function getDataBoxPdpt(Request $r) {
@@ -170,9 +170,9 @@ class DashboardFPController extENDs Controller
             FROM lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
                 FROM db_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
@@ -274,9 +274,9 @@ class DashboardFPController extENDs Controller
             FROM lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
                 FROM db_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
@@ -378,9 +378,9 @@ class DashboardFPController extENDs Controller
             FROM lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
                 FROM db_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
@@ -481,9 +481,9 @@ class DashboardFPController extENDs Controller
             ISNULL(b.capai,0) as capai
             FROM lokasi a
             LEFT JOIN (SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
                 FROM db_grafik_d a
                 INNER JOIN exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
@@ -584,9 +584,9 @@ class DashboardFPController extENDs Controller
             ISNULL(b.shu,0) AS shu
             FROM lokasi a
             LEFT JOIN (SELECT a.kode_lokasi,
-                SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS pdpt,
-                SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS beban,
-                SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='PENDapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS shu		
+                SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS pdpt,
+                SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS beban,
+                SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS shu		
                 FROM db_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -725,6 +725,84 @@ class DashboardFPController extENDs Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }   
+    }
+
+    /**
+     * Function ini untuk API detail performansi lembaga
+     * 
+     */
+    public function getDataPerformansiLembaga(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode', 'kode_grafik');
+            $db_col_name = array('b.periode', 'a.kode_grafik');
+            $where = "WHERE a.kode_fs = 'FS1'";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+
+            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.capai,0) as capai
+            FROM lokasi a
+            LEFT JOIN (
+                SELECT a.kode_lokasi,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+                FROM db_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where
+                GROUP BY a.kode_lokasi
+            ) b ON a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $ctg = [];
+            $data_realisasi = [];
+            $data_anggaran = [];
+            foreach($res as $item) {
+                if($item['kode_lokasi'] == '03') {
+                    $name = "KAPEL";
+                } elseif($item['kode_lokasi'] == '11') {
+                    $name = "TelU";
+                } elseif($item['kode_lokasi'] == '12') {
+                    $name = "TS";
+                } elseif($item['kode_lokasi'] == '13') {
+                    $name = "ITTJ";
+                } elseif($item['kode_lokasi'] == '14') {
+                    $name = "ITTP";
+                } elseif($item['kode_lokasi'] == '15') {
+                    $name = "ITTS";
+                }
+
+                $realisasi = floatval(number_format((float)$item['capai'], 1, '.', ''));
+                $sisa = 100 - $realisasi;
+                $anggaran = floatval(number_format((float)$sisa, 1, '.', ''));
+                
+                array_push($ctg, $name);
+                array_push($data_realisasi, $realisasi);
+                array_push($data_anggaran, $anggaran);
+            }
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = [
+                "ketegori" => $ctg,
+                "realisasi" => $data_realisasi,
+                "anggaran" => $data_anggaran
+            ];
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
 }
