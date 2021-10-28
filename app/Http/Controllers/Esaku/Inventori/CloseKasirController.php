@@ -359,7 +359,7 @@ class CloseKasirController extends Controller
     
                 } 
                 
-                if(count($request->no_retur) > 0){
+                if(isset($request->no_retur) && count($request->no_retur) > 0){
 
                     $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' ";
                     $return = DB::connection($this->sql)->select($sql);
