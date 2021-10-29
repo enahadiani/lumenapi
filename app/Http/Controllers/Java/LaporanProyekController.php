@@ -201,7 +201,7 @@ class LaporanProyekController extends Controller {
                 a.nama as nama_vendor, b.nilai,b.status
                 from java_vendor a
                 inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
-                where b.kode_lokasi = '".$kode_lokasi."' and b.no_proyek in ($no_proyek)";
+                where b.kode_lokasi = '".$kode_lokasi."' and b.no_proyek in ($no_proyek) order by tanggal desc";
 
                 $res3 = DB::connection($this->sql)->select($beban);
                 $res3 = json_decode(json_encode($res3),true);
