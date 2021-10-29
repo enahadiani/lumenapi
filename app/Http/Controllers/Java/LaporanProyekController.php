@@ -176,7 +176,7 @@ class LaporanProyekController extends Controller {
                 $no_proyek = "";
                 $resdata = array();
                 $i=0;
-                foreach($rs1 as $row){
+                foreach($rs1 as $row) {
 
                     $resdata[]=(array)$row;
                     if($i == 0){
@@ -201,7 +201,7 @@ class LaporanProyekController extends Controller {
                 a.nama as nama_vendor, b.nilai,b.status
                 from java_vendor a
                 inner join java_beban b on a.kode_vendor=b.kode_vendor and a.kode_lokasi=b.kode_lokasi
-                where b.kode_lokasi = '".$kode_lokasi."' and b.no_proyek in ($no_proyek) order by tanggal desc";
+                where b.kode_lokasi = '".$kode_lokasi."' and b.no_proyek in ($no_proyek) order by tanggal asc";
 
                 $res3 = DB::connection($this->sql)->select($beban);
                 $res3 = json_decode(json_encode($res3),true);
