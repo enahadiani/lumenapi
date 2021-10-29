@@ -1015,4 +1015,90 @@ class DashboardFPController extENDs Controller
         }
     }
 
+    /**
+     * Function ini untuk API detail kelompok Yoy
+     * 
+     */
+    public function getDataKelompokAkun(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            if($r->query('kode_grafik')[1] == "PI01") {
+                $kode_grafik = "PI05";
+            } elseif($r->query('kode_grafik')[1] == "PI02") {
+                $kode_grafik = "PI06";
+            } else {
+                $kode_grafik = $r->query('kode_grafik')[1];
+            }
+
+            $where = "WHERE a.kode_lokasi = '20' AND a.kode_grafik = '".$kode_grafik."' AND a.kode_fs='FS1'";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+
+            $sql = "SELECT a.kode_neraca, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.capai,0) AS capai
+            FROM neraca a
+            INNER JOIN (
+                SELECT a.kode_lokasi,a.kode_neraca,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+                FROM db_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where
+                GROUP BY a.kode_lokasi,a.kode_neraca
+            ) b ON a.kode_lokasi=b.kode_lokasi AND a.kode_neraca=b.kode_neraca 
+            WHERE a.kode_lokasi='20' AND a.kode_fs='FS1'";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $total = 0;
+            foreach($res as $item) {
+                $total = $total + floatval(abs($item['n4']));
+            }
+
+            $idx = 0;
+            $chart = [];
+            if($total > 0) { 
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+
+                    $data = [
+                        'name' => $item['nama'],
+                        'y' => floatval($_persen),
+                        'z' => intval($item['n4'])
+                    ];
+                    array_push($chart, $data);
+                }
+            } else {
+                foreach($res as $item) { 
+                    $data = [
+                        'name' => $item['nama'],
+                        'y' => 0,
+                        'z' => 0
+                    ];
+                    array_push($chart, $data);
+                }
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $chart;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
