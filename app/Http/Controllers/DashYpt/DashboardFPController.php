@@ -955,7 +955,7 @@ class DashboardFPController extENDs Controller
                 }
             }
 
-            $sql = "SELECT DISTINCT TOP 3 a.kode_neraca,a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            $sql = "SELECT DISTINCT a.kode_neraca,a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
             ISNULL(b.n6,0) AS n6
             FROM neraca a
             INNER JOIN (
