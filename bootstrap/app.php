@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
@@ -29,7 +29,7 @@ date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
 
 // $app->withEloquent();
 $app = new Laravel\Lumen\Application(
-    realpath(__DIR__.'/../')
+    realpath(__DIR__ . '/../')
 );
 
 $app->instance('path.storage', app()->basePath() . DIRECTORY_SEPARATOR . 'storage');
@@ -75,7 +75,7 @@ $app->configure('app');
 $app->configure('filesystems');
 
 
-$app->alias('Storage',Illuminate\Support\Facades\Storage::class);
+$app->alias('Storage', Illuminate\Support\Facades\Storage::class);
 
 // class_alias('Illuminate\Support\Facades\Storage', 'Storage');
 
@@ -169,28 +169,35 @@ $app->register(Milon\Barcode\BarcodeServiceProvider::class);
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/approval'
 ], function ($router) {
-    require __DIR__.'/../routes/approval.php';
+    require __DIR__ . '/../routes/approval.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/gl'
 ], function ($router) {
-    require __DIR__.'/../routes/gl.php';
+    require __DIR__ . '/../routes/gl.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/apv'
 ], function ($router) {
-    require __DIR__.'/../routes/apv.php';
+    require __DIR__ . '/../routes/apv.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/silo'
+], function ($router) {
+    require __DIR__ . '/../routes/silo.php';
 });
 
 
@@ -200,77 +207,77 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sppd'
 ], function ($router) {
-    require __DIR__.'/../routes/sppd.php';
+    require __DIR__ . '/../routes/sppd.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/lapsaku'
 ], function ($router) {
-    require __DIR__.'/../routes/lapsaku.php';
+    require __DIR__ . '/../routes/lapsaku.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/proyek'
 ], function ($router) {
-    require __DIR__.'/../routes/proyek.php';
+    require __DIR__ . '/../routes/proyek.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/aset'
 ], function ($router) {
-    require __DIR__.'/../routes/aset.php';
+    require __DIR__ . '/../routes/aset.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/rtrw'
 ], function ($router) {
-    require __DIR__.'/../routes/rtrw.php';
+    require __DIR__ . '/../routes/rtrw.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sekolah'
 ], function ($router) {
-    require __DIR__.'/../routes/sekolah.php';
+    require __DIR__ . '/../routes/sekolah.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ts'
 ], function ($router) {
-    require __DIR__.'/../routes/ts.php';
+    require __DIR__ . '/../routes/ts.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sju'
 ], function ($router) {
-    require __DIR__.'/../routes/sju.php';
+    require __DIR__ . '/../routes/sju.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/mobile-sekolah'
 ], function ($router) {
-    require __DIR__.'/../routes/mobilesekolah.php';
+    require __DIR__ . '/../routes/mobilesekolah.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dago'
 ], function ($router) {
-    require __DIR__.'/../routes/dago.php';
+    require __DIR__ . '/../routes/dago.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dago-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/dago/auth.php';
+    require __DIR__ . '/../routes/dago/auth.php';
 });
 
 // $app->router->group([
@@ -284,105 +291,105 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dago-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/dago/dash.php';
+    require __DIR__ . '/../routes/dago/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dago-master'
 ], function ($router) {
-    require __DIR__.'/../routes/dago/master.php';
+    require __DIR__ . '/../routes/dago/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dago-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/dago/trans.php';
+    require __DIR__ . '/../routes/dago/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dago-report'
 ], function ($router) {
-    require __DIR__.'/../routes/dago/report.php';
+    require __DIR__ . '/../routes/dago/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/midtrans'
 ], function ($router) {
-    require __DIR__.'/../routes/midtrans.php';
+    require __DIR__ . '/../routes/midtrans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/toko-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/toko/auth.php';
+    require __DIR__ . '/../routes/toko/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/toko-master'
 ], function ($router) {
-    require __DIR__.'/../routes/toko/master.php';
+    require __DIR__ . '/../routes/toko/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/toko-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/toko/trans.php';
+    require __DIR__ . '/../routes/toko/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/toko-report'
 ], function ($router) {
-    require __DIR__.'/../routes/toko/report.php';
+    require __DIR__ . '/../routes/toko/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/toko-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/toko/dash.php';
+    require __DIR__ . '/../routes/toko/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/portal'
 ], function ($router) {
-    require __DIR__.'/../routes/portal.php';
+    require __DIR__ . '/../routes/portal.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ginas'
 ], function ($router) {
-    require __DIR__.'/../routes/ginas.php';
+    require __DIR__ . '/../routes/ginas.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sai-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/sai/auth.php';
+    require __DIR__ . '/../routes/sai/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sai-master'
 ], function ($router) {
-    require __DIR__.'/../routes/sai/master.php';
+    require __DIR__ . '/../routes/sai/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sai-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/sai/trans.php';
+    require __DIR__ . '/../routes/sai/trans.php';
 });
 
 
@@ -390,42 +397,42 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sai-report'
 ], function ($router) {
-    require __DIR__.'/../routes/sai/report.php';
+    require __DIR__ . '/../routes/sai/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sai-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/sai/dash.php';
+    require __DIR__ . '/../routes/sai/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/warga'
 ], function ($router) {
-    require __DIR__.'/../routes/warga.php';
+    require __DIR__ . '/../routes/warga.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/apv-mobile'
 ], function ($router) {
-    require __DIR__.'/../routes/apv_mobile.php';
+    require __DIR__ . '/../routes/apv_mobile.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/webjava'
 ], function ($router) {
-    require __DIR__.'/../routes/webjava/web.php';
+    require __DIR__ . '/../routes/webjava/web.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/webginas'
 ], function ($router) {
-    require __DIR__.'/../routes/webginas/web.php';
+    require __DIR__ . '/../routes/webginas/web.php';
 });
 
 
@@ -433,154 +440,154 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/wisata-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/wisata/auth.php';
+    require __DIR__ . '/../routes/wisata/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/wisata-master'
 ], function ($router) {
-    require __DIR__.'/../routes/wisata/master.php';
+    require __DIR__ . '/../routes/wisata/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/wisata-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/wisata/trans.php';
+    require __DIR__ . '/../routes/wisata/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/wisata-report'
 ], function ($router) {
-    require __DIR__.'/../routes/wisata/report.php';
+    require __DIR__ . '/../routes/wisata/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/wisata-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/wisata/dash.php';
+    require __DIR__ . '/../routes/wisata/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/yakes-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/yakes/auth.php';
+    require __DIR__ . '/../routes/yakes/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/yakes-master'
 ], function ($router) {
-    require __DIR__.'/../routes/yakes/master.php';
+    require __DIR__ . '/../routes/yakes/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/yakes-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/yakes/trans.php';
+    require __DIR__ . '/../routes/yakes/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/yakes-report'
 ], function ($router) {
-    require __DIR__.'/../routes/yakes/report.php';
+    require __DIR__ . '/../routes/yakes/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/yakes-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/yakes/dash.php';
+    require __DIR__ . '/../routes/yakes/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/admginas/auth.php';
+    require __DIR__ . '/../routes/admginas/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-master'
 ], function ($router) {
-    require __DIR__.'/../routes/admginas/master.php';
+    require __DIR__ . '/../routes/admginas/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/admginas/trans.php';
+    require __DIR__ . '/../routes/admginas/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-report'
 ], function ($router) {
-    require __DIR__.'/../routes/admginas/report.php';
+    require __DIR__ . '/../routes/admginas/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/admginas/dash.php';
+    require __DIR__ . '/../routes/admginas/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/barber-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/barber/auth.php';
+    require __DIR__ . '/../routes/barber/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/barber-master'
 ], function ($router) {
-    require __DIR__.'/../routes/barber/master.php';
+    require __DIR__ . '/../routes/barber/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/barber-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/barber/trans.php';
+    require __DIR__ . '/../routes/barber/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/barber-report'
 ], function ($router) {
-    require __DIR__.'/../routes/barber/report.php';
+    require __DIR__ . '/../routes/barber/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/barber-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/barber/dash.php';
+    require __DIR__ . '/../routes/barber/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dev'
 ], function ($router) {
-    require __DIR__.'/../routes/dev.php';
+    require __DIR__ . '/../routes/dev.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/yptkug'
 ], function ($router) {
-    require __DIR__.'/../routes/yptkug.php';
+    require __DIR__ . '/../routes/yptkug.php';
 });
 
 /*
@@ -596,7 +603,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ypt-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/ypt/auth.php';
+    require __DIR__ . '/../routes/ypt/auth.php';
 });
 
 
@@ -604,7 +611,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ypt-master'
 ], function ($router) {
-    require __DIR__.'/../routes/ypt/master.php';
+    require __DIR__ . '/../routes/ypt/master.php';
 });
 
 
@@ -612,49 +619,49 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ypt-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/ypt/trans.php';
+    require __DIR__ . '/../routes/ypt/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ypt-report'
 ], function ($router) {
-    require __DIR__.'/../routes/ypt/report.php';
+    require __DIR__ . '/../routes/ypt/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/ypt-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/ypt/dash.php';
+    require __DIR__ . '/../routes/ypt/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/siaga-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/siaga/dash.php';
+    require __DIR__ . '/../routes/siaga/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/siaga-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/siaga/auth.php';
+    require __DIR__ . '/../routes/siaga/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/siaga-master'
 ], function ($router) {
-    require __DIR__.'/../routes/siaga/master.php';
+    require __DIR__ . '/../routes/siaga/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/siaga-report'
 ], function ($router) {
-    require __DIR__.'/../routes/siaga/report.php';
+    require __DIR__ . '/../routes/siaga/report.php';
 });
 
 
@@ -662,49 +669,49 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/siaga-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/siaga/trans.php';
+    require __DIR__ . '/../routes/siaga/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/java-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/java/auth.php';
+    require __DIR__ . '/../routes/java/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/java-master'
 ], function ($router) {
-    require __DIR__.'/../routes/java/master.php';
+    require __DIR__ . '/../routes/java/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/java-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/java/trans.php';
+    require __DIR__ . '/../routes/java/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/java-report'
 ], function ($router) {
-    require __DIR__.'/../routes/java/report.php';
+    require __DIR__ . '/../routes/java/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/java-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/java/dash.php';
+    require __DIR__ . '/../routes/java/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/esaku-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/esaku/auth.php';
+    require __DIR__ . '/../routes/esaku/auth.php';
 });
 
 
@@ -712,7 +719,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/esaku-master'
 ], function ($router) {
-    require __DIR__.'/../routes/esaku/master.php';
+    require __DIR__ . '/../routes/esaku/master.php';
 });
 
 
@@ -720,42 +727,42 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/esaku-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/esaku/trans.php';
+    require __DIR__ . '/../routes/esaku/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/esaku-report'
 ], function ($router) {
-    require __DIR__.'/../routes/esaku/report.php';
+    require __DIR__ . '/../routes/esaku/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/esaku-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/esaku/dash.php';
+    require __DIR__ . '/../routes/esaku/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admjava-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/admjava/auth.php';
+    require __DIR__ . '/../routes/admjava/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admjava-content'
 ], function ($router) {
-    require __DIR__.'/../routes/admjava/content.php';
+    require __DIR__ . '/../routes/admjava/content.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bangtel'
 ], function ($router) {
-    require __DIR__.'/../routes/bangtel.php';
+    require __DIR__ . '/../routes/bangtel.php';
 });
 
 
@@ -763,7 +770,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/simlog-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/simlog/auth.php';
+    require __DIR__ . '/../routes/simlog/auth.php';
 });
 
 
@@ -771,7 +778,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/simlog-master'
 ], function ($router) {
-    require __DIR__.'/../routes/simlog/master.php';
+    require __DIR__ . '/../routes/simlog/master.php';
 });
 
 
@@ -779,35 +786,35 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/simlog-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/simlog/trans.php';
+    require __DIR__ . '/../routes/simlog/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/simlog-report'
 ], function ($router) {
-    require __DIR__.'/../routes/simlog/report.php';
+    require __DIR__ . '/../routes/simlog/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/simlog-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/simlog/dash.php';
+    require __DIR__ . '/../routes/simlog/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/sdm'
 ], function ($router) {
-    require __DIR__.'/../routes/sdm.php';
+    require __DIR__ . '/../routes/sdm.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bdh-auth'
 ], function ($router) {
-    require __DIR__.'/../routes/bdh/auth.php';
+    require __DIR__ . '/../routes/bdh/auth.php';
 });
 
 
@@ -815,7 +822,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bdh-master'
 ], function ($router) {
-    require __DIR__.'/../routes/bdh/master.php';
+    require __DIR__ . '/../routes/bdh/master.php';
 });
 
 
@@ -823,56 +830,56 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bdh-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/bdh/trans.php';
+    require __DIR__ . '/../routes/bdh/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bdh-report'
 ], function ($router) {
-    require __DIR__.'/../routes/bdh/report.php';
+    require __DIR__ . '/../routes/bdh/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/bdh-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/bdh/dash.php';
+    require __DIR__ . '/../routes/bdh/dash.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dash-ypt'
 ], function ($router) {
-    require __DIR__.'/../routes/dash-ypt/auth.php';
+    require __DIR__ . '/../routes/dash-ypt/auth.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dash-ypt-master'
 ], function ($router) {
-    require __DIR__.'/../routes/dash-ypt/master.php';
+    require __DIR__ . '/../routes/dash-ypt/master.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dash-ypt-trans'
 ], function ($router) {
-    require __DIR__.'/../routes/dash-ypt/trans.php';
+    require __DIR__ . '/../routes/dash-ypt/trans.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dash-ypt-report'
 ], function ($router) {
-    require __DIR__.'/../routes/dash-ypt/report.php';
+    require __DIR__ . '/../routes/dash-ypt/report.php';
 });
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/dash-ypt-dash'
 ], function ($router) {
-    require __DIR__.'/../routes/dash-ypt/dash.php';
+    require __DIR__ . '/../routes/dash-ypt/dash.php';
 });
 
 return $app;
