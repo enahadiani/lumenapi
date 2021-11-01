@@ -68,9 +68,16 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('dash-siswa-profile','Ts\DashSiswaController@getProfile');    
     $router->post('send-email','EmailController@send');
 
+    $router->get('saldo-piutang','Ts\DashSiswaController@getSaldoPiutang');
     $router->get('rincian-piutang','Ts\DashSiswaController@getRincianTagihan');
     $router->get('riwayat-trans','Ts\DashSiswaController@getRiwayatTransaksi');
+    $router->get('info','Ts\DashSiswaController@getInformasi');
+    $router->get('pesan','Ts\DashSiswaController@getPesan');
+    $router->get('pesan-detail','Ts\DashSiswaController@getPesanDetail');
+    $router->post('upload-bukti-bayar','Ts\DashSiswaController@uploadBuktiBayar');
     $router->get('tahun-ajaran','Ts\DashSiswaController@getTA');
+    $router->put('update-status-read-pesan', 'Ts\DashSiswaController@updateStatusReadPesan');
+    $router->put('update-status-read-info', 'Ts\DashSiswaController@updateStatusReadInfo');
 
     $router->get('periode','Ts\DashSiswaController@getPeriode');
     $router->get('detail-trans','Ts\DashSiswaController@getDetailTransaksi');

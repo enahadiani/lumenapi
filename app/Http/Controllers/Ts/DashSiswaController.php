@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; 
 
 class DashSiswaController extends Controller
 {
@@ -703,6 +704,103 @@ class DashSiswaController extends Controller
         
     }
 
+    public function getSaldoPiutang(Request $request)
+    {
+        $this->validate($request,[
+            'periode' => 'required'
+        ]);
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+
+            $get = DB::connection($this->db)->select("select max(a.periode) as periode from ( select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+            union all
+            select max(periode) as periode from sis_cd_d where kode_lokasi='$kode_lokasi' and nis='$nik'
+            union all
+            select max(periode) as periode from sis_bill_d where kode_lokasi='$kode_lokasi' and nis='$nik' 
+            union all
+            select max(periode) as periode from sis_rekon_d where kode_lokasi='$kode_lokasi' and nis='$nik'
+            ) a");
+            if(count($get) > 0){
+                $periode = $get[0]->periode;
+            }else{
+                $periode = $request->periode;
+            }
+
+            $res = DB::connection($this->db)->select("select a.nis,a.nama,a.kode_lokasi,a.kode_pp,isnull(b.total,0)-isnull(d.total,0)-isnull(f.total,0)+isnull(c.total,0)-isnull(e.total,0)-isnull(g.total,0) as piutang,a.id_bank
+            from sis_siswa a 
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+                        from sis_bill_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )c on a.nis=c.nis and a.kode_lokasi=c.kode_lokasi
+            left join (select y.nis,y.kode_lokasi,  
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                        from sis_rekon_d x 	
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periode')	and x.kode_pp='$kode_pp'		
+                        group by y.nis,y.kode_lokasi 			
+                        )d on a.nis=d.nis and a.kode_lokasi=d.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
+                        from sis_rekon_d x 			
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periode') and x.kode_pp='$kode_pp'			
+                        group by y.nis,y.kode_lokasi 			
+                        )e on a.nis=e.nis and a.kode_lokasi=e.kode_lokasi
+			left join (select y.nis,y.kode_lokasi,  
+                                sum(x.nilai) as total				
+                        from sis_mandiri_bill_d x 	
+						inner join sis_mandiri_bill z on x.no_bukti=z.no_bukti and x.kode_lokasi=z.kode_lokasi
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode_bill <'$periode') and x.kode_pp='$kode_pp' and z.status='PAID'		
+                        group by y.nis,y.kode_lokasi 			
+                        )f on a.nis=f.nis and a.kode_lokasi=d.kode_lokasi
+            left join (select y.nis,y.kode_lokasi, 
+                                sum(x.nilai) as total		
+                        from sis_mandiri_bill_d x 	
+						inner join sis_mandiri_bill z on x.no_bukti=z.no_bukti and x.kode_lokasi=z.kode_lokasi		
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode_bill ='$periode') and x.kode_pp='$kode_pp' and z.status='PAID'			
+                        group by y.nis,y.kode_lokasi 			
+                        )g on a.nis=g.nis and a.kode_lokasi=e.kode_lokasi
+            where a.nis='$nik'
+             ");
+            $res = json_decode(json_encode($res),true);
+
+           
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
     public function getTA(Request $request)
     {
         try {
@@ -1327,4 +1425,252 @@ class DashSiswaController extends Controller
         
     }
 
+    public function getInformasi(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+            $sql = "select a.kontak,a.no_bukti,a.judul as kelompok_notifikasi,a.info as notifikasi,convert(varchar,a.tgl_input,105) as tgl, isnull(b.file_dok,'-') as gambar 
+            from sis_info_m a
+            left join sis_info_dok b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.no_urut=0
+            where a.kontak = '$nik' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi'
+            union all
+            select a.kontak,a.no_bukti,a.judul as kelompok_notifikasi,a.info as notifikasi,convert(varchar,a.tgl_input,105) as tgl, isnull(b.file_dok,'-') as gambar 
+            from sis_info_m a
+            left join sis_info_dok b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.no_urut=0
+            where a.jenis = 'Semua' and a.kode_pp='$kode_pp' and a.kode_lokasi='$kode_lokasi' ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $success['rows'] = count($res);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPesan(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+            $sql = "
+            select a.nik_buat as nik,b.nama,d.pesan,isnull(e.jum_not_read,0) as jum_not_read
+            from sis_msg_m a
+            left join (
+                select a.kode_pp as nik,a.kode_lokasi,a.nama from sis_sekolah a 
+                union all
+                select a.nis,a.kode_lokasi,a.nama from sis_siswa a 
+                ) b on a.nik_buat=b.nik and a.kode_lokasi=b.kode_lokasi
+            inner join (SELECT a.kode_lokasi,MAX(no_bukti) as no_bukti
+                        FROM sis_msg_m a
+                        where a.nik_tuju='$nik' or a.nik_buat='$nik'
+                        GROUP BY a.kode_lokasi
+            ) c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi
+            inner join (SELECT a.kode_lokasi,a.no_bukti,a.pesan
+                        FROM sis_msg_m a
+            ) d on c.no_bukti=d.no_bukti and c.kode_lokasi=d.kode_lokasi
+            left join (SELECT a.kode_lokasi,count(*) as jum_not_read
+                        FROM sis_msg_m a
+                        where (a.nik_tuju='$nik' or a.nik_buat='$nik') and a.sts_read=0
+                        GROUP BY a.kode_lokasi
+            ) e on a.kode_lokasi=e.kode_lokasi
+            where a.nik_tuju='$nik' and a.kode_lokasi='$kode_lokasi' 
+             ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $success['rows'] = count($res);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPesanDetail(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp= $data->kode_pp;
+            }
+            $sql = "
+            select a.*, isnull(b.file_dok,'-') as dokumen from sis_msg_m a 
+            left join sis_msg_dok b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.no_urut=0
+            where (a.nik_tuju='$nik' or a.nik_buat='$nik') 
+            order by a.tgl_input 
+             ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            $success['rows'] = count($res);
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
+        $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
+        $query = json_decode(json_encode($query),true);
+        $kode = $query[0]['id'];
+        $id = $prefix.str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
+        return $id;
+    }
+
+    public function simpanBuktiBayar(Request $request)
+    {
+        $this->validate($request, [
+            'file_dok' => 'file|max:10000'
+        ]);
+
+        DB::connection($this->sql)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if($request->hasfile('file_dok')){
+                $file = $request->file('file_dok');
+                
+                $nama_foto = uniqid()."_".$file->getClientOriginalName();
+                // $picName = uniqid() . '_' . $picName;
+                $foto = $nama_foto;
+                if(Storage::disk('s3')->exists('ts/'.$foto)){
+                    Storage::disk('s3')->delete('ts/'.$foto);
+                }
+                Storage::disk('s3')->put('ts/'.$foto,file_get_contents($file));
+            }else{
+
+                $foto="-";
+            }
+
+            $per = substr(date('Ym'),2,2);
+            $no_bukti = $this->generateKode("sis_msg_m", "no_bukti", $kode_lokasi."-".$per.".", "00001");
+            $ins = DB::connection($this->sql)->insert("insert into sis_msg_m(no_bukti,nik_buat,nik_tuju,pesan,tgl_input,kode_lokasi,kode_pp,sts_read) values (?, ?, ?, ?, getdate(), ?, ?, ?)",array($no_bukti,$nik,$kode_pp,'Bukti Pembayaran',$kode_lokasi,$kode_pp,0));
+            
+            $insdok = DB::connection($this->sql)->insert("insert into sis_msg_dok(no_bukti,file_dok,no_urut,kode_lokasi,kode_pp) values (?, ?, ?, ?, ?)",array($no_bukti,$foto,0,$kode_lokasi,$kode_pp));
+            
+            DB::connection($this->sql)->commit();
+            $success['status'] = true;
+            $success['kode'] = $request->nik;
+            $success['message'] = "Data Bukti Bayar berhasil disimpan";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            DB::connection($this->sql)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Bukti Bayar gagal disimpan ".$e;
+            return response()->json($success, $this->successStatus); 
+        }				
+     
+    }
+
+    public function updateStatusReadPesan(Request $request)
+	{
+		if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $kode_pp = $data->kode_pp;
+		}
+
+		$this->validate($request,[
+            'no_bukti' => 'required'
+		]);
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			$upd = DB::connection($this->db)->insert("update sis_msg_m set sts_read = '1' where no_bukti='$request->no_bukti' and (nik_tuju='$nik' or nik_buat='$nik') and kode_lokasi='$kode_lokasi' ");
+
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = "Sukses";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
+
+    public function updateStatusReadInfo(Request $request)
+	{
+		if($data =  Auth::guard($this->guard)->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+            $kode_pp = $data->kode_pp;
+		}
+
+		$this->validate($request,[
+            'no_bukti' => 'required'
+		]);
+
+		DB::connection($this->db)->beginTransaction();
+        try{
+            
+			$upd = DB::connection($this->db)->insert("update sis_info_d set sts_read = '1' where no_bukti='$request->no_bukti' and nik='$nik' and kode_lokasi='$kode_lokasi' ");
+
+			DB::connection($this->db)->commit();
+			$success['status'] = true;
+			$success['message'] = "Sukses";
+            return response()->json($success, 200);
+        } catch (\Throwable $e) {
+			DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+    }
 }
