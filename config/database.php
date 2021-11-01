@@ -4,13 +4,13 @@ return [
     'connections' => [
         'default' => env('DB_CONNECTION', 'sqlsrv'),
         'sqlite' => [
-            'driver' => env('DB_CONNECTION','sqlite'),
+            'driver' => env('DB_CONNECTION', 'sqlite'),
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
         ],
-    
+
         'mysql' => [
-            'driver' => env('DB_CONNECTION','mysql'),
+            'driver' => env('DB_CONNECTION', 'mysql'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -23,9 +23,9 @@ return [
             'strict' => true,
             'engine' => null,
         ],
-    
+
         'mysql2' => [
-            'driver' => env('DB_CONNECTION_2','mysql'),
+            'driver' => env('DB_CONNECTION_2', 'mysql'),
             'host' => env('DB_HOST_2', '127.0.0.1'),
             'port' => env('DB_PORT_2', '3306'),
             'database' => env('DB_DATABASE_2', 'forge'),
@@ -37,10 +37,10 @@ return [
             'prefix' => '',
             'strict' => true,
             'engine' => null,
-        ],    
-        
+        ],
+
         'sqlsrv' => [
-            'driver' => env('DB_CONNECTION','sqlsrv'),
+            'driver' => env('DB_CONNECTION', 'sqlsrv'),
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '1433'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -50,7 +50,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrv2' => [
-            'driver' => env('DB_CONNECTION2','sqlsrv'),
+            'driver' => env('DB_CONNECTION2', 'sqlsrv'),
             'host' => env('DB_HOST2', 'localhost'),
             'port' => env('DB_PORT2', '1433'),
             'database' => env('DB_DATABASE2', 'forge'),
@@ -60,7 +60,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvypt' => [
-            'driver' => env('DB_CONNECTION3','sqlsrv'),
+            'driver' => env('DB_CONNECTION3', 'sqlsrv'),
             'host' => env('DB_HOST3', 'localhost'),
             'port' => env('DB_PORT3', '1433'),
             'database' => env('DB_DATABASE3', 'forge'),
@@ -70,7 +70,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvrtrw' => [
-            'driver' => env('DB_CONNECTION4','sqlsrv'),
+            'driver' => env('DB_CONNECTION4', 'sqlsrv'),
             'host' => env('DB_HOST4', 'localhost'),
             'port' => env('DB_PORT4', '1433'),
             'database' => env('DB_DATABASE4', 'forge'),
@@ -80,7 +80,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvtarbak' => [
-            'driver' => env('DB_CONNECTION5','sqlsrv'),
+            'driver' => env('DB_CONNECTION5', 'sqlsrv'),
             'host' => env('DB_HOST5', 'localhost'),
             'port' => env('DB_PORT5', '1433'),
             'database' => env('DB_DATABASE5', 'forge'),
@@ -90,7 +90,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvyptkug' => [
-            'driver' => env('DB_CONNECTION6','sqlsrv'),
+            'driver' => env('DB_CONNECTION6', 'sqlsrv'),
             'host' => env('DB_HOST6', 'localhost'),
             'port' => env('DB_PORT6', '1433'),
             'database' => env('DB_DATABASE6', 'forge'),
@@ -100,7 +100,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvsju' => [
-            'driver' => env('DB_CONNECTION7','sqlsrv'),
+            'driver' => env('DB_CONNECTION7', 'sqlsrv'),
             'host' => env('DB_HOST7', 'localhost'),
             'port' => env('DB_PORT7', '1433'),
             'database' => env('DB_DATABASE7', 'forge'),
@@ -110,7 +110,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvdago' => [
-            'driver' => env('DB_CONNECTION8','sqlsrv'),
+            'driver' => env('DB_CONNECTION8', 'sqlsrv'),
             'host' => env('DB_HOST8', 'localhost'),
             'port' => env('DB_PORT8', '1433'),
             'database' => env('DB_DATABASE8', 'forge'),
@@ -120,7 +120,7 @@ return [
             'prefix' => '',
         ],
         'tokoaws' => [
-            'driver' => env('DB_CONNECTION9','sqlsrv'),
+            'driver' => env('DB_CONNECTION9', 'sqlsrv'),
             'host' => env('DB_HOST9', 'localhost'),
             'port' => env('DB_PORT9', '1433'),
             'database' => env('DB_DATABASE9', 'forge'),
@@ -130,7 +130,7 @@ return [
             'prefix' => '',
         ],
         'sqlsrvginas' => [
-            'driver' => env('DB_CONNECTION10','sqlsrv'),
+            'driver' => env('DB_CONNECTION10', 'sqlsrv'),
             'host' => env('DB_HOST10', 'localhost'),
             'port' => env('DB_PORT10', '1433'),
             'database' => env('DB_DATABASE10', 'forge'),
@@ -140,7 +140,7 @@ return [
             'prefix' => '',
         ],
         'dbsilo' => [
-            'driver' => env('DB_CONNECTION11','sqlsrv'),
+            'driver' => env('DB_CONNECTION11', 'sqlsrv'),
             'host' => env('DB_HOST11', 'localhost'),
             'port' => env('DB_PORT11', '1433'),
             'database' => env('DB_DATABASE11', 'forge'),
@@ -149,8 +149,18 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        'dbnewsilo' => [
+            'driver' => env('DB_CONNECTION110', 'sqlsrv'),
+            'host' => env('DB_HOST110', 'localhost'),
+            'port' => env('DB_PORT110', '1433'),
+            'database' => env('DB_DATABASE110', 'forge'),
+            'username' => env('DB_USERNAME110', 'forge'),
+            'password' => env('DB_PASSWORD110', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
         'dbsaife' => [
-            'driver' => env('DB_CONNECTION12','sqlsrv'),
+            'driver' => env('DB_CONNECTION12', 'sqlsrv'),
             'host' => env('DB_HOST12', 'localhost'),
             'port' => env('DB_PORT12', '1433'),
             'database' => env('DB_DATABASE12', 'forge'),
@@ -160,7 +170,7 @@ return [
             'prefix' => '',
         ],
         'dbsapkug' => [
-            'driver' => env('DB_CONNECTION13','sqlsrv'),
+            'driver' => env('DB_CONNECTION13', 'sqlsrv'),
             'host' => env('DB_HOST13', 'localhost'),
             'port' => env('DB_PORT13', '1433'),
             'database' => env('DB_DATABASE13', 'forge'),
@@ -170,7 +180,7 @@ return [
             'prefix' => '',
         ],
         'dbaset' => [
-            'driver' => env('DB_CONNECTION14','sqlsrv'),
+            'driver' => env('DB_CONNECTION14', 'sqlsrv'),
             'host' => env('DB_HOST14', 'localhost'),
             'port' => env('DB_PORT14', '1433'),
             'database' => env('DB_DATABASE14', 'forge'),
@@ -180,7 +190,7 @@ return [
             'prefix' => '',
         ],
         'dbsiaga' => [
-            'driver' => env('DB_CONNECTION15','sqlsrv'),
+            'driver' => env('DB_CONNECTION15', 'sqlsrv'),
             'host' => env('DB_HOST15', 'localhost'),
             'port' => env('DB_PORT15', '1433'),
             'database' => env('DB_DATABASE15', 'forge'),
@@ -190,7 +200,7 @@ return [
             'prefix' => '',
         ],
         'dbbangtelindo' => [
-            'driver' => env('DB_CONNECTION18','sqlsrv'),
+            'driver' => env('DB_CONNECTION18', 'sqlsrv'),
             'host' => env('DB_HOST18', 'localhost'),
             'port' => env('DB_PORT18', '1433'),
             'database' => env('DB_DATABASE18', 'forge'),
@@ -199,22 +209,22 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ]
-    
+
     ],
     'migrations' => 'migrations',
- 
+
     'redis' => [
- 
+
         'client' => 'predis',
- 
+
         'default' => [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => 0,
         ],
- 
+
     ],
- 
+
 
 ];

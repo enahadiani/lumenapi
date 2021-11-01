@@ -67,6 +67,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'silo',
         ],
+        'newsilo' => [
+            'driver' => 'jwt',
+            'provider' => 'newsilo',
+        ],
         'yakes' => [
             'driver' => 'jwt',
             'provider' => 'yakes',
@@ -149,6 +153,10 @@ return [
         'silo' => [
             'driver' => 'eloquent',
             'model' => \App\AdminSilo::class
+        ],
+        'newsilo' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminNewSilo::class
         ],
         'yakes' => [
             'driver' => 'eloquent',
