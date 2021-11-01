@@ -928,6 +928,16 @@ class DashSiswaController extends Controller
                     where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0 $filter_midtrans
                     group by x.kode_lokasi,x.kode_pp,x.no_bukti )a 
                 inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nis='$nik' 
+                union all
+                select a.no_bukti,a.kode_lokasi,b.tgl_input,convert(varchar(10),b.tgl_input,103) as tgl,
+                'MANDIRI' as modul, isnull(a.tagihan,0) as total,a.id_bank,b.status,b.bill_cust_id
+                from (select x.kode_lokasi,x.kode_pp,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
+                    from sis_mandiri_bill_d x 
+					inner join sis_mandiri_bill m on x.no_bukti=m.no_bukti and x.kode_pp=m.kode_pp and x.kode_lokasi=m.kode_lokasi
+                    inner join sis_bill_d y on x.no_bill=y.no_bill and x.kode_pp=y.kode_pp and x.kode_lokasi=y.kode_lokasi and m.nik_user=y.nis and x.kode_param=y.kode_param
+                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                    group by x.kode_lokasi,x.kode_pp,x.no_bukti )a 
+                inner join sis_mandiri_bill b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik_user='$nik' 
             ) a
             $filter_jenis
             order by a.tanggal desc";
@@ -1089,6 +1099,14 @@ class DashSiswaController extends Controller
                     where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
                     group by x.kode_lokasi,x.no_bukti )a 
                 inner join sis_mid_bayar b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nis='$nik' 
+                union all
+				select a.no_bukti,a.kode_lokasi,b.tgl_input,convert(varchar(10),b.tgl_input,103) as tgl,
+                'MANDIRI' as modul, isnull(a.tagihan,0) as total,b.bill_cust_id as id_bank
+                from (select x.kode_lokasi,x.no_bukti,sum(x.nilai) as tagihan, '-' as id_bank
+                    from sis_mandiri_bill_d x 
+                    where x.kode_lokasi = '$kode_lokasi' and x.kode_pp='$kode_pp' and x.nilai<>0  
+                    group by x.kode_lokasi,x.no_bukti )a 
+                inner join sis_mandiri_bill b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user' 
             ) a
             where a.no_bukti = '$request->no_bukti'
             order by a.tanggal desc ");
@@ -1126,6 +1144,13 @@ class DashSiswaController extends Controller
 								inner join sis_mid_bayar b on x.no_bukti=b.no_bukti and x.no_bill=b.no_bill and x.kode_lokasi=b.kode_lokasi 
                                 inner join sis_siswa y on b.nis=y.nis and b.kode_lokasi=y.kode_lokasi and b.kode_pp=y.kode_pp
                                 where x.kode_lokasi = '$kode_lokasi' and b.nis='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
+                                group by x.kode_param,x.no_bukti,x.no_bill,b.tgl_input 
+                        union all
+                        select x.kode_param,x.no_bukti,x.no_bill,b.tgl_input,sum(x.nilai) as nilai
+                                from sis_mandiri_bill_d x 
+								inner join sis_mandiri_bill b on x.no_bukti=b.no_bukti and x.kode_lokasi=b.kode_lokasi 
+                                inner join sis_siswa y on b.nik_user=y.nis and b.kode_lokasi=y.kode_lokasi and b.kode_pp=y.kode_pp
+                                where x.kode_lokasi = '$kode_lokasi' and b.nik_user='$nik' and x.kode_pp='$kode_pp' and x.nilai<>0 
                                 group by x.kode_param,x.no_bukti,x.no_bill,b.tgl_input 
                     ) a
                     where a.no_bukti='".$res[$i]['no_bukti']."'
