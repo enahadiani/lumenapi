@@ -22,9 +22,9 @@ class DashboardFPController extENDs Controller
         for($i = 0; $i<count($col_array); $i++){
             if(ISSET($request->input($col_array[$i])[0])){
                 if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
-                    $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    $where .= " AND (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
                 }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
-                    $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    $where .= " AND ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
                 }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                     $tmp = explode(",",$request->input($col_array[$i])[1]);
                     $this_in = "";
@@ -36,11 +36,11 @@ class DashboardFPController extENDs Controller
                             $this_in .= ","."'".$tmp[$x]."'";
                         }
                     }
-                    $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    $where .= " AND ".$db_col_name[$i]." in ($this_in) ";
                 }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
-                    $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                    $where .= " AND ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
                 }else if($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
-                    $where .= " and ".$db_col_name[$i]." <> '".$request->input($col_array[$i])[1]."' ";
+                    $where .= " AND ".$db_col_name[$i]." <> '".$request->input($col_array[$i])[1]."' ";
                 }
             }
         }
@@ -370,7 +370,7 @@ class DashboardFPController extENDs Controller
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') and a.kode_fs='FS1' and a.kode_grafik in ('PI03')";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03')";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5,
@@ -474,7 +474,7 @@ class DashboardFPController extENDs Controller
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') and a.kode_fs='FS1' and a.kode_grafik in ('PI04')";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04')";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi,a.nama, ISNULL(b.n1,0) as n1, ISNULL(b.n4,0) as n4, ISNULL(b.n5,0) as n5, 
@@ -486,8 +486,8 @@ class DashboardFPController extENDs Controller
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
                 FROM db_grafik_d a
-                INNER JOIN exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c on a.kode_grafik=c.kode_grafik and a.kode_lokasi=c.kode_lokasi
+                INNER JOIN exs_neraca b on a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN db_grafik_m c on a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
@@ -577,7 +577,7 @@ class DashboardFPController extENDs Controller
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') and a.kode_fs='FS1'";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt,0) AS pdpt, ISNULL(b.beban,0) AS beban, 
@@ -656,7 +656,7 @@ class DashboardFPController extENDs Controller
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') and a.kode_fs='FS1'";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt_ach,0) AS pdpt_ach, ISNULL(b.pdpt_yoy,0) as pdpt_yoy,
@@ -796,6 +796,302 @@ class DashboardFPController extENDs Controller
                 "realisasi" => $data_realisasi,
                 "anggaran" => $data_anggaran
             ];
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    /**
+     * Function ini untuk API detail per lembaga
+     * 
+     */
+    public function getDataPerLembaga(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_grafik');
+            $db_col_name = array('b.periode','a.kode_grafik');
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+
+            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.capai,0) as capai
+            FROM lokasi a
+            LEFT JOIN (
+                SELECT a.kode_lokasi,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+                FROM db_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where
+                GROUP BY a.kode_lokasi
+            ) b ON a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $total = 0;
+            foreach($res as $item) {
+                $total = $total + floatval(abs($item['n4']));
+            }
+
+            $chart = [];
+            $idx = 0;
+            if($total > 0) {
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
+
+                    if($idx == 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'sliced' =>  true,
+                            'selected' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen)
+                        ];
+                    }
+                    array_push($chart, $value);
+                    $idx++;
+                }
+            } else {
+                foreach($res as $item) {
+                    $_persen = 0;
+                    
+                    if($item['kode_lokasi'] == '03') {
+                        $name = "KAPEL";
+                    } elseif($item['kode_lokasi'] == '11') {
+                        $name = "TelU";
+                    } elseif($item['kode_lokasi'] == '12') {
+                        $name = "TS";
+                    } elseif($item['kode_lokasi'] == '13') {
+                        $name = "ITTJ";
+                    } elseif($item['kode_lokasi'] == '14') {
+                        $name = "ITTP";
+                    } elseif($item['kode_lokasi'] == '15') {
+                        $name = "ITTS";
+                    }
+
+                    $value = [
+                        'name' => $name,
+                        'y' => floatval($_persen)
+                    ];
+                    array_push($chart, $value);
+                }
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $chart;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    /**
+     * Function ini untuk API detail kelompok Yoy
+     * 
+     */
+    public function getDataKelompokYoy(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            // $col_array = array('kode_grafik');
+            // $db_col_name = array('a.kode_grafik');
+            if($r->query('kode_grafik')[1] == "PI01") {
+                $kode_grafik = "PI05";
+            } elseif($r->query('kode_grafik')[1] == "PI02") {
+                $kode_grafik = "PI06";
+            } else {
+                $kode_grafik = $r->query('kode_grafik')[1];
+            }
+
+            $where = "WHERE a.kode_lokasi = '20' AND a.kode_grafik = '".$kode_grafik."'";
+
+            $tahun = intval($r->query('periode')[1]);
+            $periode = [];
+            for($i=0;$i<=5;$i++) {
+                if($i == 0) {
+                    array_push($periode, $tahun);
+                } else {
+                    $tahun = $tahun - 100;
+                    array_push($periode, $tahun);
+                }
+            }
+
+            $sql = "SELECT DISTINCT a.kode_neraca,a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.n6,0) AS n6
+            FROM neraca a
+            INNER JOIN (
+                SELECT a.kode_neraca,a.kode_lokasi,
+                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.n4,0) ELSE -ISNULL(b.n4,0) END) AS n1,
+                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.n4,0) ELSE -ISNULL(c.n4,0) END) AS n2,
+                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.n4,0) ELSE -ISNULL(d.n4,0) END) AS n3,
+                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.n4,0) ELSE -ISNULL(e.n4,0) END) AS n4,
+                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.n4,0) ELSE -ISNULL(f.n4,0) END) AS n5,
+                    SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.n4,0) ELSE -ISNULL(g.n4,0) END) AS n6
+                    FROM db_grafik_d a
+                    INNER JOIN db_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
+                    LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs AND b.periode='".$periode[5]."'
+                    LEFT JOIN exs_neraca c ON a.kode_neraca=c.kode_neraca AND a.kode_lokasi=c.kode_lokasi AND a.kode_fs=c.kode_fs AND c.periode='".$periode[4]."'
+                    LEFT JOIN exs_neraca d ON a.kode_neraca=d.kode_neraca AND a.kode_lokasi=d.kode_lokasi AND a.kode_fs=d.kode_fs AND d.periode='".$periode[3]."'
+                    LEFT JOIN exs_neraca e ON a.kode_neraca=e.kode_neraca AND a.kode_lokasi=e.kode_lokasi AND a.kode_fs=e.kode_fs AND e.periode='".$periode[2]."'
+                    LEFT JOIN exs_neraca f ON a.kode_neraca=f.kode_neraca AND a.kode_lokasi=f.kode_lokasi AND a.kode_fs=f.kode_fs AND f.periode='".$periode[1]."'
+                    LEFT JOIN exs_neraca g ON a.kode_neraca=g.kode_neraca AND a.kode_lokasi=g.kode_lokasi AND a.kode_fs=g.kode_fs AND g.periode='".$periode[0]."'
+                    $where
+                GROUP BY a.kode_neraca,a.kode_lokasi
+            )b ON a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='20' AND LEN(a.kode_neraca) = '3'";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            // $color = ['#1D4ED8', '#EC4899', '#EC4899'];
+            $ctg = [];
+            for($i=0;$i<=3;$i++) {
+                array_unshift($ctg, substr($periode[$i], 0, 4));
+            }
+            
+            $series = [];
+            foreach($res as $item) {
+                $data = [];
+                array_unshift($data, intval($item['n1']), intval($item['n4']), intval($item['n5']), intval($item['n6']));
+
+                $_series = [
+                    'name' => $item['nama'],
+                    'data' => $data
+                ];
+
+                array_push($series, $_series);
+            }
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = [
+                'kategori' => $ctg,
+                'series' => $series
+            ];
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    /**
+     * Function ini untuk API detail kelompok Yoy
+     * 
+     */
+    public function getDataKelompokAkun(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            if($r->query('kode_grafik')[1] == "PI01") {
+                $kode_grafik = "PI05";
+            } elseif($r->query('kode_grafik')[1] == "PI02") {
+                $kode_grafik = "PI06";
+            } else {
+                $kode_grafik = $r->query('kode_grafik')[1];
+            }
+
+            $where = "WHERE a.kode_lokasi = '20' AND a.kode_grafik = '".$kode_grafik."' AND a.kode_fs='FS1'";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+
+            $sql = "SELECT a.kode_neraca, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.capai,0) AS capai
+            FROM neraca a
+            INNER JOIN (
+                SELECT a.kode_lokasi,a.kode_neraca,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+                FROM db_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where
+                GROUP BY a.kode_lokasi,a.kode_neraca
+            ) b ON a.kode_lokasi=b.kode_lokasi AND a.kode_neraca=b.kode_neraca 
+            WHERE a.kode_lokasi='20' AND a.kode_fs='FS1'";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $total = 0;
+            foreach($res as $item) {
+                $total = $total + floatval(abs($item['n4']));
+            }
+
+            $idx = 0;
+            $chart = [];
+            if($total > 0) { 
+                foreach($res as $item) { 
+                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $_persen = number_format((float)$persen, 1, '.', '');
+
+                    $data = [
+                        'name' => $item['nama'],
+                        'y' => floatval($_persen),
+                        'z' => intval($item['n4'])
+                    ];
+                    array_push($chart, $data);
+                }
+            } else {
+                foreach($res as $item) { 
+                    $data = [
+                        'name' => $item['nama'],
+                        'y' => 0,
+                        'z' => 0
+                    ];
+                    array_push($chart, $data);
+                }
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $chart;
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
