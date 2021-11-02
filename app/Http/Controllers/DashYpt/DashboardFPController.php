@@ -792,7 +792,7 @@ class DashboardFPController extENDs Controller
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
-                "ketegori" => $ctg,
+                "kategori" => $ctg,
                 "realisasi" => $data_realisasi,
                 "anggaran" => $data_anggaran
             ];
