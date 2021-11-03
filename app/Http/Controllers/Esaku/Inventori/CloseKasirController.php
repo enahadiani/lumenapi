@@ -399,23 +399,6 @@ class CloseKasirController extends Controller
                         ->where('no_bukti', $return2[$i]['no_beli'])
                         ->update(['no_close'=>$id]);   
 
-                        $get = DB::connection($this->sql)->select("select sum(case dc when 'D' then nilai else -nilai end) as sls  
-                        from trans_j where no_bukti ='".$return2[$i]['no_beli']."' and kode_lokasi='$kode_lokasi'
-                        ");
-
-                        if(count($get) > 0){
-                            $sls = $get[0]->sls;
-                        }else{
-                            $sls = 0;
-                        }
-
-                        if($sls < 0){
-                            $dc = "D";
-                        }else{
-                            $dc = "C";
-                        }
-
-                        $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($return2[$i]['no_beli'],$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',$return2[$i]['id_sync']));
                     } 
                 }
 
