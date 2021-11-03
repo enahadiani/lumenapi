@@ -240,7 +240,7 @@ class Pembelian3Controller extends Controller
             'kode_pp' => 'required',
             'total_trans' => 'required',
             'total_diskon' => 'required',
-            'total_ppn' => 'required',
+            // 'total_ppn' => 'required',
             'kode_akun' => 'required|array',
             'kode_barang' => 'required|array',
             'qty_barang' => 'required|array',
@@ -416,9 +416,11 @@ class Pembelian3Controller extends Controller
                 ]);       
             }
 
+            $totDiskon = (floatval($request->total_diskon)*(100/110)) +$diskItem;
+            $totPPN = ($total - $totDiskon)*0.1;
+
             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            // $sqlm = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGBELI','F','-','-','".$request->kode_pp."',getdate(),'".$request->no_faktur."','Pembelian Persediaan','IDR',1,$request->total_trans,$request->total_ppn,$request->total_diskon,'-','-','-','-','-','-','-','".$request->kode_vendor."','".$akunHutang."')");
             DB::connection($this->sql)->insert($insertM, [
                 $id,
                 $kode_lokasi,
@@ -437,8 +439,8 @@ class Pembelian3Controller extends Controller
                 'IDR',
                 1,
                 round(floatval($total),0),
-                round((floatval($request->total_ppn)*(100/110)),0),
-                round((floatval($request->total_diskon)*(100/110)),0),
+                round($totPPN,0),
+                round($totDiskon,0),
                 '-',
                 '-',
                 '-',
@@ -452,7 +454,6 @@ class Pembelian3Controller extends Controller
 			
             $insertB = "insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            // $sqlb = DB::connection($this->sql)->insert("insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) values ('".$id."','".$kode_lokasi."',getdate(), 'Pembelian Persediaan','".$request->kode_vendor."','IDR',1,'".$request->kode_pp."',$request->total_trans,'".$periode."','".$nik."',getdate(),'".$akunHutang."',$request->total_ppn,'-',getdate(),0,$request->total_diskon, 'BELI','$kodeGudang')");
             DB::connection($this->sql)->insert($insertB, [
                $id,
                $kode_lokasi,
@@ -467,23 +468,20 @@ class Pembelian3Controller extends Controller
                $nik,
                date('Y-m-d H:i:s'),
                $akunHutang,
-               round((floatval($request->total_ppn)*(100/110)),0),
+               round($totPPN,0),
                '-',
                date('Y-m-d H:i:s'),
                0,
-               round((floatval($request->total_diskon)*(100/110)),0),
+               round($totDiskon,0),
                'BELI',
                $kodeGudang 
             ]);
                         
-            
-            
-            $totDiskon = (floatval($request->total_diskon)*(100/110)) +$diskItem;
-            if ($request->total_ppn > 0) {
+        
+            if ($totPPN > 0) {
                 $x=$x+1;
                 $insert6 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                // $sql6=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunPPN."','D',".$request->total_ppn.",".$request->total_ppn.",'PPN Masukan','BRGBELI','PPNM','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
                 DB::connection($this->sql)->insert($insert6, [
                     $id,
                     $kode_lokasi,
@@ -495,8 +493,8 @@ class Pembelian3Controller extends Controller
                     $x,
                     $akunPPN,
                     'D',
-                    round((floatval($request->total_ppn)*(100/110)),0),
-                    round((floatval($request->total_ppn)*(100/110)),0),
+                    round($totPPN,0),
+                    round($totPPN,0),
                     'PPN Masukan',
                     'BRGBELI',
                     'PPNM',
@@ -516,10 +514,9 @@ class Pembelian3Controller extends Controller
 
             if ($total > 0) {
                 $x=$x+1;
-                $hut = floatval($total)+(floatval($request->total_ppn)*(100/110))-floatval($totDiskon);
+                $hut = (floatval($total)+floatval($totPPN))-floatval($totDiskon);
                 $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                // $sql7= DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunHutang."','C',".$request->total_trans.",".$request->total_trans.",'Hutang Vendor Pembelian','BRGBELI','BELIDISC','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
                 DB::connection($this->sql)->insert($insert7, [
                     $id,
                     $kode_lokasi,
@@ -554,7 +551,6 @@ class Pembelian3Controller extends Controller
                 $x=$x+1;
                 $insert8 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                // $sql8=  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunDiskon."','C',".$totDiskon.",".$totDiskon.",'Diskon Pembelian','BRGBELI','BELIDISC','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
                 DB::connection($this->sql)->insert($insert8, [
                     $id,
                     $kode_lokasi,
