@@ -44,14 +44,22 @@ class UploadPegawaiController extends Controller
         return $num;
     }
 
-    // public function getKodeLoker($nama, $kode_lokasi) {
-    //     $select = "SELECT kode_loker FROM hr_loker WHERE LOWER(nama) = '".strtolower($nama)."'
-    //     AND kode_lokasi = '".$kode_lokasi."'";
-    //     $res1 = DB::connection($this->db)->select($select);
-    //     $res1 = json_decode(json_encode($res1),true);
+    public function getKodeLoker($nama, $kode_lokasi) {
+        $select = "SELECT kode_loker FROM hr_loker WHERE LOWER(nama) = '".strtolower($nama)."'
+        AND kode_lokasi = '".$kode_lokasi."'";
+        $res1 = DB::connection($this->db)->select($select);
+        $res1 = json_decode(json_encode($res1),true);
         
-    //     return $res1[0]['kode_loker'];
-    // }
+        return $res1[0]['kode_loker'];
+    }
+
+    public function getKodeProfesi($nama, $kode_lokasi) {
+        $select = "SELECT kode_profesi FROM hr_profesi WHERE LOWER(nama) = '".strtolower($nama)."'
+        AND kode_lokasi = '".$kode_lokasi."'";
+        $res1 = DB::connection($this->db)->select($select);
+        $res1 = json_decode(json_encode($res1),true);
+        return $res1[0]['kode_profesi'];
+    }
 
     public function store(Request $request) {
         $this->validate($request, [ 
@@ -103,7 +111,7 @@ class UploadPegawaiController extends Controller
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
-            $success['message'] = "Data Karyawan awal berhasil disimpan";
+            $success['message'] = "Data Karyawan berhasil disimpan";
             return response()->json(['success'=>$success], $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
@@ -162,6 +170,7 @@ class UploadPegawaiController extends Controller
             'nik_user' => 'required'
         ]);
 
+        ini_set('max_execution_time', 600);
         DB::connection($this->db)->beginTransaction();
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -190,40 +199,55 @@ class UploadPegawaiController extends Controller
             foreach($excel as $row){
                 if($row[0] != "") {
                     // tanggal lahir
-                    if($row[8] == "") {
+                    if($row[8] == "" || $row[8] == "-") {
                         $row[8] = date('Y-m-d');
                     } else {
-                        $row[8] = $this->convertDate($row[8]);
+                        $row[8] = $this->convertDateExcel($row[8]);
                     }
 
                     // tanggal nikah
-                    if($row[20] == "") {
+                    if($row[20] == "" || $row[20] == "-") {
                         $row[20] = date('Y-m-d');
                     } else {
-                        $row[20] = $this->convertDate($row[20]);
+                        $row[20] = $this->convertDateExcel($row[20]);
                     }
 
                     // tanggal masuk
-                    if($row[25] == "") {
+                    if($row[25] == "" || $row[25] == "-") {
                         $row[25] = date('Y-m-d');
                     } else {
-                        $row[25] = $this->convertDate($row[25]);
+                        $row[25] = $this->convertDateExcel($row[25]);
                     }
 
                     // tanggal kontrak
-                    if($row[38] == "") {
+                    if($row[38] == "" || $row[38] == "-") {
                         $row[38] = date('Y-m-d');
                     } else {
-                        $row[38] = $this->convertDate($row[38]);
+                        $row[38] = $this->convertDateExcel($row[38]);
                     }
 
                     // tanggal kontrak akhir
-                    if($row[39] == "") {
+                    if($row[39] == "" || $row[39] == "-") {
                         $row[39] = date('Y-m-d');
                     } else {
-                        $row[39] = $this->convertDate($row[39]);
+                        $row[39] = $this->convertDateExcel($row[39]);
                     }
 
+                    // unit
+                    if($row[23] == "HOUSEKEEPING") {
+                        $row[23] = "UT001";
+                    } elseif($row[23] == "MECHANICAL, ELECTRICAL & CIVIL OPERATION") {
+                        $row[23] = "UT002";
+                    } else {
+                        $row[23] = "UT003";
+                    }
+                    
+                    // loker
+                    $row[24] = $this->getKodeLoker($row[24], $kode_lokasi);
+                    
+                    // profesi
+                    $row[29] = $this->getKodeProfesi($row[29], $kode_lokasi);
+                    
                     $sts = 1;
                     $insert = "INSERT INTO hr_karyawan_tmp (
                     nik, no_ktp, nama, jk, kode_agama, no_telp, no_hp, tempat, tgl_lahir, alamat,
@@ -297,7 +321,6 @@ class UploadPegawaiController extends Controller
                     $no++;
                 }
             }
-
             DB::connection($this->db)->commit();
             Storage::disk('local')->delete($nama_file);
             if($status_validate){
