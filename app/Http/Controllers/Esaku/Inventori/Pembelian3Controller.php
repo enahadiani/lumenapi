@@ -80,7 +80,7 @@ class Pembelian3Controller extends Controller
             if(count($get) > 0){
                 $success["totpemb"]=$get[0]['nilai1'];
                 $success["totdisk"]=$get[0]['nilai3'];
-                $success["tottrans"]=$get[0]['nilai1']-$get[0]['nilai3'];
+                $success["tottrans"]=($get[0]['nilai1']+$get[0]['nilai2'])-$get[0]['nilai3'];
                 $success["totppn"]=$get[0]['nilai2'];
                 $success["tgl"] = $get[0]['tanggal'];
             }else{
