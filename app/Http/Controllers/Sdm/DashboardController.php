@@ -587,7 +587,7 @@ class DashboardController extends Controller
             ) b ON a.kode_strata=b.kode_strata AND a.kode_lokasi=b.kode_lokasi
             WHERE a.kode_lokasi = '".$kode_lokasi."' ORDER BY a.nu";
 
-            $lokasi_kerja = "SELECT a.kode_loker, a.nama AS nama_loker, isnull(b.jumlah, 0) AS jumlah
+            $lokasi_kerja = "SELECT TOP 5 a.kode_loker, a.nama AS nama_loker, isnull(b.jumlah, 0) AS jumlah
             FROM hr_loker a
             LEFT JOIN (SELECT kode_loker, kode_lokasi, count(nik) AS jumlah
             FROM hr_karyawan
