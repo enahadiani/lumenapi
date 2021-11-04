@@ -516,9 +516,10 @@ class DashboardController extends Controller
                 $select = "SELECT a.nik, a.nama AS nama_pegawai, '-' AS nama_jabatan, c.nama AS nama_loker, ISNULL(a.client, '-') AS client,
                 ISNULL(a.no_bpjs_kerja, '-') AS no_bpjs_kerja
                 FROM hr_karyawan a
-                -- INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
                 INNER JOIN hr_loker c ON a.kode_loker=c.kode_loker AND a.kode_lokasi=c.kode_lokasi
                 $where";
+                
+                // -- INNER JOIN hr_jab b ON a.jabatan=b.kode_jab AND a.kode_lokasi=b.kode_lokasi
 
                 $res = DB::connection($this->db)->select($select);
                 $res = json_decode(json_encode($res),true);
