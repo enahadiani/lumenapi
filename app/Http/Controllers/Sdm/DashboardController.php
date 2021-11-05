@@ -603,12 +603,19 @@ class DashboardController extends Controller
             // GROUP BY kode_jab, kode_lokasi
             // ) b ON a.kode_jab=b.jabatan AND a.kode_lokasi=b.kode_lokasi
             // WHERE a.kode_lokasi = '".$kode_lokasi."'";
-            $jabatan = "SELECT a.kode_jab, a.nama AS nama_jabatan, isnull(b.jumlah, 0) AS jumlah
-            FROM hr_jab a
-            LEFT JOIN (SELECT jabatan, kode_lokasi, count(nik) AS jumlah
+            // $jabatan = "SELECT a.kode_jab, a.nama AS nama_jabatan, isnull(b.jumlah, 0) AS jumlah
+            // FROM hr_jab a
+            // LEFT JOIN (SELECT jabatan, kode_lokasi, count(nik) AS jumlah
+            // FROM hr_karyawan
+            // GROUP BY jabatan, kode_lokasi
+            // ) b ON a.kode_jab=b.jabatan AND a.kode_lokasi=b.kode_lokasi
+            // WHERE a.kode_lokasi = '".$kode_lokasi."'";
+            $unit = "SELECT a.kode_unit, a.nama AS nama_unit, isnull(b.jumlah, 0) AS jumlah
+            FROM hr_unit a
+            LEFT JOIN (SELECT kode_unit, kode_lokasi, count(nik) AS jumlah
             FROM hr_karyawan
-            GROUP BY jabatan, kode_lokasi
-            ) b ON a.kode_jab=b.jabatan AND a.kode_lokasi=b.kode_lokasi
+            GROUP BY kode_unit, kode_lokasi
+            ) b ON a.kode_unit=b.kode_unit AND a.kode_lokasi=b.kode_lokasi
             WHERE a.kode_lokasi = '".$kode_lokasi."'";
 
             $selectJK = DB::connection($this->db)->select($jumlah_karyawan);
@@ -635,8 +642,8 @@ class DashboardController extends Controller
             $selectLok = DB::connection($this->db)->select($lokasi_kerja);
             $resLok = json_decode(json_encode($selectLok),true);
 
-            $selectJab = DB::connection($this->db)->select($jabatan);
-            $resJab = json_decode(json_encode($selectJab),true);
+            $selectUnit = DB::connection($this->db)->select($unit);
+            $resUnit = json_decode(json_encode($selectUnit),true);
 
             $success['status'] = true;
             $success['message'] = "Success!";
@@ -648,7 +655,7 @@ class DashboardController extends Controller
             $success['tingkat_pendidikan'] = $resPend;
             $success['lokasi_kerja'] = $resLok;
             $success['jumlah_client'] = count($resClient);
-            $success['jabatan'] = $resJab;
+            $success['unit'] = $resUnit;
 
             return response()->json($success, $this->successStatus);     
             
