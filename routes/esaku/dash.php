@@ -57,6 +57,14 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     
     $router->get('sdm-detail-pegawai','Sdm\DashboardDetailPegawaiController@getDataPegawai');
     $router->get('sdm-detail-cv','Sdm\DashboardDetailPegawaiController@getDataPegawaiDetail');
+    
+    $router->get('sdm-detail-bpjs-sehat-komposisi','Sdm\DashboardDetailBPJSController@getKomposisiBPJSSehat');
+    $router->get('sdm-detail-bpjs-kerja-komposisi','Sdm\DashboardDetailBPJSController@getKomposisiBPJSKerja');
+    
+    $router->get('sdm-detail-bpjs-sehat-register','Sdm\DashboardDetailBPJSController@getDataBPJSSehatRegister');
+    $router->get('sdm-detail-bpjs-sehat-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSSehatUnRegister');
+    $router->get('sdm-detail-bpjs-kerja-register','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaRegister');
+    $router->get('sdm-detail-bpjs-kerja-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaUnRegister');
 
 });
 
