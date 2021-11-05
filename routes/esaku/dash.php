@@ -28,20 +28,6 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('penjualan','Esaku\Dashboard\DashboardController@getLapPnj');
     $router->get('vendor','Esaku\Dashboard\DashboardController@getLapVendor');
     $router->get('jurnal','Esaku\Dashboard\DashboardController@getJurnal');
-    
-    $router->get('sdm-dash','Sdm\DashboardController@getDataDashboard');
-    $router->get('sdm-karyawan','Sdm\DashboardController@getDataKaryawan');
-    $router->get('sdm-karyawan-detail','Sdm\DashboardController@getDataKaryawanDetail');
-    $router->get('sdm-client','Sdm\DashboardController@getKomposisiClient');
-    $router->get('sdm-list-client','Sdm\DashboardController@getDataKomposisiClient');
-    $router->get('sdm-bpjs-sehat','Sdm\DashboardController@getDataBPJSKesehatan');
-    $router->get('sdm-bpjs-kerja','Sdm\DashboardController@getDataBPJSTenagaKerja');
-    $router->get('sdm-umur','Sdm\DashboardController@getDataUmur');
-    $router->get('sdm-gaji','Sdm\DashboardController@getDataGaji');
-    $router->get('sdm-searchbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanTerdaftar');
-    $router->get('sdm-searchnonbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanNonTerdaftar');
-    $router->get('sdm-searchbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanTerdaftar');
-    $router->get('sdm-searchnonbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanNonTerdaftar');
 
     $router->get('sdm-box-pegawai','Sdm\DashboardBoxController@getPegawai');
     $router->get('sdm-box-sehat','Sdm\DashboardBoxController@getBPJSSehat');
@@ -65,6 +51,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sdm-detail-bpjs-sehat-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSSehatUnRegister');
     $router->get('sdm-detail-bpjs-kerja-register','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaRegister');
     $router->get('sdm-detail-bpjs-kerja-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaUnRegister');
+
+    $router->get('sdm-detail-client-pie','Sdm\DashboardDetailClientController@getDataClientPie');
+    $router->get('sdm-detail-client-data','Sdm\DashboardDetailClientController@getDataClientData');
 
 });
 
