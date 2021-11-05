@@ -11,7 +11,7 @@ class DashboardDetailClientController extends Controller {
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function getDataClientData(Request $r) {
+    public function getDataClient(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;

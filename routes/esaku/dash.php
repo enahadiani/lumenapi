@@ -53,7 +53,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sdm-detail-bpjs-kerja-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaUnRegister');
 
     $router->get('sdm-detail-client-pie','Sdm\DashboardDetailClientController@getDataClientPie');
-    $router->get('sdm-detail-client-data','Sdm\DashboardDetailClientController@getDataClientData');
+    $router->get('sdm-detail-client-data','Sdm\DashboardDetailClientController@getDataClient');
 
 });
 
