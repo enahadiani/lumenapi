@@ -42,6 +42,19 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sdm-searchnonbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanNonTerdaftar');
     $router->get('sdm-searchbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanTerdaftar');
     $router->get('sdm-searchnonbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanNonTerdaftar');
+
+    $router->get('sdm-box-pegawai','Sdm\DashboardBoxController@getPegawai');
+    $router->get('sdm-box-sehat','Sdm\DashboardBoxController@getBPJSSehat');
+    $router->get('sdm-box-kerja','Sdm\DashboardBoxController@getBPJSKerja');
+    $router->get('sdm-box-client','Sdm\DashboardBoxController@getClient');
+    $router->get('sdm-box-gender','Sdm\DashboardBoxController@getJumlahJenisKelamin');
+    
+    $router->get('sdm-chart-pendidikan','Sdm\DashboardChartController@getPendidikan');
+    $router->get('sdm-chart-unitp','Sdm\DashboardChartController@getUnitPie');
+    $router->get('sdm-chart-unitc','Sdm\DashboardChartController@getUnitCol');
+    $router->get('sdm-chart-umur','Sdm\DashboardChartController@getKelompokUmur');
+    $router->get('sdm-chart-gaji','Sdm\DashboardChartController@getKelompokGaji');
+
 });
 
 
