@@ -23,7 +23,7 @@ class DashboardDetailClientController extends Controller {
             WHERE kode_lokasi = '".$kode_lokasi."'
             GROUP BY client, fungsi, alamat";
 
-            $res = DB::connection($this->db)->select($res);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             
@@ -51,7 +51,7 @@ class DashboardDetailClientController extends Controller {
             WHERE kode_lokasi = '".$kode_lokasi."'
             GROUP BY client";
 
-            $res = DB::connection($this->db)->select($res);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
             $total = 0;
