@@ -116,6 +116,7 @@ class DashboardChartController extends Controller {
             $rs = json_decode(json_encode($rs),true);
 
             $data = [];
+            $ctg = [];
 
             if(count($rs) > 0) {
                 foreach($rs as $dt) {
@@ -125,6 +126,7 @@ class DashboardChartController extends Controller {
                         'kode' => $dt['kode_unit']
                     ];
 
+                    array_unshift($ctg, $dt['nama_unit']);
                     array_unshift($data, $_data);
                 }
             }
@@ -132,7 +134,10 @@ class DashboardChartController extends Controller {
 
             $success['status'] = true;
             $success['message'] = "Success!";
-            $success['data'] = $data;
+            $success['data'] = [
+                'kategori' => $ctg,
+                'data' => $data
+            ];
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
