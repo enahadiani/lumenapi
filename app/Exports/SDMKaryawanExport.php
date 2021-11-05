@@ -42,7 +42,7 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
             '' as bank, '' as cabang, '' as no_rek, '' as nama_rek,  '' as client, 
             '' as fungsi, '' as skill, '' as no_kontrak, '' as tgl_kontrak, '' as tgl_kontrak_akhir, 
             '' as area, '' as kota_area, '' as fm, '' as bm, '' as loker_client, 
-            '' as jabatan_client, '' as atasan_langsung, '' as atasan_t_langsung, '' as kode_jab, '' as kode_strata"));
+            '' as jabatan_client, '' as atasan_langsung, '' as atasan_t_langsung, '' as kode_jab, '' as kode_strata, '' as gaji_pokok"));
         }else{
             
             $res = collect(DB::connection('sqlsrvtarbak')
@@ -50,7 +50,7 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
             alamat, provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah, convert(varchar(10), tgl_nikah, 101) as tgl_nikah,
             kode_gol, kode_sdm, kode_unit, kode_loker, convert(varchar(10), tgl_masuk, 101) as tgl_masuk, npwp, no_bpjs, no_bpjs_kerja, kode_profesi, bank, cabang, 
             no_rek, nama_rek, client, fungsi, skill, no_kontrak, convert(varchar(10), tgl_kontrak, 101) as tgl_kontrak, convert(varchar(10), tgl_kontrak_akhir, 101) as tgl_kontrak_akhir, 
-            area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung, kode_jab, kode_strata
+            area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung, kode_jab, kode_strata, gaji_pokok
             from hr_karyawan_tmp, sts_upload, ket_upload, nu
             where nik_user ='$this->nik_user' 
             order by nu"));
@@ -114,6 +114,7 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
                     'Atasan Tidak Langsung',
                     'Pendidikan Terakhir',
                     'Jabatan',
+                    'Gaji Pokok',
                 ],
                 [
                     '',
@@ -156,6 +157,7 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
                     '',
                     'Format tanggal dd/mm/yyyy',
                     'Format tanggal dd/mm/yyyy',
+                    '',
                     '',
                     '',
                     '',
@@ -221,6 +223,7 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
                     'Atasan Tidak Langsung',
                     'Pendidikan Terakhir',
                     'Jabatan',
+                    'Gaji Pokok',
                     'Status Upload',
                     'Keterangan Upload',
                     'Nomor Urut'
@@ -266,6 +269,7 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
                     '',
                     'Format tanggal dd/mm/yyyy',
                     'Format tanggal dd/mm/yyyy',
+                    '',
                     '',
                     '',
                     '',

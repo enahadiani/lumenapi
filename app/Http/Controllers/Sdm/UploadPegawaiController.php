@@ -254,14 +254,14 @@ class UploadPegawaiController extends Controller
                     provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah,
                     tgl_nikah, kode_gol, kode_sdm, kode_unit, kode_loker, tgl_masuk, npwp, no_bpjs, no_bpjs_kerja, kode_profesi, 
                     bank, cabang, no_rek, nama_rek, client, fungsi, skill, no_kontrak, tgl_kontrak, tgl_kontrak_akhir, 
-                    area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung, kode_jab, kode_strata
+                    area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung, kode_jab, kode_strata, gaji_pokok
                     kode_lokasi, nik_user, nu, sts_upload, ket_upload) 
                     VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     ?, ?, ?, ?, ?)";
                     DB::connection($this->db)->insert($insert, [
                         $row[0],
@@ -314,6 +314,7 @@ class UploadPegawaiController extends Controller
                         $row[47],
                         $row[48],
                         $row[49],
+                        $this->joinNum($row[50]),
                         $kode_lokasi,
                         $request->input('nik_user'),
                         $no,
