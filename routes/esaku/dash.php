@@ -56,6 +56,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('sdm-chart-gaji','Sdm\DashboardChartController@getKelompokGaji');
     
     $router->get('sdm-detail-pegawai','Sdm\DashboardDetailPegawaiController@getDataPegawai');
+    $router->get('sdm-detail-cv','Sdm\DashboardDetailPegawaiController@getDataPegawaiDetail');
 
 });
 
