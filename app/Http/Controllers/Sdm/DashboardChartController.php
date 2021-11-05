@@ -11,7 +11,7 @@ class DashboardChartController extends Controller {
     public $guard = 'toko';
     public $db = 'tokoaws';
 
-    public function getGaji(Request $r) { 
+    public function getKelompokGaji(Request $r) { 
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
