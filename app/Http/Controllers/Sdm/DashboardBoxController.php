@@ -62,7 +62,7 @@ class DashboardBoxController extends Controller {
 
             $success['status'] = true;
             $success['message'] = "Success!";
-            $success['data'] = intval($rs[0]['jumlah']);
+            $success['data'] = $rs;
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
