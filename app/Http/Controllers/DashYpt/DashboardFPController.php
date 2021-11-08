@@ -23,9 +23,9 @@ class DashboardFPController extends Controller
             if(ISSET($request->input($col_array[$i])[0])){
                 if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                     $where .= " AND (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
-                }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                     $where .= " AND ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
-                }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                     $tmp = explode(",",$request->input($col_array[$i])[1]);
                     $this_in = "";
                     for($x=0;$x<count($tmp);$x++){
@@ -37,9 +37,9 @@ class DashboardFPController extends Controller
                         }
                     }
                     $where .= " AND ".$db_col_name[$i]." in ($this_in) ";
-                }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
                     $where .= " AND ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
-                }else if($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
                     $where .= " AND ".$db_col_name[$i]." <> '".$request->input($col_array[$i])[1]."' ";
                 }
             }
