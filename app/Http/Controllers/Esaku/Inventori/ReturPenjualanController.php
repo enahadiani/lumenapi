@@ -210,7 +210,7 @@ class ReturPenjualanController extends Controller
                 inner join brg_trans_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and c.no_ref=b.no_bukti
                 where a.no_bukti=? and a.kode_lokasi=?  and c.no_ref1= ?",array($id,$kode_lokasi,$request->no_bukti));
                 	
-                // $exec = DB::connection($this->sql)->update("exec sp_brg_batalbeli ?, ?, ?, ?, ? ",array($id, $request->no_bukti, $periode, $kode_lokasi, $nik));
+                $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
                 
                 $success["no_bukti"] =$id;
                 $success["message"] = "Data Retur Penjualan berhasil disimpan";
