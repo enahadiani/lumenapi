@@ -468,8 +468,8 @@ class LaporanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $col_array = array('periode','kode_gudang','kode_klp','kode_barang');
-            $db_col_name = array('substring(convert(varchar(10),a.tgl_input,112),1,6)','c.kode_gudang','b.kode_klp', 'a.kode_barang');
+            $col_array = array('kode_gudang','kode_klp','kode_barang');
+            $db_col_name = array('c.kode_gudang','b.kode_klp', 'a.kode_barang');
             $where = "where a.kode_lokasi='$kode_lokasi'";
 
             for($i = 0; $i<count($col_array); $i++){
@@ -503,6 +503,7 @@ class LaporanController extends Controller
             // $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
             DB::connection($this->sql)->update($sql1);
             // DB::connection($this->sql)->update($sql2);
+            $success['exec'] = $sql1;
 
             // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
             //     b.nama as nama_barang,c.nama as nama_gudang
@@ -580,7 +581,6 @@ class LaporanController extends Controller
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
-                $success['sql'] = $sql4;
                 $success['status'] = true;
                 return response()->json($success, $this->successStatus);
             }
