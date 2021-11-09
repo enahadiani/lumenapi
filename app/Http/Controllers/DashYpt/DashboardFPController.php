@@ -215,10 +215,19 @@ class DashboardFPController extends Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             } elseif($total < 0) {
@@ -240,10 +249,19 @@ class DashboardFPController extends Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             } else {
@@ -266,7 +284,8 @@ class DashboardFPController extends Controller
 
                     $value = [
                         'name' => $name,
-                        'y' => floatval($_persen)
+                        'y' => floatval($_persen),
+                        'negative' => false
                     ];
                     array_push($chart, $value);
                 }
@@ -344,10 +363,19 @@ class DashboardFPController extends Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             } elseif($total < 0) {
@@ -369,11 +397,19 @@ class DashboardFPController extends Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
-                    array_push($chart, $value);
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false
+                        ];
+                    }
                 }
             } else {
                 foreach($res as $item) {
@@ -395,7 +431,8 @@ class DashboardFPController extends Controller
 
                     $value = [
                         'name' => $name,
-                        'y' => floatval($_persen)
+                        'y' => floatval($_persen),
+                        'negative' => false
                     ];
                     array_push($chart, $value);
                 }
@@ -473,10 +510,19 @@ class DashboardFPController extends Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             } elseif($total < 0) {
@@ -498,10 +544,19 @@ class DashboardFPController extends Controller
                         $name = "ITTS";
                     }
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true
+                        ];
+                    } else {
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             } else {
@@ -524,7 +579,8 @@ class DashboardFPController extends Controller
 
                     $value = [
                         'name' => $name,
-                        'y' => floatval($_persen)
+                        'y' => floatval($_persen),
+                        'negative' => false
                     ];
                     array_push($chart, $value);
                 }
