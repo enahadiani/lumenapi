@@ -499,8 +499,8 @@ class LaporanController extends Controller
                 $periode = date('Ym');
             }
 
-            $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
-            // $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
+            // $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
+            $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
             DB::connection($this->sql)->update($sql1);
             // DB::connection($this->sql)->update($sql2);
             $success['exec'] = $sql1;
@@ -633,8 +633,8 @@ class LaporanController extends Controller
                  $periode = date('Ym');
              }
  
-             $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
-             // $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
+            //  $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
+             $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
              DB::connection($this->sql)->update($sql1);
              // DB::connection($this->sql)->update($sql2);
              $success['exec'] = $sql1;
