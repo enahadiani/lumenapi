@@ -28,20 +28,33 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('penjualan','Esaku\Dashboard\DashboardController@getLapPnj');
     $router->get('vendor','Esaku\Dashboard\DashboardController@getLapVendor');
     $router->get('jurnal','Esaku\Dashboard\DashboardController@getJurnal');
+
+    $router->get('sdm-box-pegawai','Sdm\DashboardBoxController@getPegawai');
+    $router->get('sdm-box-sehat','Sdm\DashboardBoxController@getBPJSSehat');
+    $router->get('sdm-box-kerja','Sdm\DashboardBoxController@getBPJSKerja');
+    $router->get('sdm-box-client','Sdm\DashboardBoxController@getClient');
+    $router->get('sdm-box-gender','Sdm\DashboardBoxController@getJumlahJenisKelamin');
     
-    $router->get('sdm-dash','Sdm\DashboardController@getDataDashboard');
-    $router->get('sdm-karyawan','Sdm\DashboardController@getDataKaryawan');
-    $router->get('sdm-karyawan-detail','Sdm\DashboardController@getDataKaryawanDetail');
-    $router->get('sdm-client','Sdm\DashboardController@getKomposisiClient');
-    $router->get('sdm-list-client','Sdm\DashboardController@getDataKomposisiClient');
-    $router->get('sdm-bpjs-sehat','Sdm\DashboardController@getDataBPJSKesehatan');
-    $router->get('sdm-bpjs-kerja','Sdm\DashboardController@getDataBPJSTenagaKerja');
-    $router->get('sdm-umur','Sdm\DashboardController@getDataUmur');
-    $router->get('sdm-gaji','Sdm\DashboardController@getDataGaji');
-    $router->get('sdm-searchbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanTerdaftar');
-    $router->get('sdm-searchnonbpjs-sehat','Sdm\DashboardController@getListBPJSKesehatanNonTerdaftar');
-    $router->get('sdm-searchbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanTerdaftar');
-    $router->get('sdm-searchnonbpjs-kerja','Sdm\DashboardController@getListBPJSKetenagaanNonTerdaftar');
+    $router->get('sdm-chart-pendidikan','Sdm\DashboardChartController@getPendidikan');
+    $router->get('sdm-chart-unitp','Sdm\DashboardChartController@getUnitPie');
+    $router->get('sdm-chart-unitc','Sdm\DashboardChartController@getUnitCol');
+    $router->get('sdm-chart-umur','Sdm\DashboardChartController@getKelompokUmur');
+    $router->get('sdm-chart-gaji','Sdm\DashboardChartController@getKelompokGaji');
+    
+    $router->get('sdm-detail-pegawai','Sdm\DashboardDetailPegawaiController@getDataPegawai');
+    $router->get('sdm-detail-cv','Sdm\DashboardDetailPegawaiController@getDataPegawaiDetail');
+    
+    $router->get('sdm-detail-bpjs-sehat-komposisi','Sdm\DashboardDetailBPJSController@getKomposisiBPJSSehat');
+    $router->get('sdm-detail-bpjs-kerja-komposisi','Sdm\DashboardDetailBPJSController@getKomposisiBPJSKerja');
+    
+    $router->get('sdm-detail-bpjs-sehat-register','Sdm\DashboardDetailBPJSController@getDataBPJSSehatRegister');
+    $router->get('sdm-detail-bpjs-sehat-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSSehatUnRegister');
+    $router->get('sdm-detail-bpjs-kerja-register','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaRegister');
+    $router->get('sdm-detail-bpjs-kerja-unregister','Sdm\DashboardDetailBPJSController@getDataBPJSKerjaUnRegister');
+
+    $router->get('sdm-detail-client-pie','Sdm\DashboardDetailClientController@getDataClientPie');
+    $router->get('sdm-detail-client-data','Sdm\DashboardDetailClientController@getDataClient');
+
 });
 
 

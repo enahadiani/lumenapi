@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class DashboardFPController extENDs Controller
+class DashboardFPController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,9 +23,9 @@ class DashboardFPController extENDs Controller
             if(ISSET($request->input($col_array[$i])[0])){
                 if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
                     $where .= " AND (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
-                }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
                     $where .= " AND ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
-                }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
                     $tmp = explode(",",$request->input($col_array[$i])[1]);
                     $this_in = "";
                     for($x=0;$x<count($tmp);$x++){
@@ -37,9 +37,9 @@ class DashboardFPController extENDs Controller
                         }
                     }
                     $where .= " AND ".$db_col_name[$i]." in ($this_in) ";
-                }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
                     $where .= " AND ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
-                }else if($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
+                }elseif($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
                     $where .= " AND ".$db_col_name[$i]." <> '".$request->input($col_array[$i])[1]."' ";
                 }
             }
@@ -67,6 +67,7 @@ class DashboardFPController extENDs Controller
 
             $sql = "SELECT a.kode_grafik, c.nama,
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n1,
+            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n2 ELSE b.n2 END AS n2,
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n4,
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
             CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
@@ -90,6 +91,7 @@ class DashboardFPController extENDs Controller
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
                         "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
                         "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
@@ -101,6 +103,7 @@ class DashboardFPController extENDs Controller
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
                         "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
                         "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
@@ -112,6 +115,7 @@ class DashboardFPController extENDs Controller
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
                         "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
                         "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
@@ -123,6 +127,7 @@ class DashboardFPController extENDs Controller
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
                         "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
                         "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),

@@ -30,6 +30,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-fp-detail-kelompok','DashYpt\DashboardFPController@getDataKelompokYoy');  
     $router->get('data-fp-detail-akun','DashYpt\DashboardFPController@getDataKelompokAkun');  
 
+    $router->get('data-ccr-box','DashYpt\DashboardCCRController@getDataBox');  
+    
+    $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
+    $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');  
+
+
 });
 
 
