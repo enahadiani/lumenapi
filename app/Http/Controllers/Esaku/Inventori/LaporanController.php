@@ -501,8 +501,8 @@ class LaporanController extends Controller
 
             // $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
             $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
-            DB::connection($this->sql)->update($sql1);
-            // DB::connection($this->sql)->update($sql2);
+            // DB::connection($this->sql)->update($sql1);
+            DB::connection($this->sql)->update($sql2);
             $success['exec'] = $sql1;
 
             // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
@@ -635,8 +635,8 @@ class LaporanController extends Controller
  
             //  $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
              $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
-             DB::connection($this->sql)->update($sql1);
-             // DB::connection($this->sql)->update($sql2);
+            //  DB::connection($this->sql)->update($sql1);
+             DB::connection($this->sql)->update($sql2);
              $success['exec'] = $sql1;
  
              // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
