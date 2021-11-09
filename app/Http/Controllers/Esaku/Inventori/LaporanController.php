@@ -521,7 +521,7 @@ class LaporanController extends Controller
             //     inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang
             //     $where
             //     order by a.kode_barang,a.kode_gudang";
-            $sql3 = "select a.kode_barang,b.nama,a.stok,a.kode_gudang,c.nama as nama_gudang,b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total
+            $sql3 = "select a.kode_barang,b.nama as nama_barang,a.stok,a.kode_gudang,c.nama as nama_gudang,b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total
             from brg_stok a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
@@ -548,7 +548,7 @@ class LaporanController extends Controller
                 $i++;
             }
 
-            $sql4="select distinct * from (select convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+            $sql4="select distinct * from (select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
                 case when a.dc='D' then a.jumlah else 0 end as debet,	      
                 case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
                 from brg_trans_d a
@@ -556,7 +556,7 @@ class LaporanController extends Controller
                 inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
                 union all
-                select convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+                select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
                 case when a.dc='D' then a.jumlah else 0 end as debet,	      
                 case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
                 from brg_trans_d a
