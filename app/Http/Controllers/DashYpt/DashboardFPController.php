@@ -452,7 +452,6 @@ class DashboardFPController extends Controller
             foreach($res as $item) {
                 $total = $total + floatval($item['n4']);
             }
-            var_dump($total);
 
             $chart = [];
             if($total > 0) {
