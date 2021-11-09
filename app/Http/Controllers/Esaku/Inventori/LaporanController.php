@@ -499,10 +499,10 @@ class LaporanController extends Controller
                 $periode = date('Ym');
             }
 
-            $sql1 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
-            $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
+            $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
+            // $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
             DB::connection($this->sql)->update($sql1);
-            DB::connection($this->sql)->update($sql2);
+            // DB::connection($this->sql)->update($sql2);
 
             // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
             //     b.nama as nama_barang,c.nama as nama_gudang
@@ -512,14 +512,21 @@ class LaporanController extends Controller
             //     inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang and a.nik_user=d.nik_user
             //     $where
             //     order by a.kode_barang,a.kode_gudang";
-            $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
-                b.nama as nama_barang,c.nama as nama_gudang
-                from brg_stok a
-                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
-                inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi 
-                inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang
-                $where
-                order by a.kode_barang,a.kode_gudang";
+            // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
+            //     b.nama as nama_barang,c.nama as nama_gudang
+            //     from brg_stok a
+            //     inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+            //     inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi 
+            //     inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang
+            //     $where
+            //     order by a.kode_barang,a.kode_gudang";
+            $sql3 = "select a.kode_barang,b.nama,a.stok,a.kode_gudang,c.nama as nama_gudang,b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total
+            from brg_stok a
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
+            left join brg_hpp d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.nik_user=d.nik_user
+            $where and a.nik_user='$nik_user'
+            order by b.kode_klp,a.kode_barang";
            
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs),true);  
@@ -580,6 +587,8 @@ class LaporanController extends Controller
 
        } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
        }
