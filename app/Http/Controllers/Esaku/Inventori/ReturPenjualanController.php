@@ -206,8 +206,9 @@ class ReturPenjualanController extends Controller
                 $ins3 = DB::connection($this->sql)->insert("
                 update a set a.hpp=b.hpp, a.no_belicurr=b.no_belicurr 
                 from brg_trans_d a 
-                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
-                where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
+                inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
+                inner join brg_trans_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and c.no_ref=b.no_bukti
+                where a.no_bukti=? and a.kode_lokasi=?  and c.no_ref1= ?",array($id,$kode_lokasi,$request->no_bukti));
                 	
                 // $exec = DB::connection($this->sql)->update("exec sp_brg_batalbeli ?, ?, ?, ?, ? ",array($id, $request->no_bukti, $periode, $kode_lokasi, $nik));
                 
