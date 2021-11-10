@@ -7348,7 +7348,7 @@ class DashboardController extends Controller
             select a.kode_grafik,x.nama,
             isnull(sum(case when b.jenis_akun='Pendapatan' then -b.n2 else b.n2 end),0) as rka1, 
             isnull(sum(case when b.jenis_akun='Pendapatan' then -b.n4 else b.n4 end),0) as real1,
-            isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n2 else c.n2 end),0) as rka2, 
+            isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n13 else c.n2 end),0) as rka2, 
             isnull(sum(case when b.jenis_akun='Pendapatan' then -c.n4 else c.n4 end),0) as real2,
             isnull(sum(case when b.jenis_akun='Pendapatan' then -d.n2 else d.n2 end),0) as rka3, 
             isnull(sum(case when b.jenis_akun='Pendapatan' then -d.n4 else d.n4 end),0) as real3,
