@@ -18,9 +18,13 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     $router->get('data-fp-box','DashYpt\DashboardFPController@getDataBoxFirst');  
+    $router->get('v2/data-fp-box','DashYpt\DashboardFPV2Controller@getDataBoxFirst');  
     $router->get('data-fp-pdpt','DashYpt\DashboardFPController@getDataBoxPdpt');  
+    $router->get('v2/data-fp-pdpt','DashYpt\DashboardFPV2Controller@getDataPdpt');  
     $router->get('data-fp-beban','DashYpt\DashboardFPController@getDataBoxBeban');  
+    $router->get('v2/data-fp-beban','DashYpt\DashboardFPV2Controller@getDataBeban');  
     $router->get('data-fp-shu','DashYpt\DashboardFPController@getDataBoxShu');  
+    $router->get('v2/data-fp-shu','DashYpt\DashboardFPV2Controller@getDataSHU');  
     $router->get('data-fp-or','DashYpt\DashboardFPController@getDataBoxOr'); 
     $router->get('data-fp-lr','DashYpt\DashboardFPController@getDataBoxLabaRugi'); 
     $router->get('data-fp-pl','DashYpt\DashboardFPController@getDataBoxPerformLembaga'); 
