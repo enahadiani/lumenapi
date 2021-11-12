@@ -26,6 +26,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-fp-shu','DashYpt\DashboardFPController@getDataBoxShu');  
     $router->get('v2/data-fp-shu','DashYpt\DashboardFPV2Controller@getDataSHU');  
     $router->get('data-fp-or','DashYpt\DashboardFPController@getDataBoxOr'); 
+    $router->get('v2/data-fp-or','DashYpt\DashboardFPV2Controller@getDataOR');  
     $router->get('data-fp-lr','DashYpt\DashboardFPController@getDataBoxLabaRugi'); 
     $router->get('data-fp-pl','DashYpt\DashboardFPController@getDataBoxPerformLembaga'); 
 

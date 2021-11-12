@@ -206,8 +206,8 @@ class DashboardFPV2Controller extends Controller {
                 }
 
                 array_push($ctg, $name);
-                array_push($anggaran, floatval($item['n2']));
-                array_push($realisasi, floatval($item['n4']));
+                array_push($anggaran, floatval(number_format((float)$item['n2'], 1, '.', '')));
+                array_push($realisasi, floatval(number_format((float)$item['n4'], 1, '.', '')));
             }
 
             $success['status'] = true;
