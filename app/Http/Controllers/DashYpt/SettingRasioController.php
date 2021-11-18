@@ -290,7 +290,10 @@ class SettingRasioController extends Controller
             if(isset($request->kode_neraca) && $request->kode_neraca != ""){
                 $filter .= " and a.kode_neraca = '$request->kode_neraca' ";
             }
-            $res = DB::connection($this->db)->select("select a.kode_neraca,a.nama from neraca a where a.kode_lokasi='$kode_lokasi' $filter ");						
+            $res = DB::connection($this->db)->select(" select a.kode_neraca,a.nama from neraca a where a.kode_lokasi='$kode_lokasi' $filter
+            union all
+            select a.kode_dash as kode_neraca,a.nama from dash_ypt_neraca a where a.kode_lokasi='$kode_lokasi' $filter
+             ");						
             $res= json_decode(json_encode($res),true);
             
            
@@ -326,7 +329,7 @@ class SettingRasioController extends Controller
             if(isset($request->kode_klp) && $request->kode_klp != ""){
                 $filter .= " and a.kode_klp = '$request->kode_klp' ";
             }
-            $res = DB::connection($this->db)->select("select a.kode_klp,a.nama from dash_ypt_klp a where a.kode_lokasi='$kode_lokasi' $filter ");						
+            $res = DB::connection($this->db)->select("select a.kode_klp,a.nama from dash_ypt_rasio_klp a where a.kode_lokasi='$kode_lokasi' $filter ");						
             $res= json_decode(json_encode($res),true);
             
            
