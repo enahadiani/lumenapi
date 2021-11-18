@@ -241,7 +241,7 @@ class SettingRasioController extends Controller
             $kode_rasio= $request->kode_rasio;
             $res = DB::connection($this->db)->select("select a.kode_rasio,a.nama,a.klp_rasio,a.keterangan,a.rumus,a.kode_fs, a.tgl_input,b.nama as nama_klp,c.nama as nama_fs 
             from dash_ypt_rasio_m a 
-            left join dash_klp b on a.klp_rasio=b.kode_klp and a.kode_lokasi=b.kode_lokasi
+            left join dash_ypt_rasio_klp b on a.klp_rasio=b.kode_klp and a.kode_lokasi=b.kode_lokasi
             left join fs c on a.kode_fs=c.kode_fs and a.kode_lokasi=c.kode_lokasi
             where a.kode_rasio = '".$kode_rasio."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
