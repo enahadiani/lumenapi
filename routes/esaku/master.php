@@ -375,6 +375,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-klien', 'Sdm\KlienController@store');
     $router->put('sdm-klien', 'Sdm\KlienController@update');
     $router->delete('sdm-klien', 'Sdm\KlienController@destroy');
+
+    // Master Data Gaji Param
+    $router->get('sdm-gaji-param', 'Sdm\GajiParamController@index');
+    $router->get('show-gaji-param', 'Sdm\GajiParamController@show');
+    $router->post('sdm-gaji-param', 'Sdm\GajiParamController@store');
+    $router->put('sdm-gaji-param', 'Sdm\GajiParamController@update');
+    $router->delete('sdm-gaji-param', 'Sdm\GajiParamController@destroy');
     /*-------------------------------------------------------------------------
        END MODUL SDM
     --------------------------------------------------------------------------*/

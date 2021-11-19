@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class KlienController extends Controller
+class GajiParamController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class KlienController extends Controller
     public function isUnik($isi, $kode_lokasi)
     {
 
-        $auth = DB::connection($this->db)->select("SELECT kode_client FROM hr_client WHERE kode_client ='" . $isi . "'");
+        $auth = DB::connection($this->db)->select("SELECT kode_param FROM hr_gaji_param WHERE kode_param ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
         $auth = json_decode(json_encode($auth), true);
         if (count($auth) > 0) {
             return false;
@@ -39,7 +39,7 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_client,nama_client as nama, flag_aktif as is_active   FROM hr_client";
+            $sql = "SELECT kode_param,kode_lokasi,nama  FROM hr_gaji_param WHERE kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -67,7 +67,7 @@ class KlienController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'kode_client' => 'required'
+            'kode_param' => 'required'
         ]);
 
         try {
@@ -76,7 +76,7 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_client, nama_client as nama, flag_aktif as is_active FROM hr_client WHERE kode_client = '" . $request->kode_client . "' ";
+            $sql = "SELECT kode_param, nama, kode_lokasi FROM hr_gaji_param WHERE kode_param = '" . $request->kode_param . "' AND kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -110,9 +110,8 @@ class KlienController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_client' => 'required',
-            'nama_client' => 'required',
-            'flag_aktif' => 'required'
+            'kode_param' => 'required',
+            'nama' => 'required',
         ]);
 
         try {
@@ -120,28 +119,28 @@ class KlienController extends Controller
                 $nik = $data->nik;
                 $kode_lokasi = $data->kode_lokasi;
             }
-            if ($this->isUnik($request->input('kode_client'), $kode_lokasi)) {
-                $insert = "INSERT INTO hr_client(kode_client, nama_client, flag_aktif)
+            if ($this->isUnik($request->input('kode_param'), $kode_lokasi)) {
+                $insert = "INSERT INTO hr_gaji_param(kode_param, nama, kode_lokasi)
                 VALUES (?, ?, ?)";
 
                 DB::connection($this->db)->insert($insert, [
-                    $request->input('kode_client'),
-                    $request->input('nama_client'),
-                    $request->input('flag_aktif')
+                    $request->input('kode_param'),
+                    $request->input('nama'),
+                    $kode_lokasi
                 ]);
 
                 $success['status'] = true;
-                $success['message'] = "Data klien berhasil disimpan";
+                $success['message'] = "Data parameter gaji karyawan berhasil disimpan";
             } else {
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode client sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode param karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_client;
+            $success['kode'] = $request->kode_param;
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data klien gagal disimpan " . $e;
+            $success['message'] = "Data parameter gaji karyawan gagal disimpan " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -156,9 +155,8 @@ class KlienController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_client' => 'required',
-            'nama_client' => 'required',
-            'flag_aktif' => 'required'
+            'kode_param' => 'required',
+            'nama' => 'required'
         ]);
 
         try {
@@ -167,18 +165,19 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_client SET nama_client = '" . $request->input('nama_client') . "', flag_aktif = '" . $request->input("flag_aktif") . "'
-            WHERE kode_client = '" . $request->input('kode_client') . "'";
+            $update = "UPDATE hr_gaji_param SET nama = '" . $request->input('nama') . "'
+            WHERE kode_param = '" . $request->input('kode_param') . "'
+            AND kode_lokasi = '" . $kode_lokasi . "'";
 
             DB::connection($this->db)->update($update);
 
             $success['status'] = true;
-            $success['message'] = "Data klien berhasil diubah";
-            $success['kode'] = $request->kode_client;
+            $success['message'] = "Data parameter gaji karyawan berhasil diubah";
+            $success['kode'] = $request->kode_param;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data klien gagal diubah " . $e;
+            $success['message'] = "Data parameter gaji karyawan gagal diubah " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -192,7 +191,7 @@ class KlienController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_client' => 'required'
+            'kode_param' => 'required'
         ]);
 
         try {
@@ -201,17 +200,18 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            DB::connection($this->db)->table('hr_client')
-                ->where('kode_client', $request->kode_client)
+            DB::connection($this->db)->table('hr_gaji_param')
+                ->where('kode_param', $request->kode_param)
+                ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
             $success['status'] = true;
-            $success['message'] = "Data klien berhasil dihapus";
+            $success['message'] = "Data parameter karyawan berhasil dihapus";
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data klien gagal dihapus " . $e;
+            $success['message'] = "Data parameter karyawan gagal dihapus " . $e;
 
             return response()->json($success, $this->successStatus);
         }
