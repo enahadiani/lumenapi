@@ -191,7 +191,7 @@ class BmController extends Controller
                 $success['message'] = "Data BM karyawan berhasil disimpan";
             } else {
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode bm karyawan sudah ada di database!";
+                $success['message'] = "Kode yang dimasukan sudah digunakan, gunakan kode lainnya.!";
             }
             $success['kode'] = $request->kode_bm;
 

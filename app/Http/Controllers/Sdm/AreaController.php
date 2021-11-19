@@ -134,7 +134,7 @@ class AreaController extends Controller
                 $success['message'] = "Data Area karyawan berhasil disimpan";
             } else {
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode area karyawan sudah ada di database!";
+                $success['message'] = "Kode yang dimasukan sudah digunakan, gunakan kode lainnya.!";
             }
             $success['kode'] = $request->kode_area;
 

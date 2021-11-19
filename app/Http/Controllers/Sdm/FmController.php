@@ -186,7 +186,7 @@ class FmController extends Controller
                 $success['message'] = "Data FM karyawan berhasil disimpan";
             } else {
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode fm karyawan sudah ada di database!";
+                $success['message'] = "Kode yang dimasukan sudah digunakan, gunakan kode lainnya.!";
             }
             $success['kode'] = $request->kode_fm;
 

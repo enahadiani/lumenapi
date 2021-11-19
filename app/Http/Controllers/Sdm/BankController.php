@@ -134,7 +134,7 @@ class BankController extends Controller
                 $success['message'] = "Data Bank  berhasil disimpan";
             } else {
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode bank  sudah ada di database!";
+                $success['message'] = "Kode yang dimasukan sudah digunakan, gunakan kode lainnya.!";
             }
             $success['kode'] = $request->kode_bank;
 
