@@ -293,6 +293,14 @@ class PembelianController extends Controller
                 $akunHutang = $res[0]->akun_hutang;									
             }	
 
+            $spro3 = DB::connection($this->sql)->select(" select kode_spro,flag  from spro where kode_lokasi='$kode_lokasi' and kode_spro='CUSTINV'");
+            $spro3 = json_decode(json_encode($spro3),true);
+            if(count($spro3)>0){
+                $akunpiu=$spro3[0]["flag"];
+            }else{
+                $akunpiu = "-";
+            }
+
             $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
             $rsg = DB::connection($this->sql)->select($sqlg);
             if(count($rsg) > 0){
@@ -607,6 +615,25 @@ class PembelianController extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
             }	
+
+            
+            $get = DB::connection($this->sql)->select("select sum(case dc when 'D' then nilai else -nilai end) as sls  
+            from trans_j where no_bukti ='".$id."' and kode_lokasi='$kode_lokasi'
+            ");
+            
+            if(count($get) > 0){
+                $sls = $get[0]->sls;
+            }else{
+                $sls = 0;
+            }
+            
+            if($sls < 0){
+                $dc = "D";
+            }else{
+                $dc = "C";
+            }
+            
+            $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
 
             $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));

@@ -300,8 +300,6 @@ class CloseKasirController extends Controller
                         ->update(['no_close'=>$id]);   
                         
                     } 
-                    
-                    $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));
 
                     // $get2=DB::connection($this->sql)->select("select c.akun_pdpt,'akun_ppn', round ((sum(a.total)*100/110)*10/100,0) as nilai_ppn from brg_trans_d a 
                     // inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
@@ -385,7 +383,7 @@ class CloseKasirController extends Controller
                 
                 if(isset($request->no_beli) && count($request->no_beli) > 0){
 
-                    $sql = "select no_beli from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' ";
+                    $sql = "select no_beli,id_sync,akun_hutang from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' ";
                     $return2 = DB::connection($this->sql)->select($sql);
                     $return2 = json_decode(json_encode($return2),true);
     
@@ -400,9 +398,12 @@ class CloseKasirController extends Controller
                         ->where('kode_lokasi', $kode_lokasi)
                         ->where('no_bukti', $return2[$i]['no_beli'])
                         ->update(['no_close'=>$id]);   
-                        
+
                     } 
                 }
+
+                set_time_limit(300);
+                $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));
 
                 $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
     

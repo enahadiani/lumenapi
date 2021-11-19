@@ -499,6 +499,226 @@ class SppdController extends Controller
         }
     }
 
+    public function keepBudget21(Request $request){
+        $this->validate($request,[
+            'PBYR' =>'required|array',
+            'PBYR.*.keterangan' =>'max:200',
+            'PBYR.*.tanggal' =>'date_format:Y-m-d H:i:s',
+            'PBYR.*.jenis' =>'max:100',
+            'PBYR.*.lama' =>'max:100',
+            'PBYR.*.kota' =>'max:100',
+            'PBYR.*.sarana' =>'max:100',
+            'PBYR.*.catatan' =>'max:200',
+            'PBYR.*.nik_buat' =>'max:10',
+            'PBYR.*.nik_app' =>'max:10',
+            'PBYR.*.jenis_trans' =>'max:10',
+            'PBYR.*.kode_pp' =>'max:10',
+            'PBYR.*.kode_akun' =>'max:20',
+            'PBYR.*.kode_drk' =>'max:30',
+            'PBYR.*.periode' =>'max:6',
+            'AJU' =>'required|array',
+            'AJU.*.no_spj_igracias' => 'required', 
+            'AJU.*.nip' =>'max:20',
+            'AJU.*.nama_perjalanan' =>'max:200',
+            'AJU.*.pp_code' =>'max:10',
+            'REK' => 'array',
+            'REK.*.nama' => 'max:50',
+            'REK.*.no_rekening' => 'max:50',
+            'REK.*.bank' =>'max:100'
+        ]);
+        if($data =  Auth::guard('ypt')->user()){
+            $nik= $data->nik;
+            $kode_lokasi= $data->kode_lokasi;
+        }
+        
+        $datam= $request->input("PBYR");
+        Log::info($request->all());
+        DB::connection('sqlsrvypt')->beginTransaction();
+        try {
+            $tglperiode = substr($datam[0]['tanggal'],0,4).''.substr($datam[0]['tanggal'],5,2);
+            $periodecek = $datam[0]['periode'];
+            // cek tgl & periode
+            if($tglperiode != $periodecek){
+
+                $msg = "Periode tidak valid. Periode $periodecek tidak sama dengan periode di tanggal (".$datam[0]['tanggal']."). ";
+                $sts = false;	
+
+            }else{
+    
+                $no_agenda = $this->generateKode("it_aju_m", "no_aju", $kode_lokasi."-".substr($datam[0]['periode'],2,2).".", "00001");
+                $no_bukti = $this->generateKode("tu_pdapp_m", "no_app", $kode_lokasi."-PDA".substr($datam[0]['periode'],2,4).".", "0001");
+
+                // SAVE LOG TO DB
+                $log = print_r($request->all(), true); 
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
+                values ('$no_agenda','$kode_lokasi',getdate(),'$nik','".$log."') ");
+                // END SAVE
+    
+                $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
+                $res = json_decode(json_encode($res),true);
+                if(count($res) > 0){
+                    $stsGar = $res[0]['status_gar'];
+                    if ($datam[0]['kode_drk'] == "-") {
+                        $msg = "Transaksi tidak valid. Akun Anggaran Harus diisi DRK.";
+                        $sts = false;						
+                    }
+                    else {
+    
+                        $request->request->add([
+                            'kode_pp' => $datam[0]['kode_pp'],
+                            'kode_akun' =>$datam[0]['kode_akun'],
+                            'periode' => $datam[0]['periode'],
+                            'kode_drk' => $datam[0]['kode_drk']
+                        ]);
+    
+                        $cekB = json_decode(json_encode($this->cekBudget($request)),true);
+                        $dtbugdet = $cekB['original'];
+    
+                        if (floatval($datam[0]['total']) > floatval($dtbugdet['saldo_budget'])) {   
+                            $msg = "Transaksi tidak valid. Nilai transaksi melebihi saldo.";
+                            $sts =false;						
+                        }elseif(floatval($datam[0]['total']) <= 0) {
+                            $msg = "Transaksi tidak valid. Total tidak boleh nol atau kurang.";
+                            $sts =false;
+                        }else{
+                            $periode = DB::connection('sqlsrvypt')->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
+                            ");
+                            $periode = json_decode(json_encode($periode),true);
+    
+                            if ($datam[0]['periode'] < $periode[0]['periode']  ){
+                                $msg ="Periode transaksi tidak valid. Periode transaksi tidak boleh kurang dari periode aktif sistem.[".$periode[0]['periode']."]";
+                                $sts= false;
+                            } else {
+                                $sts=true;
+                                $msg="Transaksi Berhasil";
+                                $exec = array();
+                                //if ($stsGar == "1") {
+                                    $nilaiGar = $datam[0]['total'];
+                                    $sql1 = DB::connection('sqlsrvypt')->insert("insert into angg_r(no_bukti,modul,kode_lokasi,kode_akun,kode_pp,kode_drk,periode1,periode2,dc,saldo,nilai) values 
+                                    ('".$no_agenda."','ITKBAJUDRK','".$kode_lokasi."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['periode']."','".$datam[0]['periode']."','D',".$datam[0]['saldo_budget'].",".$nilaiGar.")");
+                                //}	
+                                $sql="insert into tu_pdapp_m(no_app,kode_lokasi,nik_user,tgl_input,periode,tanggal,keterangan,jenis,lama,kota,sarana,catatan,nik_buat,nik_app,no_aju) values ('".$no_bukti."','".$kode_lokasi."','".$nik."',getdate(),'".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['keterangan']."','".$datam[0]['jenis']."','".$datam[0]['lama']."','".$datam[0]['kota']."','".$datam[0]['sarana']."','".$datam[0]['catatan']."','".$datam[0]['nik_buat']."','".$datam[0]['nik_app']."','".$no_agenda."')";
+                                $sql2 = DB::connection('sqlsrvypt')->insert($sql);
+                                //$success['tmp1']=$sql;
+                                $datad=$request->input("AJU");
+                                $datarek=$request->input("REK");
+                                $nu=1;
+                                $total_d=0;
+                                $sts_no_igracias = true; $no_duplikat = [];
+                                for ($i=0;$i < count($datad);$i++){
+                                    
+                                    $gt = DB::connection('sqlsrvypt')->select("select count(no_spj_igracias) as jum 
+                                    from tu_pdaju_m 
+                                    where kode_lokasi='$kode_lokasi' and no_spj_igracias='".$datad[$i]['no_spj_igracias']."'
+                                    ");
+                                    if(count($gt) > 0){
+                                        if($gt[0]->jum > 0){
+                                            $sts_no_igracias = false;
+                                            $msg = 'Transaksi tidak valid. Terdapat data duplikat, no spj ('.$datad[$i]['no_spj_igracias'].') sudah ada di database.';
+                                            break;
+                                        }
+                                    }
+                                    //$no_spj = $this->generateKode("tu_pdaju_m", "no_spj", $kode_lokasi."-PJ".substr($datam[0]['periode'],2,4).".", "0001");
+                                    $no_spj=$no_agenda."-".strval($nu);
+                                    // $upd = "update tu_pdaju_m set progress='1',no_app='".$no_bukti."' where kode_lokasi='".$kode_lokasi."' and no_spj='".$datad[$i]['no_spj']."'";																								
+                                    // array_push($exec,$upd);
+                                    $sql="insert into tu_pdaju_m (no_spj,tanggal,kode_lokasi,kode_pp,kode_akun,kode_drk,keterangan,nik_buat,nik_spj,periode,tgl_input,progress,no_app,nilai,jenis_pd,sts_bmhd,kode_proyek,no_spj_igracias) values ('$no_spj',getdate(),'".$kode_lokasi."','".$datad[$i]['pp_code']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_drk']."','".$datad[$i]['nama_perjalanan']."','".$datam[0]['nik_buat']."','".$datad[$i]['nip']."','".$datam[0]['periode']."',getdate(),'1','".$no_bukti."',".$datad[$i]['total_biaya'].",'-','-','-','".$datad[$i]['no_spj_igracias']."') ";
+                                    $insAju = DB::connection('sqlsrvypt')->insert($sql);
+                                    //$success['tmp2']=$sql;
+    
+                                    $sql="insert into tu_pdaju_d (no_spj,kode_lokasi,kode_param,jumlah,nilai,total) values ('$no_spj','$kode_lokasi','91',1,".$datad[$i]['transport'].",".$datad[$i]['transport'].") ";
+                                    $insAjud1 = DB::connection('sqlsrvypt')->insert($sql);
+                                    //$success['tmp3']=$sql;
+                                    
+                                    $sql="insert into tu_pdaju_d (no_spj,kode_lokasi,kode_param,jumlah,nilai,total) values ('$no_spj','$kode_lokasi','92',1,".$datad[$i]['harian'].",".$datad[$i]['harian'].") ";
+                                    $insAjud2 = DB::connection('sqlsrvypt')->insert($sql);
+                                    //$success['tmp4']=$sql;
+    
+                                    $sql="insert into tu_pdaju_d (no_spj,kode_lokasi,kode_param,jumlah,nilai,total) values ('$no_spj','$kode_lokasi','93',1,".$datad[$i]['lain_lain'].",".$datad[$i]['lain_lain'].") ";
+                                    $insAjud3 = DB::connection('sqlsrvypt')->insert($sql);
+                                    //$success['tmp5']=$sql;
+    
+                                    $total_d= $total_d + floatval($datad[$i]['total_biaya']);
+                                    $nu++;
+                                }
+                                
+                                if($sts_no_igracias){
+
+                                    if(count($datarek) > 0){
+                                        if(count($datarek) == 1){
+                                            $nu=1; 
+                                            $nip = (isset($datad[0]['nip']) ? $datad[0]['nip'] : '-');
+                                            $total_biaya = $total_d;
+
+                                            $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek[0]['bank']."','".$datarek[0]['no_rekening']."','".$datarek[0]['nama']."','-',".$total_biaya.",'".$nip."',0,'".$no_agenda."-".$nu."')";
+
+                                            $sql3 = DB::connection('sqlsrvypt')->insert($sql);
+                                        }else{
+                                            $nu = 1;
+                                            for ($i=0;$i < count($datarek);$i++){
+            
+                                                $nip = (isset($datad[$i]['nip']) ? $datad[$i]['nip'] : $datad[0]['nip']);
+                                                $total_biaya = (isset($datad[$i]['total_biaya']) ? $datad[$i]['total_biaya'] : $datad[0]['total_biaya'] );
+                                                $sql="insert into it_aju_rek(no_aju,kode_lokasi,bank,no_rek,nama_rek,bank_trans,nilai,keterangan,pajak,berita) values ('".$no_agenda."','".$kode_lokasi."','".$datarek[$i]['bank']."','".$datarek[$i]['no_rekening']."','".$datarek[$i]['nama']."','-',".$total_biaya.",'".$nip."',0,'".$no_agenda."-".$nu."')";
+                                                $sql3 = DB::connection('sqlsrvypt')->insert($sql);
+                                                //$success['tmp6']=$sql;
+                                                $nu++;
+                                            }
+                                        }
+                                    }
+                                    
+                                    // $sql4 = "update a set a.bank=b.bank,a.no_rek=b.no_rek,a.nama_rek=b.nama_rek,a.bank_trans=b.cabang 
+                                    // from it_aju_rek a inner join karyawan b on a.keterangan=b.nik and a.kode_lokasi=b.kode_lokasi 
+                                    // where a.no_aju='".$no_agenda."' and a.kode_lokasi='".$kode_lokasi."'";
+                                    
+                                    // array_push($exec,$sql4);
+                                    $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."')";
+                                    //$success['tmp7']=$sql;
+                                    $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
+        
+                                    //insert it_aju_dok
+                                    $dataDok = $request->input("URL_DOK");
+                                    $nu=1;
+                                    if(count($dataDok) > 0 ){
+                                        for ($i=0;$i < count($dataDok);$i++){
+                                        
+                                            $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
+                                            $upload = DB::connection('sqlsrvypt')->insert($sql);
+                                            $nu++;
+                                        }	
+                                    }
+        
+                                    DB::connection('sqlsrvypt')->commit();
+                                    $success['no_agenda']=$no_agenda;
+                                    $success['no_bukti']=$no_bukti;
+                                }else{
+                                    DB::connection('sqlsrvypt')->rollback();
+                                    $sts = false;
+                                }
+
+                            } 
+                        }
+                    }
+    
+                }else{
+                    $msg = "Kode akun tidak valid. Status Anggaran kode akun ".$datam[0]['kode_akun']." tidak valid.";
+                    $sts = false;	
+                }
+            }
+
+            $success['status'] = $sts;
+            $success['message'] = $msg;
+            return response()->json($success, $this->successStatus);     
+          
+        } catch (\Throwable $e) {
+            DB::connection('sqlsrvypt')->rollback();
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error.".$e;
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function releaseBudget($no_agenda){
         if($data =  Auth::guard('ypt')->user()){
             $nik= $data->nik;
