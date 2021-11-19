@@ -21,7 +21,6 @@ class BmController extends Controller
 
     public function isUnik($isi, $kode_lokasi)
     {
-
         $auth = DB::connection($this->db)->select("SELECT kode_bm FROM hr_bm WHERE kode_bm ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
         $auth = json_decode(json_encode($auth), true);
         if (count($auth) > 0) {
@@ -39,7 +38,13 @@ class BmController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_bm,kode_lokasi,nama,kode_area,kode_fm  FROM hr_bm WHERE kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql = "SELECT a.kode_bm,a.kode_lokasi,a.nama,concat(a.kode_area,' - ',b.nama) AS area, concat(a.kode_fm,' - ',c.nama) as fm
+            FROM hr_bm a
+            INNER JOIN hr_area  b
+            ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+            INNER JOIN hr_fm c
+            ON a.kode_fm=c.kode_fm AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -76,7 +81,13 @@ class BmController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_bm, nama, kode_lokasi,kode_area,kode_fm FROM hr_bm WHERE kode_bm = '" . $request->kode_bm . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $sql = "SELECT a.kode_bm,a.kode_lokasi,a.nama,a.kode_area,b.nama AS nama_area, a.kode_fm, c.nama AS nama_fm
+            FROM hr_bm a
+            INNER JOIN hr_area  b
+            ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+            INNER JOIN hr_fm c
+            ON a.kode_fm=c.kode_fm AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_bm = '" . $request->kode_bm . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
