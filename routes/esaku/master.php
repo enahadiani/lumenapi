@@ -369,6 +369,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('sdm-bank', 'Sdm\BankController@update');
     $router->delete('sdm-bank', 'Sdm\BankController@destroy');
 
+    // Master Data KLIEN
+    $router->get('sdm-klien', 'Sdm\KlienController@index');
+    $router->get('show-klien', 'Sdm\KlienController@show');
+    $router->post('sdm-klien', 'Sdm\KlienController@store');
+    $router->put('sdm-klien', 'Sdm\KlienController@update');
+    $router->delete('sdm-klien', 'Sdm\KlienController@destroy');
     /*-------------------------------------------------------------------------
        END MODUL SDM
     --------------------------------------------------------------------------*/
