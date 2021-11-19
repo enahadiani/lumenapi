@@ -39,7 +39,7 @@ class GajiParamController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_param,kode_lokasi,nama  FROM hr_gaji_param WHERE kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql = "SELECT kode_param,kode_lokasi,nama,jenis  FROM hr_gaji_param WHERE kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -76,7 +76,7 @@ class GajiParamController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_param, nama, kode_lokasi FROM hr_gaji_param WHERE kode_param = '" . $request->kode_param . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $sql = "SELECT kode_param, nama, kode_lokasi,jenis FROM hr_gaji_param WHERE kode_param = '" . $request->kode_param . "' AND kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -112,6 +112,7 @@ class GajiParamController extends Controller
         $this->validate($request, [
             'kode_param' => 'required',
             'nama' => 'required',
+            'jenis' => 'required'
         ]);
 
         try {
@@ -120,13 +121,14 @@ class GajiParamController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
             if ($this->isUnik($request->input('kode_param'), $kode_lokasi)) {
-                $insert = "INSERT INTO hr_gaji_param(kode_param, nama, kode_lokasi)
-                VALUES (?, ?, ?)";
+                $insert = "INSERT INTO hr_gaji_param(kode_param, nama, kode_lokasi,jenis)
+                VALUES (?, ?, ?, ?)";
 
                 DB::connection($this->db)->insert($insert, [
                     $request->input('kode_param'),
                     $request->input('nama'),
-                    $kode_lokasi
+                    $kode_lokasi,
+                    $request->input('jenis')
                 ]);
 
                 $success['status'] = true;
@@ -156,7 +158,8 @@ class GajiParamController extends Controller
     {
         $this->validate($request, [
             'kode_param' => 'required',
-            'nama' => 'required'
+            'nama' => 'required',
+            'jenis' => 'required'
         ]);
 
         try {
@@ -165,7 +168,8 @@ class GajiParamController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_gaji_param SET nama = '" . $request->input('nama') . "'
+            $update = "UPDATE hr_gaji_param SET nama = '" . $request->input('nama') . "',
+            jenis = '" . $request->input('jenis') . "'
             WHERE kode_param = '" . $request->input('kode_param') . "'
             AND kode_lokasi = '" . $kode_lokasi . "'";
 
