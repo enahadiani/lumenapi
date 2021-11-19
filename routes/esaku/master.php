@@ -348,6 +348,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('sdm-fm', 'Sdm\FmController@update');
     $router->delete('sdm-fm', 'Sdm\FmController@destroy');
 
+    // Master Data BM
+    $router->get('sdm-bm', 'Sdm\BmController@index');
+    $router->get('show-bm', 'Sdm\BmController@show');
+    $router->post('sdm-bm', 'Sdm\BmController@store');
+    $router->put('sdm-bm', 'Sdm\BmController@update');
+    $router->delete('sdm-bm', 'Sdm\BmController@destroy');
+
     /*-------------------------------------------------------------------------
        END MODUL SDM
     --------------------------------------------------------------------------*/
