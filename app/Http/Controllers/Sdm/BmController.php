@@ -129,7 +129,7 @@ class BmController extends Controller
                     $request->input('kode_bm'),
                     $request->input('nama'),
                     $request->input('kode_area'),
-                    $request->input('kode_bm'),
+                    $request->input('kode_fm'),
                     $kode_lokasi,
                     $nik
                 ]);
