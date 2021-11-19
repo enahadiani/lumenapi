@@ -47,8 +47,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('users/{id}', 'AdminTokoController@singleUser');
     $router->get('users', 'AdminTokoController@allUsers');
     $router->get('cek-payload', 'AdminTokoController@cekPayload');
+    $router->get('profile-user', 'AdminTokoController@getUser');
 
-    
     $router->post('update-password', 'AdminTokoController@updatePassword');
     $router->post('update-foto', 'AdminTokoController@updatePhoto');
     $router->post('update-background', 'AdminTokoController@updateBackground');
