@@ -355,6 +355,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->put('sdm-bm', 'Sdm\BmController@update');
     $router->delete('sdm-bm', 'Sdm\BmController@destroy');
 
+    // Master Data Witel
+    $router->get('sdm-witel', 'Sdm\WitelController@index');
+    $router->get('show-witel', 'Sdm\WitelController@show');
+    $router->post('sdm-witel', 'Sdm\WitelController@store');
+    $router->put('sdm-witel', 'Sdm\WitelController@update');
+    $router->delete('sdm-witel', 'Sdm\WitelController@destroy');
+
     /*-------------------------------------------------------------------------
        END MODUL SDM
     --------------------------------------------------------------------------*/
