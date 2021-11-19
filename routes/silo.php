@@ -50,14 +50,14 @@ $router->get('storage/{filename}', function ($filename) {
 });
 
 
-$router->group(['middleware' => 'auth:silo'], function () use ($router) {
+$router->group(['middleware' => 'auth:newsilo'], function () use ($router) {
 
-    $router->get('profile', 'AdminSiloController@profile2');
-    $router->get('users/{id}', 'AdminSiloController@singleUser');
-    $router->get('users', 'AdminSiloController@allUsers');
-    $router->get('cek-payload', 'AdminSiloController@cekPayload');
+    $router->get('profile', 'AdminNewSiloController@profile2');
+    $router->get('users/{id}', 'AdminNewSiloController@singleUser');
+    $router->get('users', 'AdminNewSiloController@allUsers');
+    $router->get('cek-payload', 'AdminNewSiloController@cekPayload');
 
-    $router->post('update-password', 'AdminSiloController@updatePassword');
+    $router->post('update-password', 'AdminNewSiloController@updatePassword');
 
     //Menu
     $router->get('side-menu/{kode_klp}', 'Apv\HakaksesController@getSideMenu');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apv;
+namespace App\Http\Controllers\Silo;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
