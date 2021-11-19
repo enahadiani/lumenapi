@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class AreaController extends Controller
+class FmController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class AreaController extends Controller
     public function isUnik($isi, $kode_lokasi)
     {
 
-        $auth = DB::connection($this->db)->select("SELECT kode_area FROM hr_area WHERE kode_area ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
+        $auth = DB::connection($this->db)->select("SELECT kode_fm FROM hr_fm WHERE kode_fm ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
         $auth = json_decode(json_encode($auth), true);
         if (count($auth) > 0) {
             return false;
@@ -39,7 +39,7 @@ class AreaController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_area,kode_lokasi,nama  FROM hr_area WHERE kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql = "SELECT kode_fm,kode_lokasi,nama,kode_lokasi  FROM hr_fm WHERE kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -67,7 +67,7 @@ class AreaController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'kode_area' => 'required'
+            'kode_fm' => 'required'
         ]);
 
         try {
@@ -76,7 +76,7 @@ class AreaController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_area, nama, kode_lokasi FROM hr_area WHERE kode_area = '" . $request->kode_area . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $sql = "SELECT kode_fm, nama, kode_lokasi FROM hr_fm WHERE kode_fm = '" . $request->kode_fm . "' AND kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -110,8 +110,9 @@ class AreaController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_area' => 'required',
+            'kode_fm' => 'required',
             'nama' => 'required',
+            'kode_area' => 'required'
         ]);
 
         try {
@@ -119,29 +120,30 @@ class AreaController extends Controller
                 $nik = $data->nik;
                 $kode_lokasi = $data->kode_lokasi;
             }
-            if ($this->isUnik($request->input('kode_area'), $kode_lokasi)) {
-                $insert = "INSERT INTO hr_area(kode_area, nama, kode_lokasi,nik_user)
-                VALUES (?, ?, ?, ?)";
+            if ($this->isUnik($request->input('kode_fm'), $kode_lokasi)) {
+                $insert = "INSERT INTO hr_fm(kode_fm, nama,kode_area ,kode_lokasi,nik_user)
+                VALUES (?, ?, ?, ?,?)";
 
                 DB::connection($this->db)->insert($insert, [
-                    $request->input('kode_area'),
+                    $request->input('kode_fm'),
                     $request->input('nama'),
+                    $request->input('kode_area'),
                     $kode_lokasi,
                     $nik
                 ]);
 
                 $success['status'] = true;
-                $success['message'] = "Data Area karyawan berhasil disimpan";
+                $success['message'] = "Data FM karyawan berhasil disimpan";
             } else {
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. Kode area karyawan sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. Kode fm karyawan sudah ada di database!";
             }
-            $success['kode'] = $request->kode_area;
+            $success['kode'] = $request->kode_fm;
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data area karyawan gagal disimpan " . $e;
+            $success['message'] = "Data FM karyawan gagal disimpan " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -156,8 +158,9 @@ class AreaController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_area' => 'required',
-            'nama' => 'required'
+            'kode_fm' => 'required',
+            'nama' => 'required',
+            'kode_area' => 'required'
         ]);
 
         try {
@@ -166,19 +169,19 @@ class AreaController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_area SET nama = '" . $request->input('nama') . "'
-            WHERE kode_area = '" . $request->input('kode_area') . "'
+            $update = "UPDATE hr_fm SET nama = '" . $request->input('nama') . "',kode_area = '" . $request->input('kode_area') . "'
+            WHERE kode_fm = '" . $request->input('kode_fm') . "'
             AND kode_lokasi = '" . $kode_lokasi . "'";
 
             DB::connection($this->db)->update($update);
 
             $success['status'] = true;
-            $success['message'] = "Data area karyawan berhasil diubah";
-            $success['kode'] = $request->kode_area;
+            $success['message'] = "Data FM karyawan berhasil diubah";
+            $success['kode'] = $request->kode_fm;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data area karyawan gagal diubah " . $e;
+            $success['message'] = "Data FM karyawan gagal diubah " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -192,7 +195,7 @@ class AreaController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_area' => 'required'
+            'kode_fm' => 'required'
         ]);
 
         try {
@@ -201,18 +204,18 @@ class AreaController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            DB::connection($this->db)->table('hr_area')
-                ->where('kode_area', $request->kode_area)
+            DB::connection($this->db)->table('hr_fm')
+                ->where('kode_fm', $request->kode_fm)
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
             $success['status'] = true;
-            $success['message'] = "Data area karyawan berhasil dihapus";
+            $success['message'] = "Data FM karyawan berhasil dihapus";
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data area karyawan gagal dihapus " . $e;
+            $success['message'] = "Data FM karyawan gagal dihapus " . $e;
 
             return response()->json($success, $this->successStatus);
         }
