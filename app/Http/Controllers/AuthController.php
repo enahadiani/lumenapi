@@ -618,7 +618,7 @@ class AuthController extends Controller
         $credentials = $request->only(['nik', 'password']);
 
         if (!$token = Auth::guard('newsilo')->setTTL(1440)->attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized 1'], 401);
+            return response()->json(['message' => 'Unauthorized'], 401);
         } else {
             if (isset($request->id_device)) {
 
