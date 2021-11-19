@@ -39,7 +39,11 @@ class FmController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_fm,kode_lokasi,nama,kode_lokasi  FROM hr_fm WHERE kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql = "SELECT a.kode_fm,a.kode_lokasi,a.nama,concat(a.kode_area,' - ',b.nama) as area
+            FROM hr_fm  a
+            INNER JOIN hr_area  b
+            ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -76,7 +80,11 @@ class FmController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_fm, nama, kode_lokasi FROM hr_fm WHERE kode_fm = '" . $request->kode_fm . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $sql = "SELECT a.kode_fm,a.kode_lokasi,a.nama,a.kode_area,b.nama as nama_area
+            FROM hr_fm  a
+            INNER JOIN hr_area  b
+            ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+             WHERE a.kode_fm = '" . $request->kode_fm . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
