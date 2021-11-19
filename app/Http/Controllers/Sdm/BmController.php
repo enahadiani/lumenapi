@@ -68,6 +68,48 @@ class BmController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+    public function filterFm(Request $request)
+    {
+        $this->validate($request, [
+            'kode_fm' => 'required'
+        ]);
+
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $sql = "SELECT a.kode_bm,a.kode_lokasi,a.nama,a.kode_area,b.nama AS nama_area, a.kode_fm, c.nama AS nama_fm
+            FROM hr_bm a
+            INNER JOIN hr_area  b
+            ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+            INNER JOIN hr_fm c
+            ON a.kode_fm=c.kode_fm AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.kode_fm = '" . $request->kode_fm . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res), true);
+
+            if (count($res) > 0) {
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);
+            } else {
+
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 
     public function show(Request $request)
     {

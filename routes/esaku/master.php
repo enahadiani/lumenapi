@@ -351,6 +351,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     // Master Data BM
     $router->get('sdm-bm', 'Sdm\BmController@index');
+    $router->get('sdm-bm-filter-fm', 'Sdm\BmController@filterFm');
     $router->get('show-bm', 'Sdm\BmController@show');
     $router->post('sdm-bm', 'Sdm\BmController@store');
     $router->put('sdm-bm', 'Sdm\BmController@update');
