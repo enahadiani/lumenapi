@@ -343,6 +343,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
 
     // Master Data FM
     $router->get('sdm-fm', 'Sdm\FmController@index');
+    $router->get('sdm-fm-filter-area', 'Sdm\FmController@filterArea');
     $router->get('show-fm', 'Sdm\FmController@show');
     $router->post('sdm-fm', 'Sdm\FmController@store');
     $router->put('sdm-fm', 'Sdm\FmController@update');

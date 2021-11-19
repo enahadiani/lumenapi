@@ -109,6 +109,48 @@ class FmController extends Controller
         }
     }
 
+    // filter berdasarkan kode area
+    public function filterArea(Request $request)
+    {
+        $this->validate($request, [
+            'kode_area' => 'required'
+        ]);
+
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $sql = "SELECT a.kode_fm,a.kode_lokasi,a.nama,a.kode_area,b.nama as nama_area
+            FROM hr_fm  a
+            INNER JOIN hr_area  b
+            ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+             WHERE a.kode_area = '" . $request->kode_area . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res), true);
+
+            if (count($res) > 0) {
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);
+            } else {
+
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
