@@ -79,9 +79,9 @@ class LokerController extends Controller
             $sql = "SELECT a.kode_loker,a.nama,a.flag_aktif,a.kode_area,
             b.nama AS nama_area, a.kode_fm,c.nama as nama_fm,a.kode_bm, d.nama as nama_bm
             FROM hr_loker a
-            INNER JOIN hr_area b ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
-            INNER JOIN hr_fm c ON a.kode_fm=c.kode_fm AND a.kode_lokasi=c.kode_lokasi
-            INNER JOIN hr_bm d ON a.kode_bm=d.kode_bm AND a.kode_lokasi=d.kode_lokasi WHERE a.kode_loker = '" . $request->kode_loker . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
+            LEFT JOIN hr_area b ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_fm c ON a.kode_fm=c.kode_fm AND a.kode_lokasi=c.kode_lokasi
+            LEFT JOIN hr_bm d ON a.kode_bm=d.kode_bm AND a.kode_lokasi=d.kode_lokasi WHERE a.kode_loker = '" . $request->kode_loker . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
