@@ -99,13 +99,13 @@ class DashboardRasioController extends Controller
             left join (select a.kode_dash as kode_neraca,a.kode_lokasi,b.periode,sum(b.n4) as nilai2
                     from dash_ypt_neraca_d a
                     inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-                    where a.kode_lokasi='$request->lokasi' and a.kode_fs='FS1' and b.periode in ('$perAwal','$request->periode')
+                    where a.kode_lokasi='$request->lokasi' and a.kode_fs='FS1' and b.periode = '$request->periode'
                     group by a.kode_dash,a.kode_lokasi,b.periode
                     union all
                     select a.kode_neraca,a.kode_lokasi,b.periode,sum(b.n4) as nilai2
                     from dash_ypt_rasio_d a
                     inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-                    where a.kode_lokasi='$request->lokasi' and a.kode_fs='FS1' and a.kode_rasio='$request->jenis' and b.periode in ('$perAwal','$request->periode')
+                    where a.kode_lokasi='$request->lokasi' and a.kode_fs='FS1' and a.kode_rasio='$request->jenis' and b.periode = '$request->periode'
                     group by a.kode_neraca,a.kode_lokasi,b.periode
                     )b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$request->lokasi' and a.kode_fs='FS1'  and a.kode_rasio='$request->jenis'";
@@ -156,11 +156,8 @@ class DashboardRasioController extends Controller
                 }
                 $data[count($data)] = $hasil;
                 $column[count($column)] = $kode;
-                $kali = ($hasil[$perAwal] != 0 ?($hasil[$request->periode] - $hasil[$perAwal])/ $hasil[$perAwal] : 0);
                 $success['status'] = true;
                 $success['data'] = $hasil;
-                $success['kenaikan'] = abs($kali);
-                $success['status_rasio'] = ($kali == 0 ? 'Tetap' : ($hasil[$perAwal] > $hasil[$request->periode] ? 'Turun' : 'Naik'));
                 // $success['column'] = $column;
                 $success['message'] = "Success!";     
             }
