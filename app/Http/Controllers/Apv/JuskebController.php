@@ -20,10 +20,14 @@ class JuskebController extends Controller
     public $guard = 'silo';
     public $db = 'dbsilo';
 
-    public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-')
-    {
+    public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-') {
         $arr = explode($org_sep, $ymd_or_dmy_date);
         return $arr[2] . $new_sep . $arr[1] . $new_sep . $arr[0];
+    }
+
+    public function reverseDate2($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-') {
+        $arr = explode($org_sep, $ymd_or_dmy_date);
+        return $arr[0] . $new_sep . $arr[1] . $new_sep . $arr[2];
     }
 
     public function isUnik($isi, $kode_lokasi, $kode_pp)
@@ -110,7 +114,7 @@ class JuskebController extends Controller
             $kode_lok_log = $dt->kode_lokasi;
         }
 
-        $format = $this->reverseDate($request->tanggal, "/", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
+        $format = $this->reverseDate2($request->tanggal, "/", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
         $format2 = "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
         $tahun = substr($request->tanggal, 0, 4);
         $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2, $tahun, $kode_lok_log);
