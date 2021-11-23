@@ -389,7 +389,7 @@ class JuskebController extends Controller
                     $kode_divisi = '-';
                 }
 
-                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver,pemakai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti, $no_dokumen, $request->input('kode_pp'), $request->input('waktu'), $request->input('kegiatan'), $request->input('dasar'), $nik_user, $kode_lokasi, $request->input('total_barang'), $this->reverseDate($request->input('tanggal'), '/', '-'), 'A', $request->kode_kota, $kode_divisi, $request->nik_ver, $request->pemakai]);
+                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver,pemakai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti, $no_dokumen, $request->input('kode_pp'), $this->reverseDate3($request->input('waktu'), '/', '-'), $request->input('kegiatan'), $request->input('dasar'), $nik_user, $kode_lokasi, $request->input('total_barang'), $this->reverseDate($request->input('tanggal'), '/', '-'), 'A', $request->kode_kota, $kode_divisi, $request->nik_ver, $request->pemakai]);
 
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
