@@ -55,8 +55,7 @@ class DashboardRasioController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $sql = "select a.kode_lokasi,a.nama,a.skode from dash_ypt_lokasi a
-            where a.kode_lokasi='$kode_lokasi' ";
+            $sql = "select a.kode_lokasi,a.nama,a.skode from dash_ypt_lokasi a";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
