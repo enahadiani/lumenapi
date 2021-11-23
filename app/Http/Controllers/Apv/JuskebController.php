@@ -17,7 +17,7 @@ class JuskebController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'newsilo';
+    public $guard = 'silo';
     public $db = 'dbsilo';
 
     public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-')
