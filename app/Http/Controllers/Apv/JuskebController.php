@@ -110,7 +110,7 @@ class JuskebController extends Controller
             $kode_lok_log = $dt->kode_lokasi;
         }
 
-        $format = $this->reverseDate($request->tanggal, "-", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
+        $format = $this->reverseDate($request->tanggal, "/", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
         $format2 = "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
         $tahun = substr($request->tanggal, 0, 4);
         $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2, $tahun, $kode_lok_log);
