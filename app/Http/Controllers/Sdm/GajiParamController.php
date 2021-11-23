@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class LokerController extends Controller
+class GajiParamController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,7 +22,7 @@ class LokerController extends Controller
     public function isUnik($isi, $kode_lokasi)
     {
 
-        $auth = DB::connection($this->db)->select("SELECT kode_loker FROM hr_loker WHERE kode_loker ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
+        $auth = DB::connection($this->db)->select("SELECT kode_param FROM hr_gaji_param WHERE kode_param ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
         $auth = json_decode(json_encode($auth), true);
         if (count($auth) > 0) {
             return false;
@@ -39,7 +39,7 @@ class LokerController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_loker, nama, flag_aktif FROM hr_loker WHERE kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql = "SELECT kode_param,kode_lokasi,nama,jenis  FROM hr_gaji_param WHERE kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -67,7 +67,7 @@ class LokerController extends Controller
     public function show(Request $request)
     {
         $this->validate($request, [
-            'kode_loker' => 'required'
+            'kode_param' => 'required'
         ]);
 
         try {
@@ -76,12 +76,7 @@ class LokerController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.kode_loker,a.nama,a.flag_aktif,a.kode_area,
-            b.nama AS nama_area, a.kode_fm,c.nama as nama_fm,a.kode_bm, d.nama as nama_bm
-            FROM hr_loker a
-            LEFT JOIN hr_area b ON a.kode_area=b.kode_area AND a.kode_lokasi=b.kode_lokasi
-            LEFT JOIN hr_fm c ON a.kode_fm=c.kode_fm AND a.kode_lokasi=c.kode_lokasi
-            LEFT JOIN hr_bm d ON a.kode_bm=d.kode_bm AND a.kode_lokasi=d.kode_lokasi WHERE a.kode_loker = '" . $request->kode_loker . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
+            $sql = "SELECT kode_param, nama, kode_lokasi,jenis FROM hr_gaji_param WHERE kode_param = '" . $request->kode_param . "' AND kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -112,15 +107,12 @@ class LokerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function save(Request $request)
+    public function store(Request $request)
     {
         $this->validate($request, [
-            'kode_loker' => 'required',
+            'kode_param' => 'required',
             'nama' => 'required',
-            'status' => 'required',
-            'kode_area' => 'required',
-            'kode_fm' => 'required',
-            'kode_bm' => 'required'
+            'jenis' => 'required'
         ]);
 
         try {
@@ -128,32 +120,29 @@ class LokerController extends Controller
                 $nik = $data->nik;
                 $kode_lokasi = $data->kode_lokasi;
             }
-            if ($this->isUnik($request->input('kode_loker'), $kode_lokasi)) {
-                $insert = "INSERT INTO hr_loker(kode_loker, nama, flag_aktif, kode_lokasi,kode_area,kode_fm,kode_bm)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+            if ($this->isUnik($request->input('kode_param'), $kode_lokasi)) {
+                $insert = "INSERT INTO hr_gaji_param(kode_param, nama, kode_lokasi,jenis)
+                VALUES (?, ?, ?, ?)";
 
                 DB::connection($this->db)->insert($insert, [
-                    $request->input('kode_loker'),
+                    $request->input('kode_param'),
                     $request->input('nama'),
-                    $request->input('status'),
                     $kode_lokasi,
-                    $request->input('kode_area'),
-                    $request->input('kode_fm'),
-                    $request->input('kode_bm'),
+                    $request->input('jenis')
                 ]);
 
                 $success['status'] = true;
-                $success['message'] = "Data lokasi kerja berhasil disimpan";
+                $success['message'] = "Data parameter gaji karyawan berhasil disimpan";
             } else {
                 $success['status'] = false;
                 $success['message'] = "Kode yang dimasukan sudah digunakan, gunakan kode lainnya.!";
             }
-            $success['kode'] = $request->kode_loker;
+            $success['kode'] = $request->kode_param;
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data lokasi kerja gagal disimpan " . $e;
+            $success['message'] = "Data parameter gaji karyawan gagal disimpan " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -168,12 +157,9 @@ class LokerController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'kode_loker' => 'required',
+            'kode_param' => 'required',
             'nama' => 'required',
-            'status' => 'required',
-            'kode_area' => 'required',
-            'kode_fm' => 'required',
-            'kode_bm' => 'required'
+            'jenis' => 'required'
         ]);
 
         try {
@@ -182,22 +168,20 @@ class LokerController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_loker SET nama = '" . $request->input('nama') . "',
-            flag_aktif = '" . $request->input('status') . "',
-            kode_area = '" . $request->input('kode_area') . "',
-            kode_fm = '" . $request->input('kode_fm') . "',
-            kode_bm = '" . $request->input('kode_bm') . "'
-            WHERE kode_loker = '" . $request->input('kode_loker') . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $update = "UPDATE hr_gaji_param SET nama = '" . $request->input('nama') . "',
+            jenis = '" . $request->input('jenis') . "'
+            WHERE kode_param = '" . $request->input('kode_param') . "'
+            AND kode_lokasi = '" . $kode_lokasi . "'";
 
             DB::connection($this->db)->update($update);
 
             $success['status'] = true;
-            $success['message'] = "Data lokasi kerja berhasil diubah";
-            $success['kode'] = $request->kode_loker;
+            $success['message'] = "Data parameter gaji karyawan berhasil diubah";
+            $success['kode'] = $request->kode_param;
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data lokasi kerja gagal diubah " . $e;
+            $success['message'] = "Data parameter gaji karyawan gagal diubah " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -211,7 +195,7 @@ class LokerController extends Controller
     public function destroy(Request $request)
     {
         $this->validate($request, [
-            'kode_loker' => 'required'
+            'kode_param' => 'required'
         ]);
 
         try {
@@ -220,18 +204,18 @@ class LokerController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            DB::connection($this->db)->table('hr_loker')
-                ->where('kode_loker', $request->kode_loker)
+            DB::connection($this->db)->table('hr_gaji_param')
+                ->where('kode_param', $request->kode_param)
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
             $success['status'] = true;
-            $success['message'] = "Data lokasi kerja berhasil dihapus";
+            $success['message'] = "Data parameter karyawan berhasil dihapus";
 
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data lokasi kerja gagal dihapus " . $e;
+            $success['message'] = "Data parameter karyawan gagal dihapus " . $e;
 
             return response()->json($success, $this->successStatus);
         }

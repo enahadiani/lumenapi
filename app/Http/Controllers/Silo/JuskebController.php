@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apv;
+namespace App\Http\Controllers\Silo;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -125,7 +125,6 @@ class JuskebController extends Controller
                 $nik_user = $data->nik;
                 $kode_lokasi = $data->kode_lokasi;
             }
-            $kode_lokasi = '51';
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,p.nama as nama_pp,
             a.nilai,

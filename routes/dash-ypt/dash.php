@@ -38,7 +38,14 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-ccr-box','DashYpt\DashboardCCRController@getDataBox');  
     
     $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
-    $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');  
+    $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');
+    
+    // RASIO
+    $router->get('data-rasio-jenis','DashYpt\DashboardRasioController@getKlpRasio');
+    $router->get('data-rasio-lembaga','DashYpt\DashboardRasioController@getLokasi');
+    $router->get('data-rasio-ytd','DashYpt\DashboardRasioController@getRasioYtd');
+    $router->get('data-rasio-yoy','DashYpt\DashboardRasioController@getRasioYoY');
+    $router->get('data-rasio-tahun','DashYpt\DashboardRasioController@getRasioTahun');
 
 
 });
