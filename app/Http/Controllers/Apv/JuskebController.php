@@ -18,7 +18,7 @@ class JuskebController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'newsilo';
-    public $db = 'dbnewsilo';
+    public $db = 'dbsilo';
 
     public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-')
     {
@@ -125,7 +125,6 @@ class JuskebController extends Controller
                 $nik_user = $data->nik;
                 $kode_lokasi = $data->kode_lokasi;
             }
-            $kode_lokasi = '51';
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.waktu,a.kegiatan,p.nama as nama_pp,
             a.nilai,
