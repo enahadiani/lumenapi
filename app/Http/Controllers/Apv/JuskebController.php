@@ -365,7 +365,7 @@ class JuskebController extends Controller
                 $periode = substr($request->tanggal, 0, 4) . substr($request->tanggal, 5, 2);
                 $no_bukti = $this->generateKodeBaru("apv_juskeb_m", "no_bukti", "APV-", "0001", $kode_lokasi . "-APV" . $periode . substr(2, 2) . ".");
 
-                $format = $this->reverseDate($request->tanggal, "-", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
+                $format = $this->reverseDate($request->tanggal, "/", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
                 $format2 = "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
                 $tahun = substr($request->tanggal, 0, 4);
                 $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2, $tahun, $kode_lokasi);
