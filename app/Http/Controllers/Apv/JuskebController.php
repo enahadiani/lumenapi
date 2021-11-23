@@ -18,7 +18,7 @@ class JuskebController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'newsilo';
-    public $db = 'dbnewsilo';
+    public $db = 'dbsilo';
 
     public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-')
     {
