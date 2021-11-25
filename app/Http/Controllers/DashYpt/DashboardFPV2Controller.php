@@ -72,9 +72,9 @@ class DashboardFPV2Controller extends Controller {
             CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
             CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END AS ach,
             CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END AS yoy
-            FROM db_grafik_d a
+            FROM dash_ypt_grafik_d a
             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-            INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+            INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
             $where";
 
             $select = DB::connection($this->sql)->select($sql);
@@ -167,8 +167,8 @@ class DashboardFPV2Controller extends Controller {
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
             ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai
-            FROM lokasi a
+            ISNULL(b.capai,0) as capai,a.skode
+            FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
@@ -176,9 +176,9 @@ class DashboardFPV2Controller extends Controller {
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM db_grafik_d a
+                FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
@@ -191,19 +191,8 @@ class DashboardFPV2Controller extends Controller {
             $realisasi = [];
             $ctg = [];
             foreach($res as $item) {  
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
-                }
+
+                $name= $item['skode'];
 
                 array_push($ctg, $name);
                 array_push($anggaran, floatval(number_format((float)$item['n2'], 1, '.', '')));
@@ -240,8 +229,8 @@ class DashboardFPV2Controller extends Controller {
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
             ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai
-            FROM lokasi a
+            ISNULL(b.capai,0) as capai,a.skode
+            FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
@@ -249,9 +238,9 @@ class DashboardFPV2Controller extends Controller {
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM db_grafik_d a
+                FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
@@ -264,19 +253,7 @@ class DashboardFPV2Controller extends Controller {
             $realisasi = [];
             $ctg = [];
             foreach($res as $item) {  
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
-                }
+                $name = $item['skode'];
 
                 array_push($ctg, $name);
                 array_push($anggaran, floatval($item['n2']));
@@ -313,8 +290,8 @@ class DashboardFPV2Controller extends Controller {
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
             ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai
-            FROM lokasi a
+            ISNULL(b.capai,0) as capai,a.skode
+            FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
@@ -322,9 +299,9 @@ class DashboardFPV2Controller extends Controller {
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM db_grafik_d a
+                FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
@@ -337,19 +314,7 @@ class DashboardFPV2Controller extends Controller {
             $realisasi = [];
             $ctg = [];
             foreach($res as $item) {  
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
-                }
+                $name = $item['skode'];
 
                 array_push($ctg, $name);
                 array_push($anggaran, floatval($item['n2']));
@@ -386,8 +351,8 @@ class DashboardFPV2Controller extends Controller {
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
             ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai
-            FROM lokasi a
+            ISNULL(b.capai,0) as capai,a.skode
+            FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
@@ -395,9 +360,9 @@ class DashboardFPV2Controller extends Controller {
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
                 SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM db_grafik_d a
+                FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
@@ -410,19 +375,7 @@ class DashboardFPV2Controller extends Controller {
             $realisasi = [];
             $ctg = [];
             foreach($res as $item) {  
-                if($item['kode_lokasi'] == '03') {
-                    $name = "KAPEL";
-                } elseif($item['kode_lokasi'] == '11') {
-                    $name = "TelU";
-                } elseif($item['kode_lokasi'] == '12') {
-                    $name = "TS";
-                } elseif($item['kode_lokasi'] == '13') {
-                    $name = "ITTJ";
-                } elseif($item['kode_lokasi'] == '14') {
-                    $name = "ITTP";
-                } elseif($item['kode_lokasi'] == '15') {
-                    $name = "ITTS";
-                }
+                $name = $item['skode'];
 
                 array_push($ctg, $name);
                 array_push($anggaran, floatval($item['n2']));

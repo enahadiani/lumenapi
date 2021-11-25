@@ -17,11 +17,20 @@ class JuskebController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'newsilo';
-    public $db = 'dbnewsilo';
+    public $guard = 'silo';
+    public $db = 'dbsilo';
 
-    public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-')
-    {
+    public function reverseDate($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-') {
+        $arr = explode($org_sep, $ymd_or_dmy_date);
+        return $arr[2] . $new_sep . $arr[1] . $new_sep . $arr[0];
+    }
+
+    public function reverseDate2($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-') {
+        $arr = explode($org_sep, $ymd_or_dmy_date);
+        return $arr[0] . $new_sep . $arr[1] . $new_sep . $arr[2];
+    }
+
+    public function reverseDate3($ymd_or_dmy_date, $org_sep = '-', $new_sep = '-') {
         $arr = explode($org_sep, $ymd_or_dmy_date);
         return $arr[2] . $new_sep . $arr[1] . $new_sep . $arr[0];
     }
@@ -96,7 +105,10 @@ class JuskebController extends Controller
 
     public function generateKode2($tabel, $kolom_acuan, $prefix, $str_format, $prefix2, $tahun, $kode_lokasi)
     {
-        $query = DB::connection($this->db)->select("select max(right($kolom_acuan, " . strlen($str_format) . "))+1 as id from $tabel where $kolom_acuan like '%$prefix2%' and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ");
+        $q = "select max(right($kolom_acuan, " . strlen($str_format) . "))+1 as id 
+        from $tabel where $kolom_acuan like '%$prefix2%' 
+        and substring(convert(varchar(10),tanggal,121),1,4) = '$tahun' and kode_lokasi='$kode_lokasi' ";
+        $query = DB::connection($this->db)->select($q);
         $query = json_decode(json_encode($query), true);
         $kode = $query[0]['id'];
         $id = $prefix . str_pad($kode, strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -110,9 +122,9 @@ class JuskebController extends Controller
             $kode_lok_log = $dt->kode_lokasi;
         }
 
-        $format = $this->reverseDate($request->tanggal, "-", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
+        $format = $this->reverseDate2($request->tanggal, "/", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
         $format2 = "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
-        $tahun = substr($request->tanggal, 0, 4);
+        $tahun = substr($this->reverseDate3($request->tanggal, '/', '-'), 0, 4);
         $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2, $tahun, $kode_lok_log);
         return $no_dokumen;
     }
@@ -365,7 +377,7 @@ class JuskebController extends Controller
                 $periode = substr($request->tanggal, 0, 4) . substr($request->tanggal, 5, 2);
                 $no_bukti = $this->generateKodeBaru("apv_juskeb_m", "no_bukti", "APV-", "0001", $kode_lokasi . "-APV" . $periode . substr(2, 2) . ".");
 
-                $format = $this->reverseDate($request->tanggal, "-", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
+                $format = $this->reverseDate($request->tanggal, "/", "-") . "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
                 $format2 = "/" . $request->kode_pp . "/" . $request->kode_kota . "/";
                 $tahun = substr($request->tanggal, 0, 4);
                 $no_dokumen = $this->generateKode2("apv_juskeb_m", "no_dokumen", $format, "00001", $format2, $tahun, $kode_lokasi);
@@ -377,7 +389,7 @@ class JuskebController extends Controller
                     $kode_divisi = '-';
                 }
 
-                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver,pemakai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti, $no_dokumen, $request->input('kode_pp'), $request->input('waktu'), $request->input('kegiatan'), $request->input('dasar'), $nik_user, $kode_lokasi, $request->input('total_barang'), $request->input('tanggal'), 'A', $request->kode_kota, $kode_divisi, $request->nik_ver, $request->pemakai]);
+                $ins = DB::connection($this->db)->insert('insert into apv_juskeb_m (no_bukti,no_dokumen,kode_pp,waktu,kegiatan,dasar,nik_buat,kode_lokasi,nilai,tanggal,progress,kode_kota,kode_divisi,nik_ver,pemakai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$no_bukti, $request->input('no_dokumen'), $request->input('kode_pp'), $this->reverseDate3($request->input('waktu'), '/', '-'), $request->input('kegiatan'), $request->input('dasar'), $nik_user, $kode_lokasi, $request->input('total_barang'), $this->reverseDate($request->input('tanggal'), '/', '-'), 'A', $request->kode_kota, $kode_divisi, $request->nik_ver, $request->pemakai]);
 
                 $barang = $request->input('barang');
                 $harga = $request->input('harga');
