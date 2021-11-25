@@ -267,6 +267,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     // Lokasi Kerja
     $router->get('sdm-lokers', 'Sdm\LokerController@index');
     $router->get('sdm-loker', 'Sdm\LokerController@show');
+    $router->get('sdm-loker-bm', 'Sdm\LokerController@lokerByBm');
     $router->post('sdm-loker', 'Sdm\LokerController@save');
     $router->post('sdm-loker-update', 'Sdm\LokerController@update');
     $router->delete('sdm-loker', 'Sdm\LokerController@destroy');
