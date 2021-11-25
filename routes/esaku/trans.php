@@ -1,9 +1,9 @@
 <?php
 namespace App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
 
 
 $router->get('/', function () use ($router) {
@@ -58,7 +58,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('pembelian-nota','Esaku\Inventori\PembelianController@getNota');
     $router->get('pembelian-barang','Esaku\Inventori\PembelianController@getBarang');
 
-    
+
     //Pembelian3
     $router->get('pembelian3','Esaku\Inventori\Pembelian3Controller@index');
     $router->get('pembelian3-detail','Esaku\Inventori\Pembelian3Controller@show');
@@ -105,15 +105,15 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('periode','Esaku\Inventori\BarcodeController@getPeriode');
     $router->post('barcode','Esaku\Inventori\BarcodeController@store');
 
-    
+
     $router->get('sync-master','Esaku\Inventori\Sync2Controller@getSyncMaster');
     $router->post('sync-master','Esaku\Inventori\Sync2Controller@syncMaster');
-    
+
     $router->get('sync-pnj','Esaku\Inventori\Sync2Controller@getSyncPnj');
     $router->get('sync-pnj-detail','Esaku\Inventori\Sync2Controller@getSyncPnjDetail');
     $router->get('load-sync-pnj','Esaku\Inventori\Sync2Controller@loadSyncPnj');
     $router->post('sync-pnj','Esaku\Inventori\Sync2Controller@syncPnj');
-    
+
     $router->get('sync-pmb','Esaku\Inventori\Sync2Controller@getSyncPmb');
     $router->get('sync-pmb-detail','Esaku\Inventori\Sync2Controller@getSyncPmbDetail');
     $router->get('load-sync-pmb','Esaku\Inventori\Sync2Controller@loadSyncPmb');
@@ -145,7 +145,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('unposting-jurnal','Esaku\Keuangan\UnPostingController@loadData');
     $router->post('unposting','Esaku\Keuangan\UnPostingController@store');
 
-    // Jurnal Dok 
+    // Jurnal Dok
     $router->get('jurnal-dok','Esaku\Keuangan\JurnalDokController@show');
     $router->post('jurnal-dok','Esaku\Keuangan\JurnalDokController@store');
     $router->delete('jurnal-dok','Esaku\Keuangan\JurnalDokController@destroy');
@@ -183,7 +183,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('aktap-pp','Esaku\Aktap\AktapController@getPP');
     $router->get('aktap-klpakun','Esaku\Aktap\AktapController@getKlpAkun');
     $router->post('aktap','Esaku\Aktap\AktapController@store');
-    
+
     $router->get('aktap','Esaku\Aktap\AktapController@getAktap');
     $router->get('aktap-detail','Esaku\Aktap\AktapController@show');
     $router->put('aktap','Esaku\Aktap\AktapController@update');
@@ -197,7 +197,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('susutcpt-noaktap','Esaku\Aktap\PercepatanController@getNoAktap');
     $router->get('susutcpt-load','Esaku\Aktap\PercepatanController@loadDataAktap');
     $router->post('susutcpt','Esaku\Aktap\PercepatanController@store');
-    
+
     //Data Pembatalan
     $router->get('susut-batal-noaktap','Esaku\Aktap\PembatalanController@getNoAktap');
     $router->get('susut-batal-load','Esaku\Aktap\PembatalanController@loadDataAktap');
@@ -231,7 +231,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('kas-bank-tmp','Esaku\KasBank\KasBankController@getDataTmp');
 
     // UANG MASUK
-    
+
     $router->get('uang-masuk','Esaku\KasBank\UangMasukController@index');
     $router->get('uang-masuk-detail','Esaku\KasBank\UangMasukController@show');
     $router->post('uang-masuk','Esaku\KasBank\UangMasukController@store');
@@ -239,7 +239,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('uang-masuk','Esaku\KasBank\UangMasukController@destroy');
     $router->post('uang-masuk-import-excel','Esaku\KasBank\UangMasukController@importExcel');
     $router->get('uang-masuk-tmp','Esaku\KasBank\UangMasukController@getDataTmp');
-    
+
     $router->get('uang-keluar','Esaku\KasBank\UangKeluarController@index');
     $router->get('uang-keluar-detail','Esaku\KasBank\UangKeluarController@show');
     $router->post('uang-keluar','Esaku\KasBank\UangKeluarController@store');
@@ -247,7 +247,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('uang-keluar','Esaku\KasBank\UangKeluarController@destroy');
     $router->post('uang-keluar-import-excel','Esaku\KasBank\UangKeluarController@importExcel');
     $router->get('uang-keluar-tmp','Esaku\KasBank\UangKeluarController@getDataTmp');
-    
+
     $router->get('terima-dari','Esaku\KasBank\UangMasukController@getTerimaDari');
     $router->get('akun-terima','Esaku\KasBank\UangMasukController@getAkunTerima');
 
@@ -256,20 +256,20 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('kas-bank-dok','Esaku\KasBank\KasBankDokController@destroy');
 
     // ANGGARAN
-    $router->get('tahun','Esaku\Anggaran\AnggaranController@getTahun'); 
-    $router->get('anggaran','Esaku\Anggaran\AnggaranController@index');          
-    $router->post('anggaran-upload','Esaku\Anggaran\AnggaranController@importExcel'); 
-    $router->get('anggaran-load','Esaku\Anggaran\AnggaranController@loadAnggaran');    
-    $router->post('anggaran','Esaku\Anggaran\AnggaranController@store');  
+    $router->get('tahun','Esaku\Anggaran\AnggaranController@getTahun');
+    $router->get('anggaran','Esaku\Anggaran\AnggaranController@index');
+    $router->post('anggaran-upload','Esaku\Anggaran\AnggaranController@importExcel');
+    $router->get('anggaran-load','Esaku\Anggaran\AnggaranController@loadAnggaran');
+    $router->post('anggaran','Esaku\Anggaran\AnggaranController@store');
 
     // RRA AJU
-    $router->get('rra-agg-saldo','Esaku\Anggaran\PengajuanRRAController@getSaldo'); 
-    $router->get('rra-agg','Esaku\Anggaran\PengajuanRRAController@index');    
-    $router->get('rra-agg-detail','Esaku\Anggaran\PengajuanRRAController@show');          
-    $router->post('rra-agg','Esaku\Anggaran\PengajuanRRAController@store'); 
-    $router->put('rra-agg','Esaku\Anggaran\PengajuanRRAController@update');    
-    $router->delete('rra-agg','Esaku\Anggaran\PengajuanRRAController@destroy'); 
-    $router->get('rra-nik-app','Esaku\Anggaran\PengajuanRRAController@getNIKApp'); 
+    $router->get('rra-agg-saldo','Esaku\Anggaran\PengajuanRRAController@getSaldo');
+    $router->get('rra-agg','Esaku\Anggaran\PengajuanRRAController@index');
+    $router->get('rra-agg-detail','Esaku\Anggaran\PengajuanRRAController@show');
+    $router->post('rra-agg','Esaku\Anggaran\PengajuanRRAController@store');
+    $router->put('rra-agg','Esaku\Anggaran\PengajuanRRAController@update');
+    $router->delete('rra-agg','Esaku\Anggaran\PengajuanRRAController@destroy');
+    $router->get('rra-nik-app','Esaku\Anggaran\PengajuanRRAController@getNIKApp');
     $router->get('rra-pp-terima','Esaku\Anggaran\PengajuanRRAController@getPPTerima');
     $router->get('rra-akun-terima','Esaku\Anggaran\PengajuanRRAController@getAkunTerima');
     $router->get('rra-mta','Esaku\Anggaran\PengajuanRRAController@getAkun');
@@ -279,11 +279,11 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('rra-app-ajudet','Esaku\Anggaran\ApprovalController@getAjuDet');
     $router->post('rra-app','Esaku\Anggaran\ApprovalController@store');
 
-    $router->post('send-whatsapp','Esaku\Setting\WAController@sendMessage'); 
-    $router->get('msg-whatsapp','Esaku\Setting\WAController@Messages'); 
-    $router->post('pooling','Esaku\Setting\WAController@storePooling'); 
-    $router->post('jurnal-notifikasi','Esaku\Keuangan\JurnalController@sendNotifikasi'); 
-    
+    $router->post('send-whatsapp','Esaku\Setting\WAController@sendMessage');
+    $router->get('msg-whatsapp','Esaku\Setting\WAController@Messages');
+    $router->post('pooling','Esaku\Setting\WAController@storePooling');
+    $router->post('jurnal-notifikasi','Esaku\Keuangan\JurnalController@sendNotifikasi');
+
     // AKRU SIMPANAN
     $router->get('akru-simp','Esaku\Simpanan\AkruSimpController@index');
     $router->get('akru-simp-detail','Esaku\Simpanan\AkruSimpController@show');
@@ -377,6 +377,12 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('v2/sdm-karyawan-update','Sdm\KepegawaianV2Controller@update');
     $router->delete('v2/sdm-karyawan','Sdm\KepegawaianV2Controller@destroy');
 
+    $router->get('v3/sdm-karyawans','Sdm\KepegawaianV3Controller@index');
+    $router->get('v3/sdm-karyawan','Sdm\KepegawaianV3Controller@show');
+    $router->post('v3/sdm-karyawan','Sdm\KepegawaianV3Controller@save');
+    $router->post('v3/sdm-karyawan-update','Sdm\KepegawaianV3Controller@update');
+    $router->delete('v3/sdm-karyawan','Sdm\KepegawaianV3Controller@destroy');
+
     // UPLOAD KARYAWAN
     $router->post('sdm-karyawan-simpan','Sdm\UploadPegawaiController@store');
     $router->post('sdm-karyawan-import','Sdm\UploadPegawaiController@importXLS');
@@ -459,26 +465,26 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('sdm-adm-sanksi','Sdm\SanksiAdmController@save');
     $router->post('sdm-adm-sanksi-update','Sdm\SanksiAdmController@update');
     $router->delete('sdm-adm-sanksi','Sdm\SanksiAdmController@destroy');
-    
+
     $router->get('inv-hitung-hpp','Esaku\Inventori\HppController@index');
     $router->get('inv-hitung-hpp-detail','Esaku\Inventori\HppController@show');
     $router->get('inv-hitung-hpp-load','Esaku\Inventori\HppController@loadData');
     $router->post('inv-hitung-hpp','Esaku\Inventori\HppController@store');
     $router->post('inv-hitung-hpp-update','Esaku\Inventori\HppController@update');
     $router->delete('inv-hitung-hpp','Esaku\Inventori\HppController@destroy');
-    
+
     //Retur Penjualan
     $router->get('retur-jual-bukti','Esaku\Inventori\ReturPenjualanController@getPenjualan');
     $router->get('retur-jual-detail','Esaku\Inventori\ReturPenjualanController@show');
     $router->post('retur-jual','Esaku\Inventori\ReturPenjualanController@store');
-    
+
 });
 
 $router->post('select-query', 'Esaku\Inventori\Sync2Controller@selectQuery');
-$router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');    
+$router->get('anggaran-export','Esaku\Anggaran\AnggaranController@export');
 
 $router->group(['middleware' => 'auth:admin'], function () use ($router) {
-    
+
     // $router->get('load-sync-master','Esaku\Inventori\Sync2Controller@loadSyncMaster');
     // $router->post('sync-pnj','Esaku\Inventori\Sync2Controller@syncPnj');
     // $router->post('sync-pmb','Esaku\Inventori\Sync2Controller@syncPmb');
@@ -491,7 +497,3 @@ $router->get('jurnal-upload-export', 'Esaku\Keuangan\JurnalUploadController@expo
 $router->get('akun-export', 'Esaku\Keuangan\AkunController@export');
 $router->get('terima-simp-upload-export', 'Esaku\Simpanan\PenerimaanUploadController@export');
 $router->get('sdm-export', 'Sdm\UploadPegawaiController@exportXLS');
-
-
-
-?>
