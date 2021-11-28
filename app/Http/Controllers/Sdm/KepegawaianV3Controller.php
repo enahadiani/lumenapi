@@ -570,18 +570,17 @@ class KepegawaianV3Controller extends Controller
                 ->where('nik', $request->input('nik'))
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
+
             DB::connection($this->db)->table('hr_sdm_client')
                 ->where('nik', $request->input('nik'))
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
-            DB::connection($this->db)->table('hr_sdm_gaji')
-                ->where('nik', $request->input('nik'))
-                ->where('kode_lokasi', $kode_lokasi)
-                ->delete();
+
             DB::connection($this->db)->table('hr_sdm_doc')
                 ->where('nik', $request->input('nik'))
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
+
             $insert_kar = "INSERT INTO hr_sdm_pribadi(
                     nik,kode_lokasi,
                     nama, nomor_ktp,
