@@ -111,10 +111,7 @@ class KepegawaianV3Controller extends Controller
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3), true);
 
-            // DATA GAJI PARAM
-            $sql4 = "SELECT kode_param,nama_param,nilai,nu FROM hr_sdm_gaji WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ORDER BY nu ";
-            $res4 = DB::connection($this->db)->select($sql4);
-            $res4 = json_decode(json_encode($res4), true);
+
 
             // DATA CLIENT
             $sql5 = "SELECT  nama_client,skill,no_kontrak,
@@ -135,7 +132,6 @@ class KepegawaianV3Controller extends Controller
                 $success['data_pribadi'] = $res;
                 $success['data_kepeg'] = $res2;
                 $success['data_bank'] = $res3;
-                $success['data_gaji'] = $res4;
                 $success['data_client'] = $res5;
                 $success['data_doc'] = $res6;
                 $success['status'] = true;
@@ -147,10 +143,48 @@ class KepegawaianV3Controller extends Controller
                 $success['data_pribadi'] = [];
                 $success['data_kepeg'] = [];
                 $success['data_bank'] = [];
-                $success['data_gaji'] = [];
                 $success['data_client'] = [];
                 $success['data_doc'] = [];
                 $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function show_gaji(Request $request)
+    {
+        $this->validate($request, [
+            'nik' => 'required'
+        ]);
+
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $kode_lokasi = $data->kode_lokasi;
+            }
+            $nik = $request->nik;
+
+            // DATA GAJI PARAM
+            $sql = "SELECT nik,kode_param,nama_param,nilai,nu FROM hr_sdm_gaji WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ORDER BY nu ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res), true);
+
+            if (count($res) > 0) {
+                $success['data'] = $res;
+                $success['nik'] = $nik;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['data'] = [];
+                $success['nik'] = $nik;
+                $success['status'] = true;
                 $success['message'] = "Data Kosong!";
 
                 return response()->json($success, $this->successStatus);
@@ -341,25 +375,6 @@ class KepegawaianV3Controller extends Controller
                     $kode_lokasi
                 ]);
 
-                if (count($request->input('kode_param')) > 0) {
-                    $nik = $request->input('nik');
-                    $insert_param = "INSERT INTO hr_sdm_gaji(nik,kode_param,nama_param,nilai,kode_lokasi,nu) VALUES(?,?,?,?,?,?)";
-                    for ($y = 0; $y < count($request->input('kode_param')); $y++) {
-                        $kode_param = $request->input('kode_param');
-                        $nama_param = $request->input('nama_param');
-                        $nilai = $request->input('nilai');
-                        $nu_param = $request->input('nu_param');
-                        DB::connection($this->db)->insert($insert_param, [
-                            $nik,
-                            $kode_param[$y],
-                            $nama_param[$y],
-                            $nilai[$y],
-                            $kode_lokasi,
-                            $nu_param[$y],
-                        ]);
-                    }
-                }
-
                 if (count($request->input('nu')) > 0) {
                     if (!empty($request->file('file'))) {
                         if (count($request->file('file')) > 0) {
@@ -427,6 +442,57 @@ class KepegawaianV3Controller extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function save_gaji(Request $request)
+    {
+        $this->validate($request, [
+            'nik' => 'required',
+            'kode_param' => 'required'
+        ]);
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $kode_lokasi = $data->kode_lokasi;
+            }
+            DB::connection($this->db)->table('hr_sdm_gaji')
+                ->where('nik', $request->input('nik'))
+                ->where('kode_lokasi', $kode_lokasi)
+                ->delete();
+            if (count($request->input('kode_param')) > 0) {
+                $nik = $request->input('nik');
+                $insert_param = "INSERT INTO hr_sdm_gaji(nik,kode_param,nama_param,nilai,kode_lokasi,nu) VALUES(?,?,?,?,?,?)";
+                for ($y = 0; $y < count($request->input('kode_param')); $y++) {
+                    $kode_param = $request->input('kode_param');
+                    $nama_param = $request->input('nama_param');
+                    $nilai = $request->input('nilai');
+                    $nu_param = $request->input('nu_param');
+                    DB::connection($this->db)->insert($insert_param, [
+                        $nik,
+                        $kode_param[$y],
+                        $nama_param[$y],
+                        $nilai[$y],
+                        $kode_lokasi,
+                        $nu_param[$y],
+                    ]);
+                }
+            }
+
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Param Gaji karyawan berhasil disimpan";
+            $success['kode'] = $request->nik;
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Param Gaji karyawan gagal disimpan " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -632,24 +698,7 @@ class KepegawaianV3Controller extends Controller
                 $kode_lokasi
             ]);
 
-            if (count($request->input('kode_param')) > 0) {
-                $nik = $request->input('nik');
-                $insert_param = "INSERT INTO hr_sdm_gaji(nik,kode_param,nama_param,nilai,kode_lokasi,nu) VALUES(?,?,?,?,?,?)";
-                for ($y = 0; $y < count($request->input('kode_param')); $y++) {
-                    $kode_param = $request->input('kode_param');
-                    $nama_param = $request->input('nama_param');
-                    $nilai = $request->input('nilai');
-                    $nu_param = $request->input('nu_param');
-                    DB::connection($this->db)->insert($insert_param, [
-                        $nik,
-                        $kode_param[$y],
-                        $nama_param[$y],
-                        $nilai[$y],
-                        $kode_lokasi,
-                        $nu_param[$y],
-                    ]);
-                }
-            }
+
 
             if (count($request->input('nu')) > 0) {
                 if (!empty($request->file('file'))) {
