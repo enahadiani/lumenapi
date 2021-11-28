@@ -77,25 +77,37 @@ class KepegawaianV3Controller extends Controller
             }
 
             // data pribadi
-            $sql1 = "SELECT nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir,
-            convert(varchar(10), tgl_lahir, 101) as tgl_lahir,alamat,
-            provinsi,kota,kecamatan,kelurahan,kode_pos,tinggi_badan,berat_badan,
-            golongan_darah,nomor_kk,status_nikah,
+            $sql1 = "SELECT a.nik, a.nama, a.nomor_ktp, a.jenis_kelamin, a.kode_agama,b.nama as nama_agama, a.no_telp, a.no_hp, a.tempat_lahir,
+            convert(varchar(10), a.tgl_lahir, 101) as tgl_lahir,a.alamat,
+            a.provinsi,a.kota,a.kecamatan,a.kelurahan,a.kode_pos,a.tinggi_badan,a.berat_badan,
+            a.golongan_darah,a.nomor_kk,a.status_nikah,
             convert(varchar(10), tgl_nikah, 101) as tgl_nikah
-            FROM hr_sdm_pribadi
-            WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            FROM hr_sdm_pribadi a
+            LEFT JOIN hr_agama b ON a.kode_agama=b.kode_agama AND a.kode_lokasi=b.kode_lokasi
+            WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
             $res = DB::connection($this->db)->select($sql1);
             $res = json_decode(json_encode($res), true);
 
             // Data Kepegawaian
-            $sql2 = "SELECT kode_golongan,kode_sdm, kode_area, kode_area,kode_fm, kode_bm, kode_loker, no_npwp, no_bpjs, tgl_masuk, no_bpjs_naker, kode_profesi
-            FROM hr_sdm_kepegawaian WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $sql2 = "SELECT a.kode_golongan,h.nama as nama_golongan,a.kode_sdm,b.nama as nama_sdm, a.kode_area,c.nama as nama_area,a.kode_fm,d.nama as nama_fm,
+            a.kode_bm,e.nama as nama_bm, a.kode_loker,f.nama as nama_loker, a.no_npwp, a.no_bpjs,
+            a.tgl_masuk, a.no_bpjs_naker, a.kode_profesi,g.nama as nama_profesi
+            FROM hr_sdm_kepegawaian a
+            LEFT JOIN hr_sdm b ON a.kode_sdm=b.kode_sdm AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_area c ON a.kode_area=c.kode_area AND a.kode_lokasi=c.kode_lokasi
+            LEFT JOIN hr_fm d ON a.kode_fm=d.kode_fm AND a.kode_lokasi=d.kode_lokasi
+            LEFT JOIN hr_bm e ON a.kode_bm=e.kode_bm AND a.kode_lokasi=e.kode_lokasi
+            LEFT JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi
+            LEFT JOIN hr_profesi g ON a.kode_profesi=g.kode_profesi AND a.kode_lokasi=g.kode_lokasi
+            LEFT JOIN hr_gol h ON a.kode_golongan=h.kode_gol AND a.kode_lokasi=g.kode_lokasi
+            WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2), true);
 
             // DATA BANK
-            $sql3 = "SELECT kode_bank,cabang, no_rek,nama_rek
-            FROM hr_sdm_bank WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "'";
+            $sql3 = "SELECT a.kode_bank,b.nama as nama_bank,a.cabang, a.no_rek,a.nama_rek
+            FROM hr_sdm_bank a
+            LEFT JOIN hr_bank b ON a.kode_bank=b.kode_bank WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3), true);
 
