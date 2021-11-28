@@ -117,7 +117,11 @@ class KepegawaianV3Controller extends Controller
             $res4 = json_decode(json_encode($res4), true);
 
             // DATA CLIENT
-            $sql5 = "SELECT * FROM hr_sdm_client WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql5 = "SELECT  nama_client,skill,no_kontrak,
+            convert(varchar(10), tgl_kontrak_awal, 101) as tgl_kontrak_awal,
+            convert(varchar(10), tgl_kontrak_akhir, 101) as tgl_kontrak_akhir,
+            atasan_langsung,atasan_tidak_langsung
+            FROM hr_sdm_client WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ";
             $res5 = DB::connection($this->db)->select($sql5);
             $res5 = json_decode(json_encode($res5), true);
 
