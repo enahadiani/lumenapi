@@ -502,4 +502,6 @@ $router->get('sawal-export', 'Esaku\Keuangan\SawalController@export');
 $router->get('jurnal-upload-export', 'Esaku\Keuangan\JurnalUploadController@export');
 $router->get('akun-export', 'Esaku\Keuangan\AkunController@export');
 $router->get('terima-simp-upload-export', 'Esaku\Simpanan\PenerimaanUploadController@export');
+
+// export template excel SDM -Data Karaywan
 $router->get('sdm-export', 'Sdm\UploadPegawaiController@exportXLS');
