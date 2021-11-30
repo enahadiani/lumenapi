@@ -117,7 +117,7 @@ class PengajuanController extends Controller
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.no_dokumen,a.kode_pp,a.komentar,a.tanggal,a.keterangan,p.nama as nama_pp,
             case when a.progress='R' then 'Return' when a.progress = 'S' then 'Finish' else nvl(x.nama_jab,'-') 
-            end as posisi,a.progress
+            end as progress,a.progress as kode_progress
             from agg_rkm_m a
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
             left join (select a.no_bukti,b.nama as nama_jab
