@@ -834,6 +834,8 @@ class DashboardFPController extends Controller
                                 'sliced' =>  true,
                                 'selected' => true,
                                 'negative' => true,
+                                'fillColor' => 'url(#custom-pattern)',                            
+                                'color' => 'url(#custom-pattern)',
                                 'nilai' => $item['n4']
                             ];
                         }else{
@@ -853,6 +855,8 @@ class DashboardFPController extends Controller
                                 'name' => $name,
                                 'y' => abs(floatval($_persen)),
                                 'negative' => true,
+                                'fillColor' => 'url(#custom-pattern)',                            
+                                'color' => 'url(#custom-pattern)',
                                 'nilai' => $item['n4']
                             ];
                         }else{
@@ -875,6 +879,8 @@ class DashboardFPController extends Controller
                             'name' => $name,
                             'y' => abs(floatval($_persen)),
                             'negative' => true,
+                            'fillColor' => 'url(#custom-pattern)',
+                            'color' => 'url(#custom-pattern)',
                             'nilai' => $item['n4']
                         ];
                     }else{
