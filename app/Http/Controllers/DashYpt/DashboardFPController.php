@@ -1135,12 +1135,12 @@ class DashboardFPController extends Controller
             }
 
             if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $lokasi = $r->kode_lokasi;
+                $filter_lokasi = " and a.kode_lokasi='$r->kode_lokasi'";
             }else{
-                $lokasi = $kode_lokasi;
+                $filter_lokasi = "";
             }
 
-            $where = "WHERE a.kode_lokasi = '$lokasi' AND a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' ";
+            $where = "WHERE a.kode_lokasi IN ('03','11','12','13','14','15') and a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' $filter_lokasi ";
 
             $tahun = intval($r->query('periode')[1]);
             $periode = [];
@@ -1153,8 +1153,9 @@ class DashboardFPController extends Controller
                 }
             }
 
-            $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5
+            $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5,c.skode as lokasi
             FROM neraca a
+            INNER JOIN dash_ypt_lokasi c on a.kode_lokasi=c.kode_lokasi
             INNER JOIN (
                 SELECT a.kode_neraca,a.kode_lokasi,
                     SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.n4,0) ELSE -ISNULL(b.n4,0) END) AS n1,
@@ -1172,7 +1173,7 @@ class DashboardFPController extends Controller
                     $where
                 GROUP BY a.kode_neraca,a.kode_lokasi
             )b ON a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$lokasi' and a.kode_fs='FS1'";
+            where a.kode_lokasi IN ('03','11','12','13','14','15') and a.kode_fs='FS1' $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -1189,7 +1190,7 @@ class DashboardFPController extends Controller
                 array_unshift($data, floatval($item['n1']),  floatval($item['n2']),  floatval($item['n3']), floatval($item['n4']), floatval($item['n5']));
 
                 $_series = [
-                    'name' => $item['nama'],
+                    'name' => $item['lokasi'],
                     'data' => $data
                 ];
 
