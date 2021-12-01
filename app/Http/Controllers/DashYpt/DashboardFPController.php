@@ -428,13 +428,15 @@ class DashboardFPController extends Controller
                         $value = [
                             'name' => $name,
                             'y' => abs(floatval($_persen)),
-                            'negative' => true
+                            'negative' => true,
+                            'nilai' => $item['n4']
                         ];
                     } else {
                         $value = [
                             'name' => $name,
                             'y' => floatval($_persen),
-                            'negative' => false
+                            'negative' => false,
+                            'nilai' => $item['n4']
                         ];
                     }
                     array_push($chart, $value);
@@ -450,13 +452,15 @@ class DashboardFPController extends Controller
                         $value = [
                             'name' => $name,
                             'y' => abs(floatval($_persen)),
-                            'negative' => true
+                            'negative' => true,
+                            'nilai' => $item['n4']
                         ];
                     } else {
                         $value = [
                             'name' => $name,
                             'y' => floatval($_persen),
-                            'negative' => false
+                            'negative' => false,
+                            'nilai' => $item['n4']
                         ];
                     }
                     array_push($chart, $value);
@@ -468,7 +472,8 @@ class DashboardFPController extends Controller
                     $value = [
                         'name' => $name,
                         'y' => floatval($_persen),
-                        'negative' => false
+                        'negative' => false,
+                        'nilai' => $item['n4']
                     ];
                     array_push($chart, $value);
                 }
@@ -816,23 +821,47 @@ class DashboardFPController extends Controller
             $idx = 0;
             if($total > 0) {
                 foreach($res as $item) { 
-                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
+                    $persen = (floatval($item['n4']) / $total) * 100;
                     $_persen = number_format((float)$persen, 1, '.', '');
                     
                     $name = $item['skode'];
 
                     if($idx == 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'sliced' =>  true,
-                            'selected' => true
-                        ];
+                        if($_persen < 0){
+                            $value = [
+                                'name' => $name,
+                                'y' => abs(floatval($_persen)),
+                                'sliced' =>  true,
+                                'selected' => true,
+                                'negative' => true,
+                                'nilai' => $item['n4']
+                            ];
+                        }else{
+
+                            $value = [
+                                'name' => $name,
+                                'y' => floatval($_persen),
+                                'sliced' =>  true,
+                                'selected' => true,
+                                'negative' => false,
+                                'nilai' => $item['n4']
+                            ];
+                        }
                     } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen)
-                        ];
+                        if($_persen < 0){
+                            $value = [
+                                'name' => $name,
+                                'y' => abs(floatval($_persen)),
+                                'negative' => true,
+                                'nilai' => $item['n4']
+                            ];
+                        }else{
+                            $value = [
+                                'name' => $name,
+                                'y' => floatval($_persen),'negative' => false,
+                                'nilai' => $item['n4']
+                            ];
+                        }
                     }
                     array_push($chart, $value);
                     $idx++;
@@ -841,11 +870,21 @@ class DashboardFPController extends Controller
                 foreach($res as $item) {
                     $_persen = 0;
                     $name = $item['skode'];
-
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
+                    if($_persen < 0) {
+                        $value = [
+                            'name' => $name,
+                            'y' => abs(floatval($_persen)),
+                            'negative' => true,
+                            'nilai' => $item['n4']
+                        ];
+                    }else{
+                        $value = [
+                            'name' => $name,
+                            'y' => floatval($_persen),
+                            'negative' => false,
+                            'nilai' => $item['n4']
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             }
