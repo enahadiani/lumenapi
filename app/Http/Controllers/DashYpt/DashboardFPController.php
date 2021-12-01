@@ -977,7 +977,7 @@ class DashboardFPController extends Controller
             $series = [];
             foreach($res as $item) {
                 $data = [];
-                array_unshift($data, intval($item['n1']), intval($item['n4']), intval($item['n5']), intval($item['n6']));
+                array_unshift($data, floatval($item['n1']), floatval($item['n4']), floatval($item['n5']), floatval($item['n6']));
 
                 $_series = [
                     'name' => $item['nama'],
