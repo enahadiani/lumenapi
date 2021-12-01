@@ -71,9 +71,9 @@ class DashboardCFController extends Controller {
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='10' THEN b.n4 ELSE 0 END) AS n10,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='11' THEN b.n4 ELSE 0 END) AS n11,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='12' THEN b.n4 ELSE 0 END) AS n12
-                FROM db_grafik_d a
+                FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 WHERE a.kode_lokasi='20' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='2021'
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi

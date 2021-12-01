@@ -58,10 +58,16 @@ class DashboardFPV2Controller extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
+            }
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi='20' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
+            $where = "WHERE a.kode_lokasi='$lokasi' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_grafik, c.nama,
@@ -142,7 +148,8 @@ class DashboardFPV2Controller extends Controller {
                 "data_pdpt" => $data_pdpt,
                 "data_beban" => $data_beban,
                 "data_shu" => $data_shu,
-                "data_or" => $data_or
+                "data_or" => $data_or,
+                "lokasi" => $r->all()
             ];
 
             return response()->json($success, $this->successStatus); 
@@ -159,10 +166,14 @@ class DashboardFPV2Controller extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04')";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04') $filter_lokasi ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -182,7 +193,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -204,7 +215,8 @@ class DashboardFPV2Controller extends Controller {
             $success['data'] = [
                 'kategori' => $ctg,
                 'anggaran' => $anggaran,
-                'realisasi' => $realisasi
+                'realisasi' => $realisasi,
+                'lokasi' => $filter_lokasi
             ];
 
             return response()->json($success, $this->successStatus); 
@@ -221,10 +233,16 @@ class DashboardFPV2Controller extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03')";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -244,7 +262,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -265,7 +283,8 @@ class DashboardFPV2Controller extends Controller {
             $success['data'] = [
                 'kategori' => $ctg,
                 'anggaran' => $anggaran,
-                'realisasi' => $realisasi
+                'realisasi' => $realisasi,
+                'lokasi' => $filter_lokasi
             ];
 
             return response()->json($success, $this->successStatus); 
@@ -283,9 +302,15 @@ class DashboardFPV2Controller extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
+
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02')";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -305,7 +330,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -326,7 +351,8 @@ class DashboardFPV2Controller extends Controller {
             $success['data'] = [
                 'kategori' => $ctg,
                 'anggaran' => $anggaran,
-                'realisasi' => $realisasi
+                'realisasi' => $realisasi,
+                'lokasi' => $filter_lokasi
             ];
 
             return response()->json($success, $this->successStatus); 
@@ -344,9 +370,15 @@ class DashboardFPV2Controller extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
+            
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01')";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -366,7 +398,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -387,7 +419,8 @@ class DashboardFPV2Controller extends Controller {
             $success['data'] = [
                 'kategori' => $ctg,
                 'anggaran' => $anggaran,
-                'realisasi' => $realisasi
+                'realisasi' => $realisasi,
+                'lokasi' => $r->kode_lokasi
             ];
 
             return response()->json($success, $this->successStatus); 
