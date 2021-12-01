@@ -31,6 +31,18 @@ class KepegawaianV3Controller extends Controller
         }
     }
 
+    public function isUnik_kontrak($isi, $kode_lokasi)
+    {
+
+        $auth = DB::connection($this->db)->select("SELECT no_kontrak FROM hr_sdm_client WHERE no_kontrak ='" . $isi . "' AND kode_lokasi = '" . $kode_lokasi . "'");
+        $auth = json_decode(json_encode($auth), true);
+        if (count($auth) > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -88,21 +100,6 @@ class KepegawaianV3Controller extends Controller
             $res = DB::connection($this->db)->select($sql1);
             $res = json_decode(json_encode($res), true);
 
-            // Data Kepegawaian
-            $sql2 = "SELECT a.kode_golongan,h.nama as nama_golongan,a.kode_sdm,b.nama as nama_sdm, a.kode_area,c.nama as nama_area,a.kode_fm,d.nama as nama_fm,
-            a.kode_bm,e.nama as nama_bm, a.kode_loker,f.nama as nama_loker, a.no_npwp, a.no_bpjs,
-            a.tgl_masuk, a.no_bpjs_naker, a.kode_profesi,g.nama as nama_profesi
-            FROM hr_sdm_kepegawaian a
-            LEFT JOIN hr_sdm b ON a.kode_sdm=b.kode_sdm AND a.kode_lokasi=b.kode_lokasi
-            LEFT JOIN hr_area c ON a.kode_area=c.kode_area AND a.kode_lokasi=c.kode_lokasi
-            LEFT JOIN hr_fm d ON a.kode_fm=d.kode_fm AND a.kode_lokasi=d.kode_lokasi
-            LEFT JOIN hr_bm e ON a.kode_bm=e.kode_bm AND a.kode_lokasi=e.kode_lokasi
-            LEFT JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi
-            LEFT JOIN hr_profesi g ON a.kode_profesi=g.kode_profesi AND a.kode_lokasi=g.kode_lokasi
-            LEFT JOIN hr_gol h ON a.kode_golongan=h.kode_gol AND a.kode_lokasi=g.kode_lokasi
-            WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
-            $res2 = DB::connection($this->db)->select($sql2);
-            $res2 = json_decode(json_encode($res2), true);
 
             // DATA BANK
             $sql3 = "SELECT a.kode_bank,b.nama as nama_bank,a.cabang, a.no_rek,a.nama_rek
@@ -112,27 +109,15 @@ class KepegawaianV3Controller extends Controller
             $res3 = json_decode(json_encode($res3), true);
 
 
-
-            // DATA CLIENT
-            $sql5 = "SELECT  nama_client,skill,no_kontrak,
-            convert(varchar(10), tgl_kontrak_awal, 101) as tgl_kontrak_awal,
-            convert(varchar(10), tgl_kontrak_akhir, 101) as tgl_kontrak_akhir,
-            atasan_langsung,atasan_tidak_langsung
-            FROM hr_sdm_client WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ";
-            $res5 = DB::connection($this->db)->select($sql5);
-            $res5 = json_decode(json_encode($res5), true);
-
             $sql6 = "SELECT nu, jenis, dokumen, sts_dokumen FROM hr_sdm_doc WHERE kode_lokasi = '" . $kode_lokasi . "'
             AND nik = '" . $request->query('nik') . "' ORDER BY nu";
 
-            $res6 = DB::connection($this->db)->select($sql3);
+            $res6 = DB::connection($this->db)->select($sql6);
             $res6 = json_decode(json_encode($res6), true);
 
             if (count($res) > 0) {
                 $success['data_pribadi'] = $res;
-                $success['data_kepeg'] = $res2;
                 $success['data_bank'] = $res3;
-                $success['data_client'] = $res5;
                 $success['data_doc'] = $res6;
                 $success['status'] = true;
                 $success['message'] = "Success!";
@@ -146,6 +131,69 @@ class KepegawaianV3Controller extends Controller
                 $success['data_client'] = [];
                 $success['data_doc'] = [];
                 $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function show_kontrak(Request $request)
+    {
+        $this->validate($request, [
+            'nik' => 'required'
+        ]);
+
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $nik = $request->input('nik');
+            // Data Kepegawaian
+            $sql2 = "SELECT a.kode,a.nik,a.kode_sdm,b.nama as nama_sdm, a.kode_area,c.nama as nama_area,a.kode_fm,d.nama as nama_fm,
+            a.kode_bm,e.nama as nama_bm, a.kode_loker,f.nama as nama_loker, a.no_npwp, a.no_bpjs,
+            convert(varchar(10), a.tgl_masuk, 101) as tgl_masuk,
+            a.no_bpjs_naker, a.kode_profesi,g.nama as nama_profesi,a.kode_status,h.nama as nama_status
+            FROM hr_sdm_kepegawaian a
+            LEFT JOIN hr_sdm b ON a.kode_sdm=b.kode_sdm AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_area c ON a.kode_area=c.kode_area AND a.kode_lokasi=c.kode_lokasi
+            LEFT JOIN hr_fm d ON a.kode_fm=d.kode_fm AND a.kode_lokasi=d.kode_lokasi
+            LEFT JOIN hr_bm e ON a.kode_bm=e.kode_bm AND a.kode_lokasi=e.kode_lokasi
+            LEFT JOIN hr_loker f ON a.kode_loker=f.kode_loker AND a.kode_lokasi=f.kode_lokasi
+            LEFT JOIN hr_profesi g ON a.kode_profesi=g.kode_profesi AND a.kode_lokasi=g.kode_lokasi
+            LEFT JOIN hr_status h ON a.kode_status=h.kode AND a.kode_lokasi=h.kode_lokasi
+            WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2), true);
+
+
+            // DATA CLIENT
+            $sql5 = "SELECT  nama_client,skill,no_kontrak,
+            convert(varchar(10), tgl_kontrak_akhir, 101) as tgl_kontrak_akhir,
+            atasan_langsung,atasan_tidak_langsung,
+            DATEDIFF(day, tgl_kontrak_awal, tgl_kontrak_akhir) as jumlah_hari_kontrak,
+            DATEDIFF(day, GETDATE(), tgl_kontrak_akhir) as sisa_hari_kontrak
+            FROM hr_sdm_client WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ";
+            $res5 = DB::connection($this->db)->select($sql5);
+            $res5 = json_decode(json_encode($res5), true);
+
+            if (count($res2) > 0) {
+                $success['data_kepeg'] = $res2;
+                $success['data_client'] = $res5;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['data_kepeg'] = [];
+                $success['data_client'] = [];
+                $success['nik'] = $nik;
+                $success['status'] = true;
                 $success['message'] = "Data Kosong!";
 
                 return response()->json($success, $this->successStatus);
@@ -226,30 +274,12 @@ class KepegawaianV3Controller extends Controller
             'nomor_kk' => 'required',
             'status_nikah' => 'required',
             'tgl_nikah' => 'required',
-            'kode_golongan' => 'required',
-            'kode_sdm' => 'required',
-            'kode_loker' => 'required',
-            'tgl_masuk' => 'required',
-            'no_npwp' => 'required',
-            'no_bpjs' => 'required',
-            'no_bpjs_naker' => 'required',
-            'kode_profesi' => 'required',
             'kode_bank' => 'required',
             'cabang' => 'required',
             'no_rek' => 'required',
             'nama_rek' => 'required',
-            'skill' => 'required',
-            'no_kontrak' => 'required',
-            'tgl_kontrak_awal' => 'required',
-            'tgl_kontrak_akhir' => 'required',
-            'kode_area' => 'required',
-            'kode_fm' => 'required',
-            'kode_bm' => 'required',
-            'nama_client' => 'required',
-            'atasan_langsung' => 'required',
-            'atasan_tidak_langsung' => 'required',
         ]);
-        // 49 field
+
 
         DB::connection($this->db)->beginTransaction();
         try {
@@ -306,37 +336,6 @@ class KepegawaianV3Controller extends Controller
                     // 6
                 ]);
 
-                $insert_kepeg = "INSERT INTO hr_sdm_kepegawaian(
-                        nik,kode_golongan,
-                        kode_sdm,kode_area,kode_fm,
-                        kode_bm,kode_loker,no_npwp,no_bpjs,
-                        tgl_masuk,no_bpjs_naker,kode_profesi,kode_lokasi
-                    ) VALUES(
-                        ?,?,
-                        ?,?,?,
-                        ?,?,?,?,
-                        ?,?,?,?
-                    )";
-                DB::connection($this->db)->insert($insert_kepeg, [
-                    $request->input('nik'),
-                    $request->input('kode_golongan'),
-                    // 2
-                    $request->input('kode_sdm'),
-                    $request->input('kode_area'),
-                    $request->input('kode_fm'),
-                    // 3
-                    $request->input('kode_bm'),
-                    $request->input('kode_loker'),
-                    $request->input('no_npwp'),
-                    $request->input('no_bpjs'),
-
-                    // 4
-                    $request->input('tgl_masuk'),
-                    $request->input('no_bpjs_naker'),
-                    $request->input('kode_profesi'),
-                    $kode_lokasi
-                ]);
-
                 $insert_bank = "INSERT INTO hr_sdm_bank(
                         nik,kode_lokasi,
                         kode_bank,cabang,no_rek,nama_rek
@@ -353,27 +352,6 @@ class KepegawaianV3Controller extends Controller
                     $request->input('nama_rek'),
                 ]);
 
-                $insert_client = "INSERT INTO hr_sdm_client(
-                    nik,nama_client,skill,
-                    no_kontrak,tgl_kontrak_awal,tgl_kontrak_akhir,
-                    atasan_langsung,atasan_tidak_langsung,kode_lokasi
-                    ) VALUES(
-                        ?,?,?,
-                        ?,?,?,
-                        ?,?,?
-                    )";
-
-                DB::connection($this->db)->insert($insert_client, [
-                    $request->input('nik'),
-                    $request->input('nama_client'),
-                    $request->input('skill'),
-                    $request->input('no_kontrak'),
-                    $request->input('tgl_kontrak_awal'),
-                    $request->input('tgl_kontrak_akhir'),
-                    $request->input('atasan_langsung'),
-                    $request->input('atasan_tidak_langsung'),
-                    $kode_lokasi
-                ]);
 
                 if (count($request->input('nu')) > 0) {
                     if (!empty($request->file('file'))) {
@@ -431,6 +409,115 @@ class KepegawaianV3Controller extends Controller
             } else {
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. NIK karyawan sudah ada di database!";
+            }
+            $success['kode'] = $request->nik;
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data karyawan gagal disimpan " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function save_kontrak(Request $request)
+    {
+        $this->validate($request, [
+            'kode_status' => 'required',
+            'kode_sdm' => 'required',
+            'kode_loker' => 'required',
+            'tgl_masuk' => 'required',
+            'no_npwp' => 'required',
+            'no_bpjs' => 'required',
+            'no_bpjs_naker' => 'required',
+            'kode_profesi' => 'required',
+            'skill' => 'required',
+            'no_kontrak' => 'required',
+            'tgl_kontrak_awal' => 'required',
+            'tgl_kontrak_akhir' => 'required',
+            'kode_area' => 'required',
+            'kode_fm' => 'required',
+            'kode_bm' => 'required',
+            'nama_client' => 'required',
+            'atasan_langsung' => 'required',
+            'atasan_tidak_langsung' => 'required',
+        ]);
+
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+            if ($this->isUnik($request->input('no_kontrak'), $kode_lokasi)) {
+
+
+                $insert_kepeg = "INSERT INTO hr_sdm_kepegawaian(
+                        kode,nik,
+                        kode_sdm,kode_area,kode_fm,
+                        kode_bm,kode_loker,no_npwp,no_bpjs,
+                        tgl_masuk,no_bpjs_naker,kode_profesi,kode_lokasi,kode_status
+                    ) VALUES(
+                        ?,?,
+                        ?,?,?,
+                        ?,?,?,?,
+                        ?,?,?,?,?
+                    )";
+                DB::connection($this->db)->insert($insert_kepeg, [
+                    $request->input('no_kontrak'),
+                    $request->input('nik'),
+
+                    // 2
+                    $request->input('kode_sdm'),
+                    $request->input('kode_area'),
+                    $request->input('kode_fm'),
+                    // 3
+                    $request->input('kode_bm'),
+                    $request->input('kode_loker'),
+                    $request->input('no_npwp'),
+                    $request->input('no_bpjs'),
+
+                    // 4
+                    $request->input('tgl_masuk'),
+                    $request->input('no_bpjs_naker'),
+                    $request->input('kode_profesi'),
+                    $kode_lokasi,
+                    $request->input('kode_status')
+                ]);
+
+
+
+                $insert_client = "INSERT INTO hr_sdm_client(
+                    kode,nik,nama_client,skill,
+                    no_kontrak,tgl_kontrak_awal,tgl_kontrak_akhir,
+                    atasan_langsung,atasan_tidak_langsung,kode_lokasi
+                    ) VALUES(
+                        ?,?,?,?,
+                        ?,?,?,
+                        ?,?,?
+                    )";
+
+                DB::connection($this->db)->insert($insert_client, [
+                    $request->input('no_kontrak'),
+                    $request->input('nik'),
+                    $request->input('nama_client'),
+                    $request->input('skill'),
+                    $request->input('no_kontrak'),
+                    $request->input('tgl_kontrak_awal'),
+                    $request->input('tgl_kontrak_akhir'),
+                    $request->input('atasan_langsung'),
+                    $request->input('atasan_tidak_langsung'),
+                    $kode_lokasi
+                ]);
+
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data karyawan berhasil disimpan";
+            } else {
+                $success['status'] = false;
+                $success['message'] = "No Kontrak Sudah digunakan silahkan gunakan No Kontrak yang lain!";
             }
             $success['kode'] = $request->nik;
 
@@ -820,7 +907,7 @@ class KepegawaianV3Controller extends Controller
         }
     }
 
-    public function getPP(Request $request)
+    public function get_status(Request $request)
     {
         try {
             if ($data =  Auth::guard($this->guard)->user()) {
@@ -828,7 +915,8 @@ class KepegawaianV3Controller extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_pp, nama FROM pp WHERE kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql = "SELECT kode,nama
+            FROM hr_status WHERE kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 

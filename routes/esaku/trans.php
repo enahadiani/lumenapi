@@ -386,6 +386,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('v3/sdm-karyawan-update', 'Sdm\KepegawaianV3Controller@update');
     $router->delete('v3/sdm-karyawan', 'Sdm\KepegawaianV3Controller@destroy');
 
+    // KONTRAK/UPDATE KARYAWAN (TRX)
+    $router->get('v3/sdm-kontrak', 'Sdm\KepegawaianV3Controller@show_kontrak');
+    $router->post('v3/sdm-kontrak', 'Sdm\KepegawaianV3Controller@save_kontrak');
+
+    // STATUS KEPEgAWAIAN
+    $router->get('v3/sdm-status', 'Sdm\KepegawaianV3Controller@get_status');
+
     // GAJI PARAM (TRX)
     $router->get('v3/sdm-gaji-param', 'Sdm\KepegawaianV3Controller@show_gaji');
     $router->post('v3/sdm-gaji-param', 'Sdm\KepegawaianV3Controller@save_gaji');
