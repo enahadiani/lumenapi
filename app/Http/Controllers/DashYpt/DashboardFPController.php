@@ -580,10 +580,14 @@ class DashboardFPController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt,0) AS pdpt, ISNULL(b.beban,0) AS beban, 
@@ -599,7 +603,7 @@ class DashboardFPController extends Controller
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -627,7 +631,8 @@ class DashboardFPController extends Controller
                 'kategori' => $ctg,
                 'data_pdpt' => $data_pdpt,
                 'data_beban' => $data_beban,
-                'data_shu' => $data_shu
+                'data_shu' => $data_shu,
+                'lokasi' => $filter_lokasi
             ];
 
             return response()->json($success, $this->successStatus); 
@@ -647,10 +652,14 @@ class DashboardFPController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt_ach,0) AS pdpt_ach, ISNULL(b.pdpt_yoy,0) as pdpt_yoy,
@@ -673,7 +682,7 @@ class DashboardFPController extends Controller
                 $where
                 GROUP BY a.kode_lokasi
             ) b on a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -720,9 +729,15 @@ class DashboardFPController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
+
             $col_array = array('periode', 'kode_grafik');
             $db_col_name = array('b.periode', 'a.kode_grafik');
-            $where = "WHERE a.kode_fs = 'FS1'";
+            $where = "WHERE a.kode_fs = 'FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
@@ -740,7 +755,7 @@ class DashboardFPController extends Controller
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -786,10 +801,15 @@ class DashboardFPController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
+
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            }else{
+                $filter_lokasi = "";
+            }
             $col_array = array('periode','kode_grafik');
             $db_col_name = array('b.periode','a.kode_grafik');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1'";
+            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
@@ -807,7 +827,7 @@ class DashboardFPController extends Controller
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -834,6 +854,8 @@ class DashboardFPController extends Controller
                                 'sliced' =>  true,
                                 'selected' => true,
                                 'negative' => true,
+                                'fillColor' => 'url(#custom-pattern)',                            
+                                'color' => 'url(#custom-pattern)',
                                 'nilai' => $item['n4']
                             ];
                         }else{
@@ -853,6 +875,8 @@ class DashboardFPController extends Controller
                                 'name' => $name,
                                 'y' => abs(floatval($_persen)),
                                 'negative' => true,
+                                'fillColor' => 'url(#custom-pattern)',                            
+                                'color' => 'url(#custom-pattern)',
                                 'nilai' => $item['n4']
                             ];
                         }else{
@@ -875,6 +899,8 @@ class DashboardFPController extends Controller
                             'name' => $name,
                             'y' => abs(floatval($_persen)),
                             'negative' => true,
+                            'fillColor' => 'url(#custom-pattern)',
+                            'color' => 'url(#custom-pattern)',
                             'nilai' => $item['n4']
                         ];
                     }else{
@@ -922,7 +948,13 @@ class DashboardFPController extends Controller
                 $kode_grafik = $r->query('kode_grafik')[1];
             }
 
-            $where = "WHERE a.kode_lokasi = '20' AND a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' ";
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
+            }
+
+            $where = "WHERE a.kode_lokasi = '$lokasi' AND a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' ";
 
             $tahun = intval($r->query('periode')[1]);
             $periode = [];
@@ -935,7 +967,7 @@ class DashboardFPController extends Controller
                 }
             }
 
-            $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
             ISNULL(b.n6,0) AS n6
             FROM neraca a
             INNER JOIN (
@@ -957,7 +989,7 @@ class DashboardFPController extends Controller
                     $where
                 GROUP BY a.kode_neraca,a.kode_lokasi
             )b ON a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='20' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1'";
+            where a.kode_lokasi='$lokasi' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1'";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -971,7 +1003,7 @@ class DashboardFPController extends Controller
             $series = [];
             foreach($res as $item) {
                 $data = [];
-                array_unshift($data, intval($item['n1']), intval($item['n4']), intval($item['n5']), intval($item['n6']));
+                array_unshift($data, floatval($item['n3']), floatval($item['n4']), floatval($item['n5']), floatval($item['n6']));
 
                 $_series = [
                     'name' => $item['nama'],
@@ -1015,8 +1047,12 @@ class DashboardFPController extends Controller
             } else {
                 $kode_grafik = $r->query('kode_grafik')[1];
             }
-
-            $where = "WHERE a.kode_lokasi = '20' AND a.kode_grafik = '".$kode_grafik."' AND a.kode_fs='FS1'";
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
+            }
+            $where = "WHERE a.kode_lokasi = '$lokasi' AND a.kode_grafik = '".$kode_grafik."' AND a.kode_fs='FS1'";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_neraca, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
@@ -1034,7 +1070,7 @@ class DashboardFPController extends Controller
                 $where
                 GROUP BY a.kode_lokasi,a.kode_neraca
             ) b ON a.kode_lokasi=b.kode_lokasi AND a.kode_neraca=b.kode_neraca 
-            WHERE a.kode_lokasi='20' AND a.kode_fs='FS1'";
+            WHERE a.kode_lokasi='$lokasi' AND a.kode_fs='FS1'";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -1072,6 +1108,101 @@ class DashboardFPController extends Controller
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = $chart;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataOR5Tahun(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            // $col_array = array('kode_grafik');
+            // $db_col_name = array('a.kode_grafik');
+            if($r->query('kode_grafik')[1] == "PI01") {
+                $kode_grafik = "PI05";
+            } elseif($r->query('kode_grafik')[1] == "PI02") {
+                $kode_grafik = "PI06";
+            } else {
+                $kode_grafik = $r->query('kode_grafik')[1];
+            }
+
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $filter_lokasi = " and a.kode_lokasi='$r->kode_lokasi'";
+            }else{
+                $filter_lokasi = "";
+            }
+
+            $where = "WHERE a.kode_lokasi IN ('03','11','12','13','14','15') and a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' $filter_lokasi ";
+
+            $tahun = intval($r->query('periode')[1]);
+            $periode = [];
+            for($i=0;$i<5;$i++) {
+                if($i == 0) {
+                    array_push($periode, $tahun);
+                } else {
+                    $tahun = $tahun - 100;
+                    array_push($periode, $tahun);
+                }
+            }
+
+            $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5,c.skode as lokasi
+            FROM neraca a
+            INNER JOIN dash_ypt_lokasi c on a.kode_lokasi=c.kode_lokasi
+            INNER JOIN (
+                SELECT a.kode_neraca,a.kode_lokasi,
+                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.n4,0) ELSE -ISNULL(b.n4,0) END) AS n1,
+                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.n4,0) ELSE -ISNULL(c.n4,0) END) AS n2,
+                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.n4,0) ELSE -ISNULL(d.n4,0) END) AS n3,
+                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.n4,0) ELSE -ISNULL(e.n4,0) END) AS n4,
+                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.n4,0) ELSE -ISNULL(f.n4,0) END) AS n5
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
+                    LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs AND b.periode='".$periode[4]."'
+                    LEFT JOIN exs_neraca c ON a.kode_neraca=c.kode_neraca AND a.kode_lokasi=c.kode_lokasi AND a.kode_fs=c.kode_fs AND c.periode='".$periode[3]."'
+                    LEFT JOIN exs_neraca d ON a.kode_neraca=d.kode_neraca AND a.kode_lokasi=d.kode_lokasi AND a.kode_fs=d.kode_fs AND d.periode='".$periode[2]."'
+                    LEFT JOIN exs_neraca e ON a.kode_neraca=e.kode_neraca AND a.kode_lokasi=e.kode_lokasi AND a.kode_fs=e.kode_fs AND e.periode='".$periode[1]."'
+                    LEFT JOIN exs_neraca f ON a.kode_neraca=f.kode_neraca AND a.kode_lokasi=f.kode_lokasi AND a.kode_fs=f.kode_fs AND f.periode='".$periode[0]."'
+                    $where
+                GROUP BY a.kode_neraca,a.kode_lokasi
+            )b ON a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi IN ('03','11','12','13','14','15') and a.kode_fs='FS1' $filter_lokasi";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            // $color = ['#1D4ED8', '#EC4899', '#EC4899'];
+            $ctg = [];
+            for($i=0;$i<5;$i++) {
+                array_unshift($ctg, substr($periode[$i], 0, 4));
+            }
+            
+            $series = [];
+            foreach($res as $item) {
+                $data = [];
+                array_unshift($data, floatval($item['n1']),  floatval($item['n2']),  floatval($item['n3']), floatval($item['n4']), floatval($item['n5']));
+
+                $_series = [
+                    'name' => $item['lokasi'],
+                    'data' => $data
+                ];
+
+                array_push($series, $_series);
+            }
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = [
+                'kategori' => $ctg,
+                'series' => $series,
+                'periode' => $periode
+            ];
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {

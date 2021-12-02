@@ -52,11 +52,12 @@ class DashboardCFController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            $tahun = substr($r->periode[1],0,4);
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, ISNULL(b.n3,0) AS n3,
             ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, ISNULL(b.n6,0) AS n6, ISNULL(b.n7,0) AS n7, 
             ISNULL(b.n8,0) AS n8, ISNULL(b.n9,0) AS n9, ISNULL(b.n10,0) AS n10, ISNULL(b.n11,0) AS n11, 
             ISNULL(b.n12,0) AS n12
-            FROM lokasi a
+            FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='01' THEN b.n4 ELSE 0 END) AS n1,
@@ -71,13 +72,13 @@ class DashboardCFController extends Controller {
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='10' THEN b.n4 ELSE 0 END) AS n10,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='11' THEN b.n4 ELSE 0 END) AS n11,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='12' THEN b.n4 ELSE 0 END) AS n12
-                FROM db_grafik_d a
+                FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN db_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='20' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='2021'
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahun'
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi='20'";
+            WHERE a.kode_lokasi='$kode_lokasi'";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -121,11 +122,12 @@ class DashboardCFController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            $periode = $r->periode[1];
             $sql = "SELECT a.kode_lokasi, SUM(debet) AS debet, SUM(kredit) AS kredit, 
             SUM(debet) - SUM(kredit) AS mutasi, SUM(so_akhir) AS so_akhir
             FROM exs_glma a
             INNER JOIN flag_relasi b ON a.kode_akun=b.kode_akun AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi='20' AND a.periode='202109' AND b.kode_flag IN ('001','009') 
+            WHERE a.kode_lokasi='$kode_lokasi' AND a.periode='$periode' AND b.kode_flag IN ('001','009') 
             GROUP BY a.kode_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
@@ -146,6 +148,7 @@ class DashboardCFController extends Controller {
                 'closing' => [
                     'nominal' => floatval($res[0]['so_akhir'])
                 ],
+                'periode' => $periode
             ];
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {

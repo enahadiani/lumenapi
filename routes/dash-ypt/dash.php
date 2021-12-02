@@ -34,6 +34,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-fp-detail-lembaga','DashYpt\DashboardFPController@getDataPerLembaga');  
     $router->get('data-fp-detail-kelompok','DashYpt\DashboardFPController@getDataKelompokYoy');  
     $router->get('data-fp-detail-akun','DashYpt\DashboardFPController@getDataKelompokAkun');  
+    $router->get('data-fp-detail-or-5tahun','DashYpt\DashboardFPController@getDataOR5Tahun');  
 
     $router->get('data-ccr-box','DashYpt\DashboardCCRController@getDataBox');  
     
