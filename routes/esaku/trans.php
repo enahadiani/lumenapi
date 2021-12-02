@@ -387,6 +387,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->delete('v3/sdm-karyawan', 'Sdm\KepegawaianV3Controller@destroy');
 
     // KONTRAK/UPDATE KARYAWAN (TRX)
+    $router->get('v3/sdm-kontraks', 'Sdm\KepegawaianV3Controller@get_kontrak');
     $router->get('v3/sdm-kontrak', 'Sdm\KepegawaianV3Controller@show_kontrak');
     $router->post('v3/sdm-kontrak', 'Sdm\KepegawaianV3Controller@save_kontrak');
 
