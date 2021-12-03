@@ -79,7 +79,7 @@ class UploadPegawaiController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $select = "SELECT nik FROM hr_karyawan_tmp WHERE nik_user = '" . $request->input('nik_user') . "'
+            $select = "SELECT nik FROM hr_sdm_tmp WHERE nik_user = '" . $request->input('nik_user') . "'
             AND kode_lokasi = '" . $kode_lokasi . "'";
             $res1 = DB::connection($this->db)->select($select);
             $res1 = json_decode(json_encode($res1), true);
@@ -90,27 +90,30 @@ class UploadPegawaiController extends Controller
             }
 
             DB::connection($this->db)
-                ->table('hr_karyawan')
+                ->table('hr_sdm_pribadi')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->whereIn('nik', $niks)
+                ->delete();
+            DB::connection($this->db)
+                ->table('hr_sdm_bank')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->whereIn('nik', $niks)
                 ->delete();
 
-            $insert = "INSERT INTO hr_karyawan (nik, nama, no_ktp, jk, kode_agama, no_telp, no_hp, tempat, tgl_lahir, alamat,
-            provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah,
-            tgl_nikah, kode_gol, kode_sdm, kode_unit, kode_loker, tgl_masuk, npwp, no_bpjs, no_bpjs_kerja,
-            kode_profesi, bank, cabang, no_rek, nama_rek, client, fungsi, skill, no_kontrak, tgl_kontrak,
-            tgl_kontrak_akhir, area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung,
-            kode_lokasi) SELECT nik, nama, no_ktp, jk, kode_agama, no_telp, no_hp, tempat, tgl_lahir, alamat,
-            provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah,
-            tgl_nikah, kode_gol, kode_sdm, kode_unit, kode_loker, tgl_masuk, npwp, no_bpjs, no_bpjs_kerja,
-            kode_profesi, bank, cabang, no_rek, nama_rek, client, fungsi, skill, no_kontrak, tgl_kontrak,
-            tgl_kontrak_akhir, area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung,
-            kode_lokasi FROM hr_karyawan_tmp
+            $insert = "INSERT INTO hr_sdm_pribadi (nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,tgl_nikah,kode_lokasi)
+            SELECT nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,
+            provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,
+            tgl_nikah,kode_lokasi FROM hr_sdm_tmp
             WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
             DB::connection($this->db)->insert($insert);
 
+            $insert2 = "INSERT INTO hr_sdm_bank (nik, kode_bank, cabang, no_rek, nama_rek,kode_lokasi)
+            SELECT nik,kode_bank,cabang,no_rek,nama_rek,kode_lokasi FROM hr_sdm_tmp
+            WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
+            DB::connection($this->db)->insert($insert2);
+
             DB::connection($this->db)
-                ->table('hr_karyawan_tmp')
+                ->table('hr_sdm_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('nik_user', $request->input('nik_user'))
                 ->delete();
@@ -140,12 +143,11 @@ class UploadPegawaiController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $select = "SELECT nik, nama, no_ktp, jk, kode_agama, no_telp, no_hp, tempat, convert(varchar(10), tgl_lahir, 101) as tgl_lahir, alamat,
-            provinsi, kota, kecamatan, kelurahan, kode_pos, t_badan, b_badan, gol_darah, no_kk, status_nikah,
-            tgl_nikah, kode_gol, kode_sdm, kode_unit, kode_loker, tgl_masuk, npwp, no_bpjs, no_bpjs_kerja,
-            kode_profesi, bank, cabang, no_rek, nama_rek, client, fungsi, skill, no_kontrak, tgl_kontrak,
-            tgl_kontrak_akhir, area, kota_area, fm, bm, loker_client, jabatan_client, atasan_langsung, atasan_t_langsung,nu
-            FROM hr_karyawan_tmp
+
+            $select = "SELECT nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, convert(varchar(10), tgl_lahir, 101) as tgl_lahir, alamat,
+            provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,
+            convert(varchar(10), tgl_nikah, 101) as tgl_nikah, kode_bank, cabang, no_rek, nama_rek,nu
+			FROM hr_sdm_tmp
             WHERE nik_user = '" . $request->query('nik_user') . "' AND kode_lokasi = '" . $kode_lokasi . "'";
 
             $res = DB::connection($this->db)->select($select);
@@ -159,6 +161,7 @@ class UploadPegawaiController extends Controller
             } else {
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['nik'] = $request->query('nik_user');
                 $success['status'] = false;
                 return response()->json(['success' => $success], $this->successStatus);
             }
@@ -187,7 +190,7 @@ class UploadPegawaiController extends Controller
             DB::connection($this->db)
                 ->table('hr_sdm_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('nik_user', $nik)
+                ->where('nik_user', $request->input('nik_user'))
                 ->delete();
 
             $file = $request->file('file');
@@ -218,27 +221,6 @@ class UploadPegawaiController extends Controller
                         $row[20] = $this->convertDateExcel($row[20]);
                     }
 
-                    // tanggal masuk
-                    if ($row[29] == "" || $row[25] == "-") {
-                        $row[29] = date('Y-m-d');
-                    } else {
-                        $row[29] = $this->convertDateExcel($row[25]);
-                    }
-
-                    // tanggal kontrak
-                    if ($row[39] == "" || $row[38] == "-") {
-                        $row[39] = date('Y-m-d');
-                    } else {
-                        $row[39] = $this->convertDateExcel($row[38]);
-                    }
-
-                    // tanggal kontrak akhir
-                    if ($row[40] == "" || $row[39] == "-") {
-                        $row[40] = date('Y-m-d');
-                    } else {
-                        $row[40] = $this->convertDateExcel($row[39]);
-                    }
-
                     // loker
                     // $row[24] = $this->getKodeLoker($row[24], $kode_lokasi);
 
@@ -249,16 +231,12 @@ class UploadPegawaiController extends Controller
                     $insert = "INSERT INTO hr_sdm_tmp (
                     nik, nama, nomor_ktp,jenis_kelamin,kode_agama, no_telp, no_hp,tempat_lahir, tgl_lahir,alamat,
                     provinsi, kota, kecamatan,kelurahan,kode_pos,tinggi_badan,berat_badan,golongan_darah,nomor_kk,
-                    status_nikah,tgl_nikah,kode_golongan, kode_sdm,kode_area,kode_fm,kode_bm,kode_loker,no_npwp,no_bpjs,
-                    no_bpjs_naker, kode_profesi,kode_bank,cabang, no_rek,nama_rek,nama_client,skill,no_kontrak,tgl_kontrak_awal,
-                    tgl_kontrak_akhir,atasan_langsung,atasan_tidak_langsung,
+                    status_nikah,tgl_nikah,kode_bank,cabang, no_rek,nama_rek,
                     kode_lokasi, nik_user, nu, sts_upload, ket_upload)
                     VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?)";
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     DB::connection($this->db)->insert($insert, [
                         $row[0],
                         $row[1],
@@ -285,26 +263,8 @@ class UploadPegawaiController extends Controller
                         $row[22],
                         $row[23],
                         $row[24],
-                        $row[25],
-                        $row[26],
-                        $row[27],
-                        $row[28],
-                        $row[29],
-                        $row[30],
-                        $row[31],
-                        $row[32],
-                        $row[33],
-                        $row[34],
-                        $row[35],
-                        $row[36],
-                        $row[37],
-                        $row[38],
-                        $row[39],
-                        $row[40],
-                        $row[41],
-                        $row[42],
                         $kode_lokasi,
-                        $nik,
+                        $request->input('nik_user'),
                         $no,
                         $sts,
                         "Upload Data Karyawan" . $nik
