@@ -390,6 +390,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('v3/sdm-kontraks', 'Sdm\KepegawaianV3Controller@get_kontrak');
     $router->get('v3/sdm-kontrak', 'Sdm\KepegawaianV3Controller@show_kontrak');
     $router->post('v3/sdm-kontrak', 'Sdm\KepegawaianV3Controller@save_kontrak');
+    $router->post('v3/sdm-kontrak-update', 'Sdm\KepegawaianV3Controller@update_kontrak');
 
     // STATUS KEPEgAWAIAN
     $router->get('v3/sdm-status', 'Sdm\KepegawaianV3Controller@get_status');
