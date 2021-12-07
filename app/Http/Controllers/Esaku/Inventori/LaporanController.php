@@ -655,7 +655,9 @@ class LaporanController extends Controller
              //     inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang
              //     $where
              //     order by a.kode_barang,a.kode_gudang";
-             $sql3 = "select a.kode_barang,b.nama as nama_barang,a.stok,a.kode_gudang,c.nama as nama_gudang,b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total,isnull(a.so_awal,0) as so_awal,isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit
+             $sql3 = "select a.kode_barang,b.nama as nama_barang,a.stok,a.kode_gudang,c.nama as nama_gudang,
+             b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total,isnull(a.so_awal,0) as so_awal,
+             isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit, b.hpp, (a.stok * b.hpp) as saldo_persediaan
              from brg_stok a
              inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
              inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
