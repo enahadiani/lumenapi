@@ -52,10 +52,7 @@ class DashboardCCRController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('kode_lokasi');
-            $db_col_name = array('x.kode_lokasi');
-            $where = "";
-            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+            $where = " and x.kode_lokasi='12' ";
             $periode=$r->periode[1];
             $tahun=substr($periode,0,4);
             $bulan=substr($periode,4,2);
@@ -173,6 +170,67 @@ class DashboardCCRController extends Controller {
                     'persentase' => floatval(number_format((float)$ccr_periode, 2,'.', ''))
                 ],
             ];
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getTopCCR(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            // $col_array = array('kode_lokasi');
+            // $db_col_name = array('x.kode_lokasi');
+            // $where = "";
+            // $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+            $periode=$r->periode[1];
+            // $tahun=substr($periode,0,4);
+            // $bulan=substr($periode,4,2);
+            // $periode_awal=$tahun."01";
+            // $bulanSeb = intval($bulan)-1;
+            // if(strlen($bulanSeb) == 1){
+            //     $bulanSeb = "0".$bulanSeb;
+            // }else{
+            //     $bulanSeb = $bulanSeb;
+            // }
+            // $periode_rev=$tahun.$bulanSeb;
+            $sort = $r->sort;
+            $where = "where x.kode_lokasi='12' ";
+
+            $sql = "select a.kode_pp,a.nama,
+            case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end as ccr_berjalan
+            from pp a
+            left join (select x.kode_lokasi,x.kode_pp,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        $where and x.periode='$periode'
+                        group by x.kode_lokasi,x.kode_pp
+                        )c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
+            left join (select x.kode_lokasi,x.kode_pp,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        $where and x.periode='$periode' and x.periode_bill = '$periode' 
+                        group by x.kode_lokasi,x.kode_pp
+                        )e on a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
+            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3','4','5')
+            order by (case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end) $sort ";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
