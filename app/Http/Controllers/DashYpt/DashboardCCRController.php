@@ -56,7 +56,7 @@ class DashboardCCRController extends Controller {
             $db_col_name = array('x.kode_lokasi');
             $where = "";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
-            $periode=$request->periode[1];
+            $periode=$r->periode[1];
             $tahun=substr($periode,0,4);
             $bulan=substr($periode,4,2);
             $periode_awal=$tahun."01";
@@ -145,8 +145,8 @@ class DashboardCCRController extends Controller {
             $ccr_tahun_ini_inflow = floatval($res[0]['pn1']);
             $ccr_tahun_ini =($ccr_tahun_ini_ar != 0 ? ($ccr_tahun_ini_inflow/$ccr_tahun_ini_ar)*100 : 0);
 
-            $ccr_periode_ar = floatval($res[0]['tn1']);
-            $ccr_periode_inflow = floatval($res[0]['pn1']);
+            $ccr_periode_ar = floatval($res[0]['tn2']);
+            $ccr_periode_inflow = floatval($res[0]['pn2']);
             $ccr_periode =($ccr_periode_ar != 0 ? ($ccr_periode_inflow/$ccr_periode_ar)*100 : 0);
 
             $success['status'] = true;
@@ -177,6 +177,7 @@ class DashboardCCRController extends Controller {
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
