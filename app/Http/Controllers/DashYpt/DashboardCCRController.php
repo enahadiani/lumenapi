@@ -141,8 +141,8 @@ class DashboardCCRController extends Controller {
             $ccr_tahun_lalu_inflow = floatval($res[0]['hn3']);
             $ccr_tahun_lalu =($ccr_tahun_lalu_ar != 0 ? ($ccr_tahun_lalu_inflow/$ccr_tahun_lalu_ar)*100 : 0);
 
-            $ccr_tahun_ini_ar = floatval($res[0]['tn1']);
-            $ccr_tahun_ini_inflow = floatval($res[0]['pn1']);
+            $ccr_tahun_ini_ar = floatval($res[0]['tn3']);
+            $ccr_tahun_ini_inflow = floatval($res[0]['pn3']);
             $ccr_tahun_ini =($ccr_tahun_ini_ar != 0 ? ($ccr_tahun_ini_inflow/$ccr_tahun_ini_ar)*100 : 0);
 
             $ccr_periode_ar = floatval($res[0]['tn2']);
