@@ -90,49 +90,49 @@ class DashboardFPController extends Controller
                     $data_pdpt = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI02') {
                     $data_beban = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI03') {
                     $data_shu = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI04') {
                     $data_or = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 }
             }
@@ -199,7 +199,7 @@ class DashboardFPController extends Controller
             if($total > 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     $name = $item['skode'];
 
                     if($_persen < 0) {
@@ -220,7 +220,7 @@ class DashboardFPController extends Controller
             } elseif($total < 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     
                     $name = $item['skode'];
 
@@ -309,7 +309,7 @@ class DashboardFPController extends Controller
             if($total > 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     $name = $item['skode'];
 
                     if($_persen < 0) {
@@ -330,7 +330,7 @@ class DashboardFPController extends Controller
             } elseif($total < 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     
                     $name = $item['skode'];
 
@@ -419,7 +419,7 @@ class DashboardFPController extends Controller
             if($total > 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     
                     
                     $name = $item['skode'];
@@ -444,7 +444,7 @@ class DashboardFPController extends Controller
             } elseif($total < 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     
                     $name = $item['skode'];
 
@@ -535,7 +535,7 @@ class DashboardFPController extends Controller
             if($total > 0) {
                 foreach($res as $item) { 
                     $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     
                     $name = $item['skode'];
 
@@ -694,13 +694,13 @@ class DashboardFPController extends Controller
                 $perform = [
                     "kode_lokasi" => $item['kode_lokasi'],
                     "nama" => $name,
-                    "pdpt_ach" => floatval(number_format((float)$item['pdpt_ach'], 1, '.', '')),
-                    "pdpt_yoy" => floatval(number_format((float)$item['pdpt_yoy'], 1, '.', '')),
-                    "beban_ach" => floatval(number_format((float)$item['beban_ach'], 1, '.', '')),
-                    "beban_yoy" => floatval(number_format((float)$item['beban_yoy'], 1, '.', '')),
-                    "shu_ach" => floatval(number_format((float)$item['shu_ach'], 1, '.', '')),
-                    "shu_yoy" => floatval(number_format((float)$item['shu_yoy'], 1, '.', '')),
-                    "or_ach" => floatval(number_format((float)$item['or_ach'], 1, '.', '')),
+                    "pdpt_ach" => floatval(number_format((float)$item['pdpt_ach'], 2,'.', '')),
+                    "pdpt_yoy" => floatval(number_format((float)$item['pdpt_yoy'], 2,'.', '')),
+                    "beban_ach" => floatval(number_format((float)$item['beban_ach'], 2,'.', '')),
+                    "beban_yoy" => floatval(number_format((float)$item['beban_yoy'], 2,'.', '')),
+                    "shu_ach" => floatval(number_format((float)$item['shu_ach'], 2,'.', '')),
+                    "shu_yoy" => floatval(number_format((float)$item['shu_yoy'], 2,'.', '')),
+                    "or_ach" => floatval(number_format((float)$item['or_ach'], 2,'.', '')),
                     "or_yoy" => floatval(number_format((float)$item['or_yoy'], 0, '.', '')),
                 ];
                 array_push($data_perform, $perform);
@@ -767,7 +767,7 @@ class DashboardFPController extends Controller
                 
                 $name = $item['skode'];
 
-                $realisasi = floatval(number_format((float)$item['capai'], 1, '.', ''));
+                $realisasi = floatval(number_format((float)$item['capai'], 2,'.', ''));
                 $sisa = 100 - $realisasi;
                 $anggaran = 100;
                 
@@ -842,7 +842,7 @@ class DashboardFPController extends Controller
             if($total > 0) {
                 foreach($res as $item) { 
                     $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
                     
                     $name = $item['skode'];
 
@@ -1085,7 +1085,7 @@ class DashboardFPController extends Controller
             if($total > 0) { 
                 foreach($res as $item) { 
                     $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                    $_persen = number_format((float)$persen, 1, '.', '');
+                    $_persen = number_format((float)$persen, 2,'.', '');
 
                     $data = [
                         'name' => $item['nama'],

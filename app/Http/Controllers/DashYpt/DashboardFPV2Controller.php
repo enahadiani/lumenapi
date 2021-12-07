@@ -95,49 +95,49 @@ class DashboardFPV2Controller extends Controller {
                     $data_pdpt = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI02') {
                     $data_beban = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI03') {
                     $data_shu = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI04') {
                     $data_or = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 }
             }
@@ -206,8 +206,8 @@ class DashboardFPV2Controller extends Controller {
                 $name= $item['skode'];
 
                 array_push($ctg, $name);
-                array_push($anggaran, floatval(number_format((float)$item['n2'], 1, '.', '')));
-                array_push($realisasi, floatval(number_format((float)$item['n4'], 1, '.', '')));
+                array_push($anggaran, floatval(number_format((float)$item['n2'], 2,'.', '')));
+                array_push($realisasi, floatval(number_format((float)$item['n4'], 2,'.', '')));
             }
 
             $success['status'] = true;

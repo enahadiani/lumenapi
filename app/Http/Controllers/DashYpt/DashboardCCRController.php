@@ -52,98 +52,125 @@ class DashboardCCRController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi='20' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
+            $col_array = array('kode_lokasi');
+            $db_col_name = array('x.kode_lokasi');
+            $where = "";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+            $periode=$request->periode[1];
+            $tahun=substr($periode,0,4);
+            $bulan=substr($periode,4,2);
+            $periode_awal=$tahun."01";
+            $bulanSeb = intval($bulan)-1;
+            if(strlen($bulanSeb) == 1){
+                $bulanSeb = "0".$bulanSeb;
+            }else{
+                $bulanSeb = $bulanSeb;
+            }
+            $periode_rev=$tahun.$bulanSeb;
 
-            $sql = "SELECT a.kode_lokasi, a.nama, 
-            ISNULL(b.total,0) AS tn1, ISNULL(c.total,0) AS tn2, ISNULL(b.total,0) + ISNULL(c.total,0) AS tn3,
-			ISNULL(d.total,0) AS pn1, ISNULL(e.total,0) AS pn2, ISNULL(d.total,0) + ISNULL(e.total,0) AS pn3,
-			ISNULL(f.total,0) - ISNULL(g.total,0) AS piutang, 
-			ISNULL(h.total,0) AS hn1, ISNULL(i.total,0) AS hn2, ISNULL(h.total,0) + ISNULL(i.total,0) AS hn3
-			FROM lokasi a
-			LEFT JOIN (
-                SELECT x.kode_lokasi,
-				SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_bill_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND (x.periode BETWEEN '202101' AND '202109')
-				GROUP BY x.kode_lokasi
-			) b ON a.kode_lokasi=b.kode_lokasi 
-			LEFT JOIN (
-                SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_bill_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND x.periode='202109'
-				GROUP BY x.kode_lokasi
-			) c ON a.kode_lokasi=c.kode_lokasi 
-			LEFT JOIN (
-                SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_rekon_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND (x.periode BETWEEN '202101' AND '202108') 
-                AND (x.periode_bill BETWEEN '202101' AND '202108') 
-				GROUP BY x.kode_lokasi
-			) d ON a.kode_lokasi=d.kode_lokasi 
-			LEFT JOIN (
-                SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_rekon_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND x.periode='202109' AND x.periode_bill = '202109' 
-				GROUP BY x.kode_lokasi
-			) e ON a.kode_lokasi=e.kode_lokasi 
-			LEFT JOIN (
-                SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_bill_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND x.periode<'202101'
-				GROUP BY x.kode_lokasi
-			) f ON a.kode_lokasi=f.kode_lokasi 
-			LEFT JOIN (
-                SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_rekon_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' and x.periode<'202101' 
-			    GROUP BY x.kode_lokasi
-			) g ON a.kode_lokasi=g.kode_lokasi 
-			LEFT JOIN (SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				from sis_rekon_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND (x.periode BETWEEN '202101' AND '202108') AND (x.periode_bill<'202101') 
-				GROUP BY x.kode_lokasi
-			) h ON a.kode_lokasi=h.kode_lokasi 
-			LEFT JOIN (
-                SELECT x.kode_lokasi, SUM(CASE WHEN x.dc='D' THEN x.nilai ELSE -x.nilai END) AS total 
-				FROM sis_rekon_d x 
-				INNER JOIN sis_siswa y ON x.nis=y.nis AND x.kode_lokasi=y.kode_lokasi AND x.kode_pp=y.kode_pp 
-				WHERE x.kode_lokasi='12' AND x.periode='202109' AND (x.periode_bill<'202101') 
-				GROUP BY x.kode_lokasi
-			) i ON a.kode_lokasi=i.kode_lokasi 
-			WHERE a.kode_lokasi='12'";
+            $sql = "select sum(isnull(b.total,0)) as tn1,sum(isnull(c.total,0)) as tn2,sum(isnull(b.total,0)+isnull(c.total,0)) as tn3,
+            sum(isnull(d.total,0)) as pn1,sum(isnull(e.total,0)) as pn2,sum(isnull(d.total,0)+isnull(e.total,0)) as pn3,
+            sum(isnull(f.total,0))-sum(isnull(g.total,0)) as piutang, 
+            sum(isnull(h.total,0)) as hn1,sum(isnull(i.total,0)) as hn2,sum(isnull(h.total,0)+isnull(i.total,0)) as hn3
+            from dash_ypt_lokasi a
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where (x.periode between '$periode_awal' and '$periode_rev') $where
+                        group by x.kode_lokasi
+                    )b on a.kode_lokasi=b.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where x.periode='$periode' $where
+                        group by x.kode_lokasi
+                        )c on a.kode_lokasi=c.kode_lokasi
+            left join (select x.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where (x.periode between '$periode_awal' and '$periode') and (x.periode_bill between '$periode_awal' and '$periode_rev') $where
+                        group by x.kode_lokasi
+                        )d on a.kode_lokasi=d.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where x.periode='$periode' and x.periode_bill = '$periode' $where
+                        group by x.kode_lokasi
+                        )e on a.kode_lokasi=e.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where x.periode<'$periode_awal' $where
+                        group by x.kode_lokasi
+                        )f on a.kode_lokasi=f.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where x.periode<'$periode_awal' $where
+                        group by x.kode_lokasi
+                        )g on a.kode_lokasi=g.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill<'$periode_awal') $where
+                        group by x.kode_lokasi
+                        )h on a.kode_lokasi=h.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        where x.periode='$periode' and (x.periode_bill<'$periode_awal') $where
+                        group by x.kode_lokasi
+                        )i on a.kode_lokasi=i.kode_lokasi ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
             
-            $ccr_total = ((floatval($res[0]['pn3']) + floatval($res[0]['hn3'])) / (floatval($res[0]['pn3']) + floatval($res[0]['hn3'])))*100;
-            $ccr_tahun_lalu = (floatval($res[0]['hn3']) / floatval($res[0]['piutang']))*100;
-            $ccr_tahun_ini = (floatval($res[0]['pn2']) / floatval($res[0]['tn2']))*100;
-            $ccr_periode = (floatval($res[0]['pn3']) / floatval($res[0]['tn3']))*100;
+            $ccr_total_ar = floatval($res[0]['piutang']) + floatval($res[0]['tn3']);
+            $ccr_total_inflow = floatval($res[0]['pn3']) + floatval($res[0]['hn3']);
+            $ccr_total = ($ccr_total_ar != 0 ? ($ccr_total_inflow / $ccr_total_ar)*100 : 0);
+
+            $ccr_tahun_lalu_ar = floatval($res[0]['piutang']);
+            $ccr_tahun_lalu_inflow = floatval($res[0]['hn3']);
+            $ccr_tahun_lalu =($ccr_tahun_lalu_ar != 0 ? ($ccr_tahun_lalu_inflow/$ccr_tahun_lalu_ar)*100 : 0);
+
+            $ccr_tahun_ini_ar = floatval($res[0]['tn1']);
+            $ccr_tahun_ini_inflow = floatval($res[0]['pn1']);
+            $ccr_tahun_ini =($ccr_tahun_ini_ar != 0 ? ($ccr_tahun_ini_inflow/$ccr_tahun_ini_ar)*100 : 0);
+
+            $ccr_periode_ar = floatval($res[0]['tn1']);
+            $ccr_periode_inflow = floatval($res[0]['pn1']);
+            $ccr_periode =($ccr_periode_ar != 0 ? ($ccr_periode_inflow/$ccr_periode_ar)*100 : 0);
 
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
                 "ccr_total" => [
-                    'persentase' => floatval(number_format((float)$ccr_total, 1, '.', ''))
+                    'ar' => floatval(number_format((float)$ccr_total_ar, 2,'.', '')),
+                    'inflow' => floatval(number_format((float)$ccr_total_inflow, 2,'.', '')),
+                    'persentase' => floatval(number_format((float)$ccr_total, 2,'.', ''))
                 ],
                 "ccr_tahun_lalu" => [
-                    'persentase' => floatval(number_format((float)$ccr_tahun_lalu, 1, '.', ''))
+                    'ar' => floatval(number_format((float)$ccr_tahun_lalu_ar, 2,'.', '')),
+                    'inflow' => floatval(number_format((float)$ccr_tahun_lalu_inflow, 2,'.', '')),
+                    'persentase' => floatval(number_format((float)$ccr_tahun_lalu, 2,'.', ''))
                 ],
                 "ccr_tahun_ini" => [
-                    'persentase' => floatval(number_format((float)$ccr_tahun_ini, 1, '.', ''))
+                    'ar' => floatval(number_format((float)$ccr_tahun_ini_ar, 2,'.', '')),
+                    'inflow' => floatval(number_format((float)$ccr_tahun_ini_inflow, 2,'.', '')),
+                    'persentase' => floatval(number_format((float)$ccr_tahun_ini, 2,'.', ''))
                 ],
                 "ccr_periode" => [
-                    'persentase' => floatval(number_format((float)$ccr_periode, 1, '.', ''))
+                    'ar' => floatval(number_format((float)$ccr_periode_ar, 2,'.', '')),
+                    'inflow' => floatval(number_format((float)$ccr_periode_inflow, 2,'.', '')),
+                    'persentase' => floatval(number_format((float)$ccr_periode, 2,'.', ''))
                 ],
             ];
 
