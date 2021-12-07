@@ -577,7 +577,7 @@ class KepegawaianV3Controller extends Controller
 
                     DB::connection($this->db)->commit();
                     $success['status'] = true;
-                    $success['message'] = "Data karyawan berhasil disimpan";
+                    $success['message'] = "Data Kontrak Kerja karyawan berhasil disimpan";
                 }
             } else {
                 $success['status'] = false;
@@ -589,7 +589,7 @@ class KepegawaianV3Controller extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Data karyawan gagal disimpan " . $e;
+            $success['message'] = "Data Kontrak Kerja karyawan gagal disimpan " . $e;
             return response()->json($success, $this->successStatus);
         }
     }
@@ -676,30 +676,12 @@ class KepegawaianV3Controller extends Controller
             'nomor_kk' => 'required',
             'status_nikah' => 'required',
             'tgl_nikah' => 'required',
-            'kode_golongan' => 'required',
-            'kode_sdm' => 'required',
-            'kode_loker' => 'required',
-            'tgl_masuk' => 'required',
-            'no_npwp' => 'required',
-            'no_bpjs' => 'required',
-            'no_bpjs_naker' => 'required',
-            'kode_profesi' => 'required',
             'kode_bank' => 'required',
             'cabang' => 'required',
             'no_rek' => 'required',
             'nama_rek' => 'required',
-            'skill' => 'required',
-            'no_kontrak' => 'required',
-            'tgl_kontrak_awal' => 'required',
-            'tgl_kontrak_akhir' => 'required',
-            'kode_area' => 'required',
-            'kode_fm' => 'required',
-            'kode_bm' => 'required',
-            'nama_client' => 'required',
-            'atasan_langsung' => 'required',
-            'atasan_tidak_langsung' => 'required',
         ]);
-        // 49 field
+
         DB::connection($this->db)->beginTransaction();
 
         try {
@@ -713,19 +695,12 @@ class KepegawaianV3Controller extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
-            DB::connection($this->db)->table('hr_sdm_kepegawaian')
-                ->where('nik', $request->input('nik'))
-                ->where('kode_lokasi', $kode_lokasi)
-                ->delete();
+
             DB::connection($this->db)->table('hr_sdm_bank')
                 ->where('nik', $request->input('nik'))
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
-            DB::connection($this->db)->table('hr_sdm_client')
-                ->where('nik', $request->input('nik'))
-                ->where('kode_lokasi', $kode_lokasi)
-                ->delete();
 
             DB::connection($this->db)->table('hr_sdm_doc')
                 ->where('nik', $request->input('nik'))
@@ -779,36 +754,6 @@ class KepegawaianV3Controller extends Controller
                 // 6
             ]);
 
-            $insert_kepeg = "INSERT INTO hr_sdm_kepegawaian(
-                        nik,kode_golongan,
-                        kode_sdm,kode_area,kode_fm,
-                        kode_bm,kode_loker,no_npwp,no_bpjs,
-                        tgl_masuk,no_bpjs_naker,kode_profesi,kode_lokasi
-                    ) VALUES(
-                        ?,?,
-                        ?,?,?,
-                        ?,?,?,?,
-                        ?,?,?,?
-                    )";
-            DB::connection($this->db)->insert($insert_kepeg, [
-                $request->input('nik'),
-                $request->input('kode_golongan'),
-                // 2
-                $request->input('kode_sdm'),
-                $request->input('kode_area'),
-                $request->input('kode_fm'),
-                // 3
-                $request->input('kode_bm'),
-                $request->input('kode_loker'),
-                $request->input('no_npwp'),
-                $request->input('no_bpjs'),
-
-                // 4
-                $request->input('tgl_masuk'),
-                $request->input('no_bpjs_naker'),
-                $request->input('kode_profesi'),
-                $kode_lokasi
-            ]);
 
             $insert_bank = "INSERT INTO hr_sdm_bank(
                         nik,kode_lokasi,
@@ -825,29 +770,6 @@ class KepegawaianV3Controller extends Controller
                 $request->input('no_rek'),
                 $request->input('nama_rek'),
             ]);
-
-            $insert_client = "INSERT INTO hr_sdm_client(
-                    nik,nama_client,skill,
-                    no_kontrak,tgl_kontrak_awal,tgl_kontrak_akhir,
-                    atasan_langsung,atasan_tidak_langsung,kode_lokasi
-                    ) VALUES(
-                        ?,?,?,
-                        ?,?,?,
-                        ?,?,?
-                    )";
-
-            DB::connection($this->db)->insert($insert_client, [
-                $request->input('nik'),
-                $request->input('nama_client'),
-                $request->input('skill'),
-                $request->input('no_kontrak'),
-                $request->input('tgl_kontrak_awal'),
-                $request->input('tgl_kontrak_akhir'),
-                $request->input('atasan_langsung'),
-                $request->input('atasan_tidak_langsung'),
-                $kode_lokasi
-            ]);
-
 
 
             if (count($request->input('nu')) > 0) {
@@ -899,7 +821,6 @@ class KepegawaianV3Controller extends Controller
                 }
             }
 
-
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data karyawan berhasil diubah";
@@ -909,6 +830,121 @@ class KepegawaianV3Controller extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data karyawan gagal diubah " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function update_kontrak(Request $request)
+    {
+        $this->validate($request, [
+            'kode_status' => 'required',
+            'kode_sdm' => 'required',
+            'kode_loker' => 'required',
+            'tgl_masuk' => 'required',
+            'no_npwp' => 'required',
+            'no_bpjs' => 'required',
+            'no_bpjs_naker' => 'required',
+            'kode_profesi' => 'required',
+            'skill' => 'required',
+            'no_kontrak' => 'required',
+            'tgl_kontrak_awal' => 'required',
+            'tgl_kontrak_akhir' => 'required',
+            'kode_area' => 'required',
+            'kode_fm' => 'required',
+            'kode_bm' => 'required',
+            'nama_client' => 'required',
+            'atasan_langsung' => 'required',
+            'atasan_tidak_langsung' => 'required',
+        ]);
+
+
+        DB::connection($this->db)->beginTransaction();
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+            DB::connection($this->db)->table('hr_sdm_kepegawaian')
+                ->where('nik', $request->input('nik'))
+                ->where('kode', $request->input('no_kontrak'))
+                ->where('kode_lokasi', $kode_lokasi)
+                ->delete();
+
+            DB::connection($this->db)->table('hr_sdm_client')
+                ->where('nik', $request->input('nik'))
+                ->where('no_kontrak', $request->input('no_kontrak'))
+                ->where('kode_lokasi', $kode_lokasi)
+                ->delete();
+
+            // insert data here
+            $insert_kepeg = "INSERT INTO hr_sdm_kepegawaian(
+                    kode,nik,
+                    kode_sdm,kode_area,kode_fm,
+                    kode_bm,kode_loker,no_npwp,no_bpjs,
+                    tgl_masuk,no_bpjs_naker,kode_profesi,kode_lokasi,kode_status
+                ) VALUES(
+                    ?,?,
+                    ?,?,?,
+                    ?,?,?,?,
+                    ?,?,?,?,?
+                )";
+            DB::connection($this->db)->insert($insert_kepeg, [
+                $request->input('no_kontrak'),
+                $request->input('nik'),
+
+                // 2
+                $request->input('kode_sdm'),
+                $request->input('kode_area'),
+                $request->input('kode_fm'),
+                // 3
+                $request->input('kode_bm'),
+                $request->input('kode_loker'),
+                $request->input('no_npwp'),
+                $request->input('no_bpjs'),
+
+                // 4
+                $request->input('tgl_masuk'),
+                $request->input('no_bpjs_naker'),
+                $request->input('kode_profesi'),
+                $kode_lokasi,
+                $request->input('kode_status')
+            ]);
+
+
+
+            $insert_client = "INSERT INTO hr_sdm_client(
+                kode,nik,nama_client,skill,
+                no_kontrak,tgl_kontrak_awal,tgl_kontrak_akhir,
+                atasan_langsung,atasan_tidak_langsung,kode_lokasi
+                ) VALUES(
+                    ?,?,?,?,
+                    ?,?,?,
+                    ?,?,?
+                )";
+
+            DB::connection($this->db)->insert($insert_client, [
+                $request->input('no_kontrak'),
+                $request->input('nik'),
+                $request->input('nama_client'),
+                $request->input('skill'),
+                $request->input('no_kontrak'),
+                $request->input('tgl_kontrak_awal'),
+                $request->input('tgl_kontrak_akhir'),
+                $request->input('atasan_langsung'),
+                $request->input('atasan_tidak_langsung'),
+                $kode_lokasi
+            ]);
+
+            DB::connection($this->db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Kontrak Kerja berhasil disimpan";
+            $success['kode'] = $request->nik;
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data karyawan gagal disimpan " . $e;
             return response()->json($success, $this->successStatus);
         }
     }

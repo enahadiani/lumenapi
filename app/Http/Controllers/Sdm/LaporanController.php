@@ -22,8 +22,8 @@ class LaporanController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $col_array = array('kode_sdm', 'kode_gol', 'kode_area', 'kode_fm', 'kode_bm', 'kode_loker', 'nik');
-            $db_col_name = array('b.kode_sdm', 'b.kode_golongan', 'b.kode_area', 'b.kode_fm', 'b.kode_bm', 'b.kode_loker', 'a.nik');
+            $col_array = array('kode_sdm', 'kode_area', 'kode_fm', 'kode_bm', 'kode_loker', 'nik');
+            $db_col_name = array('b.kode_sdm', 'b.kode_area', 'b.kode_fm', 'b.kode_bm', 'b.kode_loker', 'a.nik');
             $where = "where a.kode_lokasi='" . $kode_lokasi . "'";
             $this_in = "";
             for ($i = 0; $i < count($col_array); $i++) {
@@ -48,7 +48,7 @@ class LaporanController extends Controller
             }
 
             $sql = "SELECT a.nik,a.kode_lokasi,a.nama,a.no_telp,a.no_hp,a.alamat,convert(varchar,b.tgl_masuk,103) AS tgl_masuk,
-            b.kode_golongan,c.nama as nama_golongan,
+
             b.kode_sdm, d.nama as nama_sdm,
             b.kode_loker, e.nama as nama_loker,
             b.kode_fm, g.nama as nama_fm,
@@ -56,7 +56,6 @@ class LaporanController extends Controller
             b.kode_area, f.nama as nama_area
             FROM hr_sdm_pribadi a
             INNER JOIN hr_sdm_kepegawaian b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            INNER JOIN hr_gol c ON c.kode_gol=b.kode_golongan AND c.kode_lokasi=b.kode_lokasi
             INNER JOIN hr_sdm d ON b.kode_sdm=d.kode_sdm AND b.kode_lokasi=d.kode_lokasi
             INNER JOIN hr_loker e ON b.kode_loker=e.kode_loker AND b.kode_lokasi=e.kode_lokasi
             INNER JOIN hr_area f ON b.kode_area=f.kode_area AND b.kode_lokasi=f.kode_lokasi
@@ -100,8 +99,8 @@ class LaporanController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $col_array = array('kode_sdm', 'kode_gol', 'kode_area', 'kode_fm', 'kode_bm', 'kode_loker', 'nik');
-            $db_col_name = array('c.kode_sdm', 'c.kode_golongan', 'c.kode_area', 'c.kode_fm', 'c.kode_bm', 'c.kode_loker', 'a.nik');
+            $col_array = array('kode_sdm', 'kode_area', 'kode_fm', 'kode_bm', 'kode_loker', 'nik');
+            $db_col_name = array('c.kode_sdm', 'c.kode_area', 'c.kode_fm', 'c.kode_bm', 'c.kode_loker', 'a.nik');
             $where = "where a.kode_lokasi='" . $kode_lokasi . "'";
             $this_in = "";
             for ($i = 0; $i < count($col_array); $i++) {
