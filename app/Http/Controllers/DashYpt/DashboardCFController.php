@@ -116,7 +116,7 @@ class DashboardCFController extends Controller {
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahun'
                 GROUP BY a.kode_lokasi
-                union
+                union all
                 SELECT a.kode_lokasi,'sa_yoy' as jenis,  'Saldo YoY' as nama,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='01' THEN b.n4 ELSE 0 END) AS n1,
                 SUM(CASE WHEN SUBSTRING(b.periode,5,2)='02' THEN b.n4 ELSE 0 END) AS n2,
@@ -182,12 +182,11 @@ class DashboardCFController extends Controller {
             
             $ctg = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
             $series = array();
-            $group = array();
             $colors = ['#8085E9','#90ED7D','#F7A35C','#7CB5EC','#059669','#434348'];
             $i=0;
             foreach($res as $dt) {
-                if(!isset($group[$i])){
-                    $group[$i] = array(
+                if(!isset($series[$i])){
+                    $series[$i] = array(
                         'name' => $dt['nama'],
                         'data' => array(),
                         'color' => $colors[$i]
@@ -206,14 +205,14 @@ class DashboardCFController extends Controller {
                 floatval($dt['n10']), 
                 floatval($dt['n11']), 
                 floatval($dt['n12']));
-                $group[$i]['data'] = $data;
+                $series[$i]['data'] = $data;
                 $i++;
             }
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
                 'kategori' => $ctg,
-                'series' => $group
+                'series' => $series
             ];
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
