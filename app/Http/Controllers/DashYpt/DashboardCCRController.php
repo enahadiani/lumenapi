@@ -71,6 +71,12 @@ class DashboardCCRController extends Controller {
                 $filter_pp = "";
             }
 
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
+
             $sql = "select isnull(b.total,0) as tn1,isnull(c.total,0) as tn2,isnull(b.total,0)+isnull(c.total,0) as tn3,
             isnull(d.total,0) as pn1,isnull(e.total,0) as pn2,isnull(d.total,0)+isnull(e.total,0) as pn3,
             isnull(f.total,0)-isnull(g.total,0) as piutang, 
@@ -80,56 +86,64 @@ class DashboardCCRController extends Controller {
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_bill_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where (x.periode between '$periode_awal' and '$periode_rev') $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal' and '$periode_rev') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                     )b on a.kode_lokasi=b.kode_lokasi 
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_bill_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where x.periode='$periode' $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode='$periode' $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
             left join (select x.kode_lokasi, 
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where (x.periode between '$periode_awal' and '$periode') and (x.periode_bill between '$periode_awal' and '$periode_rev') $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal' and '$periode') and (x.periode_bill between '$periode_awal' and '$periode_rev') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )d on a.kode_lokasi=d.kode_lokasi 
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where x.periode='$periode' and x.periode_bill = '$periode' $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode='$periode' and x.periode_bill = '$periode' $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )e on a.kode_lokasi=e.kode_lokasi 
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_bill_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where x.periode<'$periode_awal' $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode<'$periode_awal' $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )f on a.kode_lokasi=f.kode_lokasi 
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where x.periode<'$periode_awal' $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode<'$periode_awal' $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )g on a.kode_lokasi=g.kode_lokasi 
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill<'$periode_awal') $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill<'$periode_awal') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )h on a.kode_lokasi=h.kode_lokasi 
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        where x.periode='$periode' and (x.periode_bill<'$periode_awal') $where $filter_pp
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode='$periode' and (x.periode_bill<'$periode_awal') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )i on a.kode_lokasi=i.kode_lokasi
             where a.kode_lokasi='12' ";
@@ -209,12 +223,18 @@ class DashboardCCRController extends Controller {
             //     $bulanSeb = $bulanSeb;
             // }
             // $periode_rev=$tahun.$bulanSeb;
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and bd.kode_bidang = '$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
             $sort = $r->sort;
             $where = "where x.kode_lokasi='12' ";
 
             $sql = "select a.kode_pp,a.nama,
             case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end as ccr_berjalan
             from pp a
+            inner join bidang bd on a.kode_bidang=bd.kode_bidang and bd.kode_lokasi='12'
             left join (select x.kode_lokasi,x.kode_pp,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_bill_d x 
@@ -229,8 +249,35 @@ class DashboardCCRController extends Controller {
                         $where and x.periode='$periode' and x.periode_bill = '$periode' 
                         group by x.kode_lokasi,x.kode_pp
                         )e on a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
-            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3','4','5')
+            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3','4','5') $filter_bidang
             order by (case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end) $sort ";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getBidang(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $sql = "select a.kode_bidang,a.nama
+            from bidang a
+            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3','4','5') ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -258,6 +305,11 @@ class DashboardCCRController extends Controller {
             $periode=$r->periode[1];
             $tahun=substr($periode,0,4);
             $nama = "-";
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
             if(isset($r->kode_pp) && $r->kode_pp !=""){
                 $get = DB::connection($this->db)->select("select nama from pp where kode_pp='$r->kode_pp' ");
                 if(count($get) > 0){
@@ -282,7 +334,8 @@ class DashboardCCRController extends Controller {
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='11' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_bill_d a
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp'
+                        inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
                         group by a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
                 left join (select a.kode_lokasi,
@@ -299,7 +352,8 @@ class DashboardCCRController extends Controller {
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='11' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_rekon_d a
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp'
+                        inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
                         group by a.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='12' ";
@@ -327,7 +381,8 @@ class DashboardCCRController extends Controller {
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='11' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_bill_d a
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun'
+                        inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' $filter_bidang
                         group by a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
                 left join (select a.kode_lokasi,
@@ -344,7 +399,8 @@ class DashboardCCRController extends Controller {
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='11' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_rekon_d a
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun'
+                        inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' $filter_bidang
                         group by a.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='12'";
@@ -404,6 +460,11 @@ class DashboardCCRController extends Controller {
             $periode=$r->periode[1];
             $tahun=substr($periode,0,4);
             $nama = "-";
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
             if(isset($r->kode_pp) && $r->kode_pp !=""){
                 $get = DB::connection($this->db)->select("select nama from pp where kode_pp='$r->kode_pp' ");
                 if(count($get) > 0){
@@ -425,32 +486,58 @@ class DashboardCCRController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='12' AND a.kode_fs='FS1' and b.kode_pp='$r->kode_pp' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun'
+                inner join pp p on b.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                WHERE a.kode_lokasi='12' AND a.kode_fs='FS1' and b.kode_pp='$r->kode_pp' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun' $filter_bidang
                 GROUP BY a.kode_lokasi
                 ";
             }else{
-                $get = DB::connection($this->db)->select("select nama from dash_ypt_lokasi where kode_lokasi='12' ");
-                if(count($get) > 0){
-                    $nama = $get[0]->nama;
+
+                if($filter_bidang != " "){
+                    $sql="SELECT a.kode_lokasi,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='01' THEN b.n4 ELSE 0 END) AS n1,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='02' THEN b.n4 ELSE 0 END) AS n2,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='03' THEN b.n4 ELSE 0 END) AS n3,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='04' THEN b.n4 ELSE 0 END) AS n4,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='05' THEN b.n4 ELSE 0 END) AS n5,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='06' THEN b.n4 ELSE 0 END) AS n6,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='07' THEN b.n4 ELSE 0 END) AS n7,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='08' THEN b.n4 ELSE 0 END) AS n8,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='09' THEN b.n4 ELSE 0 END) AS n9,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='10' THEN b.n4 ELSE 0 END) AS n10,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='11' THEN b.n4 ELSE 0 END) AS n11,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='12' THEN b.n4 ELSE 0 END) AS n12
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                    inner join pp p on b.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                    WHERE a.kode_lokasi='12' AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun' $filter_bidang
+                    GROUP BY a.kode_lokasi
+                    ";
+                }else{
+
+                    $get = DB::connection($this->db)->select("select nama from dash_ypt_lokasi where kode_lokasi='12' ");
+                    if(count($get) > 0){
+                        $nama = $get[0]->nama;
+                    }
+                    $sql="SELECT a.kode_lokasi,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='01' THEN b.n4 ELSE 0 END) AS n1,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='02' THEN b.n4 ELSE 0 END) AS n2,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='03' THEN b.n4 ELSE 0 END) AS n3,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='04' THEN b.n4 ELSE 0 END) AS n4,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='05' THEN b.n4 ELSE 0 END) AS n5,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='06' THEN b.n4 ELSE 0 END) AS n6,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='07' THEN b.n4 ELSE 0 END) AS n7,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='08' THEN b.n4 ELSE 0 END) AS n8,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='09' THEN b.n4 ELSE 0 END) AS n9,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='10' THEN b.n4 ELSE 0 END) AS n10,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='11' THEN b.n4 ELSE 0 END) AS n11,
+                    SUM(CASE WHEN SUBSTRING(b.periode,5,2)='12' THEN b.n4 ELSE 0 END) AS n12
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                    WHERE a.kode_lokasi='12' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun'
+                    GROUP BY a.kode_lokasi ";
                 }
-                $sql="SELECT a.kode_lokasi,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='01' THEN b.n4 ELSE 0 END) AS n1,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='02' THEN b.n4 ELSE 0 END) AS n2,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='03' THEN b.n4 ELSE 0 END) AS n3,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='04' THEN b.n4 ELSE 0 END) AS n4,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='05' THEN b.n4 ELSE 0 END) AS n5,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='06' THEN b.n4 ELSE 0 END) AS n6,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='07' THEN b.n4 ELSE 0 END) AS n7,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='08' THEN b.n4 ELSE 0 END) AS n8,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='09' THEN b.n4 ELSE 0 END) AS n9,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='10' THEN b.n4 ELSE 0 END) AS n10,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='11' THEN b.n4 ELSE 0 END) AS n11,
-                SUM(CASE WHEN SUBSTRING(b.periode,5,2)='12' THEN b.n4 ELSE 0 END) AS n12
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='12' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun'
-                GROUP BY a.kode_lokasi ";
             }
            
             $select = DB::connection($this->db)->select($sql);
