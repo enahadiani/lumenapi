@@ -249,7 +249,7 @@ class DashboardCCRController extends Controller {
                         $where and x.periode='$periode' and x.periode_bill = '$periode' 
                         group by x.kode_lokasi,x.kode_pp
                         )e on a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
-            where a.kode_lokasi='12' and a.kode_bidang in ('2','3','4','5') $filter_bidang
+            where a.kode_lokasi='12' and a.kode_bidang in ('2','3','4','5') and a.nama not like '%SMK PAR SP Makassar%' $filter_bidang
             order by (case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end) $sort ";
 
             $select = DB::connection($this->db)->select($sql);
@@ -277,7 +277,7 @@ class DashboardCCRController extends Controller {
             
             $sql = "select a.kode_bidang,a.nama
             from bidang a
-            where a.kode_lokasi='12' and a.kode_bidang in ('2','3','4','5') ";
+            where a.kode_lokasi='12' and a.kode_bidang in ('2','3','4','5')";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
