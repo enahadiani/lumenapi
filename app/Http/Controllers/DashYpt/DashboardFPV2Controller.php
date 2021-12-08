@@ -71,7 +71,7 @@ class DashboardFPV2Controller extends Controller {
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_grafik, c.nama,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n1,
+            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n1 ELSE b.n1 END AS n1,
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n2 ELSE b.n2 END AS n2,
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n4,
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
