@@ -409,37 +409,50 @@ class DashboardCCRController extends Controller {
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             $ctg = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
-            $series = array();
+            $series = array(); 
+            $bayar = array();
+            $lebih = array();
+            $kurang = array();
             $i=0;
             foreach($res as $dt) {
-                $data = array(
-                    (floatval($dt['t1']) != 0 ? floatval($dt['p1'])/floatval($dt['t1']) : 0)*100, 
-                    (floatval($dt['t2']) != 0 ? floatval($dt['p2'])/floatval($dt['t2']) : 0)*100, 
-                    (floatval($dt['t3']) != 0 ? floatval($dt['p3'])/floatval($dt['t3']) : 0)*100, 
-                    (floatval($dt['t4']) != 0 ? floatval($dt['p4'])/floatval($dt['t4']) : 0)*100, 
-                    (floatval($dt['t5']) != 0 ? floatval($dt['p5'])/floatval($dt['t5']) : 0)*100, 
-                    (floatval($dt['t6']) != 0 ? floatval($dt['p6'])/floatval($dt['t6']) : 0)*100, 
-                    (floatval($dt['t7']) != 0 ? floatval($dt['p7'])/floatval($dt['t7']) : 0)*100, 
-                    (floatval($dt['t8']) != 0 ? floatval($dt['p8'])/floatval($dt['t8']) : 0)*100, 
-                    (floatval($dt['t9']) != 0 ? floatval($dt['p9'])/floatval($dt['t9']) : 0)*100, 
-                    (floatval($dt['t10']) != 0 ? floatval($dt['p10'])/floatval($dt['t10']) : 0)*100, 
-                    (floatval($dt['t11']) != 0 ? floatval($dt['p11'])/floatval($dt['t11']) : 0)*100, 
-                    (floatval($dt['t12']) != 0 ? floatval($dt['p12'])/floatval($dt['t12']) : 0)*100
-                );
+                $n1 = (floatval($dt['t1']) != 0 ? floatval($dt['p1'])/floatval($dt['t1']) : 0)*100; 
+                $n2 = (floatval($dt['t2']) != 0 ? floatval($dt['p2'])/floatval($dt['t2']) : 0)*100; 
+                $n3 = (floatval($dt['t3']) != 0 ? floatval($dt['p3'])/floatval($dt['t3']) : 0)*100; 
+                $n4 = (floatval($dt['t4']) != 0 ? floatval($dt['p4'])/floatval($dt['t4']) : 0)*100; 
+                $n5 = (floatval($dt['t5']) != 0 ? floatval($dt['p5'])/floatval($dt['t5']) : 0)*100; 
+                $n6 = (floatval($dt['t6']) != 0 ? floatval($dt['p6'])/floatval($dt['t6']) : 0)*100; 
+                $n7 = (floatval($dt['t7']) != 0 ? floatval($dt['p7'])/floatval($dt['t7']) : 0)*100; 
+                $n8 = (floatval($dt['t8']) != 0 ? floatval($dt['p8'])/floatval($dt['t8']) : 0)*100; 
+                $n9 = (floatval($dt['t9']) != 0 ? floatval($dt['p9'])/floatval($dt['t9']) : 0)*100; 
+                $n10 = (floatval($dt['t10']) != 0 ? floatval($dt['p10'])/floatval($dt['t10']) : 0)*100; 
+                $n11 = (floatval($dt['t11']) != 0 ? floatval($dt['p11'])/floatval($dt['t11']) : 0)*100; 
+                $n12 = (floatval($dt['t12']) != 0 ? floatval($dt['p12'])/floatval($dt['t12']) : 0)*100;
+                for($j=1; $j <= 12; $j++){
+                    array_push($bayar, ${"n".$j});
+                    if((${"n".$j} - 100) > 0){
+                        ${"l".$j} = ${"n".$j} - 100;
+                        ${"k".$j} = 0;
+                    }else{
+                        ${"l".$j} = 0;
+                        ${"k".$j} = abs(${"n".$j} - 100);
+                    }
+                    array_push($lebih, ${"l".$j});
+                    array_push($kurang, ${"k".$j});
+                }
                 $i++;
             }
             
-            $series[0] = array(
-                'name' => 'CCR',
-                'data' => $data,
-                'color' => '#EEBE00'
-            );
+            $tagihan = [100,100,100,100,100,100,100,100,100,100,100,100];
+
             $success['nama'] = $nama;
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = array(
                 'kategori' => $ctg,
-                'series' => $series
+                'tagihan' => $tagihan,
+                'bayar' => $bayar,
+                'melampaui' => $lebih,
+                'tdkcapai' => $kurang,
             );
 
             return response()->json($success, $this->successStatus); 
