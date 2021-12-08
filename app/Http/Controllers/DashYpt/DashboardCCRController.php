@@ -315,10 +315,10 @@ class DashboardCCRController extends Controller {
                 if(count($get) > 0){
                     $nama = $get[0]->nama;
                 }
-                $sql="select a.kode_lokasi,isnull(b.n1,0)-isnull(c.n1,0) as n1,isnull(b.n2,0)-isnull(c.n2,0) as n2,isnull(b.n3,0)-isnull(c.n3,0) as n3,
-                isnull(b.n4,0)-isnull(c.n4,0) as n4,isnull(b.n5,0)-isnull(c.n5,0) as n5,isnull(b.n6,0)-isnull(c.n6,0) as n6,
-                isnull(b.n7,0)-isnull(c.n7,0) as n7,isnull(b.n8,0)-isnull(c.n8,0) as n8,isnull(b.n9,0)-isnull(c.n9,0) as n9,
-                isnull(b.n10,0)-isnull(c.n10,0) as n10,isnull(b.n11,0)-isnull(c.n11,0) as n11,isnull(b.n12,0)-isnull(c.n12,0) as n12
+                $sql="select a.kode_lokasi,isnull(b.n1,0) as t1,isnull(c.n1,0) as p1,isnull(b.n2,0) as t2,isnull(c.n2,0) as p2,isnull(b.n3,0) as t3,isnull(c.n3,0) as p3,
+                isnull(b.n4,0) as t4,isnull(c.n4,0) as p4,isnull(b.n5,0) as t5,isnull(c.n5,0) as p5,isnull(b.n6,0) as t6,isnull(c.n6,0) as p6,
+                isnull(b.n7,0) as t7,isnull(c.n7,0) as p7,isnull(b.n8,0) as t8,isnull(c.n8,0) as p8,isnull(b.n9,0) as t9,isnull(c.n9,0) as p9,
+                isnull(b.n10,0) as t10,isnull(c.n10,0) as p10,isnull(b.n11,0) as t11,isnull(c.n11,0) as p11,isnull(b.n12,0) as t12,isnull(c.n12,0) as p12
                 from dash_ypt_lokasi a
                 left join (select a.kode_lokasi,
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='01' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1,
@@ -339,21 +339,21 @@ class DashboardCCRController extends Controller {
                         group by a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
                 left join (select a.kode_lokasi,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='01' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='02' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n2,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='03' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n3,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='04' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n4,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='05' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n5,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='06' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n6,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='07' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n7,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='08' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n8,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='09' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n9,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='10' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n10,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='11' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='01' and SUBSTRING(a.periode_bill,5,2) ='01' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='02' and SUBSTRING(a.periode_bill,5,2) ='02' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n2,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='03' and SUBSTRING(a.periode_bill,5,2) ='03' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n3,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='04' and SUBSTRING(a.periode_bill,5,2) ='04' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n4,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='05' and SUBSTRING(a.periode_bill,5,2) ='05' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n5,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='06' and SUBSTRING(a.periode_bill,5,2) ='06' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n6,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='07' and SUBSTRING(a.periode_bill,5,2) ='07' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n7,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='08' and SUBSTRING(a.periode_bill,5,2) ='08' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n8,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='09' and SUBSTRING(a.periode_bill,5,2) ='09' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n9,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='10' and SUBSTRING(a.periode_bill,5,2) ='10' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n10,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='11' and SUBSTRING(a.periode_bill,5,2) ='11' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
+                                sum(CASE WHEN (SUBSTRING(a.periode,5,2)='12' and SUBSTRING(a.periode_bill,5,2) ='12' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_rekon_d a
                         inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
+                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and SUBSTRING(a.periode_bill,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
                         group by a.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='12' ";
@@ -362,10 +362,10 @@ class DashboardCCRController extends Controller {
                 if(count($get) > 0){
                     $nama = $get[0]->nama;
                 }
-                $sql="select a.kode_lokasi,isnull(b.n1,0)-isnull(c.n1,0) as n1,isnull(b.n2,0)-isnull(c.n2,0) as n2,isnull(b.n3,0)-isnull(c.n3,0) as n3,
-                isnull(b.n4,0)-isnull(c.n4,0) as n4,isnull(b.n5,0)-isnull(c.n5,0) as n5,isnull(b.n6,0)-isnull(c.n6,0) as n6,
-                isnull(b.n7,0)-isnull(c.n7,0) as n7,isnull(b.n8,0)-isnull(c.n8,0) as n8,isnull(b.n9,0)-isnull(c.n9,0) as n9,
-                isnull(b.n10,0)-isnull(c.n10,0) as n10,isnull(b.n11,0)-isnull(c.n11,0) as n11,isnull(b.n12,0)-isnull(c.n12,0) as n12
+                $sql="select a.kode_lokasi,isnull(b.n1,0) as t1,isnull(c.n1,0) as p1,isnull(b.n2,0) as t2,isnull(c.n2,0) as p2,isnull(b.n3,0) as t3,isnull(c.n3,0) as p3,
+                isnull(b.n4,0) as t4,isnull(c.n4,0) as p4,isnull(b.n5,0) as t5,isnull(c.n5,0) as p5,isnull(b.n6,0) as t6,isnull(c.n6,0) as p6,
+                isnull(b.n7,0) as t7,isnull(c.n7,0) as p7,isnull(b.n8,0) as t8,isnull(c.n8,0) as p8,isnull(b.n9,0) as t9,isnull(c.n9,0) as p9,
+                isnull(b.n10,0) as t10,isnull(c.n10,0) as p10,isnull(b.n11,0) as t11,isnull(c.n11,0) as p11,isnull(b.n12,0) as t12,isnull(c.n12,0) as p12
                 from dash_ypt_lokasi a
                 left join (select a.kode_lokasi,
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2)='01' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1,
@@ -386,21 +386,21 @@ class DashboardCCRController extends Controller {
                         group by a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
                 left join (select a.kode_lokasi,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='01' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='02' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n2,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='03' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n3,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='04' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n4,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='05' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n5,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='06' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n6,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='07' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n7,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='08' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n8,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='09' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n9,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='10' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n10,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='11' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
-                                sum(CASE WHEN SUBSTRING(a.periode,5,2)='12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='01' and SUBSTRING(a.periode_bill,5,2) ='01' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='02' and SUBSTRING(a.periode_bill,5,2) ='02' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n2,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='03' and SUBSTRING(a.periode_bill,5,2) ='03' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n3,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='04' and SUBSTRING(a.periode_bill,5,2) ='04' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n4,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='05' and SUBSTRING(a.periode_bill,5,2) ='05' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n5,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='06' and SUBSTRING(a.periode_bill,5,2) ='06' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n6,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='07' and SUBSTRING(a.periode_bill,5,2) ='07' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n7,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='08' and SUBSTRING(a.periode_bill,5,2) ='08' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n8,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='09' and SUBSTRING(a.periode_bill,5,2) ='09' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n9,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='10' and SUBSTRING(a.periode_bill,5,2) ='10' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n10,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='11' and SUBSTRING(a.periode_bill,5,2) ='11' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n11,
+                        sum(CASE WHEN (SUBSTRING(a.periode,5,2)='12' and SUBSTRING(a.periode_bill,5,2) ='12' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_rekon_d a
                         inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' $filter_bidang
+                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and SUBSTRING(a.periode_bill,1,4)='$tahun' $filter_bidang
                         group by a.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='12'";
@@ -413,18 +413,19 @@ class DashboardCCRController extends Controller {
             $i=0;
             foreach($res as $dt) {
                 $data = array(
-                floatval($dt['n1']), 
-                floatval($dt['n2']), 
-                floatval($dt['n3']), 
-                floatval($dt['n4']), 
-                floatval($dt['n5']), 
-                floatval($dt['n6']), 
-                floatval($dt['n7']), 
-                floatval($dt['n8']), 
-                floatval($dt['n9']), 
-                floatval($dt['n10']), 
-                floatval($dt['n11']), 
-                floatval($dt['n12']));
+                    (floatval($dt['t1']) != 0 ? floatval($dt['p1'])/floatval($dt['t1']) : 0)*100, 
+                    (floatval($dt['t2']) != 0 ? floatval($dt['p2'])/floatval($dt['t2']) : 0)*100, 
+                    (floatval($dt['t3']) != 0 ? floatval($dt['p3'])/floatval($dt['t3']) : 0)*100, 
+                    (floatval($dt['t4']) != 0 ? floatval($dt['p4'])/floatval($dt['t4']) : 0)*100, 
+                    (floatval($dt['t5']) != 0 ? floatval($dt['p5'])/floatval($dt['t5']) : 0)*100, 
+                    (floatval($dt['t6']) != 0 ? floatval($dt['p6'])/floatval($dt['t6']) : 0)*100, 
+                    (floatval($dt['t7']) != 0 ? floatval($dt['p7'])/floatval($dt['t7']) : 0)*100, 
+                    (floatval($dt['t8']) != 0 ? floatval($dt['p8'])/floatval($dt['t8']) : 0)*100, 
+                    (floatval($dt['t9']) != 0 ? floatval($dt['p9'])/floatval($dt['t9']) : 0)*100, 
+                    (floatval($dt['t10']) != 0 ? floatval($dt['p10'])/floatval($dt['t10']) : 0)*100, 
+                    (floatval($dt['t11']) != 0 ? floatval($dt['p11'])/floatval($dt['t11']) : 0)*100, 
+                    (floatval($dt['t12']) != 0 ? floatval($dt['p12'])/floatval($dt['t12']) : 0)*100
+                );
                 $i++;
             }
             
