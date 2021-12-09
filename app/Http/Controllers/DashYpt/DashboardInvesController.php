@@ -64,14 +64,52 @@ class DashboardInvesController extends Controller {
             }
             $periode_rev=$tahun.$bulanSeb;
 
-            $sql = "select 80.8 as persen_ytd, 198600000000 as rka_ytd, 198600000000 as real_ytd, 64.5 as persen_tahun, 198600000000 as rka_tahun, 198600000000 as real_tahun, 36.8 as persen_ach, 198600000000 as ach_now, 198600000000 as ach_lalu 
+            $sql = "select a.kode_lokasi,
+            sum(a.n2) as n1,
+            sum(a.n4) as n2,
+            sum(case when a.n2<>0 then (a.n4/a.n2)*100 else 0 end) as capai
+            from exs_neraca a
+            inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
+            group by a.kode_lokasi
             ";
-            $select = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($select),true);
+            $ytd = DB::connection($this->db)->select($sql);
+
+            $sql = "select a.kode_lokasi,
+            sum(a.n1) as n1,
+            sum(a.n4) as n2,
+            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
+            from exs_neraca a
+            inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
+                        group by a.kode_lokasi
+            ";
+            $tahun = DB::connection($this->db)->select($sql);
+
+            $sql = "select a.kode_lokasi,
+            sum(a.n4) as n1,
+            sum(a.n5) as n2,
+            sum(case when a.n5<>0 then (a.n4/a.n5)*100 else 0 end) as capai
+            from exs_neraca a
+            inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
+                        group by a.kode_lokasi
+            ";
+            $ach = DB::connection($this->db)->select($sql);
 
             $success['status'] = true;
             $success['message'] = "Success!";
-            $success['data'] = $res;
+            $success['data'][0] = array(
+                'persen_ytd' => (count($ytd) > 0 ? $ytd[0]->capai : 0),
+                'rka_ytd' => (count($ytd) > 0 ? $ytd[0]->n1 : 0),
+                'real_ytd' => (count($ytd) > 0 ? $ytd[0]->n2 : 0),
+                'persen_tahun' => (count($tahun) > 0 ? $tahun[0]->capai : 0),
+                'rka_tahun' => (count($tahun) > 0 ? $tahun[0]->n1 : 0),
+                'real_tahun' => (count($tahun) > 0 ? $tahun[0]->n2 : 0),
+                'persen_ach' => (count($ach) > 0 ? $ach[0]->capai : 0),
+                'ach_now' => (count($ach) > 0 ? $ach[0]->n1 : 0),
+                'ach_lalu' => (count($ach) > 0 ? $ach[0]->n2 : 0),
+            );
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
@@ -89,13 +127,17 @@ class DashboardInvesController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             $periode=$r->periode[1];
-            $where = "where x.kode_lokasi='12' ";
 
-            $sql = "select 'A' as kode_aset,  'Aset A' as nama_aset, 1900000000 as rka, 1000000000 as real, 10.9 as ach
-            union all
-            select 'B' as kode_aset,  'Aset B' as nama_aset, 1900000000 as rka, 1000000000 as real, 10.9 as ach
-            union all
-            select 'C' as kode_aset,  'Aset C' as nama_aset, 1900000000 as rka, 1000000000 as real, 10.9 as ach
+            $sql = "select a.kode_neraca as kode_aset,a.nama as nama_aset,b.nu,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as rka,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as real,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
+            sum(case when a.n2<>0 then (a.n6/a.n2)*100 else 0 end) as ach
+            from exs_neraca a
+            inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
+            group by a.kode_neraca,a.nama,b.nu
+            order by b.nu
              ";
 
             $select = DB::connection($this->db)->select($sql);
@@ -120,10 +162,17 @@ class DashboardInvesController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $sql = "SELECT a.kode_lokasi, a.nama, a.skode, 1000000000 as nilai
-            FROM dash_ypt_lokasi a
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
+            $periode = $r->periode[1];
+            
+            $sql = "select a.kode_lokasi,a.nama,a.skode,isnull(b.n1,0) as nilai
+            from dash_ypt_lokasi a
+            left join (select a.kode_lokasi,sum(a.n4) as n1
+                    from exs_neraca a
+                    inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca  and a.kode_fs=b.kode_fs
+                    where a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
+                    group by a.kode_lokasi
+                    )b on a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi<>'$kode_lokasi'";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
