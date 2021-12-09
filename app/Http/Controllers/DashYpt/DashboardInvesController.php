@@ -64,7 +64,7 @@ class DashboardInvesController extends Controller {
             }
             $periode_rev=$tahun.$bulanSeb;
 
-            $sql = "select 0 as persen_ytd, 0 as rka, 0 as real, 0 sa persen_tahun, 0 as rka_tahun, 0 as real_tahun, 0 as persen_ach, 0 as ach_now, 0 as ach_lalu 
+            $sql = "select 80.8 as persen_ytd, 198600000000 as rka_ytd, 198600000000 as real_ytd, 64.5 as persen_tahun, 198600000000 as rka_tahun, 198600000000 as real_tahun, 36.8 as persen_ach, 198600000000 as ach_now, 198600000000 as ach_lalu 
             ";
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -91,7 +91,12 @@ class DashboardInvesController extends Controller {
             $periode=$r->periode[1];
             $where = "where x.kode_lokasi='12' ";
 
-            $sql = "select 'A' as kode_aset,  'Aset A' as nama_aset, 0 as rka, 0 as real, 0 as ach ";
+            $sql = "select 'A' as kode_aset,  'Aset A' as nama_aset, 1900000000 as rka, 1000000000 as real, 10.9 as ach
+            union all
+            select 'B' as kode_aset,  'Aset B' as nama_aset, 1900000000 as rka, 1000000000 as real, 10.9 as ach
+            union all
+            select 'C' as kode_aset,  'Aset C' as nama_aset, 1900000000 as rka, 1000000000 as real, 10.9 as ach
+             ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -205,7 +210,7 @@ class DashboardInvesController extends Controller {
                 $tahun++;
             }
            
-            $sql="SELECT a.kode_lokasi, a.nama, a.skode, 0 as n1, 0 as n2, 0 as n3, 0 as n4, 0 as n5
+            $sql="SELECT a.kode_lokasi, a.nama, a.skode, 1234000000 as n1, 2000000000 as n2, 1567000000 as n3, 3000000000 as n4, 5000000000 as n5
             FROM dash_ypt_lokasi a
             WHERE a.kode_lokasi IN ('03','11','12','13','14','15')
                 ";
@@ -213,19 +218,20 @@ class DashboardInvesController extends Controller {
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             $series = array();
-            $i=0;
+            $i=0; $pengurang = 100000000; //untk dummy
             foreach($res as $dt) {
                 if(!isset($series[$i])){
                     $series[$i] = array('name' => $dt['nama'], 'data' => array());
                 }
                 $data = array(
-                floatval($dt['n1']), 
-                floatval($dt['n2']), 
-                floatval($dt['n3']), 
-                floatval($dt['n4']), 
-                floatval($dt['n5'])
+                floatval($dt['n1']) - $pengurang, 
+                floatval($dt['n2']) - $pengurang, 
+                floatval($dt['n3']) - $pengurang, 
+                floatval($dt['n4']) - $pengurang, 
+                floatval($dt['n5']) - $pengurang
                 );
                 $series[$i]['data'] = $data;
+                $pengurang+= 567891011;
                 $i++;
             }
             $success['status'] = true;
