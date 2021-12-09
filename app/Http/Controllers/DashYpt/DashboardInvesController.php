@@ -118,7 +118,7 @@ class DashboardInvesController extends Controller {
 
             $sql = "SELECT a.kode_lokasi, a.nama, a.skode, 1000000000 as nilai
             FROM dash_ypt_lokasi a
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -204,33 +204,9 @@ class DashboardInvesController extends Controller {
                 $tahun++;
             }
            
-            $sql="SELECT '20' as kode_lokasi, 'RKA' as nama,
-                0 AS n1,
-                0 AS n2,
-                0 AS n3,
-                0 AS n4,
-                0 AS n5,
-                0 AS n6,
-                0 AS n7,
-                0 AS n8,
-                0 AS n9,
-                0 AS n10,
-                0 AS n11,
-                0 AS n12
-                union all
-                SELECT '20' as kode_lokasi, 'Real' as nama,
-                0 AS n1,
-                0 AS n2,
-                0 AS n3,
-                0 AS n4,
-                0 AS n5,
-                0 AS n6,
-                0 AS n7,
-                0 AS n8,
-                0 AS n9,
-                0 AS n10,
-                0 AS n11,
-                0 AS n12
+            $sql="SELECT a.kode_lokasi, a.nama, a.skode, 0 as n1, 0 as n2, 0 as n3, 0 as n4, 0 as n5
+            FROM dash_ypt_lokasi a
+            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')
                 ";
           
             $select = DB::connection($this->db)->select($sql);
