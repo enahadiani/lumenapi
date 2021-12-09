@@ -44,6 +44,13 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
     $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');
+
+    // INVEST
+    $router->get('data-inves-box','DashYpt\DashboardInvesController@getDataBox'); 
+    $router->get('data-inves-serap-agg','DashYpt\DashboardInvesController@getSerapAgg');  
+    $router->get('data-inves-nilai-aset','DashYpt\DashboardInvesController@getNilaiAsetChart');  
+    $router->get('data-inves-agg-lembaga','DashYpt\DashboardInvesController@getAggPerLembagaChart');  
+    // END INVEST
     
     // RASIO
     $router->get('data-rasio-jenis','DashYpt\DashboardRasioController@getKlpRasio');
