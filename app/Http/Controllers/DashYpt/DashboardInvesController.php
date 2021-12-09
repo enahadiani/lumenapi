@@ -67,7 +67,7 @@ class DashboardInvesController extends Controller {
             $sql = "select a.kode_lokasi,
             sum(a.n2) as n1,
             sum(a.n4) as n2,
-            sum(case when a.n2<>0 then (a.n4/a.n2)*100 else 0 end) as capai
+            case when sum(a.n2) <> 0 then (sum(a.n4)/sum(a.n2))*100 else 0 end as capai
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
@@ -78,7 +78,7 @@ class DashboardInvesController extends Controller {
             $sql = "select a.kode_lokasi,
             sum(a.n1) as n1,
             sum(a.n4) as n2,
-            sum(case when a.n1<>0 then (a.n4/a.n1)*100 else 0 end) as capai
+            case when sum(a.n1) <> 0 then (sum(a.n4)/sum(a.n1))*100 else 0 end as capai
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
@@ -89,7 +89,7 @@ class DashboardInvesController extends Controller {
             $sql = "select a.kode_lokasi,
             sum(a.n4) as n1,
             sum(a.n5) as n2,
-            sum(case when a.n5<>0 then (a.n4/a.n5)*100 else 0 end) as capai
+            case when sum(a.n5) <> 0 then (sum(a.n4)/sum(a.n5))*100 else 0 end as capai
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
