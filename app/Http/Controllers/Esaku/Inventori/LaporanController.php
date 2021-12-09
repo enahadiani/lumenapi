@@ -142,13 +142,13 @@ class LaporanController extends Controller
                 group by no_bukti, kode_lokasi
                 ) c on a.kode_lokasi=c.kode_lokasi and a.no_jual=c.no_bukti
                 left join (
-                    select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_pajak
+                    select no_bukti, kode_lokasi, isnull(sum(ppn),0) as brg_pajak
                     from brg_trans_d
                     where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn > 0
                     group by no_bukti, kode_lokasi
                 ) d on a.kode_lokasi=d.kode_lokasi and a.no_jual=d.no_bukti
                 left join (
-                    select no_bukti, kode_lokasi, isnull(count(kode_barang),0) as brg_non_pajak
+                    select no_bukti, kode_lokasi, isnull(sum(ppn),0) as brg_non_pajak
                     from brg_trans_d
                     where kode_lokasi = '".$kode_lokasi."' and form='BRGJUAL' and ppn = 0
                     group by no_bukti, kode_lokasi
