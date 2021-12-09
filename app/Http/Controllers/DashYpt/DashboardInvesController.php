@@ -120,14 +120,14 @@ class DashboardInvesController extends Controller {
             FROM dash_ypt_lokasi a
             WHERE a.kode_lokasi IN ('03','11','12','13','14','15')";
 
-            $select = DB::connection($this->sql)->select($sql);
+            $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
 
             $chart = [];
             $idx = 0;
             foreach($res as $item) { 
                 $name = $item['skode'];
-                $nilai = floatval($item['n4']);
+                $nilai = floatval($item['nilai']);
                 if($idx == 0) {
                     if($nilai < 0){
                         $value = [
@@ -189,6 +189,7 @@ class DashboardInvesController extends Controller {
             }
             
             $periode=$r->periode[1];
+            $bulan = substr($periode,4,2);
             $tahun=substr($periode,0,4);
             $ctg = array();
             $tahun = intval($tahun)-4;
@@ -222,18 +223,11 @@ class DashboardInvesController extends Controller {
                 floatval($dt['n2']), 
                 floatval($dt['n3']), 
                 floatval($dt['n4']), 
-                floatval($dt['n5']), 
-                floatval($dt['n6']), 
-                floatval($dt['n7']), 
-                floatval($dt['n8']), 
-                floatval($dt['n9']), 
-                floatval($dt['n10']), 
-                floatval($dt['n11']), 
-                floatval($dt['n12']));
+                floatval($dt['n5'])
+                );
                 $series[$i]['data'] = $data;
                 $i++;
             }
-            $success['nama'] = $nama;
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = array(
