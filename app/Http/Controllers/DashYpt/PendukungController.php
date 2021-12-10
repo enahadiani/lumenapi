@@ -83,7 +83,8 @@ class PendukungController extends Controller
             'kode_dash' => 'required',
             'nama' => 'required',
             'kode_fs' => 'required',
-            'kode_neraca' => 'required|array'
+            'kode_neraca' => 'required|array',
+            'keterangan' => 'required|array' 
         ]);
 
         try {
@@ -99,11 +100,11 @@ class PendukungController extends Controller
             $res = $this->isUnik($request->kode_dash);
             if($res['status']){
                 
-                $sql = DB::connection($this->db)->insert("insert into dash_ypt_neraca (kode_dash,nama,kode_lokasi,kode_fs,tgl_input) values ('$request->kode_dash','$request->nama','$kode_lokasi','$request->kode_fs',getdate())");
+                $sql = DB::connection($this->db)->insert("insert into dash_ypt_neraca (kode_dash,nama,kode_lokasi,kode_fs,tgl_input) values (?,?,?,?,getdate())",array($request->kode_dash,$request->nama,$kode_lokasi,$request->kode_fs));
             
                 if (count($request->kode_neraca) > 0){
                     for ($i=0;$i < count($request->kode_neraca);$i++){
-                        $ins = DB::connection($this->db)->insert("insert into dash_ypt_neraca_d (kode_dash,kode_lokasi,kode_neraca,kode_fs) values ('$request->kode_dash','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."')");
+                        $ins = DB::connection($this->db)->insert("insert into dash_ypt_neraca_d (kode_dash,kode_lokasi,kode_neraca,kode_fs,nama) values (?,?,?,?,?)",array($request->kode_dash,$kode_lokasi,$request->kode_neraca[$i],$request->kode_fs,$request->keterangan[$i]));
                     }
                 }	
 
@@ -151,7 +152,8 @@ class PendukungController extends Controller
             'kode_dash' => 'required',
             'nama' => 'required',
             'kode_fs' => 'required',
-            'kode_neraca' => 'required|array'
+            'kode_neraca' => 'required|array',
+            'keterangan' => 'required|array'
         ]);
 
         try {
@@ -167,11 +169,11 @@ class PendukungController extends Controller
 
             $del2 = DB::connection($this->db)->table('dash_ypt_neraca_d')->where('kode_lokasi', $kode_lokasi)->where('kode_dash', $request->kode_dash)->delete();
 
-            $sql = DB::connection($this->db)->insert("insert into dash_ypt_neraca (kode_dash,nama,kode_lokasi,kode_fs,tgl_input) values ('$request->kode_dash','$request->nama','$kode_lokasi','$request->kode_fs',getdate())");
+            $sql = DB::connection($this->db)->insert("insert into dash_ypt_neraca (kode_dash,nama,kode_lokasi,kode_fs,tgl_input) values (?,?,?,?,getdate())",array($request->kode_dash,$request->nama,$kode_lokasi,$request->kode_fs));
             
             if (count($request->kode_neraca) > 0){
                 for ($i=0;$i < count($request->kode_neraca);$i++){
-                    $ins = DB::connection($this->db)->insert("insert into dash_ypt_neraca_d (kode_dash,kode_lokasi,kode_neraca,kode_fs) values ('$request->kode_dash','$kode_lokasi','".$request->kode_neraca[$i]."','".$request->kode_fs."')");
+                    $ins = DB::connection($this->db)->insert("insert into dash_ypt_neraca_d (kode_dash,kode_lokasi,kode_neraca,kode_fs,nama) values (?,?,?,?,?)",array($request->kode_dash,$kode_lokasi,$request->kode_neraca[$i],$request->kode_fs,$request->keterangan[$i]));
                 }
             }	
 
@@ -239,7 +241,7 @@ class PendukungController extends Controller
             where a.kode_dash = '".$kode_dash."' and a.kode_lokasi='".$kode_lokasi."'");						
             $res= json_decode(json_encode($res),true);
             
-            $res2 = DB::connection($this->db)->select("select a.kode_neraca,c.nama as nama_neraca
+            $res2 = DB::connection($this->db)->select("select a.kode_neraca,c.nama as nama_neraca,a.nama as keterangan
                     from dash_ypt_neraca_d a
                     inner join neraca c on a.kode_neraca=c.kode_neraca and a.kode_lokasi=c.kode_lokasi and a.kode_fs=c.kode_fs
                     where a.kode_dash = '".$kode_dash."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu");
