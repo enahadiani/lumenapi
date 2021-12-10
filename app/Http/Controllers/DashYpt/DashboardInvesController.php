@@ -128,7 +128,7 @@ class DashboardInvesController extends Controller {
             }
             $periode=$r->periode[1];
 
-            $sql = "select a.kode_neraca as kode_aset,a.nama as nama_aset,b.nu,
+            $sql = "select a.kode_neraca as kode_aset,b.nama as nama_aset,b.nu,
             sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as rka,
             sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as real,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
@@ -136,7 +136,7 @@ class DashboardInvesController extends Controller {
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
-            group by a.kode_neraca,a.nama,b.nu
+            group by a.kode_neraca,b.nama,b.nu
             order by b.nu
              ";
 
