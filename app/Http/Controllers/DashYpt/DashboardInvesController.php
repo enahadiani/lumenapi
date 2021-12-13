@@ -132,7 +132,7 @@ class DashboardInvesController extends Controller {
             sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as rka,
             sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as real,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
-            sum(case when a.n2<>0 then (a.n6/a.n2)*100 else 0 end) as ach
+            case when sum(a.n2)<>0 then (sum(a.n6)/sum(a.n2))*100 else 0 end as ach
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0)
