@@ -51,7 +51,11 @@ class DashboardCFController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $kode_lokasi = $r->kode_lokasi;
+            }
             
+            $where = "WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08')";
             $tahun = substr($r->periode[1],0,4);
             $tahunseb = intval($tahun)-1;
             $sql = "SELECT a.kode_lokasi, b.nama,b.jenis, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, ISNULL(b.n3,0) AS n3,
@@ -76,7 +80,7 @@ class DashboardCFController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahun'
+                $where AND SUBSTRING(b.periode,1,4)='$tahun'
                 GROUP BY a.kode_lokasi
                 union all
                 SELECT a.kode_lokasi,'ci' as jenis, 'Cash In' as nama,
@@ -95,7 +99,7 @@ class DashboardCFController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahun'
+                $where AND SUBSTRING(b.periode,1,4)='$tahun'
                 GROUP BY a.kode_lokasi
 			  union all
                 SELECT a.kode_lokasi,'co' as jenis, 'Cash Out' as nama,
@@ -114,7 +118,7 @@ class DashboardCFController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahun'
+                $where AND SUBSTRING(b.periode,1,4)='$tahun'
                 GROUP BY a.kode_lokasi
                 union all
                 SELECT a.kode_lokasi,'sa_yoy' as jenis,  'Saldo YoY' as nama,
@@ -133,7 +137,7 @@ class DashboardCFController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahunseb'
+                $where AND SUBSTRING(b.periode,1,4)='$tahunseb'
                 GROUP BY a.kode_lokasi
                 union all
                 SELECT a.kode_lokasi,'ci_yoy' as jenis, 'Cash In YoY' as nama,
@@ -152,7 +156,7 @@ class DashboardCFController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahunseb'
+                $where AND SUBSTRING(b.periode,1,4)='$tahunseb'
                 GROUP BY a.kode_lokasi
 			  union all
                 SELECT a.kode_lokasi,'co_yoy' as jenis, 'Cash Out' as nama,
@@ -171,7 +175,7 @@ class DashboardCFController extends Controller {
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI08') AND SUBSTRING(b.periode,1,4)='$tahunseb'
+                $where AND SUBSTRING(b.periode,1,4)='$tahunseb'
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
             
@@ -229,24 +233,38 @@ class DashboardCFController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            
-            $periode = $r->periode[1];
-            $tahunseb = intval(substr($periode,0,4))-1;
-            $bln = substr($periode,4,2);
-            $periodeseb = $tahunseb.$bln;
+            if($r->periode[0] == 'range'){
+                $periode = $r->periode[2];
+                $tahun = substr($periode,0,4);
+                $periodeawal = $tahun.'01';
+                $tahunseb = intval($tahun)-1;
+                $bln = substr($periode,4,2);
+                $periodeseb = $tahunseb.$bln;
+                $periodeawalseb = $tahunseb.'01';
+                $filter_periode = " and b.periode between '$periodeawal' and '$periode' ";
+                $filter_periode2 = " and b.periode between '$periodeawalseb' and '$periodeseb' ";
+            }else{
+                $periode = $r->periode[1];
+                $tahun = substr($periode,0,4);
+                $tahunseb = intval($tahun)-1;
+                $bln = substr($periode,4,2);
+                $periodeseb = $tahunseb.$bln;
+                $filter_periode = " and b.periode='$periode' ";
+                $filter_periode2 = " and b.periode='$periodeseb' ";
+            }
             $sql = "select a.kode_lokasi,isnull(b.so_akhir,0) as so_akhir,isnull(b.debet,0) as debet,isnull(b.kredit,0) as kredit,isnull(b.mutasi,0) as mutasi,
             isnull(c.so_akhir,0) as so_akhir_rev,isnull(c.debet,0) as debet_rev,isnull(c.kredit,0) as kredit_rev,isnull(c.mutasi,0) as mutasi_rev
             from dash_ypt_lokasi a
             left join (select a.kode_lokasi,sum(b.n4) as so_akhir,sum(b.n15) as debet,sum(b.n16) as kredit,sum(b.n10) as mutasi
             from dash_ypt_grafik_d a
             inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_grafik='PI08' and a.kode_lokasi='$kode_lokasi' and b.periode='$periode'
+            where a.kode_grafik='PI08' and a.kode_lokasi='$kode_lokasi' $filter_periode
             group by a.kode_lokasi
                     )b on a.kode_lokasi=b.kode_lokasi
             left join (select a.kode_lokasi,sum(b.n4) as so_akhir,sum(b.n15) as debet,sum(b.n16) as kredit,sum(b.n10) as mutasi
             from dash_ypt_grafik_d a
             inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_grafik='PI08' and a.kode_lokasi='$kode_lokasi' and b.periode='$periodeseb'
+            where a.kode_grafik='PI08' and a.kode_lokasi='$kode_lokasi' $filter_periode2
             group by a.kode_lokasi
                     )c on a.kode_lokasi=c.kode_lokasi  		
             where a.kode_lokasi='$kode_lokasi'";
@@ -273,7 +291,8 @@ class DashboardCFController extends Controller {
                     'nominal' => floatval($res[0]['so_akhir']),
                     'yoy' => floatval($res[0]['so_akhir_rev'])
                 ],
-                'periode' => $periode
+                'periode' => $periode,
+                'sql' => $sql
             ];
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
