@@ -44,6 +44,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
     $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');
+    $router->get('data-cf-selisih','DashYpt\DashboardCFController@getSelisihPerLembaga');  
 
     // INVEST
     $router->get('data-inves-box','DashYpt\DashboardInvesController@getDataBox'); 

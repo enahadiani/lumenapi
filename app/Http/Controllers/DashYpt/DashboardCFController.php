@@ -14,7 +14,7 @@ class DashboardCFController extends Controller {
      */
     public $successStatus = 200;
     public $guard = 'yptkug';
-    public $sql = 'sqlsrvyptkug';
+    public $db = 'sqlsrvyptkug';
 
     private function filterReq($request,$col_array,$db_col_name,$where,$this_in){
         for($i = 0; $i<count($col_array); $i++){
@@ -181,7 +181,7 @@ class DashboardCFController extends Controller {
             
             WHERE a.kode_lokasi='$kode_lokasi' ";
 
-            $select = DB::connection($this->sql)->select($sql);
+            $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             
             $ctg = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGT', 'SEP', 'OKT', 'NOV', 'DES'];
@@ -233,6 +233,9 @@ class DashboardCFController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $kode_lokasi = $r->kode_lokasi;
+            }
             if($r->periode[0] == 'range'){
                 $periode = $r->periode[2];
                 $tahun = substr($periode,0,4);
@@ -269,7 +272,7 @@ class DashboardCFController extends Controller {
                     )c on a.kode_lokasi=c.kode_lokasi  		
             where a.kode_lokasi='$kode_lokasi'";
 
-            $select = DB::connection($this->sql)->select($sql);
+            $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
 
             $success['status'] = true;
@@ -297,6 +300,44 @@ class DashboardCFController extends Controller {
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getSelisihPerLembaga(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode=$r->periode[1];
+            $col_array = array('periode');
+            $db_col_name = array('b.periode');
+            $where = "where a.kode_grafik='PI08' ";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+            $sql = "select a.kode_lokasi,a.nama,a.skode,isnull(b.mutasi,0) as mutasi
+            from dash_ypt_lokasi a
+            left join (select a.kode_lokasi,sum(b.n10) as mutasi
+                    from dash_ypt_grafik_d a
+                    inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                    $where
+                    group by a.kode_lokasi
+            )b on a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi in ('03','11','12','13','14','15','20')
+            ";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
