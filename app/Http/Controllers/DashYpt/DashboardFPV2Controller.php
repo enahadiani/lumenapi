@@ -77,7 +77,7 @@ class DashboardFPV2Controller extends Controller {
             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
             CASE WHEN sum(b.n1)<>0 THEN (sum(b.n4)/sum(b.n1))*100 ELSE 0 END AS capai,
             CASE ISNULL(sum(b.n2),0) WHEN 0 THEN 0 ELSE (sum(b.n4)/sum(b.n2))*100 END AS ach,
-            CASE ISNULL(sum(b.n4),0) WHEN 0 THEN 0 ELSE ((sum(b.n4) - sum(b.n5))/sum(b.n4))*100 END AS yoy
+            CASE ISNULL(sum(b.n4),0) WHEN 0 THEN 0 ELSE ((sum(b.n4) - sum(b.n5))/sum(b.n5))*100 END AS yoy
             FROM dash_ypt_grafik_d a
             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi

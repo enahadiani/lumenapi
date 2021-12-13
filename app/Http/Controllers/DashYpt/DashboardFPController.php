@@ -72,7 +72,7 @@ class DashboardFPController extends Controller
             CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
             CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
             CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END AS ach,
-            CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END AS yoy
+            CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n5)*100 END AS yoy
             FROM dash_ypt_grafik_d a
             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -662,27 +662,36 @@ class DashboardFPController extends Controller
             $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt_ach,0) AS pdpt_ach, ISNULL(b.pdpt_yoy,0) as pdpt_yoy,
-                ISNULL(b.beban_ach,0) as beban_ach,ISNULL(b.beban_yoy,0) as beban_yoy,
-                ISNULL(b.shu_ach,0) as shu_ach,ISNULL(b.shu_yoy,0) as shu_yoy,
-                ISNULL(b.or_ach,0) as or_ach,ISNULL(b.or_yoy,0) as or_yoy,a.skode
-            from dash_ypt_lokasi a
-            LEFT JOIN (SELECT a.kode_lokasi,
-                SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END) ELSE 0 END) AS pdpt_ach,
-                SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END) ELSE 0 END) AS pdpt_yoy,
-                SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END) ELSE 0 END) AS beban_ach,
-                SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END) ELSE 0 END) AS beban_yoy,
-                SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END) ELSE 0 END) AS shu_ach,
-                SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END) ELSE 0 END) AS shu_yoy,
-                SUM(CASE WHEN a.kode_grafik='PI04' THEN (CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END) ELSE 0 END) AS or_ach,
-                SUM(CASE WHEN a.kode_grafik='PI04' THEN (CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END) ELSE 0 END) AS or_yoy
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b on a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            $sql = "SELECT a.kode_lokasi, a.nama, a.skode,
+            case when ISNULL(b.pdpt_n2,0) <> 0 then (ISNULL(b.pdpt_n4,0)/ISNULL(b.pdpt_n2,0))*100 else 0 end AS pdpt_ach, 
+            case when ISNULL(b.pdpt_n5,0) <> 0 then ((ISNULL(b.pdpt_n4,0)-ISNULL(b.pdpt_n5,0))/ISNULL(b.pdpt_n5,0))*100 else 0 end AS pdpt_yoy,
+            case when ISNULL(b.beban_n2,0) <> 0 then (ISNULL(b.beban_n4,0)/ISNULL(b.beban_n2,0))*100 else 0 end AS beban_ach, 
+            case when ISNULL(b.beban_n5,0) <> 0 then ((ISNULL(b.beban_n4,0)-ISNULL(b.beban_n5,0))/ISNULL(b.beban_n5,0))*100 else 0 end AS beban_yoy,
+            case when ISNULL(b.shu_n2,0) <> 0 then (ISNULL(b.shu_n4,0)/ISNULL(b.shu_n2,0))*100 else 0 end AS shu_ach, 
+            case when ISNULL(b.shu_n5,0) <> 0 then ((ISNULL(b.shu_n4,0)-ISNULL(b.shu_n5,0))/ISNULL(b.shu_n5,0))*100 else 0 end AS shu_yoy,
+            case when ISNULL(b.or_n2,0) <> 0 then (ISNULL(b.or_n4,0)/ISNULL(b.or_n2,0))*100 else 0 end AS or_ach, 
+            case when ISNULL(b.or_n5,0) <> 0 then ((ISNULL(b.or_n4,0)-ISNULL(b.or_n5,0))/ISNULL(b.or_n5,0))*100 else 0 end AS or_yoy
+                        from dash_ypt_lokasi a
+                        LEFT JOIN (SELECT a.kode_lokasi,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.n4 ELSE 0 END) AS pdpt_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.n2 ELSE 0 END) AS pdpt_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.n5 ELSE 0 END) AS pdpt_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.n4 ELSE 0 END) AS beban_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.n2 ELSE 0 END) AS beban_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.n5 ELSE 0 END) AS beban_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.n4 ELSE 0 END) AS shu_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.n2 ELSE 0 END) AS shu_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.n5 ELSE 0 END) AS shu_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.n4 ELSE 0 END) AS or_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.n2 ELSE 0 END) AS or_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.n5 ELSE 0 END) AS or_n5
+                            FROM dash_ypt_grafik_d a
+                            INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                            INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                            $where $filter_lokasi
+                            GROUP BY a.kode_lokasi
+                        ) b on a.kode_lokasi=b.kode_lokasi
+                        WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
