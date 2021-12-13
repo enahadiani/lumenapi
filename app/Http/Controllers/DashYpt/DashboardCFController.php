@@ -321,7 +321,7 @@ class DashboardCFController extends Controller {
             left join (select a.kode_lokasi,sum(b.n10) as mutasi
                     from dash_ypt_grafik_d a
                     inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-                    $where
+                    $where and a.kode_fs='FS1'
                     group by a.kode_lokasi
             )b on a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi in ('03','11','12','13','14','15','20')
