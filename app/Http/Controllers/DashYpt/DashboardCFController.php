@@ -242,21 +242,30 @@ class DashboardCFController extends Controller {
                 $periodeawal = $tahun.'01';
                 $tahunseb = intval($tahun)-1;
                 $bln = substr($periode,4,2);
+                $blnseb = intval($bln)-1;
                 $periodeseb = $tahunseb.$bln;
                 $periodeawalseb = $tahunseb.'01';
+                $periode2 = $tahun.$blnseb;
+                $blnseb = (strlen(strval($blnseb)) > 1) ? $blnseb : "0".$blnseb;
                 $filter_periode = " and b.periode between '$periodeawal' and '$periode' ";
                 $filter_periode2 = " and b.periode between '$periodeawalseb' and '$periodeseb' ";
+                $filter_periode3 = " and b.periode between '$periode2awal' and '$periode2' ";
             }else{
                 $periode = $r->periode[1];
                 $tahun = substr($periode,0,4);
                 $tahunseb = intval($tahun)-1;
                 $bln = substr($periode,4,2);
+                $blnseb = intval($bln)-1;
                 $periodeseb = $tahunseb.$bln;
+                $blnseb = (strlen(strval($blnseb)) > 1) ? $blnseb : "0".$blnseb;
+                $periode2 = $tahun.$blnseb;
                 $filter_periode = " and b.periode='$periode' ";
                 $filter_periode2 = " and b.periode='$periodeseb' ";
+                $filter_periode3 = " and b.periode='$periode2' ";
             }
             $sql = "select a.kode_lokasi,isnull(b.so_akhir,0) as so_akhir,isnull(b.debet,0) as debet,isnull(b.kredit,0) as kredit,isnull(b.mutasi,0) as mutasi,
-            isnull(c.so_akhir,0) as so_akhir_rev,isnull(c.debet,0) as debet_rev,isnull(c.kredit,0) as kredit_rev,isnull(c.mutasi,0) as mutasi_rev
+            isnull(c.so_akhir,0) as so_akhir_rev,isnull(c.debet,0) as debet_rev,isnull(c.kredit,0) as kredit_rev,isnull(c.mutasi,0) as mutasi_rev,
+            isnull(d.so_akhir,0) as so_akhir_mom,isnull(d.debet,0) as debet_mom,isnull(d.kredit,0) as kredit_mom,isnull(d.mutasi,0) as mutasi_mom
             from dash_ypt_lokasi a
             left join (select a.kode_lokasi,sum(b.n4) as so_akhir,sum(b.n15) as debet,sum(b.n16) as kredit,sum(b.n10) as mutasi
             from dash_ypt_grafik_d a
@@ -269,7 +278,13 @@ class DashboardCFController extends Controller {
             inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             where a.kode_grafik='PI08' and a.kode_lokasi='$kode_lokasi' $filter_periode2
             group by a.kode_lokasi
-                    )c on a.kode_lokasi=c.kode_lokasi  		
+                    )c on a.kode_lokasi=c.kode_lokasi  	
+            left join (select a.kode_lokasi,sum(b.n4) as so_akhir,sum(b.n15) as debet,sum(b.n16) as kredit,sum(b.n10) as mutasi
+                    from dash_ypt_grafik_d a
+                    inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                    where a.kode_grafik='PI08' and a.kode_lokasi='$kode_lokasi' $filter_periode3
+                    group by a.kode_lokasi
+                    )d on a.kode_lokasi=d.kode_lokasi  		
             where a.kode_lokasi='$kode_lokasi'";
 
             $select = DB::connection($this->db)->select($sql);
@@ -280,19 +295,23 @@ class DashboardCFController extends Controller {
             $success['data'] = [
                 'inflow' => [
                     'nominal' => floatval($res[0]['debet']),
-                    'yoy' => floatval($res[0]['debet_rev'])
+                    'yoy' => floatval($res[0]['debet_rev']),
+                    'mom' => floatval($res[0]['debet_mom'])
                 ],
                 'outflow' => [
                     'nominal' => floatval($res[0]['kredit']),
-                    'yoy' => floatval($res[0]['kredit_rev'])
+                    'yoy' => floatval($res[0]['kredit_rev']),
+                    'mom' => floatval($res[0]['kredit_mom'])
                 ],
                 'cash_balance' => [
                     'nominal' => floatval($res[0]['mutasi']),
-                    'yoy' => floatval($res[0]['mutasi_rev'])
+                    'yoy' => floatval($res[0]['mutasi_rev']),
+                    'mom' => floatval($res[0]['mutasi_mom'])
                 ],
                 'closing' => [
                     'nominal' => floatval($res[0]['so_akhir']),
-                    'yoy' => floatval($res[0]['so_akhir_rev'])
+                    'yoy' => floatval($res[0]['so_akhir_rev']),
+                    'mom' => floatval($res[0]['so_akhir_mom'])
                 ],
                 'periode' => $periode,
                 'sql' => $sql
