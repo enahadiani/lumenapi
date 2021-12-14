@@ -174,7 +174,7 @@ class DashboardFPV2Controller extends Controller {
             }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04') $filter_lokasi ";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04') $filter_lokasi ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -194,7 +194,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi ";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -243,7 +243,7 @@ class DashboardFPV2Controller extends Controller {
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03') $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -263,7 +263,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -311,7 +311,7 @@ class DashboardFPV2Controller extends Controller {
 
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02') $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -331,7 +331,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -379,7 +379,7 @@ class DashboardFPV2Controller extends Controller {
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01') $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -399,7 +399,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);

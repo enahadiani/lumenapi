@@ -304,7 +304,7 @@ class DashboardInvesController extends Controller {
            
             $sql="SELECT a.kode_lokasi, a.nama, a.skode, 1234000000 as n1, 2000000000 as n2, 1567000000 as n3, 3000000000 as n4, 5000000000 as n5
             FROM dash_ypt_lokasi a
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15')
+            WHERE a.kode_lokasi IN ('11','12','13','14','15')
                 ";
           
             $select = DB::connection($this->db)->select($sql);
