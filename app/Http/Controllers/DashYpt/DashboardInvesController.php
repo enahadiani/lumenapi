@@ -191,7 +191,8 @@ class DashboardInvesController extends Controller {
                             'selected' => true,
                             'negative' => true,
                             'fillColor' => 'url(#custom-pattern)',                            
-                            'color' => 'url(#custom-pattern)'
+                            'color' => 'url(#custom-pattern)',
+                            'key' => $item['kode_lokasi']
                         ];
                     }else{
                         $value = [
@@ -199,7 +200,8 @@ class DashboardInvesController extends Controller {
                             'y' => $nilai,
                             'sliced' =>  true,
                             'selected' => true,
-                            'negative' => false
+                            'negative' => false,
+                            'key' => $item['kode_lokasi']
                         ];
                     }
                 } else {
@@ -209,13 +211,15 @@ class DashboardInvesController extends Controller {
                             'y' => abs($nilai),
                             'negative' => true,
                             'fillColor' => 'url(#custom-pattern)',                            
-                            'color' => 'url(#custom-pattern)'
+                            'color' => 'url(#custom-pattern)',
+                            'key' => $item['kode_lokasi']
                         ];
                     }else{
                         $value = [
                             'name' => $name,
                             'y' => $nilai,
-                            'negative' => false
+                            'negative' => false,
+                            'key' => $item['kode_lokasi']
                         ];
                     }
                 }
