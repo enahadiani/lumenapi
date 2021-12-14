@@ -654,5 +654,93 @@ class DashboardCCRController extends Controller {
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function getUmurPiutang(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $periode=$r->periode[1];
+            $tahun=substr($periode,0,4);
+            $nama = "-";
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
+            }else{
+                $filter_pp = " ";
+            }
+           
+            $sql = "select a.nama,a.kode_lokasi,
+            b.n1,b.n2,b.n3,b.n4
+            from lokasi a
+            left join (select a.kode_lokasi,
+            sum(case when a.umur<=6 then a.n1 else 0 end) as n1,
+            sum(case when a.umur between 7 and 12 then a.n1 else 0 end) as n2,
+            sum(case when a.umur between 13 and 24 then a.n1 else 0 end) as n3,
+            sum(case when a.umur>24 then a.n1 else 0 end) as n4
+            from (select a.no_bill,a.kode_lokasi,a.periode,
+                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '202109'+'01')) as umur,
+                    isnull(a.n1,0)-isnull(b.n1,0) as n1
+                    from (select x.no_bill,x.kode_lokasi,x.periode,x.kode_pp,
+                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
+                            from sis_bill_d x 	
+                            inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                            where(x.kode_lokasi = '12')and(x.periode <= '$periode') $filter_bidang $filter_pp	
+                            group by x.no_bill,x.kode_lokasi,x.periode,x.kode_pp	
+                            )a
+                    left join (select x.no_bill,x.kode_lokasi,x.kode_pp,
+                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
+                            from sis_rekon_d x 	
+                            inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                            where(x.kode_lokasi = '12')and(x.periode <= '$periode') $filter_bidang $filter_pp
+                            group by x.no_bill,x.kode_lokasi,x.kode_pp
+                    )b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                    where a.kode_lokasi = '12' 
+                )a
+                group by a.kode_lokasi
+            )b on a.kode_lokasi=b.kode_lokasi 
+            where a.kode_lokasi='12' 
+            order by a.kode_lokasi";
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            $ctg = ['0-6 bln','7-12 bln','13-24 bln','>24 bln'];
+            $series = array();
+            $i=0;
+            foreach($res as $dt) {
+                $data = array(
+                floatval($dt['n1']), 
+                floatval($dt['n2']), 
+                floatval($dt['n3']), 
+                floatval($dt['n4']));
+                $i++;
+            }
+            
+            $series[0] = array(
+                'name' => 'Umur Piutang',
+                'data' => $data,
+                'color' => '#FCA311'
+            );
+            $success['nama'] = $nama;
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = array(
+                'kategori' => $ctg,
+                'series' => $series
+            );
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
 }
 ?>

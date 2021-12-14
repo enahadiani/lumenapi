@@ -41,6 +41,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-ccr-trend','DashYpt\DashboardCCRController@getTrendCCR');  
     $router->get('data-ccr-trend-saldo','DashYpt\DashboardCCRController@getTrendSaldoPiutang');
     $router->get('data-ccr-bidang','DashYpt\DashboardCCRController@getBidang');  
+    $router->get('data-ccr-umur-piutang','DashYpt\DashboardCCRController@getUmurPiutang');
     
     $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
     $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');
