@@ -52,20 +52,16 @@ class DashboardInvesController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $periode=$r->periode[1];
-            $tahun=substr($periode,0,4);
-            $bulan=substr($periode,4,2);
-            $periode_awal=$tahun."01";
-            $bulanSeb = intval($bulan)-1;
-            if(strlen($bulanSeb) == 1){
-                $bulanSeb = "0".$bulanSeb;
-            }else{
-                $bulanSeb = $bulanSeb;
-            }
-            $periode_rev=$tahun.$bulanSeb;
             if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $kode_lokasi = $r->kode_lokasi;
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
             }
+            
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "WHERE a.kode_lokasi='$lokasi' AND a.kode_fs='FS1' ";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
             
             if(isset($r->kode_neraca) && $r->kode_neraca != ""){
                 $filter_neraca = " and a.kode_neraca='$r->kode_neraca'";
@@ -78,7 +74,7 @@ class DashboardInvesController extends Controller {
             case when sum(a.n2) <> 0 then (sum(a.n4)/sum(a.n2))*100 else 0 end as capai
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0) $filter_neraca
+            $where and b.kode_dash='DP02' and (a.n2<>0 or a.n4<>0) $filter_neraca
             group by a.kode_lokasi
             ";
             $ytd = DB::connection($this->db)->select($sql);
@@ -89,7 +85,7 @@ class DashboardInvesController extends Controller {
             case when sum(a.n1) <> 0 then (sum(a.n4)/sum(a.n1))*100 else 0 end as capai
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0) $filter_neraca
+            $where and b.kode_dash='DP02' and (a.n1<>0 or a.n4<>0) $filter_neraca
                         group by a.kode_lokasi
             ";
             $tahun = DB::connection($this->db)->select($sql);
@@ -100,7 +96,7 @@ class DashboardInvesController extends Controller {
             case when sum(a.n5) <> 0 then (sum(a.n4)/sum(a.n5))*100 else 0 end as capai
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0) $filter_neraca
+            $where and b.kode_dash='DP02' and (a.n4<>0 or a.n5<>0) $filter_neraca
                         group by a.kode_lokasi
             ";
             $ach = DB::connection($this->db)->select($sql);
@@ -134,10 +130,18 @@ class DashboardInvesController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $periode=$r->periode[1];
+
             if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $kode_lokasi = $r->kode_lokasi;
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
             }
+            
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "WHERE a.kode_lokasi='$lokasi' AND a.kode_fs='FS1' ";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+
             $sql = "select a.kode_neraca as kode_aset,b.nama as nama_aset,b.nu,
             sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as rka,
             sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as real,
@@ -145,7 +149,7 @@ class DashboardInvesController extends Controller {
             case when sum(a.n2)<>0 then (sum(a.n6)/sum(a.n2))*100 else 0 end as ach
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0) 
+            $where and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0) 
             group by a.kode_neraca,b.nama,b.nu
             order by b.nu
              ";
@@ -172,7 +176,11 @@ class DashboardInvesController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $periode = $r->periode[1];
+
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "WHERE a.kode_fs='FS1' ";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
             if(isset($r->kode_neraca) && $r->kode_neraca != ""){
                 $filter_neraca = " and a.kode_neraca='$r->kode_neraca'";
             }else{
@@ -183,7 +191,7 @@ class DashboardInvesController extends Controller {
             left join (select a.kode_lokasi,sum(a.n2) as n1
                     from exs_neraca a
                     inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca  and a.kode_fs=b.kode_fs
-                    where a.periode='$periode' and a.kode_fs='FS1' and b.kode_dash='DP02' and (a.n2<>0) $filter_neraca
+                    $where and b.kode_dash='DP02' and (a.n2<>0) $filter_neraca
                     group by a.kode_lokasi
                     )b on a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi<>'$kode_lokasi' ";
@@ -261,8 +269,15 @@ class DashboardInvesController extends Controller {
             }
 
             if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $kode_lokasi = $r->kode_lokasi;
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
             }
+            
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where = "WHERE a.kode_lokasi='$lokasi' AND a.kode_fs='FS1' ";
+            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
             
             if(isset($r->kode_neraca) && $r->kode_neraca != ""){
                 $filter_neraca = " and a.kode_neraca='$r->kode_neraca'";
