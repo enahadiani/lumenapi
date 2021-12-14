@@ -55,7 +55,9 @@ class DashboardCCRController extends Controller {
             $periode=$r->periode[1];
             $tahun=substr($periode,0,4);
             $bulan=substr($periode,4,2);
+            $tahun_rev = intval($tahun) - 1;
             $periode_awal=$tahun."01";
+            $periode_awal_lalu = $tahun_rev."01";
             $bulanSeb = intval($bulan)-1;
             if(strlen($bulanSeb) == 1){
                 $bulanSeb = "0".$bulanSeb;
@@ -63,6 +65,7 @@ class DashboardCCRController extends Controller {
                 $bulanSeb = $bulanSeb;
             }
             $periode_rev=$tahun.$bulanSeb;
+            $periode_lalu = $tahun_rev.$bulan;
             $where = " and x.kode_lokasi='12' ";
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
@@ -150,10 +153,62 @@ class DashboardCCRController extends Controller {
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
+
+            // CCR TOTAL MOM
+            $sql2 = "select 
+            isnull(d.total,0) + isnull(h.total,0) as bayar
+            from dash_ypt_lokasi a
+            left join (select x.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill between '$periode_awal' and '$periode_rev') and x.kode_lokasi='12' 
+                        group by x.kode_lokasi
+                        )d on a.kode_lokasi=d.kode_lokasi 
+            
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill<'$periode_awal') and x.kode_lokasi='12' 
+                        group by x.kode_lokasi
+                        )h on a.kode_lokasi=h.kode_lokasi 
+            where a.kode_lokasi='12' ";
+            $select2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($select2),true);
+
+            // CCR TOTAL YOY
+            $sql3 = "select    
+            isnull(d.total,0) + isnull(h.total,0) as bayar
+            from dash_ypt_lokasi a
+            left join (select x.kode_lokasi, 
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal_lalu' and '$periode_lalu') and (x.periode_bill between '$periode_awal_lalu' and '$periode_lalu') and x.kode_lokasi='12' 
+                        group by x.kode_lokasi
+                        )d on a.kode_lokasi=d.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal_lalu' and '$periode_lalu') and (x.periode_bill<'$periode_awal_lalu') and x.kode_lokasi='12' 
+                        group by x.kode_lokasi
+                        )h on a.kode_lokasi=h.kode_lokasi 
+            where a.kode_lokasi='12' ";
+            $select3 = DB::connection($this->db)->select($sql3);
+            $res3 = json_decode(json_encode($select3),true);
             
             $ccr_total_ar = floatval($res[0]['piutang']) + floatval($res[0]['tn3']);
             $ccr_total_inflow = floatval($res[0]['pn3']) + floatval($res[0]['hn3']);
             $ccr_total = ($ccr_total_ar != 0 ? ($ccr_total_inflow / $ccr_total_ar)*100 : 0);
+
+            $ccr_total_mom = floatval($res2[0]['bayar']);
+            $ccr_total_yoy = floatval($res3[0]['bayar']); 
 
             $ccr_tahun_lalu_ar = floatval($res[0]['piutang']);
             $ccr_tahun_lalu_inflow = floatval($res[0]['hn3']);
@@ -173,7 +228,9 @@ class DashboardCCRController extends Controller {
                 "ccr_total" => [
                     'ar' => floatval(number_format((float)$ccr_total_ar, 2,'.', '')),
                     'inflow' => floatval(number_format((float)$ccr_total_inflow, 2,'.', '')),
-                    'persentase' => floatval(number_format((float)$ccr_total, 2,'.', ''))
+                    'persentase' => floatval(number_format((float)$ccr_total, 2,'.', '')),
+                    'mom' => floatval(number_format((float)$ccr_total_mom, 2,'.', '')),
+                    'yoy' => floatval(number_format((float)$ccr_total_yoy, 2,'.', '')),
                 ],
                 "ccr_tahun_lalu" => [
                     'ar' => floatval(number_format((float)$ccr_tahun_lalu_ar, 2,'.', '')),
