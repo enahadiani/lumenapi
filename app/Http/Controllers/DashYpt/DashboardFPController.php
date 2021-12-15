@@ -963,7 +963,7 @@ class DashboardFPController extends Controller
                 $lokasi = $kode_lokasi;
             }
 
-            $where = "WHERE a.kode_lokasi = '$lokasi' AND a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' ";
+            $where = "WHERE a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' ";
 
             $tahun = intval($r->query('periode')[1]);
             $periode = [];
@@ -980,7 +980,7 @@ class DashboardFPController extends Controller
             ISNULL(b.n6,0) AS n6
             FROM neraca a
             INNER JOIN (
-                SELECT a.kode_neraca,a.kode_lokasi,
+                SELECT a.kode_neraca,
                     SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.n4,0) ELSE -ISNULL(b.n4,0) END) AS n1,
                     SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.n4,0) ELSE -ISNULL(c.n4,0) END) AS n2,
                     SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.n4,0) ELSE -ISNULL(d.n4,0) END) AS n3,
@@ -989,16 +989,16 @@ class DashboardFPController extends Controller
                     SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.n4,0) ELSE -ISNULL(g.n4,0) END) AS n6
                     FROM dash_ypt_grafik_d a
                     INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
-                    LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs AND b.periode='".$periode[5]."'
-                    LEFT JOIN exs_neraca c ON a.kode_neraca=c.kode_neraca AND a.kode_lokasi=c.kode_lokasi AND a.kode_fs=c.kode_fs AND c.periode='".$periode[4]."'
-                    LEFT JOIN exs_neraca d ON a.kode_neraca=d.kode_neraca AND a.kode_lokasi=d.kode_lokasi AND a.kode_fs=d.kode_fs AND d.periode='".$periode[3]."'
-                    LEFT JOIN exs_neraca e ON a.kode_neraca=e.kode_neraca AND a.kode_lokasi=e.kode_lokasi AND a.kode_fs=e.kode_fs AND e.periode='".$periode[2]."'
-                    LEFT JOIN exs_neraca f ON a.kode_neraca=f.kode_neraca AND a.kode_lokasi=f.kode_lokasi AND a.kode_fs=f.kode_fs AND f.periode='".$periode[1]."'
-                    LEFT JOIN exs_neraca g ON a.kode_neraca=g.kode_neraca AND a.kode_lokasi=g.kode_lokasi AND a.kode_fs=g.kode_fs AND g.periode='".$periode[0]."'
+                    LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND b.kode_lokasi='$lokasi' AND a.kode_fs=b.kode_fs AND b.periode='".$periode[5]."'
+                    LEFT JOIN exs_neraca c ON a.kode_neraca=c.kode_neraca AND c.kode_lokasi='$lokasi' AND a.kode_fs=c.kode_fs AND c.periode='".$periode[4]."'
+                    LEFT JOIN exs_neraca d ON a.kode_neraca=d.kode_neraca AND d.kode_lokasi='$lokasi' AND a.kode_fs=d.kode_fs AND d.periode='".$periode[3]."'
+                    LEFT JOIN exs_neraca e ON a.kode_neraca=e.kode_neraca AND e.kode_lokasi='$lokasi' AND a.kode_fs=e.kode_fs AND e.periode='".$periode[2]."'
+                    LEFT JOIN exs_neraca f ON a.kode_neraca=f.kode_neraca AND f.kode_lokasi='$lokasi' AND a.kode_fs=f.kode_fs AND f.periode='".$periode[1]."'
+                    LEFT JOIN exs_neraca g ON a.kode_neraca=g.kode_neraca AND g.kode_lokasi='$lokasi' AND a.kode_fs=g.kode_fs AND g.periode='".$periode[0]."'
                     $where
-                GROUP BY a.kode_neraca,a.kode_lokasi
-            )b ON a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$lokasi' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1'";
+                GROUP BY a.kode_neraca
+            )b ON a.kode_neraca=b.kode_neraca 
+            where a.kode_lokasi='$lokasi' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1' ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
