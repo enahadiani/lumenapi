@@ -47,529 +47,531 @@ class DashboardFPController extends Controller
         return $where;
     }
 
+// SUDAH TDK DIGUNAKAN
     /**
      * Function ini untuk API data box pertama
      * Pendapatan, Beban, SHU, dan OR
      * Data yang diberikan berupa nilai real, persentase Ach, nilai YoY, dan persentase YoY
      * 
      */
-    public function getDataBoxFirst(Request $r) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+    // public function getDataBoxFirst(Request $r) {
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
             
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi='20' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
-            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+    //         $col_array = array('periode');
+    //         $db_col_name = array('b.periode');
+    //         $where = "WHERE a.kode_lokasi='20' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
+    //         $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_grafik, c.nama,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n1,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n2 ELSE b.n2 END AS n2,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n4,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
-            CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
-            CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END AS ach,
-            CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n5)*100 END AS yoy
-            FROM dash_ypt_grafik_d a
-            INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-            INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-            $where";
+    //         $sql = "SELECT a.kode_grafik, c.nama,
+    //         CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n1,
+    //         CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n2 ELSE b.n2 END AS n2,
+    //         CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n4,
+    //         CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
+    //         CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
+    //         CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END AS ach,
+    //         CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n5)*100 END AS yoy
+    //         FROM dash_ypt_grafik_d a
+    //         INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+    //         INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+    //         $where";
 
-            $select = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($select),true);
+    //         $select = DB::connection($this->sql)->select($sql);
+    //         $res = json_decode(json_encode($select),true);
 
-            $data_pdpt = array();
-            $data_beban = array();
-            $data_shu = array();
-            $data_or = array();
-            foreach($res as $item) {
-                if($item['kode_grafik'] == 'PI01') {
-                    $data_pdpt = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
-                    ];
-                } elseif($item['kode_grafik'] == 'PI02') {
-                    $data_beban = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
-                    ];
-                } elseif($item['kode_grafik'] == 'PI03') {
-                    $data_shu = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
-                    ];
-                } elseif($item['kode_grafik'] == 'PI04') {
-                    $data_or = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
-                    ];
-                }
-            }
+    //         $data_pdpt = array();
+    //         $data_beban = array();
+    //         $data_shu = array();
+    //         $data_or = array();
+    //         foreach($res as $item) {
+    //             if($item['kode_grafik'] == 'PI01') {
+    //                 $data_pdpt = [
+    //                     "kode_grafik" => $item['kode_grafik'],
+    //                     "nama" => $item['nama'],
+    //                     "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+    //                     "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+    //                     "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+    //                     "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+    //                     "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+    //                     "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+    //                     "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
+    //                 ];
+    //             } elseif($item['kode_grafik'] == 'PI02') {
+    //                 $data_beban = [
+    //                     "kode_grafik" => $item['kode_grafik'],
+    //                     "nama" => $item['nama'],
+    //                     "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+    //                     "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+    //                     "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+    //                     "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+    //                     "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+    //                     "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+    //                     "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
+    //                 ];
+    //             } elseif($item['kode_grafik'] == 'PI03') {
+    //                 $data_shu = [
+    //                     "kode_grafik" => $item['kode_grafik'],
+    //                     "nama" => $item['nama'],
+    //                     "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+    //                     "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+    //                     "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+    //                     "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+    //                     "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+    //                     "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+    //                     "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
+    //                 ];
+    //             } elseif($item['kode_grafik'] == 'PI04') {
+    //                 $data_or = [
+    //                     "kode_grafik" => $item['kode_grafik'],
+    //                     "nama" => $item['nama'],
+    //                     "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
+    //                     "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+    //                     "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+    //                     "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+    //                     "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
+    //                     "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+    //                     "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
+    //                 ];
+    //             }
+    //         }
 
-            $success['status'] = true;
-            $success['message'] = "Success!";
-            $success['data'] = [
-                "data_pdpt" => $data_pdpt,
-                "data_beban" => $data_beban,
-                "data_shu" => $data_shu,
-                "data_or" => $data_or
-            ];
+    //         $success['status'] = true;
+    //         $success['message'] = "Success!";
+    //         $success['data'] = [
+    //             "data_pdpt" => $data_pdpt,
+    //             "data_beban" => $data_beban,
+    //             "data_shu" => $data_shu,
+    //             "data_or" => $data_or
+    //         ];
 
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
+    //         return response()->json($success, $this->successStatus); 
+    //     } catch (\Throwable $e) {
+    //         $success['status'] = false;
+    //         $success['message'] = "Error ".$e;
+    //         return response()->json($success, $this->successStatus);
+    //     }
+    // }
 
     /**
      * Function ini untuk API data box Pendapatan
      * 
      */
-    public function getDataBoxPdpt(Request $r) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+    // public function getDataBoxPdpt(Request $r) {
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
             
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01')";
-            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+    //         $col_array = array('periode');
+    //         $db_col_name = array('b.periode');
+    //         $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01')";
+    //         $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (
-                SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15')";
+    //         $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+    //         ISNULL(b.capai,0) as capai,a.skode
+    //         FROM dash_ypt_lokasi a
+    //         LEFT JOIN (
+    //             SELECT a.kode_lokasi,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+    //             SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+    //             FROM dash_ypt_grafik_d a
+    //             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+    //             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+    //             $where
+    //             GROUP BY a.kode_lokasi
+    //         ) b ON a.kode_lokasi=b.kode_lokasi
+    //         WHERE a.kode_lokasi IN ('11','12','13','14','15')";
 
-            $select = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($select),true);
+    //         $select = DB::connection($this->sql)->select($sql);
+    //         $res = json_decode(json_encode($select),true);
             
-            $total = 0;
-            foreach($res as $item) {
-                $total = $total + floatval($item['n4']);
-            }
+    //         $total = 0;
+    //         foreach($res as $item) {
+    //             $total = $total + floatval($item['n4']);
+    //         }
 
-            $chart = [];
-            if($total > 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
-                    $name = $item['skode'];
+    //         $chart = [];
+    //         if($total > 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval($item['n4']) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
+    //                 $name = $item['skode'];
 
-                    if($_persen < 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => abs(floatval($_persen)),
-                            'negative' => true
-                        ];
-                    } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'negative' => false
-                        ];
-                    }
-                    array_push($chart, $value);
-                }
-            } elseif($total < 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
+    //                 if($_persen < 0) {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => abs(floatval($_persen)),
+    //                         'negative' => true
+    //                     ];
+    //                 } else {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => floatval($_persen),
+    //                         'negative' => false
+    //                     ];
+    //                 }
+    //                 array_push($chart, $value);
+    //             }
+    //         } elseif($total < 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval($item['n4']) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
                     
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    if($_persen < 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => abs(floatval($_persen)),
-                            'negative' => true
-                        ];
-                    } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'negative' => false
-                        ];
-                    }
-                    array_push($chart, $value);
-                }
-            } else {
-                foreach($res as $item) {
-                    $_persen = 0;
-                    $name = $item['skode'];
+    //                 if($_persen < 0) {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => abs(floatval($_persen)),
+    //                         'negative' => true
+    //                     ];
+    //                 } else {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => floatval($_persen),
+    //                         'negative' => false
+    //                     ];
+    //                 }
+    //                 array_push($chart, $value);
+    //             }
+    //         } else {
+    //             foreach($res as $item) {
+    //                 $_persen = 0;
+    //                 $name = $item['skode'];
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen),
-                        'negative' => false
-                    ];
-                    array_push($chart, $value);
-                }
-            }
+    //                 $value = [
+    //                     'name' => $name,
+    //                     'y' => floatval($_persen),
+    //                     'negative' => false
+    //                 ];
+    //                 array_push($chart, $value);
+    //             }
+    //         }
 
-            $success['status'] = true;
-            $success['message'] = "Success!";
-            $success['data'] = $chart;
+    //         $success['status'] = true;
+    //         $success['message'] = "Success!";
+    //         $success['data'] = $chart;
 
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
+    //         return response()->json($success, $this->successStatus); 
+    //     } catch (\Throwable $e) {
+    //         $success['status'] = false;
+    //         $success['message'] = "Error ".$e;
+    //         return response()->json($success, $this->successStatus);
+    //     }
+    // }
 
     /**
      * Function ini untuk API data box beban
      */
-    public function getDataBoxBeban(Request $r) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+    // public function getDataBoxBeban(Request $r) {
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
             
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02')";
-            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+    //         $col_array = array('periode');
+    //         $db_col_name = array('b.periode');
+    //         $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02')";
+    //         $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (
-                SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15')";
+    //         $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+    //         ISNULL(b.capai,0) as capai,a.skode
+    //         FROM dash_ypt_lokasi a
+    //         LEFT JOIN (
+    //             SELECT a.kode_lokasi,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+    //             SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+    //             FROM dash_ypt_grafik_d a
+    //             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+    //             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+    //             $where
+    //             GROUP BY a.kode_lokasi
+    //         ) b ON a.kode_lokasi=b.kode_lokasi
+    //         WHERE a.kode_lokasi IN ('11','12','13','14','15')";
 
-            $select = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($select),true);
+    //         $select = DB::connection($this->sql)->select($sql);
+    //         $res = json_decode(json_encode($select),true);
             
-            $total = 0;
-            foreach($res as $item) {
-                $total = $total + floatval($item['n4']);
-            }
+    //         $total = 0;
+    //         foreach($res as $item) {
+    //             $total = $total + floatval($item['n4']);
+    //         }
 
-            $chart = [];
-            if($total > 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
-                    $name = $item['skode'];
+    //         $chart = [];
+    //         if($total > 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval($item['n4']) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
+    //                 $name = $item['skode'];
 
-                    if($_persen < 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => abs(floatval($_persen)),
-                            'negative' => true
-                        ];
-                    } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'negative' => false
-                        ];
-                    }
-                    array_push($chart, $value);
-                }
-            } elseif($total < 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
+    //                 if($_persen < 0) {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => abs(floatval($_persen)),
+    //                         'negative' => true
+    //                     ];
+    //                 } else {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => floatval($_persen),
+    //                         'negative' => false
+    //                     ];
+    //                 }
+    //                 array_push($chart, $value);
+    //             }
+    //         } elseif($total < 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval($item['n4']) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
                     
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    if($_persen < 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => abs(floatval($_persen)),
-                            'negative' => true
-                        ];
-                    } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'negative' => false
-                        ];
-                    }
-                }
-            } else {
-                foreach($res as $item) {
-                    $_persen = 0;
+    //                 if($_persen < 0) {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => abs(floatval($_persen)),
+    //                         'negative' => true
+    //                     ];
+    //                 } else {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => floatval($_persen),
+    //                         'negative' => false
+    //                     ];
+    //                 }
+    //             }
+    //         } else {
+    //             foreach($res as $item) {
+    //                 $_persen = 0;
                     
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen),
-                        'negative' => false
-                    ];
-                    array_push($chart, $value);
-                }
-            }
+    //                 $value = [
+    //                     'name' => $name,
+    //                     'y' => floatval($_persen),
+    //                     'negative' => false
+    //                 ];
+    //                 array_push($chart, $value);
+    //             }
+    //         }
 
-            $success['status'] = true;
-            $success['message'] = "Success!";
-            $success['data'] = $chart;
+    //         $success['status'] = true;
+    //         $success['message'] = "Success!";
+    //         $success['data'] = $chart;
 
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
+    //         return response()->json($success, $this->successStatus); 
+    //     } catch (\Throwable $e) {
+    //         $success['status'] = false;
+    //         $success['message'] = "Error ".$e;
+    //         return response()->json($success, $this->successStatus);
+    //     }
+    // }
 
     /**
      * Function ini untuk API data box SHU
      */
-    public function getDataBoxShu(Request $r) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+    // public function getDataBoxShu(Request $r) {
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
             
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03')";
-            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+    //         $col_array = array('periode');
+    //         $db_col_name = array('b.periode');
+    //         $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03')";
+    //         $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5,
-            ISNULL(b.capai,0) AS capai,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (
-                SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15')";
+    //         $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5,
+    //         ISNULL(b.capai,0) AS capai,a.skode
+    //         FROM dash_ypt_lokasi a
+    //         LEFT JOIN (
+    //             SELECT a.kode_lokasi,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+    //             SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+    //             FROM dash_ypt_grafik_d a
+    //             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+    //             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+    //             $where
+    //             GROUP BY a.kode_lokasi
+    //         ) b ON a.kode_lokasi=b.kode_lokasi
+    //         WHERE a.kode_lokasi IN ('11','12','13','14','15')";
 
-            $select = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($select),true);
+    //         $select = DB::connection($this->sql)->select($sql);
+    //         $res = json_decode(json_encode($select),true);
             
-            $total = 0;
-            foreach($res as $item) {
-                $total = $total + floatval($item['n4']);
-            }
+    //         $total = 0;
+    //         foreach($res as $item) {
+    //             $total = $total + floatval($item['n4']);
+    //         }
 
-            $chart = [];
-            if($total > 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
+    //         $chart = [];
+    //         if($total > 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval($item['n4']) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
                     
                     
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    if($_persen < 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => abs(floatval($_persen)),
-                            'negative' => true,
-                            'nilai' => $item['n4']
-                        ];
-                    } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'negative' => false,
-                            'nilai' => $item['n4']
-                        ];
-                    }
-                    array_push($chart, $value);
-                }
-            } elseif($total < 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval($item['n4']) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
+    //                 if($_persen < 0) {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => abs(floatval($_persen)),
+    //                         'negative' => true,
+    //                         'nilai' => $item['n4']
+    //                     ];
+    //                 } else {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => floatval($_persen),
+    //                         'negative' => false,
+    //                         'nilai' => $item['n4']
+    //                     ];
+    //                 }
+    //                 array_push($chart, $value);
+    //             }
+    //         } elseif($total < 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval($item['n4']) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
                     
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    if($_persen < 0) {
-                        $value = [
-                            'name' => $name,
-                            'y' => abs(floatval($_persen)),
-                            'negative' => true,
-                            'nilai' => $item['n4']
-                        ];
-                    } else {
-                        $value = [
-                            'name' => $name,
-                            'y' => floatval($_persen),
-                            'negative' => false,
-                            'nilai' => $item['n4']
-                        ];
-                    }
-                    array_push($chart, $value);
-                }
-            } else {
-                foreach($res as $item) {
-                    $_persen = 0;
-                    $name = $item['skode'];
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen),
-                        'negative' => false,
-                        'nilai' => $item['n4']
-                    ];
-                    array_push($chart, $value);
-                }
-            }
+    //                 if($_persen < 0) {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => abs(floatval($_persen)),
+    //                         'negative' => true,
+    //                         'nilai' => $item['n4']
+    //                     ];
+    //                 } else {
+    //                     $value = [
+    //                         'name' => $name,
+    //                         'y' => floatval($_persen),
+    //                         'negative' => false,
+    //                         'nilai' => $item['n4']
+    //                     ];
+    //                 }
+    //                 array_push($chart, $value);
+    //             }
+    //         } else {
+    //             foreach($res as $item) {
+    //                 $_persen = 0;
+    //                 $name = $item['skode'];
+    //                 $value = [
+    //                     'name' => $name,
+    //                     'y' => floatval($_persen),
+    //                     'negative' => false,
+    //                     'nilai' => $item['n4']
+    //                 ];
+    //                 array_push($chart, $value);
+    //             }
+    //         }
 
-            $success['status'] = true;
-            $success['message'] = "Success!";
-            $success['data'] = $chart;
+    //         $success['status'] = true;
+    //         $success['message'] = "Success!";
+    //         $success['data'] = $chart;
 
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
+    //         return response()->json($success, $this->successStatus); 
+    //     } catch (\Throwable $e) {
+    //         $success['status'] = false;
+    //         $success['data'] = [];
+    //         $success['message'] = "Error ".$e;
+    //         return response()->json($success, $this->successStatus);
+    //     }
+    // }
 
     /**
      * Function ini untuk API data box OR
      */
-    public function getDataBoxOr(Request $r) {
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
+    // public function getDataBoxOr(Request $r) {
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //         }
             
-            $col_array = array('periode');
-            $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04')";
-            $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
+    //         $col_array = array('periode');
+    //         $db_col_name = array('b.periode');
+    //         $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04')";
+    //         $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi,a.nama, ISNULL(b.n1,0) as n1, ISNULL(b.n4,0) as n4, ISNULL(b.n5,0) as n5, 
-            ISNULL(b.capai,0) as capai,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-                SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b on a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c on a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15')";
+    //         $sql = "SELECT a.kode_lokasi,a.nama, ISNULL(b.n1,0) as n1, ISNULL(b.n4,0) as n4, ISNULL(b.n5,0) as n5, 
+    //         ISNULL(b.capai,0) as capai,a.skode
+    //         FROM dash_ypt_lokasi a
+    //         LEFT JOIN (SELECT a.kode_lokasi,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
+    //             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
+    //             SUM(CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END) AS capai
+    //             FROM dash_ypt_grafik_d a
+    //             INNER JOIN exs_neraca b on a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+    //             INNER JOIN dash_ypt_grafik_m c on a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+    //             $where
+    //             GROUP BY a.kode_lokasi
+    //         ) b ON a.kode_lokasi=b.kode_lokasi
+    //         WHERE a.kode_lokasi IN ('11','12','13','14','15')";
 
-            $select = DB::connection($this->sql)->select($sql);
-            $res = json_decode(json_encode($select),true);
+    //         $select = DB::connection($this->sql)->select($sql);
+    //         $res = json_decode(json_encode($select),true);
             
-            $total = 0;
-            foreach($res as $item) {
-                $total = $total + floatval(abs($item['n4']));
-            }
+    //         $total = 0;
+    //         foreach($res as $item) {
+    //             $total = $total + floatval(abs($item['n4']));
+    //         }
 
-            $chart = [];
-            if($total > 0) {
-                foreach($res as $item) { 
-                    $persen = (floatval(abs($item['n4'])) / $total) * 100;
-                    $_persen = number_format((float)$persen, 2,'.', '');
+    //         $chart = [];
+    //         if($total > 0) {
+    //             foreach($res as $item) { 
+    //                 $persen = (floatval(abs($item['n4'])) / $total) * 100;
+    //                 $_persen = number_format((float)$persen, 2,'.', '');
                     
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
-                    array_push($chart, $value);
-                }
-            } else {
-                foreach($res as $item) {
-                    $_persen = 0;
+    //                 $value = [
+    //                     'name' => $name,
+    //                     'y' => floatval($_persen)
+    //                 ];
+    //                 array_push($chart, $value);
+    //             }
+    //         } else {
+    //             foreach($res as $item) {
+    //                 $_persen = 0;
 
-                    $name = $item['skode'];
+    //                 $name = $item['skode'];
 
-                    $value = [
-                        'name' => $name,
-                        'y' => floatval($_persen)
-                    ];
-                    array_push($chart, $value);
-                }
-            }
+    //                 $value = [
+    //                     'name' => $name,
+    //                     'y' => floatval($_persen)
+    //                 ];
+    //                 array_push($chart, $value);
+    //             }
+    //         }
 
-            $success['status'] = true;
-            $success['message'] = "Success!";
-            $success['data'] = $chart;
+    //         $success['status'] = true;
+    //         $success['message'] = "Success!";
+    //         $success['data'] = $chart;
 
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-    }
+    //         return response()->json($success, $this->successStatus); 
+    //     } catch (\Throwable $e) {
+    //         $success['status'] = false;
+    //         $success['message'] = "Error ".$e;
+    //         return response()->json($success, $this->successStatus);
+    //     }
+    // }
+// 
 
     /**
      * Function ini untuk API data box laba rugi
@@ -590,13 +592,23 @@ class DashboardFPController extends Controller
             $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                }else{
+                    $n4 = "n4";
+                }
+            }else{
+                $n4 = "n4";
+            }
+
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt,0) AS pdpt, ISNULL(b.beban,0) AS beban, 
             ISNULL(b.shu,0) AS shu,a.skode
             FROM dash_ypt_lokasi a
             LEFT JOIN (SELECT a.kode_lokasi,
-                SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS pdpt,
-                SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS beban,
-                SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) ELSE 0 END) AS shu		
+                SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS pdpt,
+                SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS beban,
+                SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS shu		
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -662,6 +674,22 @@ class DashboardFPController extends Controller
             $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                    $n2 = "n7";
+                    $n5 = "n9";
+                }else{
+                    $n4 = "n4";
+                    $n2 = "n2";
+                    $n5 = "n5";
+                }
+            }else{
+                $n4 = "n4";
+                $n2 = "n2";
+                $n5 = "n5";
+            }
+
             $sql = "SELECT a.kode_lokasi, a.nama, a.skode,
             case when ISNULL(b.pdpt_n2,0) <> 0 then (ISNULL(b.pdpt_n4,0)/ISNULL(b.pdpt_n2,0))*100 else 0 end AS pdpt_ach, 
             case when ISNULL(b.pdpt_n5,0) <> 0 then ((ISNULL(b.pdpt_n4,0)-ISNULL(b.pdpt_n5,0))/ISNULL(b.pdpt_n5,0))*100 else 0 end AS pdpt_yoy,
@@ -673,18 +701,18 @@ class DashboardFPController extends Controller
             case when ISNULL(b.or_n5,0) <> 0 then ((ISNULL(b.or_n4,0)-ISNULL(b.or_n5,0))/ISNULL(b.or_n5,0))*100 else 0 end AS or_yoy
                         from dash_ypt_lokasi a
                         LEFT JOIN (SELECT a.kode_lokasi,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.n4 ELSE 0 END) AS pdpt_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.n2 ELSE 0 END) AS pdpt_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.n5 ELSE 0 END) AS pdpt_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.n4 ELSE 0 END) AS beban_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.n2 ELSE 0 END) AS beban_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.n5 ELSE 0 END) AS beban_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.n4 ELSE 0 END) AS shu_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.n2 ELSE 0 END) AS shu_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.n5 ELSE 0 END) AS shu_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.n4 ELSE 0 END) AS or_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.n2 ELSE 0 END) AS or_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.n5 ELSE 0 END) AS or_n5
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n4 ELSE 0 END) AS pdpt_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n2 ELSE 0 END) AS pdpt_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n5 ELSE 0 END) AS pdpt_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.$n4 ELSE 0 END) AS beban_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.$n2 ELSE 0 END) AS beban_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.$n5 ELSE 0 END) AS beban_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.$n4 ELSE 0 END) AS shu_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.$n2 ELSE 0 END) AS shu_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.$n5 ELSE 0 END) AS shu_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n4 ELSE 0 END) AS or_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n2 ELSE 0 END) AS or_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n5 ELSE 0 END) AS or_n5
                             FROM dash_ypt_grafik_d a
                             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -749,15 +777,31 @@ class DashboardFPController extends Controller
             $where = "WHERE a.kode_fs = 'FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                    $n2 = "n7";
+                    $n5 = "n9";
+                }else{
+                    $n4 = "n4";
+                    $n2 = "n2";
+                    $n5 = "n5";
+                }
+            }else{
+                $n4 = "n4";
+                $n2 = "n2";
+                $n5 = "n5";
+            }
+
+            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
             ISNULL(b.capai,0) as capai,a.skode
             FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-                CASE WHEN sum(b.n1)<>0 THEN (sum(b.n4)/sum(b.n1))*100 ELSE 0 END AS capai
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -821,15 +865,31 @@ class DashboardFPController extends Controller
             $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                    $n2 = "n7";
+                    $n5 = "n9";
+                }else{
+                    $n4 = "n4";
+                    $n2 = "n2";
+                    $n5 = "n5";
+                }
+            }else{
+                $n4 = "n4";
+                $n2 = "n2";
+                $n5 = "n5";
+            }
+
+            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
             ISNULL(b.capai,0) as capai,a.skode
             FROM dash_ypt_lokasi a
             LEFT JOIN (
                 SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n1,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-                CASE WHEN sum(b.n1)<>0 THEN (sum(b.n4)/sum(b.n1))*100 ELSE 0 END AS capai
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -976,17 +1036,27 @@ class DashboardFPController extends Controller
                 }
             }
 
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                }else{
+                    $n4 = "n4";
+                }
+            }else{
+                $n4 = "n4";
+            }
+
             $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
             ISNULL(b.n6,0) AS n6
             FROM neraca a
             INNER JOIN (
                 SELECT a.kode_neraca,
-                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.n4,0) ELSE -ISNULL(b.n4,0) END) AS n1,
-                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.n4,0) ELSE -ISNULL(c.n4,0) END) AS n2,
-                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.n4,0) ELSE -ISNULL(d.n4,0) END) AS n3,
-                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.n4,0) ELSE -ISNULL(e.n4,0) END) AS n4,
-                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.n4,0) ELSE -ISNULL(f.n4,0) END) AS n5,
-                    SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.n4,0) ELSE -ISNULL(g.n4,0) END) AS n6
+                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.$n4,0) ELSE -ISNULL(b.$n4,0) END) AS n1,
+                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.$n4,0) ELSE -ISNULL(c.$n4,0) END) AS n2,
+                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.$n4,0) ELSE -ISNULL(d.$n4,0) END) AS n3,
+                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.$n4,0) ELSE -ISNULL(e.$n4,0) END) AS n4,
+                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.$n4,0) ELSE -ISNULL(f.$n4,0) END) AS n5,
+                    SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.$n4,0) ELSE -ISNULL(g.$n4,0) END) AS n6
                     FROM dash_ypt_grafik_d a
                     INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
                     LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND b.kode_lokasi='$lokasi' AND a.kode_fs=b.kode_fs AND b.periode='".$periode[5]."'
@@ -1149,6 +1219,16 @@ class DashboardFPController extends Controller
                 $filter_lokasi = "";
             }
 
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                }else{
+                    $n4 = "n4";
+                }
+            }else{
+                $n4 = "n4";
+            }
+
             $where = "WHERE a.kode_lokasi IN ('11','12','13','14','15') and a.kode_grafik = '".$kode_grafik."' and a.kode_fs='FS1' $filter_lokasi ";
 
             $tahun = intval($r->query('periode')[1]);
@@ -1167,11 +1247,11 @@ class DashboardFPController extends Controller
             INNER JOIN dash_ypt_lokasi c on a.kode_lokasi=c.kode_lokasi
             INNER JOIN (
                 SELECT a.kode_neraca,a.kode_lokasi,
-                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.n4,0) ELSE -ISNULL(b.n4,0) END) AS n1,
-                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.n4,0) ELSE -ISNULL(c.n4,0) END) AS n2,
-                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.n4,0) ELSE -ISNULL(d.n4,0) END) AS n3,
-                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.n4,0) ELSE -ISNULL(e.n4,0) END) AS n4,
-                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.n4,0) ELSE -ISNULL(f.n4,0) END) AS n5
+                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.$n4,0) ELSE -ISNULL(b.$n4,0) END) AS n1,
+                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.$n4,0) ELSE -ISNULL(c.$n4,0) END) AS n2,
+                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.$n4,0) ELSE -ISNULL(d.$n4,0) END) AS n3,
+                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.$n4,0) ELSE -ISNULL(e.$n4,0) END) AS n4,
+                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.$n4,0) ELSE -ISNULL(f.$n4,0) END) AS n5
                     FROM dash_ypt_grafik_d a
                     INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
                     LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs AND b.periode='".$periode[4]."'

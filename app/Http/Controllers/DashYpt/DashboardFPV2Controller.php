@@ -64,6 +64,22 @@ class DashboardFPV2Controller extends Controller {
             }else{
                 $lokasi = $kode_lokasi;
             }
+
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                    $n2 = "n7";
+                    $n5 = "n9";
+                }else{
+                    $n4 = "n4";
+                    $n2 = "n2";
+                    $n5 = "n5";
+                }
+            }else{
+                $n4 = "n4";
+                $n2 = "n2";
+                $n5 = "n5";
+            }
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
@@ -71,13 +87,11 @@ class DashboardFPV2Controller extends Controller {
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_grafik, c.nama,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n1 ELSE b.n1 END) AS n1,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n2 ELSE b.n2 END) AS n2,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END) AS n4,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END) AS n5,
-            CASE WHEN sum(b.n1)<>0 THEN (sum(b.n4)/sum(b.n1))*100 ELSE 0 END AS capai,
-            CASE ISNULL(sum(b.n2),0) WHEN 0 THEN 0 ELSE (sum(b.n4)/sum(b.n2))*100 END AS ach,
-            CASE ISNULL(sum(b.n4),0) WHEN 0 THEN 0 ELSE ((sum(b.n4) - sum(b.n5))/sum(b.n5))*100 END AS yoy
+            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+            CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END AS ach,
+            CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
             FROM dash_ypt_grafik_d a
             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -96,11 +110,9 @@ class DashboardFPV2Controller extends Controller {
                     $data_pdpt = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
                         "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
                         "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
                         "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
@@ -108,11 +120,9 @@ class DashboardFPV2Controller extends Controller {
                     $data_beban = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
                         "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
                         "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
                         "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
@@ -120,11 +130,9 @@ class DashboardFPV2Controller extends Controller {
                     $data_shu = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
                         "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
                         "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
                         "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
@@ -132,11 +140,9 @@ class DashboardFPV2Controller extends Controller {
                     $data_or = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 2,'.', '')),
                         "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
                         "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
                         "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 2,'.', '')),
                         "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
                         "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
