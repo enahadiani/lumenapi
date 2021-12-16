@@ -75,7 +75,12 @@ class DashboardCCRController extends Controller {
             }
 
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                
+                if($r->kode_bidang == 'GB'){
+                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                }else{
+                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                }
             }else{
                 $filter_bidang = " ";
             }
@@ -281,7 +286,11 @@ class DashboardCCRController extends Controller {
             // }
             // $periode_rev=$tahun.$bulanSeb;
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                $filter_bidang = " and bd.kode_bidang = '$r->kode_bidang' ";
+                if($r->kode_bidang == 'GB'){
+                    $filter_bidang = " and bd.kode_bidang in ('4','5') ";
+                }else{
+                    $filter_bidang = " and bd.kode_bidang = '$r->kode_bidang' ";
+                }
             }else{
                 $filter_bidang = " ";
             }
@@ -334,7 +343,9 @@ class DashboardCCRController extends Controller {
             
             $sql = "select a.kode_bidang,a.nama
             from bidang a
-            where a.kode_lokasi='12' and a.kode_bidang in ('2','3','4','5')";
+            where a.kode_lokasi='12' and a.kode_bidang in ('2','3')
+            union all
+            select 'GB', 'SMA/SMK' ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -363,7 +374,11 @@ class DashboardCCRController extends Controller {
             $tahun=substr($periode,0,4);
             $nama = "-";
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                if($r->kode_bidang == 'GB'){
+                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                }else{
+                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                }
             }else{
                 $filter_bidang = " ";
             }
@@ -532,7 +547,11 @@ class DashboardCCRController extends Controller {
             $tahun=substr($periode,0,4);
             $nama = "-";
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                if($r->kode_bidang == 'GB'){
+                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                }else{
+                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                }
             }else{
                 $filter_bidang = " ";
             }
@@ -666,7 +685,11 @@ class DashboardCCRController extends Controller {
             $tahun=substr($periode,0,4);
             $nama = "-";
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                if($r->kode_bidang == 'GB'){
+                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                }else{
+                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                }
             }else{
                 $filter_bidang = " ";
             }
