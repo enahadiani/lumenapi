@@ -36,10 +36,23 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-fp-detail-akun','DashYpt\DashboardFPController@getDataKelompokAkun');  
     $router->get('data-fp-detail-or-5tahun','DashYpt\DashboardFPController@getDataOR5Tahun');  
 
-    $router->get('data-ccr-box','DashYpt\DashboardCCRController@getDataBox');  
+    $router->get('data-ccr-box','DashYpt\DashboardCCRController@getDataBox'); 
+    $router->get('data-ccr-top','DashYpt\DashboardCCRController@getTopCCR');  
+    $router->get('data-ccr-trend','DashYpt\DashboardCCRController@getTrendCCR');  
+    $router->get('data-ccr-trend-saldo','DashYpt\DashboardCCRController@getTrendSaldoPiutang');
+    $router->get('data-ccr-bidang','DashYpt\DashboardCCRController@getBidang');  
+    $router->get('data-ccr-umur-piutang','DashYpt\DashboardCCRController@getUmurPiutang');
     
     $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
     $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');
+    $router->get('data-cf-soakhir','DashYpt\DashboardCFController@getSoAkhirPerLembaga');  
+
+    // INVEST
+    $router->get('data-inves-box','DashYpt\DashboardInvesController@getDataBox'); 
+    $router->get('data-inves-serap-agg','DashYpt\DashboardInvesController@getSerapAgg');  
+    $router->get('data-inves-nilai-aset','DashYpt\DashboardInvesController@getNilaiAsetChart');  
+    $router->get('data-inves-agg-lembaga','DashYpt\DashboardInvesController@getAggPerLembagaChart');  
+    // END INVEST
     
     // RASIO
     $router->get('data-rasio-jenis','DashYpt\DashboardRasioController@getKlpRasio');

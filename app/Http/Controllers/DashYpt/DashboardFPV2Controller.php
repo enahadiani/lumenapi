@@ -64,6 +64,22 @@ class DashboardFPV2Controller extends Controller {
             }else{
                 $lokasi = $kode_lokasi;
             }
+
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                    $n2 = "n7";
+                    $n5 = "n9";
+                }else{
+                    $n4 = "n4";
+                    $n2 = "n2";
+                    $n5 = "n5";
+                }
+            }else{
+                $n4 = "n4";
+                $n2 = "n2";
+                $n5 = "n5";
+            }
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
@@ -71,17 +87,16 @@ class DashboardFPV2Controller extends Controller {
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_grafik, c.nama,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n1,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n2 ELSE b.n2 END AS n2,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n4 ELSE b.n4 END AS n4,
-            CASE WHEN b.jenis_akun='Pendapatan' THEN -b.n5 ELSE b.n5 END AS n5,
-            CASE WHEN b.n1<>0 THEN (b.n4/b.n1)*100 ELSE 0 END AS capai,
-            CASE ISNULL(b.n2,0) WHEN 0 THEN 0 ELSE (b.n4/b.n2)*100 END AS ach,
-            CASE ISNULL(b.n4,0) WHEN 0 THEN 0 ELSE ((b.n4 - b.n5)/b.n4)*100 END AS yoy
+            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+            CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END AS ach,
+            CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
             FROM dash_ypt_grafik_d a
             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-            $where";
+            $where
+            group by a.kode_grafik, c.nama ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -95,49 +110,41 @@ class DashboardFPV2Controller extends Controller {
                     $data_pdpt = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI02') {
                     $data_beban = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI03') {
                     $data_shu = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 } elseif($item['kode_grafik'] == 'PI04') {
                     $data_or = [
                         "kode_grafik" => $item['kode_grafik'],
                         "nama" => $item['nama'],
-                        "n1" => floatval(number_format((float)$item['n1'], 1, '.', '')),
-                        "n2" => floatval(number_format((float)$item['n2'], 1, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 1, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 1, '.', '')),
-                        "capai" => floatval(number_format((float)$item['capai'], 1, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 1, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 1, '.', '')),
+                        "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                        "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                        "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                        "ach" => floatval(number_format((float)$item['ach'], 2,'.', '')),
+                        "yoy" => floatval(number_format((float)$item['yoy'], 2,'.', '')),
                     ];
                 }
             }
@@ -173,7 +180,7 @@ class DashboardFPV2Controller extends Controller {
             }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04') $filter_lokasi ";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI04') $filter_lokasi ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -193,7 +200,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi ";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -206,8 +213,8 @@ class DashboardFPV2Controller extends Controller {
                 $name= $item['skode'];
 
                 array_push($ctg, $name);
-                array_push($anggaran, floatval(number_format((float)$item['n2'], 1, '.', '')));
-                array_push($realisasi, floatval(number_format((float)$item['n4'], 1, '.', '')));
+                array_push($anggaran, floatval(number_format((float)$item['n2'], 2,'.', '')));
+                array_push($realisasi, floatval(number_format((float)$item['n4'], 2,'.', '')));
             }
 
             $success['status'] = true;
@@ -242,7 +249,7 @@ class DashboardFPV2Controller extends Controller {
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03') $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik in ('PI03') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -262,7 +269,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -310,7 +317,7 @@ class DashboardFPV2Controller extends Controller {
 
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02') $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI02') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -330,7 +337,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -378,7 +385,7 @@ class DashboardFPV2Controller extends Controller {
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('03','11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01') $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI01') $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n1,0) AS n1, ISNULL(b.n2,0) AS n2, 
@@ -398,7 +405,7 @@ class DashboardFPV2Controller extends Controller {
                 $where
                 GROUP BY a.kode_lokasi
             ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('03','11','12','13','14','15') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
