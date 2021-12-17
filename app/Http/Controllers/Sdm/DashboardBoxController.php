@@ -56,11 +56,79 @@ class DashboardBoxController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.klp_client,b.nama, count(*) AS jumlah
+            $sql = "SELECT b.kelompok as nama, count(*) AS jumlah,
+           CASE
+                WHEN b.kelompok = 'YPT' THEN '#255F85'
+                WHEN b.kelompok = 'GSD' THEN '#941B0C'
+                WHEN b.kelompok = 'TELKOM' THEN '#E26D5C'
+                WHEN b.kelompok = 'EKSTERNAL' THEN '#FAA613'
+                ELSE '#F1F1'
+            END as color,
+            CASE
+                WHEN b.kelompok = 'YPT' THEN 'bg-dark-blue'
+                WHEN b.kelompok = 'GSD' THEN 'bg-dark-red'
+                WHEN b.kelompok = 'TELKOM' THEN 'bg-pink'
+                WHEN b.kelompok = 'EKSTERNAL' THEN 'bg-orange'
+                ELSE '#F1F1'
+            END as bg
             FROM hr_sdm_client a
-            JOIN hr_sdm_klp_client b ON a.klp_client=b.kode AND a.kode_lokasi=b.kode_lokasi
+            JOIN hr_client b ON a.nama_client=b.kode_client
             WHERE a.kode_lokasi = '" . $kode_lokasi . "'
-            GROUP BY a.klp_client,b.nama";
+            GROUP BY b.kelompok";
+
+            $rs = DB::connection($this->db)->select($sql);
+            $rs = json_decode(json_encode($rs), true);
+
+            $total = 0;
+            $series = [];
+            $desk = [];
+
+            if (count($rs) > 0) {
+                foreach ($rs as $dt) {
+                    $total = $total + $dt['jumlah'];
+                }
+
+                foreach ($rs as $dt) {
+                    $persen = ($dt['jumlah'] / $total) * 100;
+                    $_persen = floatval(number_format((float)$persen, 1, '.', ''));
+                    $data = [
+                        'name' => $dt['nama'],
+                        'y' => $dt['jumlah'],
+                        'color' => $dt['color'],
+                        'decimal' => $_persen,
+                        'bg' => $dt['bg']
+                    ];
+
+
+
+                    array_unshift($series, $data);
+                }
+            }
+
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $series;
+
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getTotalClient(Request $r)
+    {
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $sql = "SELECT COUNT(kode_client)
+            FROM hr_client";
 
             $rs = DB::connection($this->db)->select($sql);
             $rs = json_decode(json_encode($rs), true);
