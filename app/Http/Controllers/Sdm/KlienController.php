@@ -39,7 +39,7 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_client,nama_client as nama, flag_aktif as is_active   FROM hr_client";
+            $sql = "SELECT kode_client,nama_client as nama, flag_aktif as is_active, kelompok   FROM hr_client";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -76,7 +76,7 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT kode_client, nama_client as nama, flag_aktif as is_active FROM hr_client WHERE kode_client = '" . $request->kode_client . "' ";
+            $sql = "SELECT kode_client, nama_client as nama, flag_aktif as is_active, kelompok FROM hr_client WHERE kode_client = '" . $request->kode_client . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
 
@@ -112,6 +112,7 @@ class KlienController extends Controller
         $this->validate($request, [
             'kode_client' => 'required',
             'nama_client' => 'required',
+            'kelompok' => 'required',
             'flag_aktif' => 'required'
         ]);
 
@@ -121,13 +122,14 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
             if ($this->isUnik($request->input('kode_client'), $kode_lokasi)) {
-                $insert = "INSERT INTO hr_client(kode_client, nama_client, flag_aktif)
-                VALUES (?, ?, ?)";
+                $insert = "INSERT INTO hr_client(kode_client, nama_client, flag_aktif,kelompok)
+                VALUES (?, ?, ?, ?)";
 
                 DB::connection($this->db)->insert($insert, [
                     $request->input('kode_client'),
                     $request->input('nama_client'),
-                    $request->input('flag_aktif')
+                    $request->input('flag_aktif'),
+                    $request->input('kelompok')
                 ]);
 
                 $success['status'] = true;
@@ -158,7 +160,8 @@ class KlienController extends Controller
         $this->validate($request, [
             'kode_client' => 'required',
             'nama_client' => 'required',
-            'flag_aktif' => 'required'
+            'flag_aktif' => 'required',
+            'kelompok' => 'required'
         ]);
 
         try {
@@ -167,7 +170,7 @@ class KlienController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $update = "UPDATE hr_client SET nama_client = '" . $request->input('nama_client') . "', flag_aktif = '" . $request->input("flag_aktif") . "'
+            $update = "UPDATE hr_client SET nama_client = '" . $request->input('nama_client') . "', flag_aktif = '" . $request->input("flag_aktif") . "', kelompok = '" . $request->input('kelompok') . "'
             WHERE kode_client = '" . $request->input('kode_client') . "'";
 
             DB::connection($this->db)->update($update);
