@@ -160,7 +160,7 @@ class DashboardCCRController extends Controller {
             $res = json_decode(json_encode($select),true);
 
             // CCR TOTAL MOM
-            $sql2 = "select 
+            $sql2 = "select isnull(d.total,0) as bayar_ytm, isnull(h.total,0) as bayar_seb,
             isnull(d.total,0) + isnull(h.total,0) as bayar
             from dash_ypt_lokasi a
             left join (select x.kode_lokasi, 
@@ -185,7 +185,7 @@ class DashboardCCRController extends Controller {
             $res2 = json_decode(json_encode($select2),true);
 
             // CCR TOTAL YOY
-            $sql3 = "select    
+            $sql3 = "select isnull(d.total,0) as bayar_ytm, isnull(h.total,0) as bayar_seb,
             isnull(d.total,0) + isnull(h.total,0) as bayar
             from dash_ypt_lokasi a
             left join (select x.kode_lokasi, 
@@ -218,10 +218,14 @@ class DashboardCCRController extends Controller {
             $ccr_tahun_lalu_ar = floatval($res[0]['piutang']);
             $ccr_tahun_lalu_inflow = floatval($res[0]['hn3']);
             $ccr_tahun_lalu =($ccr_tahun_lalu_ar != 0 ? ($ccr_tahun_lalu_inflow/$ccr_tahun_lalu_ar)*100 : 0);
+            $ccr_tahun_lalu_mom = floatval($res2[0]['bayar_seb']);
+            $ccr_tahun_lalu_yoy = floatval($res3[0]['bayar_seb']); 
 
             $ccr_tahun_ini_ar = floatval($res[0]['tn3']);
             $ccr_tahun_ini_inflow = floatval($res[0]['pn3']);
             $ccr_tahun_ini =($ccr_tahun_ini_ar != 0 ? ($ccr_tahun_ini_inflow/$ccr_tahun_ini_ar)*100 : 0);
+            $ccr_tahun_ini_mom = floatval($res2[0]['bayar_ytm']);
+            $ccr_tahun_ini_yoy = floatval($res3[0]['bayar_ytm']); 
 
             $ccr_periode_ar = floatval($res[0]['tn2']);
             $ccr_periode_inflow = floatval($res[0]['pn2']);
@@ -240,12 +244,16 @@ class DashboardCCRController extends Controller {
                 "ccr_tahun_lalu" => [
                     'ar' => floatval(number_format((float)$ccr_tahun_lalu_ar, 2,'.', '')),
                     'inflow' => floatval(number_format((float)$ccr_tahun_lalu_inflow, 2,'.', '')),
-                    'persentase' => floatval(number_format((float)$ccr_tahun_lalu, 2,'.', ''))
+                    'persentase' => floatval(number_format((float)$ccr_tahun_lalu, 2,'.', '')),
+                    'mom' => floatval(number_format((float)$ccr_tahun_lalu_mom, 2,'.', '')),
+                    'yoy' => floatval(number_format((float)$ccr_tahun_lalu_yoy, 2,'.', '')),
                 ],
                 "ccr_tahun_ini" => [
                     'ar' => floatval(number_format((float)$ccr_tahun_ini_ar, 2,'.', '')),
                     'inflow' => floatval(number_format((float)$ccr_tahun_ini_inflow, 2,'.', '')),
-                    'persentase' => floatval(number_format((float)$ccr_tahun_ini, 2,'.', ''))
+                    'persentase' => floatval(number_format((float)$ccr_tahun_ini, 2,'.', '')),
+                    'mom' => floatval(number_format((float)$ccr_tahun_ini_mom, 2,'.', '')),
+                    'yoy' => floatval(number_format((float)$ccr_tahun_ini_yoy, 2,'.', '')),
                 ],
                 "ccr_periode" => [
                     'ar' => floatval(number_format((float)$ccr_periode_ar, 2,'.', '')),
