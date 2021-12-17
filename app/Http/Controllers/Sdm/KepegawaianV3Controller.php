@@ -84,7 +84,7 @@ class KepegawaianV3Controller extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $sql = "SELECT a.nik,a.nama,ISNULL(b.nama_client, '-') as nama_client,
+            $sql = "SELECT a.nik,a.nama,e.kode_client,ISNULL(e.nama_client, '-') as nama_client,
             ISNULL(b.no_kontrak, '-') as no_kontrak,
             ISNULL(d.nama, '-') as nama_loker,
             ISNULL(DATEDIFF(day, b.tgl_kontrak_awal, b.tgl_kontrak_akhir) , '0') as jumlah_hari_kontrak,
@@ -93,6 +93,7 @@ class KepegawaianV3Controller extends Controller
             INNER JOIN hr_sdm_client b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
             INNER JOIN hr_sdm_kepegawaian c ON b.no_kontrak=c.kode AND c.kode_lokasi=b.kode_lokasi
             INNER JOIN hr_loker d ON d.kode_loker=c.kode_loker AND d.kode_lokasi=c.kode_lokasi
+            INNER JOIN hr_client as e ON b.nama_client=e.kode_client
             WHERE a.kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
@@ -201,7 +202,7 @@ class KepegawaianV3Controller extends Controller
             convert(varchar(10), a.tgl_lahir, 101) as tgl_lahir,a.alamat,
             a.provinsi,a.kota,a.kecamatan,a.kelurahan,a.kode_pos,a.tinggi_badan,a.berat_badan,
             a.golongan_darah,a.nomor_kk,a.status_nikah,
-            convert(varchar(10), tgl_nikah, 101) as tgl_nikah
+            convert(varchar(10), a.tgl_nikah, 101) as tgl_nikah
             FROM hr_sdm_pribadi a
             LEFT JOIN hr_agama b ON a.kode_agama=b.kode_agama AND a.kode_lokasi=b.kode_lokasi
             WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
@@ -227,13 +228,15 @@ class KepegawaianV3Controller extends Controller
 
 
             // DATA CLIENT
-            $sql5 = "SELECT  nama_client,skill,no_kontrak,
-            convert(varchar(10), tgl_kontrak_awal, 101) as tgl_kontrak_awal,
-            convert(varchar(10), tgl_kontrak_akhir, 101) as tgl_kontrak_akhir,
-            atasan_langsung,atasan_tidak_langsung,
-            DATEDIFF(day, tgl_kontrak_awal, tgl_kontrak_akhir) as jumlah_hari_kontrak,
-            DATEDIFF(day, GETDATE(), tgl_kontrak_akhir) as sisa_hari_kontrak
-            FROM hr_sdm_client WHERE nik = '" . $request->nik . "' AND kode_lokasi = '" . $kode_lokasi . "' ";
+            $sql5 = "SELECT b.kode_client, b.nama_client,a.skill,a.no_kontrak,
+            convert(varchar(10), a.tgl_kontrak_awal, 101) as tgl_kontrak_awal,
+            convert(varchar(10), a.tgl_kontrak_akhir, 101) as tgl_kontrak_akhir,
+            a.atasan_langsung,a.atasan_tidak_langsung,
+            DATEDIFF(day, a.tgl_kontrak_awal, a.tgl_kontrak_akhir) as jumlah_hari_kontrak,
+            DATEDIFF(day, GETDATE(), a.tgl_kontrak_akhir) as sisa_hari_kontrak
+            FROM hr_sdm_client a
+            JOIN hr_client b ON a.nama_client = b.kode_client
+            WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "' ";
             $res5 = DB::connection($this->db)->select($sql5);
             $res5 = json_decode(json_encode($res5), true);
 
