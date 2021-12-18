@@ -302,15 +302,25 @@ class DashboardInvesController extends Controller {
                 $tahun++;
             }
            
+            /*
             $sql="SELECT a.kode_lokasi, a.nama, a.skode, 1234000000 as n1, 2000000000 as n2, 1567000000 as n3, 3000000000 as n4, 5000000000 as n5
             FROM dash_ypt_lokasi a
             WHERE a.kode_lokasi IN ('11','12','13','14','15')
                 ";
-          
+            */
+            $sql="select a.kode_lokasi,a.nama, a.skode,sum(case when substring(a.periode,1,4)='2021' then a.n4 else 0 end) as n1,
+            sum(case when substring(a.periode,1,4)='2020' then a.n4 else 0 end) as n2,
+            sum(case when substring(a.periode,1,4)='2019' then a.n4 else 0 end) as n3,
+            sum(case when substring(a.periode,1,4)='2018' then a.n4 else 0 end) as n4,
+            sum(case when substring(a.periode,1,4)='2017' then a.n4 else 0 end) as n5
+     from exs_neraca a
+     inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
+     where b.kode_dash='DP02' and a.kode_lokasi IN ('03','11','12','13','14','15')
+     group by a.kode_lokasi";
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             $series = array();
-            $i=0; $pengurang = 100000000; //untk dummy
+            $i=0; $pengurang = 0; //untk dummy
             foreach($res as $dt) {
                 if(!isset($series[$i])){
                     $series[$i] = array('name' => $dt['nama'], 'data' => array());
@@ -323,7 +333,7 @@ class DashboardInvesController extends Controller {
                 floatval($dt['n5']) - $pengurang
                 );
                 $series[$i]['data'] = $data;
-                $pengurang+= 567891011;
+                //$pengurang+= 567891011;
                 $i++;
             }
             $success['status'] = true;
