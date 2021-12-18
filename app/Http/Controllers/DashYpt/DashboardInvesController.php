@@ -310,11 +310,11 @@ class DashboardInvesController extends Controller {
             */
             $sql="select a.kode_lokasi, a.nama, a.skode, isnull(b.n1,0) as n1, isnull(b.n2,0) as n2, isnull(b.n3,0) as n3, isnull(b.n4,0) as n4, isnull(b.n5,0) as n5
             from dash_ypt_lokasi a
-            left join (select a.kode_lokasi,sum(case when substring(a.periode,1,4)='2021' then a.n4 else 0 end) as n1,
-                           sum(case when substring(a.periode,1,4)='2020' then a.n4 else 0 end) as n2,
+            left join (select a.kode_lokasi,sum(case when substring(a.periode,1,4)='2017' then a.n4 else 0 end) as n1,
+                           sum(case when substring(a.periode,1,4)='2018' then a.n4 else 0 end) as n2,
                            sum(case when substring(a.periode,1,4)='2019' then a.n4 else 0 end) as n3,
-                           sum(case when substring(a.periode,1,4)='2018' then a.n4 else 0 end) as n4,
-                           sum(case when substring(a.periode,1,4)='2017' then a.n4 else 0 end) as n5
+                           sum(case when substring(a.periode,1,4)='2020' then a.n4 else 0 end) as n4,
+                           sum(case when substring(a.periode,1,4)='2021' then a.n4 else 0 end) as n5
                     from exs_neraca a
                     inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
                     where b.kode_dash='DP02' 
