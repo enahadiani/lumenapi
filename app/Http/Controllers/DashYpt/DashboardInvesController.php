@@ -317,7 +317,7 @@ class DashboardInvesController extends Controller {
                            sum(case when substring(a.periode,1,4)='2021' then a.n4 else 0 end) as n5
                     from exs_neraca a
                     inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-                    $where and b.kode_dash='DP02' $filter_neraca
+                    $where and b.kode_dash='DP02' 
                     group by a.kode_lokasi
                     ) b on a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi IN ('03','11','12','13','14','15')";
