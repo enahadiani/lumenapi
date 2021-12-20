@@ -74,7 +74,7 @@ class DashboardInvesController extends Controller {
             case when sum(a.n5) <> 0 then ((sum(a.n4)-sum(a.n5))/sum(a.n5))*100 else 0 end as yoy
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-            $where and b.kode_dash='DP02'
+            $where and b.kode_dash='DP02' $filter_neraca
             group by a.kode_lokasi
             ";
             $res = DB::connection($this->db)->select($sql);
@@ -122,12 +122,12 @@ class DashboardInvesController extends Controller {
 
             $sql = "select a.kode_neraca as kode_aset,b.nama as nama_aset,b.nu,
             sum(case when a.jenis_akun='Pendapatan' then -a.n2 else a.n2 end) as rka,
-            sum(case when a.jenis_akun='Pendapatan' then -a.n6 else a.n6 end) as real,
+            sum(case when a.jenis_akun='Pendapatan' then -a.n4 else a.n4 end) as real,
             sum(case when a.jenis_akun='Pendapatan' then -a.n5 else a.n5 end) as n5,
-            case when sum(a.n2)<>0 then (sum(a.n6)/sum(a.n2))*100 else 0 end as ach
+            case when sum(a.n2)<>0 then (sum(a.n4)/sum(a.n2))*100 else 0 end as ach
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-            $where and b.kode_dash='DP02' and (a.n2<>0 or a.n6<>0 or a.n5<>0) 
+            $where and b.kode_dash='DP02' and (a.n2<>0 or a.n4<>0) 
             group by a.kode_neraca,b.nama,b.nu
             order by b.nu
              ";
@@ -289,7 +289,7 @@ class DashboardInvesController extends Controller {
                            sum(case when substring(a.periode,1,4)='".$ctg[4]."' then a.n4 else 0 end) as n5
                     from exs_neraca a
                     inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
-                    where b.kode_dash='DP02' 
+                    where b.kode_dash='DP02' $filter_neraca
                     group by a.kode_lokasi
                     ) b on a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi IN ('03','11','12','13','14','15')";
