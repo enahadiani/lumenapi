@@ -119,6 +119,10 @@ $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('statistics','Yakes\SahamController@getStatistics');
     $router->get('parse-saham','Yakes\SahamController@getSaham');
     $router->post('parse-saham','Yakes\SahamController@getSaham');
+    
+    // DAKEM API
+    $router->post('peserta-dakem-nik','Yakes\DakemApiController@getPesertaDakemByNIK');
+    $router->post('peserta-dakem-nikes','Yakes\DakemApiController@getPesertaDakemByNIKES');
 
 });
 
