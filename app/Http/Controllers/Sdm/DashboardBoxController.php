@@ -48,6 +48,38 @@ class DashboardBoxController extends Controller
         }
     }
 
+    public function getJumlahLoker(Request $r)
+    {
+        try {
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $sql = "select count(nik) as jumlah 
+			from hr_sdm_pribadi where kota is not null
+            and kode_lokasi = '".$kode_lokasi."'";
+
+            $rs1 = DB::connection($this->db)->select($sql);
+            $rs1 = json_decode(json_encode($rs1), true);
+
+            $total = 0;
+            foreach($rs1 as $dt) {
+                $total = $total + intval($dt['jumlah']);
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $total;
+
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getClient(Request $r)
     {
         try {
@@ -72,8 +104,8 @@ class DashboardBoxController extends Controller
                 ELSE '#F1F1'
             END as bg
             FROM hr_sdm_client a
-            JOIN hr_client b ON a.nama_client=b.kode_client
-            WHERE a.kode_lokasi = '" . $kode_lokasi . "'
+            INNER JOIN hr_client b ON a.nama_client=b.kode_client
+            WHERE a.kode_lokasi = '".$kode_lokasi."'
             GROUP BY b.kelompok";
 
             $rs = DB::connection($this->db)->select($sql);
@@ -82,6 +114,7 @@ class DashboardBoxController extends Controller
             $total = 0;
             $series = [];
             $desk = [];
+            $chart = [];
 
             if (count($rs) > 0) {
                 foreach ($rs as $dt) {
@@ -99,8 +132,14 @@ class DashboardBoxController extends Controller
                         'bg' => $dt['bg']
                     ];
 
+                    $_chart = [
+                        'name' => $dt['nama'],
+                        'y' => intval($dt['jumlah']),
+                    ];
 
 
+
+                    array_unshift($chart, $_chart);
                     array_unshift($series, $data);
                 }
             }
@@ -109,6 +148,7 @@ class DashboardBoxController extends Controller
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = $series;
+            $success['chart'] = $chart;
 
 
             return response()->json($success, $this->successStatus);
