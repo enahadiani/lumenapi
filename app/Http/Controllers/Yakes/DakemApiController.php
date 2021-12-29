@@ -56,7 +56,7 @@ class DakemApiController extends Controller
             $response = $client->request('POST',  'https://sika.yakestelkom.or.id/api2/getPesertaDakem',[
                 'form_params' => [
                     'key' => 'IeXdn4oCBXN76PlsGXdB5PtuyAK7bqXvS1K4Y4k3s',
-                    'nikes' => $request->input('nik')
+                    'nikes' => $request->input('nikes')
                 ]
             ]);
 
