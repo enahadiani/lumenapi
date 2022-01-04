@@ -63,7 +63,7 @@ $router->get('storage-file-telu/{filename}', function ($filename)
     if (!Storage::disk('s3')->exists('telu/'.$filename)) {
         abort(404);
     }
-    return Storage::disk('s3')->file('telu/'.$filename); 
+    return Storage::disk('s3')->get('telu/'.$filename); 
 });
 
 
