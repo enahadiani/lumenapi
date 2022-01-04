@@ -3,8 +3,8 @@ namespace App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; 
-
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
@@ -56,16 +56,6 @@ $router->get('storage-tmp/{filename}', function ($filename)
     }
     return Storage::disk('s3')->response('telu/tmp_dok/'.$filename); 
 });
-
-
-$router->get('storage-file-telu/{filename}', function ($filename)
-{
-    if (!Storage::disk('s3')->exists('telu/'.$filename)) {
-        abort(404);
-    }
-    return Storage::disk('s3')->get('telu/'.$filename); 
-});
-
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
