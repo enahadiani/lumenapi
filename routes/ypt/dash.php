@@ -165,6 +165,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     
     $router->get('berita-list','Ypt\DashboardController@getListBerita');
+    $router->get('buku-rka-list','Ypt\DashboardController@getListBukuRKA');
 
 
 });
