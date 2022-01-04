@@ -279,16 +279,6 @@ class BukuRKAController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-
-            $sql3="select file_gambar from dash_buku where kode_lokasi=? and no_bukti=? ";
-            $res3 = DB::connection($this->db)->select($sql3,array($kode_lokasi,$request->input('no_bukti')));
-            $res3 = json_decode(json_encode($res3),true);
-
-            if(count($res3) > 0){
-                for($i=0;$i<count($res3);$i++){
-                    Storage::disk('s3')->delete('telu/'.$res3[$i]['file_gambar']);
-                }
-            }
             
             $del = DB::connection($this->db)->table('dash_buku')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $request->no_bukti)->delete();
 
