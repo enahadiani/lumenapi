@@ -58,6 +58,15 @@ $router->get('storage-tmp/{filename}', function ($filename)
 });
 
 
+$router->get('storage-file-telu/{filename}', function ($filename)
+{
+    if (!Storage::disk('s3')->exists('telu/'.$filename)) {
+        abort(404);
+    }
+    return Storage::disk('s3')->file('telu/'.$filename); 
+});
+
+
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('profile', 'AdminYptKugController@profile');
