@@ -94,6 +94,17 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     
     $router->get('kategori-konten','Ypt\KontenController@getKonten');
 
+    // BUKU RKA
+    $router->get('buku-rka','Ypt\BukuRKAController@index');
+    $router->get('buku-rka-edit','Ypt\BukuRKAController@show');
+    $router->post('buku-rka','Ypt\BukuRKAController@store');
+    $router->post('buku-rka-edit','Ypt\BukuRKAController@update');
+    $router->delete('buku-rka','Ypt\BukuRKAController@destroy');
+
+    $router->post('buku-rka-dok','Ypt\BukuRKAController@storeDokTmp');
+    $router->delete('buku-rka-dok','Ypt\BukuRKAController@destroyDok');
+    $router->delete('buku-rka-dok-tmp','Ypt\BukuRKAController@destroyDokTmp');
+
 });
 
 
