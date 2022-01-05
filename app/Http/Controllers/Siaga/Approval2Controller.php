@@ -149,16 +149,16 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection($this->db)->select("select a.kode_jab
-            from apv_karyawan a
-            where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            ");
-            $get = json_decode(json_encode($get),true);
-            if(count($get) > 0){
-                $kode_jab = $get[0]['kode_jab'];
-            }else{
-                $kode_jab = "";
-            }
+            // $get = DB::connection($this->db)->select("select a.kode_jab
+            // from karyawan a
+            // where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
+            // ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_jab = $get[0]['kode_jab'];
+            // }else{
+            //     $kode_jab = "";
+            // }
 
             $filter = "";
             if(isset($request->no_pb) && $request->no_pb != ""){
@@ -177,7 +177,7 @@ class Approval2Controller extends Controller
                     inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
                     left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                     inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and b.kode_jab='".$kode_jab."' and b.nik= '$nik_user' $filter
+                    where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
                     ");
                     $res = json_decode(json_encode($res),true);
                 
@@ -190,7 +190,7 @@ class Approval2Controller extends Controller
                 inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                 inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and b.kode_jab='".$kode_jab."' and b.nik= '$nik_user' $filter
+                where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
                 ");
                 $res = json_decode(json_encode($res),true);
             }
@@ -224,16 +224,16 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection($this->db)->select("select a.kode_jab
-            from apv_karyawan a
-            where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            ");
-            $get = json_decode(json_encode($get),true);
-            if(count($get) > 0){
-                $kode_jab = $get[0]['kode_jab'];
-            }else{
-                $kode_jab = "";
-            }
+            // $get = DB::connection($this->db)->select("select a.kode_jab
+            // from karyawan a
+            // where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
+            // ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_jab = $get[0]['kode_jab'];
+            // }else{
+            //     $kode_jab = "";
+            // }
 
             $filter = "";
             if(isset($request->no_pb) && $request->no_pb != ""){
@@ -250,8 +250,8 @@ class Approval2Controller extends Controller
                     $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
                     from apv_flow a
                     inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-                    inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
                     ");
                 }else{
                     $res = DB::connection($this->db)->select("select * from gr_pb_m where modul='Panjar' ");
@@ -260,8 +260,8 @@ class Approval2Controller extends Controller
                 $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
                     from apv_flow a
                     inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-                    inner join apv_pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
                     ");
             }
 
@@ -362,7 +362,7 @@ class Approval2Controller extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join apv_karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                    left join karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
 
                     $rs = DB::connection($this->db)->select($sqlapp);
@@ -396,7 +396,7 @@ class Approval2Controller extends Controller
                 $sqlbuat = "
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from gr_pb_m b 
-                inner join apv_karyawan c on b.nik_buat=c.nik 
+                inner join karyawan c on b.nik_buat=c.nik 
                 where b.no_pb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -486,7 +486,7 @@ class Approval2Controller extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join apv_karyawan b on a.kode_jab=b.kode_jab 
+                    left join karyawan b on a.kode_jab=b.kode_jab 
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi' ";
                     $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
@@ -515,7 +515,7 @@ class Approval2Controller extends Controller
                 $sqlbuat="
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from gr_pb_m b
-                inner join apv_karyawan c on b.nik_buat=c.nik 
+                inner join karyawan c on b.nik_buat=c.nik 
                 where b.no_pb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -632,7 +632,7 @@ class Approval2Controller extends Controller
             $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
             from apv_flow a
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-            left join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            left join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1' ";
             
             $res = DB::connection($this->db)->select($sql);
@@ -654,14 +654,14 @@ class Approval2Controller extends Controller
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
-                left join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+                left join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
                 select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
-                left join apv_karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
+                left join karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
             ) a order by id2,tanggal
 	        ";
@@ -797,7 +797,7 @@ class Approval2Controller extends Controller
             from apv_flow a
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
             inner join apv_pesan d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
-            left join apv_pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            left join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and d.id='$id' ";
             
             $res = DB::connection($this->db)->select($sql);
@@ -819,14 +819,14 @@ class Approval2Controller extends Controller
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
-                left join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+                left join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
                 select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from gr_pb_m a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
-                left join apv_karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
+                left join karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
             ) a order by id2,tanggal
 	        ";

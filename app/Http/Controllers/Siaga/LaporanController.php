@@ -52,17 +52,19 @@ class LaporanController extends Controller
                 }
             }
 
-            $sql="select a.no_pb,a.kode_lokasi,a.no_dokumen,convert(varchar(20),a.tanggal,103) as tgl_aju,a.keterangan,a.kode_pp,b.nama as nama_pp,a.nilai,case when a.progress = '1' then 'Verifikasi' 
-            when a.progress='B' then 'Return Approval' 
-            when a.progress='R' then 'Return Approval' 
-            else isnull(x.nama_jab,'-') end as posisi
+            $sql="
+            select a.no_pb,a.kode_lokasi,a.no_dokumen,convert(varchar(20),a.tanggal,103) as tgl_aju,a.keterangan,a.kode_pp,b.nama as nama_pp,a.nilai,
+                case when a.progress = '1' then 'Verifikasi' 
+                when a.progress='B' then 'Return Approval' 
+                when a.progress='R' then 'Return Approval' 
+                else isnull(x.nama_jab,'-') end as posisi
             from gr_pb_m a
             inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            left join (select a.no_bukti,b.nama as nama_jab
-                        from apv_flow a
-                        inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
-                        where a.kode_lokasi='$kode_lokasi' and a.status='1'
-                        )x on a.no_pb=x.no_bukti
+            left join (select a.no_bukti,case no_urut when 1 then b.jab2 when 2 then b.jab3 when 3 then jab4 when 4 then jab5 else '-' end as nama_jab
+                    from apv_flow a
+                    inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1'
+                    )x on a.no_pb=x.no_bukti
             $where 
             order by a.no_pb  
             ";

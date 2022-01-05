@@ -150,7 +150,7 @@ class ApprovalSPBController extends Controller
             }
 
             $get = DB::connection($this->db)->select("select a.kode_jab
-            from apv_karyawan a
+            from karyawan a
             where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             ");
             $get = json_decode(json_encode($get),true);
@@ -198,7 +198,7 @@ class ApprovalSPBController extends Controller
             }
 
             $get = DB::connection($this->db)->select("select a.kode_jab
-            from apv_karyawan a
+            from karyawan a
             where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
             ");
             $get = json_decode(json_encode($get),true);
@@ -335,7 +335,7 @@ class ApprovalSPBController extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join apv_karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                    left join karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
 
                     $rs = DB::connection($this->db)->select($sqlapp);
@@ -368,7 +368,7 @@ class ApprovalSPBController extends Controller
                 $sqlbuat = "
                 select isnull(c.no_telp,'-') as no_telp,b.nik_user as nik_buat,isnull(c.email,'-') as email
                 from gr_spb2_m b 
-                inner join apv_karyawan c on b.nik_user=c.nik 
+                inner join karyawan c on b.nik_user=c.nik 
                 where b.no_spb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -449,7 +449,7 @@ class ApprovalSPBController extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join apv_karyawan b on a.kode_jab=b.kode_jab 
+                    left join karyawan b on a.kode_jab=b.kode_jab 
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi' ";
                     $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
@@ -477,7 +477,7 @@ class ApprovalSPBController extends Controller
                 $sqlbuat="
                 select isnull(c.no_telp,'-') as no_telp,b.nik_user as nik_buat,isnull(c.email,'-') as email
                 from gr_spb2_m b
-                inner join apv_karyawan c on b.nik_user=c.nik 
+                inner join karyawan c on b.nik_user=c.nik 
                 where b.no_spb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -605,7 +605,7 @@ class ApprovalSPBController extends Controller
             from gr_spb2_m a
             inner join apv_pesan e on a.no_spb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
-            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            inner join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_spb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
 			order by id2
 	        ";
@@ -680,7 +680,7 @@ class ApprovalSPBController extends Controller
             from gr_spb2_m a
             inner join apv_pesan e on a.no_spb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
             inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
-            inner join apv_karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
+            inner join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
             where a.no_spb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
 			order by id2
 	        ";

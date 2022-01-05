@@ -27,7 +27,7 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_jab,nama,case flag_aktif when '1' then 'AKTIF' else 'NONAKTIF' end as flag_aktif from apv_jab where kode_lokasi='".$kode_lokasi."'  
+            $res = DB::connection($this->db)->select("select kode_jab,nama,case flag_aktif when '1' then 'AKTIF' else 'NONAKTIF' end as flag_aktif from kug_jab where kode_lokasi='".$kode_lokasi."'  
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -83,7 +83,7 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $ins = DB::connection($this->db)->insert('insert into apv_jab(kode_jab,nama,kode_lokasi,flag_aktif) values (?, ?, ?, ?)', [$request->input('kode_jab'),$request->input('nama'),$kode_lokasi,$request->input('flag_aktif')]);
+            $ins = DB::connection($this->db)->insert('insert into kug_jab(kode_jab,nama,kode_lokasi,flag_aktif) values (?, ?, ?, ?)', [$request->input('kode_jab'),$request->input('nama'),$kode_lokasi,$request->input('flag_aktif')]);
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -115,7 +115,7 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select kode_jab,nama,flag_aktif from apv_jab where kode_lokasi='".$kode_lokasi."' and kode_jab='$kode_jab'
+            $sql = "select kode_jab,nama,flag_aktif from kug_jab where kode_lokasi='".$kode_lokasi."' and kode_jab='$kode_jab'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -173,9 +173,9 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('apv_jab')->where('kode_lokasi', $kode_lokasi)->where('kode_jab', $kode_jab)->delete();
+            $del = DB::connection($this->db)->table('kug_jab')->where('kode_lokasi', $kode_lokasi)->where('kode_jab', $kode_jab)->delete();
 
-            $ins = DB::connection($this->db)->insert('insert into apv_jab(kode_jab,nama,kode_lokasi,flag_aktif) values (?, ?, ?, ?)', [$kode_jab,$request->input('nama'),$kode_lokasi,$request->input('flag_aktif')]);
+            $ins = DB::connection($this->db)->insert('insert into kug_jab(kode_jab,nama,kode_lokasi,flag_aktif) values (?, ?, ?, ?)', [$kode_jab,$request->input('nama'),$kode_lokasi,$request->input('flag_aktif')]);
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -206,7 +206,7 @@ class JabatanController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('apv_jab')->where('kode_lokasi', $kode_lokasi)->where('kode_jab', $kode_jab)->delete();
+            $del = DB::connection($this->db)->table('kug_jab')->where('kode_lokasi', $kode_lokasi)->where('kode_jab', $kode_jab)->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
