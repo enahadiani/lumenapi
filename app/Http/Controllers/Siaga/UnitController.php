@@ -27,7 +27,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' 
+            $res = DB::connection($this->db)->select("select kode_pp,nama from pp where kode_lokasi='".$kode_lokasi."' 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -82,7 +82,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $ins = DB::connection($this->db)->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi]);
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -114,7 +114,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select kode_pp,nama from apv_pp where kode_lokasi='".$kode_lokasi."' and kode_pp='$kode_pp'
+            $sql = "select kode_pp,nama from pp where kode_lokasi='".$kode_lokasi."' and kode_pp='$kode_pp'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -171,9 +171,9 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
-
-            $ins = DB::connection($this->db)->insert('insert into apv_pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$kode_pp,$request->input('nama'),$kode_lokasi]);
+            $update = DB::connection($this->db)->table('pp')
+            ->where('kode_pp',$kode_pp)
+            ->update(['nama' => $request->input('nama')]);
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -203,7 +203,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $del = DB::connection($this->db)->table('apv_pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
+            $del = DB::connection($this->db)->table('pp')->where('kode_lokasi', $kode_lokasi)->where('kode_pp', $kode_pp)->delete();
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
