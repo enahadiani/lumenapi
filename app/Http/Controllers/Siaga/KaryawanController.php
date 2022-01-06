@@ -74,7 +74,6 @@ class KaryawanController extends Controller
     {
         $this->validate($request, [
             'nik' => 'required',
-            'kode_lokasi' => 'required',
             'nama' => 'required',
             'alamat' => 'required',
             'jabatan' => 'required',
@@ -92,7 +91,6 @@ class KaryawanController extends Controller
             'kode_pos' => 'required',
             'no_hp' => 'required',
             'flag_aktif' => 'required',
-            'sts_pj' => 'required',
             'kode_jab' => 'required',
             'tgl_lahir' => 'required',
             'sts_sdm' => 'required',
@@ -220,7 +218,6 @@ class KaryawanController extends Controller
     {
         $this->validate($request, [
             'nik' => 'required',
-            'kode_lokasi' => 'required',
             'nama' => 'required',
             'alamat' => 'required',
             'jabatan' => 'required',
@@ -238,7 +235,6 @@ class KaryawanController extends Controller
             'kode_pos' => 'required',
             'no_hp' => 'required',
             'flag_aktif' => 'required',
-            'sts_pj' => 'required',
             'kode_jab' => 'required',
             'tgl_lahir' => 'required',
             'sts_sdm' => 'required',
