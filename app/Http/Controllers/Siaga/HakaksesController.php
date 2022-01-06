@@ -46,7 +46,7 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select nik,nama,kode_klp_menu,kode_lokasi,status_admin from hakakses where kode_lokasi='".$kode_lokasi."'
+            $res = DB::connection($this->db)->select("select nik,nama,kode_menu_saku,kode_lokasi,status_admin from hakakses where kode_lokasi='".$kode_lokasi."'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -92,10 +92,12 @@ class HakaksesController extends Controller
             'nik' => 'required|max:10',
             'nama' => 'required|max:100',
             'kode_klp_menu' => 'required|max:10',
+            'path_view' => 'required|max:10',
             'pass' => 'required|max:10',
             'status_admin' => 'required|max:1',
             'klp_akses' => 'required|max:20',
-            'kode_menu_lab'=> 'required|max:20'
+            'kode_menu_saku'=> 'required|max:20',
+            'menu_mobile' => 'required|max:10'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -114,8 +116,8 @@ class HakaksesController extends Controller
             }
             
             if($sts){
-
-                $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$request->input('kode_menu_lab'),app('hash')->make($request->pass)]);
+                $kode_menu_lab = (isset($request->kode_menu_lab) && $request->kode_menu_lab != '' ? $request->kode_menu_Lab : '-');
+                $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,kode_menu_saku,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$kode_menu_lab,$request->input('kode_menu_saku'),app('hash')->make($request->pass)]);
                 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
@@ -151,7 +153,14 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select nik,nama,kode_klp_menu,pass,status_admin,klp_akses,menu_mobile,path_view,kode_menu_lab from hakakses where kode_lokasi='".$kode_lokasi."' and nik='$nik'
+            $sql = "select a.nik,a.nama,a.kode_klp_menu,a.kode_menu_lab, a.kode_menu_saku,a.pass,a.status_admin,a.klp_akses,a.menu_mobile,a.path_view,a.kode_menu_saku,b.nama as nama_klp,c.nama as nama_klp2,d.nama as nama_klp3,e.nama_form as nama_form,f.nama_form as nama_form2 
+            from hakakses a 
+            left join menu_klp b on a.kode_klp_menu=b.kode_klp
+            left join menu_klp c on a.kode_menu_lab=c.kode_klp
+            left join menu_klp d on a.kode_menu_saku=d.kode_klp
+            left join m_form e on a.path_view=e.kode_form
+            left join m_form f on a.menu_mobile=f.kode_form
+            where a.kode_lokasi='".$kode_lokasi."' and a.nik='$nik'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -198,10 +207,12 @@ class HakaksesController extends Controller
         $this->validate($request, [
             'nama' => 'required|max:100',
             'kode_klp_menu' => 'required|max:10',
+            'path_view' => 'required|max:10',
             'pass' => 'required|max:10',
             'status_admin' => 'required|max:1',
             'klp_akses' => 'required|max:20',
-            'kode_menu_lab'=> 'required|max:20'
+            'kode_menu_saku'=> 'required|max:20',
+            'menu_mobile' => 'required|max:10'
         ]);
 
         DB::connection($this->db)->beginTransaction();
@@ -214,7 +225,8 @@ class HakaksesController extends Controller
             
             $del = DB::connection($this->db)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
-            $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$nik,$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$request->input('kode_menu_lab'),app('hash')->make($request->pass)]);
+            $kode_menu_lab = (isset($request->kode_menu_lab) && $request->kode_menu_lab != '' ? $request->kode_menu_Lab : '-');
+            $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,kode_menu_saku,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$kode_menu_lab,$request->input('kode_menu_saku'),app('hash')->make($request->pass)]);
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -269,7 +281,7 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select distinct kode_klp_menu as kode_klp from hakakses where kode_lokasi='$kode_lokasi'
+            $res = DB::connection($this->db)->select("select kode_klp,nama from menu_klp
             ");
             $res = json_decode(json_encode($res),true);
             
