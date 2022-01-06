@@ -23,6 +23,7 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
      $router->post('karyawan','Siaga\KaryawanController@store');
      $router->post('karyawan/{nik}','Siaga\KaryawanController@update');
      $router->delete('karyawan/{nik}','Siaga\KaryawanController@destroy');
+     $router->get('karyawan-nik','Siaga\KaryawanController@getGrKaryawan');
  
      //Master Jabatan
      $router->get('jabatan','Siaga\JabatanController@index');
