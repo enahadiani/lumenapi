@@ -90,6 +90,7 @@ class HakaksesController extends Controller
     {
         $this->validate($request, [
             'nik' => 'required|max:10',
+            'nik2' => 'required',
             'nama' => 'required|max:100',
             'kode_klp_menu' => 'required|max:10',
             'path_view' => 'required|max:10',
@@ -114,10 +115,10 @@ class HakaksesController extends Controller
             }else{
                 $sts= true;
             }
-            
+            $success['kode'] = $request->input('nik');
             if($sts){
                 $kode_menu_lab = (isset($request->kode_menu_lab) && $request->kode_menu_lab != '' ? $request->kode_menu_Lab : '-');
-                $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,kode_menu_saku,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$kode_menu_lab,$request->input('kode_menu_saku'),app('hash')->make($request->pass)]);
+                $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nik2,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,kode_menu_saku,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nik2'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$kode_menu_lab,$request->input('kode_menu_saku'),app('hash')->make($request->pass)]);
                 
                 DB::connection($this->db)->commit();
                 $success['status'] = true;
@@ -153,7 +154,7 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.nik,a.nama,a.kode_klp_menu,a.kode_menu_lab, a.kode_menu_saku,a.pass,a.status_admin,a.klp_akses,a.menu_mobile,a.path_view,a.kode_menu_saku,b.nama as nama_klp,c.nama as nama_klp2,d.nama as nama_klp3,e.nama_form as nama_form,f.nama_form as nama_form2 
+            $sql = "select a.nik,a.nama,a.kode_klp_menu,a.kode_menu_lab, a.kode_menu_saku,a.pass,a.status_admin,a.klp_akses,a.menu_mobile,a.path_view,a.kode_menu_saku,b.nama as nama_klp,c.nama as nama_klp2,d.nama as nama_klp3,e.nama_form as nama_form,f.nama_form as nama_form2,a.nik2 
             from hakakses a 
             left join menu_klp b on a.kode_klp_menu=b.kode_klp
             left join menu_klp c on a.kode_menu_lab=c.kode_klp
@@ -205,6 +206,7 @@ class HakaksesController extends Controller
     public function update(Request $request, $nik)
     {
         $this->validate($request, [
+            'nik' => 'required',
             'nama' => 'required|max:100',
             'kode_klp_menu' => 'required|max:10',
             'path_view' => 'required|max:10',
@@ -223,10 +225,11 @@ class HakaksesController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
+            $success['kode'] = $request->input('nik');
             $del = DB::connection($this->db)->table('hakakses')->where('kode_lokasi', $kode_lokasi)->where('nik', $nik)->delete();
 
             $kode_menu_lab = (isset($request->kode_menu_lab) && $request->kode_menu_lab != '' ? $request->kode_menu_Lab : '-');
-            $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,kode_menu_saku,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$kode_menu_lab,$request->input('kode_menu_saku'),app('hash')->make($request->pass)]);
+            $ins = DB::connection($this->db)->insert('insert into hakakses(nik,nik2,nama,kode_lokasi,kode_klp_menu,pass,status_admin,klp_akses,path_view,menu_mobile,kode_menu_lab,kode_menu_saku,password) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$request->input('nik'), $request->input('nik2'),$request->input('nama'),$kode_lokasi,$request->input('kode_klp_menu'),$request->input('pass'),$request->input('status_admin'),$request->input('klp_akses'),$request->input('path_view'),$request->input('menu_mobile'),$kode_menu_lab,$request->input('kode_menu_saku'),app('hash')->make($request->pass)]);
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
