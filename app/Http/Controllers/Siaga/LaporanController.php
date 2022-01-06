@@ -263,9 +263,8 @@ class LaporanController extends Controller
             when a.progress='R' then 'Return Approval' 
             else isnull(x.nama_jab,'-') end as posisi
             from gr_spb2_m a
-            left join (select a.no_bukti,b.nama as nama_jab
+            left join (select a.no_bukti,case no_urut when 1 then 'Bendahara' when 2 then 'Pemberi SPB' when 3 then 'Dir' else '-' end as nama_jab
                         from apv_flow a
-                        inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
                         where a.kode_lokasi='$kode_lokasi' and a.status='1'
                         )x on a.no_spb=x.no_bukti
             $where 

@@ -197,16 +197,16 @@ class ApprovalSPBController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $get = DB::connection($this->db)->select("select a.kode_jab
-            from karyawan a
-            where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            ");
-            $get = json_decode(json_encode($get),true);
-            if(count($get) > 0){
-                $kode_jab = $get[0]['kode_jab'];
-            }else{
-                $kode_jab = "";
-            }
+            // $get = DB::connection($this->db)->select("select a.kode_jab
+            // from karyawan a
+            // where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
+            // ");
+            // $get = json_decode(json_encode($get),true);
+            // if(count($get) > 0){
+            //     $kode_jab = $get[0]['kode_jab'];
+            // }else{
+            //     $kode_jab = "";
+            // }
 
             $filter = "";
             if(isset($request->no_spb) && $request->no_spb != ""){
@@ -224,7 +224,7 @@ class ApprovalSPBController extends Controller
                     select b.no_spb as no_bukti,b.nilai,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan
                     from apv_flow a
                     inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
                     ");
                     $res = json_decode(json_encode($res),true);
                 }else{
@@ -235,7 +235,7 @@ class ApprovalSPBController extends Controller
                     select b.no_spb as no_bukti,b.nilai,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan
                     from apv_flow a
                     inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.kode_jab='".$kode_jab."' and a.nik= '$nik_user' $filter
+                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
                     ");
                 $res = json_decode(json_encode($res),true);
             }
