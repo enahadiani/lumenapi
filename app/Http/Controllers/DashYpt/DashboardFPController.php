@@ -1000,7 +1000,7 @@ class DashboardFPController extends Controller
      * Function ini untuk API detail kelompok Yoy
      * 
      */
-    public function getDataKelompokYoy(Request $r) {
+    public function getDataKelompokYoyBackup(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
@@ -1096,6 +1096,156 @@ class DashboardFPController extends Controller
             $success['data'] = [
                 'kategori' => $ctg,
                 'series' => $series
+            ];
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getDataKelompokYoy(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            // $col_array = array('kode_grafik');
+            // $db_col_name = array('a.kode_grafik');
+            $kode_grafik1 = $r->query('kode_grafik')[1];
+            if($r->query('kode_grafik')[1] == "PI01") {
+                $kode_grafik2 = "PI05";
+            } elseif($r->query('kode_grafik')[1] == "PI02") {
+                $kode_grafik2 = "PI06";
+            } else {
+                $kode_grafik2 = $r->query('kode_grafik')[1];
+            }
+
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $lokasi = $r->kode_lokasi;
+            }else{
+                $lokasi = $kode_lokasi;
+            }
+
+            $where = "WHERE a.kode_grafik = '".$kode_grafik2."' and a.kode_fs='FS1' ";
+
+            $tahun = intval($r->query('periode')[1]);
+            $periode = [];
+            for($i=0;$i<=5;$i++) {
+                if($i == 0) {
+                    array_push($periode, $tahun);
+                } else {
+                    $tahun = $tahun - 100;
+                    array_push($periode, $tahun);
+                }
+            }
+
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $n4 = "n6";
+                }else{
+                    $n4 = "n4";
+                }
+            }else{
+                $n4 = "n4";
+            }
+
+            $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+            ISNULL(b.n6,0) AS n6
+            FROM neraca a
+            INNER JOIN (
+                SELECT a.kode_neraca,
+                    SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.$n4,0) ELSE -ISNULL(b.$n4,0) END) AS n1,
+                    SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.$n4,0) ELSE -ISNULL(c.$n4,0) END) AS n2,
+                    SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.$n4,0) ELSE -ISNULL(d.$n4,0) END) AS n3,
+                    SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.$n4,0) ELSE -ISNULL(e.$n4,0) END) AS n4,
+                    SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.$n4,0) ELSE -ISNULL(f.$n4,0) END) AS n5,
+                    SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.$n4,0) ELSE -ISNULL(g.$n4,0) END) AS n6
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
+                    LEFT JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND b.kode_lokasi='$lokasi' AND a.kode_fs=b.kode_fs AND b.periode='".$periode[5]."'
+                    LEFT JOIN exs_neraca c ON a.kode_neraca=c.kode_neraca AND c.kode_lokasi='$lokasi' AND a.kode_fs=c.kode_fs AND c.periode='".$periode[4]."'
+                    LEFT JOIN exs_neraca d ON a.kode_neraca=d.kode_neraca AND d.kode_lokasi='$lokasi' AND a.kode_fs=d.kode_fs AND d.periode='".$periode[3]."'
+                    LEFT JOIN exs_neraca e ON a.kode_neraca=e.kode_neraca AND e.kode_lokasi='$lokasi' AND a.kode_fs=e.kode_fs AND e.periode='".$periode[2]."'
+                    LEFT JOIN exs_neraca f ON a.kode_neraca=f.kode_neraca AND f.kode_lokasi='$lokasi' AND a.kode_fs=f.kode_fs AND f.periode='".$periode[1]."'
+                    LEFT JOIN exs_neraca g ON a.kode_neraca=g.kode_neraca AND g.kode_lokasi='$lokasi' AND a.kode_fs=g.kode_fs AND g.periode='".$periode[0]."'
+                    $where
+                GROUP BY a.kode_neraca
+            )b ON a.kode_neraca=b.kode_neraca 
+            where a.kode_lokasi='$lokasi' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1' ";
+
+            $select = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            // $color = ['#1D4ED8', '#EC4899', '#EC4899'];
+            $ctg = [];
+            for($i=0;$i<=3;$i++) {
+                array_unshift($ctg, substr($periode[$i], 0, 4));
+            }
+            
+            $series = [];
+            $drill = [];
+            $n3=0;$n4=0;$n5=0;$n6=0; $i=0;
+            $color =  ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1"];
+            foreach($res as $item) {
+                $n3+= floatval($item['n3']);
+                $n4+= floatval($item['n4']);
+                $n5+= floatval($item['n5']);
+                $n6+= floatval($item['n6']);
+
+                $dd = [];
+                array_unshift($dd, floatval($item['n3']), floatval($item['n4']), floatval($item['n5']), floatval($item['n6']));
+
+                $_drill = [
+                    'name' => $item['nama'],
+                    'color' => $color[$i],
+                    'data' => $dd
+                ];
+
+                array_push($drill, $_drill);
+                $i++;
+            }
+            $data = [];
+            $nama = 'Total';
+            array_unshift($data, 
+                array(
+                    'y' =>floatval($n3),
+                    'name' => $nama,
+                    'drilldown' => $ctg[0]
+                ), 
+                array(
+                    'y' =>floatval($n4),
+                    'name' => $nama,
+                    'drilldown' => $ctg[1]
+                ),
+                array(
+                    'y' =>floatval($n5),
+                    'name' => $nama,
+                    'drilldown' => $ctg[2]
+                ), 
+                array(
+                    'y' =>floatval($n6),
+                    'name' => $nama,
+                    'drilldown' => $ctg[3]
+                )
+            );
+
+            $_series = [
+                'name' => $nama,
+                'data' => $data
+            ];
+
+            array_push($series, $_series);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = [
+                'kategori' => $ctg,
+                'series' => $series,
+                'drilldown' => $drill
             ];
 
             return response()->json($success, $this->successStatus); 
