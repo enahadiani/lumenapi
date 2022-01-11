@@ -61,6 +61,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-rasio-yoy','DashYpt\DashboardRasioController@getRasioYoY');
     $router->get('data-rasio-tahun','DashYpt\DashboardRasioController@getRasioTahun');
 
+    // PIUTANG
+    
+    $router->get('data-piutang-box','DashYpt\DashboardPiutangController@getDataBox'); 
+    $router->get('data-piutang-top','DashYpt\DashboardPiutangController@getTopPiutang'); 
+    $router->get('data-piutang-bidang','DashYpt\DashboardPiutangController@getBidang');  
+
 
 });
 
