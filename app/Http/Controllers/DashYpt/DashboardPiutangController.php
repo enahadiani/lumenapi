@@ -387,6 +387,8 @@ class DashboardPiutangController extends Controller {
                         'sliced' =>  true,
                         'selected' => true,
                         'negative' => false,
+                        'fillColor' => '#FBBF24',                            
+                        'color' => '#FBBF24',
                         'key' => 'DSP'
                     ];
                 }
@@ -407,7 +409,9 @@ class DashboardPiutangController extends Controller {
                         'name' => 'SPP',
                         'y' => $spp,
                         'negative' => false,
-                        'key' => 'SPP'
+                        'key' => 'SPP',
+                        'fillColor' => '#008000',                            
+                        'color' => '#008000',
                     ];
                 }
                 array_push($chart, $value);
@@ -426,7 +430,9 @@ class DashboardPiutangController extends Controller {
                         'name' => 'Lainnya',
                         'y' => $lain,
                         'negative' => false,
-                        'key' => 'Lainnya'
+                        'key' => 'Lainnya',
+                        'fillColor' => '#870202',                            
+                        'color' => '#870202',
                     ];
                 }
                 array_push($chart, $value);
