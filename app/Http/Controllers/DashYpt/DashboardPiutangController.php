@@ -417,6 +417,12 @@ class DashboardPiutangController extends Controller {
                 $filter_bidang = " and p.kode_bidang not in ('1')";
             }
 
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
+            }else{
+                $filter_pp = " and p.kode_pp not in ('1')";
+            }
+
             $tahun = substr($r->query('periode')[1],0,4);
             $periode = [];
             for($i=0;$i<5;$i++) {
@@ -427,35 +433,35 @@ class DashboardPiutangController extends Controller {
                     array_push($periode, $tahun);
                 }
             }
-            
+            $periode = array_reverse($periode);
             $sql="select a.kode_lokasi,isnull(b.n1,0)-isnull(d.n1,0) as n1,isnull(b.n2,0)-isnull(d.n2,0) as n2,
             isnull(b.n3,0)-isnull(d.n3,0) as n3,isnull(b.n4,0)-isnull(d.n4,0) as n4,isnull(b.n5,0)-isnull(d.n5,0) as n5
             from lokasi a 
             left join (select y.kode_lokasi,
-                            sum(case when substring(x.periode,1,4)<='2018' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1,
-                            sum(case when substring(x.periode,1,4)<='2019' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n2,
-                            sum(case when substring(x.periode,1,4)<='2020' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n3,
-                            sum(case when substring(x.periode,1,4)<='2021' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n4,
-                            sum(case when substring(x.periode,1,4)<='2022' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n5	
+                            sum(case when substring(x.periode,1,4)<='".$periode[0]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1,
+                            sum(case when substring(x.periode,1,4)<='".$periode[1]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n2,
+                            sum(case when substring(x.periode,1,4)<='".$periode[2]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n3,
+                            sum(case when substring(x.periode,1,4)<='".$periode[3]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n4,
+                            sum(case when substring(x.periode,1,4)<='".$periode[4]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n5	
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_lokasi=p.kode_lokasi and x.kode_pp=p.kode_pp
-                        where(x.kode_lokasi = '12')
+                        where(x.kode_lokasi = '$kode_lokasi') $filter_pp $filter_bidang and p.kode_bidang in ('2','3','4','5')
                         group by y.kode_lokasi			
                         )b on a.kode_lokasi=b.kode_lokasi 
             left join (select y.kode_lokasi,  
-                            sum(case when substring(x.periode,1,4)<='2018' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1,
-                            sum(case when substring(x.periode,1,4)<='2019' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n2,
-                            sum(case when substring(x.periode,1,4)<='2020' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n3,
-                            sum(case when substring(x.periode,1,4)<='2021' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n4,
-                            sum(case when substring(x.periode,1,4)<='2022' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n5				
+                            sum(case when substring(x.periode,1,4)<='".$periode[0]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1,
+                            sum(case when substring(x.periode,1,4)<='".$periode[1]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n2,
+                            sum(case when substring(x.periode,1,4)<='".$periode[2]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n3,
+                            sum(case when substring(x.periode,1,4)<='".$periode[3]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n4,
+                            sum(case when substring(x.periode,1,4)<='".$periode[4]."' then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n5				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_lokasi=p.kode_lokasi and x.kode_pp=p.kode_pp
-                        where(x.kode_lokasi = '12')
+                        where(x.kode_lokasi = '$kode_lokasi') $filter_pp $filter_bidang and p.kode_bidang in ('2','3','4','5')
                         group by y.kode_lokasi	
                         )d on a.kode_lokasi=d.kode_lokasi 
-            where a.kode_lokasi='12'";
+            where a.kode_lokasi='$kode_lokasi'";
            
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
