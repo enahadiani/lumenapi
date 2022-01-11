@@ -83,7 +83,7 @@ class DashboardCCRController extends Controller {
                     $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
                 }
             }else{
-                $filter_bidang = " ";
+                $filter_bidang = " and p.kode_bidang not in ('1') ";
             }
 
             $sql = "select isnull(b.total,0) as tn1,isnull(c.total,0) as tn2,isnull(b.total,0)+isnull(c.total,0) as tn3,
@@ -345,7 +345,7 @@ class DashboardCCRController extends Controller {
                         $where and x.periode='$periode' and x.periode_bill = '$periode' 
                         group by x.kode_lokasi,x.kode_pp
                         )e on a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
-            where a.kode_lokasi='12' and a.kode_bidang in ('2','3','4','5') and a.nama not like '%SMK PAR SP Makassar%' and a.kode_pp <> 'YSPTF02' $filter_bidang
+            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3','4','5') and a.nama not like '%SMK PAR SP Makassar%' and a.kode_pp <> 'YSPTF02' $filter_bidang
             order by (case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end) $sort ";
 
             $select = DB::connection($this->db)->select($sql);
@@ -373,7 +373,7 @@ class DashboardCCRController extends Controller {
             
             $sql = "select a.kode_bidang,a.nama
             from bidang a
-            where a.kode_lokasi='12' and a.kode_bidang in ('2','3')
+            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3')
             union all
             select 'GB', 'SMA/SMK' ";
 
@@ -410,7 +410,7 @@ class DashboardCCRController extends Controller {
                     $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
                 }
             }else{
-                $filter_bidang = " ";
+                $filter_bidang = " and p.kode_bidang not in ('1') ";
             }
             if(isset($r->kode_pp) && $r->kode_pp !=""){
                 $get = DB::connection($this->db)->select("select nama from pp where kode_pp='$r->kode_pp' ");
@@ -583,7 +583,7 @@ class DashboardCCRController extends Controller {
                     $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
                 }
             }else{
-                $filter_bidang = " ";
+                $filter_bidang = " and p.kode_bidang not in ('1')";
             }
             if(isset($r->kode_pp) && $r->kode_pp !=""){
                 $get = DB::connection($this->db)->select("select nama from pp where kode_pp='$r->kode_pp' ");
@@ -721,7 +721,7 @@ class DashboardCCRController extends Controller {
                     $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
                 }
             }else{
-                $filter_bidang = " ";
+                $filter_bidang = " and p.kode_bidang not in ('1')";
             }
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
