@@ -76,82 +76,60 @@ class DashboardPiutangController extends Controller {
                 $filter_bidang = " and p.kode_bidang not in ('1') ";
             }
 
-            $sql = "select a.kode_lokasi,a.nama,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total
+            $sql = "select a.kode_lokasi,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from lokasi a 
-            left join (select y.kode_lokasi, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+            left join (select y.kode_lokasi,
+                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
+                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
+                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
+                               sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periode') $filter_bidang $filter_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') $filter_pp $filter_bidang 		
                         group by y.kode_lokasi			
                         )b on a.kode_lokasi=b.kode_lokasi 
-            left join (select y.kode_lokasi, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
-                        from sis_bill_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periode') $filter_bidang $filter_pp
-                        group by y.kode_lokasi			
-                        )c on a.kode_lokasi=c.kode_lokasi 
             left join (select y.kode_lokasi,  
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
+                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
+                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
+                               sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periode') $filter_bidang $filter_pp
-                        group by y.kode_lokasi		
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') $filter_pp $filter_bidang
+                        group by y.kode_lokasi	
                         )d on a.kode_lokasi=d.kode_lokasi 
-            left join (select y.kode_lokasi, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
-                        from sis_rekon_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periode') $filter_bidang $filter_pp
-                        group by y.kode_lokasi		
-                        )e on a.kode_lokasi=e.kode_lokasi 
-            where a.kode_lokasi='$kode_lokasi'
-            order by a.kode_lokasi";
+            where a.kode_lokasi='$kode_lokasi'";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
 
-            $sql2 = "select a.kode_lokasi,a.nama,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total
+            $sql2 = "select a.kode_lokasi,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from lokasi a 
-            left join (select y.kode_lokasi, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+            left join (select y.kode_lokasi,
+                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
+                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
+                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
+                               sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periodelalu') $filter_bidang $filter_pp
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periodelalu') $filter_pp $filter_bidang 		
                         group by y.kode_lokasi			
                         )b on a.kode_lokasi=b.kode_lokasi 
-            left join (select y.kode_lokasi, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
-                        from sis_bill_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periodelalu') $filter_bidang $filter_pp
-                        group by y.kode_lokasi			
-                        )c on a.kode_lokasi=c.kode_lokasi 
             left join (select y.kode_lokasi,  
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
+                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
+                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
+                               sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periodelalu') $filter_bidang $filter_pp
-                        group by y.kode_lokasi		
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periodelalu') $filter_pp $filter_bidang
+                        group by y.kode_lokasi	
                         )d on a.kode_lokasi=d.kode_lokasi 
-            left join (select y.kode_lokasi, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
-                        from sis_rekon_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periodelalu') $filter_bidang $filter_pp
-                        group by y.kode_lokasi		
-                        )e on a.kode_lokasi=e.kode_lokasi 
-            where a.kode_lokasi='$kode_lokasi'
-            order by a.kode_lokasi";
+            where a.kode_lokasi='$kode_lokasi' ";
 
             $select2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($select2),true);
@@ -200,48 +178,40 @@ class DashboardPiutangController extends Controller {
             $kode_lokasi = "12";
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
                 if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and bd.kode_bidang in ('4','5') ";
+                    $filter_bidang = " and c.kode_bidang in ('4','5') ";
                 }else{
-                    $filter_bidang = " and bd.kode_bidang = '$r->kode_bidang' ";
+                    $filter_bidang = " and c.kode_bidang = '$r->kode_bidang' ";
                 }
             }else{
-                $filter_bidang = " and bd.kode_bidang not in ('1') ";
+                $filter_bidang = " and c.kode_bidang not in ('1') ";
             }
             $sort = $r->sort;
 
-            $sql = "select a.kode_lokasi,a.kode_pp,a.nama,isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) as sak_total
+            $sql = "select a.kode_pp,a.nama,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from pp a 
-            inner join bidang bd on a.kode_bidang=bd.kode_bidang and bd.kode_lokasi='$kode_lokasi'
-            left join (select y.kode_lokasi,y.kode_pp, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
+            inner join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
+            left join (select y.kode_lokasi,y.kode_pp,
+                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
+                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
+                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
+                               sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode < '$periode') 
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') 
                         group by y.kode_lokasi,y.kode_pp			
                         )b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            left join (select y.kode_lokasi,y.kode_pp, 
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
-                        from sis_bill_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode = '$periode') 
-                        group by y.kode_lokasi,y.kode_pp			
-                        )c on a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             left join (select y.kode_lokasi,y.kode_pp,  
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
+                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
+                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
+                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
+                               sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <'$periode') 
-                        group by y.kode_lokasi,y.kode_pp		
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') 
+                        group by y.kode_lokasi,y.kode_pp	
                         )d on a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
-            left join (select y.kode_lokasi,y.kode_pp,
-                            sum(case when x.dc='D' then x.nilai else -x.nilai end) as total			
-                        from sis_rekon_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode ='$periode') 
-                        group by y.kode_lokasi,y.kode_pp		
-                        )e on a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and a.kode_bidang in ('2','3','4','5') and a.nama not like '%SMK PAR SP Makassar%' and a.kode_pp <> 'YSPTF02' $filter_bidang
-            order by isnull(b.total,0)-isnull(d.total,0)+isnull(c.total,0)-isnull(e.total,0) $sort ";
+            where a.kode_lokasi='$kode_lokasi' and c.kode_bidang in ('2','3','4','5') $filter_bidang
+            order by isnull(b.total,0)-isnull(d.total,0) $sort ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
