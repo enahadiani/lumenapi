@@ -66,6 +66,7 @@ class DashboardCCRController extends Controller {
             }
             $periode_rev=$tahun.$bulanSeb;
             $periode_lalu = $tahun_rev.$bulan;
+            $periode_rev_lalu=$tahun_rev.$bulanSeb;
             $where = " and x.kode_lokasi='12' ";
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
@@ -159,77 +160,100 @@ class DashboardCCRController extends Controller {
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
 
-            // CCR TOTAL MOM
-            $sql2 = "select isnull(d.total,0) as bayar_ytm, isnull(h.total,0) as bayar_seb,
-            isnull(d.total,0) + isnull(h.total,0) as bayar
+            // CCR TAHUN LALU
+            $sql2 = "select isnull(b.total,0) as tn1,isnull(c.total,0) as tn2,isnull(b.total,0)+isnull(c.total,0) as tn3,
+            isnull(d.total,0) as pn1,isnull(e.total,0) as pn2,isnull(d.total,0)+isnull(e.total,0) as pn3,
+            isnull(f.total,0)-isnull(g.total,0) as piutang, 
+            isnull(h.total,0) as hn1,isnull(i.total,0) as hn2,isnull(h.total,0)+isnull(i.total,0) as hn3
             from dash_ypt_lokasi a
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal_lalu' and '$periode_rev_lalu') $where $filter_pp $filter_bidang
+                        group by x.kode_lokasi
+                    )b on a.kode_lokasi=b.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode='$periode_lalu' $where $filter_pp $filter_bidang
+                        group by x.kode_lokasi
+                        )c on a.kode_lokasi=c.kode_lokasi
             left join (select x.kode_lokasi, 
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill between '$periode_awal' and '$periode_rev') and x.kode_lokasi='12' 
+                        where (x.periode between '$periode_awal_lalu' and '$periode_lalu') and (x.periode_bill between '$periode_awal_lalu' and '$periode_rev_lalu') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )d on a.kode_lokasi=d.kode_lokasi 
-            
             left join (select x.kode_lokasi,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_rekon_d x 
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where (x.periode between '$periode_awal' and '$periode_rev') and (x.periode_bill<'$periode_awal') and x.kode_lokasi='12' 
+                        where x.periode='$periode_lalu' and x.periode_bill = '$periode_lalu' $where $filter_pp $filter_bidang
+                        group by x.kode_lokasi
+                        )e on a.kode_lokasi=e.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_bill_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode<'$periode_awal_lalu' $where $filter_pp $filter_bidang
+                        group by x.kode_lokasi
+                        )f on a.kode_lokasi=f.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode<'$periode_awal_lalu' $where $filter_pp $filter_bidang
+                        group by x.kode_lokasi
+                        )g on a.kode_lokasi=g.kode_lokasi 
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where (x.periode between '$periode_awal_lalu' and '$periode_rev_lalu') and (x.periode_bill<'$periode_awal_lalu') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )h on a.kode_lokasi=h.kode_lokasi 
-            where a.kode_lokasi='12' ";
+            left join (select x.kode_lokasi,
+                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
+                        from sis_rekon_d x 
+                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
+                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
+                        where x.periode='$periode_lalu' and (x.periode_bill<'$periode_awal_lalu') $where $filter_pp $filter_bidang
+                        group by x.kode_lokasi
+                        )i on a.kode_lokasi=i.kode_lokasi
+            where a.kode_lokasi='12'";
             $select2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($select2),true);
-
-            // CCR TOTAL YOY
-            $sql3 = "select isnull(d.total,0) as bayar_ytm, isnull(h.total,0) as bayar_seb,
-            isnull(d.total,0) + isnull(h.total,0) as bayar
-            from dash_ypt_lokasi a
-            left join (select x.kode_lokasi, 
-                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
-                        from sis_rekon_d x 
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where (x.periode between '$periode_awal_lalu' and '$periode_lalu') and (x.periode_bill between '$periode_awal_lalu' and '$periode_lalu') and x.kode_lokasi='12' 
-                        group by x.kode_lokasi
-                        )d on a.kode_lokasi=d.kode_lokasi 
-            left join (select x.kode_lokasi,
-                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
-                        from sis_rekon_d x 
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp 
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where (x.periode between '$periode_awal_lalu' and '$periode_lalu') and (x.periode_bill<'$periode_awal_lalu') and x.kode_lokasi='12' 
-                        group by x.kode_lokasi
-                        )h on a.kode_lokasi=h.kode_lokasi 
-            where a.kode_lokasi='12' ";
-            $select3 = DB::connection($this->db)->select($sql3);
-            $res3 = json_decode(json_encode($select3),true);
             
             $ccr_total_ar = floatval($res[0]['piutang']) + floatval($res[0]['tn3']);
             $ccr_total_inflow = floatval($res[0]['pn3']) + floatval($res[0]['hn3']);
             $ccr_total = ($ccr_total_ar != 0 ? ($ccr_total_inflow / $ccr_total_ar)*100 : 0);
-
-            $ccr_total_mom = floatval($res2[0]['bayar']);
-            $ccr_total_yoy = floatval($res3[0]['bayar']); 
+            $ccr_total_prev_ar = floatval($res2[0]['piutang']) + floatval($res2[0]['tn3']);
+            $ccr_total_prev_inflow = floatval($res2[0]['pn3']) + floatval($res2[0]['hn3']);
+            $ccr_total_prev = ($ccr_total_prev_ar != 0 ? ($ccr_total_prev_inflow / $ccr_total_prev_ar)*100 : 0);
 
             $ccr_tahun_lalu_ar = floatval($res[0]['piutang']);
             $ccr_tahun_lalu_inflow = floatval($res[0]['hn3']);
             $ccr_tahun_lalu =($ccr_tahun_lalu_ar != 0 ? ($ccr_tahun_lalu_inflow/$ccr_tahun_lalu_ar)*100 : 0);
-            $ccr_tahun_lalu_mom = floatval($res2[0]['bayar_seb']);
-            $ccr_tahun_lalu_yoy = floatval($res3[0]['bayar_seb']); 
+            $ccr_tahun_lalu_prev_ar = floatval($res2[0]['piutang']);
+            $ccr_tahun_lalu_prev_inflow = floatval($res2[0]['hn3']);
+            $ccr_tahun_lalu_prev =($ccr_tahun_lalu_prev_ar != 0 ? ($ccr_tahun_lalu_prev_inflow/$ccr_tahun_lalu_prev_ar)*100 : 0);
 
             $ccr_tahun_ini_ar = floatval($res[0]['tn3']);
             $ccr_tahun_ini_inflow = floatval($res[0]['pn3']);
             $ccr_tahun_ini =($ccr_tahun_ini_ar != 0 ? ($ccr_tahun_ini_inflow/$ccr_tahun_ini_ar)*100 : 0);
-            $ccr_tahun_ini_mom = floatval($res2[0]['bayar_ytm']);
-            $ccr_tahun_ini_yoy = floatval($res3[0]['bayar_ytm']); 
-
-            $ccr_periode_ar = floatval($res[0]['tn2']);
-            $ccr_periode_inflow = floatval($res[0]['pn2']);
-            $ccr_periode =($ccr_periode_ar != 0 ? ($ccr_periode_inflow/$ccr_periode_ar)*100 : 0);
+            $ccr_tahun_ini_prev_ar = floatval($res2[0]['tn3']);
+            $ccr_tahun_ini_prev_inflow = floatval($res2[0]['pn3']);
+            $ccr_tahun_ini_prev =($ccr_tahun_ini_prev_ar != 0 ? ($ccr_tahun_ini_prev_inflow/$ccr_tahun_ini_prev_ar)*100 : 0);
 
             $success['status'] = true;
             $success['message'] = "Success!";
@@ -238,27 +262,25 @@ class DashboardCCRController extends Controller {
                     'ar' => floatval(number_format((float)$ccr_total_ar, 2,'.', '')),
                     'inflow' => floatval(number_format((float)$ccr_total_inflow, 2,'.', '')),
                     'persentase' => floatval(number_format((float)$ccr_total, 2,'.', '')),
-                    'mom' => floatval(number_format((float)$ccr_total_mom, 2,'.', '')),
-                    'yoy' => floatval(number_format((float)$ccr_total_yoy, 2,'.', '')),
+                    'prev_ar' => floatval(number_format((float)$ccr_total_prev_ar, 2,'.', '')),
+                    'prev_inflow' => floatval(number_format((float)$ccr_total_prev_inflow, 2,'.', '')),
+                    'prev_persentase' => floatval(number_format((float)$ccr_total_prev, 2,'.', '')),
                 ],
                 "ccr_tahun_lalu" => [
                     'ar' => floatval(number_format((float)$ccr_tahun_lalu_ar, 2,'.', '')),
                     'inflow' => floatval(number_format((float)$ccr_tahun_lalu_inflow, 2,'.', '')),
                     'persentase' => floatval(number_format((float)$ccr_tahun_lalu, 2,'.', '')),
-                    'mom' => floatval(number_format((float)$ccr_tahun_lalu_mom, 2,'.', '')),
-                    'yoy' => floatval(number_format((float)$ccr_tahun_lalu_yoy, 2,'.', '')),
+                    'prev_ar' => floatval(number_format((float)$ccr_tahun_lalu_prev_ar, 2,'.', '')),
+                    'prev_inflow' => floatval(number_format((float)$ccr_tahun_lalu_prev_inflow, 2,'.', '')),
+                    'prev_persentase' => floatval(number_format((float)$ccr_tahun_lalu_prev, 2,'.', '')),
                 ],
                 "ccr_tahun_ini" => [
                     'ar' => floatval(number_format((float)$ccr_tahun_ini_ar, 2,'.', '')),
                     'inflow' => floatval(number_format((float)$ccr_tahun_ini_inflow, 2,'.', '')),
                     'persentase' => floatval(number_format((float)$ccr_tahun_ini, 2,'.', '')),
-                    'mom' => floatval(number_format((float)$ccr_tahun_ini_mom, 2,'.', '')),
-                    'yoy' => floatval(number_format((float)$ccr_tahun_ini_yoy, 2,'.', '')),
-                ],
-                "ccr_periode" => [
-                    'ar' => floatval(number_format((float)$ccr_periode_ar, 2,'.', '')),
-                    'inflow' => floatval(number_format((float)$ccr_periode_inflow, 2,'.', '')),
-                    'persentase' => floatval(number_format((float)$ccr_periode, 2,'.', ''))
+                    'prev_ar' => floatval(number_format((float)$ccr_tahun_ini_prev_ar, 2,'.', '')),
+                    'prev_inflow' => floatval(number_format((float)$ccr_tahun_ini_prev_inflow, 2,'.', '')),
+                    'prev_persentase' => floatval(number_format((float)$ccr_tahun_ini_prev, 2,'.', '')),
                 ],
             ];
 
