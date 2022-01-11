@@ -66,6 +66,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-piutang-box','DashYpt\DashboardPiutangController@getDataBox'); 
     $router->get('data-piutang-top','DashYpt\DashboardPiutangController@getTopPiutang'); 
     $router->get('data-piutang-bidang','DashYpt\DashboardPiutangController@getBidang');  
+    $router->get('data-piutang-komposisi','DashYpt\DashboardPiutangController@getKomposisiPiutang');  
+    $router->get('data-piutang-umur','DashYpt\DashboardPiutangController@getUmurPiutang');  
 
 
 });
