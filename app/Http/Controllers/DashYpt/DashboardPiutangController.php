@@ -278,7 +278,7 @@ class DashboardPiutangController extends Controller {
                         where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') $filter_param 
                         group by y.kode_lokasi,y.kode_pp	
                         )d on a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and c.kode_bidang in ('2','3','4','5') $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and c.kode_bidang in ('2','3','4','5') and a.nama not like '%SMK PAR%' and a.kode_pp <> 'YSPTF02' $filter_bidang
             order by isnull(b.total,0)-isnull(d.total,0) $sort ";
 
             $select = DB::connection($this->db)->select($sql);
