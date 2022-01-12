@@ -76,6 +76,7 @@ class DashboardPiutangController extends Controller {
                 $filter_bidang = " and p.kode_bidang not in ('1') ";
             }
 
+            // PIUTANG
             $sql = "select a.kode_lokasi,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from lokasi a 
             left join (select y.kode_lokasi,
@@ -138,6 +139,60 @@ class DashboardPiutangController extends Controller {
             $piu_thn_lalu = floatval($res2[0]['sak_total']);
             $piu_yoy = ($piu_thn_lalu != 0 ? (($piu_thn_ini - $piu_thn_lalu) / $piu_thn_lalu)*100 : 0);
 
+            // END PIUTANG
+
+            // PENGHAPUSAN
+            if((isset($r->kode_bidang) && $r->kode_bidang != "") || (isset($r->kode_pp) && $r->kode_pp != "")){
+                $sql3 = "
+                select a.kode_lokasi,sum(b.n4*-1) as n1
+                FROM dash_ypt_grafik_d a
+                INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' $filter_pp $filter_bidang
+                group by a.kode_lokasi
+                ";
+
+                $sql4 = "
+                select a.kode_lokasi,sum(b.n4*-1) as n1
+                FROM dash_ypt_grafik_d a
+                INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' $filter_pp $filter_bidang
+                group by a.kode_lokasi
+                ";
+            }else{
+                $sql3 = "
+                select a.kode_lokasi,sum(b.n4*-1) as n1
+                FROM dash_ypt_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' and b.periode='$periode'
+                group by a.kode_lokasi
+                ";
+
+                $sql4 = "
+                select a.kode_lokasi,sum(b.n4*-1) as n1
+                FROM dash_ypt_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' and b.periode='$periodelalu'
+                group by a.kode_lokasi
+                ";
+            }
+
+            $select3 = DB::connection($this->db)->select($sql3);
+            $res3 = json_decode(json_encode($select3),true);
+
+            $select4 = DB::connection($this->db)->select($sql4);
+            $res4 = json_decode(json_encode($select4),true);
+
+            $piu_hapus_thn_ini = floatval($res3[0]['n1']);
+            $piu_hapus_thn_lalu = floatval($res4[0]['n1']);
+            $piu_hapus_yoy = ($piu_hapus_thn_lalu != 0 ? (($piu_hapus_thn_ini - $piu_hapus_thn_lalu) / $piu_hapus_thn_lalu)*100 : 0);
+            // END PENGHAPUSAN
+
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
@@ -152,9 +207,9 @@ class DashboardPiutangController extends Controller {
                     'yoy_persentase' => 0
                 ],
                 "penghapusan_piutang" => [
-                    'nominal_tahun_ini' => 0,
-                    'nominal_tahun_lalu' => 0,
-                    'yoy_persentase' => 0
+                    'nominal_tahun_ini' => floatval(number_format((float)$piu_hapus_thn_ini, 2,'.', '')),
+                    'nominal_tahun_lalu' => floatval(number_format((float)$piu_hapus_thn_lalu, 2,'.', '')),
+                    'yoy_persentase' => floatval(number_format((float)$piu_hapus_yoy, 2,'.', '')),
                 ],
             ];
 
