@@ -149,7 +149,7 @@ class DashboardPiutangController extends Controller {
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' $filter_pp $filter_bidang
+                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' and b.periode='$periode' $filter_pp $filter_bidang
                 group by a.kode_lokasi
                 ";
 
@@ -159,7 +159,7 @@ class DashboardPiutangController extends Controller {
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' $filter_pp $filter_bidang
+                where a.kode_lokasi='$kode_lokasi' and a.kode_grafik='PI10' and a.kode_fs='FS1' and b.periode='$periodelalu' $filter_pp $filter_bidang
                 group by a.kode_lokasi
                 ";
             }else{
@@ -181,7 +181,8 @@ class DashboardPiutangController extends Controller {
                 group by a.kode_lokasi
                 ";
             }
-
+            $success['sql3'] = $sql3;
+            $success['sql4'] = $sql4;
             $select3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($select3),true);
 
