@@ -147,7 +147,7 @@ class DashboardPiutangController extends Controller {
 
             // END PIUTANG
 
-            // PENGHAPUSAN
+            // CADANGAN
             if((isset($r->kode_bidang) && $r->kode_bidang != "") || (isset($r->kode_pp) && $r->kode_pp != "")){
                 $sql3 = "
                 select a.kode_lokasi,sum(b.n4*-1) as n1
@@ -195,10 +195,10 @@ class DashboardPiutangController extends Controller {
             $select4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($select4),true);
 
-            $piu_hapus_thn_ini = floatval($res3[0]['n1']);
-            $piu_hapus_thn_lalu = floatval($res4[0]['n1']);
-            $piu_hapus_yoy = ($piu_hapus_thn_lalu != 0 ? (($piu_hapus_thn_ini - $piu_hapus_thn_lalu) / $piu_hapus_thn_lalu)*100 : 0);
-            // END PENGHAPUSAN
+            $piu_cadang_thn_ini = floatval($res3[0]['n1']);
+            $piu_cadang_thn_lalu = floatval($res4[0]['n1']);
+            $piu_cadang_yoy = ($piu_cadang_thn_lalu != 0 ? (($piu_cadang_thn_ini - $piu_cadang_thn_lalu) / $piu_cadang_thn_lalu)*100 : 0);
+            // END CADANGAN
 
             $success['status'] = true;
             $success['message'] = "Success!";
@@ -209,14 +209,14 @@ class DashboardPiutangController extends Controller {
                     'yoy_persentase' => floatval(number_format((float)$piu_yoy, 2,'.', '')),
                 ],
                 "cadangan_piutang" => [
-                    'nominal_tahun_ini' => 0,
-                    'nominal_tahun_lalu' => 0,
-                    'yoy_persentase' => 0
+                    'nominal_tahun_ini' => floatval(number_format((float)$piu_cadang_thn_ini, 2,'.', '')),
+                    'nominal_tahun_lalu' => floatval(number_format((float)$piu_cadang_thn_lalu, 2,'.', '')),
+                    'yoy_persentase' => floatval(number_format((float)$piu_cadang_yoy, 2,'.', '')),
                 ],
                 "penghapusan_piutang" => [
-                    'nominal_tahun_ini' => floatval(number_format((float)$piu_hapus_thn_ini, 2,'.', '')),
-                    'nominal_tahun_lalu' => floatval(number_format((float)$piu_hapus_thn_lalu, 2,'.', '')),
-                    'yoy_persentase' => floatval(number_format((float)$piu_hapus_yoy, 2,'.', '')),
+                    'nominal_tahun_ini' => 0,
+                    'nominal_tahun_lalu' => 0,
+                    'yoy_persentase' => 0,
                 ],
             ];
 
