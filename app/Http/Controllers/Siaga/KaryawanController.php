@@ -30,7 +30,8 @@ class KaryawanController extends Controller
 
             $res = DB::connection($this->db)->select("select a.nik,a.nama,a.grade as band,a.jabatan,a.status,a.no_telp,a.no_hp,a.email,a.alamat,a.kode_pp+' - '+b.nama as pp 
             from karyawan a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi  
-            where a.flag_aktif='1' and a.status<>'CLIENT' and a.kode_lokasi='".$kode_lokasi."' order by a.nik
+            where a.flag_aktif='1' --and a.status<>'CLIENT' 
+            and a.kode_lokasi='".$kode_lokasi."' order by a.nik
             ");
             $res = json_decode(json_encode($res),true);
             
