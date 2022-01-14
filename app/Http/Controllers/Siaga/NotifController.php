@@ -85,7 +85,7 @@ class NotifController extends Controller
 			$sql = "select top 5 no_bukti as id,judul,subjudul,pesan,tgl_input,sts_kirim as status,icon,convert(varchar,tgl_input,103) as tgl, convert(varchar,tgl_input,108) as jam
 			from app_notif_m
 			where nik='$nik' and sts_kirim in ('1')
-			order by id desc
+			order by tgl_input desc
 			";
 
 			$get = DB::connection($this->db)->select($sql);

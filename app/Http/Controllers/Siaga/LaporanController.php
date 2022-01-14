@@ -102,16 +102,15 @@ class LaporanController extends Controller
             
             $no_bukti = $request->no_bukti[1];
 
-            $sql="select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,b.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_pb as no_bukti,'Pengajuan' as status,-4 as nu, '-' as urut,a.keterangan
+            $sql="select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,a.jab1 as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_pb as no_bukti,'Pengajuan' as status,-4 as nu, '-' as urut,a.keterangan
 			from gr_pb_m a
-            inner join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
-			inner join apv_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
+            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti'
 			union all
-			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.keterangan
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,case a.no_urut when 1 then b.jab2 when 2 then b.jab3 when 3 then b.jab4 when 4 then b.jab5 else '-' end as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.keterangan
             from apv_flow a
-            inner join apv_jab b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
-            inner join apv_karyawan c on a.kode_jab=c.kode_jab and a.kode_lokasi=c.kode_lokasi and a.nik=c.nik
+			inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+            inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
 			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
             ";
