@@ -113,6 +113,7 @@ class LaporanController extends Controller
             inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
 			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+            order by urut
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -313,6 +314,7 @@ class LaporanController extends Controller
             inner join karyawan c on a.kode_lokasi=c.kode_lokasi and a.nik=c.nik
 			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+            order by urut
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
