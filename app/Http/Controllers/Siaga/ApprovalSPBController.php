@@ -802,7 +802,7 @@ class ApprovalSPBController extends Controller
                 $id = $id;
             }
 
-            $sql="select a.id,a.no_bukti,a.tanggal,b.nama,b.nilai,b.keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = 'R' then 'Return' end as status
+            $sql="select a.id,a.no_bukti,a.tanggal,b.nama,b.nilai,b.keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Returned' end as status
             from apv_pesan a
             inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
             inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut and a.kode_lokasi=e.kode_lokasi
