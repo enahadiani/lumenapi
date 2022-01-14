@@ -496,7 +496,7 @@ class ApprovalSPBController extends Controller
                 $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
                 $result = json_decode(json_encode($result),true);
                 if(isset($app_email) && $app_email != "-"){
-                    $pesan_header = "Pengajuan $no_bukti berikut telah di return oleh $nik_user ";
+                    $pesan_header = "Pengajuan $no_bukti berikut telah di return oleh $nik_user, menunggu approval Anda:";
 
                     if(count($result['original']['data']) > 0){
                    
