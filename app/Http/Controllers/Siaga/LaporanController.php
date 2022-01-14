@@ -308,7 +308,7 @@ class LaporanController extends Controller
 			left join kug_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_spb='$no_bukti'
 			union all
-			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,,case a.no_urut when 1 then 'Mgr Kug' when 2 then 'VP Kug' when 3 then 'Dir Kug' else '-' end as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.keterangan
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,case a.no_urut when 1 then 'Mgr Kug' when 2 then 'VP Kug' when 3 then 'Dir Kug' else '-' end as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.keterangan
             from apv_flow a
             inner join karyawan c on a.kode_lokasi=c.kode_lokasi and a.nik=c.nik
 			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
