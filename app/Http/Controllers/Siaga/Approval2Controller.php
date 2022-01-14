@@ -362,7 +362,7 @@ class Approval2Controller extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join karyawan b on a.kode_jab=b.kode_jab and a.kode_lokasi=b.kode_lokasi
+                    left join karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
 
                     $rs = DB::connection($this->db)->select($sqlapp);
@@ -486,7 +486,7 @@ class Approval2Controller extends Controller
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
-                    left join karyawan b on a.kode_jab=b.kode_jab 
+                    left join karyawan b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
                     where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi' ";
                     $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
