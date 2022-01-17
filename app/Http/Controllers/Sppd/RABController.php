@@ -419,9 +419,9 @@ class RABController extends Controller
             $no_app = $this->generateKode("tu_pdapp_m", "no_app", $kode_lokasi."-PDA".substr($periode,2,4).".", "0001");
 
             // SAVE LOG TO DB
-            $log = print_r($request->all(), true); 
-            $save_log = DB::connection($this->db)->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
-            values ('$no_bukti','$kode_lokasi',getdate(),'$nik','".$log."') ");
+            $log = print_r($request->input(), true); 
+            $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+            values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'AJUBEBAN'));
             // END SAVE
 
             $detail_proyek = $this->getDetailProyek($datam['kode_proyek'],$no_bukti);

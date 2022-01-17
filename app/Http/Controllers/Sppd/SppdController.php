@@ -347,9 +347,9 @@ class SppdController extends Controller
                 $no_bukti = $this->generateKode("tu_pdapp_m", "no_app", $kode_lokasi."-PDA".substr($datam[0]['periode'],2,4).".", "0001");
 
                 // SAVE LOG TO DB
-                $log = print_r($request->all(), true); 
-                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
-                values ('$no_agenda','$kode_lokasi',getdate(),'$nik','".$log."') ");
+                $log = print_r($request->input(), true); 
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+                values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KEEP'));
                 // END SAVE
     
                 $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
@@ -549,9 +549,9 @@ class SppdController extends Controller
                 $no_bukti = $this->generateKode("tu_pdapp_m", "no_app", $kode_lokasi."-PDA".substr($datam[0]['periode'],2,4).".", "0001");
 
                 // SAVE LOG TO DB
-                $log = print_r($request->all(), true); 
-                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog)
-                values ('$no_agenda','$kode_lokasi',getdate(),'$nik','".$log."') ");
+                $log = print_r($request->input(), true); 
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+                values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KEEP21'));
                 // END SAVE
     
                 $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
@@ -738,7 +738,12 @@ class SppdController extends Controller
 
                 $cek2 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress in ('A','R')  ");
                 if(count($cek2) > 0){
-                    
+
+                    // SAVE LOG TO DB
+                    $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+                    values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'','RELEASE'));
+                    // END SAVE
+
                     $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
                     $del2 = DB::connection('sqlsrvypt')->table('it_aju_d')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
                     $del3 = DB::connection('sqlsrvypt')->table('it_aju_rek')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
@@ -748,6 +753,7 @@ class SppdController extends Controller
                     $del7 = DB::connection('sqlsrvypt')->table('tu_pdapp_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
                     $del8 = DB::connection('sqlsrvypt')->table('it_aju_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_agenda)->delete();
                     DB::connection('sqlsrvypt')->commit();
+
                     $success['no_agenda']=$no_agenda;
                     $success['status'] = true;
                     $success['message'] = "Release Budget Sukses";
@@ -824,6 +830,13 @@ class SppdController extends Controller
             $periode = json_decode(json_encode($periode),true);
 
             if(count($cek) > 0){
+
+                // SAVE LOG TO DB
+                $log = print_r($request->input(), true); 
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+                values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KIRIM'));
+                // END SAVE
+
                 $no_app = generateKode("it_ajuapp_m", "no_app", $kode_lokasi."-APP".substr($periode[0]['periode'],2,2).".", "00001");
 
                 $sql = DB::connection('sqlsrvypt')->insert("insert into it_ajuapp_m(no_app,no_aju,kode_lokasi,periode,tgl_input,user_input,tgl_aju,nik_terima) values 
