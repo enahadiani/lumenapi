@@ -420,7 +420,7 @@ class RABController extends Controller
 
             // SAVE LOG TO DB
             $log = print_r($request->input(), true); 
-            $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+            $save_log = DB::connection($this->db)->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
             values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'AJUBEBAN'));
             // END SAVE
 
