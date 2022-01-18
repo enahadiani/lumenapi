@@ -35,6 +35,7 @@ class AdminTsController extends Controller
             $nik= $data->nik;
             $kode_lokasi= $data->kode_lokasi;
             $status_login = $data->status_login;
+            $kode_pp = $data->kode_pp;
 
             if($status_login == "S"){
                 $user = DB::connection($this->db)->select("select a.nik, a.kode_menu, a.kode_lokasi, a.kode_pp, b.nis, b.nama, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background, a.status_login, b.kode_kelas, isnull(e.form,'-') as path_view,x.nama as nama_pp,isnull(b.email,'-') as email,isnull(b.hp_siswa,'-')  as no_hp,a.pass,isnull(convert(varchar,b.tgl_lahir,103),'-') as tgl_lahir,a.pass as password,a.kode_menu as kode_klp_menu,a.status_login as status_admin,f.nama as nmlok,f.logo,'-' as jabatan,isnull(b.agama,'-') as agama,isnull(b.jk,'-') as jk,isnull(b.tmp_lahir,'-') as tmp_lahir
@@ -43,7 +44,7 @@ class AdminTsController extends Controller
                 left join m_form e on a.path_view=e.kode_form  
                 inner join lokasi f on a.kode_lokasi = f.kode_lokasi 
                 left join pp x on a.kode_pp=x.kode_pp and a.kode_lokasi=x.kode_lokasi
-                where a.nik='$nik' 
+                where a.nik='$nik' and a.kode_pp='$kode_pp'
                 ");
             }else if($status_login == "G"){
                 $user = DB::connection($this->db)->select("select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password,'-' as agama,'-' as jk,'-' as tmp_lahir
@@ -52,7 +53,7 @@ class AdminTsController extends Controller
                 inner join sis_guru c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
                 inner join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
                 inner join m_form e on a.path_view=e.kode_form 
-                where a.nik='$nik' 
+                where a.nik='$nik' and a.kode_pp='$kode_pp'
                 ");
             }else{
                 // select a.kode_menu as kode_klp_menu, a.nik, c.nama, a.status_login as status_admin, a.kode_lokasi,b.nama as nmlok, a.kode_pp,d.nama as nama_pp, isnull(a.foto,'-') as foto,isnull(a.background,'-') as background,isnull(e.form,'-') as path_view,b.logo,c.no_hp,'-' as jabatan,a.pass as password
@@ -70,7 +71,7 @@ class AdminTsController extends Controller
                 left join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi 
                 left join pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi 
                 left join m_form e on a.path_view=e.kode_form 
-                where a.nik='$nik' 
+                where a.nik='$nik' and a.kode_pp='$kode_pp'
                 ");
             }
             $user = json_decode(json_encode($user),true);
@@ -532,6 +533,37 @@ class AdminTsController extends Controller
             $success['message'] = "Data Pribadi Siswa gagal diubah ".$e;
             return response()->json($success, 200); 
         }	
+    }
+
+    public function getSekolah(Request $request)
+    {
+        try {
+
+            $nis = $request->nis;
+
+            $res = DB::connection($this->db)->select("SELECT a.kode_pp,a.nama from sis_sekolah a left join sis_hakakses b on a.kode_pp = b.kode_pp where a.kode_lokasi = '12' and b.nik='$nis' order by a.kode_pp
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['pp'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, 200);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['pp'] = [];
+                $success['status'] = true;
+                return response()->json($success, 200);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['pp'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
+        
     }
 
 }

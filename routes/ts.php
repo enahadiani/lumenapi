@@ -23,6 +23,7 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
     $router->post('logout', 'AuthController@logoutTs');
     
     $router->get('pp-list','Ts\DashSiswaController@getPP');
+    $router->get('sekolah', 'AdminTsController@getSekolah');
 
 });
 
