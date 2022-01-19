@@ -39,7 +39,7 @@ class HashPasswordController extends Controller
             $res = DB::connection($this->db)->select("
             select 0 AS no,a.kode_pp, b.nama,count(a.nik) as jumlah
             from sis_hakakses a
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+            left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.password is null
             group by a.kode_pp,b.nama ");
             $res = json_decode(json_encode($res),true);
