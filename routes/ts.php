@@ -115,6 +115,9 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->put('cancel-mandiri-bill','Ts\BayarMandiriController@update');
     $router->delete('delete-mandiri-bill','Ts\BayarMandiriController@destroy');
     $router->get('cek-mandiri-bill','Ts\BayarMandiriController@cekBill');
+
+    $router->get('hash-pass-pp','Ts\HashPasswordController@index');
+    $router->get('hash-pass-pp-batch','Ts\HashPasswordController@getBatch');
     
     
 });

@@ -1191,12 +1191,12 @@ class AuthController extends Controller
             set_time_limit(300);
             foreach ($users as $user) {
                 $sql .= " update $table set password = '" . app('hash')->make($user->pass) . "' where nik='$user->nik' and password is null ";
-                if ($i % 1000 == 0) {
+                if ($i % 100 == 0) {
                     $sql = $begin . $sql . $commit;
                     $ins[] = DB::connection($db)->update($sql);
                     $sql = "";
                 }
-                if ($i == count($users) && ($i % 1000 != 0)) {
+                if ($i == count($users) && ($i % 100 != 0)) {
                     $sql = $begin . $sql . $commit;
                     $ins[] = DB::connection($db)->update($sql);
                     $sql = "";
