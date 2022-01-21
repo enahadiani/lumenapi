@@ -324,6 +324,8 @@ class Approval2Controller extends Controller
             // $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             // $get = DB::connection($this->db)->select("select isnull(max(id)+1,1) as no_app from apv_pesan where kode_lokasi='$kode_lokasi' ");
             // $no_app = (isset($get[0]->no_app) ? $get[0]->no_app : 1);
+            date_default_timezone_set('Asia/Jakarta');
+            $tgl = date('Y-m-d H:i:s');
 
             $no_bukti = $request->input('no_aju');
             $nik_buat = "";
@@ -331,13 +333,13 @@ class Approval2Controller extends Controller
             $nik_app = $nik_user;
             $token_player = array();
             $token_player2 = array();
-            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$request->input('keterangan')."','".$request->input('tanggal')."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
+            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$request->input('keterangan')."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
 
             $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
             ->where('kode_lokasi', $kode_lokasi)
             ->where('no_urut', $request->input('no_urut'))
-            ->update(['status' => $request->input('status'),'tgl_app'=>$request->input('tanggal')]);
+            ->update(['status' => $request->input('status'),'tgl_app'=>$tgl]);
 
             $max = DB::connection($this->db)->select("select max(no_urut) as nu from apv_flow where no_bukti='".$no_bukti."' and kode_lokasi='$kode_lokasi' 
             ");
@@ -354,7 +356,7 @@ class Approval2Controller extends Controller
                 ->where('no_bukti', $no_bukti)    
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
-                ->update(['status' => '1','tgl_app'=>$request->input('tanggal')]);
+                ->update(['status' => '1','tgl_app'=>$tgl]);
                 
                 //send to App selanjutnya
                 if($request->no_urut != $max[0]['nu']){
