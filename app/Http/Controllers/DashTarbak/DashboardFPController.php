@@ -15,8 +15,8 @@ class DashboardFPController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'yptkug';
-    public $sql = 'sqlsrvyptkug';
+    public $guard = 'tarbak';
+    public $sql = 'sqlsrvtarbak';
 
     private function filterReq($request,$col_array,$db_col_name,$where,$this_in){
         for($i = 0; $i<count($col_array); $i++){
