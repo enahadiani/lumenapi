@@ -697,7 +697,7 @@ class DashboardFPController extends Controller
             case when ISNULL(b.beban_n5,0) <> 0 then ((ISNULL(b.beban_n4,0)-ISNULL(b.beban_n5,0))/ISNULL(b.beban_n5,0))*100 else 0 end AS beban_yoy,
             case when ISNULL(b.shu_n2,0) <> 0 then (ISNULL(b.shu_n4,0)/ISNULL(b.shu_n2,0))*100 else 0 end AS shu_ach, 
             case when ISNULL(b.shu_n5,0) <> 0 then ((ISNULL(b.shu_n4,0)-ISNULL(b.shu_n5,0))/ISNULL(b.shu_n5,0))*100 else 0 end AS shu_yoy,
-            case when ISNULL(b.or_n2,0) <> 0 then (ISNULL(b.or_n4,0)/ISNULL(b.or_n2,0))*100 else 0 end AS or_ach, 
+            case when ISNULL(b.or_n4,0) <> 0 then (ISNULL(b.or_n2,0)/ISNULL(b.or_n4,0))*100 else 0 end AS or_ach, 
             case when ISNULL(b.or_n5,0) <> 0 then ((ISNULL(b.or_n4,0)-ISNULL(b.or_n5,0))/ISNULL(b.or_n5,0))*100 else 0 end AS or_yoy
                         from dash_ypt_lokasi a
                         LEFT JOIN (SELECT a.kode_lokasi,
@@ -793,22 +793,42 @@ class DashboardFPController extends Controller
                 $n5 = "n5";
             }
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (
-                SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
-                CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+            if(isset($r->kode_grafik) && $r->kode_grafik[1] == "PI04"){
+
+                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                ISNULL(b.capai,0) as capai,a.skode
+                FROM dash_ypt_lokasi a
+                LEFT JOIN (
+                    SELECT a.kode_lokasi,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                    CASE WHEN sum(b.$n4)<>0 THEN (sum(b.$n2)/sum(b.$n4))*100 ELSE 0 END AS capai
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                    $where
+                    GROUP BY a.kode_lokasi
+                ) b ON a.kode_lokasi=b.kode_lokasi
+                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+            }else{
+                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                ISNULL(b.capai,0) as capai,a.skode
+                FROM dash_ypt_lokasi a
+                LEFT JOIN (
+                    SELECT a.kode_lokasi,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                    CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                    $where
+                    GROUP BY a.kode_lokasi
+                ) b ON a.kode_lokasi=b.kode_lokasi
+                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+            }
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -881,22 +901,41 @@ class DashboardFPController extends Controller
                 $n5 = "n5";
             }
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-            ISNULL(b.capai,0) as capai,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (
-                SELECT a.kode_lokasi,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
-                CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
-                FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+            if(isset($r->kode_grafik) && $r->kode_grafik[1] == "PI04"){
+                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                ISNULL(b.capai,0) as capai,a.skode
+                FROM dash_ypt_lokasi a
+                LEFT JOIN (
+                    SELECT a.kode_lokasi,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                    CASE WHEN sum(b.$n4)<>0 THEN (sum(b.$n2)/sum(b.$n4))*100 ELSE 0 END AS capai
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                    $where
+                    GROUP BY a.kode_lokasi
+                ) b ON a.kode_lokasi=b.kode_lokasi
+                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+            }else{
+                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                ISNULL(b.capai,0) as capai,a.skode
+                FROM dash_ypt_lokasi a
+                LEFT JOIN (
+                    SELECT a.kode_lokasi,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                    SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                    CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
+                    FROM dash_ypt_grafik_d a
+                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                    $where
+                    GROUP BY a.kode_lokasi
+                ) b ON a.kode_lokasi=b.kode_lokasi
+                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+            }
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);

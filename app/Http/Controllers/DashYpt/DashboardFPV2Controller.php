@@ -90,7 +90,7 @@ class DashboardFPV2Controller extends Controller {
             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
             SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
-            CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END AS ach,
+            CASE a.kode_grafik when 'PI04' then (CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE (sum(b.$n2)/sum(b.$n4))*100 END) else ( CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END) END AS ach,
             CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
             FROM dash_ypt_grafik_d a
             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
