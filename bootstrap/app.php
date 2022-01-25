@@ -882,4 +882,40 @@ $app->router->group([
     require __DIR__ . '/../routes/dash-ypt/dash.php';
 });
 
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-tarbak'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-tarbak/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-tarbak-master'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-tarbak/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-tarbak-trans'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-tarbak/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-tarbak-report'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-tarbak/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-tarbak-dash'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-tarbak/dash.php';
+});
+
 return $app;
