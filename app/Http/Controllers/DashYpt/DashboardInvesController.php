@@ -69,9 +69,9 @@ class DashboardInvesController extends Controller {
                 $filter_neraca = "";
             }
             $sql = "select a.kode_lokasi,sum(a.n1) as rka_tahun,sum(a.n2) as rka_bulan,sum(a.n6) as real_bulan,sum(a.n7) as real_rev,
-            case when sum(a.n3) <> 0 then (sum(a.n4)/sum(a.n3))*100 else 0 end as capai_ytd,
-            case when sum(a.n1) <> 0 then (sum(a.n4)/sum(a.n1))*100 else 0 end as capai_tahun,
-            case when sum(a.n5) <> 0 then ((sum(a.n4)-sum(a.n5))/sum(a.n5))*100 else 0 end as yoy
+            case when sum(a.n2) <> 0 then (sum(a.n6)/sum(a.n2))*100 else 0 end as capai_ytd,
+            case when sum(a.n1) <> 0 then (sum(a.n6)/sum(a.n1))*100 else 0 end as capai_tahun,
+            case when sum(a.n7) <> 0 then ((sum(a.n6)-sum(a.n7))/sum(a.n7))*100 else 0 end as yoy
             from exs_neraca a
             inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca and a.kode_fs=b.kode_fs
             $where and b.kode_dash='DP02' $filter_neraca
