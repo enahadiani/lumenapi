@@ -319,6 +319,7 @@ class DashboardCFController extends Controller {
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -335,15 +336,15 @@ class DashboardCFController extends Controller {
             $db_col_name = array('b.periode');
             $where = "where a.kode_grafik='PI08' ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
-            $sql = "select a.kode_lokasi,a.nama,a.skode,isnull(b.so_akhir,0) as so_akhir
-            from dash_ypt_lokasi a
-            left join (select a.kode_lokasi,sum(b.n4) as so_akhir
+            $sql = "select a.kode_pp,a.nama,a.skode,isnull(b.so_akhir,0) as so_akhir
+            from dash_ypt_pp a
+            left join (select a.kode_lokasi,b.kode_pp,sum(b.n4) as so_akhir
                     from dash_ypt_grafik_d a
-                    inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
+                    inner join exs_neraca_pp b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
                     $where and a.kode_fs='FS1'
-                    group by a.kode_lokasi
-            )b on a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi in ('11','12','13','14','15','20')
+                    group by a.kode_lokasi,b.kode_pp
+            )b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            where a.kode_lokasi = '$kode_lokasi' and a.kode_pp in ('02','03','04','05','06')
             ";
 
             $select = DB::connection($this->db)->select($sql);
