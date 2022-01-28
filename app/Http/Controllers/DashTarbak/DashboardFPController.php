@@ -582,14 +582,14 @@ class DashboardFPController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp = '$r->kode_pp' ";
             }else{
-                $filter_lokasi = "";
+                $filter_pp = "";
             }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
+            $where = "WHERE a.kode_lokasi = '$kode_lokasi' AND a.kode_fs='FS1' ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             if(isset($r->jenis) && $r->jenis != ""){
@@ -602,20 +602,20 @@ class DashboardFPController extends Controller
                 $n4 = "n4";
             }
 
-            $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.pdpt,0) AS pdpt, ISNULL(b.beban,0) AS beban, 
+            $sql = "SELECT a.kode_pp, a.nama, ISNULL(b.pdpt,0) AS pdpt, ISNULL(b.beban,0) AS beban, 
             ISNULL(b.shu,0) AS shu,a.skode
-            FROM dash_ypt_lokasi a
-            LEFT JOIN (SELECT a.kode_lokasi,
+            FROM dash_ypt_pp a
+            LEFT JOIN (SELECT b.kode_pp,a.kode_lokasi,
                 SUM(CASE WHEN a.kode_grafik='PI01' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS pdpt,
                 SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS beban,
                 SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS shu		
                 FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
-                GROUP BY a.kode_lokasi
-            ) b ON a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                GROUP BY a.kode_lokasi,b.kode_pp
+            ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+            WHERE a.kode_lokasi ='$kode_lokasi' $filter_pp";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -643,8 +643,7 @@ class DashboardFPController extends Controller
                 'kategori' => $ctg,
                 'data_pdpt' => $data_pdpt,
                 'data_beban' => $data_beban,
-                'data_shu' => $data_shu,
-                'lokasi' => $filter_lokasi
+                'data_shu' => $data_shu
             ];
 
             return response()->json($success, $this->successStatus); 
@@ -664,14 +663,14 @@ class DashboardFPController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp = '$r->kode_pp' ";
             }else{
-                $filter_lokasi = "";
+                $filter_pp = "";
             }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
+            $where = "WHERE a.kode_lokasi ='$kode_lokasi' AND a.kode_fs='FS1' $filter_pp";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             if(isset($r->jenis) && $r->jenis != ""){
@@ -690,7 +689,7 @@ class DashboardFPController extends Controller
                 $n5 = "n5";
             }
 
-            $sql = "SELECT a.kode_lokasi, a.nama, a.skode,
+            $sql = "SELECT a.kode_pp, a.nama, a.skode,
             case when ISNULL(b.pdpt_n2,0) <> 0 then (ISNULL(b.pdpt_n4,0)/ISNULL(b.pdpt_n2,0))*100 else 0 end AS pdpt_ach, 
             case when ISNULL(b.pdpt_n5,0) <> 0 then ((ISNULL(b.pdpt_n4,0)-ISNULL(b.pdpt_n5,0))/ISNULL(b.pdpt_n5,0))*100 else 0 end AS pdpt_yoy,
             case when ISNULL(b.beban_n2,0) <> 0 then (ISNULL(b.beban_n4,0)/ISNULL(b.beban_n2,0))*100 else 0 end AS beban_ach, 
@@ -699,8 +698,8 @@ class DashboardFPController extends Controller
             case when ISNULL(b.shu_n5,0) <> 0 then ((ISNULL(b.shu_n4,0)-ISNULL(b.shu_n5,0))/ISNULL(b.shu_n5,0))*100 else 0 end AS shu_yoy,
             case when ISNULL(b.or_n4,0) <> 0 then (ISNULL(b.or_n2,0)/ISNULL(b.or_n4,0))*100 else 0 end AS or_ach, 
             case when ISNULL(b.or_n5,0) <> 0 then ((ISNULL(b.or_n4,0)-ISNULL(b.or_n5,0))/ISNULL(b.or_n5,0))*100 else 0 end AS or_yoy
-                        from dash_ypt_lokasi a
-                        LEFT JOIN (SELECT a.kode_lokasi,
+                        from dash_ypt_pp a
+                        LEFT JOIN (SELECT a.kode_lokasi,b.kode_pp,
                             SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n4 ELSE 0 END) AS pdpt_n4,
                             SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n2 ELSE 0 END) AS pdpt_n2,
                             SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n5 ELSE 0 END) AS pdpt_n5,
@@ -714,12 +713,12 @@ class DashboardFPController extends Controller
                             SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n2 ELSE 0 END) AS or_n2,
                             SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n5 ELSE 0 END) AS or_n5
                             FROM dash_ypt_grafik_d a
-                            INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                            INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                            $where $filter_lokasi
-                            GROUP BY a.kode_lokasi
-                        ) b on a.kode_lokasi=b.kode_lokasi
-                        WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                            $where $filter_pp
+                            GROUP BY a.kode_lokasi,b.kode_pp
+                        ) b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                        WHERE a.kode_lokasi='$kode_lokasi' $filter_pp";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -729,7 +728,7 @@ class DashboardFPController extends Controller
                 
                 $name = $item['skode'];
                 $perform = [
-                    "kode_lokasi" => $item['kode_lokasi'],
+                    "kode_pp" => $item['kode_pp'],
                     "nama" => $name,
                     "pdpt_ach" => floatval(number_format((float)$item['pdpt_ach'], 2,'.', '')),
                     "pdpt_yoy" => floatval(number_format((float)$item['pdpt_yoy'], 2,'.', '')),
@@ -766,15 +765,15 @@ class DashboardFPController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp = '$r->kode_pp' ";
             }else{
-                $filter_lokasi = "";
+                $filter_pp = "";
             }
 
             $col_array = array('periode', 'kode_grafik');
             $db_col_name = array('b.periode', 'a.kode_grafik');
-            $where = "WHERE a.kode_fs = 'FS1' $filter_lokasi";
+            $where = "WHERE a.kode_fs = 'FS1'  ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             if(isset($r->jenis) && $r->jenis != ""){
@@ -795,39 +794,39 @@ class DashboardFPController extends Controller
 
             if(isset($r->kode_grafik) && $r->kode_grafik[1] == "PI04"){
 
-                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                $sql = "SELECT a.kode_pp, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
                 ISNULL(b.capai,0) as capai,a.skode
-                FROM dash_ypt_lokasi a
+                FROM dash_ypt_pp a
                 LEFT JOIN (
-                    SELECT a.kode_lokasi,
+                    SELECT a.kode_lokasi,b.kode_pp,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
                     CASE WHEN sum(b.$n4)<>0 THEN (sum(b.$n2)/sum(b.$n4))*100 ELSE 0 END AS capai
                     FROM dash_ypt_grafik_d a
-                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     $where
-                    GROUP BY a.kode_lokasi
-                ) b ON a.kode_lokasi=b.kode_lokasi
-                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                    GROUP BY a.kode_lokasi,b.kode_pp
+                ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                WHERE a.kode_lokasi ='$kode_lokasi' $filter_pp ";
             }else{
-                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                $sql = "SELECT a.kode_pp, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
                 ISNULL(b.capai,0) as capai,a.skode
-                FROM dash_ypt_lokasi a
+                FROM dash_ypt_pp a
                 LEFT JOIN (
-                    SELECT a.kode_lokasi,
+                    SELECT a.kode_lokasi,b.kode_pp,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
                     CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
                     FROM dash_ypt_grafik_d a
-                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     $where
-                    GROUP BY a.kode_lokasi
-                ) b ON a.kode_lokasi=b.kode_lokasi
-                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                    GROUP BY a.kode_lokasi,b.kode_pp
+                ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                WHERE a.kode_lokasi ='$kode_lokasi' $filter_pp ";
             }
 
             $select = DB::connection($this->sql)->select($sql);
@@ -875,14 +874,14 @@ class DashboardFPController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $filter_lokasi = " and a.kode_lokasi = '$r->kode_lokasi' ";
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp = '$r->kode_pp' ";
             }else{
-                $filter_lokasi = "";
+                $filter_pp = "";
             }
             $col_array = array('periode','kode_grafik');
             $db_col_name = array('b.periode','a.kode_grafik');
-            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi ";
+            $where = "WHERE a.kode_lokasi ='$kode_lokasi' AND a.kode_fs='FS1' $filter_pp ";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             if(isset($r->jenis) && $r->jenis != ""){
@@ -902,39 +901,39 @@ class DashboardFPController extends Controller
             }
 
             if(isset($r->kode_grafik) && $r->kode_grafik[1] == "PI04"){
-                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                $sql = "SELECT a.kode_pp, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
                 ISNULL(b.capai,0) as capai,a.skode
-                FROM dash_ypt_lokasi a
+                FROM dash_ypt_pp a
                 LEFT JOIN (
-                    SELECT a.kode_lokasi,
+                    SELECT a.kode_lokasi,b.kode_pp,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
                     CASE WHEN sum(b.$n4)<>0 THEN (sum(b.$n2)/sum(b.$n4))*100 ELSE 0 END AS capai
                     FROM dash_ypt_grafik_d a
-                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     $where
-                    GROUP BY a.kode_lokasi
-                ) b ON a.kode_lokasi=b.kode_lokasi
-                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                    GROUP BY a.kode_lokasi,b.kode_pp
+                ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                WHERE a.kode_lokasi ='$kode_lokasi' $filter_pp";
             }else{
-                $sql = "SELECT a.kode_lokasi, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                $sql = "SELECT a.kode_pp, a.nama, ISNULL(b.n2,0) AS n2, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
                 ISNULL(b.capai,0) as capai,a.skode
-                FROM dash_ypt_lokasi a
+                FROM dash_ypt_pp a
                 LEFT JOIN (
-                    SELECT a.kode_lokasi,
+                    SELECT a.kode_lokasi,b.kode_pp,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
                     SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
                     CASE WHEN sum(b.$n2)<>0 THEN (sum(b.$n4)/sum(b.$n2))*100 ELSE 0 END AS capai
                     FROM dash_ypt_grafik_d a
-                    INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                    INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     $where
-                    GROUP BY a.kode_lokasi
-                ) b ON a.kode_lokasi=b.kode_lokasi
-                WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                    GROUP BY a.kode_lokasi,b.kode_pp
+                ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
+                WHERE a.kode_lokasi ='$kode_lokasi' $filter_pp";
             }
 
             $select = DB::connection($this->sql)->select($sql);
@@ -1030,6 +1029,7 @@ class DashboardFPController extends Controller
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

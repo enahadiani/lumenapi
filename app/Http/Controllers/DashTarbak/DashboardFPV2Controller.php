@@ -14,8 +14,8 @@ class DashboardFPV2Controller extends Controller {
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'yptkug';
-    public $sql = 'sqlsrvyptkug';
+    public $guard = 'tarbak';
+    public $sql = 'sqlsrvtarbak';
 
     private function filterReq($request,$col_array,$db_col_name,$where,$this_in){
         for($i = 0; $i<count($col_array); $i++){
@@ -59,12 +59,6 @@ class DashboardFPV2Controller extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
-                $lokasi = $r->kode_lokasi;
-            }else{
-                $lokasi = $kode_lokasi;
-            }
-
             if(isset($r->jenis) && $r->jenis != ""){
                 if($r->jenis == "PRD"){
                     $n4 = "n6";
@@ -83,20 +77,37 @@ class DashboardFPV2Controller extends Controller {
             
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi='$lokasi' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
+            $where = "WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1' AND a.kode_grafik in ('PI01','PI02','PI03','PI04')";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
-            $sql = "SELECT a.kode_grafik, c.nama,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
-            SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
-            CASE a.kode_grafik when 'PI04' then (CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE (sum(b.$n2)/sum(b.$n4))*100 END) else ( CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END) END AS ach,
-            CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
-            FROM dash_ypt_grafik_d a
-            INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
-            INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-            $where
-            group by a.kode_grafik, c.nama ";
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and b.kode_pp='$r->kode_pp' ";
+                $sql = "SELECT a.kode_grafik, c.nama,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                CASE a.kode_grafik when 'PI04' then (CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE (sum(b.$n2)/sum(b.$n4))*100 END) else ( CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END) END AS ach,
+                CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
+                FROM dash_ypt_grafik_d a
+                INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where $filter_pp
+                group by a.kode_grafik, c.nama ";
+            }else{
+
+                $sql = "SELECT a.kode_grafik, c.nama,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
+                CASE a.kode_grafik when 'PI04' then (CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE (sum(b.$n2)/sum(b.$n4))*100 END) else ( CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END) END AS ach,
+                CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
+                FROM dash_ypt_grafik_d a
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
+                $where
+                group by a.kode_grafik, c.nama ";
+            }
+
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -155,14 +166,20 @@ class DashboardFPV2Controller extends Controller {
                 "data_pdpt" => $data_pdpt,
                 "data_beban" => $data_beban,
                 "data_shu" => $data_shu,
-                "data_or" => $data_or,
-                "lokasi" => $r->all()
+                "data_or" => $data_or
             ];
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['message'] = "Error ".$e;
+            $success['data'] = [
+                "data_pdpt" => [],
+                "data_beban" => [],
+                "data_shu" => [],
+                "data_or" => [],
+                "message" => "Error ".$e
+            ];
             return response()->json($success, $this->successStatus);
         }
     }

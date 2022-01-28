@@ -16,8 +16,8 @@ class FormController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $guard = 'yptkug';
-    public $sql = 'sqlsrvyptkug';
+    public $guard = 'tarbak';
+    public $sql = 'sqlsrvtarbak';
 
     public function isUnik($isi){
         
