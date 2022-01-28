@@ -164,14 +164,14 @@ class DashboardInvesController extends Controller {
             }else{
                 $filter_neraca = "";
             }
-            $sql = "select a.kode_lokasi,a.nama,a.skode,isnull(b.n1,0) as nilai
-            from dash_ypt_lokasi a
-            left join (select a.kode_lokasi,sum(a.n2) as n1
-                    from exs_neraca a
+            $sql = "select a.kode_pp,a.nama,a.skode,isnull(b.n1,0) as nilai
+            from dash_ypt_pp a
+            left join (select a.kode_lokasi,a.kode_pp,sum(a.n2) as n1
+                    from exs_neraca_pp a
                     inner join dash_ypt_neraca_d b on a.kode_neraca=b.kode_neraca  and a.kode_fs=b.kode_fs
                     $where and b.kode_dash='DP02' and (a.n2<>0) $filter_neraca
-                    group by a.kode_lokasi
-                    )b on a.kode_lokasi=b.kode_lokasi
+                    group by a.kode_lokasi,a.kode_pp
+                    )b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             where a.kode_lokasi<>'$kode_lokasi' ";
 
             $select = DB::connection($this->db)->select($sql);
