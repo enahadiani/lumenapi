@@ -67,7 +67,7 @@ class DashboardCCRController extends Controller {
             $periode_rev=$tahun.$bulanSeb;
             $periode_lalu = $tahun_rev.$bulan;
             $periode_rev_lalu=$tahun_rev.$bulanSeb;
-            $where = " and x.kode_lokasi='12' ";
+            $where = " and x.kode_lokasi='$kode_lokasi' ";
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and x.kode_pp='$r->kode_pp' ";
@@ -76,14 +76,14 @@ class DashboardCCRController extends Controller {
             }
 
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1') ";
+                $filter_bidang = "";
             }
 
             $sql = "select isnull(b.total,0) as tn1,isnull(c.total,0) as tn2,isnull(b.total,0)+isnull(c.total,0) as tn3,
@@ -155,7 +155,7 @@ class DashboardCCRController extends Controller {
                         where x.periode='$periode' and (x.periode_bill<'$periode_awal') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )i on a.kode_lokasi=i.kode_lokasi
-            where a.kode_lokasi='12' ";
+            where a.kode_lokasi='$kode_lokasi' ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -230,7 +230,7 @@ class DashboardCCRController extends Controller {
                         where x.periode='$periode_lalu' and (x.periode_bill<'$periode_awal_lalu') $where $filter_pp $filter_bidang
                         group by x.kode_lokasi
                         )i on a.kode_lokasi=i.kode_lokasi
-            where a.kode_lokasi='12'";
+            where a.kode_lokasi='$kode_lokasi'";
             $select2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($select2),true);
             
@@ -316,21 +316,21 @@ class DashboardCCRController extends Controller {
             // }
             // $periode_rev=$tahun.$bulanSeb;
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and bd.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and a.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and bd.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and a.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " ";
+                $filter_bidang = "";
             }
             $sort = $r->sort;
-            $where = "where x.kode_lokasi='12' ";
+            $where = "where x.kode_lokasi='$kode_lokasi' ";
 
             $sql = "select a.kode_pp,a.nama,
             case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end as ccr_berjalan
             from pp a
-            inner join bidang bd on a.kode_bidang=bd.kode_bidang and bd.kode_lokasi='12'
             left join (select x.kode_lokasi,x.kode_pp,
                                 sum(case when x.dc='D' then x.nilai else -x.nilai end) as total 
                         from sis_bill_d x 
@@ -345,7 +345,7 @@ class DashboardCCRController extends Controller {
                         $where and x.periode='$periode' and x.periode_bill = '$periode' 
                         group by x.kode_lokasi,x.kode_pp
                         )e on a.kode_lokasi=e.kode_lokasi and a.kode_pp=e.kode_pp
-            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3','4','5') and a.nama not like '%SMK PAR SP Makassar%' and a.kode_pp <> 'YSPTF02' $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' $filter_bidang and a.kode_pp in ('02','03','04','05','06')
             order by (case when isnull(c.total,0) <> 0 then (isnull(e.total,0)/isnull(c.total,0))*100 else 0 end) $sort ";
 
             $select = DB::connection($this->db)->select($sql);
@@ -373,9 +373,7 @@ class DashboardCCRController extends Controller {
             
             $sql = "select a.kode_bidang,a.nama
             from bidang a
-            where a.kode_lokasi='12' and a.kode_bidang in ('1','2','3')
-            union all
-            select 'GB', 'SMA/SMK' ";
+            where a.flag_aktif='1'";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -404,13 +402,14 @@ class DashboardCCRController extends Controller {
             $tahun=substr($periode,0,4);
             $nama = "-";
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1') ";
+                $filter_bidang = "";
             }
             if(isset($r->kode_pp) && $r->kode_pp !=""){
                 $get = DB::connection($this->db)->select("select nama from pp where kode_pp='$r->kode_pp' ");
@@ -437,7 +436,7 @@ class DashboardCCRController extends Controller {
                             sum(CASE WHEN SUBSTRING(a.periode,5,2) between '01' and '12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12
                         from sis_bill_d a
                         inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
+                        where a.kode_lokasi='$kode_lokasi' and SUBSTRING(a.periode,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
                         group by a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
                 left join (select a.kode_lokasi,
@@ -455,12 +454,12 @@ class DashboardCCRController extends Controller {
                             sum(CASE WHEN (SUBSTRING(a.periode,5,2) between '01' and '12' and SUBSTRING(a.periode_bill,5,2)  between '01' and '12' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_rekon_d a
                         inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and SUBSTRING(a.periode_bill,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
+                        where a.kode_lokasi='$kode_lokasi' and SUBSTRING(a.periode,1,4)='$tahun' and SUBSTRING(a.periode_bill,1,4)='$tahun' and a.kode_pp='$r->kode_pp' $filter_bidang
                         group by a.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='12' ";
+                where a.kode_lokasi='$kode_lokasi' ";
             }else{
-                $get = DB::connection($this->db)->select("select nama from dash_ypt_lokasi where kode_lokasi='12' ");
+                $get = DB::connection($this->db)->select("select nama from dash_ypt_lokasi where kode_lokasi='$kode_lokasi' ");
                 if(count($get) > 0){
                     $nama = $get[0]->nama;
                 }
@@ -484,7 +483,7 @@ class DashboardCCRController extends Controller {
                                 sum(CASE WHEN SUBSTRING(a.periode,5,2) between '01' and '12' then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_bill_d a
                         inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' $filter_bidang
+                        where a.kode_lokasi='$kode_lokasi' and SUBSTRING(a.periode,1,4)='$tahun' $filter_bidang
                         group by a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
                 left join (select a.kode_lokasi,
@@ -502,10 +501,10 @@ class DashboardCCRController extends Controller {
                         sum(CASE WHEN (SUBSTRING(a.periode,5,2) between '01' and '12' and SUBSTRING(a.periode_bill,5,2)  between '01' and '12' ) then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n12  
                         from sis_rekon_d a
                         inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                        where a.kode_lokasi='12' and SUBSTRING(a.periode,1,4)='$tahun' and SUBSTRING(a.periode_bill,1,4)='$tahun' $filter_bidang
+                        where a.kode_lokasi='$kode_lokasi' and SUBSTRING(a.periode,1,4)='$tahun' and SUBSTRING(a.periode_bill,1,4)='$tahun' $filter_bidang
                         group by a.kode_lokasi
                         )c on a.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='12' ";
+                where a.kode_lokasi='$kode_lokasi' ";
             }
            
             $select = DB::connection($this->db)->select($sql);
@@ -607,7 +606,7 @@ class DashboardCCRController extends Controller {
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 inner join pp p on b.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                WHERE a.kode_lokasi='12' AND a.kode_fs='FS1' and b.kode_pp='$r->kode_pp' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun' $filter_bidang
+                WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1' and b.kode_pp='$r->kode_pp' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun' $filter_bidang
                 GROUP BY a.kode_lokasi
                 ";
             }else{
@@ -630,12 +629,12 @@ class DashboardCCRController extends Controller {
                     INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     inner join pp p on b.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-                    WHERE a.kode_lokasi='12' AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun' $filter_bidang
+                    WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1' AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun' $filter_bidang
                     GROUP BY a.kode_lokasi
                     ";
                 }else{
 
-                    $get = DB::connection($this->db)->select("select nama from dash_ypt_lokasi where kode_lokasi='12' ");
+                    $get = DB::connection($this->db)->select("select nama from dash_ypt_lokasi where kode_lokasi='$kode_lokasi' ");
                     if(count($get) > 0){
                         $nama = $get[0]->nama;
                     }
@@ -655,7 +654,7 @@ class DashboardCCRController extends Controller {
                     FROM dash_ypt_grafik_d a
                     INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                    WHERE a.kode_lokasi='12' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun'
+                    WHERE a.kode_lokasi='$kode_lokasi' AND a.kode_fs='FS1'  AND a.kode_grafik IN ('PI09') AND SUBSTRING(b.periode,1,4)='$tahun'
                     GROUP BY a.kode_lokasi ";
                 }
             }
@@ -715,13 +714,14 @@ class DashboardCCRController extends Controller {
             $tahun=substr($periode,0,4);
             $nama = "-";
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1')";
+                $filter_bidang = "";
             }
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
@@ -738,27 +738,27 @@ class DashboardCCRController extends Controller {
             sum(case when a.umur between 13 and 24 then a.n1 else 0 end) as n3,
             sum(case when a.umur>24 then a.n1 else 0 end) as n4
             from (select a.no_bill,a.kode_lokasi,a.periode,
-                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '$periode'+'01')) as umur,
+                    datediff(month,convert(datetime, (case when substring(a.periode,5,2) > 12 then substring(a.periode,1,4)+'12' else a.periode end)+'01'),convert(datetime, '".$periode."01')) as umur,
                     isnull(a.n1,0)-isnull(b.n1,0) as n1
                     from (select x.no_bill,x.kode_lokasi,x.periode,x.kode_pp,
                             sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
                             from sis_bill_d x 	
                             inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                            where(x.kode_lokasi = '12')and(x.periode <= '$periode') $filter_bidang $filter_pp	
+                            where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') $filter_bidang $filter_pp	
                             group by x.no_bill,x.kode_lokasi,x.periode,x.kode_pp	
                             )a
                     left join (select x.no_bill,x.kode_lokasi,x.kode_pp,
                             sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
                             from sis_rekon_d x 	
                             inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                            where(x.kode_lokasi = '12')and(x.periode <= '$periode') $filter_bidang $filter_pp
+                            where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') $filter_bidang $filter_pp
                             group by x.no_bill,x.kode_lokasi,x.kode_pp
                     )b on a.no_bill=b.no_bill and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                    where a.kode_lokasi = '12' 
+                    where a.kode_lokasi = '$kode_lokasi' 
                 )a
                 group by a.kode_lokasi
             )b on a.kode_lokasi=b.kode_lokasi 
-            where a.kode_lokasi='12' 
+            where a.kode_lokasi='$kode_lokasi' 
             order by a.kode_lokasi";
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -784,7 +784,8 @@ class DashboardCCRController extends Controller {
             $success['message'] = "Success!";
             $success['data'] = array(
                 'kategori' => $ctg,
-                'series' => $series
+                'series' => $series,
+                'sql' => $sql
             );
 
             return response()->json($success, $this->successStatus); 

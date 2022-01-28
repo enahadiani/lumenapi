@@ -57,7 +57,7 @@ class DashboardPiutangController extends Controller {
             $bulan = substr($periode,4,2);
             $tahunlalu = intval($tahun) - 1;
             $periodelalu = $tahunlalu.$bulan;
-            $kode_lokasi = "12";
+            
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
@@ -237,7 +237,7 @@ class DashboardPiutangController extends Controller {
             }
             
             $periode=$r->periode[1];
-            $kode_lokasi = "12";
+            
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
                 if($r->kode_bidang == 'GB'){
                     $filter_bidang = " and c.kode_bidang in ('4','5') ";
@@ -306,9 +306,7 @@ class DashboardPiutangController extends Controller {
             
             $sql = "select a.kode_bidang,a.nama
             from bidang a
-            where a.kode_lokasi='12' and a.kode_bidang in ('2','3')
-            union all
-            select 'GB', 'SMA/SMK' ";
+            where a.flag_aktif='1' ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -334,7 +332,7 @@ class DashboardPiutangController extends Controller {
             }
 
             $periode=$r->periode[1];
-            $kode_lokasi = "12";
+            
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
