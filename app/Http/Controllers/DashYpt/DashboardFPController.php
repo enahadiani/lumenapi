@@ -589,7 +589,7 @@ class DashboardFPController extends Controller
             }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('01') AND a.kode_fs='FS1' $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             if(isset($r->jenis) && $r->jenis != ""){
@@ -615,7 +615,7 @@ class DashboardFPController extends Controller
                 $where
                 GROUP BY a.kode_lokasi,b.kode_pp
             ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-            WHERE a.kode_lokasi IN ('01') $filter_lokasi";
+            WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -671,7 +671,7 @@ class DashboardFPController extends Controller
             }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
-            $where = "WHERE a.kode_lokasi in ('01') AND a.kode_fs='FS1' $filter_lokasi";
+            $where = "WHERE a.kode_lokasi in ('11','12','13','14','15') AND a.kode_fs='FS1' $filter_lokasi";
             $where = $this->filterReq($r,$col_array,$db_col_name,$where,"");
 
             if(isset($r->jenis) && $r->jenis != ""){
@@ -719,7 +719,7 @@ class DashboardFPController extends Controller
                             $where $filter_lokasi
                             GROUP BY a.kode_lokasi,b.kode_pp
                         ) b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
-                        WHERE a.kode_lokasi IN ('01') $filter_lokasi";
+                        WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
