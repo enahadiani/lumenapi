@@ -72,14 +72,14 @@ class DashboardPiutangController extends Controller {
             }
 
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1') ";
+                $filter_bidang = "";
             }
 
             // PIUTANG
@@ -141,8 +141,8 @@ class DashboardPiutangController extends Controller {
             $select2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($select2),true);
 
-            $piu_thn_ini = floatval($res[0]['sak_total']);
-            $piu_thn_lalu = floatval($res2[0]['sak_total']);
+            $piu_thn_ini = count($res) > 0 ? floatval($res[0]['sak_total']) : 0;
+            $piu_thn_lalu = count($res2) > 0 ? floatval($res2[0]['sak_total']) : 0;
             $piu_yoy = ($piu_thn_lalu != 0 ? (($piu_thn_ini - $piu_thn_lalu) / $piu_thn_lalu)*100 : 0);
 
             // END PIUTANG
@@ -195,8 +195,8 @@ class DashboardPiutangController extends Controller {
             $select4 = DB::connection($this->db)->select($sql4);
             $res4 = json_decode(json_encode($select4),true);
 
-            $piu_cadang_thn_ini = floatval($res3[0]['n1']);
-            $piu_cadang_thn_lalu = floatval($res4[0]['n1']);
+            $piu_cadang_thn_ini = count($res3) > 0 ? floatval($res3[0]['n1']) : 0;
+            $piu_cadang_thn_lalu = count($res4) > 0 ? floatval($res4[0]['n1']) : 0;
             $piu_cadang_yoy = ($piu_cadang_thn_lalu != 0 ? (($piu_cadang_thn_ini - $piu_cadang_thn_lalu) / $piu_cadang_thn_lalu)*100 : 0);
             // END CADANGAN
 
@@ -239,13 +239,14 @@ class DashboardPiutangController extends Controller {
             $periode=$r->periode[1];
             
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and c.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and a.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and c.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and a.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and c.kode_bidang not in ('1') ";
+                $filter_bidang = "";
             }
             $sort = $r->sort;
 
@@ -257,7 +258,6 @@ class DashboardPiutangController extends Controller {
 
             $sql = "select a.kode_pp,a.nama,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from pp a 
-            inner join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
             left join (select y.kode_lokasi,y.kode_pp,
                                 sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
                                sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
@@ -278,7 +278,7 @@ class DashboardPiutangController extends Controller {
                         where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') $filter_param 
                         group by y.kode_lokasi,y.kode_pp	
                         )d on a.kode_lokasi=d.kode_lokasi and a.kode_pp=d.kode_pp
-            where a.kode_lokasi='$kode_lokasi' and c.kode_bidang in ('2','3','4','5') and a.nama not like '%SMK PAR SP Makassar%' and a.kode_pp <> 'YSPTF02' $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.kode_pp in ('02','03','04','05','06') $filter_bidang
             order by isnull(b.total,0)-isnull(d.total,0) $sort ";
 
             $select = DB::connection($this->db)->select($sql);
@@ -341,14 +341,14 @@ class DashboardPiutangController extends Controller {
             }
 
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1') ";
+                $filter_bidang = "";
             }
             
             $sql = "select a.kode_lokasi,isnull(b.n1,0)-isnull(d.n1,0) as sak_n1
@@ -472,15 +472,16 @@ class DashboardPiutangController extends Controller {
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $kode_lokasi = '12';
+            $kode_lokasi = '01';
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1')";
+                $filter_bidang = "";
             }
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
@@ -580,15 +581,16 @@ class DashboardPiutangController extends Controller {
             $periode=$r->periode[1];
             $tahun=substr($periode,0,4);
             $nama = "-";
-            $kode_lokasi = '12';
+            $kode_lokasi = '01';
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
-                if($r->kode_bidang == 'GB'){
-                    $filter_bidang = " and p.kode_bidang in ('4','5') ";
+                if($r->kode_bidang == '5'){
+                    $filter_bidang = " and p.kode_pp='02' ";
                 }else{
-                    $filter_bidang = " and p.kode_bidang = '$r->kode_bidang' ";
+                    $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
-                $filter_bidang = " and p.kode_bidang not in ('1')";
+                $filter_bidang = "";
             }
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
@@ -610,7 +612,7 @@ class DashboardPiutangController extends Controller {
             sum(case when a.umur between 13 and 24 then a.n1 else 0 end) as n3,
             sum(case when a.umur>24 then a.n1 else 0 end) as n4
             from (select a.no_bill,a.kode_lokasi,a.periode,
-                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '202109'+'01')) as umur,
+                    datediff(month,convert(datetime, (case when substring(a.periode,5,2) > 12 then substring(a.periode,1,4)+'12' else a.periode end)+'01'),convert(datetime, '".$periode."01')) as umur,
                     isnull(a.n1,0)-isnull(b.n1,0) as n1
                     from (select x.no_bill,x.kode_lokasi,x.periode,x.kode_pp,
                             sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
@@ -643,8 +645,8 @@ class DashboardPiutangController extends Controller {
             sum(case when a.umur between 13 and 24 then a.n1 else 0 end) as n3,
             sum(case when a.umur>24 then a.n1 else 0 end) as n4
             from (select a.no_bill,a.kode_lokasi,a.periode,
-                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '202109'+'01')) as umur,
-                    isnull(a.n1,0)-isnull(b.n1,0) as n1
+            datediff(month,convert(datetime, (case when substring(a.periode,5,2) > 12 then substring(a.periode,1,4)+'12' else a.periode end)+'01'),convert(datetime, '".$periode."01')) as umur,
+            isnull(a.n1,0)-isnull(b.n1,0) as n1
                     from (select x.no_bill,x.kode_lokasi,x.periode,x.kode_pp,
                             sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
                             from sis_bill_d x 	

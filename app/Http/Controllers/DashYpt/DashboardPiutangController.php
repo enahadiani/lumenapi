@@ -612,7 +612,7 @@ class DashboardPiutangController extends Controller {
             sum(case when a.umur between 13 and 24 then a.n1 else 0 end) as n3,
             sum(case when a.umur>24 then a.n1 else 0 end) as n4
             from (select a.no_bill,a.kode_lokasi,a.periode,
-                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '202109'+'01')) as umur,
+                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '".$periode."01')) as umur,
                     isnull(a.n1,0)-isnull(b.n1,0) as n1
                     from (select x.no_bill,x.kode_lokasi,x.periode,x.kode_pp,
                             sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
@@ -645,7 +645,7 @@ class DashboardPiutangController extends Controller {
             sum(case when a.umur between 13 and 24 then a.n1 else 0 end) as n3,
             sum(case when a.umur>24 then a.n1 else 0 end) as n4
             from (select a.no_bill,a.kode_lokasi,a.periode,
-                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '202109'+'01')) as umur,
+                    datediff(month,convert(datetime, a.periode+'01'),convert(datetime, '".$periode."01')) as umur,
                     isnull(a.n1,0)-isnull(b.n1,0) as n1
                     from (select x.no_bill,x.kode_lokasi,x.periode,x.kode_pp,
                             sum(case when x.dc='D' then x.nilai else -x.nilai end) as n1	
