@@ -37,6 +37,25 @@ $router->group(['middleware' => 'auth:admin'], function () use ($router) {
     $router->get('users', 'AdminController@allUsers');
     $router->get('cekPayload', 'AdminController@cekPayload');
     
+    //Kelompok Menu
+    $router->get('menu-klp', 'Dev\KelompokMenuController@index');
+    $router->post('menu-klp', 'Dev\KelompokMenuController@store');
+    $router->put('menu-klp', 'Dev\KelompokMenuController@update');
+    $router->delete('menu-klp', 'Dev\KelompokMenuController@destroy');
+
+    //Menu
+    $router->get('menu', 'Dev\MenuController@index');
+    $router->post('menu', 'Dev\MenuController@store');
+    $router->put('menu', 'Dev\MenuController@update');
+    $router->delete('menu', 'Dev\MenuController@destroy');
+    $router->post('menu-move', 'Dev\MenuController@simpanMove');
+
+    //Form
+    $router->get('form', 'Dev\FormController@index');
+    $router->post('form', 'Dev\FormController@store');
+    $router->put('form', 'Dev\FormController@update');
+    $router->delete('form', 'Dev\FormController@destroy');
+    
     //Menu
     $router->get('menu/{kode_klp}', 'Gl\MenuController@show');
 
