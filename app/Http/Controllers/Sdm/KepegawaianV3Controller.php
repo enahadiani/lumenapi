@@ -349,20 +349,20 @@ class KepegawaianV3Controller extends Controller
             }
             if ($this->isUnik($request->input('nik'), $kode_lokasi)) {
                 //  50 column
-                $insert_kar = "INSERT INTO hr_sdm_pribadi(
+                $insert_kar = "insert into hr_sdm_pribadi(
                     nik,kode_lokasi,
                     nama, nomor_ktp,
                     jenis_kelamin, kode_agama,
                     no_telp, no_hp, tempat_lahir, tgl_lahir,
                     alamat, provinsi, kota, kecamatan, kelurahan, kode_pos,
-                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah)
-                    VALUES(
+                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah, created_at)
+                    values(
                         ?,?,
                         ?,?,
                         ?,?,
                         ?,?,?,?,
                         ?,?,?,?,?,?,
-                        ?,?,?,?,?,?
+                        ?,?,?,?,?,?, getdate()
                     )";
 
                 DB::connection($this->db)->insert($insert_kar, [
@@ -710,20 +710,20 @@ class KepegawaianV3Controller extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
-            $insert_kar = "INSERT INTO hr_sdm_pribadi(
+            $insert_kar = "insert into hr_sdm_pribadi(
                     nik,kode_lokasi,
                     nama, nomor_ktp,
                     jenis_kelamin, kode_agama,
                     no_telp, no_hp, tempat_lahir, tgl_lahir,
                     alamat, provinsi, kota, kecamatan, kelurahan, kode_pos,
-                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah)
-                    VALUES(
+                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah, created_at)
+                    values(
                         ?,?,
                         ?,?,
                         ?,?,
                         ?,?,?,?,
                         ?,?,?,?,?,?,
-                        ?,?,?,?,?,?
+                        ?,?,?,?,?,?, getdate()
                     )";
 
             DB::connection($this->db)->insert($insert_kar, [
