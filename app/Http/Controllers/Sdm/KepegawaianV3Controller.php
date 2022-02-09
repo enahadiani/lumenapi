@@ -133,10 +133,10 @@ class KepegawaianV3Controller extends Controller
 
             // data pribadi
             $sql1 = "SELECT a.nik, a.nama, a.nomor_ktp, a.jenis_kelamin, a.kode_agama,b.nama as nama_agama, a.no_telp, a.no_hp, a.tempat_lahir,
-            isnull(convert(varchar(10), a.tgl_lahir, 101), convert(date, getdate())) as tgl_lahir,a.alamat,
+            isnull(convert(varchar(10), a.tgl_lahir, 101), convert(varchar, getdate(), 101)) as tgl_lahir,a.alamat,
             a.provinsi,a.kota,a.kecamatan,a.kelurahan,a.kode_pos,a.tinggi_badan,a.berat_badan,
             a.golongan_darah,a.nomor_kk,a.status_nikah,
-            isnull(convert(varchar(10), tgl_nikah, 101), convert(date, getdate())) as tgl_nikah
+            isnull(convert(varchar(10), tgl_nikah, 101), convert(varchar, getdate(), 101)) as tgl_nikah
             FROM hr_sdm_pribadi a
             LEFT JOIN hr_agama b ON a.kode_agama=b.kode_agama AND a.kode_lokasi=b.kode_lokasi
             WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
