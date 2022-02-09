@@ -42,6 +42,7 @@ class BukuRKAController extends Controller
                 if(isset($request->nik_user)){
                     $del =  DB::connection($this->db)->table('dash_buku_dok_tmp')
                     ->where('no_bukti', $request->input('no_bukti'))
+                    ->where('nik_user', $request->input('nik_user'))
                     ->where('kode_lokasi', $kode_lokasi)
                     ->delete();
     
@@ -130,7 +131,7 @@ class BukuRKAController extends Controller
 
             $ins = DB::connection($this->db)->insert("insert into dash_buku(no_bukti,kode_lokasi,tanggal,keterangan,nik_user,tgl_input,flag_aktif,kode_pp) values (?, ?, ?, ?, ?, getdate(), ?, ?)", array($no_bukti,$kode_lokasi,$request->input('tanggal'),$request->input('keterangan'),$nik,$request->input('flag_aktif'),$request->input('kode_pp')));
             
-            $get = DB::connection($this->db)->select("select no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis from dash_buku_dok_tmp where nik_user=? and no_bukti=? ",array($request->input('nik_user'),$no_bukti));
+            $get = DB::connection($this->db)->select("select no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis from dash_buku_dok_tmp where nik_user=? and no_bukti=? and kode_lokasi=?",array($request->input('nik_user'),$no_bukti,$kode_lokasi));
             $i=0;
             foreach($get as $row){
                 $ins2[] = DB::connection($this->db)->insert("insert into dash_buku_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values (?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$row->file_dok,$row->nama,$row->no_urut,$row->kode_jenis));
@@ -149,6 +150,7 @@ class BukuRKAController extends Controller
             $del =  DB::connection($this->db)->table('dash_buku_dok_tmp')
             ->where('no_bukti', $no_bukti)
             ->where('kode_lokasi', $kode_lokasi)
+            ->where('nik_user',$request->input('nik_user'))
             ->delete();
             
             Storage::disk('s3')->deleteDirectory('telu/tmp_dok');
@@ -220,7 +222,7 @@ class BukuRKAController extends Controller
             ->where('kode_lokasi', $kode_lokasi)
             ->delete();
             
-            $get = DB::connection($this->db)->select("select no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis from dash_buku_dok_tmp where nik_user=? and no_bukti=? ",array($request->input('nik_user'),$request->input('no_bukti')));
+            $get = DB::connection($this->db)->select("select no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis from dash_buku_dok_tmp where nik_user=? and no_bukti=? and kode_lokasi=?",array($request->input('nik_user'),$request->input('no_bukti'),$kode_lokasi));
             $i=0;
             foreach($get as $row){
                 $ins2[] = DB::connection($this->db)->insert("insert into dash_buku_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values (?, ?, ?, ?, ?, ?)",array($request->input('no_bukti'),$kode_lokasi,$row->file_dok,$row->nama,$row->no_urut,$row->kode_jenis));
@@ -243,6 +245,7 @@ class BukuRKAController extends Controller
             $del =  DB::connection($this->db)->table('dash_buku_dok_tmp')
             ->where('no_bukti',  $request->input('no_bukti'))
             ->where('kode_lokasi', $kode_lokasi)
+            ->where('nik_user',$request->input('nik_user'))
             ->delete();
             
             Storage::disk('s3')->deleteDirectory('telu/tmp_dok');
@@ -389,9 +392,9 @@ class BukuRKAController extends Controller
             }
             if($request->hasfile('file_upload')){
 
-                $sql = "select file_dok as file_upload from dash_buku_dok_tmp where no_bukti=? and no_urut=? and nik_user=?
+                $sql = "select file_dok as file_upload from dash_buku_dok_tmp where no_bukti=? and no_urut=? and nik_user=? and kode_lokasi=?
                 ";
-                $res = DB::connection($this->db)->select($sql,array($no_bukti,$request->input('no_urut'),$request->input('nik_user')));
+                $res = DB::connection($this->db)->select($sql,array($no_bukti,$request->input('no_urut'),$request->input('nik_user'),$kode_lokasi));
                 $res = json_decode(json_encode($res),true);
 
                 if(count($res) > 0){
@@ -417,7 +420,7 @@ class BukuRKAController extends Controller
                 $foto="-";
             }
 
-            $ins2 = DB::connection($this->db)->insert("insert into dash_buku_dok_tmp (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis,nik_user) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$kode_lokasi,$foto,$request->input('nama'),$request->input('no_urut'),$request->input('kode_jenis'),$request->input('nik_user')));
+            $ins2 = DB::connection($this->db)->insert("insert into dash_buku_dok_tmp (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis,nik_user,tgl_input) values (?, ?, ?, ?, ?, ?, ?, getdate()) ",array($no_bukti,$kode_lokasi,$foto,$request->input('nama'),$request->input('no_urut'),$request->input('kode_jenis'),$request->input('nik_user')));
 
             if($ins2){ //mengecek apakah data kosong atau tidak
                 DB::connection($this->db)->commit();
