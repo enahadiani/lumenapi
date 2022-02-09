@@ -141,11 +141,11 @@ class BukuRKAController extends Controller
                 $i++;
             }
 
-            if(isset($request->kode_jenis)){
-                for($i=0; $i < count($request->kode_jenis); $i++){
-                    $ins3[] = DB::connection($this->db)->insert("insert into dash_buku_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values (?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->input('nama_file')[$i],$request->input('nama_dok')[$i],$request->input('no_urut')[$i],$request->input('kode_jenis')[$i]));
-                }
-            }
+            // if(isset($request->kode_jenis)){
+            //     for($i=0; $i < count($request->kode_jenis); $i++){
+            //         $ins3[] = DB::connection($this->db)->insert("insert into dash_buku_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values (?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$request->input('nama_file')[$i],$request->input('nama_dok')[$i],$request->input('no_urut')[$i],$request->input('kode_jenis')[$i]));
+            //     }
+            // }
             
             $del =  DB::connection($this->db)->table('dash_buku_dok_tmp')
             ->where('no_bukti', $no_bukti)
@@ -233,11 +233,11 @@ class BukuRKAController extends Controller
                 $i++;
             }
 
-            if(isset($request->kode_jenis)){
-                for($i=0; $i < count($request->kode_jenis); $i++){
-                    $ins3[] = DB::connection($this->db)->insert("insert into dash_buku_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values (?, ?, ?, ?, ?, ?)",array($request->input('no_bukti'),$kode_lokasi,$request->input('nama_file')[$i],$request->input('nama_dok')[$i],$request->input('no_urut')[$i],$request->input('kode_jenis')[$i]));
-                }
-            }
+            // if(isset($request->kode_jenis)){
+            //     for($i=0; $i < count($request->kode_jenis); $i++){
+            //         $ins3[] = DB::connection($this->db)->insert("insert into dash_buku_dok (no_bukti,kode_lokasi,file_dok,nama,no_urut,kode_jenis) values (?, ?, ?, ?, ?, ?)",array($request->input('no_bukti'),$kode_lokasi,$request->input('nama_file')[$i],$request->input('nama_dok')[$i],$request->input('no_urut')[$i],$request->input('kode_jenis')[$i]));
+            //     }
+            // }
 
             $success['kode_jenis'] = $request->kode_jenis;
             $success['nama_file'] = $request->nama_file;
