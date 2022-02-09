@@ -646,7 +646,8 @@ class Approval2Controller extends Controller
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql3="select no_pb,no_gambar,nu,kode_jenis,no_ref,'https://siaga.simkug.com/server/media/'+no_gambar as file_dok from gr_pb_dok where kode_lokasi='".$kode_lokasi."' and no_pb='$no_aju' order by nu";
+            $url = config('services.api.doc_url_siaga');
+            $sql3="select no_pb,no_gambar,nu,kode_jenis,no_ref,'".$url."'+no_gambar as file_dok from gr_pb_dok where kode_lokasi='".$kode_lokasi."' and no_pb='$no_aju' order by nu";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 

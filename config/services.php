@@ -38,6 +38,9 @@ return [
         'api_tarbak'     => env('GCM_APIKEY_TARBAK'),
         'api_ts'     => env('GCM_APIKEY_TS')     ,
         'api_siaga'     => env('GCM_APIKEY_SIAGA')                
+    ],
+    'api' => [
+        'doc_url_siaga' => env('DOC_URL_SIAGA')
     ]
 
 ];
