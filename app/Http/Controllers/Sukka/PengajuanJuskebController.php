@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Log;
 use Carbon\Carbon; 
 
-class PengajuanRRAController extends Controller
+class PengajuanJuskebController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -465,12 +465,16 @@ class PengajuanRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select * from apv_juskeb_m where no_bukti=? and kode_lokasi=?";
+            $strSQL = "select *,b.nama as nama_pp,c.nama as nama_jenis from apv_juskeb_m a
+            left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            left join apv_jenis c on a.kode_jenis=c.kode_jenis and a.kode_lokasi=c.kode_lokasi
+            where a.no_bukti=? and a.kode_lokasi=?";
             $rs = DB::connection($this->db)->select($strSQL,array($request->input('no_bukti'),$kode_lokasi));
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $strdet = "select * from apv_flow a
+                $strdet = "select *,b.nama from apv_flow a
+                inner join apv_karyawan b on a.nik=b.nik
                 where a.no_bukti = ? and a.kode_lokasi=? order by a.nu";
                 $rsdet = DB::connection($this->db)->select($strdet,array($request->input('no_bukti'),$kode_lokasi));
                 $resdet = json_decode(json_encode($rsdet),true);
@@ -515,9 +519,9 @@ class PengajuanRRAController extends Controller
             from apv_role a
             inner join apv_role_jab b on a.kode_role=b.kode_role and a.kode_lokasi=b.kode_lokasi
             inner join apv_karyawan c on b.kode_jab=c.kode_jab 
-            where a.jenis=? and a.kode_lokasi=? and ? between a.bawah and a.atas";
+            where a.jenis=? and ? between a.bawah and a.atas";
 
-            $rs = DB::connection($this->db)->select($strSQL,array($request->input('jenis'),$kode_lokasi,$request->input('nilai')));
+            $rs = DB::connection($this->db)->select($strSQL,array($request->input('kode_jenis'),$request->input('nilai')));
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -528,7 +532,7 @@ class PengajuanRRAController extends Controller
             }
             else{
                 $success['message'] = "Data Kosong!";
-                $success['data'] = [];
+                $success['data'] = $request->input();
                 $success['status'] = false;
             }
             return response()->json($success, $this->successStatus);
@@ -543,10 +547,6 @@ class PengajuanRRAController extends Controller
 
     public function getPP(Request $request)
     {
-
-        $this->validate($request,[
-            'kode_lokasi' => 'required'
-        ]);
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -562,7 +562,7 @@ class PengajuanRRAController extends Controller
 
             $strSQL = "select a.kode_pp, a.nama  
             from pp a 
-            where a.kode_lokasi = '".$request->kode_lokasi."' and a.tipe='posting' and a.flag_aktif ='1' $filter";
+            where a.kode_lokasi = '".$kode_lokasi."' and a.tipe='posting' and a.flag_aktif ='1' $filter";
             
             $rs = DB::connection($this->db)->select($strSQL);
             $res = json_decode(json_encode($rs),true);
