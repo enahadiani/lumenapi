@@ -133,10 +133,10 @@ class KepegawaianV3Controller extends Controller
 
             // data pribadi
             $sql1 = "SELECT a.nik, a.nama, a.nomor_ktp, a.jenis_kelamin, a.kode_agama,b.nama as nama_agama, a.no_telp, a.no_hp, a.tempat_lahir,
-            convert(varchar(10), a.tgl_lahir, 101) as tgl_lahir,a.alamat,
+            isnull(convert(varchar(10), a.tgl_lahir, 101), convert(varchar, getdate(), 101)) as tgl_lahir,a.alamat,
             a.provinsi,a.kota,a.kecamatan,a.kelurahan,a.kode_pos,a.tinggi_badan,a.berat_badan,
             a.golongan_darah,a.nomor_kk,a.status_nikah,
-            convert(varchar(10), tgl_nikah, 101) as tgl_nikah
+            isnull(convert(varchar(10), tgl_nikah, 101), convert(varchar, getdate(), 101)) as tgl_nikah
             FROM hr_sdm_pribadi a
             LEFT JOIN hr_agama b ON a.kode_agama=b.kode_agama AND a.kode_lokasi=b.kode_lokasi
             WHERE a.nik = '" . $request->nik . "' AND a.kode_lokasi = '" . $kode_lokasi . "'";
@@ -349,20 +349,20 @@ class KepegawaianV3Controller extends Controller
             }
             if ($this->isUnik($request->input('nik'), $kode_lokasi)) {
                 //  50 column
-                $insert_kar = "INSERT INTO hr_sdm_pribadi(
+                $insert_kar = "insert into hr_sdm_pribadi(
                     nik,kode_lokasi,
                     nama, nomor_ktp,
                     jenis_kelamin, kode_agama,
                     no_telp, no_hp, tempat_lahir, tgl_lahir,
                     alamat, provinsi, kota, kecamatan, kelurahan, kode_pos,
-                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah)
-                    VALUES(
+                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah, created_at)
+                    values(
                         ?,?,
                         ?,?,
                         ?,?,
                         ?,?,?,?,
                         ?,?,?,?,?,?,
-                        ?,?,?,?,?,?
+                        ?,?,?,?,?,?, getdate()
                     )";
 
                 DB::connection($this->db)->insert($insert_kar, [
@@ -710,20 +710,20 @@ class KepegawaianV3Controller extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->delete();
 
-            $insert_kar = "INSERT INTO hr_sdm_pribadi(
+            $insert_kar = "insert into hr_sdm_pribadi(
                     nik,kode_lokasi,
                     nama, nomor_ktp,
                     jenis_kelamin, kode_agama,
                     no_telp, no_hp, tempat_lahir, tgl_lahir,
                     alamat, provinsi, kota, kecamatan, kelurahan, kode_pos,
-                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah)
-                    VALUES(
+                    tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah, tgl_nikah, created_at)
+                    values(
                         ?,?,
                         ?,?,
                         ?,?,
                         ?,?,?,?,
                         ?,?,?,?,?,?,
-                        ?,?,?,?,?,?
+                        ?,?,?,?,?,?, getdate()
                     )";
 
             DB::connection($this->db)->insert($insert_kar, [

@@ -10,7 +10,7 @@ class SDMKaryawanImport implements ToModel, WithStartRow
 {
     public function startRow(): int
     {
-        return 3;
+        return 2;
     }
 
     public function model(Array $row)

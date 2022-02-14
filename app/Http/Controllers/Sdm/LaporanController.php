@@ -55,12 +55,12 @@ class LaporanController extends Controller
             b.kode_bm, h.nama as nama_bm,
             b.kode_area, f.nama as nama_area
             FROM hr_sdm_pribadi a
-            INNER JOIN hr_sdm_kepegawaian b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            INNER JOIN hr_sdm d ON b.kode_sdm=d.kode_sdm AND b.kode_lokasi=d.kode_lokasi
-            INNER JOIN hr_loker e ON b.kode_loker=e.kode_loker AND b.kode_lokasi=e.kode_lokasi
-            INNER JOIN hr_area f ON b.kode_area=f.kode_area AND b.kode_lokasi=f.kode_lokasi
-            INNER JOIN hr_fm g ON b.kode_fm=g.kode_fm AND b.kode_lokasi=g.kode_lokasi
-            INNER JOIN hr_bm h ON b.kode_bm=h.kode_bm AND b.kode_lokasi=h.kode_lokasi
+            LEFT JOIN hr_sdm_kepegawaian b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_sdm d ON b.kode_sdm=d.kode_sdm AND b.kode_lokasi=d.kode_lokasi
+            LEFT JOIN hr_loker e ON b.kode_loker=e.kode_loker AND b.kode_lokasi=e.kode_lokasi
+            LEFT JOIN hr_area f ON b.kode_area=f.kode_area AND b.kode_lokasi=f.kode_lokasi
+            LEFT JOIN hr_fm g ON b.kode_fm=g.kode_fm AND b.kode_lokasi=g.kode_lokasi
+            LEFT JOIN hr_bm h ON b.kode_bm=h.kode_bm AND b.kode_lokasi=h.kode_lokasi
             $where
             order by b.tgl_masuk";
 
@@ -133,17 +133,17 @@ class LaporanController extends Controller
             i.kode_bank,j.nama as nama_bank,i.cabang,i.nama_rek,i.no_rek,a.kota,a.kelurahan,a.kecamatan,
             convert(varchar,k.tgl_kontrak_awal,103) AS tgl_kontrak, k.no_kontrak,b.nama as nama_agama,l.nama as nama_loker
             FROM hr_sdm_pribadi a
-            INNER JOIN hr_agama b ON a.kode_agama=b.kode_agama AND a.kode_lokasi=b.kode_lokasi
-            INNER JOIN hr_sdm_kepegawaian c ON a.nik=c.nik AND a.kode_lokasi=c.kode_lokasi
-            INNER JOIN hr_area d ON c.kode_area=d.kode_area AND c.kode_lokasi=d.kode_lokasi
-            INNER JOIN hr_fm e ON c.kode_fm=e.kode_fm AND c.kode_lokasi=e.kode_lokasi
-            INNER JOIN hr_bm f ON c.kode_bm=f.kode_bm AND c.kode_lokasi=f.kode_lokasi
-            INNER JOIN hr_sdm g ON c.kode_sdm=g.kode_sdm AND c.kode_lokasi=g.kode_lokasi
-            INNER JOIN hr_profesi h ON c.kode_profesi=h.kode_profesi AND c.kode_lokasi=h.kode_lokasi
-            INNER JOIN hr_sdm_bank i ON a.nik=i.nik AND a.kode_lokasi=i.kode_lokasi
-            INNER JOIN hr_bank j ON i.kode_bank=j.kode_bank AND i.kode_lokasi=j.kode_lokasi
-            INNER JOIN hr_sdm_client k ON a.nik=k.nik AND a.kode_lokasi=k.kode_lokasi
-            INNER JOIN hr_loker l ON c.kode_loker=l.kode_loker AND l.kode_lokasi=c.kode_lokasi
+            LEFT JOIN hr_agama b ON a.kode_agama=b.kode_agama AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_sdm_kepegawaian c ON a.nik=c.nik AND a.kode_lokasi=c.kode_lokasi
+            LEFT JOIN hr_area d ON c.kode_area=d.kode_area AND c.kode_lokasi=d.kode_lokasi
+            LEFT JOIN hr_fm e ON c.kode_fm=e.kode_fm AND c.kode_lokasi=e.kode_lokasi
+            LEFT JOIN hr_bm f ON c.kode_bm=f.kode_bm AND c.kode_lokasi=f.kode_lokasi
+            LEFT JOIN hr_sdm g ON c.kode_sdm=g.kode_sdm AND c.kode_lokasi=g.kode_lokasi
+            LEFT JOIN hr_profesi h ON c.kode_profesi=h.kode_profesi AND c.kode_lokasi=h.kode_lokasi
+            LEFT JOIN hr_sdm_bank i ON a.nik=i.nik AND a.kode_lokasi=i.kode_lokasi
+            LEFT JOIN hr_bank j ON i.kode_bank=j.kode_bank AND i.kode_lokasi=j.kode_lokasi
+            LEFT JOIN hr_sdm_client k ON a.nik=k.nik AND a.kode_lokasi=k.kode_lokasi
+            LEFT JOIN hr_loker l ON c.kode_loker=l.kode_loker AND l.kode_lokasi=c.kode_lokasi
             $where
             ORDER BY a.nik";
 
@@ -195,8 +195,8 @@ class LaporanController extends Controller
                     $pendidikan = "SELECT a.nama, a.tahun, a.kode_jurusan, a.kode_strata,b.nama AS nama_jur,
                     c.nama AS nama_strata
                     FROM hr_pendidikan a
-                    INNER JOIN hr_jur b ON a.kode_jurusan=b.kode_jur AND a.kode_lokasi=b.kode_lokasi
-                    INNER JOIN hr_strata c ON a.kode_strata=c.kode_strata AND a.kode_lokasi=c.kode_lokasi
+                    LEFT JOIN hr_jur b ON a.kode_jurusan=b.kode_jur AND a.kode_lokasi=b.kode_lokasi
+                    LEFT JOIN hr_strata c ON a.kode_strata=c.kode_strata AND a.kode_lokasi=c.kode_lokasi
                     where a.nik = '" . $cv[$i]['nik'] . "' AND a.kode_lokasi='" . $kode_lokasi . "' ORDER BY tahun DESC";
 
                     $resPendidikan = DB::connection($this->sql)->select($pendidikan);
