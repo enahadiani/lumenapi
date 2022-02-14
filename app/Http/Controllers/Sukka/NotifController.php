@@ -51,7 +51,7 @@ class NotifController extends Controller
 				event(new \App\Events\NotifSukka($request->title,$request->message,$request->id[$i]));
 				if($request->sts_insert == '1'){
 
-					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read,sts_read_mob) values ('$kode_lokasi','".$request->title."','".$request->subtitle."','".$request->message."','".$request->id[$i]."','saisiaga-channel-".$request->id[$i]."','1',getdate(),'-','0','0') ");
+					$ins[$i] = DB::connection($this->db)->insert("insert into user_message (kode_lokasi,judul,subjudul,pesan,nik,id_device,status,tgl_input,icon,sts_read,sts_read_mob) values ('$kode_lokasi','".$request->title."','".$request->subtitle."','".$request->message."','".$request->id[$i]."','saisukka-channel-".$request->id[$i]."','1',getdate(),'-','0','0') ");
 				}
 
 			}
@@ -79,7 +79,7 @@ class NotifController extends Controller
             
 			// $sql = "select top 5 id,judul,subjudul,pesan,tgl_input,status,icon,convert(varchar,tgl_input,103) as tgl, convert(varchar,tgl_input,108) as jam
 			// from user_message
-			// where id_device='saisiaga-channel-$nik' and status in ('1')
+			// where id_device='saisukka-channel-$nik' and status in ('1')
 			// order by id desc
 			// ";
 			$sql = "select top 5 no_bukti as id,judul,subjudul,pesan,tgl_input,sts_kirim as status,icon,convert(varchar,tgl_input,103) as tgl, convert(varchar,tgl_input,108) as jam
@@ -306,7 +306,7 @@ class NotifController extends Controller
 				// NOTIF WEB
 				event(new \App\Events\NotifSukka($title,$message,$nik_kirim));
 				
-				$insd = DB::connection($this->db)->insert("insert into app_notif_d (kode_lokasi,no_bukti,id_device,nik,no_urut) values (?, ?, ?, ?, ?)",array($kode_lokasi,$request->no_pesan,'saisiaga-channel-'.$nik_kirim,$nik_kirim,0));
+				$insd = DB::connection($this->db)->insert("insert into app_notif_d (kode_lokasi,no_bukti,id_device,nik,no_urut) values (?, ?, ?, ?, ?)",array($kode_lokasi,$request->no_pesan,'saisukka-channel-'.$nik_kirim,$nik_kirim,0));
 
 				// NOTIF ANDROID
 

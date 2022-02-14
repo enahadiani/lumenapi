@@ -25,6 +25,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('juskeb', 'Sukka\PengajuanJuskebController@store');
     $router->put('juskeb', 'Sukka\PengajuanJuskebController@update');
     $router->delete('juskeb', 'Sukka\PengajuanJuskebController@destroy');
+    
+    $router->post('send-email', 'Sukka\PengajuanJuskebController@sendNotifikasi');
+    $router->get('tes-email', 'Sukka\PengajuanJuskebController@getEmailView');
 });
 
 
