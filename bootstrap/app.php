@@ -918,4 +918,39 @@ $app->router->group([
     require __DIR__ . '/../routes/dash-tarbak/dash.php';
 });
 
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sukka-auth'
+], function ($router) {
+    require __DIR__ . '/../routes/sukka/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sukka-master'
+], function ($router) {
+    require __DIR__ . '/../routes/sukka/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sukka-trans'
+], function ($router) {
+    require __DIR__ . '/../routes/sukka/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sukka-report'
+], function ($router) {
+    require __DIR__ . '/../routes/sukka/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sukka-dash'
+], function ($router) {
+    require __DIR__ . '/../routes/sukka/dash.php';
+});
+
 return $app;
