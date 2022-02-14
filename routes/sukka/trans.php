@@ -16,7 +16,15 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
-    
+    //Justifikasi Kebutuhan
+    $router->get('juskeb', 'Sukka\PengajuanJuskebController@index');
+    $router->get('juskeb-detail', 'Sukka\PengajuanJuskebController@show');
+    $router->get('juskeb-pp', 'Sukka\PengajuanJuskebController@getPP');
+    $router->get('juskeb-app-flow', 'Sukka\PengajuanJuskebController@getAppFlow');
+    $router->get('juskeb-jenis', 'Sukka\PengajuanJuskebController@getJenis');
+    $router->post('juskeb', 'Sukka\PengajuanJuskebController@store');
+    $router->put('juskeb', 'Sukka\PengajuanJuskebController@update');
+    $router->delete('juskeb', 'Sukka\PengajuanJuskebController@destroy');
 });
 
 

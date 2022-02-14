@@ -17,6 +17,20 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
+    //Menu Setting
+    $router->get('menu','Sukka\MenuController@index');
+    $router->post('menu','Sukka\MenuController@store');
+    $router->put('menu','Sukka\MenuController@update');
+    $router->delete('menu','Sukka\MenuController@destroy');
+    $router->get('menu-klp','Sukka\MenuController@getKlp');
+    $router->post('menu-move','Sukka\MenuController@simpanMove');
+
+    //Kelompok Menu
+    $router->get('menu-klp','Sukka\KelompokMenuController@index');
+    $router->post('menu-klp','Sukka\KelompokMenuController@store');
+    $router->put('menu-klp','Sukka\KelompokMenuController@update');
+    $router->delete('menu-klp','Sukka\KelompokMenuController@destroy');
+
      //Master Karyawan
      $router->get('karyawan','Sukka\KaryawanController@index');
      $router->get('karyawan/{nik}','Sukka\KaryawanController@show');
@@ -52,8 +66,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
      $router->post('hakakses','Sukka\HakaksesController@store');
      $router->put('hakakses/{nik}','Sukka\HakaksesController@update');
      $router->delete('hakakses/{nik}','Sukka\HakaksesController@destroy');
-     $router->get('form','Sukka\HakaksesController@getForm');
-     $router->get('menu','Sukka\HakaksesController@getMenu');
+     
+    //Form
+    $router->get('form','Sukka\FormController@index');
+    $router->post('form','Sukka\FormController@store');
+    $router->put('form','Sukka\FormController@update');
+    $router->delete('form','Sukka\FormController@destroy');
 
     $router->get('filter-pp','Sukka\FilterController@getFilterPP');
     $router->get('filter-kota','Sukka\FilterController@getFilterKota');
