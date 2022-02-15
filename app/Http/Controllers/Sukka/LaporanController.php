@@ -48,7 +48,7 @@ class LaporanController extends Controller
                 inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                 inner join apv_karyawan c on a.nik=c.nik
                 left join apv_jab d on c.kode_jab=d.kode_jab and c.kode_lokasi=d.kode_lokasi
-                inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
+                inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
                 where a.no_bukti='$no_bukti'
 			) a
 			order by a.no_app,a.tgl

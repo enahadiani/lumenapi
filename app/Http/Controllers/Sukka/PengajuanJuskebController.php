@@ -200,14 +200,14 @@ class PengajuanJuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.tanggal,a.nilai,a.kegiatan,a.periode,a.kode_pp,a.jenis,case a.progress when 'R' then 'Return' when 'J' then 'Finish Approval Justifikasi' else isnull(x.nama_jab,'-') end as progress,case when datediff(minute,a.tanggal,getdate()) <= 10 then 'baru' else 'lama' end as status
+            $sql="select a.no_bukti,a.tanggal,a.nilai,a.kegiatan,a.periode,a.kode_pp,a.jenis,case a.progress when 'R' then 'Return Approval Juskeb' when 'J' then 'Finish Approval Juskeb' else isnull(x.nama_jab,'-') end as progress,case when datediff(minute,a.tanggal,getdate()) <= 10 then 'baru' else 'lama' end as status, a.progress as sts_log
             from apv_juskeb_m a 	 		
             left join (select a.no_bukti,b.nama as nama_jab
                                 from apv_flow a
                                 inner join apv_jab b on a.kode_jab=b.kode_jab --and a.kode_lokasi=b.kode_lokasi
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )x on a.no_bukti=x.no_bukti
-            where a.progress in ('0','R')  and a.nik_buat='$nik' order by a.tanggal";
+            where a.progress in ('0','R','J')  and a.nik_buat='$nik' order by a.tanggal";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -576,7 +576,7 @@ class PengajuanJuskebController extends Controller
             from apv_juskeb_m a
             left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             left join apv_jenis c on a.kode_jenis=c.kode_jenis 
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            where a.no_bukti='$no_bukti' ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -585,15 +585,15 @@ class PengajuanJuskebController extends Controller
                 from apv_juskeb_m a
                 left join apv_karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
                 left join apv_jab d on c.kode_jab=d.kode_jab and c.kode_lokasi=d.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+                where a.no_bukti='$no_bukti'
                 union all
                 select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,d.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl
                 from apv_flow a
                 inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                 inner join apv_karyawan c on a.nik=c.nik
                 left join apv_jab d on c.kode_jab=d.kode_jab and c.kode_lokasi=d.kode_lokasi
-                inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
-                where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+                inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
+                where a.no_bukti='$no_bukti'
 			) a
 			order by a.no_app,a.tgl
             ";
