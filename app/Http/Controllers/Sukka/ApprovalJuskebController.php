@@ -582,7 +582,7 @@ class ApprovalJuskebController extends Controller
                 select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from apv_juskeb_m a
                 inner join apv_pesan e on a.no_bukti=e.no_bukti 
-                inner join apv_flow c on e.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+                inner join apv_flow c on e.no_bukti=c.no_bukti and e.no_urut=c.no_urut
                 left join apv_karyawan f on c.nik=f.nik 
                 where a.no_bukti='$no_aju' 
             ) a order by id2,tanggal
