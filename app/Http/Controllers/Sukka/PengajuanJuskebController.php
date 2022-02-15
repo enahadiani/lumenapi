@@ -200,14 +200,14 @@ class PengajuanJuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,a.tanggal,a.nilai,a.kegiatan,a.periode,a.kode_pp,a.jenis,case a.progress when 'R' then 'Return' when 'S' then 'Selesai' else isnull(x.nama_jab,'-') end as progress,case when datediff(minute,a.tanggal,getdate()) <= 10 then 'baru' else 'lama' end as status
+            $sql="select a.no_bukti,a.tanggal,a.nilai,a.kegiatan,a.periode,a.kode_pp,a.jenis,case a.progress when 'R' then 'Return' when 'J' then 'Finish Approval Justifikasi' else isnull(x.nama_jab,'-') end as progress,case when datediff(minute,a.tanggal,getdate()) <= 10 then 'baru' else 'lama' end as status
             from apv_juskeb_m a 	 		
             left join (select a.no_bukti,b.nama as nama_jab
                                 from apv_flow a
                                 inner join apv_jab b on a.kode_jab=b.kode_jab --and a.kode_lokasi=b.kode_lokasi
                                 where a.kode_lokasi='$kode_lokasi' and a.status='1'
                                 )x on a.no_bukti=x.no_bukti
-            where a.progress in ('0')  and a.nik_buat='$nik' order by a.tanggal";
+            where a.progress in ('0','R')  and a.nik_buat='$nik' order by a.tanggal";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -302,6 +302,7 @@ class PengajuanJuskebController extends Controller
                     $title = "Pengajuan Justifikasi Pengadaan";
                     $subtitle = "-";
                     $content = "Pengajuan Justifikasi Pengadaan No: $no_bukti menunggu approval Anda.";
+                    $periode = substr($periode,4,2);
                     $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
                     $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
                     $success['no_pesan'] = $no_pesan;
@@ -312,6 +313,7 @@ class PengajuanJuskebController extends Controller
                     $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
                     $result = app('App\Http\Controllers\Sukka\LaporanController')->getDataEmail($r);
                     $result = json_decode(json_encode($result),true);
+                    $periode = substr($periode,4,2);
                     $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                     $result['original']['judul'] = $pesan_header;
                     $html = view('email-sukka',$result['original'])->render();

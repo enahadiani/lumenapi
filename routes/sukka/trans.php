@@ -36,7 +36,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('app-juskeb','Sukka\ApprovalJuskebController@store');
     $router->get('app-juskeb-status','Sukka\ApprovalJuskebController@getStatus');
     $router->get('app-juskeb-preview','Sukka\ApprovalJuskebController@getPreview');
-    $router->post('app-juskeb-send-email', 'Sukka\PengajuanJuskebController@sendNotifikasi');
+    $router->post('app-juskeb-send-email', 'Sukka\ApprovalJuskebController@sendNotifikasi');
 
 });
 

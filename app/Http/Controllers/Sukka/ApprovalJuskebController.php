@@ -380,7 +380,7 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -399,7 +399,7 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -466,7 +466,7 @@ class ApprovalJuskebController extends Controller
                 $sqlbuat="
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from apv_juskeb_m b
-                inner join karyawan c on b.nik_buat=c.nik 
+                inner join apv_karyawan c on b.nik_buat=c.nik 
                 where b.no_bukti='".$no_bukti."' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
@@ -490,7 +490,7 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -509,7 +509,7 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
