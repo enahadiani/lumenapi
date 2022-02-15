@@ -17,7 +17,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
-    $router->get('lap-aju-form','Sukka\LaporanController@getDataEmail');
+    $router->get('lap-aju-form','Sukka\LaporanController@getAjuForm');
 });
 
 
