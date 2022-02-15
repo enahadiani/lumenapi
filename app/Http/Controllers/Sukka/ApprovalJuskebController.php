@@ -140,7 +140,7 @@ class ApprovalJuskebController extends Controller
         return $id;
     }
 
-    public function index(Request $request)
+    public function index(Request $r)
     {
         try {
             
@@ -150,12 +150,12 @@ class ApprovalJuskebController extends Controller
             }
 
             $filter = "";
-            if(isset($request->no_bukti) && $request->no_bukti != ""){
-                $filter .= " and c.no_bukti='$request->no_bukti' ";
+            if(isset($r->no_bukti) && $r->no_bukti != ""){
+                $filter .= " and c.no_bukti='$r->no_bukti' ";
             }
 
-            if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
-                $filter .= " and a.tanggal between '$request->start_date' and '$request->end_date' ";
+            if(isset($r->start_date) && $r->start_date != "" && isset($r->end_date) && $r->end_date != ""){
+                $filter .= " and a.tanggal between '$r->start_date' and '$r->end_date' ";
             }
 
             $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
@@ -163,7 +163,7 @@ class ApprovalJuskebController extends Controller
             inner join apv_juskeb_m c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi 
             left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
             inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
+            where b.nik= '$nik_user' $filter
             ");
             $res = json_decode(json_encode($res),true);
 
@@ -188,7 +188,7 @@ class ApprovalJuskebController extends Controller
         
     }
 
-    public function getPengajuan(Request $request)
+    public function getPengajuan(Request $r)
     {
         try {
             
@@ -198,15 +198,14 @@ class ApprovalJuskebController extends Controller
             }
 
             $filter = "";
-            if(isset($request->no_bukti) && $request->no_bukti != ""){
-                $filter .= " and b.no_bukti='$request->no_bukti' ";
+            if(isset($r->no_bukti) && $r->no_bukti != ""){
+                $filter .= " and b.no_bukti='$r->no_bukti' ";
             }
 
-            if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
-                $filter .= " and b.tanggal between '$request->start_date' and '$request->end_date' ";
+            if(isset($r->start_date) && $r->start_date != "" && isset($r->end_date) && $r->end_date != ""){
+                $filter .= " and b.tanggal between '$r->start_date' and '$r->end_date' ";
             }
-            
-            $res = DB::connection($this->db)->select("select b.no_bukti,b.kode_pp,b.jenis,convert(varchar,b.tanggal,103)  as tanggal,b.kegiatan,p.nama as nama_pp,b.nilai,b.periode
+            $sql = "select b.no_bukti,b.kode_pp,b.jenis,convert(varchar,b.tanggal,103)  as tanggal,b.kegiatan,p.nama as nama_pp,b.nilai,b.periode
             from apv_flow a
             inner join (select a.no_urut,a.no_bukti,a.kode_lokasi
 					from apv_flow a
@@ -214,8 +213,10 @@ class ApprovalJuskebController extends Controller
 				) x on a.no_bukti=x.no_bukti and a.kode_lokasi=x.kode_lokasi and a.no_urut < x.no_urut
             inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             left join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
-            ");
+            where a.status='1' and a.nik= '$nik_user' $filter
+            ";
+            $success['sql'] = $sql;
+            $res = DB::connection($this->db)->select($sql);
 
             $res = json_decode(json_encode($res),true);
             
@@ -253,12 +254,12 @@ class ApprovalJuskebController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $r
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $r)
     {
-        $this->validate($request, [
+        $this->validate($r, [
             'no_aju' => 'required|max:20',
             'status' => 'required|max:1',
             'keterangan' => 'required|max:150',
@@ -273,22 +274,21 @@ class ApprovalJuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            date_default_timezone_set('Asia/Jakarta');
+            date_default_timezone_set('Asia/Jakarta');            
             $tgl = date('Y-m-d H:i:s');
 
-            $no_bukti = $request->input('no_aju');
+            $no_bukti = $r->input('no_aju');
             $nik_buat = "";
             $nik_app1 = "";
             $nik_app = $nik_user;
             $token_player = array();
             $token_player2 = array();
-            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$request->input('keterangan')."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','JK') ");
+            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, getdate(), ?, ?, ?)", array($no_bukti,$kode_lokasi,$r->input('keterangan'),$r->input('no_urut'),$r->input('status'),'JK'));
 
             $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
-            ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_urut', $request->input('no_urut'))
-            ->update(['status' => $request->input('status'),'tgl_app'=>$tgl]);
+            ->where('no_urut', $r->input('no_urut'))
+            ->update(['status' => $r->input('status'),'tgl_app'=>$tgl]);
 
             $max = DB::connection($this->db)->select("
             select max(a.no_urut) as nu from apv_flow a
@@ -296,7 +296,7 @@ class ApprovalJuskebController extends Controller
                 from apv_flow a
                 where a.nik='201'
             ) x on a.no_bukti=x.no_bukti and a.kode_lokasi=x.kode_lokasi and a.no_urut < x.no_urut
-            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' 
+            where a.no_bukti='$no_bukti' 
             ");
             $max = json_decode(json_encode($max),true);
 
@@ -305,27 +305,26 @@ class ApprovalJuskebController extends Controller
                 from apv_flow a
                 where a.nik='201'
             ) x on a.no_bukti=x.no_bukti and a.kode_lokasi=x.kode_lokasi and a.no_urut < x.no_urut
-            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' 
+            where a.no_bukti='$no_bukti' 
             ");
             $min = json_decode(json_encode($min),true);
 
-            if($request->status == 2){
-                $nu = $request->no_urut+1;
+            if($r->status == 2){
+                $nu = $r->no_urut+1;
 
                 $upd2 =  DB::connection($this->db)->table('apv_flow')
                 ->where('no_bukti', $no_bukti)    
-                ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
                 ->update(['status' => '1','tgl_app'=>$tgl]);
                 
                 //send to App selanjutnya
-                if($request->no_urut != $max[0]['nu']){
+                if($r->no_urut != $max[0]['nu']){
 
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
                     left join apv_karyawan b on a.nik=b.nik 
-                    where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi'";
+                    where a.no_bukti='".$no_bukti."' and a.no_urut=$nu ";
 
                     $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
@@ -340,16 +339,14 @@ class ApprovalJuskebController extends Controller
 
                     $upd3 =  DB::connection($this->db)->table('apv_juskeb_m')
                     ->where('no_bukti', $no_bukti)    
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['progress' => 'S']);
+                    ->update(['progress' => '1']);
                 }else{
                     $no_telp = "-";
                     $nik_app1 = "-";
 
                     $upd3 =  DB::connection($this->db)->table('apv_juskeb_m')
                     ->where('no_bukti', $no_bukti)    
-                    ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['progress' => '1']);
+                    ->update(['progress' => 'J']);
 
                     $psn = "Approver terakhir";
                 }
@@ -359,13 +356,13 @@ class ApprovalJuskebController extends Controller
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from apv_juskeb_m b 
                 inner join apv_karyawan c on b.nik_buat=c.nik 
-                where b.no_bukti='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
+                where b.no_bukti='".$no_bukti."' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
                     $no_telp2 = $rs2[0]["no_telp"];
                     $nik_buat = $rs2[0]['nik_buat'];
-                    if(intval($request->no_urut) == intval($max[0]['nu'])){
+                    if(intval($r->no_urut) == intval($max[0]['nu'])){
                         $app_email2 = $rs2[0]['email'];
                     }
                 }else{
@@ -374,8 +371,8 @@ class ApprovalJuskebController extends Controller
                 }
                 $success['approval'] = "Approve";
                 
-                $request->request->add(['no_bukti' => ["=",$no_bukti,""]]);
-                $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
+                $result = app('App\Http\Controllers\Sukka\LaporanController')->getDataEmail($r);
                 $result = json_decode(json_encode($result),true);
                 if(isset($app_email) && $app_email != "-"){
                     $pesan_header = "Pengajuan $no_bukti berikut telah di approve oleh $nik_user, menunggu approval Anda:";
@@ -429,22 +426,21 @@ class ApprovalJuskebController extends Controller
                 $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Beban','-',0,0]);
 
             }else{
-                $nu=$request->no_urut-1;
+                $nu=$r->no_urut-1;
 
                 $upd2 =  DB::connection($this->db)->table('apv_flow')
                 ->where('no_bukti', $no_bukti)    
-                ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_urut', $nu)
                 ->update(['status' => '1','tgl_app'=>NULL]);
 
 
-                if(intval($request->no_urut) != intval($min[0]['nu'])){
+                if(intval($r->no_urut) != intval($min[0]['nu'])){
                     // //send to approver sebelumnya
                     $sqlapp="
                     select isnull(b.no_telp,'-') as no_telp,b.nik,isnull(b.email,'-') as email
                     from apv_flow a
                     left join apv_karyawan b on a.nik=b.nik 
-                    where a.no_bukti='".$no_bukti."' and a.no_urut=$nu and a.kode_lokasi='$kode_lokasi' ";
+                    where a.no_bukti='".$no_bukti."' and a.no_urut=$nu ";
                     $rs = DB::connection($this->db)->select($sqlapp);
                     $rs = json_decode(json_encode($rs),true);
                     if(count($rs)>0){
@@ -457,14 +453,12 @@ class ApprovalJuskebController extends Controller
                     }
                     $upd3 =  DB::connection($this->db)->table('apv_juskeb_m')
                     ->where('no_bukti', $no_bukti)    
-                    ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'B']);
                 }else{
                     $no_telp = "-";
                     $nik_app1 = "-";
                     $upd3 =  DB::connection($this->db)->table('apv_juskeb_m')
                     ->where('no_bukti', $no_bukti)    
-                    ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'R']);
                 }
                 //send to nik buat
@@ -473,13 +467,13 @@ class ApprovalJuskebController extends Controller
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from apv_juskeb_m b
                 inner join karyawan c on b.nik_buat=c.nik 
-                where b.no_bukti='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
+                where b.no_bukti='".$no_bukti."' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
                     $no_telp2 = $rs2[0]["no_telp"];
                     $nik_buat = $rs2[0]["nik_buat"];
-                    if(intval($request->no_urut) == intval($min[0]['nu'])){
+                    if(intval($r->no_urut) == intval($min[0]['nu'])){
                         $app_email2 = $rs2[0]['email'];
                     }
                 }else{
@@ -487,8 +481,8 @@ class ApprovalJuskebController extends Controller
                     $nik_buat = "-";
                 }
 
-                $request->request->add(['no_bukti' => ["=",$no_bukti,""]]);
-                $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
+                $result = app('App\Http\Controllers\Sukka\LaporanController')->getDataEmail($r);
                 $result = json_decode(json_encode($result),true);
                 if(isset($app_email) && $app_email != "-"){
                     $pesan_header = "Pengajuan $no_bukti berikut telah di return oleh $nik_user, menunggu approval Anda:";
@@ -545,6 +539,11 @@ class ApprovalJuskebController extends Controller
 
             }
 
+            $success['app_email2'] = (isset($app_email2) ? $app_email2 : 'none');
+            $success['app_email'] = (isset($app_email) ? $app_email : 'none');
+            $success['sqlbuat'] = (isset($sqlbuat) ? $sqlbuat : 'none');
+            $success['sqlapp'] = (isset($sqlapp) ? $sqlapp : 'none');
+            $success['result'] = (isset($result) ? $result : []);
             DB::connection($this->db)->commit();
             
             $success['status'] = true;
@@ -571,21 +570,21 @@ class ApprovalJuskebController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function show(Request $request)
+    public function show(Request $r)
     {
         try {
-            $no_aju = $request->no_aju;
+            $no_aju = $r->no_aju;
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.jenis,b.kode_pp,b.tanggal,b.kegiatan,a.no_urut,c.nama as nama_pp,b.nilai,b.periode
+            $sql="select a.no_bukti,b.jenis,b.kode_pp,b.tanggal,b.kegiatan,a.no_urut,c.nama as nama_pp,b.nilai,b.periode,b.latar,b.aspek,b.spesifikasi,b.rencana
             from apv_flow a
             inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             left join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1' ";
+            where a.no_bukti='$no_aju' and a.status='1' ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -594,10 +593,10 @@ class ApprovalJuskebController extends Controller
 			select * from (
                 select convert(varchar,e.id) as id,a.no_bukti,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
                 from apv_juskeb_m a
-                inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi
-                inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
+                inner join apv_pesan e on a.no_bukti=e.no_bukti 
+                inner join apv_flow c on e.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
                 left join apv_karyawan f on c.nik=f.nik 
-                where a.no_bukti='$no_aju' and a.kode_lokasi='$kode_lokasi' 
+                where a.no_bukti='$no_aju' 
             ) a order by id2,tanggal
 	        ";
             $res2 = DB::connection($this->db)->select($sql4);
@@ -641,11 +640,11 @@ class ApprovalJuskebController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $r
      * @param  \App\Fs  $Fs
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $no_bukti)
+    public function update(Request $r, $no_bukti)
     {
         //
     }
@@ -694,12 +693,12 @@ class ApprovalJuskebController extends Controller
         
     }
 
-    public function getPreview(Request $request)
+    public function getPreview(Request $r)
     {
         try {
             
-            $no_bukti = $request->id;
-            $id = $request->jenis;
+            $no_bukti = $r->id;
+            $id = $r->jenis;
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
@@ -709,18 +708,18 @@ class ApprovalJuskebController extends Controller
             if($id == "default"){
                 $rs = DB::connection($this->db)->select("select max(id) as id
                 from apv_pesan a
-                left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-                where a.kode_lokasi='$kode_lokasi' and a.modul='JK' and b.nik= '$nik_user' and a.no_bukti='$no_bukti'");
+                left join apv_flow b on a.no_bukti=b.no_bukti and a.no_urut=b.no_urut
+                where a.modul='JK' and b.nik= '$nik_user' and a.no_bukti='$no_bukti'");
                 $id = $rs[0]->id;
             }else{
                 $id = $id;
             }
 
-            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Returned' end as status
+            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan as keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Returned' end as status
             from apv_pesan a
-            inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            inner join apv_juskeb_m b on a.no_bukti=b.no_bukti 
             inner join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
-            inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut and a.kode_lokasi=e.kode_lokasi
+            inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
             where a.no_bukti='$no_bukti' and a.modul='JK' and a.id='$id' ";
             
             $res = DB::connection($this->db)->select($sql);
@@ -745,9 +744,9 @@ class ApprovalJuskebController extends Controller
         }
     }
 
-    public function sendNotifikasi(Request $request)
+    public function sendNotifikasi(Request $r)
     {
-        $this->validate($request,[
+        $this->validate($r,[
             "no_pooling" => 'required'
         ]);
 
@@ -759,7 +758,7 @@ class ApprovalJuskebController extends Controller
         DB::connection($this->db)->beginTransaction();
         try{
             $client = new Client();
-            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis,email from pooling where flag_kirim=0 and no_pool ='$request->no_pooling'  ");
+            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis,email from pooling where flag_kirim=0 and no_pool ='$r->no_pooling'  ");
             if(count($res) > 0){
                 $msg = "";
                 $sts = false;
@@ -785,7 +784,7 @@ class ApprovalJuskebController extends Controller
                                 $success['data2'] = $data;
 
                                 $updt =  DB::connection($this->db)->table('pooling')
-                                ->where('no_pool', $request->no_pooling)    
+                                ->where('no_pool', $r->no_pooling)    
                                 ->where('jenis', 'EMAIL')
                                 ->where('flag_kirim', 0)
                                 ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
