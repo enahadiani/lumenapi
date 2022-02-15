@@ -61,7 +61,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
      $router->get('aju-rra-tmp','Sukka\PengajuanRRAController@getDataTmp');
      $router->get('aju-rra-preview', 'Sukka\PengajuanRRAController@getPreview');
      
-     $router->post('aju-rra-send-email', 'Sukka\PengajuanRRAController@sendNotifikasi');
+     $router->post('aju-rra-email', 'Sukka\PengajuanRRAController@sendNotifikasi');
      $router->get('tes-email', 'Sukka\PengajuanRRAController@getEmailView');
  
     // APPROVAL RRA

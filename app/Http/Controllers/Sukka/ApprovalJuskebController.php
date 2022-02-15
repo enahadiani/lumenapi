@@ -158,7 +158,7 @@ class ApprovalJuskebController extends Controller
                 $filter .= " and a.tanggal between '$r->start_date' and '$r->end_date' ";
             }
 
-            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Justifikasi Kebutuhan' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
+            $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'RRA' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
             from apv_pesan a
             inner join apv_juskeb_m c on a.no_bukti=c.no_bukti 
             left join apv_flow b on a.no_bukti=b.no_bukti and c.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
@@ -401,8 +401,8 @@ class ApprovalJuskebController extends Controller
                         $msg_email = "";
                 }
 
-                $title = "Justifikasi Kebutuhan";
-                $subtitle = "Approval Justifikasi Kebutuhan";
+                $title = "RRA";
+                $subtitle = "Approval RRA";
                 $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di approve oleh ".$nik_app." , menunggu approval anda.";
 
                 $content2 = "Pengajuan dengan no transaksi ".$no_bukti." Anda telah di approve oleh ".$nik_app;
@@ -513,8 +513,8 @@ class ApprovalJuskebController extends Controller
                 
                 $success['approval'] = "Return";
 
-                $title = "Justifikasi Kebutuhan";
-                $subtitle = "Return Justifikasi Kebutuhan";
+                $title = "RRA";
+                $subtitle = "Return RRA";
                 $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di return oleh ".$nik_app." , menunggu approval anda.";
 
                 $content2 = "Pengajuan dengan no transaksi ".$no_bukti." Anda telah di return oleh ".$nik_app;
@@ -535,13 +535,13 @@ class ApprovalJuskebController extends Controller
             DB::connection($this->db)->commit();
             
             $success['status'] = true;
-            $success['message'] = "Data Approval Justifikasi Kebutuhan berhasil disimpan. No Bukti:".$no_bukti;
+            $success['message'] = "Data Approval RRA berhasil disimpan. No Bukti:".$no_bukti;
             $success['no_aju'] = $no_bukti;
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             $success['status'] = false;
-            $success['message'] = "Data Approval Justifikasi Kebutuhan gagal disimpan ".$e;
+            $success['message'] = "Data Approval RRA gagal disimpan ".$e;
             $success['no_aju'] = "";
             $success['approval'] = "Failed";
             DB::connection($this->db)->rollback();
@@ -761,7 +761,7 @@ class ApprovalJuskebController extends Controller
                             'form_params' => [
                                 'from' => 'devsaku5@gmail.com',
                                 'to' => $row->email,
-                                'subject' => 'Approval Justifikasi Kebutuhan',
+                                'subject' => 'Approval RRA',
                                 'html' => htmlspecialchars_decode($row->pesan)
                             ]
                         ]);

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Imports\RRAjuImport;
 use App\Exports\RRAjuExport;
 use Maatwebsite\Excel\Facades\Excel;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use Log;
 use Carbon\Carbon; 
 
@@ -272,10 +274,15 @@ class PengajuanRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_pdrk,convert(varchar,a.tanggal,103) as tgl,b.no_dokumen,a.keterangan,case a.progress when '0' then 'Pengajuan' when 'R' then 'Return' end as progress,a.tanggal, b.nilai,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input  
+            $sql="select a.no_pdrk,convert(varchar,a.tanggal,103) as tgl,b.no_dokumen,a.keterangan,case a.progress when 'R' then 'Return Approval RRA' when 'P' then 'Finish Approval RRA' else isnull(x.nama_jab,'-') end as progress,a.tanggal, b.nilai,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input,a.progress as sts_log  
             from apv_pdrk_m a 
-            inner join anggaran_m b on a.no_pdrk=b.no_agg 					 		
-            where a.modul = 'PUSAT' and a.progress in ('0','K','A')  order by a.tanggal";
+            inner join anggaran_m b on a.no_pdrk=b.no_agg 	
+            left join (select a.no_bukti,b.nama as nama_jab
+                        from apv_flow a
+                        inner join apv_jab b on a.kode_jab=b.kode_jab
+                        where a.status='1'
+                        )x on a.no_pdrk=x.no_bukti
+            where a.progress in ('0','R','P') and a.modul = 'PUSAT' order by a.tanggal";
 
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -324,7 +331,7 @@ class PengajuanRRAController extends Controller
             'deskripsi' => 'required|max:200',
             'lokasi_terima' => 'required',
             'lokasi_beri' => 'required',
-            'kode_jenis' => 'required',
+            'jenis_rra' => 'required',
             'total_terima' => 'required',
             'total_beri' => 'required',
             'kode_akun' => 'required|array',
@@ -424,7 +431,7 @@ class PengajuanRRAController extends Controller
 
                         $insm1 = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values (?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$r->no_dokumen,$r->tanggal,$r->deskripsi,substr($periode,0,4),'IDR',floatval($r->total_beri),$nik,'T','-',$nik,'-',$jenis));
 
-                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_terima,$r->lokasi_beri,$r->deskripsi,$this_pp,'-',$r->jenis,$r->tanggal,$periode,$nik,$jenis,$r->kode_jenis,$nik,'0','PUSAT'));
+                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_terima,$r->lokasi_beri,$r->deskripsi,$this_pp,'-',$r->jenis,$r->tanggal,$periode,$nik,$jenis,$r->jenis_rra,$nik,'0','PUSAT'));
 
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -483,16 +490,16 @@ class PengajuanRRAController extends Controller
                         }
         
                         if(isset($nik_app) && $nik_app != ""){
-                            $title = "Pengajuan Justifikasi Kebutuhan";
+                            $title = "Pengajuan RRA";
                             $subtitle = "-";
-                            $content = "Pengajuan Justifikasi Kebutuhan No: $no_bukti menunggu approval Anda.";
+                            $content = "Pengajuan RRA No: $no_bukti menunggu approval Anda.";
                             $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
                             $success['no_pesan'] = $no_pesan;
                         }
         
                         if(isset($app_email) && $app_email != ""){
-                            $pesan_header = "Pengajuan Justifikasi Kebutuhan No: $no_bukti berikut menunggu approval Anda.";
+                            $pesan_header = "Pengajuan RRA No: $no_bukti berikut menunggu approval Anda.";
                             $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
                             $result = app('App\Http\Controllers\Sukka\LaporanController')->getRRAForm($r);
                             $result = json_decode(json_encode($result),true);
@@ -563,7 +570,7 @@ class PengajuanRRAController extends Controller
             'jenis' => 'required',
             'lokasi_terima' => 'required',
             'lokasi_beri' => 'required',
-            'kode_jenis' => 'required',
+            'jenis_rra' => 'required',
             'total_terima' => 'required',
             'total_beri' => 'required',
             'kode_akun' => 'required|array',
@@ -607,23 +614,23 @@ class PengajuanRRAController extends Controller
             if($cek['status']){
 
                 $del1 = DB::connection($this->db)->table('anggaran_m')
-                ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_agg', $no_bukti)
                 ->delete();
 
                 $del2 = DB::connection($this->db)->table('anggaran_d')
-                ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_agg', $no_bukti)
                 ->delete();
                 
                 $del3 = DB::connection($this->db)->table('apv_pdrk_m')
-                ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_pdrk', $no_bukti)
                 ->delete();
 
                 $del4 = DB::connection($this->db)->table('apv_pdrk_d')
-                ->where('kode_lokasi', $kode_lokasi)
                 ->where('no_pdrk', $no_bukti)
+                ->delete();
+
+                $del5 = DB::connection($this->db)->table('apv_flow')
+                ->where('no_bukti', $no_bukti)
                 ->delete();
 
                 $j = 0;
@@ -683,7 +690,7 @@ class PengajuanRRAController extends Controller
 
                         $insm1 = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values (?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$r->no_dokumen,$r->tanggal,$r->deskripsi,substr($periode,0,4),'IDR',floatval($r->total_beri),$nik,'T','-',$nik,'-',$jenis));
 
-                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_terima,$r->lokasi_beri,$r->deskripsi,$this_pp,'-',$r->jenis,$r->tanggal,$periode,$nik,$jenis,$r->kode_jenis,$nik,'0','PUSAT'));
+                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_terima,$r->lokasi_beri,$r->deskripsi,$this_pp,'-',$r->jenis,$r->tanggal,$periode,$nik,$jenis,$r->jenis_rra,$nik,'0','PUSAT'));
 
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -742,16 +749,16 @@ class PengajuanRRAController extends Controller
                         }
         
                         if(isset($nik_app) && $nik_app != ""){
-                            $title = "Pengajuan Justifikasi Kebutuhan";
+                            $title = "Pengajuan RRA";
                             $subtitle = "-";
-                            $content = "Pengajuan Justifikasi Kebutuhan No: $no_bukti menunggu approval Anda.";
+                            $content = "Pengajuan RRA No: $no_bukti menunggu approval Anda.";
                             $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
                             $success['no_pesan'] = $no_pesan;
                         }
         
                         if(isset($app_email) && $app_email != ""){
-                            $pesan_header = "Pengajuan Justifikasi Kebutuhan No: $no_bukti berikut menunggu approval Anda.";
+                            $pesan_header = "Pengajuan RRA No: $no_bukti berikut menunggu approval Anda.";
                             $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
                             $result = app('App\Http\Controllers\Sukka\LaporanController')->getRRAForm($r);
                             $result = json_decode(json_encode($result),true);
@@ -814,23 +821,23 @@ class PengajuanRRAController extends Controller
             $no_bukti = $r->no_bukti;
     
             $del1 = DB::connection($this->db)->table('anggaran_m')
-            ->where('kode_lokasi', $kode_lokasi)
             ->where('no_agg', $no_bukti)
             ->delete();
             
             $del2 = DB::connection($this->db)->table('anggaran_d')
-            ->where('kode_lokasi', $kode_lokasi)
             ->where('no_agg', $no_bukti)
             ->delete();
             
             $del3 = DB::connection($this->db)->table('apv_pdrk_m')
-            ->where('kode_lokasi', $kode_lokasi)
             ->where('no_pdrk', $no_bukti)
             ->delete();
             
             $del4 = DB::connection($this->db)->table('apv_pdrk_d')
-            ->where('kode_lokasi', $kode_lokasi)
             ->where('no_pdrk', $no_bukti)
+            ->delete();
+            
+            $del5 = DB::connection($this->db)->table('apv_flow')
+            ->where('no_bukti', $no_bukti)
             ->delete();
             
             $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
@@ -1081,30 +1088,30 @@ class PengajuanRRAController extends Controller
                 if($res[0]['jenis_agg'] == "ANGGARAN"){
                     $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai,0 as saldo
                     --,dbo.fn_saldoGarTW(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,substring(a.periode,1,4),case substring(a.periode,5,2) when '01' then 'TW1' when '04' then 'TW2' when '07' then 'TW3' when '10' then 'TW4' end,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        inner join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
                     where a.no_pdrk='".$r->no_bukti."' and a.dc ='C'";
 
                     $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai,0 as saldo
                     --dbo.fn_saldoGarTW(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,substring(a.periode,1,4),case substring(a.periode,5,2) when '01' then 'TW1' when '04' then 'TW2' when '07' then 'TW3' when '10' then 'TW4' end,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        inner join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
                     where a.no_pdrk='".$r->no_bukti."' and a.dc ='D'";
                 }else{
                     $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai,0 as saldo
                     --dbo.fn_saldoRilis(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,a.periode,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        inner join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
                     where a.no_pdrk='".$r->no_bukti."' and a.dc ='C'";
 
                     $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai, 0 as saldo
                     --dbo.fn_saldoRilis(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,a.periode,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        inner join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        inner join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
                     where a.no_pdrk='".$r->no_bukti."' and a.dc ='D'";
                 }
                 $rsd = DB::connection($this->db)->select($strd);
@@ -1114,7 +1121,7 @@ class PengajuanRRAController extends Controller
                 $rest = json_decode(json_encode($rst),true);
 
                 $strdok = "select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres
-                from pbh_dok a inner join dok_jenis b on a.kode_jenis=b.kode_jenis 
+                from pbh_dok a inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
                 where a.no_bukti = '".$r->no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.nu";
                 $rsdok = DB::connection($this->db)->select($strdok);
                 $resdok = json_decode(json_encode($rsdok),true);
@@ -1124,26 +1131,12 @@ class PengajuanRRAController extends Controller
                 where a.no_bukti = ? order by a.no_urut";
                 $rsdet = DB::connection($this->db)->select($strdet,array($r->input('no_bukti')));
                 $resdet = json_decode(json_encode($rsdet),true);
-
-                $sql4 = "
-                select * from (
-                    select convert(varchar,e.id) as id,a.no_pdrk as no_bukti,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
-                    from apv_pdrk_m a
-                    inner join apv_pesan e on a.no_pdrk=e.no_bukti 
-                    inner join apv_flow c on e.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
-                    left join apv_karyawan f on c.nik=f.nik 
-                    where a.no_bukti=?
-                ) a order by id2,tanggal
-                ";
-                $rs5 = DB::connection($this->db)->select($strdet,array($r->input('no_bukti')));
-                $res5 = json_decode(json_encode($rs5),true);
                 
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['detail_beri'] = $resd;
                 $success['detail_app'] = $resdet;
                 $success['detail_terima'] = $rest;
-                $success['detail_catatan'] = $res5;
                 $success['dokumen'] = $resdok;
                 $success['message'] = "Success!";     
             }
@@ -1153,7 +1146,6 @@ class PengajuanRRAController extends Controller
                 $success['detail_app'] = [];
                 $success['detail_beri'] = [];
                 $success['detail_terima'] = [];
-                $success['detail_catatan'] = [];
                 $success['dokumen'] = [];
                 $success['status'] = false;
             }
@@ -1164,12 +1156,89 @@ class PengajuanRRAController extends Controller
             $success['detail_app'] = [];
             $success['detail_beri'] = [];
             $success['detail_terima'] = [];
-            $success['detail_catatan'] = [];
             $success['dokumen'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function getPreview(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $no_bukti = $request->no_bukti;
+
+            $sql = "select a.periode,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk,a.kode_lokasi,a.keterangan,a.nik_buat,b.nama as nama_buat
+            from apv_pdrk_m a
+            inner join karyawan b on a.nik_buat=b.nik
+            where a.no_pdrk='$no_bukti'
+            order by a.no_pdrk";
+            
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql="select * from (select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,d.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut,a.tanggal as tgl
+                from apv_pdrk_m a
+                left join apv_karyawan c on a.nik_buat=c.nik 
+                left join apv_jab d on c.kode_jab=d.kode_jab 
+                where a.no_pdrk='$no_bukti'
+                union all
+                select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,d.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl
+                from apv_flow a
+                inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
+                inner join apv_karyawan c on a.nik=c.nik
+                left join apv_jab d on c.kode_jab=d.kode_jab 
+                inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
+                where a.no_bukti='$no_bukti'
+			) a
+			order by a.no_app,a.tgl
+            ";
+            $res3 = DB::connection($this->db)->select($sql);
+            $res3 = json_decode(json_encode($res3),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $i=0;
+                foreach($res as $row){
+                    $sql2 = "select a.kode_akun,a.kode_pp,a.kode_drk,a.periode,a.dc,a.nilai,
+                    b.nama as nama_akun,c.nama as nama_pp,d.nama as nama_drk, 
+                    case when a.dc='D' then a.nilai else 0 end debet,case when a.dc='C' then a.nilai else 0 end kredit
+                    from apv_pdrk_d a
+                    left join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                    left join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                    left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring('".$row['periode']."',1,4)
+                    where a.no_pdrk='".$row['no_pdrk']."' 
+                    order by a.dc,a.kode_akun";
+                    $res2 = DB::connection($this->db)->select($sql2);
+                    $res[$i]['detail'] = json_decode(json_encode($res2),true);
+                    $i++;
+                }
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail_app'] = $res3;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail_app'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['detail_app'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
     public function getAkun(Request $r)
@@ -1464,7 +1533,7 @@ class PengajuanRRAController extends Controller
                 $filter = " where kode_jenis='$r->kode_jenis' ";
             }
 
-            $strSQL = "select kode_jenis, nama  from inv_dok_jenis $filter ";				
+            $strSQL = "select kode_jenis, nama  from dok_jenis where kode_lokasi='$kode_lokasi' $filter ";				
             $res = DB::connection($this->db)->select($strSQL);						
             $res= json_decode(json_encode($res),true);
             
@@ -1719,6 +1788,79 @@ class PengajuanRRAController extends Controller
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function sendNotifikasi(Request $r)
+    {
+        $this->validate($r,[
+            "no_pooling" => 'required'
+        ]);
+
+        if($auth =  Auth::guard($this->guard)->user()){
+            $nik= $auth->nik;
+            $kode_lokasi= $auth->kode_lokasi;
+        }
+
+        DB::connection($this->db)->beginTransaction();
+        try{
+            $client = new Client();
+            $res = DB::connection($this->db)->select("select no_hp,pesan,jenis,email from pooling where flag_kirim=0 and no_pool ='$r->no_pooling'  ");
+            if(count($res) > 0){
+                $msg = "";
+                $sts = false;
+                foreach($res as $row){
+                    if($row->jenis == "EMAIL") {
+                        $credentials = base64_encode('api:'.config('services.mailgun.secret'));
+                        $domain = "https://api.mailgun.net/v3/".config('services.mailgun.domain')."/messages";
+                        $response = $client->request('POST',  $domain,[
+                            'headers' => [
+                                'Authorization' => 'Basic '.$credentials
+                            ],
+                            'form_params' => [
+                                'from' => 'devsaku5@gmail.com',
+                                'to' => $row->email,
+                                'subject' => 'Pengajuan RRA',
+                                'html' => htmlspecialchars_decode($row->pesan)
+                            ]
+                        ]);
+                        if ($response->getStatusCode() == 200) { // 200 OK
+                            $response_data = $response->getBody()->getContents();
+                            $data = json_decode($response_data,true);
+                            if(isset($data["id"])){
+                                $success['data2'] = $data;
+
+                                $updt =  DB::connection($this->db)->table('pooling')
+                                ->where('no_pool', $r->no_pooling)    
+                                ->where('jenis', 'EMAIL')
+                                ->where('flag_kirim', 0)
+                                ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
+
+                                
+                                DB::connection($this->db)->commit();
+                                $sts = true;
+                                $msg .= $data['message'];
+                            }
+                        }
+                    }
+                    
+                }
+
+                $success['message'] = $msg;
+                $success['status'] = $sts;
+            }else{
+                $success['message'] = "Data pooling tidak valid";
+                $success['status'] = false;
+            }
+            return response()->json($success, 200);
+        } catch (BadResponseException $ex) {
+            
+            DB::connection($this->db)->rollback();
+            $response = $ex->getResponse();
+            $res = json_decode($response->getBody(),true);
+            $data['message'] = $res;
+            $data['status'] = false;
+            return response()->json($data, 500);
+        }
     }
 
     public function getEmailView(Request $r)
