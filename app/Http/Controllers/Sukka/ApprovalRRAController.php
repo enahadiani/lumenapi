@@ -280,7 +280,7 @@ class ApprovalRRAController extends Controller
             $nik_app = $nik_user;
             $token_player = array();
             $token_player2 = array();
-            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, getdate(), ?, ?, ?)", array($no_bukti,$kode_lokasi,$r->input('keterangan'),$r->input('no_urut'),$r->input('status'),'AJU'));
+            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values (?, ?, ?, getdate(), ?, ?, ?)", array($no_bukti,$kode_lokasi,$r->input('keterangan'),$r->input('no_urut'),$r->input('status'),'RRA'));
 
             $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
@@ -345,7 +345,7 @@ class ApprovalRRAController extends Controller
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from apv_pdrk_m b 
                 inner join apv_karyawan c on b.nik_buat=c.nik 
-                where b.no_bukti='".$no_bukti."' ";
+                where b.no_pdrk='".$no_bukti."' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
@@ -456,7 +456,7 @@ class ApprovalRRAController extends Controller
                 select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
                 from apv_pdrk_m b
                 inner join apv_karyawan c on b.nik_buat=c.nik 
-                where b.no_bukti='".$no_bukti."' ";
+                where b.no_pdrk='".$no_bukti."' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
@@ -569,7 +569,7 @@ class ApprovalRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select b.no_pdrk as no_bukti,b.kode_pp,b.nik_buat,convert(varchar,b.tanggal,103) as tanggal,b.keterangan,p.nama as nama_pp,b.periode,k.nama as nama_buat,b.jenis_agg
+            $sql = "select b.no_pdrk as no_bukti,b.kode_pp,b.nik_buat,convert(varchar,b.tanggal,103) as tanggal,b.keterangan,p.nama as nama_pp,b.periode,k.nama as nama_buat,b.jenis_agg,a.no_urut
             from apv_flow a
             inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
             left join pp p on b.kode_pp=p.kode_pp 
@@ -750,18 +750,18 @@ class ApprovalRRAController extends Controller
                 $rs = DB::connection($this->db)->select("select max(id) as id
                 from apv_pesan a
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.no_urut=b.no_urut
-                where a.modul='AJU' and b.nik= '$nik_user' and a.no_bukti='$no_bukti'");
+                where a.modul='RRA' and b.nik= '$nik_user' and a.no_bukti='$no_bukti'");
                 $id = $rs[0]->id;
             }else{
                 $id = $id;
             }
 
-            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.kegiatan as keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Returned' end as status
+            $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Returned' end as status
             from apv_pesan a
             inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
-            inner join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            inner join pp c on b.kode_pp=c.kode_pp 
             inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
-            where a.no_bukti='$no_bukti' and a.modul='AJU' and a.id='$id' ";
+            where a.no_bukti='$no_bukti' and a.modul='RRA' and a.id='$id' ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);

@@ -371,8 +371,8 @@ class PengajuanRRAController extends Controller
             $no_bukti = $this->generateKode("anggaran_m", "no_agg", $kode_lokasi."-RRA".substr($periode,2,4).".", "0001");
 
             // CEK PERIODE
-            $cek = $this->cekPeriode($periode);
-            if($cek['status']){
+            // $cek = $this->cekPeriode($periode);
+            // if($cek['status']){
 
                 $j = 0;
                 $total_beri = 0;
@@ -448,14 +448,14 @@ class PengajuanRRAController extends Controller
                                         //kalo ada cek nama sebelumnya ada atau -
                                         if($r->nama_file_seb[$i] != "-"){
                                             //kalo ada hapus yang lama
-                                            Storage::disk('local')->delete('sukka/'.$r->nama_file_seb[$i]);
+                                            Storage::disk('s3')->delete('sukka/'.$r->nama_file_seb[$i]);
                                         }
                                         $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                                         $dok = $nama_dok;
-                                        if(Storage::disk('local')->exists('sukka/'.$dok)){
-                                            Storage::disk('local')->delete('sukka/'.$dok);
+                                        if(Storage::disk('s3')->exists('sukka/'.$dok)){
+                                            Storage::disk('s3')->delete('sukka/'.$dok);
                                         }
-                                        Storage::disk('local')->put('sukka/'.$dok,file_get_contents($file));
+                                        Storage::disk('s3')->put('sukka/'.$dok,file_get_contents($file));
                                         $arr_dok[] = $dok;
                                         $arr_jenis[] = $r->kode_jenis[$i];
                                         $arr_no_urut[] = $r->no_urut[$i];
@@ -523,12 +523,12 @@ class PengajuanRRAController extends Controller
                         $success['message'] = "Transaksi tidak valid. Total Terima atau Pemberi tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
-            }else{
-                DB::connection($this->db)->rollback();
-                $success['status'] = false;
-                $success['no_bukti'] = "-";
-                $success['message'] = $cek["message"];
-            }
+            // }else{
+            //     DB::connection($this->db)->rollback();
+            //     $success['status'] = false;
+            //     $success['no_bukti'] = "-";
+            //     $success['message'] = $cek["message"];
+            // }
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
@@ -610,8 +610,8 @@ class PengajuanRRAController extends Controller
             }
 
             // CEK PERIODE
-            $cek = $this->cekPeriode($periode);
-            if($cek['status']){
+            // $cek = $this->cekPeriode($periode);
+            // if($cek['status']){
 
                 $del1 = DB::connection($this->db)->table('anggaran_m')
                 ->where('no_agg', $no_bukti)
@@ -707,14 +707,14 @@ class PengajuanRRAController extends Controller
                                         //kalo ada cek nama sebelumnya ada atau -
                                         if($r->nama_file_seb[$i] != "-"){
                                             //kalo ada hapus yang lama
-                                            Storage::disk('local')->delete('sukka/'.$r->nama_file_seb[$i]);
+                                            Storage::disk('s3')->delete('sukka/'.$r->nama_file_seb[$i]);
                                         }
                                         $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                                         $dok = $nama_dok;
-                                        if(Storage::disk('local')->exists('sukka/'.$dok)){
-                                            Storage::disk('local')->delete('sukka/'.$dok);
+                                        if(Storage::disk('s3')->exists('sukka/'.$dok)){
+                                            Storage::disk('s3')->delete('sukka/'.$dok);
                                         }
-                                        Storage::disk('local')->put('sukka/'.$dok,file_get_contents($file));
+                                        Storage::disk('s3')->put('sukka/'.$dok,file_get_contents($file));
                                         $arr_dok[] = $dok;
                                         $arr_jenis[] = $r->kode_jenis[$i];
                                         $arr_no_urut[] = $r->no_urut[$i];
@@ -782,12 +782,12 @@ class PengajuanRRAController extends Controller
                         $success['message'] = "Transaksi tidak valid. Total Terima atau Pemberi tidak boleh kurang dari atau sama dengan nol";
                     }
                 }
-            }else{
-                DB::connection($this->db)->rollback();
-                $success['status'] = false;
-                $success['no_bukti'] = "-";
-                $success['message'] = $cek["message"];
-            }
+            // }else{
+            //     DB::connection($this->db)->rollback();
+            //     $success['status'] = false;
+            //     $success['no_bukti'] = "-";
+            //     $success['message'] = $cek["message"];
+            // }
                             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
@@ -843,8 +843,8 @@ class PengajuanRRAController extends Controller
             $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
             $res = json_decode(json_encode($res),true);
             for($i=0;$i<count($res);$i++){
-                if(Storage::disk('local')->exists('sukka/'.$res[$i]['no_gambar'])){
-                    Storage::disk('local')->delete('sukka/'.$res[$i]['no_gambar']);
+                if(Storage::disk('s3')->exists('sukka/'.$res[$i]['no_gambar'])){
+                    Storage::disk('s3')->delete('sukka/'.$res[$i]['no_gambar']);
                 }
             }
             
@@ -886,7 +886,7 @@ class PengajuanRRAController extends Controller
             if(count($res3) > 0){
 
                 for($i=0;$i<count($res3);$i++){
-                    Storage::disk('local')->delete('sukka/'.$res3[$i]['file_dok']);
+                    Storage::disk('s3')->delete('sukka/'.$res3[$i]['file_dok']);
                 }
 
                 $del3 = DB::connection($this->db)->table('pbh_dok')
@@ -1631,7 +1631,7 @@ class PengajuanRRAController extends Controller
             // membuat nama file unik
             $nama_file = rand().$file->getClientOriginalName();
             
-            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            Storage::disk('s3')->put($nama_file,file_get_contents($file));
             $dt = Excel::toArray(new RRAjuImport(),$nama_file);
             $excel = $dt[0];
             $x = array();
@@ -1678,7 +1678,7 @@ class PengajuanRRAController extends Controller
             }
             
             DB::connection($this->db)->commit();
-            Storage::disk('local')->delete($nama_file);
+            Storage::disk('s3')->delete($nama_file);
             if($status_validate){
                 $msg = "File berhasil diupload!";
             }else{
