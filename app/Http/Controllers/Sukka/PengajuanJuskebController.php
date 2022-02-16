@@ -426,7 +426,7 @@ class PengajuanJuskebController extends Controller
 
                         if(isset($nik_app) && $nik_app != ""){
                             $title = "Pengajuan Justifikasi Kebutuhan";
-                            $subtitle = "-";
+                            $subtitle = "Juskeb";
                             $content = "Pengajuan Justifikasi Kebutuhan No: $no_bukti menunggu approval Anda.";
                             $no_pesan = $this->generateKode("app_notif_m", "no_bukti",$kode_lokasi."-PN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
@@ -657,7 +657,7 @@ class PengajuanJuskebController extends Controller
 
                         if(isset($nik_app) && $nik_app != ""){
                             $title = "Pengajuan Justifikasi Kebutuhan";
-                            $subtitle = "-";
+                            $subtitle = "Juskeb";
                             $content = "Pengajuan Justifikasi Kebutuhan No: $no_bukti menunggu approval Anda.";
                             $no_pesan = $this->generateKode("app_notif_m", "no_bukti",$kode_lokasi."-PN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
