@@ -57,6 +57,21 @@ class LaporanController extends Controller
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $i=0;
+                foreach($res as $row){
+                    $sql2 = "select a.kode_akun,a.kode_pp,a.kode_drk,a.periode,a.dc,a.nilai,
+                    b.nama as nama_akun,c.nama as nama_pp,isnull(d.nama,'-') as nama_drk, 
+                    case when a.dc='D' then a.nilai else 0 end debet,case when a.dc='C' then a.nilai else 0 end kredit
+                    from apv_juskeb_d a
+                    left join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
+                    left join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                    left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring('".$row['periode']."',1,4)
+                    where a.no_bukti='".$row['no_bukti']."' 
+                    order by a.dc,a.kode_akun";
+                    $res3 = DB::connection($this->db)->select($sql2);
+                    $res[$i]['detail'] = json_decode(json_encode($res3),true);
+                    $i++;
+                }
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['detail'] = $res2;

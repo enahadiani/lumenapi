@@ -192,10 +192,52 @@
                     <p style="font-weight:bold"># <u>RENCANA PELAKSANAAN</u></p>
                     <p>{{ $data[0]['rencana'] }}</p>
                 </div>
-                    <div class="col-12">
-                        <p style="font-weight:bold"># <u>LAMPIRAN</u></p>
-                    </div>
-                    <div class="col-12">
+                <div class="col-12">
+                    <p style="font-weight:bold"># <u>DETAIL</u></p>
+                </div>
+                <div class="col-12">
+                    <table class="table table-condensed table-bordered" style='border:1px solid black;border-collapse:collapse' border="1" width="100%" id="table-penutup">
+                        <thead class="text-center">
+                        <tr>
+                        <td width="5%">NO</td>
+                        <td width="10">KODE AKUN</td>
+                        <td width="25">NAMA AKUN</td>
+                        <td width="10">KODE PP</td>
+                        <td width="25">NAMA PP</td>
+                        <td width="10">KODE DRK</td>
+                        <td width="25">NAMA DRK</td>
+                        <td width="10%">PERIODE</td>
+                        <td width="10%">DONOR</td>
+                        <td width="10%">PENERIMA</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @php $total =0; $no=0; @endphp
+                    @for($i=0; $i < count($data[0]['detail']); $i++)
+                        @php
+                            $line2 = $data[0]['detail'][$i];
+                            $no++;
+                        @endphp
+                        <tr>
+                        <td>{{ $no }} </td>
+                        <td>{{ $line2['kode_akun'] }} </td>
+                        <td>{{ $line2['nama_akun'] }}</td>
+                        <td>{{ $line2['kode_pp'] }} </td>
+                        <td>{{ $line2['nama_pp'] }} </td>
+                        <td>{{ $line2['kode_drk'] }} </td>
+                        <td>{{ $line2['nama_drk'] }} </td>
+                        <td>{{ $line2['periode'] }} </td>
+                        <td align='right' class='isi_laporan'>{{ number_format($line2['kredit'],0,",",".") }}</td>
+                        <td align='right' class='isi_laporan'>{{ number_format($line2['debet'],0,",",".") }}</td>
+                        </tr>
+                    @endfor
+                    </tbody>
+                    </table>
+                </div>
+                <div class="col-12">
+                    <p style="font-weight:bold"># <u>LAMPIRAN</u></p>
+                </div>
+                <div class="col-12">
                     <table class="table table-condensed table-bordered" style='border:1px solid black;border-collapse:collapse' border="1" width="100%" id="table-penutup">
                         <thead class="text-center">
                         <tr>

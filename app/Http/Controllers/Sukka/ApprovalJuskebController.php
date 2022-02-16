@@ -568,10 +568,12 @@ class ApprovalJuskebController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.jenis,b.kode_pp,b.tanggal,b.kegiatan,a.no_urut,c.nama as nama_pp,b.nilai,b.periode,b.latar,b.aspek,b.spesifikasi,b.rencana
+            $sql="select a.no_bukti,b.jenis,b.kode_pp,b.tanggal,b.kegiatan,a.no_urut,c.nama as nama_pp,b.nilai,b.periode,b.latar,b.aspek,b.spesifikasi,b.rencana,d.nama as nama_terima,e.nama as nama_beri,b.lok_terima,b.lok_donor
             from apv_flow a
             inner join apv_juskeb_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             left join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
+            left join lokasi d on b.lok_terima=d.kode_lokasi
+            left join lokasi e on b.lok_donor=e.kode_lokasi
             where a.no_bukti='$no_aju' and a.status='1' ";
             
             $res = DB::connection($this->db)->select($sql);
@@ -591,9 +593,37 @@ class ApprovalJuskebController extends Controller
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,isnull(d.nama,'-') as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
+                    from apv_juskeb_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                    where a.no_bukti='".$no_aju."' and a.dc ='C'";
+                
+                $rsd = DB::connection($this->db)->select($strd);
+                $resd = json_decode(json_encode($rsd),true);
+
+                $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,isnull(d.nama,'-') as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
+                    from apv_juskeb_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                    where a.no_bukti='".$no_aju."' and a.dc ='D'";
+                
+                $rst = DB::connection($this->db)->select($strt);
+                $rest = json_decode(json_encode($rst),true);
+
+                $strdok = "select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres
+                from apv_juskeb_dok a 
+                inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti = '".$no_aju."'  order by a.nu";
+                $rsdok = DB::connection($this->db)->select($strdok);
+                $resdok = json_decode(json_encode($rsdok),true);
+
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['data_detail'] = $res2;
+                $success['detail_beri'] = $resd;
+                $success['detail_terima'] = $rest;
+                $success['dokumen'] = $resdok;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
@@ -601,6 +631,9 @@ class ApprovalJuskebController extends Controller
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
                 $success['data_detail'] = [];
+                $success['detail_beri'] = [];
+                $success['detail_terima'] = [];
+                $success['dokumen'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus); 
             }
@@ -608,6 +641,9 @@ class ApprovalJuskebController extends Controller
             $success['status'] = false;
             $success['data'] = [];
             $success['data_detail'] = [];
+            $success['detail_beri'] = [];
+            $success['detail_terima'] = [];
+            $success['dokumen'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
