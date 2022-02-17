@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Carbon\Carbon;
 use Log;
+use Queue;
 
 class ApprovalJuskebController extends Controller
 {
@@ -368,12 +369,14 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
+                        $subject = "Approval Juskeb";
                         $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
-                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-                        $success['no_pooling'] = $no_pool;
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool,subject) values (?,?,?,?,getdate(),?,?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool,$subject]);
+                        // $success['no_pooling'] = $no_pool;
+                        Queue::push(new \App\Jobs\SendSukkaEmailJob($no_pool,$this->db));
                         $msg_email = "";
                     }else{
                         $msg_email = "Form Aju Kosong";
@@ -389,10 +392,13 @@ class ApprovalJuskebController extends Controller
                         $result['original']['judul'] = $pesan_header;
                         $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
+                        $subject = "Approval Juskeb";
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
-                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email2,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-                        $success['no_pooling2'] = $no_pool;
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool,subject) values (?,?,?,?,getdate(),?,?,?, ?)', ['-',$app_email2,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool,$subject]);
+                        // $success['no_pooling2'] = $no_pool;
+                        
+                        Queue::push(new \App\Jobs\SendSukkaEmailJob($no_pool,$this->db));
                         $msg_email = "";
                     }else{
                         $msg_email = "Form Aju Kosong";
@@ -413,6 +419,7 @@ class ApprovalJuskebController extends Controller
                 
                 $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Juskeb','-',0,0]);
 
+                Queue::push(new \App\Jobs\SendSukkaNotifJob($no_pesan,$this->db));
             }else{
                 $nu=$r->no_urut-1;
 
@@ -478,12 +485,14 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
+                        $subject = "Return Juskeb";
                         $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
-                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-                        $success['no_pooling'] = $no_pool;
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool,subject) values (?,?,?,?,getdate(),?,?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool,$subject]);
+                        // $success['no_pooling'] = $no_pool;
+                        Queue::push(new \App\Jobs\SendSukkaEmailJob($no_pool,$this->db));
                         $msg_email = "";
                     }else{
                         $msg_email = "Form Aju Kosong";
@@ -497,12 +506,14 @@ class ApprovalJuskebController extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
+                        $subject = "Return Juskeb";
                         $html = view('email-sukka',$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
-                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email2,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-                        $success['no_pooling2'] = $no_pool;
+                        $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool,subject) values (?,?,?,?,getdate(),?,?,?,?)', ['-',$app_email2,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool,$subject]);
+                        // $success['no_pooling2'] = $no_pool;
+                        Queue::push(new \App\Jobs\SendSukkaEmailJob($no_pool,$this->db));
                         $msg_email = "";
                     }else{
                         $msg_email = "Form Aju Kosong";
@@ -524,6 +535,8 @@ class ApprovalJuskebController extends Controller
                 $success['no_pesan'] = $no_pesan;
                 
                 $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Juskeb','-',0,0]);
+
+                Queue::push(new \App\Jobs\SendSukkaNotifJob($no_pesan,$this->db));
 
             }
 

@@ -31,7 +31,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('juskeb-jenis', 'Sukka\PengajuanJuskebController@getJenis');
     $router->get('juskeb-jenis-dok', 'Sukka\PengajuanJuskebController@getJenisDokumen');
     $router->post('juskeb', 'Sukka\PengajuanJuskebController@store');
-    $router->put('juskeb', 'Sukka\PengajuanJuskebController@update');
+    $router->post('juskeb-ubah', 'Sukka\PengajuanJuskebController@update');
     $router->delete('juskeb', 'Sukka\PengajuanJuskebController@destroy');
     $router->get('juskeb-preview', 'Sukka\PengajuanJuskebController@getPreview');
     $router->delete('juskeb-dok','Sukka\PengajuanJuskebController@destroyDok');
