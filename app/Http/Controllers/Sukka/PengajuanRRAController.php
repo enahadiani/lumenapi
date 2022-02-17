@@ -1003,6 +1003,12 @@ class PengajuanRRAController extends Controller
             $rs = DB::connection($this->db)->select($strSQL,array($r->input('no_bukti')));
             $res = json_decode(json_encode($rs),true);
             
+            $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
+            
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 if($res[0]['no_pdrk'] != "-"){
                     $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,isnull(d.nama,'-') as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
