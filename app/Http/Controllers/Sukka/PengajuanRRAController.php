@@ -338,7 +338,6 @@ class PengajuanRRAController extends Controller
             'kode_pp' => 'required|array',
             'kode_drk' => 'required|array',
             'tw' => 'required|array',
-            'saldo' => 'required|array',
             'nilai' => 'required|array',
             'kode_akun_terima' => 'required|array',
             'kode_pp_terima' => 'required|array',
@@ -360,13 +359,6 @@ class PengajuanRRAController extends Controller
                 $status_admin = $data->status_admin;
             }
 
-            if ($r->input('jenis') == "ANGGARAN") { 
-                $jenis = "RRA";											
-            }
-            else {
-                $jenis = "RRRMULTI";
-            }
-
             $periode = substr($r->tanggal,0,4).substr($r->tanggal,5,2);
             $no_bukti = $this->generateKode("apv_pdrk_m", "no_pdrk", $kode_lokasi."-RRA".substr($periode,2,4).".", "0001");
 
@@ -384,17 +376,9 @@ class PengajuanRRAController extends Controller
                         if ($r->tw[$i] == "TW4") { $bulan = "10"; }
                         
                         $periode_beri = substr($periode,0,4).''.$bulan;
-                        $insd1[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->lokasi_beri,$i,$r->kode_akun[$i],$r->kode_pp[$i],$r->kode_drk[$i],$periode_beri,floatval($r->saldo[$i]),floatval($r->nilai[$i]),'C','-'));
-                        
-                        if ($r->input('jenis') == "ANGGARAN") {		
-                            $insd2[$i] = DB::connection($this->db)->insert("insert into anggaran_d(no_agg,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,volume,periode,nilai_sat,nilai,dc,satuan,nik_user,tgl_input,modul,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_beri,$i,$r->kode_akun[$i],$r->kode_pp[$i],$r->kode_drk[$i],1,$periode_beri,floatval($r->nilai[$i]),floatval($r->nilai[$i]),'C','-',$nik,$jenis,$i));
-                        }
-                        else {
-                            $insd2[$i] = DB::connection($this->db)->insert("insert into angg_r (no_bukti, modul, kode_lokasi, kode_akun, kode_pp, kode_drk, periode1, periode2, dc, saldo, nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            array($no_bukti, 'RELEASE', $r->lokasi_beri, $r->kode_akun[$i],$r->kode_pp[$i],$r->kode_drk[$i], $periode_beri, $periode_beri, 'C', 0,floatval($r->nilai[$i])));			
-                        }
+                        $insd1[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->input('lokasi_beri'),$i,$r->input('kode_akun')[$i],$r->input('kode_pp')[$i],$r->input('kode_drk')[$i],$periode_beri,0,floatval($r->input('nilai')[$i]),'C','-'));
 
-                        $total_beri+= +floatval($r->nilai[$i]);
+                        $total_beri+= +floatval($r->input('nilai')[$i]);
                     }
                 }
 
@@ -407,9 +391,9 @@ class PengajuanRRAController extends Controller
                         if ($r->tw_terima[$i] == "TW4") { $bulan = "10"; }
                         
                         $periode_terima = substr($periode,0,4).''.$bulan;
-                        $insd3[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->lokasi_terima,$i,$r->kode_akun_terima[$i],$r->kode_pp_terima[$i],$r->kode_drk_terima[$i],$periode_terima,0,floatval($r->nilai_terima[$i]),'D','-'));
+                        $insd3[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$i,$r->input('kode_akun_terima')[$i],$r->input('kode_pp_terima')[$i],$r->input('kode_drk_terima')[$i],$periode_terima,0,floatval($r->input('nilai_terima')[$i]),'D','-'));
 
-                        $total_terima+= +floatval($r->nilai_terima[$i]);
+                        $total_terima+= +floatval($r->input('nilai_terima')[$i]);
                     }
                 }
 
@@ -429,9 +413,9 @@ class PengajuanRRAController extends Controller
                             $this_pp = "";		 
                         }
 
-                        $insm1 = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values (?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$r->no_dokumen,$r->tanggal,$r->deskripsi,substr($periode,0,4),'IDR',floatval($r->total_beri),$nik,'T','-',$nik,'-',$jenis));
+                        $insm1 = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values (?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$r->input('no_dokumen'),$r->input('tanggal'),$r->input('deskripsi'),substr($periode,0,4),'IDR',floatval($r->input('total_beri')),$nik,'T','-',$nik,'-','RRA'));
 
-                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_terima,$r->lokasi_beri,$r->deskripsi,$this_pp,'-',$r->jenis,$r->tanggal,$periode,$nik,$jenis,$r->no_juskeb,$nik,'0','PUSAT'));
+                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$r->input('lokasi_beri'),$r->input('deskripsi'),$this_pp,'-','ANGGARAN',$r->input('tanggal'),$periode,$nik,'RRA',$r->input('no_juskeb'),$nik,'0','PUSAT'));
 
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -439,16 +423,16 @@ class PengajuanRRAController extends Controller
                         $i=0;
                         $cek = $r->file_dok;
                         if(!empty($cek)){
-                            if(count($r->nama_file_seb) > 0){
+                            if(count($r->input('nama_file_seb')) > 0){
                                 //looping berdasarkan nama dok
-                                for($i=0;$i<count($r->nama_file_seb);$i++){
+                                for($i=0;$i<count($r->input('nama_file_seb'));$i++){
                                     //cek row i ada file atau tidak
                                     if(isset($r->file('file_dok')[$i])){
                                         $file = $r->file('file_dok')[$i];
                                         //kalo ada cek nama sebelumnya ada atau -
-                                        if($r->nama_file_seb[$i] != "-"){
+                                        if($r->input('nama_file_seb')[$i] != "-"){
                                             //kalo ada hapus yang lama
-                                            Storage::disk('s3')->delete('sukka/'.$r->nama_file_seb[$i]);
+                                            Storage::disk('s3')->delete('sukka/'.$r->input('nama_file_seb')[$i]);
                                         }
                                         $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                                         $dok = $nama_dok;
@@ -457,21 +441,21 @@ class PengajuanRRAController extends Controller
                                         }
                                         Storage::disk('s3')->put('sukka/'.$dok,file_get_contents($file));
                                         $arr_dok[] = $dok;
-                                        $arr_jenis[] = $r->kode_jenis[$i];
-                                        $arr_no_urut[] = $r->no_urut[$i];
-                                    }else if($r->nama_file_seb[$i] != "-"){
-                                        $arr_dok[] = $r->nama_file_seb[$i];
-                                        $arr_jenis[] = $r->kode_jenis[$i];
-                                        $arr_no_urut[] = $r->no_urut[$i];
+                                        $arr_jenis[] = $r->input('kode_jenis')[$i];
+                                        $arr_no_urut[] = $r->input('no_urut')[$i];
+                                    }else if($r->input('nama_file_seb')[$i] != "-"){
+                                        $arr_dok[] = $r->input('nama_file_seb')[$i];
+                                        $arr_jenis[] = $r->input('kode_jenis')[$i];
+                                        $arr_no_urut[] = $r->input('no_urut')[$i];
                                     }     
                                 }
                                 
-                                $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                                $deldok = DB::connection($this->db)->table('apv_pdrk_dok')->where('no_bukti', $no_bukti)->delete();
                             }
             
                             if(count($arr_no_urut) > 0){
                                 for($i=0; $i<count($arr_no_urut);$i++){
-                                    $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,$jenis,$no_bukti)); 
+                                    $insdok[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'RRA',$no_bukti)); 
                                 }
                             }
                         }
@@ -493,7 +477,7 @@ class PengajuanRRAController extends Controller
                             $title = "Pengajuan RRA";
                             $subtitle = "-";
                             $content = "Pengajuan RRA No: $no_bukti menunggu approval Anda.";
-                            $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".substr($periode,2,4).".", "000001");
+                            $no_pesan = $this->generateKode("app_notif_m", "no_bukti",$kode_lokasi."-PN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
                             $success['no_pesan'] = $no_pesan;
                         }
@@ -567,7 +551,6 @@ class PengajuanRRAController extends Controller
             'tanggal' => 'required|date_format:Y-m-d',
             'no_dokumen' => 'required',
             'deskripsi' => 'required|max:200',
-            'jenis' => 'required',
             'lokasi_terima' => 'required',
             'lokasi_beri' => 'required',
             'no_juskeb' => 'required',
@@ -577,7 +560,6 @@ class PengajuanRRAController extends Controller
             'kode_pp' => 'required|array',
             'kode_drk' => 'required|array',
             'tw' => 'required|array',
-            'saldo' => 'required|array',
             'nilai' => 'required|array',
             'kode_akun_terima' => 'required|array',
             'kode_pp_terima' => 'required|array',
@@ -613,23 +595,15 @@ class PengajuanRRAController extends Controller
             // $cek = $this->cekPeriode($periode);
             // if($cek['status']){
 
-                $del1 = DB::connection($this->db)->table('anggaran_m')
-                ->where('no_agg', $no_bukti)
-                ->delete();
-
-                $del2 = DB::connection($this->db)->table('anggaran_d')
-                ->where('no_agg', $no_bukti)
-                ->delete();
-                
-                $del3 = DB::connection($this->db)->table('apv_pdrk_m')
+                $del1 = DB::connection($this->db)->table('apv_pdrk_m')
                 ->where('no_pdrk', $no_bukti)
                 ->delete();
 
-                $del4 = DB::connection($this->db)->table('apv_pdrk_d')
+                $del2 = DB::connection($this->db)->table('apv_pdrk_d')
                 ->where('no_pdrk', $no_bukti)
                 ->delete();
 
-                $del5 = DB::connection($this->db)->table('apv_flow')
+                $del3 = DB::connection($this->db)->table('apv_flow')
                 ->where('no_bukti', $no_bukti)
                 ->delete();
 
@@ -643,17 +617,9 @@ class PengajuanRRAController extends Controller
                         if ($r->tw[$i] == "TW4") { $bulan = "10"; }
                         
                         $periode_beri = substr($periode,0,4).''.$bulan;
-                        $insd1[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->lokasi_beri,$i,$r->kode_akun[$i],$r->kode_pp[$i],$r->kode_drk[$i],$periode_beri,floatval($r->saldo[$i]),floatval($r->nilai[$i]),'C','-'));
+                        $insd1[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->input('lokasi_beri'),$i,$r->input('kode_akun')[$i],$r->input('kode_pp')[$i],$r->input('kode_drk')[$i],$periode_beri,0,floatval($r->input('nilai')[$i]),'C','-'));
 
-                        if ($r->input('jenis') == "ANGGARAN") {		
-                            $insd2[$i] = DB::connection($this->db)->insert("insert into anggaran_d(no_agg,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,volume,periode,nilai_sat,nilai,dc,satuan,nik_user,tgl_input,modul,nu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_beri,$i,$r->kode_akun[$i],$r->kode_pp[$i],$r->kode_drk[$i],1,$periode_beri,floatval($r->nilai[$i]),floatval($r->nilai[$i]),'C','-',$nik,$jenis,$i));
-                        }
-                        else {
-                            $insd2[$i] = DB::connection($this->db)->insert("insert into angg_r (no_bukti, modul, kode_lokasi, kode_akun, kode_pp, kode_drk, periode1, periode2, dc, saldo, nilai) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            array($no_bukti, 'RELEASE', $r->lokasi_beri, $r->kode_akun[$i],$r->kode_pp[$i],$r->kode_drk[$i], $periode_beri, $periode_beri, 'C', 0,floatval($r->nilai[$i])));			
-                        }
-
-                        $total_beri+= +floatval($r->nilai[$i]);
+                        $total_beri+= +floatval($r->input('nilai')[$i]);
                     }
                 }
 
@@ -666,9 +632,9 @@ class PengajuanRRAController extends Controller
                         if ($r->tw_terima[$i] == "TW4") { $bulan = "10"; }
                         
                         $periode_terima = substr($periode,0,4).''.$bulan;
-                        $insd3[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->lokasi_terima,$i,$r->kode_akun_terima[$i],$r->kode_pp_terima[$i],$r->kode_drk_terima[$i],$periode_terima,0,floatval($r->nilai_terima[$i]),'D','-'));
+                        $insd3[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_d(no_pdrk,kode_lokasi,no_urut,kode_akun,kode_pp,kode_drk,periode,saldo,nilai,dc,target) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$i,$r->input('kode_akun_terima')[$i],$r->input('kode_pp_terima')[$i],$r->input('kode_drk_terima')[$i],$periode_terima,0,floatval($r->input('nilai_terima')[$i]),'D','-'));
 
-                        $total_terima+= +floatval($r->nilai_terima[$i]);
+                        $total_terima+= +floatval($r->input('nilai_terima')[$i]);
                     }
                 }
 
@@ -688,9 +654,9 @@ class PengajuanRRAController extends Controller
                             $this_pp = "";		 
                         }
 
-                        $insm1 = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values (?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$r->no_dokumen,$r->tanggal,$r->deskripsi,substr($periode,0,4),'IDR',floatval($r->total_beri),$nik,'T','-',$nik,'-',$jenis));
+                        $insm1 = DB::connection($this->db)->insert("insert into anggaran_m (no_agg,kode_lokasi,no_dokumen,tanggal,keterangan,tahun,kode_curr,nilai,tgl_input,nik_user,posted,no_del,nik_buat,nik_setuju,jenis) values (?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)",array($no_bukti,$kode_lokasi,$r->input('no_dokumen'),$r->input('tanggal'),$r->input('deskripsi'),substr($periode,0,4),'IDR',floatval($r->input('total_beri')),$nik,'T','-',$nik,'-','RRA'));
 
-                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->lokasi_terima,$r->lokasi_beri,$r->deskripsi,$this_pp,'-',$r->jenis,$r->tanggal,$periode,$nik,$jenis,$r->no_juskeb,$nik,'0','PUSAT'));
+                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$r->input('lokasi_beri'),$r->input('deskripsi'),$this_pp,'-','ANGGARAN',$r->input('tanggal'),$periode,$nik,'RRA',$r->input('no_juskeb'),$nik,'0','PUSAT'));
 
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -698,16 +664,16 @@ class PengajuanRRAController extends Controller
                         $i=0;
                         $cek = $r->file_dok;
                         if(!empty($cek)){
-                            if(count($r->nama_file_seb) > 0){
+                            if(count($r->input('nama_file_seb')) > 0){
                                 //looping berdasarkan nama dok
-                                for($i=0;$i<count($r->nama_file_seb);$i++){
+                                for($i=0;$i<count($r->input('nama_file_seb'));$i++){
                                     //cek row i ada file atau tidak
                                     if(isset($r->file('file_dok')[$i])){
                                         $file = $r->file('file_dok')[$i];
                                         //kalo ada cek nama sebelumnya ada atau -
-                                        if($r->nama_file_seb[$i] != "-"){
+                                        if($r->input('nama_file_seb')[$i] != "-"){
                                             //kalo ada hapus yang lama
-                                            Storage::disk('s3')->delete('sukka/'.$r->nama_file_seb[$i]);
+                                            Storage::disk('s3')->delete('sukka/'.$r->input('nama_file_seb')[$i]);
                                         }
                                         $nama_dok = uniqid()."_".str_replace(' ', '_', $file->getClientOriginalName());
                                         $dok = $nama_dok;
@@ -716,21 +682,21 @@ class PengajuanRRAController extends Controller
                                         }
                                         Storage::disk('s3')->put('sukka/'.$dok,file_get_contents($file));
                                         $arr_dok[] = $dok;
-                                        $arr_jenis[] = $r->kode_jenis[$i];
-                                        $arr_no_urut[] = $r->no_urut[$i];
-                                    }else if($r->nama_file_seb[$i] != "-"){
-                                        $arr_dok[] = $r->nama_file_seb[$i];
-                                        $arr_jenis[] = $r->kode_jenis[$i];
-                                        $arr_no_urut[] = $r->no_urut[$i];
+                                        $arr_jenis[] = $r->input('kode_jenis')[$i];
+                                        $arr_no_urut[] = $r->input('no_urut')[$i];
+                                    }else if($r->input('nama_file_seb')[$i] != "-"){
+                                        $arr_dok[] = $r->input('nama_file_seb')[$i];
+                                        $arr_jenis[] = $r->input('kode_jenis')[$i];
+                                        $arr_no_urut[] = $r->input('no_urut')[$i];
                                     }     
                                 }
                                 
-                                $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+                                $deldok = DB::connection($this->db)->table('apv_pdrk_dok')->where('no_bukti', $no_bukti)->delete();
                             }
             
                             if(count($arr_no_urut) > 0){
                                 for($i=0; $i<count($arr_no_urut);$i++){
-                                    $insdok[$i] = DB::connection($this->db)->insert("insert into pbh_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,$jenis,$no_bukti)); 
+                                    $insdok[$i] = DB::connection($this->db)->insert("insert into apv_pdrk_dok (no_bukti,no_gambar,nu,kode_jenis,kode_lokasi,modul,no_ref) values (?, ?, ?, ?, ?, ?, ?) ",array($no_bukti,$arr_dok[$i],$arr_no_urut[$i],$arr_jenis[$i],$kode_lokasi,'RRA',$no_bukti)); 
                                 }
                             }
                         }
@@ -749,10 +715,10 @@ class PengajuanRRAController extends Controller
                         }
         
                         if(isset($nik_app) && $nik_app != ""){
-                            $title = "Pengajuan RRA";
-                            $subtitle = "-";
+                            $title = "Update Pengajuan RRA";
+                            $subtitle = "RRA";
                             $content = "Pengajuan RRA No: $no_bukti menunggu approval Anda.";
-                            $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".substr($periode,2,4).".", "000001");
+                            $no_pesan = $this->generateKode("app_notif_m", "no_bukti",$kode_lokasi."-PN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
                             $success['no_pesan'] = $no_pesan;
                         }
@@ -772,7 +738,7 @@ class PengajuanRRAController extends Controller
                         DB::connection($this->db)->commit();
                         $success['status'] = true;
                         $success['no_bukti'] = $no_bukti;
-                        $success['message'] = "Data Pengajuan RRA berhasil disimpan";
+                        $success['message'] = "Data Pengajuan RRA berhasil diubah";
                         
                     }else{
 
@@ -820,14 +786,6 @@ class PengajuanRRAController extends Controller
             
             $no_bukti = $r->no_bukti;
     
-            $del1 = DB::connection($this->db)->table('anggaran_m')
-            ->where('no_agg', $no_bukti)
-            ->delete();
-            
-            $del2 = DB::connection($this->db)->table('anggaran_d')
-            ->where('no_agg', $no_bukti)
-            ->delete();
-            
             $del3 = DB::connection($this->db)->table('apv_pdrk_m')
             ->where('no_pdrk', $no_bukti)
             ->delete();
@@ -840,7 +798,7 @@ class PengajuanRRAController extends Controller
             ->where('no_bukti', $no_bukti)
             ->delete();
             
-            $res = DB::connection($this->db)->select("select * from pbh_dok where no_bukti='$no_bukti' and kode_lokasi='$kode_lokasi' ");
+            $res = DB::connection($this->db)->select("select * from apv_pdrk_dok where no_bukti='$no_bukti' ");
             $res = json_decode(json_encode($res),true);
             for($i=0;$i<count($res);$i++){
                 if(Storage::disk('s3')->exists('sukka/'.$res[$i]['no_gambar'])){
@@ -848,7 +806,7 @@ class PengajuanRRAController extends Controller
                 }
             }
             
-            $deldok = DB::connection($this->db)->table('pbh_dok')->where('kode_lokasi', $kode_lokasi)->where('no_bukti', $no_bukti)->delete();
+            $deldok = DB::connection($this->db)->table('apv_pdrk_dok')->where('no_bukti', $no_bukti)->delete();
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -879,7 +837,7 @@ class PengajuanRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }		
 
-            $sql3="select no_bukti,kode_lokasi,no_gambar as file_dok,nu,kode_jenis from pbh_dok where kode_lokasi='".$kode_lokasi."' and no_bukti='$r->no_bukti' and kode_jenis='$r->kode_jenis' and nu='$r->no_urut' ";
+            $sql3="select no_bukti,kode_lokasi,no_gambar as file_dok,nu,kode_jenis from apv_pdrk_dok where no_bukti='$r->no_bukti' and kode_jenis='$r->kode_jenis' and nu='$r->no_urut' ";
             $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
@@ -889,8 +847,7 @@ class PengajuanRRAController extends Controller
                     Storage::disk('s3')->delete('sukka/'.$res3[$i]['file_dok']);
                 }
 
-                $del3 = DB::connection($this->db)->table('pbh_dok')
-                ->where('kode_lokasi', $kode_lokasi)
+                $del3 = DB::connection($this->db)->table('apv_pdrk_dok')
                 ->where('no_bukti', $r->no_bukti)
                 ->where('kode_jenis', $r->kode_jenis)
                 ->where('nu', $r->no_urut)
@@ -912,146 +869,6 @@ class PengajuanRRAController extends Controller
             
             return response()->json($success, $this->successStatus); 
         }	
-    }
-
-    public function cekBudget(Request $r)
-    {
-        $this->validate($r,[
-            'kode_akun_agg' => 'required|array',
-            'kode_pp_agg' => 'required|array',
-            'kode_drk_agg' => 'required|array',
-            'nilai_agg' => 'required|array',
-            'kode_lokasi' => 'required',
-            'periode' => 'required',
-            'jenis' => 'required'
-        ]);
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-            $periode = $r->periode;
-            if(isset($r->no_bukti)){
-                $no_bukti = $r->no_bukti;
-            }else{
-                $no_bukti = '-';
-            }
-            $nilai = 0; $total = 0;
-            $sls = 0;
-            $result = array();
-			for ($i=0;$i < count($r->kode_akun_agg);$i++){
-                // if ($r->jenis == "ANGGARAN") {
-				// 	$strSQL = "select dbo.fn_saldoGarTW('".$r->kode_lokasi."','".$r->kode_akun_agg[$i]."','".$r->kode_pp_agg[$i]."','".$r->kode_drk_agg[$i]."','".substr($periode,0,4)."','".$r->tw_agg[$i]."','".$no_bukti."') as saldo ";
-				// }
-				// else {
-
-				// 	if ($r->tw_agg[$i] == "TW1") { $bulan = "01"; }
-				// 	if ($r->tw_agg[$i] == "TW2") { $bulan = "04"; }
-				// 	if ($r->tw_agg[$i] == "TW3") { $bulan = "07"; }
-				// 	if ($r->tw_agg[$i] == "TW4") { $bulan = "10"; }
-
-                //     $strSQL = "select dbo.fn_saldoRilis('".$r->kode_lokasi."','".$r->kode_akun_agg[$i]."','".$r->kode_pp_agg[$i]."','".$r->kode_drk_agg[$i]."','".substr($periode,0,4).$bulan."','".$no_bukti."') as saldo  ";
-				// }	
-                $strSQL = " select 0 as saldo ";	
-                $res = DB::connection($this->db)->select($strSQL);
-				if (count($res) > 0){
-					$line = $res[0];
-                    $so_awal = floatval($line->saldo);					
-                    $so_akhir = $so_awal - floatval($r->nilai_agg[$i]);
-				}else{
-                    $so_awal = 0;
-					$so_akhir = $so_awal - floatval($r->nilai_agg[$i]);
-                }
-
-                $hasil = array(
-                    'kode_akun_agg' => $r->kode_akun_agg[$i],
-                    'kode_pp_agg' => $r->kode_pp_agg[$i],
-                    'kode_drk_agg' => $r->kode_drk_agg[$i],
-                    'so_awal_agg' => $so_awal,
-                    'nilai_agg' => $r->nilai_agg[$i],
-                    'so_akhir_agg' => $so_akhir,
-                    'tw_agg' => $r->tw_agg[$i],
-                );
-                $result[] = $hasil;
-			}
-            
-            if(count($result) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $result;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
-    public function getSaldo(Request $r)
-    {
-        $this->validate($r,[
-            'kode_lokasi' => 'required',
-            'periode' => 'required',
-            'kode_akun' => 'required',
-            'kode_pp' => 'required',
-            'kode_drk' => 'required',
-            'tw' => 'required',
-            'saldo_seb' => 'required',
-            'no_bukti' => 'required',
-            'jenis' => 'required'
-        ]);
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            $periode = $r->periode;
-            $no_bukti = $r->no_bukti;
-            // if ($r->jenis == "ANGGARAN") {
-            //     $strSQL = "select dbo.fn_saldoGarTW('".$r->kode_lokasi."','".$r->kode_akun."','".$r->kode_pp."','".$r->kode_drk."','".substr($periode,0,4)."','".$r->tw."','".$no_bukti."') as saldo ";
-            // }
-            // else {
-
-            //     if ($r->tw == "TW1") { $bulan = "01"; }
-            //     if ($r->tw == "TW2") { $bulan = "04"; }
-            //     if ($r->tw == "TW3") { $bulan = "07"; }
-            //     if ($r->tw == "TW4") { $bulan = "10"; }
-
-            //     $strSQL = "select dbo.fn_saldoRilis('".$r->kode_lokasi."','".$r->kode_akun."','".$r->kode_pp."','".$r->kode_drk."','".substr($periode,0,4).$bulan."','".$no_bukti."') as saldo  ";
-            // }
-            $strSQL = " select 0 as saldo ";					
-            $res = DB::connection($this->db)->select($strSQL);
-            if (count($res) > 0){
-                $line = $res[0];
-                $so_awal = floatval($line->saldo) - floatval($r->saldo_seb);
-            }else{
-                $so_awal = 0;
-            }
-
-            $success['status'] = true;
-            $success['saldo_awal'] = $so_awal;
-            $success['message'] = "Success!";     
-            
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['saldo_awal'] = 0;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
     }
 
     public function showH(Request $r)
@@ -1176,14 +993,15 @@ class PengajuanRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $strSQL = "select *,b.nama as nama_pp,c.nama as nama_jenis,d.nama as nama_terima,e.nama as nama_beri 
+            $strSQL = "select *,b.nama as nama_pp,c.nama as nama_jenis,d.nama as nama_terima,e.nama as nama_beri,isnull(f.no_pdrk,'-') as no_pdrk 
             from apv_juskeb_m a
             left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             left join apv_jenis c on a.kode_jenis=c.kode_jenis 
             left join lokasi d on a.lok_terima=d.kode_lokasi
             left join lokasi e on a.lok_donor=e.kode_lokasi
+            left join apv_pdrk_m f on a.no_bukti=convert(varchar,f.justifikasi)
             where a.no_bukti=?";
-            $rs = DB::connection($this->db)->select($strSQL,array($r->input('no_bukti'),$kode_lokasi));
+            $rs = DB::connection($this->db)->select($strSQL,array($r->input('no_bukti')));
             $res = json_decode(json_encode($rs),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1192,25 +1010,25 @@ class PengajuanRRAController extends Controller
                     from apv_juskeb_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                         left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
                         left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
-                    where a.no_bukti='".$r->no_bukti."' and a.dc ='C'";
+                    where a.no_bukti=? and a.dc ='C'";
                 
-                $rsd = DB::connection($this->db)->select($strd);
+                $rsd = DB::connection($this->db)->select($strd,array($r->input('no_bukti')));
                 $resd = json_decode(json_encode($rsd),true);
 
                 $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,isnull(d.nama,'-') as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
                     from apv_juskeb_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                         left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
                         left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
-                    where a.no_bukti='".$r->no_bukti."' and a.dc ='D'";
+                    where a.no_bukti=? and a.dc ='D'";
                 
-                $rst = DB::connection($this->db)->select($strt);
+                $rst = DB::connection($this->db)->select($strt,array($r->input('no_bukti')));
                 $rest = json_decode(json_encode($rst),true);
 
-                $strdok = "select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres
+                $strdok = "select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres,a.modul
                 from apv_juskeb_dok a 
                 inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
-                where a.no_bukti = '".$r->no_bukti."'  order by a.nu";
-                $rsdok = DB::connection($this->db)->select($strdok);
+                where a.no_bukti = ?  order by a.nu";
+                $rsdok = DB::connection($this->db)->select($strdok,array($r->input('no_bukti')));
                 $resdok = json_decode(json_encode($rsdok),true);
 
                 $strdet = "select *,b.nama,b.email from apv_flow a
@@ -1252,7 +1070,7 @@ class PengajuanRRAController extends Controller
     }
 
 
-    public function getPreview(Request $request){
+    public function getPreview(Request $r){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -1260,22 +1078,22 @@ class PengajuanRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $no_bukti = $request->no_bukti;
+            $no_bukti = $r->input('no_bukti');
 
             $sql = "select a.periode,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk,a.kode_lokasi,a.keterangan,a.nik_buat,b.nama as nama_buat
             from apv_pdrk_m a
             inner join karyawan b on a.nik_buat=b.nik
-            where a.no_pdrk='$no_bukti'
+            where a.no_pdrk= ?
             order by a.no_pdrk";
             
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->db)->select($sql,array($no_bukti));
             $res = json_decode(json_encode($res),true);
 
             $sql="select * from (select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,d.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut,a.tanggal as tgl
                 from apv_pdrk_m a
                 left join apv_karyawan c on a.nik_buat=c.nik 
                 left join apv_jab d on c.kode_jab=d.kode_jab 
-                where a.no_pdrk='$no_bukti'
+                where a.no_pdrk=?
                 union all
                 select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,d.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl
                 from apv_flow a
@@ -1283,11 +1101,11 @@ class PengajuanRRAController extends Controller
                 inner join apv_karyawan c on a.nik=c.nik
                 left join apv_jab d on c.kode_jab=d.kode_jab 
                 inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
-                where a.no_bukti='$no_bukti'
+                where a.no_bukti=?
 			) a
 			order by a.no_app,a.tgl
             ";
-            $res3 = DB::connection($this->db)->select($sql);
+            $res3 = DB::connection($this->db)->select($sql,array($no_bukti,$no_bukti));
             $res3 = json_decode(json_encode($res3),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -1299,10 +1117,10 @@ class PengajuanRRAController extends Controller
                     from apv_pdrk_d a
                     left join masakun b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
                     left join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
-                    left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring('".$row['periode']."',1,4)
-                    where a.no_pdrk='".$row['no_pdrk']."' 
+                    left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(?,1,4)
+                    where a.no_pdrk=? 
                     order by a.dc,a.kode_akun";
-                    $res2 = DB::connection($this->db)->select($sql2);
+                    $res2 = DB::connection($this->db)->select($sql2,array($row['periode'],$row['no_pdrk']));
                     $res[$i]['detail'] = json_decode(json_encode($res2),true);
                     $i++;
                 }
@@ -1343,6 +1161,10 @@ class PengajuanRRAController extends Controller
             $filter = "";
             if(isset($r->kode_akun) && $r->kode_akun != ""){
                 $filter = " and kode_akun='$r->kode_akun' ";
+            }
+
+            if(isset($r->kode_lokasi) && $r->kode_lokasi != ""){
+                $kode_lokasi = $r->kode_lokasi;
             }
 
             $strSQL = "select kode_akun,nama    from masakun where status_gar ='1' and block= '0' and kode_lokasi = '".$kode_lokasi."' $filter";
@@ -1559,54 +1381,6 @@ class PengajuanRRAController extends Controller
         
     }
 
-    public function getNIKApp(Request $r)
-    {
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $status_admin = $data->status_admin;
-            }
-
-            $get = DB::connection($this->db)->select("select a.flag,b.nama from spro a inner join karyawan b on a.flag=b.nik and a.kode_lokasi=b.kode_lokasi where kode_spro='GARAPP' and a.kode_lokasi='".$kode_lokasi."'");
-			if (count($get) > 0){
-				$success['nik_app']	= $get[0]->flag;
-				$success['nama_app'] = $get[0]->nama;					 
-			} else {
-                $success['nik_app']	= "";
-				$success['nama_app'] = "";					 
-            }
-            
-            $filter = "";
-            if(isset($r->nik) && $r->nik != ""){
-                $filter = " and nik='$r->nik' ";
-            }
-
-            $strSQL = "select nik, nama from karyawan where flag_aktif='1' and kode_lokasi='".$kode_lokasi."' $filter ";				
-            $res = DB::connection($this->db)->select($strSQL);						
-            $res= json_decode(json_encode($res),true);
-            
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";
-                return response()->json($success, $this->successStatus);     
-            }
-            else{
-                $success['message'] = "Data Kosong!"; 
-                $success['data'] = [];
-                $success['status'] = true;
-                return response()->json($success, $this->successStatus);
-            }
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
-
     public function getJenisDokumen(Request $r)
     {
         try {
@@ -1662,10 +1436,11 @@ class PengajuanRRAController extends Controller
                 $filter = " and no_bukti='$r->no_bukti' ";
             }
 
-            $strSQL = "select *,b.nama as nama_pp,c.nama as nama_jenis 
+            $strSQL = "select a.*,b.nama as nama_pp,c.nama as nama_jenis,isnull(d.no_pdrk,'-') as no_pdrk
             from apv_juskeb_m a
             left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
             left join apv_jenis c on a.kode_jenis=c.kode_jenis  
+            left join apv_pdrk_m d on a.no_bukti=convert(varchar,d.justifikasi)
             where a.progress ='J' $filter ";				
             $res = DB::connection($this->db)->select($strSQL);						
             $res= json_decode(json_encode($res),true);

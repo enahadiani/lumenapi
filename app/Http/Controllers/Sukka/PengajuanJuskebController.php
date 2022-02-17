@@ -738,6 +738,17 @@ class PengajuanJuskebController extends Controller
             ->where('no_bukti', $no_bukti)
             ->delete();
 
+            $res = DB::connection($this->db)->select("select * from apv_juskeb_dok where no_bukti='$no_bukti' ");
+            $res = json_decode(json_encode($res),true);
+            for($i=0;$i<count($res);$i++){
+                if(Storage::disk('s3')->exists('sukka/'.$res[$i]['no_gambar'])){
+                    Storage::disk('s3')->delete('sukka/'.$res[$i]['no_gambar']);
+                }
+            }
+            
+            $deldok = DB::connection($this->db)->table('apv_juskeb_dok')->where('no_bukti', $no_bukti)->delete();
+            
+
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Pengajuan Justifikasi Kebutuhan berhasil dihapus";
@@ -747,6 +758,55 @@ class PengajuanJuskebController extends Controller
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pengajuan Justifikasi Kebutuhan gagal dihapus ".$e;
+            
+            return response()->json($success, $this->successStatus); 
+        }	
+    }
+
+    public function destroyDok(Request $r)
+    {
+        $this->validate($r, [
+            'no_bukti' => 'required',
+            'kode_jenis' => 'required',
+            'no_urut' => 'required'
+        ]);
+        DB::connection($this->db)->beginTransaction();
+        
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }		
+
+            $sql3="select no_bukti,kode_lokasi,no_gambar as file_dok,nu,kode_jenis from apv_juskeb_dok where no_bukti='$r->no_bukti' and kode_jenis='$r->kode_jenis' and nu='$r->no_urut' ";
+            $res3 = DB::connection($this->db)->select($sql3);
+            $res3 = json_decode(json_encode($res3),true);
+
+            if(count($res3) > 0){
+
+                for($i=0;$i<count($res3);$i++){
+                    Storage::disk('s3')->delete('sukka/'.$res3[$i]['file_dok']);
+                }
+
+                $del3 = DB::connection($this->db)->table('apv_juskeb_dok')
+                ->where('no_bukti', $r->no_bukti)
+                ->where('kode_jenis', $r->kode_jenis)
+                ->where('nu', $r->no_urut)
+                ->delete();
+
+                DB::connection($this->db)->commit();
+                $success['status'] = true;
+                $success['message'] = "Data Dokumen Pengajuan Juskeb berhasil dihapus";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data Dokumen Pengajuan Juskeb gagal dihapus.";
+            }
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Dokumen Pengajuan Juskeb gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	
