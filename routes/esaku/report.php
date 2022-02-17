@@ -33,6 +33,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-periode-retur','Esaku\Keuangan\FilterController@getFilterPeriodeRetur');
     $router->get('filter-nik-retur','Esaku\Keuangan\FilterController@getFilterNIKRetur');
     $router->get('filter-bukti-retur','Esaku\Keuangan\FilterController@getFilterNoBuktiRetur');
+    $router->get('filter-bukti-retur-jual','Esaku\Inventori\FilterController@getFilterNoBuktiReturJual');
+    $router->get('filter-nik-retur-jual','Esaku\Inventori\FilterController@getFilterNIKRetur');
+    $router->get('filter-periode-retur-jual','Esaku\Inventori\FilterController@getFilterPeriodeReturJual');
     $router->get('filter-akun','Esaku\Keuangan\FilterController@getFilterAkun');
     $router->get('filter-periode-keu','Esaku\Keuangan\FilterController@getFilterPeriodeKeuangan');
     $router->get('filter-fs','Esaku\Keuangan\FilterController@getFilterFS');
