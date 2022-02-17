@@ -594,45 +594,35 @@ class ApprovalRRAController extends Controller
             $res2 = json_decode(json_encode($res2),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                if($res[0]['jenis_agg'] == "ANGGARAN"){
-                    $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai,0 as saldo
-                    --,dbo.fn_saldoGarTW(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,substring(a.periode,1,4),case substring(a.periode,5,2) when '01' then 'TW1' when '04' then 'TW2' when '07' then 'TW3' when '10' then 'TW4' end,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
-                    where a.no_pdrk='".$no_aju."' and a.dc ='C'";
+                $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
+                from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                    left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                    left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                where a.no_pdrk='".$no_aju."' and a.dc ='C'";
 
-                    $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai,0 as saldo
-                    --dbo.fn_saldoGarTW(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,substring(a.periode,1,4),case substring(a.periode,5,2) when '01' then 'TW1' when '04' then 'TW2' when '07' then 'TW3' when '10' then 'TW4' end,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
-                    where a.no_pdrk='".$no_aju."' and a.dc ='D'";
-                }else{
-                    $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai,0 as saldo
-                    --dbo.fn_saldoRilis(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,a.periode,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
-                    where a.no_pdrk='".$no_aju."' and a.dc ='C'";
-
-                    $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai, 0 as saldo
-                    --dbo.fn_saldoRilis(a.kode_lokasi,a.kode_akun,a.kode_pp,a.kode_drk,a.periode,a.no_pdrk) as saldo 
-                    from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                        left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
-                        left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
-                    where a.no_pdrk='".$no_aju."' and a.dc ='D'";
-                }
+                $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
+                from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                    left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
+                    left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
+                where a.no_pdrk='".$no_aju."' and a.dc ='D'";
                 $rsd = DB::connection($this->db)->select($strd);
                 $resd = json_decode(json_encode($rsd),true);
 
                 $rst = DB::connection($this->db)->select($strt);
                 $rest = json_decode(json_encode($rst),true);
 
-                $strdok = "select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres
-                from pbh_dok a inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
-                where a.no_bukti = '".$no_aju."' order by a.nu";
-                $rsdok = DB::connection($this->db)->select($strdok);
+                $strdok = "select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres,a.modul,a.nu
+                from apv_juskeb_dok a 
+                inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
+                inner join apv_pdrk_m c on a.no_bukti=convert(varchar,c.justifikasi) 
+                where c.no_pdrk = ?  
+                union all
+                select b.kode_jenis as jenis,b.nama,a.no_gambar as fileaddres,a.modul,a.nu
+                from apv_pdrk_dok a 
+                inner join dok_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi
+                where a.no_bukti = ? 
+                order by a.nu";
+                $rsdok = DB::connection($this->db)->select($strdok,array($no_aju,$no_aju));
                 $resdok = json_decode(json_encode($rsdok),true);
 
                 $success['status'] = true;
