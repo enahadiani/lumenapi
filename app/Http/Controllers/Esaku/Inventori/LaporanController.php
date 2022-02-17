@@ -920,7 +920,7 @@ class LaporanController extends Controller
             from brg_jualpiu_dloc a 
             left join ( select no_bukti,kode_gudang,kode_lokasi,sum(case when dc='D' then -total else total end) as nilai
                         from brg_trans_d 
-                        where kode_lokasi='$kode_lokasi' and form='BRGJUAL'
+                        where kode_lokasi='$kode_lokasi' and (form='BRGJUAL' or form='BRGRETJ')
                         group by no_bukti,kode_gudang,kode_lokasi
                         ) b on a.no_jual=b.no_bukti and a.kode_lokasi=b.kode_lokasi
             left join pp c on a.kode_pp=c.kode_pp 
@@ -952,16 +952,26 @@ class LaporanController extends Controller
 
             $sql2="select c.tanggal,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,sum(a.jumlah) as jumlah,
             sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex,
-            '0' as hpp,'0' as stok_akhir, '-' as keterangan, c.nik_user
+            '0' as hpp,'0' as stok_akhir, '-' as keterangan, c.nik_user,a.dc
             from brg_trans_d a
             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
 			inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
-			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,c.nik_user
+			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,c.nik_user,a.dc
             order by c.tanggal";
             
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
+
+            if(count($res2) > 0) {
+                for($i=0;$i<count($res2);$i++) {
+                    if($res2[$i]['dc'] == 'C') {
+                        $res2[$i]['jumlah'] = -1*$res2[$i]['jumlah'];
+                        $res2[$i]['total'] = -1*$res2[$i]['total'];
+                        $res2[$i]['total_ex'] = -1*$res2[$i]['total_ex'];
+                    }
+                }
+            }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
