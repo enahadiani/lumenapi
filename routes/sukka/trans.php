@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage; 
+use Queue;
 
 
 $router->get('/', function () use ($router) {
@@ -81,7 +82,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('app-rra-status','Sukka\ApprovalRRAController@getStatus');
     $router->get('app-rra-preview','Sukka\ApprovalRRAController@getPreview');
     $router->post('app-rra-send-email', 'Sukka\ApprovalRRAController@sendNotifikasi');
-    
+});
+
+$router->get('queue', function(Request $request){
+    // dispatch(new TesEmailJob(new Request));
+    Queue::push(new \App\Jobs\TesEmailJob($request->input()));
+    print_r('berhasil');
 });
 
 

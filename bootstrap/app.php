@@ -101,6 +101,9 @@ $app->alias('QrCode', SimpleSoftwareIO\QrCode\Facade::class);
 $app->configure('services');
 $app->alias('Socialite', Laravel\Socialite\Facades\Socialite::class);
 
+$app->configure('queue');
+
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
