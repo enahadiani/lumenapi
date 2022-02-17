@@ -1287,7 +1287,10 @@ class LaporanController extends Controller
                 for($i=0;$i<count($res);$i++) {
                     $res[$i]['data_detail'] = [];
 
-                    $sql2="select distinct a.no_bukti,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,a.jumlah,a.bonus,a.harga,a.diskon,(a.harga)*a.jumlah-a.diskon as total,a.stok
+                    $sql2="select distinct a.no_bukti,
+                    a.kode_barang, b.nama as nama_brg, b.sat_kecil as satuan, 
+                    -a.jumlah as jumlah, a.bonus, a.harga, a.diskon, a.stok,
+                    ((a.harga*(a.stok-a.jumlah))-a.diskon) as total 
                     from brg_trans_d a
                     inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETJ' and a.no_bukti = '".$res[$i]['no_jual']."'
