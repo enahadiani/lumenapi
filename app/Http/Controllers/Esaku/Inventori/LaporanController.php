@@ -1269,34 +1269,39 @@ class LaporanController extends Controller
             $rs = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($rs),true);
 
-            $nb = "";
-            $resdata = array();
-            $i=0;
-            foreach($rs as $row){
+            if(count($res) > 0) {
+                $nb = "";
+                $resdata = array();
+                $i=0;
+                foreach($rs as $row){
 
-                $resdata[]=(array)$row;
-                if($i == 0){
-                    $nb .= "'$row->no_jual'";
-                }else{
+                    $resdata[]=(array)$row;
+                    if($i == 0){
+                        $nb .= "'$row->no_jual'";
+                    }else{
 
-                    $nb .= ","."'$row->no_jual'";
+                        $nb .= ","."'$row->no_jual'";
+                    }
+                    $i++;
                 }
-                $i++;
-            }
+                for($i=0;$i<count($res);$i++) {
+                    $res[$i]['data_detail'] = [];
 
-            $sql2="select distinct a.no_bukti,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,a.jumlah,a.bonus,a.harga,a.diskon,(a.harga)*a.jumlah-a.diskon as total,a.stok
-            from brg_trans_d a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETJ' and a.no_bukti in ($nb)
-            order by a.no_bukti
-            " ;
-            $res2 = DB::connection($this->sql)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
+                    $sql2="select distinct a.no_bukti,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,a.jumlah,a.bonus,a.harga,a.diskon,(a.harga)*a.jumlah-a.diskon as total,a.stok
+                    from brg_trans_d a
+                    inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETJ' and a.no_bukti = '".$res[$i]['no_jual']."'
+                    order by a.no_bukti";
+                    $res2 = DB::connection($this->sql)->select($sql2);
+                    $res2 = json_decode(json_encode($res2),true);
+
+                    $res[$i]['data_detail'] = $res2;
+                }
+            }
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['data_detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
 
