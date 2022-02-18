@@ -1046,7 +1046,7 @@ class PengajuanJuskebController extends Controller
             }
 
             $strSQL = "select a.kode_pp, a.nama  
-            from apv_pp a 
+            from pp a 
             where a.kode_lokasi = '".$kode_lokasi."' and a.tipe='posting' and a.flag_aktif ='1' $filter";
             
             $rs = DB::connection($this->db)->select($strSQL);

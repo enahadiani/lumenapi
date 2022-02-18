@@ -163,7 +163,7 @@ class ApprovalRRAController extends Controller
             from apv_pesan a
             inner join apv_pdrk_m c on a.no_bukti=c.no_pdrk 
             left join apv_flow b on a.no_bukti=b.no_bukti and c.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-            inner join apv_pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
+            inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
             where b.nik= '$nik_user' $filter
             ");
             $res = json_decode(json_encode($res),true);
@@ -209,7 +209,7 @@ class ApprovalRRAController extends Controller
             $sql = "select b.no_pdrk as no_bukti,b.kode_pp,b.nik_buat,convert(varchar,b.tanggal,103) as tanggal,b.keterangan,p.nama as nama_pp,b.periode,k.nama as nama_buat
             from apv_flow a
             inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
-            left join apv_pp p on b.kode_pp=p.kode_pp 
+            left join pp p on b.kode_pp=p.kode_pp 
             left join karyawan k on b.nik_buat=k.nik 
             where a.status='1' and a.nik= '$nik_user' $filter
             ";
@@ -583,7 +583,7 @@ class ApprovalRRAController extends Controller
             $sql = "select b.no_pdrk as no_bukti,b.kode_pp,b.nik_buat,convert(varchar,b.tanggal,103) as tanggal,b.keterangan,p.nama as nama_pp,b.periode,k.nama as nama_buat,b.jenis_agg,a.no_urut
             from apv_flow a
             inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
-            left join apv_pp p on b.kode_pp=p.kode_pp 
+            left join pp p on b.kode_pp=p.kode_pp 
             left join karyawan k on b.nik_buat=k.nik 
             where a.status='1' and a.no_bukti= '$no_aju' 
             ";
@@ -606,13 +606,13 @@ class ApprovalRRAController extends Controller
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $strd = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
-                from apv_pdrk_d a left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
                     left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
                 where a.no_pdrk='".$no_aju."' and a.dc ='C'";
 
                 $strt = "select substring(a.periode,5,2) as bulan,a.kode_pp,b.nama as nama_pp,a.kode_drk,d.nama as nama_drk,a.kode_akun,c.nama as nama_akun,a.nilai
-                from apv_pdrk_d a left join apv_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                from apv_pdrk_d a left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                     left join masakun c on a.kode_akun=c.kode_akun and a.kode_lokasi=c.kode_lokasi 
                     left join drk d on a.kode_drk=d.kode_drk and a.kode_lokasi=d.kode_lokasi and d.tahun=substring(a.periode,1,4)  
                 where a.no_pdrk='".$no_aju."' and a.dc ='D'";
@@ -760,7 +760,7 @@ class ApprovalRRAController extends Controller
             $sql="select a.id,a.no_bukti,a.tanggal,b.kode_pp,c.nama as nama_pp,b.keterangan,e.nik,convert(varchar,a.tanggal,103) as tgl,case when a.status = '2' then 'Approved' when a.status = '3' then 'Returned' end as status
             from apv_pesan a
             inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
-            inner join apv_pp c on b.kode_pp=c.kode_pp 
+            inner join pp c on b.kode_pp=c.kode_pp 
             inner join apv_flow e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
             where a.no_bukti='$no_bukti' and a.modul='RRA' and a.id='$id' ";
             
