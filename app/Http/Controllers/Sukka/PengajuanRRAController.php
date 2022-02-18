@@ -275,21 +275,26 @@ class PengajuanRRAController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $sql="select a.no_pdrk,convert(varchar,a.tanggal,103) as tgl,b.no_dokumen,a.keterangan,case a.progress when 'R' then 'Return Approval RRA' when 'P' then 'Finish Approval RRA' else isnull(x.nama_jab,'-') end as progress,a.tanggal, b.nilai,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input,a.progress as sts_log  
-            // from apv_pdrk_m a 
-            // inner join anggaran_m b on a.no_pdrk=b.no_agg 	
-            // left join (select a.no_bukti,b.nama as nama_jab
-            //             from apv_flow a
-            //             inner join apv_jab b on a.kode_jab=b.kode_jab
-            //             where a.status='1'
-            //             )x on a.no_pdrk=x.no_bukti
-            // where a.progress in ('0','R','P') and a.modul = 'PUSAT' order by a.tanggal";
-            $sql ="select a.no_pdrk,a.keterangan
-            from apv_pdrk_m a
-            where a.progress in ('0','R','P') and a.modul = 'PUSAT' ";
+            if($nik == '201'){
 
-            $res = DB::connection($this->db)->select($sql);
-            $res = json_decode(json_encode($res),true);
+                // $sql="select a.no_pdrk,convert(varchar,a.tanggal,103) as tgl,b.no_dokumen,a.keterangan,case a.progress when 'R' then 'Return Approval RRA' when 'P' then 'Finish Approval RRA' else isnull(x.nama_jab,'-') end as progress,a.tanggal, b.nilai,case when datediff(minute,a.tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status, a.tgl_input,a.progress as sts_log  
+                // from apv_pdrk_m a 
+                // inner join anggaran_m b on a.no_pdrk=b.no_agg 	
+                // left join (select a.no_bukti,b.nama as nama_jab
+                //             from apv_flow a
+                //             inner join apv_jab b on a.kode_jab=b.kode_jab
+                //             where a.status='1'
+                //             )x on a.no_pdrk=x.no_bukti
+                // where a.progress in ('0','R','P') and a.modul = 'PUSAT' order by a.tanggal";
+                $sql ="select a.no_pdrk,a.keterangan
+                from apv_pdrk_m a
+                where a.progress in ('0','R','P') and a.modul = 'PUSAT' ";
+    
+                $res = DB::connection($this->db)->select($sql);
+                $res = json_decode(json_encode($res),true);
+            }else{
+                $res = [];
+            }
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -1483,25 +1488,30 @@ class PengajuanRRAController extends Controller
             }
 
             $filter = "";
-            if(isset($r->no_pdrk) && $r->no_pdrk != ""){
-                $strSQL = "select a.*,b.nama as nama_pp,c.nama as nama_jenis,isnull(d.no_pdrk,'-') as no_pdrk,isnull(d.progress,'-') as progress_pdrk
-                from apv_juskeb_m a
-                left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                left join apv_jenis c on a.kode_jenis=c.kode_jenis  
-                inner join apv_pdrk_m d on a.no_bukti=convert(varchar,d.justifikasi)
-                where a.progress ='J' and d.no_pdrk='$r->no_pdrk'  ";		
+            if($nik == '201'){
+
+                if(isset($r->no_pdrk) && $r->no_pdrk != ""){
+                    $strSQL = "select a.*,b.nama as nama_pp,c.nama as nama_jenis,isnull(d.no_pdrk,'-') as no_pdrk,isnull(d.progress,'-') as progress_pdrk
+                    from apv_juskeb_m a
+                    left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                    left join apv_jenis c on a.kode_jenis=c.kode_jenis  
+                    inner join apv_pdrk_m d on a.no_bukti=convert(varchar,d.justifikasi)
+                    where a.progress ='J' and d.no_pdrk='$r->no_pdrk'  ";		
+                }else{
+    
+                    $strSQL = "select a.*,b.nama as nama_pp,c.nama as nama_jenis,isnull(d.no_pdrk,'-') as no_pdrk,isnull(d.progress,'-') as progress_pdrk
+                    from apv_juskeb_m a
+                    left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+                    left join apv_jenis c on a.kode_jenis=c.kode_jenis  
+                    left join apv_pdrk_m d on a.no_bukti=convert(varchar,d.justifikasi)
+                    where a.progress ='J' and d.no_pdrk is null  ";				
+                }
+    
+                $res = DB::connection($this->db)->select($strSQL);						
+                $res= json_decode(json_encode($res),true);
             }else{
-
-                $strSQL = "select a.*,b.nama as nama_pp,c.nama as nama_jenis,isnull(d.no_pdrk,'-') as no_pdrk,isnull(d.progress,'-') as progress_pdrk
-                from apv_juskeb_m a
-                left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
-                left join apv_jenis c on a.kode_jenis=c.kode_jenis  
-                left join apv_pdrk_m d on a.no_bukti=convert(varchar,d.justifikasi)
-                where a.progress ='J' and d.no_pdrk is null  ";				
+                $res = [];
             }
-
-            $res = DB::connection($this->db)->select($strSQL);						
-            $res= json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
