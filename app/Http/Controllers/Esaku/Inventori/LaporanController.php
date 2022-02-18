@@ -965,7 +965,7 @@ class LaporanController extends Controller
 
             if(count($res2) > 0) {
                 for($i=0;$i<count($res2);$i++) {
-                    if($res2[$i]['dc'] == 'C') {
+                    if($res2[$i]['dc'] == 'D') {
                         $res2[$i]['jumlah'] = -1*$res2[$i]['jumlah'];
                         $res2[$i]['total'] = -1*$res2[$i]['total'];
                         $res2[$i]['total_ex'] = -1*$res2[$i]['total_ex'];
