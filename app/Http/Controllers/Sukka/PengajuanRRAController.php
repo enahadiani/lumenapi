@@ -14,6 +14,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use Log;
 use Carbon\Carbon; 
+use Queue;
 
 class PengajuanRRAController extends Controller
 {
@@ -480,19 +481,22 @@ class PengajuanRRAController extends Controller
                             $content = "Pengajuan RRA No: $no_bukti menunggu approval Anda.";
                             $no_pesan = $this->generateKode("app_notif_m", "no_bukti",$kode_lokasi."-PN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
-                            $success['no_pesan'] = $no_pesan;
+                            // $success['no_pesan'] = $no_pesan;
+                            Queue::push(new \App\Jobs\SendSukkaNotifJob($no_pesan,$this->db));
                         }
         
                         if(isset($app_email) && $app_email != ""){
                             $pesan_header = "Pengajuan RRA No: $no_bukti berikut menunggu approval Anda.";
+                            $subject = "Pengajuan RRA";
                             $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
                             $result = app('App\Http\Controllers\Sukka\LaporanController')->getRRAForm($r);
                             $result = json_decode(json_encode($result),true);
                             $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".substr($periode,2,4).".", "000001");
                             $result['original']['judul'] = $pesan_header;
                             $html = view('email-rra-sukka',$result['original'])->render();
-                            $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-                            $success['no_pooling'] = $no_pool;
+                            $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool,subject) values (?,?,?,?,getdate(),?,?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool,$subject]);
+                            // $success['no_pooling'] = $no_pool;
+                            Queue::push(new \App\Jobs\SendSukkaEmailJob($no_pool,$this->db));
                         }
                         
                         DB::connection($this->db)->commit();
@@ -719,19 +723,22 @@ class PengajuanRRAController extends Controller
                             $content = "Pengajuan RRA No: $no_bukti menunggu approval Anda.";
                             $no_pesan = $this->generateKode("app_notif_m", "no_bukti",$kode_lokasi."-PN".substr($periode,2,4).".", "000001");
                             $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app,'-',$no_bukti,'-','-',0,0]);
-                            $success['no_pesan'] = $no_pesan;
+                            // $success['no_pesan'] = $no_pesan;
+                            Queue::push(new \App\Jobs\SendSukkaNotifJob($no_pesan,$this->db));
                         }
         
                         if(isset($app_email) && $app_email != ""){
                             $pesan_header = "Pengajuan RRA No: $no_bukti berikut menunggu approval Anda.";
+                            $subject = "Pengajuan RRA";
                             $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
                             $result = app('App\Http\Controllers\Sukka\LaporanController')->getRRAForm($r);
                             $result = json_decode(json_encode($result),true);
                             $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".substr($periode,2,4).".", "000001");
                             $result['original']['judul'] = $pesan_header;
                             $html = view('email-rra-sukka',$result['original'])->render();
-                            $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool) values (?,?,?,?,getdate(),?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool]);
-                            $success['no_pooling'] = $no_pool;
+                            $inspool= DB::connection($this->db)->insert('insert into pooling(no_hp,email,pesan,flag_kirim,tgl_input,tgl_kirim,jenis,no_pool,subject) values (?,?,?,?,getdate(),?,?,?,?)', ['-',$app_email,htmlspecialchars($html),'0',NULL,'EMAIL',$no_pool,$subject]);
+                            // $success['no_pooling'] = $no_pool;
+                            Queue::push(new \App\Jobs\SendSukkaEmailJob($no_pool,$this->db));
                         }
                         
                         DB::connection($this->db)->commit();
