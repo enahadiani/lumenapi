@@ -18,6 +18,35 @@ class LaporanController extends Controller
     public $db = 'sqlsrvyptkug';
     public $guard = 'yptkug';
 
+    function filterRpt($request,$col_array,$db_col_name,$where,$this_in){
+        for($i = 0; $i<count($col_array); $i++){
+            if(ISSET($request->input($col_array[$i])[0])){
+                if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                    $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                    $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                    $tmp = explode(",",$request->input($col_array[$i])[1]);
+                    $this_in = "";
+                    for($x=0;$x<count($tmp);$x++){
+                        if($x == 0){
+                            $this_in .= "'".$tmp[$x]."'";
+                        }else{
+        
+                            $this_in .= ","."'".$tmp[$x]."'";
+                        }
+                    }
+                    $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                }else if($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                    $where .= " and ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                }else if($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
+                    $where .= " and ".$db_col_name[$i]." <> '".$request->input($col_array[$i])[1]."' ";
+                }
+            }
+        }
+        return $where;
+    }
+
     public function getAjuForm(Request $request){
         try {
             
@@ -47,7 +76,7 @@ class LaporanController extends Controller
                 from apv_flow a
                 inner join apv_juskeb_m b on a.no_bukti=b.no_bukti 
                 inner join apv_karyawan c on a.nik=c.nik
-                left join apv_jab d on c.kode_jab=d.kode_jab 
+                left join apv_jab d on a.kode_jab=d.kode_jab 
                 inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
                 where a.no_bukti='$no_bukti'
 			) a
@@ -123,7 +152,7 @@ class LaporanController extends Controller
                 from apv_flow a
                 inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk 
                 inner join apv_karyawan c on a.nik=c.nik
-                left join apv_jab d on c.kode_jab=d.kode_jab 
+                left join apv_jab d on a.kode_jab=d.kode_jab 
                 inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
                 where a.no_bukti='$no_bukti'
 			) a
@@ -167,6 +196,75 @@ class LaporanController extends Controller
             $success['status'] = false;
             $success['data'] = [];
             $success['detail_app'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+
+    public function getPosisiJuskeb(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('kode_lokasi','no_bukti','periode','kode_pp');
+            $db_col_name = array('a.kode_lokasi','a.no_bukti','a.periode','a.kode_pp');
+            $where = "";
+            $where = $this->filterRpt($request,$col_array,$db_col_name,$where,"");
+            $where = ($where == "" ? "" : "where ".substr($where,4));            
+
+            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kegiatan,a.latar,a.aspek,a.spesifikasi,a.rencana,
+            a.nilai as nilai_kebutuhan,
+            case when a.progress = 'R' then 'Return Approval Juskeb' 
+            when a.progress not in ('R','J') then isnull(x.nama_jab,'-')
+            when a.progress = 'J' and isnull(c.progress,'-') ='-' then 'Finish Juskeb' 
+            when a.progress = 'J' and c.progress ='P' then 'Finish RRA' 
+            when a.progress = 'J' and c.progress ='R' then 'Return Approval RRA' 
+            when a.progress = 'J' and c.progress not in ('R','P') then isnull(y.nama_jab,'-')
+            end as posisi,
+			isnull(e.nilai,0) as nilai_rra
+            from apv_juskeb_m a
+            left join apv_flow d on a.no_bukti=d.no_bukti and d.no_urut=0
+            left join apv_pdrk_m c on a.no_bukti=convert(varchar,c.justifikasi) 
+            left join (select no_pdrk, sum(nilai) as nilai
+					from apv_pdrk_d 
+					where dc='D'
+					group by no_pdrk
+			) e on c.no_pdrk=e.no_pdrk
+            left join (select a.no_bukti,b.nama as nama_jab
+                                from apv_flow a
+                                inner join apv_jab b on a.kode_jab=b.kode_jab
+                                where a.status='1'
+                                )x on a.no_bukti=x.no_bukti
+            left join (select a.no_bukti,b.nama as nama_jab
+                                from apv_flow a
+                                inner join apv_jab b on a.kode_jab=b.kode_jab 
+                                where a.status='1'
+                                )y on c.no_pdrk=y.no_bukti
+            $where 
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

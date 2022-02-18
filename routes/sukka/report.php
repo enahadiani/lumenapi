@@ -17,7 +17,15 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
+    
+    $router->get('filter-pp','Sukka\LaporanController@getFilterPP');
+    $router->get('filter-lokasi','Sukka\LaporanController@getFilterLokasi');
+    $router->get('filter-periode-juskeb','Sukka\LaporanController@getFilterPeriodeJuskeb');
+    $router->get('filter-bukti-juskeb','Sukka\LaporanController@getFilterBuktiJuskeb');
+    $router->get('filter-default-juskeb','Sukka\LaporanController@getFilterDefaultJuskeb');
+
     $router->get('lap-aju-form','Sukka\LaporanController@getAjuForm');
+    $router->get('lap-posisi-juskeb','Sukka\LaporanController@getPosisiJuskeb');
 });
 
 
