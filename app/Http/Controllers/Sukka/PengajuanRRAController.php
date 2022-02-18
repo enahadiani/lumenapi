@@ -1264,7 +1264,7 @@ class PengajuanRRAController extends Controller
             }
 
             $strSQL = "select a.kode_pp, a.nama  
-            from pp a 
+            from apv_pp a 
             where a.kode_lokasi = '".$r->kode_lokasi."' and a.tipe='posting' and a.flag_aktif ='1' $filter";
             
             $rs = DB::connection($this->db)->select($strSQL);
@@ -1539,7 +1539,7 @@ class PengajuanRRAController extends Controller
             $keterangan .= "Kode Akun $kode_akun tidak valid. ";
         }
 
-        $authpp = DB::connection($this->db)->select("select kode_pp from pp where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' 
+        $authpp = DB::connection($this->db)->select("select kode_pp from apv_pp where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' 
         ");
         $authpp = json_decode(json_encode($authpp),true);
         if(count($authpp) > 0){
