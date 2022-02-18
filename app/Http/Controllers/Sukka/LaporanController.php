@@ -106,7 +106,7 @@ class LaporanController extends Controller
 
             $sql = "select a.periode,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk,a.kode_lokasi,a.keterangan,a.nik_buat,b.nama as nama_buat
             from apv_pdrk_m a
-            inner join karyawan b on a.nik_buat=b.nik
+            inner join apv_karyawan b on a.nik_buat=b.nik
             where a.no_pdrk='$no_bukti'
             order by a.no_pdrk";
             

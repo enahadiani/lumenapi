@@ -295,7 +295,7 @@ class PengajuanRRAController extends Controller
             }else{
                 $res = [];
             }
-            
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -496,6 +496,7 @@ class PengajuanRRAController extends Controller
                             $r->request->add(['no_bukti' => ["=",$no_bukti,""]]);
                             $result = app('App\Http\Controllers\Sukka\LaporanController')->getRRAForm($r);
                             $result = json_decode(json_encode($result),true);
+                            $success['result'] = $result;
                             $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".substr($periode,2,4).".", "000001");
                             $result['original']['judul'] = $pesan_header;
                             $html = view('email-rra-sukka',$result['original'])->render();
