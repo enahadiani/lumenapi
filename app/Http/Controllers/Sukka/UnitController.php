@@ -82,7 +82,7 @@ class UnitController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $ins = DB::connection($this->db)->insert('insert into pp(kode_pp,nama,kode_lokasi) values (?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi]);
+            $ins = DB::connection($this->db)->insert('insert into pp(kode_pp,nama,kode_lokasi,flag_aktif,tipe) values (?, ?, ?, ?, ?)', [$request->input('kode_pp'),$request->input('nama'),$kode_lokasi,1,'Posting']);
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
