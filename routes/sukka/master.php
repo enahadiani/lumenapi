@@ -37,7 +37,6 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
      $router->post('karyawan','Sukka\KaryawanController@store');
      $router->post('karyawan/{nik}','Sukka\KaryawanController@update');
      $router->delete('karyawan/{nik}','Sukka\KaryawanController@destroy');
-     $router->get('karyawan-nik','Sukka\KaryawanController@getGrKaryawan');
  
      //Master Jabatan
      $router->get('jabatan','Sukka\JabatanController@index');
