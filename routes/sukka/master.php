@@ -55,6 +55,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
  
      //Master Role
      $router->get('role','Sukka\RoleController@index');
+     $router->get('role-jenis','Sukka\RoleController@getJenis');
      $router->get('role/{kode_role}','Sukka\RoleController@show');
      $router->post('role','Sukka\RoleController@store');
      $router->put('role/{kode_role}','Sukka\RoleController@update');

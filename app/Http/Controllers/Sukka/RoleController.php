@@ -46,7 +46,7 @@ class RoleController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_role,a.nama,a.kode_pp,a.bawah,a.atas,case a.modul when 'JK' then 'Justifikasi Kebutuhan' when 'JP' then 'Justifikasi Pengadaan' when 'JV' then 'Verifikasi' else '-' end as modul
+            $res = DB::connection($this->db)->select("select a.kode_role,a.nama,a.jenis,a.bawah,a.atas,case a.form when 'AJU' then 'Justifikasi Kebutuhan' when 'RRA' then 'Pengajuan RRA' else '-' end as form
             from apv_role a
             where a.kode_lokasi='".$kode_lokasi."'
             ");
@@ -56,13 +56,47 @@ class RoleController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
                 $success['status'] = true;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getJenis(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_jenis,a.nama
+            from apv_jenis a
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -93,10 +127,10 @@ class RoleController extends Controller
         $this->validate($request, [
             'kode_role' => 'required|max:10',
             'nama' => 'required|max:100',
-            'kode_pp' => 'required|max:10',
             'bawah' => 'required',
             'atas' => 'required',
-            'modul' => 'required|max:10',
+            'form' => 'required|max:10',
+            'jenis' => 'required|max:10',
             'detail.*.kode_jab'=> 'required|max:10'
         ]);
 
@@ -117,7 +151,7 @@ class RoleController extends Controller
             
             if($sts){
 
-                $ins = DB::connection($this->db)->insert('insert into apv_role (kode_role,kode_pp,nama,bawah,atas,kode_lokasi,modul) values (?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_role'),$request->input('kode_pp'),$request->input('nama'),$request->input('bawah'),$request->input('atas'),$kode_lokasi,$request->input('modul')]);
+                $ins = DB::connection($this->db)->insert('insert into apv_role (kode_role,jenis,nama,bawah,atas,kode_lokasi,form) values (?, ?, ?, ?, ?, ?, ?)', [$request->input('kode_role'),$request->input('jenis'),$request->input('nama'),$request->input('bawah'),$request->input('atas'),$kode_lokasi,$request->input('form')]);
 
                 $detail = $request->input('detail');
 
@@ -134,12 +168,12 @@ class RoleController extends Controller
                 $success['status'] = $sts;
                 $success['message'] = $tmp;
             }
-            return response()->json(['success'=>$success], $this->successStatus);     
+            return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Role gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }				
         
         
@@ -161,7 +195,7 @@ class RoleController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select kode_role,kode_pp,nama,bawah,atas,modul from apv_role where kode_lokasi='".$kode_lokasi."' and kode_role='$kode_role'
+            $sql = "select kode_role,kode_pp,nama,bawah,atas,form,jenis from apv_role where kode_lokasi='".$kode_lokasi."' and kode_role='$kode_role'
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -176,14 +210,14 @@ class RoleController extends Controller
                 $success['data'] = $res;
                 $success['data2'] = $res2;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Tidak ditemukan!";
                 $success['data'] = [];
                 $success['data2'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus); 
+                return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -214,10 +248,10 @@ class RoleController extends Controller
     {
         $this->validate($request, [
             'nama' => 'required|max:100',
-            'kode_pp' => 'required|max:10',
+            'jenis' => 'required|max:10',
             'bawah' => 'required',
             'atas' => 'required',
-            'modul' => 'required|max:10',
+            'form' => 'required|max:10',
             'detail.*.kode_jab'=> 'required|max:10'
         ]);
 
@@ -233,7 +267,7 @@ class RoleController extends Controller
 
             $del2 = DB::connection($this->db)->table('apv_role_jab')->where('kode_lokasi', $kode_lokasi)->where('kode_role', $kode_role)->delete();
 
-            $ins = DB::connection($this->db)->insert('insert into apv_role (kode_role,kode_pp,nama,bawah,atas,kode_lokasi,modul) values (?, ?, ?, ?, ?, ?, ?)', [$kode_role,$request->input('kode_pp'),$request->input('nama'),$request->input('bawah'),$request->input('atas'),$kode_lokasi,$request->input('modul')]);
+            $ins = DB::connection($this->db)->insert('insert into apv_role (kode_role,jenis,nama,bawah,atas,kode_lokasi,form) values (?, ?, ?, ?, ?, ?, ?)', [$kode_role,$request->input('jenis'),$request->input('nama'),$request->input('bawah'),$request->input('atas'),$kode_lokasi,$request->input('form')]);
 
             $detail = $request->input('detail');
 
@@ -246,12 +280,12 @@ class RoleController extends Controller
             DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Data Role berhasil diubah";
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Role gagal diubah ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
@@ -279,13 +313,13 @@ class RoleController extends Controller
             $success['status'] = true;
             $success['message'] = "Data Role berhasil dihapus";
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Role gagal dihapus ".$e;
             
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     }
 
