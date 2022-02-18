@@ -341,6 +341,7 @@ class PengajuanRRAController extends Controller
             'lokasi_terima' => 'required',
             'lokasi_beri' => 'required',
             'no_juskeb' => 'required',
+            'kode_pp_juskeb' => 'required',
             'total_terima' => 'required',
             'total_beri' => 'required',
             'kode_akun' => 'required|array',
@@ -422,7 +423,7 @@ class PengajuanRRAController extends Controller
                             $this_pp = "";		 
                         }
 
-                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul,no_dokumen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$r->input('lokasi_beri'),$r->input('deskripsi'),$this_pp,'-','ANGGARAN',$r->input('tanggal'),$periode,$nik,'RRA',$r->input('no_juskeb'),$nik,'0','PUSAT',$r->input('no_dokumen')));
+                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul,no_dokumen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$r->input('lokasi_beri'),$r->input('deskripsi'),$r->input('kode_pp_juskeb'),'-','ANGGARAN',$r->input('tanggal'),$periode,$nik,'RRA',$r->input('no_juskeb'),$nik,'0','PUSAT',$r->input('no_dokumen')));
 
                         $arr_dok = array();
                         $arr_jenis = array();
@@ -565,6 +566,7 @@ class PengajuanRRAController extends Controller
             'lokasi_terima' => 'required',
             'lokasi_beri' => 'required',
             'no_juskeb' => 'required',
+            'kode_pp_juskeb' => 'required',
             'total_terima' => 'required',
             'total_beri' => 'required',
             'kode_akun' => 'required|array',
@@ -665,7 +667,7 @@ class PengajuanRRAController extends Controller
                             $this_pp = "";		 
                         }
 
-                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul,no_dokumen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$r->input('lokasi_beri'),$r->input('deskripsi'),$this_pp,'-','ANGGARAN',$r->input('tanggal'),$periode,$nik,'RRA',$r->input('no_juskeb'),$nik,'0','PUSAT',$r->input('no_dokumen')));
+                        $insm2 = DB::connection($this->db)->insert("insert into apv_pdrk_m(no_pdrk,kode_lokasi,lok_donor,keterangan,kode_pp,kode_bidang,jenis_agg,tanggal,periode,nik_buat,sts_pdrk,justifikasi, nik_user, tgl_input,progress,modul,no_dokumen) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?)",array($no_bukti,$r->input('lokasi_terima'),$r->input('lokasi_beri'),$r->input('deskripsi'),$r->input('kode_pp_juskeb'),'-','ANGGARAN',$r->input('tanggal'),$periode,$nik,'RRA',$r->input('no_juskeb'),$nik,'0','PUSAT',$r->input('no_dokumen')));
 
                         $arr_dok = array();
                         $arr_jenis = array();
