@@ -303,8 +303,14 @@ class LaporanController extends Controller
 			left join apv_jab d on a.kode_jab=d.kode_jab
 			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+            union all
+            select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,d.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk as no_bukti,'Pengajuan' as status,-1 as nu, '-' as urut,a.tanggal as tgl,a.keterangan
+			from apv_pdrk_m a
+            left join apv_karyawan c on a.nik_buat=c.nik 
+			left join apv_jab d on c.kode_jab=d.kode_jab
+            where convert(varchar,a.justifikasi)='$no_bukti'
 			union all
-			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,d.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl,e.keterangan
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,d.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,0 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl,e.keterangan
             from apv_flow a
 			inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk
             inner join apv_karyawan c on a.nik=c.nik 
@@ -312,7 +318,7 @@ class LaporanController extends Controller
 			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
             where a.kode_lokasi='$kode_lokasi' and convert(varchar,b.justifikasi)='$no_bukti'
 			) a
-			order by a.urut,a.tgl
+			order by a.nu,a.urut,a.tgl
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -339,6 +345,8 @@ class LaporanController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['lokasi'] = [];
+            $success['data'] = "Error ".$e;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -425,7 +433,7 @@ class LaporanController extends Controller
             $no_bukti = $request->input('no_bukti')[1];
 
             $sql="select * from (
-            select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,d.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk as no_bukti,'Pengajuan' as status,-4 as nu, '-' as urut,a.tanggal as tgl,a.kegiatan as keterangan
+            select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,d.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk as no_bukti,'Pengajuan' as status,-4 as nu, '-' as urut,a.tanggal as tgl,a.keterangan
 			from apv_pdrk_m a
             left join apv_karyawan c on a.nik_buat=c.nik 
 			left join apv_jab d on c.kode_jab=d.kode_jab
@@ -466,6 +474,8 @@ class LaporanController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['lokasi'] = [];
+            $success['data'] = "Error ".$e;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
