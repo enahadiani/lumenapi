@@ -1108,9 +1108,12 @@ class Approval2Controller extends Controller
 
             $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
             $template= 'email-siaga';
-        }else{
+        }else if($request->jenis == "SPB"){
             $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
             $template= 'email-siaga-spb';
+        }else{
+            $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormPJ($request);
+            $template= 'email-siaga-panjar';
         }
         $result = json_decode(json_encode($result),true);
         $success['status'] = true;

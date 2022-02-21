@@ -231,6 +231,90 @@ class LaporanController extends Controller
         }
     }
 
+    public function getAjuFormPJ(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('no_bukti','periode','kode_pp');
+            $db_col_name = array('a.no_pb','a.periode','a.kode_pp');
+
+            $no_bukti = $request->no_bukti[1];
+
+            $sql="select a.no_pb ,a.keterangan,a.nik_buat,b.nama as nama_buat,a.atensi as ref1,'Jakarta' as kota,tanggal,convert(varchar(20),a.tanggal,103) as tgl,
+            a.nilai,a.kurs,a.nilai,a.nilai_curr,d.nama as nama_curr,a.kode_curr,a.kode_pp,c.nama as nama_pp,a.kode_lokasi,
+            a.latar, a.strategis, a.bisnis, a.teknis, a.lain,a.nik_tahu,e.nama as nama_tahu,
+            a.nik_sah,a.nik_ver,f.nama as nama_sah,g.nama as nama_ver,a.jenis,a.jab1,a.jab2,a.jab3,a.jab4
+            from gr_pb_m a
+            inner join karyawan b on a.nik_buat=b.nik
+            inner join pp c on a.kode_pp=c.kode_pp
+            inner join curr d on a.kode_curr=d.kode_curr
+            inner join karyawan e on a.nik_tahu=e.nik
+            left join karyawan f on a.nik_sah=f.nik
+            left join karyawan g on a.nik_ver=g.nik
+            where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti' ";
+            
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $sql2="select a.no_pb,a.nu,a.nama_brg,a.satuan,a.jumlah,a.harga,a.nu
+            from gr_pb_boq a   
+            where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti' ";					
+            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = json_decode(json_encode($res2),true);
+
+            $sql="select * from (select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,a.jab1 as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut,a.tanggal as tgl
+			from gr_pb_m a
+            inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti'
+			union all
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,case a.no_urut when 1 then b.jab2 when 2 then b.jab3 when 3 then b.jab4 when 4 then b.jab5 else '-' end as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl
+            from apv_flow a
+			inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+            inner join karyawan c on a.nik=c.nik and a.kode_lokasi=c.kode_lokasi
+			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.kode_lokasi=e.kode_lokasi and a.no_urut=e.no_urut
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+			union all
+			select 'Diapprove oleh' as ket,c.kode_jab,c.nik,c.nama as nama_kar,b.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl
+            from gr_app_m a
+            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+			inner join kug_jab b on c.kode_jab=b.kode_jab and c.kode_lokasi=b.kode_lokasi
+			inner join apv_pesan e on a.no_app=e.no_ref and a.kode_lokasi=e.kode_lokasi and e.no_urut=10 
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+			) a
+			order by a.no_app,a.tgl
+            ";
+            $res3 = DB::connection($this->db)->select($sql);
+            $res3 = json_decode(json_encode($res3),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['detail'] = $res2;
+                $success['histori'] = $res3;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['detail'] = [];
+                $success['histori'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+    
     public function getPosisiSPB(Request $request){
         try {
             
