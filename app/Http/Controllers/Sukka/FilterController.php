@@ -114,7 +114,7 @@ class FilterController extends Controller
         }
     }
 
-    function getFilterPeriode(Request $request){
+    function getFilterPeriodeJuskeb(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -169,7 +169,7 @@ class FilterController extends Controller
             $where = $this->filterRpt($request,$col_array,$db_col_name,$where,"");
 
             $where = ($where == "" ? "" : "where ".substr($where,4));
-            $sql="select a.no_bukti,a.keterangan from apv_juskeb_m a 
+            $sql="select a.no_bukti,a.kegiatan as keterangan from apv_juskeb_m a 
             $where ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -188,6 +188,7 @@ class FilterController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = "Error ".$e;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

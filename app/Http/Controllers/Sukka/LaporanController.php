@@ -216,8 +216,8 @@ class LaporanController extends Controller
             $where = $this->filterRpt($request,$col_array,$db_col_name,$where,"");
             $where = ($where == "" ? "" : "where ".substr($where,4));            
 
-            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kegiatan,a.latar,a.aspek,a.spesifikasi,a.rencana,
-            a.nilai as nilai_kebutuhan,
+            $sql="select a.no_bukti,a.no_dokumen,a.kode_pp,a.kegiatan,a.latar,a.aspek,a.spesifikasi,a.rencana,a.periode,convert(varchar,a.tanggal,103) as tanggal,p.nama as nama_pp,
+            a.nilai,
             case when a.progress = 'R' then 'Return Approval Juskeb' 
             when a.progress not in ('R','J') then isnull(x.nama_jab,'-')
             when a.progress = 'J' and isnull(c.progress,'-') ='-' then 'Finish Juskeb' 
@@ -228,6 +228,7 @@ class LaporanController extends Controller
 			isnull(e.nilai,0) as nilai_rra
             from apv_juskeb_m a
             left join apv_flow d on a.no_bukti=d.no_bukti and d.no_urut=0
+            left join pp p on a.kode_pp=p.kode_pp
             left join apv_pdrk_m c on a.no_bukti=convert(varchar,c.justifikasi) 
             left join (select no_pdrk, sum(nilai) as nilai
 					from apv_pdrk_d 
@@ -248,6 +249,13 @@ class LaporanController extends Controller
             ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
+
+            $kode_lokasi = $request->input('kode_lokasi')[1];
+            $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
