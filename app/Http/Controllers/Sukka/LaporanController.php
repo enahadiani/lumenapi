@@ -344,6 +344,133 @@ class LaporanController extends Controller
         }
     }
 
+    public function getPosisiRRA(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('kode_lokasi','no_bukti','periode','kode_pp');
+            $db_col_name = array('a.kode_lokasi','a.no_pdrk','a.periode','a.kode_pp');
+            $where = "";
+            $where = $this->filterRpt($request,$col_array,$db_col_name,$where,"");
+            $where = ($where == "" ? "" : "where ".substr($where,4));            
+
+            $sql="select a.no_pdrk as no_bukti,a.no_dokumen,a.kode_pp,a.keterangan,a.periode,convert(varchar,a.tanggal,103) as tanggal,p.nama as nama_pp,
+            case when a.progress = 'R' then 'Return Approval RRA' 
+            when a.progress = 'P' then 'Finish RRA' 
+            when a.progress not in ('R','P') then isnull(x.nama_jab,'-')
+            end as posisi,
+			isnull(e.nilai,0) as nilai_rra
+            from apv_pdrk_m a
+            left join apv_flow d on a.no_pdrk=d.no_bukti and d.no_urut=0
+            left join pp p on a.kode_pp=p.kode_pp
+            left join (select no_pdrk, sum(nilai) as nilai
+					from apv_pdrk_d 
+					where dc='D'
+					group by no_pdrk
+			) e on a.no_pdrk=e.no_pdrk
+            left join (select a.no_bukti,b.nama as nama_jab
+                                from apv_flow a
+                                inner join apv_jab b on a.kode_jab=b.kode_jab
+                                where a.status='1'
+                                )x on a.no_pdrk=x.no_bukti
+                            
+            $where 
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $kode_lokasi = $request->input('kode_lokasi')[1];
+            $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['lokasi'] = [];
+            $success['data'] = "Error ".$e;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getHistoryAppRRA(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $kode_lokasi = $request->input('kode_lokasi')[1];
+            $no_bukti = $request->input('no_bukti')[1];
+
+            $sql="select * from (
+            select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,d.nama as nama_jab,convert(varchar,a.tanggal,103) as tanggal,a.no_pdrk as no_bukti,'Pengajuan' as status,-4 as nu, '-' as urut,a.tanggal as tgl,a.kegiatan as keterangan
+			from apv_pdrk_m a
+            left join apv_karyawan c on a.nik_buat=c.nik 
+			left join apv_jab d on c.kode_jab=d.kode_jab
+            where a.kode_lokasi='$kode_lokasi' and a.no_pdrk='$no_bukti'
+			union all
+			select 'Diapprove oleh' as ket,a.kode_jab,c.nik,c.nama as nama_kar,d.nama as nama_jab,isnull(convert(varchar,e.tanggal,103),'-') as tanggal,isnull(convert(varchar,e.id),'-') as no_app,case e.status when '2' then 'APPROVE' when '3' then 'REVISI' else '-' end as status,-2 as nu, isnull(convert(varchar,e.id),'X') as urut,e.tanggal as tgl,e.keterangan
+            from apv_flow a
+			inner join apv_pdrk_m b on a.no_bukti=b.no_pdrk
+            inner join apv_karyawan c on a.nik=c.nik 
+			left join apv_jab d on a.kode_jab=d.kode_jab
+			inner join apv_pesan e on a.no_bukti=e.no_bukti and a.no_urut=e.no_urut
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti'
+			) a
+			order by a.urut,a.tgl
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
+            from lokasi a
+            where a.kode_lokasi='".$kode_lokasi."'");						
+            $reslok= json_decode(json_encode($reslok),true);
+            $success['lokasi'] = $reslok;
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;        
+
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
     
 

@@ -222,4 +222,113 @@ class FilterController extends Controller
         
     }
 
+
+    function getFilterPeriodeRRA(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('kode_lokasi');
+            $db_col_name = array('a.kode_lokasi');
+            $where = "";
+            $where = $this->filterRpt($request,$col_array,$db_col_name,$where,"");
+
+            $where = ($where == "" ? "" : "where ".substr($where,4));
+            $sql="select distinct a.periode,dbo.fnNamaBulan(a.periode) as nama 
+            from apv_pdrk_m a 
+            $where
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterBuktiRRA(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $col_array = array('kode_lokasi','no_bukti','periode','kode_pp');
+            $db_col_name = array('a.kode_lokasi','a.no_pdrk','a.periode','a.kode_pp');
+
+            $where = "";
+            $where = $this->filterRpt($request,$col_array,$db_col_name,$where,"");
+
+            $where = ($where == "" ? "" : "where ".substr($where,4));
+            $sql="select a.no_pdrk as no_bukti,a.keterangan from apv_pdrk_m a 
+            $where ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = "Error ".$e;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterDefaultRRA(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = "-";
+
+            $sql="select max(periode) as periode from apv_pdrk_m where kode_lokasi='".$kode_lokasi."' ";
+            $res = DB::connection($this->db)->select($sql);
+            if(count($res) > 0){
+                $periode = $res[0]->periode;
+            }
+
+            $success['status'] = true;
+            $success['periode'] = $periode;
+            $success['message'] = "Success!";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 }
