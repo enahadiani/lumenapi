@@ -26,6 +26,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
 
     $router->get('lap-aju-form','Sukka\LaporanController@getAjuForm');
     $router->get('lap-posisi-juskeb','Sukka\LaporanController@getPosisiJuskeb');
+    $router->get('lap-history-app-juskeb','Sukka\LaporanController@getHistoryAppJuskeb');
 });
 
 
