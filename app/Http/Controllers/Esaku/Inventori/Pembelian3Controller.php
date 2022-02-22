@@ -355,8 +355,8 @@ class Pembelian3Controller extends Controller
 
             for($a=0; $a<count($request->kode_barang);$a++){
 
-                $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,ppn) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 
                 if($request->flag_ppn[$a] == "1") {
                     $harga = floatval($request->harga_barang[$a])*(100/110);
@@ -365,6 +365,13 @@ class Pembelian3Controller extends Controller
                 }
 
                 $sub = $request->qty_barang[$a] * $harga;
+
+                if($request->flag_ppn[$a] == "1") {
+                    $ppn = $sub * 0.1; // 10%
+                } else {
+                    $ppn = 0;
+                }
+
                 DB::connection($this->sql)->insert($insert9, [
                     $id,
                     $kode_lokasi,
@@ -386,7 +393,8 @@ class Pembelian3Controller extends Controller
                     0,
                     $diskItem,
                     $request->disc_barang[$a],
-                    round($sub,0)
+                    round($sub,0),
+                    round($ppn,0)
                 ]);
 
                 $update = DB::connection($this->sql)->table('brg_barang')
