@@ -133,8 +133,8 @@ class Pembelian3Controller extends Controller
 
             $kodeGudang = ($kode_lokasi == 100 ? 'GT1' : 'G01');
 
-            $sql="select a.kode_barang,a.nama,a.hna as harga,a.barcode,a.sat_kecil as satuan,x.akun_pers as kode_akun,isnull(a.nilai_beli,0) as harga_seb,isnull(d.sakhir,0) as saldo 
-            from ( select a.kode_barang,a.nama,a.hna,a.barcode,a.sat_kecil,a.nilai_beli,b.kode_gudang,a.kode_klp,a.kode_lokasi
+            $sql="select a.kode_barang,a.nama,a.hna as harga,a.barcode,a.sat_kecil as satuan,x.akun_pers as kode_akun,isnull(a.nilai_beli,0) as harga_seb,isnull(d.sakhir,0) as saldo,a.flag_ppn
+            from ( select a.kode_barang,a.nama,a.hna,a.barcode,a.sat_kecil,a.nilai_beli,b.kode_gudang,a.kode_klp,a.kode_lokasi,isnull(a.flag_ppn, 0) as flag_ppn
 			from brg_barang a cross join brg_gudang b
 			where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang'
 			) a
@@ -317,8 +317,13 @@ class Pembelian3Controller extends Controller
             $nilai = 0;
             $diskItem = 0;
             $total=0;
-            for($b=0; $b<count($request->kode_barang);$b++){
-                $harga = floatval($request->harga_barang[$b])*(100/110);
+            for($b=0; $b<count($request->kode_barang);$b++) {
+                if($request->flag_ppn[$b] == "1") {
+                    $harga = floatval($request->harga_barang[$b])*(100/110);
+                } else {
+                    $harga = floatval($request->harga_barang[$b]);
+                }
+
                 $nilai = $request->qty_barang[$b] * $harga;
                 $isAda = false;
                 $idx = 0;
@@ -352,7 +357,13 @@ class Pembelian3Controller extends Controller
 
                 $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                $harga = floatval($request->harga_barang[$a])*(100/110);
+                
+                if($request->flag_ppn[$b] == "1") {
+                    $harga = floatval($request->harga_barang[$a])*(100/110);
+                } else {
+                    $harga = floatval($request->harga_barang[$a]);
+                }
+
                 $sub = $request->qty_barang[$a] * $harga;
                 DB::connection($this->sql)->insert($insert9, [
                     $id,
