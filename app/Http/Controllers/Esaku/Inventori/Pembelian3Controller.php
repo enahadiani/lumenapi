@@ -358,7 +358,7 @@ class Pembelian3Controller extends Controller
                 $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 
-                if($request->flag_ppn[$b] == "1") {
+                if($request->flag_ppn[$a] == "1") {
                     $harga = floatval($request->harga_barang[$a])*(100/110);
                 } else {
                     $harga = floatval($request->harga_barang[$a]);
