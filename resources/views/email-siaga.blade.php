@@ -267,6 +267,7 @@
                     </table>
                     </div>
                 </div>
+                <p>Klik <a href="{{ config('services.api.redirect_email_url_siaga') }}">link ini</a> untuk melihat detail pengajuan.</p>
         </div>
 </body>
 </html>

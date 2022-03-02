@@ -40,7 +40,8 @@ return [
         'api_siaga'     => env('GCM_APIKEY_SIAGA')                
     ],
     'api' => [
-        'doc_url_siaga' => env('DOC_URL_SIAGA')
+        'doc_url_siaga' => env('DOC_URL_SIAGA'),
+        'redirect_email_url_siaga' => env('REDIRECT_EMAIL_URL_SIAGA')
     ]
 
 ];
