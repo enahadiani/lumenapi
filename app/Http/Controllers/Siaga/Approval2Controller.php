@@ -1002,7 +1002,7 @@ class Approval2Controller extends Controller
             $sql="select a.no_pb ,a.keterangan,a.nik_buat,b.nama as nama_buat,a.atensi as ref1,'Jakarta' as kota,tanggal,convert(varchar(20),a.tanggal,103) as tgl,
             a.nilai,a.kurs,a.nilai,a.nilai_curr,d.nama as nama_curr,a.kode_curr,a.kode_pp,c.nama as nama_pp,a.kode_lokasi,
             a.latar, a.strategis, a.bisnis, a.teknis, a.lain,a.nik_tahu,e.nama as nama_tahu,
-            a.nik_sah,a.nik_ver,f.nama as nama_sah,g.nama as nama_ver,a.jenis,a.jab1,a.jab2,a.jab3,a.jab4
+            a.nik_sah,a.nik_ver,a.nik_dir,f.nama as nama_sah,g.nama as nama_ver,j.nama as nama_dir,a.jenis,a.jab1,a.jab2,a.jab3,a.jab4,a.jab5,isnull(h.nik,'-') as nik_kirim,isnull(i.email,'-') as email_kirim
             from gr_pb_m a
             inner join karyawan b on a.nik_buat=b.nik
             inner join pp c on a.kode_pp=c.kode_pp
@@ -1010,6 +1010,9 @@ class Approval2Controller extends Controller
             inner join karyawan e on a.nik_tahu=e.nik
             left join karyawan f on a.nik_sah=f.nik
             left join karyawan g on a.nik_ver=g.nik
+            left join karyawan j on a.nik_dir=j.nik
+            left join apv_flow h on a.no_pb=h.no_bukti and a.kode_lokasi=h.kode_lokasi and h.status=1
+            left join karyawan i on h.nik=i.nik and h.kode_lokasi=i.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti' ";
             
             $res = DB::connection($this->db)->select($sql);
@@ -1020,6 +1023,36 @@ class Approval2Controller extends Controller
             where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti' ";					
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
+
+            $sql4="select f.ref1,c.no_bukti,c.kode_akun,b.nama as nama_akun,sum(case a.dc when 'D' then a.nilai else -a.nilai end) as nilai,isnull(d.kode_flag,'-') as kode_flag, 
+            sum(case when b.jenis='Neraca' and isnull(d.kode_flag,'-')='-' then a.nilai else c.saldo end ) as saldo,
+             sum(case when b.jenis='Neraca' and isnull(d.kode_flag,'-')='-' then 0 else c.saldo-a.nilai end ) as sisa 
+            from gr_pb_j a 
+            inner join gr_pb_m f on a.no_pb=f.no_pb and a.kode_lokasi=f.kode_lokasi
+             inner join angg_r c on f.no_pb=c.no_bukti and  a.kode_akun=c.kode_akun
+            inner join masakun b on c.kode_akun=b.kode_akun and c.kode_lokasi=b.kode_lokasi
+            left join flag_relasi d on c.kode_akun=d.kode_akun and c.kode_lokasi=d.kode_lokasi and d.kode_flag='006'
+            where a.no_pb='$no_bukti' and a.kode_lokasi='$kode_lokasi' and c.modul in ('AJU','BMHD','BYRBMHD')
+            group by f.ref1,c.no_bukti,c.kode_akun,b.nama,d.kode_flag ";					
+            $res4 = DB::connection($this->db)->select($sql4);
+            $res4 = json_decode(json_encode($res4),true);
+
+            $sql5="select a.no_pb ,a.keterangan,a.nik_buat,b.nama as nama_buat,a.atensi as ref1,'Jakarta' as kota,tanggal,convert(varchar(20),a.tanggal,103) as tgl,
+            a.nilai,a.kurs,a.nilai,a.nilai_curr,d.nama as nama_curr,a.kode_curr,a.kode_pp,c.nama as nama_pp,a.kode_lokasi,
+                a.latar, a.strategis, a.bisnis, a.teknis, a.lain,a.nik_tahu,e.nama as nama_tahu,
+                isnull(f.saldo,0) as saldo,isnull(f.nilai,0) as nilai_gar
+            from gr_pb_m a
+            inner join karyawan b on a.nik_buat=b.nik
+            inner join pp c on a.kode_pp=c.kode_pp
+            inner join curr d on a.kode_curr=d.kode_curr
+            inner join karyawan e on a.nik_tahu=e.nik
+            left join (select no_bukti,kode_lokasi,sum(saldo) as saldo,sum(nilai) as nilai
+                    from angg_r
+                    group by no_bukti,kode_lokasi
+                    )f on a.no_pb=f.no_bukti and a.kode_lokasi=f.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti' ";					
+            $res5 = DB::connection($this->db)->select($sql5);
+            $res5 = json_decode(json_encode($res5),true);
 
             $sql="select * from (select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,a.jab1 as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut,a.tanggal as tgl
 			from gr_pb_m a
@@ -1048,7 +1081,9 @@ class Approval2Controller extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
+                $success['data2'] = $res5;
                 $success['detail'] = $res2;
+                $success['detail_akun'] = $res4;
                 $success['histori'] = $res3;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;        
@@ -1058,13 +1093,20 @@ class Approval2Controller extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
+                $success['data2'] = [];
                 $success['detail'] = [];
+                $success['detail_akun'] = [];
                 $success['histori'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
+            $success['data2'] = [];
+            $success['detail'] = [];
+            $success['detail_akun'] = [];
+            $success['histori'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
