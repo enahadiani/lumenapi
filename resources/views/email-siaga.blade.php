@@ -48,7 +48,7 @@
                             <tr>
                                 <td>3</td>
                                 <td>TERBILANG</td>
-                                <td id="print-kegiatan2">{{ \app\Helper\SaiHelper::terbilang($data[0]['nilai']) }}</td>
+                                <td id="print-kegiatan2">{{ \app\Helper\SaiHelpers::terbilang($data[0]['nilai']) }}</td>
                             </tr>
                             <tr>
                                 <td>4</td>
@@ -58,7 +58,7 @@
                             <tr>
                                 <td>5</td>
                                 <td>SAAT PENGGUNAAN</td>
-                                <td id="print-waktu">{{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelper::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                                <td id="print-waktu">{{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                             </tr>
                         </tbody>
                     </table>

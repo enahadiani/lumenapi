@@ -52,12 +52,12 @@
                             <tr>
                                 <td>5</td>
                                 <td>TERBILANG</td>
-                                <td id="print-kegiatan2" style="text-transform: capitalize">{{ \app\Helper\SaiHelper::terbilang($data[0]['nilai']) }}</td>
+                                <td id="print-kegiatan2" style="text-transform: capitalize">{{ \app\Helper\SaiHelpers::terbilang($data[0]['nilai']) }}</td>
                             </tr>
                             <tr>
                                 <td>6</td>
                                 <td>PERIODE PENGGUNAAN</td>
-                                <td id="print-waktu">{{ \app\Helper\SaiHelper::getNamaBulan(substr($data[0]['periode'],4,2)) }} {{ substr($data[0]['periode'],0,4) }}</td>
+                                <td id="print-waktu">{{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['periode'],4,2)) }} {{ substr($data[0]['periode'],0,4) }}</td>
                             </tr>
                             <tr>
                                 <td>7</td>

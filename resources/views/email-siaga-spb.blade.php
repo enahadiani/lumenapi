@@ -117,7 +117,7 @@
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
-                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelper::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -149,7 +149,7 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td>Terbilang </td>
-                    <td colspan='2'>: {{ \app\Helper\SaiHelper::terbilang($data[0]['nilai']) }}</td>
+                    <td colspan='2'>: {{ \app\Helper\SaiHelpers::terbilang($data[0]['nilai']) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -185,7 +185,7 @@
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
-                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelper::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -249,7 +249,7 @@
                     </tr>
                 <tr>
                     <td width='68' valign='top'>Terbilang :</td>
-                    <td width='272' valign='top'>{{ \app\Helper\SaiHelper::terbilang($data[0]['nilai']) }}</td>
+                    <td width='272' valign='top'>{{ \app\Helper\SaiHelpers::terbilang($data[0]['nilai']) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -260,7 +260,7 @@
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelper::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                 </tr>
                 <tr>
                     <td height='60'>&nbsp;</td>
