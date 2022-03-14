@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Mail;
 
-class DashboardController extends Controller
+class DashboardControllerV2 extends Controller
 {
     /**
      * Display a listing of the resource.
