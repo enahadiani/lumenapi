@@ -57,6 +57,9 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     
 });
 
+$router->get('app-mobile-nik','Siaga\Approval2Controller@cekNIK');
+$router->post('app-mobile-pin','Siaga\Approval2Controller@inputPIN');
+
 
 
 ?>

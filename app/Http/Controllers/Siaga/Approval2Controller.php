@@ -1188,4 +1188,65 @@ class Approval2Controller extends Controller
         // END EMAIL
     }
 
+    public function cekNIK(Request $r)
+    {
+        $this->validate($r,[
+            'nik' => 'required'
+        ]);
+        try {
+            
+            $res = DB::connection($this->db)->select("select a.nik, isnull(b.pin,'-') as pin from karyawan a 
+            inner join hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
+            where a.nik=?
+            ",[$r->input('nik')]);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['message'] = "NIK Cocok!";
+                if($res[0]->pin != "-" || $res[0]->pin == ""){
+                    $success['status_pin'] = true;
+                }else{
+                    $success['status_pin'] = false;
+                }
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "NIK tidak ditemukan!";
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function inputPIN(Request $r)
+    {
+        $this->validate($r,[
+            'nik' => 'required',
+            'pin' => 'required'
+        ]);
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            $upd = DB::connection($this->db)->update("update hakakses set pin=? where nik=?
+            ",[$r->input('pin'),$r->input('nik')]);
+
+            $success['status'] = true;
+            $success['message'] = "Sukses!";
+            DB::connection($this->db)->commit();
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            DB::connection($this->db)->rollback();
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+
 }

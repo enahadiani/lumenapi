@@ -16,7 +16,9 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 }]);
 
 $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
-    
+    $router->get('dash-databox','Sukka\DashboardController@getDataBox');
+    $router->get('dash-return','Sukka\DashboardController@getDataReturn');
+    $router->get('dash-datatable','Sukka\DashboardController@index');
 });
 
 
