@@ -197,13 +197,23 @@ class Approval2Controller extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'tanggal' => 'required',
-            'no_aju' => 'required|max:20',
-            'status' => 'required|max:1',
-            'keterangan' => 'required|max:150',
-            'no_urut' => 'required'
-        ]);
+        if($request->status == "2"){
+            $this->validate($request, [
+                'tanggal' => 'required',
+                'no_aju' => 'required|max:20',
+                'status' => 'required|max:1',
+                'keterangan' => 'max:150',
+                'no_urut' => 'required'
+            ]);
+        }else{
+            $this->validate($request, [
+                'tanggal' => 'required',
+                'no_aju' => 'required|max:20',
+                'status' => 'required|max:1',
+                'keterangan' => 'required|max:150',
+                'no_urut' => 'required'
+            ]);
+        }
 
         DB::connection($this->db)->beginTransaction();
         
@@ -219,13 +229,15 @@ class Approval2Controller extends Controller
             date_default_timezone_set('Asia/Jakarta');
             $tgl = date('Y-m-d H:i:s');
 
+            $keterangan = isset($request->keterangan) ? $request->input('keterangan') : '-';
+
             $no_bukti = $request->input('no_aju');
             $nik_buat = "";
             $nik_app1 = "";
             $nik_app = $nik_user;
             $token_player = array();
             $token_player2 = array();
-            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$request->input('keterangan')."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
+            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$keterangan."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
 
             $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
