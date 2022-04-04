@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class NotifController extends Controller
 {
@@ -304,7 +305,12 @@ class NotifController extends Controller
 				$modul = $getpsn[0]->ref2;
 
 				// NOTIF WEB
-				event(new \App\Events\NotifSiaga($title,$message,$nik_kirim));
+				try{
+					event(new \App\Events\NotifSiaga($title,$message,$nik_kirim));
+				}catch(\Throwable $e){
+					Log::error('error notif web siaga:');
+					Log::error($e);
+				}
 				
 				$insd = DB::connection($this->db)->insert("insert into app_notif_d (kode_lokasi,no_bukti,id_device,nik,no_urut) values (?, ?, ?, ?, ?)",array($kode_lokasi,$request->no_pesan,'saisiaga-channel-'.$nik_kirim,$nik_kirim,0));
 
@@ -361,7 +367,7 @@ class NotifController extends Controller
         } catch (\Throwable $e) {
 			DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Error Notif Siaga : ".$e;
             return response()->json($success, 200);
         }
 	}
