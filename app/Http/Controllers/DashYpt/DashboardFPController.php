@@ -725,10 +725,10 @@ class DashboardFPController extends Controller
 
             $data_perform = [];
             foreach($res as $item) { 
-                $pdpt_yoy = ($item['pdpt_n5'] != 0 ? (($item['pdpt_n4']-$item['pdpt_n5'])/$item['pdpt_n5'])*100 : 0);
-                $beban_yoy = ($item['beban_n5'] != 0 ? (($item['beban_n4']-$item['beban_n5'])/$item['beban_n5'])*100 : 0);
-                $shu_yoy = ($item['shu_n5'] != 0 ? (($item['shu_n4']-$item['shu_n5'])/$item['shu_n5'])*100 : 0);
-                $or_yoy = ($item['or_n5'] != 0 ? (($item['or_n4']-$item['or_n5'])/$item['or_n5'])*100 : 0);
+                $pdpt_yoy = ($item['pdpt_n5'] != 0 ? (($item['pdpt_n4']-$item['pdpt_n5'])/abs($item['pdpt_n5']))*100 : 0);
+                $beban_yoy = ($item['beban_n5'] != 0 ? (($item['beban_n4']-$item['beban_n5'])/abs($item['beban_n5']))*100 : 0);
+                $shu_yoy = ($item['shu_n5'] != 0 ? (($item['shu_n4']-$item['shu_n5'])/abs($item['shu_n5']))*100 : 0);
+                $or_yoy = ($item['or_n5'] != 0 ? (($item['or_n4']-$item['or_n5'])/abs($item['or_n5']))*100 : 0);
                 try{
                     $pdpt_ach = ($item['pdpt_n2'] < 0 ? (1+($item['pdpt_n2']-$item['pdpt_n4'])/$item['pdpt_n2'])*100 : (1+($item['pdpt_n4']-$item['pdpt_n2'])/$item['pdpt_n2'])*100 );
                 }catch(\Throwable $e){

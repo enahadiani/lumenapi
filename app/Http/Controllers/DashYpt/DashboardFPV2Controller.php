@@ -102,7 +102,7 @@ class DashboardFPV2Controller extends Controller {
 
             $data = array();
             foreach($res as $item) {
-                $yoy = ($item['n5'] != 0 ? (($item['n4']-$item['n5'])/$item['n5'])*100 : 0);
+                $yoy = ($item['n5'] != 0 ? (($item['n4']-$item['n5'])/abs($item['n5']))*100 : 0);
                 if($item['kode_grafik'] == 'PI04'){
                     try{
                         $ach = ($item['n2']/$item['n4'])*100;
