@@ -1184,18 +1184,21 @@ class Approval2Controller extends Controller
                         ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
                         Log::info("update pooling :");
                         Log::info($updt);
-                        DB::connection($this->db)->commit();
                         $sts = true;
                         $msg .= $data['message'];
                     }
                 }
-            
+                
+                DB::connection($this->db)->commit();
                 $success['message'] = $msg;
         }else{
             DB::connection($this->db)->rollback();
+            Log::info("email siaga : Data tidak ditemukan");
             $success['status'] = false;
             $success['message'] = 'Data tidak ditemukan';
         }
+        Log::info("response email siaga lewat saku3:");
+        Log::info($success);
         return response()->json($success, $this->successStatus);
         // END EMAIL
     }
