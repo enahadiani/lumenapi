@@ -610,7 +610,7 @@ class DashboardFPController extends Controller
                 SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS beban,
                 SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS shu		
                 FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
@@ -698,18 +698,18 @@ class DashboardFPController extends Controller
             ISNULL(b.or_n2,0) as or_n2, ISNULL(b.or_n4,0) as or_n4, ISNULL(b.or_n5,0) as or_n5
                         from dash_ypt_lokasi a
                         LEFT JOIN (SELECT a.kode_lokasi,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else $n4 end) ELSE 0 END) AS pdpt_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else $n2 end) ELSE 0 END) AS pdpt_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else $n5 end) ELSE 0 END) AS pdpt_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else $n4 end) ELSE 0 END) AS beban_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else $n2 end) ELSE 0 END) AS beban_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else $n5 end) ELSE 0 END) AS beban_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else $n4 end) ELSE 0 END) AS shu_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else $n2 end) ELSE 0 END) AS shu_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else $n5 end) ELSE 0 END) AS shu_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else $n4 end) ELSE 0 END) AS or_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else $n2 end) ELSE 0 END) AS or_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else $n5 end) ELSE 0 END) AS or_n5
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS pdpt_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS pdpt_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS pdpt_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS beban_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS beban_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS beban_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS shu_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS shu_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS shu_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS or_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS or_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS or_n5
                             FROM dash_ypt_grafik_d a
                             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
