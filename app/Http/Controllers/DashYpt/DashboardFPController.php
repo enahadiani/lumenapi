@@ -1237,7 +1237,7 @@ class DashboardFPController extends Controller
                     $where
                 GROUP BY a.kode_neraca
             )b ON a.kode_neraca=b.kode_neraca 
-            where a.kode_lokasi='$lokasi' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1' ";
+            where a.kode_lokasi='$lokasi' and a.kode_fs='FS1' --AND LEN(a.kode_neraca) = '3' ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
