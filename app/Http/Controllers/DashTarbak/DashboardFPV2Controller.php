@@ -89,9 +89,7 @@ class DashboardFPV2Controller extends Controller
                 $sql = "SELECT a.kode_grafik, c.nama,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
-                CASE a.kode_grafik when 'PI04' then (CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE (sum(b.$n2)/sum(b.$n4))*100 END) else ( CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END) END AS ach,
-                CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
@@ -102,75 +100,52 @@ class DashboardFPV2Controller extends Controller
                 $sql = "SELECT a.kode_grafik, c.nama,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
-                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5,
-                CASE a.kode_grafik when 'PI04' then (CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE (sum(b.$n2)/sum(b.$n4))*100 END) else ( CASE ISNULL(sum(b.$n2),0) WHEN 0 THEN 0 ELSE (sum(b.$n4)/sum(b.$n2))*100 END) END AS ach,
-                CASE ISNULL(sum(b.$n4),0) WHEN 0 THEN 0 ELSE ((sum(b.$n4) - sum(b.$n5))/sum(b.$n5))*100 END AS yoy
+                SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n5 ELSE b.$n5 END) AS n5
                 FROM dash_ypt_grafik_d a
                 INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
-                group by a.kode_grafik, c.nama ";
+                group by a.kode_grafik, c.nama 
+                order by a.kode_grafik ";
             }
 
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select), true);
 
-            $data_pdpt = array();
-            $data_beban = array();
-            $data_shu = array();
-            $data_or = array();
-            $totalPdptN2 = 0;
-            $totalPdptN4 = 0;
-            $totalPdptN5 = 0;
-            $totalBebanN2 = 0;
-            $totalBebanN4 = 0;
-            $totalBebanN5 = 0;
+            $data = array();
             foreach ($res as $item) {
-                if ($item['kode_grafik'] == 'PI01') {
-                    $data_pdpt = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n2" => floatval(number_format((float)$item['n2'], 2, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2, '.', '')),
-                    ];
-                    $totalPdptN2 = $totalPdptN2 + (float) $item['n2'];
-                    $totalPdptN4 = $totalPdptN4 + (float) $item['n4'];
-                    $totalPdptN5 = $totalPdptN5 + (float) $item['n5'];
-                } elseif ($item['kode_grafik'] == 'PI02') {
-                    $data_beban = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n2" => floatval(number_format((float)$item['n2'], 2, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2, '.', '')),
-                    ];
-                    $totalBebanN2 = $totalBebanN2 + (float) $item['n2'];
-                    $totalBebanN4 = $totalBebanN4 + (float) $item['n4'];
-                    $totalBebanN5 = $totalBebanN5 + (float) $item['n5'];
-                } elseif ($item['kode_grafik'] == 'PI03') {
-                    $data_shu = [
-                        "kode_grafik" => $item['kode_grafik'],
-                        "nama" => $item['nama'],
-                        "n2" => floatval(number_format((float)$item['n2'], 2, '.', '')),
-                        "n4" => floatval(number_format((float)$item['n4'], 2, '.', '')),
-                        "n5" => floatval(number_format((float)$item['n5'], 2, '.', '')),
-                        "ach" => floatval(number_format((float)$item['ach'], 2, '.', '')),
-                        "yoy" => floatval(number_format((float)$item['yoy'], 2, '.', '')),
-                    ];
+                $yoy = ($item['n5'] != 0 ? (($item['n4']-$item['n5'])/abs($item['n5']))*100 : 0);
+                if($item['kode_grafik'] == 'PI04'){
+                    try{
+                        $ach = ($item['n2']/$item['n4'])*100;
+                    }catch(\Throwable $e){
+                        $ach = 0;
+                    }
+                }else{
+                    try{
+                        $ach = ($item['n2'] < 0 ? (1+($item['n2']-$item['n4'])/$item['n2'])*100 : (1+($item['n4']-$item['n2'])/$item['n2'])*100 );
+                    }catch(\Throwable $e){
+                        $ach = 0;
+                    }
                 }
+                array_push($data,
+                [
+                    "kode_grafik" => $item['kode_grafik'],
+                    "nama" => $item['nama'],
+                    "n2" => floatval(number_format((float)$item['n2'], 2,'.', '')),
+                    "n4" => floatval(number_format((float)$item['n4'], 2,'.', '')),
+                    "n5" => floatval(number_format((float)$item['n5'], 2,'.', '')),
+                    "ach" => floatval(number_format((float)$ach, 2,'.', '')),
+                    "yoy" => floatval(number_format((float)$yoy, 2,'.', '')),
+                ]);
             }
 
-            $orN2 = ($totalBebanN2 / $totalPdptN2) * 100;
-            $orN4 = ($totalBebanN4 / $totalPdptN4) * 100;
-            $orN5 = ($totalBebanN5 / $totalPdptN5) * 100;
-            $orAch = ($totalBebanN2 / $totalPdptN4) * 100;
-            $orYoy = (($totalBebanN4 - $totalBebanN5) / $totalPdptN4) * 100;
+            $orN2 = ($data[1]['n2'] / $data[0]['n2']) * 100;
+            $orN4 = ($data[1]['n4'] / $data[0]['n4']) * 100;
+            $orN5 = ($data[1]['n5'] / $data[0]['n5']) * 100;
+            $orAch = ($data[1]['n2'] / $data[0]['n4']) * 100;
+            $orYoy = (($data[1]['n4'] - $data[1]['n5']) / $data[0]['n4']) * 100;
             $data_or = [
                 "kode_grafik" => "PI04",
                 "nama" => "OR",
@@ -184,9 +159,9 @@ class DashboardFPV2Controller extends Controller
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
-                "data_pdpt" => $data_pdpt,
-                "data_beban" => $data_beban,
-                "data_shu" => $data_shu,
+                "data_pdpt" => $data[0],
+                "data_beban" => $data[1],
+                "data_shu" => $data[2],
                 "data_or" => $data_or
             ];
 
