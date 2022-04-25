@@ -26,7 +26,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $convertYearNow = strval($yearNow);
             $yearYesterday = $convertYearNow - 1;
             $convertYearYesterday = strval($yearYesterday);
@@ -71,7 +71,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $select = "select top 1 isnull(sum(a.jumlah),0) as jumlah, d.nama 
                 from par_kunj_d a
                 inner join par_subjenis b on a.kode_subjenis=b.kode_subjenis and a.kode_lokasi=b.kode_lokasi
@@ -108,7 +108,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $select = "select top 1 isnull(sum(a.jumlah),0) as jumlah, b.nama
                 from par_kunj_d a
                 inner join par_mitra b on a.kode_lokasi=b.kode_lokasi and a.kode_mitra=b.kode_mitra
@@ -143,7 +143,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $select = "select top 5 sum(a.jumlah) as jumlah, b.nama as mitra, c.nama as camat, g.nama as bidang
                 from par_kunj_d a
                 inner join par_mitra b on a.kode_lokasi=b.kode_lokasi and a.kode_mitra=b.kode_mitra
@@ -183,7 +183,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $select = "select distinct top 5 sum(a.jumlah) as jumlah, b.kode_mitra, b.nama as mitra
                 from par_kunj_d a
                 inner join par_mitra b on a.kode_lokasi=b.kode_lokasi and a.kode_mitra=b.kode_mitra
@@ -218,7 +218,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $select = "select e.nama,
                 sum(case when month(a.tanggal)='01' then a.jumlah else 0 end) n1,
                 sum(case when month(a.tanggal)='02' then a.jumlah else 0 end) n2,
@@ -273,7 +273,7 @@ class DashboardController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $yearNow = date('Y');
+            $yearNow = '2020';
             $monthNow = "08";
             $select = "select e.nama, sum(a.jumlah) as jumlah
                 from par_kunj_d a
