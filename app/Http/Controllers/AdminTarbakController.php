@@ -72,6 +72,24 @@ class AdminTarbakController extends Controller
             $user = json_decode(json_encode($user),true);
             
             if(count($user) > 0){ //mengecek apakah data kosong atau tidak
+                // $periode = DB::connection($this->db)->select("select max(periode) as periode from
+                // (select distinct periode as periode from exs_neraca where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_neraca_pp where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_neraca_bidang where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_glma where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_glma_pp where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_glma_gar where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_gldt_pp where kode_lokasi= '$kode_lokasi'
+                // union all
+                // select distinct periode as periode from exs_gldt_akun where kode_lokasi= '$kode_lokasi'
+                // ) a
+                // ");
                 $periode = DB::connection($this->db)->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi'
                 ");
                 $periode = json_decode(json_encode($periode),true);

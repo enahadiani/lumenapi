@@ -94,7 +94,8 @@ class DashboardFPV2Controller extends Controller
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where $filter_pp
-                group by a.kode_grafik, c.nama ";
+                group by a.kode_grafik, c.nama
+                order by a.kode_grafik ";
             } else {
 
                 $sql = "SELECT a.kode_grafik, c.nama,
