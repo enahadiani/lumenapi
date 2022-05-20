@@ -127,7 +127,7 @@ class UploadPegawaiController extends Controller
             $success['status'] = false;
             $success['message'] = "Internal Server Error" . $e;
             Log::error($e);
-            return response()->json($success, $this->successStatus);
+            return response()->json(['success' => $success], $this->successStatus);
         }
     }
 
