@@ -17,115 +17,7 @@
             font-weight:bold;
         }
         </style> 
-        @php
-        function terbilang($int) {
-        $angka = [
-            "",
-            "satu",
-            "dua",
-            "tiga",
-            "empat",
-            "lima",
-            "enam",
-            "tujuh",
-            "delapan",
-            "sembilan",
-            "sepuluh",
-            "sebelas",
-        ];
-        if ($int < 12) return " " .$angka[$int];
-        else if ($int < 20) return terbilang($int - 10) ." belas ";
-        else if ($int < 100)
-            return terbilang($int / 10) ." puluh " .terbilang($int % 10);
-        else if ($int < 200) return "seratus" .terbilang($int - 100);
-        else if ($int < 1000)
-            return terbilang($int / 100) ." ratus " .terbilang($int % 100);
-        else if ($int < 2000) return "seribu" .terbilang($int - 1000);
-        else if ($int < 1000000)
-            return terbilang($int / 1000) ." ribu " .terbilang($int % 1000);
-        else if ($int < 1000000000)
-            return terbilang($int / 1000000) ." juta " .terbilang($int % 1000000);
-        else if ($int < 1000000000000)
-            return (
-                terbilang($int / 1000000) ." milyar " .terbilang($int % 1000000000)
-            );
-        else if ($int >= 1000000000000)
-            return (
-                terbilang($int / 1000000).
-                " trilyun ".
-                terbilang($int % 1000000000000)
-            );
-    }
-    
-    function getNamaBulan($no_bulan) {
-        switch ($no_bulan) {
-            case 1:
-            case "1":
-            case "01":
-                $bulan = "Januari";
-                break;
-            case 2:
-            case "2":
-            case "02":
-                $bulan = "Februari";
-                break;
-            case 3:
-            case "3":
-            case "03":
-                $bulan = "Maret";
-                break;
-            case 4:
-            case "4":
-            case "04":
-                $bulan = "April";
-                break;
-            case 5:
-            case "5":
-            case "05":
-                $bulan = "Mei";
-                break;
-            case 6:
-            case "6":
-            case "06":
-                $bulan = "Juni";
-                break;
-            case 7:
-            case "7":
-            case "07":
-                $bulan = "Juli";
-                break;
-            case 8:
-            case "8":
-            case "08":
-                $bulan = "Agustus";
-                break;
-            case 9:
-            case "9":
-            case "09":
-                $bulan = "September";
-                break;
-            case 10:
-            case "10":
-            case "10":
-                $bulan = "Oktober";
-                break;
-            case 11:
-            case "11":
-            case "11":
-                $bulan = "November";
-                break;
-            case 12:
-            case "12":
-            case "12":
-                $bulan = "Desember";
-                break;
-            default:
-                $bulan = null;
-        }
-    
-        return $bulan;
-    }
-        @endphp       
+             
         <p>{{ $judul }}</p>   
         <table width='800' border='1' cellspacing='0' cellpadding='0' class='kotak'>
             <tr>
@@ -225,7 +117,7 @@
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
-                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -257,7 +149,7 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td>Terbilang </td>
-                    <td colspan='2'>: {{ terbilang($data[0]['nilai']) }}</td>
+                    <td colspan='2'>: {{ \app\Helper\SaiHelpers::terbilang($data[0]['nilai']) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -293,7 +185,7 @@
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
-                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -357,7 +249,7 @@
                     </tr>
                 <tr>
                     <td width='68' valign='top'>Terbilang :</td>
-                    <td width='272' valign='top'>{{ terbilang($data[0]['nilai']) }}</td>
+                    <td width='272' valign='top'>{{ \app\Helper\SaiHelpers::terbilang($data[0]['nilai']) }}</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -368,7 +260,7 @@
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
+                    <td>Jakarta, {{ substr($data[0]['tanggal'],8,2) }} {{ \app\Helper\SaiHelpers::getNamaBulan(substr($data[0]['tanggal'],5,2)) }} {{ substr($data[0]['tanggal'],0,4) }}</td>
                 </tr>
                 <tr>
                     <td height='60'>&nbsp;</td>

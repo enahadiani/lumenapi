@@ -23,115 +23,7 @@ class Approval2Controller extends Controller
     public $successStatus = 200;
     public $db = 'dbsiaga';
     public $guard = 'siaga';
-
-    function terbilang($int) {
-        $angka = [
-            "",
-            "satu",
-            "dua",
-            "tiga",
-            "empat",
-            "lima",
-            "enam",
-            "tujuh",
-            "delapan",
-            "sembilan",
-            "sepuluh",
-            "sebelas",
-        ];
-        if ($int < 12) return " " .$angka[$int];
-        else if ($int < 20) return $this->terbilang($int - 10) ." belas ";
-        else if ($int < 100)
-            return $this->terbilang($int / 10) ." puluh " .$this->terbilang($int % 10);
-        else if ($int < 200) return "seratus" .$this->terbilang($int - 100);
-        else if ($int < 1000)
-            return $this->terbilang($int / 100) ." ratus " .$this->terbilang($int % 100);
-        else if ($int < 2000) return "seribu" .$this->terbilang($int - 1000);
-        else if ($int < 1000000)
-            return $this->terbilang($int / 1000) ." ribu " .$this->terbilang($int % 1000);
-        else if ($int < 1000000000)
-            return $this->terbilang($int / 1000000) ." juta " .$this->terbilang($int % 1000000);
-        else if ($int < 1000000000000)
-            return (
-                $this->terbilang($int / 1000000) ." milyar " .$this->terbilang($int % 1000000000)
-            );
-        else if ($int >= 1000000000000)
-            return (
-                $this->terbilang($int / 1000000).
-                " trilyun ".
-                $this->terbilang($int % 1000000000000)
-            );
-    }
     
-    function getNamaBulan($no_bulan) {
-        switch ($no_bulan) {
-            case 1:
-            case "1":
-            case "01":
-                $bulan = "Januari";
-                break;
-            case 2:
-            case "2":
-            case "02":
-                $bulan = "Februari";
-                break;
-            case 3:
-            case "3":
-            case "03":
-                $bulan = "Maret";
-                break;
-            case 4:
-            case "4":
-            case "04":
-                $bulan = "April";
-                break;
-            case 5:
-            case "5":
-            case "05":
-                $bulan = "Mei";
-                break;
-            case 6:
-            case "6":
-            case "06":
-                $bulan = "Juni";
-                break;
-            case 7:
-            case "7":
-            case "07":
-                $bulan = "Juli";
-                break;
-            case 8:
-            case "8":
-            case "08":
-                $bulan = "Agustus";
-                break;
-            case 9:
-            case "9":
-            case "09":
-                $bulan = "September";
-                break;
-            case 10:
-            case "10":
-            case "10":
-                $bulan = "Oktober";
-                break;
-            case 11:
-            case "11":
-            case "11":
-                $bulan = "November";
-                break;
-            case 12:
-            case "12":
-            case "12":
-                $bulan = "Desember";
-                break;
-            default:
-                $bulan = null;
-        }
-    
-        return $bulan;
-    }
-
     function generateKode($tabel, $kolom_acuan, $prefix, $str_format){
         $query = DB::connection($this->db)->select("select right(max($kolom_acuan), ".strlen($str_format).")+1 as id from $tabel where $kolom_acuan like '$prefix%'");
         $query = json_decode(json_encode($query),true);
@@ -305,13 +197,23 @@ class Approval2Controller extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'tanggal' => 'required',
-            'no_aju' => 'required|max:20',
-            'status' => 'required|max:1',
-            'keterangan' => 'required|max:150',
-            'no_urut' => 'required'
-        ]);
+        if($request->status == "2"){
+            $this->validate($request, [
+                'tanggal' => 'required',
+                'no_aju' => 'required|max:20',
+                'status' => 'required|max:1',
+                'keterangan' => 'max:150',
+                'no_urut' => 'required'
+            ]);
+        }else{
+            $this->validate($request, [
+                'tanggal' => 'required',
+                'no_aju' => 'required|max:20',
+                'status' => 'required|max:1',
+                'keterangan' => 'required|max:150',
+                'no_urut' => 'required'
+            ]);
+        }
 
         DB::connection($this->db)->beginTransaction();
         
@@ -327,13 +229,15 @@ class Approval2Controller extends Controller
             date_default_timezone_set('Asia/Jakarta');
             $tgl = date('Y-m-d H:i:s');
 
+            $keterangan = isset($request->keterangan) ? $request->input('keterangan') : '-';
+
             $no_bukti = $request->input('no_aju');
             $nik_buat = "";
             $nik_app1 = "";
             $nik_app = $nik_user;
             $token_player = array();
             $token_player2 = array();
-            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$request->input('keterangan')."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
+            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$keterangan."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
 
             $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
@@ -1280,20 +1184,84 @@ class Approval2Controller extends Controller
                         ->update(['tgl_kirim' => Carbon::now()->timezone("Asia/Jakarta"), 'flag_kirim' => 1]);
                         Log::info("update pooling :");
                         Log::info($updt);
-                        DB::connection($this->db)->commit();
                         $sts = true;
                         $msg .= $data['message'];
                     }
                 }
-            
+                
+                DB::connection($this->db)->commit();
                 $success['message'] = $msg;
         }else{
             DB::connection($this->db)->rollback();
+            Log::info("email siaga : Data tidak ditemukan");
             $success['status'] = false;
             $success['message'] = 'Data tidak ditemukan';
         }
+        Log::info("response email siaga lewat saku3:");
+        Log::info($success);
         return response()->json($success, $this->successStatus);
         // END EMAIL
     }
+
+    public function cekNIK(Request $r)
+    {
+        $this->validate($r,[
+            'nik' => 'required'
+        ]);
+        try {
+            
+            $res = DB::connection($this->db)->select("select a.nik, isnull(b.pin,'-') as pin from karyawan a 
+            inner join hakakses b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi
+            where a.nik=?
+            ",[$r->input('nik')]);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['message'] = "NIK Cocok!";
+                if($res[0]->pin != "-" || $res[0]->pin == ""){
+                    $success['status_pin'] = true;
+                }else{
+                    $success['status_pin'] = false;
+                }
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "NIK tidak ditemukan!";
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function inputPIN(Request $r)
+    {
+        $this->validate($r,[
+            'nik' => 'required',
+            'pin' => 'required'
+        ]);
+        DB::connection($this->db)->beginTransaction();
+        try {
+            
+            $upd = DB::connection($this->db)->update("update hakakses set pin=? where nik=?
+            ",[$r->input('pin'),$r->input('nik')]);
+
+            $success['status'] = true;
+            $success['message'] = "Sukses!";
+            DB::connection($this->db)->commit();
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            DB::connection($this->db)->rollback();
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
 
 }

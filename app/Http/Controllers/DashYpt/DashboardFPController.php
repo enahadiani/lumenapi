@@ -610,7 +610,7 @@ class DashboardFPController extends Controller
                 SUM(CASE WHEN a.kode_grafik='PI02' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS beban,
                 SUM(CASE WHEN a.kode_grafik='PI03' THEN (CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) ELSE 0 END) AS shu		
                 FROM dash_ypt_grafik_d a
-                INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
+                INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 $where
                 GROUP BY a.kode_lokasi
@@ -692,54 +692,75 @@ class DashboardFPController extends Controller
             }
 
             $sql = "SELECT a.kode_lokasi, a.nama, a.skode,
-            case when ISNULL(b.pdpt_n2,0) <> 0 then (ISNULL(b.pdpt_n4,0)/ISNULL(b.pdpt_n2,0))*100 else 0 end AS pdpt_ach, 
-            case when ISNULL(b.pdpt_n5,0) <> 0 then ((ISNULL(b.pdpt_n4,0)-ISNULL(b.pdpt_n5,0))/ISNULL(b.pdpt_n5,0))*100 else 0 end AS pdpt_yoy,
-            case when ISNULL(b.beban_n2,0) <> 0 then (ISNULL(b.beban_n4,0)/ISNULL(b.beban_n2,0))*100 else 0 end AS beban_ach, 
-            case when ISNULL(b.beban_n5,0) <> 0 then ((ISNULL(b.beban_n4,0)-ISNULL(b.beban_n5,0))/ISNULL(b.beban_n5,0))*100 else 0 end AS beban_yoy,
-            case when ISNULL(b.shu_n2,0) <> 0 then (ISNULL(b.shu_n4,0)/ISNULL(b.shu_n2,0))*100 else 0 end AS shu_ach, 
-            case when ISNULL(b.shu_n5,0) <> 0 then ((ISNULL(b.shu_n4,0)-ISNULL(b.shu_n5,0))/ISNULL(b.shu_n5,0))*100 else 0 end AS shu_yoy,
-            case when ISNULL(b.or_n4,0) <> 0 then (ISNULL(b.or_n2,0)/ISNULL(b.or_n4,0))*100 else 0 end AS or_ach, 
-            case when ISNULL(b.or_n5,0) <> 0 then ((ISNULL(b.or_n4,0)-ISNULL(b.or_n5,0))/ISNULL(b.or_n5,0))*100 else 0 end AS or_yoy
+            ISNULL(b.pdpt_n2,0) as pdpt_n2, ISNULL(b.pdpt_n4,0) as pdpt_n4, ISNULL(b.pdpt_n5,0) as pdpt_n5,
+            ISNULL(b.beban_n2,0) as beban_n2, ISNULL(b.beban_n4,0) as beban_n4, ISNULL(b.beban_n5,0) as beban_n5,
+            ISNULL(b.shu_n2,0) as shu_n2, ISNULL(b.shu_n4,0) as shu_n4, ISNULL(b.shu_n5,0) as shu_n5,
+            ISNULL(b.or_n2,0) as or_n2, ISNULL(b.or_n4,0) as or_n4, ISNULL(b.or_n5,0) as or_n5
                         from dash_ypt_lokasi a
                         LEFT JOIN (SELECT a.kode_lokasi,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n4 ELSE 0 END) AS pdpt_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n2 ELSE 0 END) AS pdpt_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI01' THEN b.$n5 ELSE 0 END) AS pdpt_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.$n4 ELSE 0 END) AS beban_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.$n2 ELSE 0 END) AS beban_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI02' THEN b.$n5 ELSE 0 END) AS beban_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.$n4 ELSE 0 END) AS shu_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.$n2 ELSE 0 END) AS shu_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI03' THEN b.$n5 ELSE 0 END) AS shu_n5,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n4 ELSE 0 END) AS or_n4,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n2 ELSE 0 END) AS or_n2,
-                            SUM(CASE WHEN a.kode_grafik='PI04' THEN b.$n5 ELSE 0 END) AS or_n5
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS pdpt_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS pdpt_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI01' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS pdpt_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS beban_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS beban_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI02' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS beban_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS shu_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS shu_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI03' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS shu_n5,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n4 else b.$n4 end) ELSE 0 END) AS or_n4,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n2 else b.$n2 end) ELSE 0 END) AS or_n2,
+                            SUM(CASE WHEN a.kode_grafik='PI04' THEN (case when b.jenis_akun='Pendapatan' then -b.$n5 else b.$n5 end) ELSE 0 END) AS or_n5
                             FROM dash_ypt_grafik_d a
                             INNER JOIN exs_neraca b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                             INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                             $where $filter_lokasi
                             GROUP BY a.kode_lokasi
                         ) b on a.kode_lokasi=b.kode_lokasi
-                        WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi";
+                        WHERE a.kode_lokasi IN ('11','12','13','14','15') $filter_lokasi
+                        ";
+            
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);
 
             $data_perform = [];
             foreach($res as $item) { 
-                
+                $pdpt_yoy = ($item['pdpt_n5'] != 0 ? (($item['pdpt_n4']-$item['pdpt_n5'])/abs($item['pdpt_n5']))*100 : 0);
+                $beban_yoy = ($item['beban_n5'] != 0 ? (($item['beban_n4']-$item['beban_n5'])/abs($item['beban_n5']))*100 : 0);
+                $shu_yoy = ($item['shu_n5'] != 0 ? (($item['shu_n4']-$item['shu_n5'])/abs($item['shu_n5']))*100 : 0);
+                $or_yoy = ($item['or_n5'] != 0 ? (($item['or_n4']-$item['or_n5'])/abs($item['or_n5']))*100 : 0);
+                try{
+                    $pdpt_ach = ($item['pdpt_n2'] < 0 ? (1+($item['pdpt_n2']-$item['pdpt_n4'])/$item['pdpt_n2'])*100 : (1+($item['pdpt_n4']-$item['pdpt_n2'])/$item['pdpt_n2'])*100 );
+                }catch(\Throwable $e){
+                    $pdpt_ach = 0;
+                }
+                try{
+                    $beban_ach = ($item['beban_n2'] < 0 ? (1+($item['beban_n2']-$item['beban_n4'])/$item['beban_n2'])*100 : (1+($item['beban_n4']-$item['beban_n2'])/$item['beban_n2'])*100 );
+                }catch(\Throwable $e){
+                    $beban_ach = 0;
+                }
+                try{
+                    $shu_ach = ($item['shu_n2'] < 0 ? (1+($item['shu_n2']-$item['shu_n4'])/$item['shu_n2'])*100 : (1+($item['shu_n4']-$item['shu_n2'])/$item['shu_n2'])*100 );
+                }catch(\Throwable $e){
+                    $shu_ach = 0;
+                }
+                try{
+                    $or_ach = ($item['or_n2']/$item['or_n4'])*100;
+                }catch(\Throwable $e){
+                    $or_ach = 0;
+                }
                 $name = $item['skode'];
                 $perform = [
                     "kode_lokasi" => $item['kode_lokasi'],
                     "nama" => $name,
-                    "pdpt_ach" => floatval(number_format((float)$item['pdpt_ach'], 2,'.', '')),
-                    "pdpt_yoy" => floatval(number_format((float)$item['pdpt_yoy'], 2,'.', '')),
-                    "beban_ach" => floatval(number_format((float)$item['beban_ach'], 2,'.', '')),
-                    "beban_yoy" => floatval(number_format((float)$item['beban_yoy'], 2,'.', '')),
-                    "shu_ach" => floatval(number_format((float)$item['shu_ach'], 2,'.', '')),
-                    "shu_yoy" => floatval(number_format((float)$item['shu_yoy'], 2,'.', '')),
-                    "or_ach" => floatval(number_format((float)$item['or_ach'], 2,'.', '')),
-                    "or_yoy" => floatval(number_format((float)$item['or_yoy'], 0, '.', '')),
+                    "pdpt_ach" => floatval(number_format((float)$pdpt_ach, 2,'.', '')),
+                    "pdpt_yoy" => floatval(number_format((float)$pdpt_yoy, 2,'.', '')),
+                    "beban_ach" => floatval(number_format((float)$beban_ach, 2,'.', '')),
+                    "beban_yoy" => floatval(number_format((float)$beban_yoy, 2,'.', '')),
+                    "shu_ach" => floatval(number_format((float)$shu_ach, 2,'.', '')),
+                    "shu_yoy" => floatval(number_format((float)$shu_yoy, 2,'.', '')),
+                    "or_ach" => floatval(number_format((float)$or_ach, 2,'.', '')),
+                    "or_yoy" => floatval(number_format((float)$or_yoy, 0, '.', '')),
                 ];
                 array_push($data_perform, $perform);
             }
@@ -1216,7 +1237,7 @@ class DashboardFPController extends Controller
                     $where
                 GROUP BY a.kode_neraca
             )b ON a.kode_neraca=b.kode_neraca 
-            where a.kode_lokasi='$lokasi' AND LEN(a.kode_neraca) = '3' and a.kode_fs='FS1' ";
+            where a.kode_lokasi='$lokasi' and a.kode_fs='FS1' --AND LEN(a.kode_neraca) = '3' ";
 
             $select = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($select),true);

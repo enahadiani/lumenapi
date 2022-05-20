@@ -43,6 +43,7 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->post('update-password', 'AdminSiagaController@updatePassword');
     $router->post('update-foto', 'AdminSiagaController@updatePhoto');
     $router->post('update-background', 'AdminSiagaController@updateBackground');
+    $router->post('update-data-pribadi', 'AdminSiagaController@updateDataPribadi');
 
     //Menu
     $router->get('menu/{kode_klp}', 'Siaga\MenuController@show');

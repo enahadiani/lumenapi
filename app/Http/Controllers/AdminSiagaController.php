@@ -364,4 +364,53 @@ class AdminSiagaController extends Controller
         }
     }
 
+    public function updateDataPribadi(Request $request)
+    {  
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $kode_pp = $data->kode_pp;
+                $status_login = $data->status_login;
+            }
+
+            $res = DB::connection($this->db)->select("select email,no_telp from karyawan where nik='$nik' and kode_lokasi='$kode_lokasi' ");
+            $email = $res[0]->email;
+            $no_telp = $res[0]->no_telp;
+
+            if(isset($request->email)){
+                $email = $request->email;
+            }else{
+                $email = $email;
+            }
+
+            if(isset($request->no_telp)){
+                $no_telp = $request->no_telp;
+            }else{
+                $no_telp = $no_telp;
+            }
+
+            $update = DB::connection($this->db)->table('karyawan')
+            ->where('nik',$nik)
+            ->where('kode_lokasi',$kode_lokasi)
+            ->update([
+                'email' => $email,
+                'no_telp' => $no_telp
+            ]);
+            
+            if($update){
+                $success['status'] = true;
+                $success['message'] = "Data Pribadi berhasil diubah";
+            }else{
+                $success['status'] = false;
+                $success['message'] = "Data Pribadi gagal diubah";
+            }
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Data Pribadi gagal diubah ".$e;
+            return response()->json($success, 200); 
+        }	
+    }
+
 }

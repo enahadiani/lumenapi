@@ -508,6 +508,50 @@ class AuthController extends Controller
         return $this->respondWithToken($token, 'siaga');
     }
 
+    public function loginSiagaPIN(Request $request)
+    {
+        //validate incoming request
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'pin' => 'required|string',
+        ]);
+
+        $user= AdminSiaga::where('nik','=',$request->nik)
+        ->where('pin',$request->pin)->first();
+
+        if(is_null($user)){
+            return response()->json(['message' => 'Unauthorized. NIK atau PIN yang dimasukan salah.'], 401);   
+        }else{
+            if (! $token = Auth::guard('siaga')->setTTL(720)->fromUser($user)) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            } else {
+                if (isset($request->id_device)) {
+                    $kode_lokasi = $user->kode_lokasi;
+                    $nik = $user->nik;
+                    $cek = DB::connection('dbsiaga')->select("select count(id_device) as jum from users_device where nik='$nik'  ");
+                    if (count($cek) > 0) {
+                        $nu = intval($cek[0]->jum) + 1;
+                    } else {
+                        $nu = 1;
+                    }
+
+                    $get = DB::connection('dbsiaga')->select("select count(id_device) as jum from users_device where id_device='$request->id_device' and nik='$nik'  ");
+                    if (count($get) > 0) {
+                        if ($get[0]->jum == 0) {
+                            $ins = DB::connection('dbsiaga')->insert("insert into users_device (
+                                id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$nik',$nu,'$kode_lokasi','-',getdate()) ");
+                        }
+                    } else {
+                        $ins = DB::connection('dbsiaga')->insert("insert into users_device (
+                            id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values('$request->id_device','$nik',$nu,'$kode_lokasi','-',getdate()) ");
+                    }
+                }
+            }
+
+            return $this->respondWithToken($token, 'siaga');
+        }
+    }
+
     public function loginYakes(Request $request)
     {
         //validate incoming request

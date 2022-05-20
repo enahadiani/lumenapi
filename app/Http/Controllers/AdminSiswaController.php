@@ -501,7 +501,7 @@ class AdminSiswaController extends Controller
                 ->update([
                     'tmp_lahir' => $tmp_lahir,
                     'tgl_lahir' => $tgl_lahir,
-                    'jk' => $request->jk,
+                    'jk' => $jk,
                     'agama' => $agama,
                     'email' => $email
                 ]);
