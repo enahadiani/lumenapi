@@ -1146,6 +1146,8 @@ class Approval2Controller extends Controller
         $result = json_decode(json_encode($result),true);
         $success['status'] = true;
         DB::connection($this->db)->beginTransaction();
+        Log::info('Email saku3 result lap : ');
+        Log::info($result['original']);
         if(count($result['original']['data']) > 0){
             $judul = $request->judul;
             $msg = "";

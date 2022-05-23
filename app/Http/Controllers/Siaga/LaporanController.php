@@ -182,7 +182,7 @@ class LaporanController extends Controller
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql="select * from (select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,a.jab1 as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut,a.tanggal as tgl
+            $sql3="select * from (select 'Dibuat oleh' as ket,c.kode_jab,a.nik_buat as nik, c.nama as nama_kar,a.jab1 as nama_jab,convert(varchar,a.tanggal,103) as tanggal,'-' as no_app,'-' as status,-4 as nu, '-' as urut,a.tanggal as tgl
 			from gr_pb_m a
             inner join karyawan c on a.nik_buat=c.nik and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.no_pb='$no_bukti'
@@ -203,7 +203,7 @@ class LaporanController extends Controller
 			) a
 			order by a.no_app,a.tgl
             ";
-            $res3 = DB::connection($this->db)->select($sql);
+            $res3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -221,11 +221,15 @@ class LaporanController extends Controller
                 $success['data'] = [];
                 $success['detail'] = [];
                 $success['histori'] = [];
+                $success['sql'] = $sql;
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
+            $success['detail'] = [];
+            $success['histori'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
