@@ -332,10 +332,13 @@ class DashboardPiutangController extends Controller {
             }
 
             $periode=$r->periode[1];
+            $nik_user=$r->nik_user;
             
+            $sqlex = " exec sp_sis_saldo_pp_all '$periode','$kode_lokasi','$nik_user' ";
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
+                $sqlex = " exec sp_sis_saldo '$periode','$kode_lokasi','$r->kode_pp','$nik_user' ";
             }else{
                 $filter_pp = "";
             }
@@ -343,72 +346,98 @@ class DashboardPiutangController extends Controller {
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
                 if($r->kode_bidang == '5'){
                     $filter_bidang = " and p.kode_pp='02' ";
+                    $sqlex = " exec sp_sis_saldo '$periode','$kode_lokasi','02','$nik_user' ";
                 }else{
                     $kd_bidang = '0'.(intval($r->kode_bidang)+2);
+                    $sqlex = " exec sp_sis_saldo '$periode','$kode_lokasi','$kd_bidang','$nik_user' ";
                     $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
                 }
             }else{
                 $filter_bidang = "";
             }
+
+            $ex = DB::connection($this->db)->getPdo()->exec($sqlex);
             
-            $sql = "select a.kode_lokasi,isnull(b.n1,0)-isnull(d.n1,0) as sak_n1
-            ,isnull(b.n2,0)-isnull(d.n2,0) as sak_n2
-            ,isnull(b.n3,0)-isnull(d.n3,0) as sak_n3
-            from lokasi a 
-            left join (select y.kode_lokasi,
-                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3	
-                        from sis_bill_d x 			
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') $filter_pp $filter_bidang  and p.kode_bidang in ('2','3','4','5') 		
-                        group by y.kode_lokasi			
-                        )b on a.kode_lokasi=b.kode_lokasi 
-            left join (select y.kode_lokasi,  
-                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3		
-                        from sis_rekon_d x 	
-                        inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
-                        inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') $filter_pp $filter_bidang  and p.kode_bidang in ('2','3','4','5')
-                        group by y.kode_lokasi	
-                        )d on a.kode_lokasi=d.kode_lokasi 
-            where a.kode_lokasi='$kode_lokasi'";
+            $sql = "select a.kode_lokasi,
+            sum(b.n16) as sak_n1,sum(b.n17) as sak_n2,sum(b.n18) as sak_n3,sum(b.n19) as sak_n4,sum(b.n20) as sak_n5
+            from sis_siswa a 
+            inner join sis_siswa_saldo b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik_user='$nik_user'
+            group by a.kode_lokasi ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             $chart = [];
             if(count($res) > 0){
                 $item = $res[0];
-                $dsp = floatval($item['sak_n1']);
-                if($dsp < 0){
+                $dp = floatval($item['sak_n1']);
+                if($dp < 0){
                     $value = [
-                        'name' => 'DSP',
-                        'y' => abs($dsp),
+                        'name' => 'DP',
+                        'y' => abs($dp),
                         'sliced' =>  true,
                         'selected' => true,
                         'negative' => true,
                         'fillColor' => 'url(#custom-pattern)',                            
                         'color' => 'url(#custom-pattern)',
-                        'key' => 'DSP'
+                        'key' => 'DP'
                     ];
                 }else{
                     $value = [
-                        'name' => 'DSP',
-                        'y' => $dsp,
+                        'name' => 'DP',
+                        'y' => $dp,
                         'sliced' =>  true,
                         'selected' => true,
                         'negative' => false,
                         'fillColor' => '#FBBF24',                            
                         'color' => '#FBBF24',
-                        'key' => 'DSP'
+                        'key' => 'DP'
                     ];
                 }
                 
                 array_push($chart, $value);
-                $spp = floatval($item['sak_n2']);
+                $dpp = floatval($item['sak_n2']);
+                if($dpp < 0){
+                    $value = [
+                        'name' => 'DPP',
+                        'y' => abs($dpp),
+                        'negative' => true,
+                        'fillColor' => 'url(#custom-pattern)',                            
+                        'color' => 'url(#custom-pattern)',
+                        'key' => 'DPP'
+                    ];
+                }else{
+                    $value = [
+                        'name' => 'DPP',
+                        'y' => $dpp,
+                        'negative' => false,
+                        'key' => 'DPP',
+                        'fillColor' => '#008000',                            
+                        'color' => '#008000',
+                    ];
+                }
+                array_push($chart, $value);
+                $dps = floatval($item['sak_n3']);
+                if($dps < 0){
+                    $value = [
+                        'name' => 'DPS',
+                        'y' => abs($dps),
+                        'negative' => true,
+                        'fillColor' => 'url(#custom-pattern)',                            
+                        'color' => 'url(#custom-pattern)',
+                        'key' => 'DPS'
+                    ];
+                }else{
+                    $value = [
+                        'name' => 'DPS',
+                        'y' => $dps,
+                        'negative' => false,
+                        'key' => 'DPS',
+                        'fillColor' => '#870202',                            
+                        'color' => '#870202',
+                    ];
+                }
+                array_push($chart, $value);
+                $spp = floatval($item['sak_n4']);
                 if($spp < 0){
                     $value = [
                         'name' => 'SPP',
@@ -424,29 +453,29 @@ class DashboardPiutangController extends Controller {
                         'y' => $spp,
                         'negative' => false,
                         'key' => 'SPP',
-                        'fillColor' => '#008000',                            
-                        'color' => '#008000',
+                        'fillColor' => '#000744',                            
+                        'color' => '#000744',
                     ];
                 }
                 array_push($chart, $value);
-                $lain = floatval($item['sak_n3']);
-                if($lain < 0){
+                $denda = floatval($item['sak_n5']);
+                if($denda < 0){
                     $value = [
-                        'name' => 'Lainnya',
-                        'y' => abs($lain),
+                        'name' => 'DENDA',
+                        'y' => abs($denda),
                         'negative' => true,
                         'fillColor' => 'url(#custom-pattern)',                            
                         'color' => 'url(#custom-pattern)',
-                        'key' => 'Lainnya'
+                        'key' => 'DENDA'
                     ];
                 }else{
                     $value = [
-                        'name' => 'Lainnya',
-                        'y' => $lain,
+                        'name' => 'DENDA',
+                        'y' => $denda,
                         'negative' => false,
-                        'key' => 'Lainnya',
-                        'fillColor' => '#870202',                            
-                        'color' => '#870202',
+                        'key' => 'DENDA',
+                        'fillColor' => '#0058e4',                            
+                        'color' => '#0058e4',
                     ];
                 }
                 array_push($chart, $value);
