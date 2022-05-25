@@ -453,8 +453,8 @@ class DashboardPiutangController extends Controller {
                         'y' => $spp,
                         'negative' => false,
                         'key' => 'SPP',
-                        'fillColor' => '#000744',                            
-                        'color' => '#000744',
+                        'fillColor' => '#0058e4',                            
+                        'color' => '#0058e4',
                     ];
                 }
                 array_push($chart, $value);
@@ -474,8 +474,8 @@ class DashboardPiutangController extends Controller {
                         'y' => $denda,
                         'negative' => false,
                         'key' => 'DENDA',
-                        'fillColor' => '#0058e4',                            
-                        'color' => '#0058e4',
+                        'fillColor' => '#000744',                            
+                        'color' => '#000744',
                     ];
                 }
                 array_push($chart, $value);
