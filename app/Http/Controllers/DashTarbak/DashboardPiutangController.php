@@ -66,7 +66,7 @@ class DashboardPiutangController extends Controller {
             }
 
             if(isset($r->kode_param) && $r->kode_param != ""){
-                $filter_param = " and x.kode_param = '$r->kode_param' ";
+                $filter_param = " and x.kode_param LIKE '".$r->kode_param."_%' ";
             }else{
                 $filter_param = "";
             }
@@ -86,25 +86,19 @@ class DashboardPiutangController extends Controller {
             $sql = "select a.kode_lokasi,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from lokasi a 
             left join (select y.kode_lokasi,
-                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') $filter_pp $filter_bidang $filter_param  and p.kode_bidang in ('2','3','4','5') 
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periode') $filter_pp $filter_bidang $filter_param  and p.kode_pp in ('03','04','05','06') 
                         group by y.kode_lokasi			
                         )b on a.kode_lokasi=b.kode_lokasi 
             left join (select y.kode_lokasi,  
-                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') $filter_pp $filter_bidang $filter_param  and p.kode_bidang in ('2','3','4','5')
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periode') $filter_pp $filter_bidang $filter_param  and p.kode_pp in ('03','04','05','06')
                         group by y.kode_lokasi	
                         )d on a.kode_lokasi=d.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi'";
@@ -115,31 +109,28 @@ class DashboardPiutangController extends Controller {
             $sql2 = "select a.kode_lokasi,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from lokasi a 
             left join (select y.kode_lokasi,
-                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periodelalu') $filter_pp $filter_bidang $filter_param  and p.kode_bidang in ('2','3','4','5') 		
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <= '$periodelalu') $filter_pp $filter_bidang $filter_param  and p.kode_pp in ('03','04','05','06') 		
                         group by y.kode_lokasi			
                         )b on a.kode_lokasi=b.kode_lokasi 
             left join (select y.kode_lokasi,  
-                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_pp=p.kode_pp and x.kode_lokasi=p.kode_lokasi
-                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periodelalu') $filter_pp $filter_bidang $filter_param  and p.kode_bidang in ('2','3','4','5')
+                        where(x.kode_lokasi = '$kode_lokasi')and(x.periode <='$periodelalu') $filter_pp $filter_bidang $filter_param  and p.kode_pp in ('03','04','05','06')
                         group by y.kode_lokasi	
                         )d on a.kode_lokasi=d.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi' ";
 
             $select2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($select2),true);
+
+            $success['sql1'] = $sql;
+            $success['sql2'] = $sql2;
 
             $piu_thn_ini = count($res) > 0 ? floatval($res[0]['sak_total']) : 0;
             $piu_thn_lalu = count($res2) > 0 ? floatval($res2[0]['sak_total']) : 0;
@@ -187,8 +178,6 @@ class DashboardPiutangController extends Controller {
                 group by a.kode_lokasi
                 ";
             }
-            $success['sql3'] = $sql3;
-            $success['sql4'] = $sql4;
             $select3 = DB::connection($this->db)->select($sql3);
             $res3 = json_decode(json_encode($select3),true);
 
@@ -251,7 +240,7 @@ class DashboardPiutangController extends Controller {
             $sort = $r->sort;
 
             if(isset($r->kode_param) && $r->kode_param != ""){
-                $filter_param = " and x.kode_param = '$r->kode_param' ";
+                $filter_param = " and x.kode_param LIKE '".$r->kode_param."_%' ";
             }else{
                 $filter_param = "";
             }
@@ -259,9 +248,6 @@ class DashboardPiutangController extends Controller {
             $sql = "select a.kode_pp,a.nama,isnull(b.total,0)-isnull(d.total,0) as sak_total
             from pp a 
             left join (select y.kode_lokasi,y.kode_pp,
-                                sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total		
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
@@ -269,9 +255,6 @@ class DashboardPiutangController extends Controller {
                         group by y.kode_lokasi,y.kode_pp			
                         )b on a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             left join (select y.kode_lokasi,y.kode_pp,  
-                            sum(case when x.kode_param in ('DSP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end) as n1, 
-                               sum(case when x.kode_param in ('SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n2, 
-                               sum(case when x.kode_param not in ('DSP','SPP') then (case when x.dc='D' then x.nilai else -x.nilai end) else 0 end)  as n3,
                                sum(case when x.dc='D' then x.nilai else -x.nilai end) as total				
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
@@ -333,36 +316,95 @@ class DashboardPiutangController extends Controller {
 
             $periode=$r->periode[1];
             $nik_user=$r->nik_user;
-            
-            $sqlex = " exec sp_sis_saldo_pp_all '$periode','$kode_lokasi','$nik_user' ";
+
+            $sql = "select a.kode_lokasi,a.nama,isnull(b.n1,0)-isnull(c.n1,0) as sak_n1,
+            isnull(b.n2,0)-isnull(c.n2,0) as sak_n2,isnull(b.n3,0)-isnull(c.n3,0) as sak_n3,
+            isnull(b.n4,0)-isnull(c.n4,0) as sak_n4,isnull(b.n5,0)-isnull(c.n5,0) as sak_n5
+            from lokasi a
+            left join (select a.kode_lokasi,
+                                sum(case when a.kode_param in ('DP_SD','DP_SMA','DP_SMP','DP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1, 
+                                sum(case when a.kode_param in ('DPP_SD','DPP_SMA','DPP_SMP','DPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n2, 
+                                sum(case when a.kode_param  in ('DPS_SD','DPS_SMA','DPS_SMP','DPS_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n3,
+                                sum(case when a.kode_param  in ('SPP_SD','SPP_SMA','SPP_SMP','SPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n4,
+                                sum(case when a.kode_param  in ('DENDA_SD','DENDA_SMA','DENDA_SMP','DENDA_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n5
+            from sis_bill_d a			
+            where a.kode_lokasi='$kode_lokasi' and a.periode<='$periode' 	
+            group by a.kode_lokasi
+                    )b on a.kode_lokasi=b.kode_lokasi
+            left join (select a.kode_lokasi,
+                                sum(case when a.kode_param in ('DP_SD','DP_SMA','DP_SMP','DP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1, 
+                                sum(case when a.kode_param in ('DPP_SD','DPP_SMA','DPP_SMP','DPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n2, 
+                                sum(case when a.kode_param  in ('DPS_SD','DPS_SMA','DPS_SMP','DPS_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n3,
+                                sum(case when a.kode_param  in ('SPP_SD','SPP_SMA','SPP_SMP','SPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n4,
+                                sum(case when a.kode_param  in ('DENDA_SD','DENDA_SMA','DENDA_SMP','DENDA_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n5
+            from sis_rekon_d a			
+            where a.kode_lokasi='$kode_lokasi' and a.periode<='$periode' 
+            group by a.kode_lokasi
+                    )c on a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' ";
 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
-                $filter_pp = " and p.kode_pp = '$r->kode_pp' ";
-                $sqlex = " exec sp_sis_saldo '$periode','$kode_lokasi','$r->kode_pp','$nik_user' ";
-            }else{
-                $filter_pp = "";
+                $filter_pp = " and a.kode_pp = '$r->kode_pp' ";
+                $sql = "select a.kode_pp,a.nama,isnull(b.n1,0)-isnull(c.n1,0) as sak_n1,
+                isnull(b.n2,0)-isnull(c.n2,0) as sak_n2,isnull(b.n3,0)-isnull(c.n3,0) as sak_n3,
+                isnull(b.n4,0)-isnull(c.n4,0) as sak_n4,isnull(b.n5,0)-isnull(c.n5,0) as sak_n5
+                from pp a
+                left join (select a.kode_lokasi,a.kode_pp, 
+                                    sum(case when a.kode_param in ('DP_SD','DP_SMA','DP_SMP','DP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1, 
+                                    sum(case when a.kode_param in ('DPP_SD','DPP_SMA','DPP_SMP','DPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n2, 
+                                    sum(case when a.kode_param  in ('DPS_SD','DPS_SMA','DPS_SMP','DPS_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n3,
+                                    sum(case when a.kode_param  in ('SPP_SD','SPP_SMA','SPP_SMP','SPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n4,
+                                    sum(case when a.kode_param  in ('DENDA_SD','DENDA_SMA','DENDA_SMP','DENDA_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n5
+                from sis_bill_d a			
+                where a.kode_lokasi='$kode_lokasi' and a.periode<='$periode' 	
+                group by a.kode_lokasi,a.kode_pp
+                        )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                left join (select a.kode_lokasi,a.kode_pp, 
+                                    sum(case when a.kode_param in ('DP_SD','DP_SMA','DP_SMP','DP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1, 
+                                    sum(case when a.kode_param in ('DPP_SD','DPP_SMA','DPP_SMP','DPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n2, 
+                                    sum(case when a.kode_param  in ('DPS_SD','DPS_SMA','DPS_SMP','DPS_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n3,
+                                    sum(case when a.kode_param  in ('SPP_SD','SPP_SMA','SPP_SMP','SPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n4,
+                                    sum(case when a.kode_param  in ('DENDA_SD','DENDA_SMA','DENDA_SMP','DENDA_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n5
+                from sis_rekon_d a			
+                where a.kode_lokasi='$kode_lokasi' and a.periode<='$periode' 
+                group by a.kode_lokasi,a.kode_pp
+                        )c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_pp in ('03','04','05','06') $filter_pp";
             }
 
             if(isset($r->kode_bidang) && $r->kode_bidang != ""){
                 if($r->kode_bidang == '5'){
-                    $filter_bidang = " and p.kode_pp='02' ";
-                    $sqlex = " exec sp_sis_saldo '$periode','$kode_lokasi','02','$nik_user' ";
+                    $filter_bidang = " and a.kode_pp='02' ";
                 }else{
                     $kd_bidang = '0'.(intval($r->kode_bidang)+2);
-                    $sqlex = " exec sp_sis_saldo '$periode','$kode_lokasi','$kd_bidang','$nik_user' ";
-                    $filter_bidang = " and p.kode_pp = '$kd_bidang' ";
+                    $filter_bidang = " and a.kode_pp = '$kd_bidang' ";
                 }
-            }else{
-                $filter_bidang = "";
+                $sql = "select a.kode_pp,a.nama,isnull(b.n1,0)-isnull(c.n1,0) as sak_n1,
+                isnull(b.n2,0)-isnull(c.n2,0) as sak_n2,isnull(b.n3,0)-isnull(c.n3,0) as sak_n3,
+                isnull(b.n4,0)-isnull(c.n4,0) as sak_n4,isnull(b.n5,0)-isnull(c.n5,0) as sak_n5
+                from pp a
+                left join (select a.kode_lokasi,a.kode_pp, 
+                                    sum(case when a.kode_param in ('DP_SD','DP_SMA','DP_SMP','DP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1, 
+                                    sum(case when a.kode_param in ('DPP_SD','DPP_SMA','DPP_SMP','DPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n2, 
+                                    sum(case when a.kode_param  in ('DPS_SD','DPS_SMA','DPS_SMP','DPS_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n3,
+                                    sum(case when a.kode_param  in ('SPP_SD','SPP_SMA','SPP_SMP','SPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n4,
+                                    sum(case when a.kode_param  in ('DENDA_SD','DENDA_SMA','DENDA_SMP','DENDA_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n5
+                from sis_bill_d a			
+                where a.kode_lokasi='$kode_lokasi' and a.periode<='$periode' 	
+                group by a.kode_lokasi,a.kode_pp
+                        )b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                left join (select a.kode_lokasi,a.kode_pp, 
+                                    sum(case when a.kode_param in ('DP_SD','DP_SMA','DP_SMP','DP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end) as n1, 
+                                    sum(case when a.kode_param in ('DPP_SD','DPP_SMA','DPP_SMP','DPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n2, 
+                                    sum(case when a.kode_param  in ('DPS_SD','DPS_SMA','DPS_SMP','DPS_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n3,
+                                    sum(case when a.kode_param  in ('SPP_SD','SPP_SMA','SPP_SMP','SPP_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n4,
+                                    sum(case when a.kode_param  in ('DENDA_SD','DENDA_SMA','DENDA_SMP','DENDA_TK') then (case when a.dc='D' then a.nilai else -a.nilai end) else 0 end)  as n5
+                from sis_rekon_d a			
+                where a.kode_lokasi='$kode_lokasi' and a.periode<='$periode' 
+                group by a.kode_lokasi,a.kode_pp
+                        )c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.kode_pp in ('03','04','05','06') $filter_bidang";
             }
-
-            $ex = DB::connection($this->db)->getPdo()->exec($sqlex);
-            
-            $sql = "select a.kode_lokasi,
-            sum(b.n16) as sak_n1,sum(b.n17) as sak_n2,sum(b.n18) as sak_n3,sum(b.n19) as sak_n4,sum(b.n20) as sak_n5
-            from sis_siswa a 
-            inner join sis_siswa_saldo b on a.nis=b.nis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp and b.nik_user='$nik_user'
-            group by a.kode_lokasi ";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -520,7 +562,7 @@ class DashboardPiutangController extends Controller {
             }
 
             if(isset($r->kode_param) && $r->kode_param != ""){
-                $filter_param = " and x.kode_param = '$r->kode_param' ";
+                $filter_param = " and x.kode_param LIKE '".$r->kode_param."_%' ";
             }else{
                 $filter_param = "";
             }
@@ -548,7 +590,7 @@ class DashboardPiutangController extends Controller {
                         from sis_bill_d x 			
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_lokasi=p.kode_lokasi and x.kode_pp=p.kode_pp
-                        where(x.kode_lokasi = '$kode_lokasi') $filter_pp $filter_bidang $filter_param and p.kode_bidang in ('2','3','4','5')
+                        where(x.kode_lokasi = '$kode_lokasi') $filter_pp $filter_bidang $filter_param and p.kode_pp in ('03','04','05','06')
                         group by y.kode_lokasi			
                         )b on a.kode_lokasi=b.kode_lokasi 
             left join (select y.kode_lokasi,  
@@ -560,7 +602,7 @@ class DashboardPiutangController extends Controller {
                         from sis_rekon_d x 	
                         inner join sis_siswa y on x.nis=y.nis and x.kode_lokasi=y.kode_lokasi and x.kode_pp=y.kode_pp
                         inner join pp p on x.kode_lokasi=p.kode_lokasi and x.kode_pp=p.kode_pp
-                        where(x.kode_lokasi = '$kode_lokasi') $filter_pp $filter_bidang $filter_param and p.kode_bidang in ('2','3','4','5')
+                        where(x.kode_lokasi = '$kode_lokasi') $filter_pp $filter_bidang $filter_param and p.kode_pp in ('03','04','05','06')
                         group by y.kode_lokasi	
                         )d on a.kode_lokasi=d.kode_lokasi 
             where a.kode_lokasi='$kode_lokasi'";
@@ -627,7 +669,7 @@ class DashboardPiutangController extends Controller {
                 $filter_pp = " ";
             }
             if(isset($r->kode_param) && $r->kode_param != ""){
-                $filter_param = " and x.kode_param = '$r->kode_param' ";
+                $filter_param = " and x.kode_param LIKE '".$r->kode_param."_%' ";
             }else{
                 $filter_param = "";
             }
