@@ -742,7 +742,7 @@ class DashboardPiutangController extends Controller {
             ";
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
-            $ctg = ['0-6 bln','7-12 bln','13-24 bln','>24 bln'];
+            $ctg = ['0-6 bln','7-12 bln','13-24 bln'];
             $series = array();
             $i=0;
             $colors = ['#064E3B','#FBBF24'];
@@ -757,8 +757,7 @@ class DashboardPiutangController extends Controller {
                 $data = array(
                 floatval($dt['n1']), 
                 floatval($dt['n2']), 
-                floatval($dt['n3']), 
-                floatval($dt['n4']));
+                floatval($dt['n3']));
                 $series[$i]['data'] = $data;
                 $i++;
             }
