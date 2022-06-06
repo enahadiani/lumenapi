@@ -90,10 +90,10 @@ class KepegawaianV3Controller extends Controller
             ISNULL(DATEDIFF(day, b.tgl_kontrak_awal, b.tgl_kontrak_akhir) , '0') as jumlah_hari_kontrak,
             DATEDIFF(day, GETDATE(), b.tgl_kontrak_akhir) as sisa_hari_kontrak
             FROM hr_sdm_pribadi a
-            INNER JOIN hr_sdm_client b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
-            INNER JOIN hr_sdm_kepegawaian c ON b.kode=c.kode AND c.kode_lokasi=b.kode_lokasi
-            INNER JOIN hr_loker d ON d.kode_loker=c.kode_loker AND d.kode_lokasi=c.kode_lokasi
-            INNER JOIN hr_client as e ON b.nama_client=e.kode_client
+            LEFT JOIN hr_sdm_client b ON a.nik=b.nik AND a.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_sdm_kepegawaian c ON b.kode=c.kode AND c.kode_lokasi=b.kode_lokasi
+            LEFT JOIN hr_loker d ON d.kode_loker=c.kode_loker AND d.kode_lokasi=c.kode_lokasi
+            LEFT JOIN hr_client as e ON b.nama_client=e.kode_client
             WHERE a.kode_lokasi = '" . $kode_lokasi . "' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res), true);
