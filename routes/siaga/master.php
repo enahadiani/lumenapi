@@ -59,6 +59,50 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('filter-kota','Siaga\FilterController@getFilterKota');
     $router->get('filter-nobukti','Siaga\FilterController@getFilterNoBukti');
     $router->get('filter-nodokumen','Siaga\FilterController@getFilterNoDokumen');
+
+    //ADMIN SETTING
+    //Menu
+    $router->get('set-menu', 'Siaga\Settings\MenuController@index');
+    $router->post('set-menu', 'Siaga\Settings\MenuController@store');
+    $router->put('set-menu', 'Siaga\Settings\MenuController@update');
+    $router->delete('set-menu', 'Siaga\Settings\MenuController@destroy');
+    $router->get('set-menu-klp', 'Siaga\Settings\MenuController@getKlp');
+    $router->post('set-menu-move', 'Siaga\Settings\MenuController@simpanMove');
+
+    //Akses User
+    $router->get('set-akses-user', 'Siaga\Settings\HakaksesController@index');
+    $router->post('set-akses-user', 'Siaga\Settings\HakaksesController@store');
+    $router->get('set-akses-user-detail', 'Siaga\Settings\HakaksesController@show');
+    $router->put('set-akses-user', 'Siaga\Settings\HakaksesController@update');
+    $router->delete('set-akses-user', 'Siaga\Settings\HakaksesController@destroy');
+    $router->get('set-akses-user-menu', 'Siaga\Settings\HakaksesController@getMenu');
+
+    //Form
+    $router->get('set-form', 'Siaga\Settings\FormController@index');
+    $router->post('set-form', 'Siaga\Settings\FormController@store');
+    $router->put('set-form', 'Siaga\Settings\FormController@update');
+    $router->delete('set-form', 'Siaga\Settings\FormController@destroy');
+
+    //Karyawan
+    $router->get('set-karyawan', 'Siaga\Settings\KaryawanController@index');
+    $router->post('set-karyawan', 'Siaga\Settings\KaryawanController@store');
+    $router->get('set-karyawan-detail', 'Siaga\Settings\KaryawanController@show');
+    $router->post('set-karyawan-ubah', 'Siaga\Settings\KaryawanController@update');
+    $router->delete('set-karyawan', 'Siaga\Settings\KaryawanController@destroy');
+
+    //Kelompok Menu
+    $router->get('set-menu-klp', 'Siaga\Settings\KelompokMenuController@index');
+    $router->post('set-menu-klp', 'Siaga\Settings\KelompokMenuController@store');
+    $router->put('set-menu-klp', 'Siaga\Settings\KelompokMenuController@update');
+    $router->delete('set-menu-klp', 'Siaga\Settings\KelompokMenuController@destroy');
+
+    //Unit
+    $router->get('set-unit', 'Siaga\Settings\UnitController@index');
+    $router->post('set-unit', 'Siaga\Settings\UnitController@store');
+    $router->put('set-unit', 'Siaga\Settings\UnitController@update');
+    $router->delete('set-unit', 'Siaga\Settings\UnitController@destroy');
+
+
  
 });
 
