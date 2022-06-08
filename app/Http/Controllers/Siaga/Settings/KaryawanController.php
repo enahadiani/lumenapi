@@ -127,8 +127,10 @@ class KaryawanController extends Controller
                 $foto="-";
             }
 
+            $kode_jab= isset($request->kode_jab) ? $request->input('kode_jab') : '-';
+
             
-            $ins = DB::connection($this->db)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            $ins = DB::connection($this->db)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto,kode_jab) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."','".$kode_jab."') ");
             
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -263,10 +265,13 @@ class KaryawanController extends Controller
 
                 $foto="-";
             }
+
+            
+            $kode_jab= isset($request->kode_jab) ? $request->input('kode_jab') : '-';
             
             $del = DB::connection($this->db)->table('karyawan')->where('kode_lokasi', $kode_lokasi)->where('nik', $request->nik)->delete();
 
-            $ins = DB::connection($this->db)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."') ");
+            $ins = DB::connection($this->db)->insert("insert into karyawan(nik,kode_lokasi,nama,alamat,jabatan,no_telp,email,kode_pp, status, no_hp,flag_aktif,foto,kode_jab) values ('".$request->nik."','".$kode_lokasi."','".$request->nama."','".$request->alamat."','".$request->jabatan."','".$request->no_telp."','".$request->email."','".$request->kode_pp."','-','".$request->no_hp."','".$request->flag_aktif."','".$foto."','".$kode_jab."') ");
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
