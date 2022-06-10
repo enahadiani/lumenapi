@@ -1,0 +1,229 @@
+<?php
+
+namespace App\Http\Controllers\Ypt;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
+class DashboardPBHController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public $successStatus = 200;
+    public $guard = 'yptkug';
+    public $db = 'sqlsrvyptkug';
+
+    private function filterReq($request,$col_array,$db_col_name,$where,$this_in){
+        for($i = 0; $i<count($col_array); $i++){
+            if(ISSET($request->input($col_array[$i])[0])){
+                if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                    $where .= " AND (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                }elseif($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                    $where .= " AND ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                }elseif($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                    $tmp = explode(",",$request->input($col_array[$i])[1]);
+                    $this_in = "";
+                    for($x=0;$x<count($tmp);$x++){
+                        if($x == 0){
+                            $this_in .= "'".$tmp[$x]."'";
+                        }else{
+        
+                            $this_in .= ","."'".$tmp[$x]."'";
+                        }
+                    }
+                    $where .= " AND ".$db_col_name[$i]." in ($this_in) ";
+                }elseif($request->input($col_array[$i])[0] == "<=" AND ISSET($request->input($col_array[$i])[1])){
+                    $where .= " AND ".$db_col_name[$i]." <= '".$request->input($col_array[$i])[1]."' ";
+                }elseif($request->input($col_array[$i])[0] == "<>" AND ISSET($request->input($col_array[$i])[1])){
+                    $where .= " AND ".$db_col_name[$i]." <> '".$request->input($col_array[$i])[1]."' ";
+                }
+            }
+        }
+        return $where;
+    }
+
+    public function getDataBox(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $sql = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join ver_m d on a.no_ver=d.no_ver and a.kode_lokasi=d.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.periode='202201'
+            group by a.kode_lokasi";
+            $select = DB::connection($this->db)->select($sql);
+
+            $sql2 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join fiat_m b on a.no_fiat=b.no_fiat and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.periode='202201'
+            group by a.kode_lokasi";
+            $select2 = DB::connection($this->db)->select($sql2);
+
+            $sql3 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join it_spb_m b on a.no_spb=b.no_spb and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.periode='202201'
+            group by a.kode_lokasi";
+            $select3 = DB::connection($this->db)->select($sql3);
+
+            $sql4 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.periode='202201'
+            group by a.kode_lokasi";
+            $select4 = DB::connection($this->db)->select($sql4);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = [
+                'ver_dok' => [
+                    'nilai' => count($select) > 0 ? $select[0]->nilai : 0,
+                    'jml' => count($select) > 0 ? $select[0]->jml : 0,
+                ],
+                'ver_akun' => [
+                    'nilai' => count($select2) > 0 ? $select2[0]->nilai : 0,
+                    'jml' => count($select2) > 0 ? $select2[0]->jml : 0,
+                ],
+                'spb' => [
+                    'nilai' => count($select3) > 0 ? $select3[0]->nilai : 0,
+                    'jml' => count($select3) > 0 ? $select3[0]->jml : 0,
+                ],
+                'spb_bayar' => [
+                    'nilai' => count($select4) > 0 ? $select4[0]->nilai : 0,
+                    'jml' => count($select4) > 0 ? $select4[0]->jml : 0,
+                ],
+            ];
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getJenisPengajuan(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $sql = "select a.kode_lokasi,sum(case when a.jenis='OFFLINE' then a.jml else 0 end) as jml_offline,
+            sum(case when a.jenis='ONLINE' then a.jml else 0 end) as jml_online
+            from (
+            select a.kode_lokasi,b.jenis,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join it_ajuapp_m b on a.no_aju=b.no_aju and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.periode='202201'
+            group by a.kode_lokasi,b.jenis
+                )a
+            group by a.kode_lokasi";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            $chart = [];
+            $success['colors'] = ['#FFCC00','#007AFF'];
+            if(count($res) > 0){
+                $item = $res[0];
+                $value = [
+                    'name' => 'Offine',
+                    'y' => abs($item['jml_offline']),
+                    'key' => 'Offine'
+                ];
+                array_push($chart, $value);
+                $value = [
+                    'name' => 'Online',
+                    'y' => abs($item['jml_online']),
+                    'key' => 'Online'
+                ];
+                array_push($chart, $value);
+            }
+
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $chart;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getNilaiKas(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $sql="select a.kode_lokasi,b.periode,substring(dbo.fnNamaBulan(b.periode),1,3) as nama,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='2021'
+            group by a.kode_lokasi,b.periode
+            order by a.kode_lokasi,b.periode
+            ";
+            $select = DB::connection($this->db)->select($sql);
+
+            $sql2="select a.kode_lokasi,b.periode,substring(dbo.fnNamaBulan(b.periode),1,3) as nama,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='2022'
+            group by a.kode_lokasi,b.periode
+            order by a.kode_lokasi,b.periode
+            ";
+            $select2 = DB::connection($this->db)->select($sql2);
+            $series = array();
+            $i=0;
+            $data = array();
+            foreach($select as $dt) {
+                $value = [
+                    'name' => $dt->nama,
+                    'y' => abs($dt->nilai),
+                    'key' => $dt->periode
+                ];
+                array_push($data, $value);
+                $i++;
+            }
+
+            $data2 = array();
+            foreach($select2 as $dt2) {
+                $value = [
+                    'name' => $dt2->nama,
+                    'y' => abs($dt2->nilai),
+                    'key' => $dt2->periode
+                ];
+                array_push($data2, $value);
+                $i++;
+            }
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = array(
+                'tahun_lalu' => $data,
+                'tahun_ini' => $data2,
+            );
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+}
