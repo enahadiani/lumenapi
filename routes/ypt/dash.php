@@ -171,6 +171,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-pbh-box','Ypt\DashboardPBHController@getDataBox');
     $router->get('data-pbh-jenis-aju','Ypt\DashboardPBHController@getJenisPengajuan');
     $router->get('data-pbh-kas','Ypt\DashboardPBHController@getNilaiKas');
+    $router->get('data-pbh-rata2-hari','Ypt\DashboardPBHController@getRata2Hari');
+    $router->get('data-pbh-jml-selesai','Ypt\DashboardPBHController@getJmlSelesai');
     $router->get('bidang','Ypt\DashboardPBHController@getBidang');
     $router->get('pp','Ypt\DashboardPBHController@getPP');
 

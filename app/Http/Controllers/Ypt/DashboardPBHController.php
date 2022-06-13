@@ -275,6 +275,132 @@ class DashboardPBHController extends Controller
         }
     }
 
+    public function getRata2Hari(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $tahun = $r->tahun;
+            $tahun_seb = intval($tahun) - 1 ; 
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp='$r->kode_pp' ";
+            }else{
+                $filter_pp = " ";
+            }
+
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang='$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
+
+            $sql="select a.kode_lokasi,a.periode,sum(case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end) as n1,
+            sum(case when datediff(day,a.tanggal,c.tanggal)=3 then 1 else 0 end) as n2,
+            sum(case when datediff(day,a.tanggal,c.tanggal)=4 then 1 else 0 end) as n3,
+            sum(case when datediff(day,a.tanggal,c.tanggal)>4 then 1 else 0 end) as n4
+            from it_aju_m a
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            inner join kas_m c on a.no_kas=c.no_kas and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi'  and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            group by a.kode_lokasi,a.periode
+            order by a.kode_lokasi,a.periode
+            ";
+            $select = DB::connection($this->db)->select($sql);
+
+            
+            $series[0] = array(
+                'name' => '2 hari',
+                'data' => []
+            );
+            $series[1] = array(
+                'name' => '3 hari',
+                'data' => []
+            );
+            $series[2] = array(
+                'name' => '4 hari',
+                'data' => []
+            );
+            $series[3] = array(
+                'name' => '5 hari',
+                'data' => []
+            );
+            $i=0;
+            $data = array();
+            foreach($select as $dt) {
+                array_push($series[0]['data'], floatval($dt->n1));
+                array_push($series[1]['data'], floatval($dt->n2));
+                array_push($series[2]['data'], floatval($dt->n3));
+                array_push($series[3]['data'], floatval($dt->n4));
+                $i++;
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['series'] = $series;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['series'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getJmlSelesai(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $tahun = $r->tahun;
+            $tahun_seb = intval($tahun) - 1 ; 
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp='$r->kode_pp' ";
+            }else{
+                $filter_pp = " ";
+            }
+
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang='$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
+
+            $sql="select a.kode_lokasi,b.periode,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            group by a.kode_lokasi,b.periode
+            order by a.kode_lokasi,b.periode
+            ";
+            $select = DB::connection($this->db)->select($sql);
+
+            $series = array();
+            $i=0;
+            $data = array();
+            foreach($select as $dt) {
+                array_push($data, floatval($dt->jml));
+                $i++;
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $data;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getBidang(Request $request)
     {
         try {
