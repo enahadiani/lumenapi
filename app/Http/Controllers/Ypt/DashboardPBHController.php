@@ -312,19 +312,23 @@ class DashboardPBHController extends Controller
             
             $series[0] = array(
                 'name' => '2 hari',
-                'data' => []
+                'data' => [],
+                'color' => '#FF9500'
             );
             $series[1] = array(
                 'name' => '3 hari',
-                'data' => []
+                'data' => [],
+                'color' => '#FFCC00'
             );
             $series[2] = array(
                 'name' => '4 hari',
-                'data' => []
+                'data' => [],
+                'color' => '#34C759'
             );
             $series[3] = array(
                 'name' => '5 hari',
-                'data' => []
+                'data' => [],
+                'color' => '#007AFF'
             );
             $i=0;
             $data = array();
