@@ -140,7 +140,7 @@ class SppdController extends Controller
             }			
 
             $res = DB::connection('sqlsrvypt')->select("select * from bank 
-            where kode_lokasi='$kode_lokasi'  $filterkode_akun order by a.kode_akun	 
+            where kode_lokasi='$kode_lokasi'  $filterkode_akun order by kode_akun	 
             ");
             $res = json_decode(json_encode($res),true);
             
