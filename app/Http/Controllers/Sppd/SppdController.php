@@ -120,6 +120,53 @@ class SppdController extends Controller
         }
     }
 
+    public function getBank(Request $request){
+
+        // $kode_lokasi= $request->input('kode_lokasi');
+        try {
+            
+            
+            if($data =  Auth::guard('ypt')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if ($request->input('kode_bank') != "") {
+                $kode_bank = $request->input('kode_bank');
+                $filterkode_bank = " and kode_bank='$kode_bank' ";
+            
+            }else{
+                $filterkode_bank = "";
+            }			
+
+            $res = DB::connection('sqlsrvypt')->select("select * from bank 
+            where kode_lokasi='$kode_lokasi'  $filterkode_akun order by a.kode_akun	 
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                $success['rows']=count($res);
+                
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getPP(Request $request){
 
         // $kode_lokasi= $request->input('kode_lokasi');

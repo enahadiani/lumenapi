@@ -47,6 +47,7 @@ $router->group(['middleware' => 'auth:ypt'], function () use ($router) {
 
     $router->get('periode-aktif', 'Sppd\SppdController@getPeriodeAktif');
     $router->get('akun', 'Sppd\SppdController@getAkun');
+    $router->get('bank', 'Sppd\SppdController@getBank');
     $router->get('pp', 'Sppd\SppdController@getPP');
     $router->get('drk', 'Sppd\SppdController@getDrk');
     $router->get('budget', 'Sppd\SppdController@cekBudget');
