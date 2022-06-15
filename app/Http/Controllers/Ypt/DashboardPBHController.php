@@ -67,7 +67,7 @@ class DashboardPBHController extends Controller
                 $filter_bidang = " ";
             }
 
-            $sql = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            $sql = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml,sum(datediff(day,a.tanggal,d.tanggal)) as jml_hari
             from it_aju_m a
             inner join ver_m d on a.no_ver=d.no_ver and a.kode_lokasi=d.kode_lokasi
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
@@ -75,29 +75,73 @@ class DashboardPBHController extends Controller
             group by a.kode_lokasi";
             $select = DB::connection($this->db)->select($sql);
 
-            $sql2 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            $sqli = "select a.kode_lokasi,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join ver_m d on a.no_ver=d.no_ver and a.kode_lokasi=d.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and d.tanggal=CONVERT(varchar,getdate(),23) $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $selecti = DB::connection($this->db)->select($sqli);
+
+            $sql2 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml,sum(datediff(day,d.tanggal,b.tanggal)) as jml_hari
             from it_aju_m a
             inner join fiat_m b on a.no_fiat=b.no_fiat and a.kode_lokasi=b.kode_lokasi
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            inner join ver_m d on a.no_ver=d.no_ver and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
             group by a.kode_lokasi";
             $select2 = DB::connection($this->db)->select($sql2);
 
-            $sql3 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            $sql2i = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join fiat_m b on a.no_fiat=b.no_fiat and a.kode_lokasi=b.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.tanggal=CONVERT(varchar,getdate(),23) $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $select2i = DB::connection($this->db)->select($sql2i);
+
+            $sql3 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml,sum(datediff(day,d.tanggal,b.tanggal)) as jml_hari
             from it_aju_m a
             inner join it_spb_m b on a.no_spb=b.no_spb and a.kode_lokasi=b.kode_lokasi
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            inner join fiat_m d on a.no_fiat=d.no_fiat and a.kode_lokasi=d.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
             group by a.kode_lokasi";
             $select3 = DB::connection($this->db)->select($sql3);
 
-            $sql4 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            $sql3i = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join it_spb_m b on a.no_spb=b.no_spb and a.kode_lokasi=b.kode_lokasi
+            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.tanggal=CONVERT(varchar,getdate(),23) $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $select3i = DB::connection($this->db)->select($sql3i);
+
+            $sql4 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml,sum(datediff(day,d.tanggal,b.tanggal)) as jml_hari
             from it_aju_m a
             inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            inner join it_spb_m d on a.no_spb=d.no_spb and a.kode_lokasi=d.kode_lokasi
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
             group by a.kode_lokasi";
             $select4 = DB::connection($this->db)->select($sql4);
+
+            $sql4i = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            inner join it_spb_m d on a.no_spb=d.no_spb and a.kode_lokasi=d.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.tanggal=CONVERT(varchar,getdate(),23) $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $select4i = DB::connection($this->db)->select($sql4i);
+
+            $sql5i = "select a.kode_lokasi,count(a.no_aju) as jml,sum(datediff(day,a.tanggal,b.tanggal)) as jml_hari
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun'  $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $select5i = DB::connection($this->db)->select($sql5i);
 
             $success['status'] = true;
             $success['message'] = "Success!";
@@ -105,19 +149,31 @@ class DashboardPBHController extends Controller
                 'ver_dok' => [
                     'nilai' => count($select) > 0 ? $select[0]->nilai : 0,
                     'jml' => count($select) > 0 ? $select[0]->jml : 0,
+                    'hari_ini' => count($selecti) > 0 ? $selecti[0]->jml : 0,
+                    'jml_hari' => count($select) > 0 ? ($select[0]->jml_hari <> 0 ? round(($select[0]->jml/$select[0]->jml_hari),0) : 0) : 0,
                 ],
                 'ver_akun' => [
                     'nilai' => count($select2) > 0 ? $select2[0]->nilai : 0,
                     'jml' => count($select2) > 0 ? $select2[0]->jml : 0,
+                    'hari_ini' => count($select2i) > 0 ? $select2i[0]->jml : 0,
+                    'jml_hari' => count($select2) > 0 ? ($select2[0]->jml_hari <> 0 ? round(($select2[0]->jml/$select2[0]->jml_hari),0) : 0) : 0,
                 ],
                 'spb' => [
                     'nilai' => count($select3) > 0 ? $select3[0]->nilai : 0,
                     'jml' => count($select3) > 0 ? $select3[0]->jml : 0,
+                    'hari_ini' => count($select3i) > 0 ? $select3i[0]->jml : 0,
+                    'jml_hari' => count($select3) > 0 ? ($select3[0]->jml_hari <> 0 ? round(($select3[0]->jml/$select3[0]->jml_hari),0) : 0) : 0,
                 ],
                 'spb_bayar' => [
                     'nilai' => count($select4) > 0 ? $select4[0]->nilai : 0,
                     'jml' => count($select4) > 0 ? $select4[0]->jml : 0,
+                    'hari_ini' => count($select4i) > 0 ? $select4i[0]->jml : 0,
+                    'jml_hari' => count($select4) > 0 ? ($select4[0]->jml_hari <> 0 ? round(($select4[0]->jml/$select4[0]->jml_hari),0) : 0) : 0,
                 ],
+                'rata_rata' => [
+                    'jml' => count($select5i) > 0 ? $select5i[0]->jml : 0,
+                    'jml_hari' => count($select5i) > 0 ? ($select5i[0]->jml_hari <> 0 ? ($select5i[0]->jml/$select5i[0]->jml_hari) : 0) : 0,
+                ]
             ];
 
             return response()->json($success, $this->successStatus); 
