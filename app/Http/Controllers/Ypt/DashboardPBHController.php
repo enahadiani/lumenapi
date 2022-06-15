@@ -135,13 +135,28 @@ class DashboardPBHController extends Controller
             group by a.kode_lokasi ";
             $select4i = DB::connection($this->db)->select($sql4i);
 
-            $sql5i = "select a.kode_lokasi,count(a.no_aju) as jml,sum(datediff(day,a.tanggal,b.tanggal)) as jml_hari
+            $sql5 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml,sum(datediff(day,a.tanggal,b.tanggal)) as jml_hari
             from it_aju_m a
             inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun'  $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $select5 = DB::connection($this->db)->select($sql5);
+
+            $sql5i = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.tanggal=CONVERT(varchar,getdate(),23) $filter_pp $filter_bidang
             group by a.kode_lokasi ";
             $select5i = DB::connection($this->db)->select($sql5i);
+
+            $sql6 = "select a.kode_lokasi,count(a.no_aju) as jml
+            from it_aju_m a
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' and progress='R' $filter_pp $filter_bidang
+            group by a.kode_lokasi ";
+            $select6 = DB::connection($this->db)->select($sql6);
 
             $success['status'] = true;
             $success['message'] = "Success!";
@@ -170,9 +185,14 @@ class DashboardPBHController extends Controller
                     'hari_ini' => count($select4i) > 0 ? $select4i[0]->jml : 0,
                     'jml_hari' => count($select4) > 0 ? ($select4[0]->jml_hari <> 0 ? round(($select4[0]->jml/$select4[0]->jml_hari),0) : 0) : 0,
                 ],
-                'rata_rata' => [
-                    'jml' => count($select5i) > 0 ? $select5i[0]->jml : 0,
-                    'jml_hari' => count($select5i) > 0 ? ($select5i[0]->jml_hari <> 0 ? ($select5i[0]->jml/$select5i[0]->jml_hari) : 0) : 0,
+                'aju' => [
+                    'nilai' => count($select5) > 0 ? $select5[0]->nilai : 0,
+                    'jml' => count($select5) > 0 ? $select5[0]->jml : 0,
+                    'hari_ini' => count($select5i) > 0 ? $select5i[0]->jml : 0,
+                    'jml_hari' => count($select5) > 0 ? ($select5[0]->jml_hari <> 0 ? ($select5[0]->jml/$select5[0]->jml_hari) : 0) : 0,
+                ],
+                'revisi' => [
+                    'jml' => count($select6) > 0 ? $select6[0]->jml : 0
                 ]
             ];
 
@@ -510,6 +530,46 @@ class DashboardPBHController extends Controller
             }
 
             $res = DB::connection($this->db)->select("select kode_pp,nama from pp where kode_lokasi='".$kode_lokasi."' $filter
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getPPKaryawan(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            if(isset($request->kode_bidang) && $request->kode_bidang != ""){
+                $filter = " and a.kode_bidang = '$request->kode_bidang' ";
+            }else{
+                $filter = "";
+            }
+
+            $res = DB::connection($this->db)->select("select a.kode_pp,a.nama from pp a
+            inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
+            where a.kode_lokasi='".$kode_lokasi."' $filter
             ");
             $res = json_decode(json_encode($res),true);
             
