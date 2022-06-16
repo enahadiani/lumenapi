@@ -112,7 +112,7 @@ class DashboardPBHController extends Controller
             $sql3i = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
             from it_aju_m a
             inner join it_spb_m b on a.no_spb=b.no_spb and a.kode_lokasi=b.kode_lokasi
-            inner join pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and b.tanggal=CONVERT(varchar,getdate(),23) $filter_pp $filter_bidang
             group by a.kode_lokasi ";
             $select3i = DB::connection($this->db)->select($sql3i);
