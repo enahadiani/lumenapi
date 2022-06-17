@@ -139,7 +139,7 @@ class RAB21Controller extends Controller
                 $filter .= "";
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_proyek,a.nama,a.nilai_or - isnull(c.beban,0) as saldo_or 
+            $res = DB::connection($this->db)->select("select a.kode_proyek,a.nama,a.nilai_or - isnull(c.beban,0) as saldo_or, a.nilai as nilai_kontrak 
             from prb_proyek a 			             
                inner join prb_proyek_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 			            						 
                left join ( 			             
