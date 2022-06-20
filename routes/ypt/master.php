@@ -44,6 +44,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->post('form','Ypt\FormController@store');
     $router->put('form','Ypt\FormController@update');
     $router->delete('form','Ypt\FormController@destroy');
+    $router->get('tes-multi-db','Ypt\FormController@tesMultiDB');
+    $router->get('tes-multi-db2','Ypt\FormController@tesMultiDB2');
 
     //Karyawan
     $router->get('karyawan','Ypt\KaryawanController@index');
