@@ -32,8 +32,9 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('setting-grafik-neraca','Ypt\SettingGrafikController@getNeraca');    
     $router->get('setting-grafik-klp','Ypt\SettingGrafikController@getKlp');
     
-
-   
+    $router->get('hash-pass-menu-lokasi','Ypt\HashPasswordController@getLokasi');
+    $router->get('hash-pass-menu','Ypt\HashPasswordController@index');
+    $router->get('hash-pass-menu-batch','Ypt\HashPasswordController@getBatch');
    
 
 });
