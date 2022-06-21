@@ -137,14 +137,26 @@ class FilterController extends Controller
         
     }
 
-    function getFilterPp(){
+    function getFilterBidang(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
-            $sql="select kode_pp,nama from pp where kode_lokasi='$kode_lokasi' ";
+            if($status_admin == "A"){
+
+                $sql="select a.kode_bidang, a.nama from bidang a where a.kode_lokasi='$kode_lokasi' ";
+
+            }else{
+                $sql = "select a.kode_bidang,c.nama 
+                from pp a
+                inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik'
+                inner join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' 
+                ";
+            }
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -162,6 +174,51 @@ class FilterController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    function getFilterPp(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
+            }
+            if(isset($request->kode_bidang) && $request->kode_bidang != ""){
+                $filter = " and a.kode_bidang = '$request->kode_bidang' ";
+            }else{
+                $filter = "";
+            }
+            if($status_admin == "A"){
+                $sql="select a.kode_pp,a.nama from pp a where a.kode_lokasi='$kode_lokasi' $filter ";
+            }else{
+                $sql="select a.kode_pp,a.nama from pp a
+                inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik'
+                where a.kode_lokasi='".$kode_lokasi."' $filter ";
+            }
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -517,6 +574,34 @@ class FilterController extends Controller
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
+    }
+
+    function getFilterDefaultLabaRugiAgg(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = "-";
+
+            $sql="select max(periode) as periode from periode where kode_lokasi='".$kode_lokasi."' ";
+            $res = DB::connection($this->db)->select($sql);
+            if(count($res) > 0){
+                $periode = $res[0]->periode;
+            }
+
+            $success['status'] = true;
+            $success['periode'] = $periode;
+            $success['message'] = "Success!";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
     }
 
 

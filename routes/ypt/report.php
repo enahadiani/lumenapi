@@ -28,6 +28,8 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('filter-bukti-jurnal','Ypt\FilterController@getFilterBuktiJurnal');
     $router->get('filter-mutasi','Ypt\FilterController@getFilterYaTidak');
     $router->get('filter-pp','Ypt\FilterController@getFilterPp');
+    $router->get('filter-bidang','Ypt\FilterController@getFilterBidang');
+    $router->get('filter-default-labarugi-agg','Ypt\FilterController@getFilterDefaultLabaRugiAgg');
     $router->get('filter-rektor','Ypt\FilterController@getFilterRektor');
     $router->get('filter-fakultas','Ypt\FilterController@getFilterFakultas');
     $router->get('filter-prodi','Ypt\FilterController@getFilterProdi');
