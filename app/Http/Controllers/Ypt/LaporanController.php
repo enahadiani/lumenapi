@@ -2599,8 +2599,11 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->db)->getPdo()->exec($sql);
+            // $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            // $res = DB::connection($this->db)->getPdo()->exec($sql);
+            $dbh = DB::connection($this->db)->getPdo();
+            $sth = $dbh->prepare("SET NOCOUNT ON; EXEC sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ");
+            $sth->execute();
             
             // $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n4 as n1,n5 as n2,rowindex 
             //     from exs_neraca 
@@ -2758,8 +2761,11 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            $sql="exec sp_neraca2_gar_dw '$kode_fs','N','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
-            $res = DB::connection($this->db)->getPdo()->exec($sql);
+            // $sql="exec sp_neraca2_gar_dw '$kode_fs','N','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            // $res = DB::connection($this->db)->getPdo()->exec($sql);
+            $dbh = DB::connection($this->db)->getPdo();
+            $sth = $dbh->prepare("SET NOCOUNT ON; EXEC sp_neraca2_gar_dw '$kode_fs','N','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ");
+            $sth->execute();
             
             $sql2="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
                     case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
